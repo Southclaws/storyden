@@ -18,7 +18,7 @@ export function MemberList({ profiles }: Props) {
   return (
     <>
       {/* Desktop Table View */}
-      <Box display={{ base: "none", lg: "block" }}>
+      <Box w="full" display={{ base: "none", lg: "block" }}>
         <Table.Root size="sm">
           <Table.Head>
             <Table.Row>
