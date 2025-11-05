@@ -124,6 +124,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 			if err := client.Schema.Create(
 				ctx,
 				schema.WithDropIndex(true),
+				schema.WithDropColumn(true),
 				schema.WithApplyHook(populateLastReplyAt()),
 			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
