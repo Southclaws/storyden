@@ -260,12 +260,8 @@ body *::-webkit-scrollbar-thumb {
 
   Every recipe/style that uses backdrop filter must be also manually set here.
  */
-.bkdp-blur_frosted,
-.menu__content {
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-}
-
+.menu__content,
+.button--variant_subtle,
 .bkdp_auto {
   -webkit-backdrop-filter: var(--backdrop-blur,) var(--backdrop-brightness,)
     var(--backdrop-contrast,) var(--backdrop-grayscale,)
