@@ -265,3 +265,14 @@ body *::-webkit-scrollbar-thumb {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
+
+.bkdp_auto {
+  -webkit-backdrop-filter: var(--backdrop-blur,) var(--backdrop-brightness,)
+    var(--backdrop-contrast,) var(--backdrop-grayscale,)
+    var(--backdrop-hue-rotate,) var(--backdrop-invert,) var(--backdrop-opacity,)
+    var(--backdrop-saturate,) var(--backdrop-sepia,);
+  backdrop-filter: var(--backdrop-blur,) var(--backdrop-brightness,)
+    var(--backdrop-contrast,) var(--backdrop-grayscale,)
+    var(--backdrop-hue-rotate,) var(--backdrop-invert,) var(--backdrop-opacity,)
+    var(--backdrop-saturate,) var(--backdrop-sepia,);
+}
