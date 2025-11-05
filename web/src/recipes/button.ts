@@ -126,7 +126,7 @@ export const button = defineRecipe({
       },
       subtle: {
         colorPalette: "accent",
-        background: "bg.muted",
+        background: "bg.muted/80",
         color: "fg.subtle",
         backdropBlur: "sm",
         backdropFilter: "auto",
