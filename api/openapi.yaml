@@ -3477,6 +3477,7 @@ components:
 
     NodeUpdateOK:
       description: Node updated.
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema:
