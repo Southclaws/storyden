@@ -271,7 +271,6 @@ function GridCard({
           position="absolute"
           top="2"
           right="2"
-          zIndex="overlay"
           {...listeners}
           {...attributes}
         >
@@ -295,8 +294,6 @@ function GridCard({
                   width="5"
                   height="5"
                   padding="0"
-                  color="fg.muted"
-                  bg="bg.default"
                   onClick={handleMenuToggle}
                 >
                   <DragHandleIcon width="4" />
