@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import { ThreadListResult } from "@/api/openapi-schema";
+import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
 import { CategoryTree } from "@/lib/category/tree";
@@ -20,6 +20,7 @@ export type Props = {
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
   paginationBasePath: string;
+  initialSession?: Account;
 };
 
 export function CategoryIndex({
@@ -30,6 +31,7 @@ export function CategoryIndex({
   initialThreadList,
   initialThreadListPage,
   paginationBasePath,
+  initialSession,
 }: Props) {
   const categoryCount = categories.length;
 
@@ -84,6 +86,7 @@ export function CategoryIndex({
         initialThreadList={initialThreadList}
         initialPage={initialThreadListPage}
         paginationBasePath={paginationBasePath}
+        initialSession={initialSession}
       />
     </LStack>
   );
@@ -95,12 +98,14 @@ function ThreadListSection({
   initialThreadList,
   initialPage,
   paginationBasePath,
+  initialSession,
 }: {
   mode: "none" | "all" | "uncategorised";
   showQuickShare: boolean;
   initialThreadList?: ThreadListResult;
   initialPage?: number;
   paginationBasePath: string;
+  initialSession?: Account;
 }) {
   if (mode === "none") {
     return null;
@@ -131,6 +136,7 @@ function ThreadListSection({
         paginationBasePath={paginationBasePath}
         showCategorySelect={showCategorySelect}
         showQuickShare={showQuickShare}
+        initialSession={initialSession}
       />
     </LStack>
   );

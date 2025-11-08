@@ -2,11 +2,12 @@
 
 import { Unready } from "src/components/site/Unready";
 
+import { Account } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
 import { ThreadReferenceCard } from "@/components/post/ThreadCard";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { LStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -20,12 +21,14 @@ export function ThreadFeedScreen({
   showCategorySelect,
   hideCategoryBadge = false,
   showQuickShare = true,
+  initialSession,
 }: Props & {
   showCategorySelect: boolean;
   hideCategoryBadge?: boolean;
   showQuickShare?: boolean;
+  initialSession?: Account;
 }) {
-  const { session } = useSettingsContext();
+  const session = useSession(initialSession);
 
   return (
     <LStack>

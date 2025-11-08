@@ -1,7 +1,11 @@
 "use client";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-import { CategoryListOKResponse, ThreadListResult } from "@/api/openapi-schema";
+import {
+  Account,
+  CategoryListOKResponse,
+  ThreadListResult,
+} from "@/api/openapi-schema";
 import { CategoryIndex } from "@/components/category/CategoryIndex/CategoryIndex";
 import { Unready } from "@/components/site/Unready";
 import { buildCategoryTree } from "@/lib/category/tree";
@@ -14,6 +18,7 @@ export type Props = {
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
   paginationBasePath: string;
+  initialSession?: Account;
 };
 
 export function useCategoryIndexScreen({ initialCategoryList }: Props) {
@@ -54,6 +59,7 @@ export function CategoryIndexScreen(props: Props) {
       initialThreadList={props.initialThreadList}
       initialThreadListPage={props.initialThreadListPage}
       paginationBasePath={props.paginationBasePath}
+      initialSession={props.initialSession}
     />
   );
 }

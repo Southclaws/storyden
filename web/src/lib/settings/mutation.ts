@@ -2,9 +2,11 @@
 
 import { Arguments, useSWRConfig } from "swr";
 
+import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import { AdminSettingsMutableProps, Info } from "@/api/openapi-schema";
+import { FeedConfig } from "@/lib/settings/feed";
 
 export function useSettingsMutation(initialValue: Info) {
   const { mutate } = useSWRConfig();
@@ -27,8 +29,34 @@ export function useSettingsMutation(initialValue: Info) {
     await adminSettingsUpdate(data);
   }
 
+  async function updateFeed(data: FeedConfig) {
+    await handle(
+      async () => {
+        const newData = { ...initialValue, ...data } satisfies Info;
+
+        await mutate(keyFilterFn, newData, { revalidate: false });
+
+        await updateSettings({
+          metadata: {
+            feed: data,
+          },
+        });
+      },
+      {
+        promiseToast: {
+          loading: "Updating feed configuration...",
+          success: "Updated!",
+        },
+        async cleanup() {
+          await mutate(keyFilterFn);
+        },
+      },
+    );
+  }
+
   return {
     updateSettings,
+    updateFeed,
     revalidate,
   };
 }
