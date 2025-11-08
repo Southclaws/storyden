@@ -223,6 +223,3 @@ If you encounter issues:
 2. Search [existing issues](https://github.com/Southclaws/storyden/issues)
 3. Open a new issue with details about your environment and the problem
 
----
-
-**Source:** Based on [Storyden Local Development Guide](https://www.storyden.org/docs/introduction/local-dev)
