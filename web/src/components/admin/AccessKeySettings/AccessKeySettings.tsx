@@ -42,12 +42,15 @@ export function AccessKeySettings({ keys }: Props) {
     <CardBox className={lstack()}>
       <Heading size="md">Access keys</Heading>
       <p>All access keys created by members of this site.</p>
-      <p>
-        <WarningIcon display="inline" /> <strong>Note:</strong> if you revoke
-        the ability to use access keys from a role or member (by removing the{" "}
-        {<PermissionBadge permission={Permission.USE_PERSONAL_ACCESS_KEYS} />}{" "}
-        permission), this will not revoke their existing access keys.
-      </p>
+      <div>
+        <span>
+          <WarningIcon display="inline" width="4" /> <strong>Note:</strong> if
+          you revoke the ability to use access keys from a role or member (by
+          removing the{" "}
+          {<PermissionBadge permission={Permission.USE_PERSONAL_ACCESS_KEYS} />}{" "}
+          permission), this will not revoke their existing access keys.
+        </span>
+      </div>
 
       <WStack alignItems="center" color="fg.muted">
         {hasInactive ? (
