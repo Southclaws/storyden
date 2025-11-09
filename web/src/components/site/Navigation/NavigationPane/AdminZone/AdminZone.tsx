@@ -11,7 +11,9 @@ import { useSWRConfig } from "swr";
 import { Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
 import { InfoTip } from "@/components/site/InfoTip";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { useSiteEditing } from "@/lib/site-editing/useSiteEditing";
+import { useSettings } from "@/lib/settings/settings-client";
+import { useSettingsMutation } from "@/lib/settings/mutation";
 import * as Checkbox from "@/components/ui/checkbox";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
@@ -40,8 +42,8 @@ const editableRoute: Record<Route["name"], boolean> = {
 };
 
 export function AdminZone() {
-  const { isEditingEnabled, isEditing, handleToggleEditing } =
-    useSettingsContext();
+  const { isEditingEnabled, isEditingFeed, toggleFeedEditing } =
+    useSiteEditing();
 
   const route = useRoute();
   const isRouteEditable = route && editableRoute[route.name];
@@ -64,20 +66,20 @@ export function AdminZone() {
           <AdminIcon w="4" />
           <AnimatePresence mode="wait">
             <MotionSpan
-              key={isEditing ? "configure-feed" : "admin"}
+              key={isEditingFeed ? "configure-feed" : "admin"}
               initial={{ opacity: 0, y: 2 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -2 }}
               transition={{ duration: 0.15 }}
             >
-              {isEditing && route ? `Editing ${route.label}` : "Admin"}
+              {isEditingFeed && route ? `Editing ${route.label}` : "Admin"}
             </MotionSpan>
           </AnimatePresence>
         </HStack>
 
         <HStack gap="1">
           {isRouteEditable && (
-            <IconButton size="xs" variant="ghost" onClick={handleToggleEditing}>
+            <IconButton size="xs" variant="ghost" onClick={toggleFeedEditing}>
               <EditIcon w="4" />
             </IconButton>
           )}
@@ -85,7 +87,7 @@ export function AdminZone() {
       </HStack>
 
       <AnimatePresence initial={false}>
-        {isEditing && (
+        {isEditingFeed && (
           <MotionBox
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -145,12 +147,15 @@ const layouts = [
 ];
 
 export function FeedConfig() {
-  const { isEditingEnabled, isEditing, feed, updateFeed, handleToggleEditing } =
-    useSettingsContext();
+  const { isEditingEnabled } = useSiteEditing();
+  const { settings } = useSettings();
+  const { updateFeed } = useSettingsMutation(settings!);
 
-  if (!isEditingEnabled) {
+  if (!isEditingEnabled || !settings) {
     return null;
   }
+
+  const feed = settings.metadata.feed;
 
   const sourceCollection = createListCollection({ items: sources });
   const layoutCollection = createListCollection({ items: layouts });
@@ -298,7 +303,13 @@ export function FeedConfig() {
 }
 
 function SourceConfig() {
-  const { feed } = useSettingsContext();
+  const { settings } = useSettings();
+
+  if (!settings) {
+    return null;
+  }
+
+  const feed = settings.metadata.feed;
 
   switch (feed.source.type) {
     case "threads":
@@ -313,7 +324,14 @@ function SourceConfig() {
 }
 
 function SourceThreadsConfig() {
-  const { feed, updateFeed } = useSettingsContext();
+  const { settings } = useSettings();
+  const { updateFeed } = useSettingsMutation(settings!);
+
+  if (!settings) {
+    return null;
+  }
+
+  const feed = settings.metadata.feed;
 
   if (feed.source.type !== "threads") {
     return null;
@@ -362,7 +380,14 @@ function SourceThreadsConfig() {
 }
 
 function SourceLibraryConfig() {
-  const { feed, updateFeed } = useSettingsContext();
+  const { settings } = useSettings();
+  const { updateFeed } = useSettingsMutation(settings!);
+
+  if (!settings) {
+    return null;
+  }
+
+  const feed = settings.metadata.feed;
 
   if (feed.source.type !== "library") {
     return null;
@@ -417,8 +442,15 @@ const threadListModes = [
 ];
 
 function SourceCategoriesConfig() {
-  const { feed, updateFeed } = useSettingsContext();
+  const { settings } = useSettings();
+  const { updateFeed } = useSettingsMutation(settings!);
   const { mutate } = useSWRConfig();
+
+  if (!settings) {
+    return null;
+  }
+
+  const feed = settings.metadata.feed;
 
   if (feed.source.type !== "categories") {
     return null;

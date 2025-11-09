@@ -6,26 +6,41 @@ import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
 import { NodeListResult } from "@/api/openapi-schema";
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { FeedConfig } from "@/lib/settings/feed";
+import { Settings } from "@/lib/settings/settings";
+import { useSettings } from "@/lib/settings/settings-client";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 export type Props = {
   initialData?: NodeListResult;
+  initialSettings: Settings;
 };
 
-export function LibraryFeedScreen({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+export function LibraryFeedScreen({ initialData, initialSettings }: Props) {
+  const { settings } = useSettings(initialSettings);
+  const feed = settings?.metadata.feed ?? initialSettings.metadata.feed;
+
   if (feed.source.type !== "library") {
     return null;
   }
 
   if (feed.source.node) {
     return (
-      <LibraryFeedNode initialData={initialData} nodeID={feed.source.node} />
+      <LibraryFeedNode
+        initialSettings={initialSettings}
+        initialData={initialData}
+        nodeID={feed.source.node}
+      />
     );
   }
 
-  return <LibraryFeedRoot initialData={initialData} />;
+  return (
+    <LibraryFeedRoot
+      initialSettings={initialSettings}
+      initialData={initialData}
+      feed={feed}
+    />
+  );
 }
 
 function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
@@ -48,8 +63,7 @@ function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
   );
 }
 
-function LibraryFeedRoot({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+function LibraryFeedRoot({ initialData, feed }: Props & { feed: FeedConfig }) {
   const { data, error } = useNodeList(
     {
       //
