@@ -1,27 +1,18 @@
-import { getServerSession } from "@/auth/server-session";
-import { hasCapability } from "@/lib/settings/capabilities";
-import { getSettings } from "@/lib/settings/settings-server";
+import { Suspense } from "react";
+
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
 import styles from "./navigation.module.css";
 
-import { AskAnchor } from "./Anchors/Ask";
+import { AskServer } from "./Anchors/AskServer";
 import { SearchAnchor } from "./Anchors/Search";
-import { MemberActions } from "./MemberActions";
-import { SidebarToggle } from "./NavigationPane/SidebarToggle";
-import { getServerSidebarState } from "./NavigationPane/server";
+import { MemberActionsServer } from "./MemberActionsServer";
+import { SidebarToggleServer } from "./NavigationPane/SidebarToggleServer";
 import { Title } from "./Title";
 
-export async function DesktopCommandBar() {
-  const { title, capabilities } = await getSettings();
-  const initialSidebarState = await getServerSidebarState();
-
-  const session = await getServerSession();
-
-  const isSemdexEnabled = hasCapability("semdex", capabilities);
-
+export function DesktopCommandBar() {
   return (
     <HStack
       className={cx(Floating(), styles["topbar"])}
@@ -31,17 +22,25 @@ export async function DesktopCommandBar() {
       px="1"
     >
       <HStack className={styles["topbar-left"]}>
-        <SidebarToggle initialValue={initialSidebarState} />
+        <Suspense>
+          <SidebarToggleServer />
+        </Suspense>
         <SearchAnchor />
-        {isSemdexEnabled && <AskAnchor />}
+        <Suspense>
+          <AskServer />
+        </Suspense>
       </HStack>
 
       <HStack className={styles["topbar-middle"]} justify="space-around">
-        <Title>{title}</Title>
+        <Suspense>
+          <Title />
+        </Suspense>
       </HStack>
 
       <HStack className={styles["topbar-right"]}>
-        <MemberActions session={session} />
+        <Suspense>
+          <MemberActionsServer />
+        </Suspense>
       </HStack>
     </HStack>
   );

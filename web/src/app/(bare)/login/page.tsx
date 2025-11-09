@@ -1,30 +1,16 @@
-import { redirect } from "next/navigation";
-import { LoginScreen } from "src/screens/auth/LoginScreen/LoginScreen";
+import { Suspense } from "react";
 
-import { getServerSession } from "@/auth/server-session";
-import { OAuthProviderList } from "@/components/auth/OAuthProviderList";
-import { UnreadyBanner } from "@/components/site/Unready";
-import { getProviders } from "@/lib/auth/providers";
+import { Unready } from "@/components/site/Unready";
 import { getSettings } from "@/lib/settings/settings-server";
 
-export default async function Page() {
-  const session = await getServerSession();
-  if (session) {
-    redirect("/");
-  }
+import { LoginPage } from "./LoginPage";
 
-  try {
-    const { oauth } = await getProviders();
-
-    return (
-      <>
-        <LoginScreen />
-        <OAuthProviderList providers={oauth} />
-      </>
-    );
-  } catch (error) {
-    return <UnreadyBanner error={error} />;
-  }
+export default function Page() {
+  return (
+    <Suspense fallback={<Unready />}>
+      <LoginPage />
+    </Suspense>
+  );
 }
 
 export async function generateMetadata() {

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, Suspense } from "react";
 
 import { Box } from "@/styled-system/jsx";
 
@@ -9,8 +9,8 @@ import styles from "./navigation.module.css";
 import { ContextPane } from "./ContextPane";
 import { DesktopCommandBar } from "./DesktopCommandBar";
 import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
+import { NavigationContainer } from "./NavigationContainer";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
-import { getServerSidebarState } from "./NavigationPane/server";
 
 type Props = {
   contextpane: React.ReactNode;
@@ -20,15 +20,42 @@ export async function Navigation({
   contextpane,
   children,
 }: PropsWithChildren<Props>) {
-  const showLeftBar = await getServerSidebarState();
-
   return (
-    <Box
-      id="navigation__container"
-      className={styles["navigation__container"]}
-      w="full"
-      data-leftbar-shown={showLeftBar}
+    <Suspense
+      fallback={
+        <Box
+          id="navigation__container"
+          className={styles["navigation__container"]}
+          w="full"
+          data-leftbar-shown="false"
+        >
+          <NavigationContent contextpane={contextpane}>
+            {children}
+          </NavigationContent>
+        </Box>
+      }
     >
+      <NavigationContainer>
+        <NavigationContent contextpane={contextpane}>
+          {children}
+        </NavigationContent>
+      </NavigationContainer>
+    </Suspense>
+  );
+}
+
+type NavigationContentProps = {
+  contextpane: React.ReactNode;
+  sidebarShown?: string;
+};
+
+async function NavigationContent({
+  contextpane,
+  children,
+  sidebarShown,
+}: PropsWithChildren<NavigationContentProps>) {
+  return (
+    <>
       <Box id="navigation__scroll" className={styles["navgrid"]}>
         <Box className={styles["main"]}>
           {/*  */}
@@ -59,9 +86,11 @@ export async function Navigation({
         </Box>
 
         <Box className={styles["navpill"]}>
-          <MobileCommandBar />
+          <Suspense>
+            <MobileCommandBar />
+          </Suspense>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }

@@ -1,6 +1,8 @@
-import { getServerSession } from "@/auth/server-session";
-import { UnreadyBanner } from "@/components/site/Unready";
-import { EmailVerificationScreen } from "@/screens/auth/EmailVerificationScreen/EmailVerificationScreen";
+import { Suspense } from "react";
+
+import { Unready } from "@/components/site/Unready";
+
+import { EmailVerifyPage } from "./EmailVerifyPage";
 
 type Props = {
   searchParams: Promise<{
@@ -8,19 +10,10 @@ type Props = {
   }>;
 };
 
-export default async function Page(props: Props) {
-  try {
-    const searchParams = await props.searchParams;
-
-    const account = await getServerSession();
-
-    return (
-      <EmailVerificationScreen
-        initialAccount={account}
-        returnURL={searchParams.returnURL}
-      />
-    );
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
-  }
+export default function Page(props: Props) {
+  return (
+    <Suspense fallback={<Unready />}>
+      <EmailVerifyPage {...props} />
+    </Suspense>
+  );
 }

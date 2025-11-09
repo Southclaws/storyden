@@ -6,6 +6,8 @@ import { RequestError } from "@/api/common";
 import { accountGet } from "@/api/openapi-server/accounts";
 
 export async function getServerSession() {
+  "use cache: private";
+
   const session = (await cookies()).get("storyden-session");
 
   if (!session) return;

@@ -1,13 +1,9 @@
-import { includes } from "lodash/fp";
-
 import {
   InstanceCapability,
   InstanceCapabilityList,
 } from "@/api/openapi-schema";
 
 import { useSettings } from "./settings-client";
-
-const findCapability = (cap: InstanceCapability) => includes(cap);
 
 export function useCapabilities() {
   const { settings } = useSettings();
@@ -26,7 +22,5 @@ export function hasCapability(
   cs?: InstanceCapabilityList,
 ) {
   const capabilities = cs ?? [];
-  const found = findCapability(cap)(capabilities);
-
-  return Boolean(found);
+  return capabilities.includes(cap);
 }

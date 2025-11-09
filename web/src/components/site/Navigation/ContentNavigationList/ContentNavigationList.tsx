@@ -1,23 +1,14 @@
-"use client";
+import { Suspense } from "react";
 
-import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
-import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { LStack, styled } from "@/styled-system/jsx";
 
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
-import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
-import { useNavigation } from "../useNavigation";
+import { CategoryListServer } from "@/components/category/CategoryList/CategoryListServer";
+import { LibraryNavigationTreeServer } from "../LibraryNavigationTree/LibraryNavigationTreeServer";
 
-type Props = {
-  initialNodeList?: NodeListResult;
-  initialCategoryList?: CategoryListOKResponse;
-};
-
-export function ContentNavigationList(props: Props) {
-  const { nodeSlug } = useNavigation();
-
+export function ContentNavigationList() {
   return (
     <styled.nav
       display="flex"
@@ -36,12 +27,12 @@ export function ContentNavigationList(props: Props) {
           scrollbarWidth: "none",
         }}
       >
-        <CategoryList initialCategoryList={props.initialCategoryList} />
-        <LibraryNavigationTree
-          initialNodeList={props.initialNodeList}
-          currentNode={nodeSlug}
-          visibility={["draft", "review", "unlisted", "published"]}
-        />
+        <Suspense>
+          <CategoryListServer />
+        </Suspense>
+        <Suspense>
+          <LibraryNavigationTreeServer />
+        </Suspense>
       </LStack>
 
       <LStack gap="1">

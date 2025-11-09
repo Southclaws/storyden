@@ -1,9 +1,7 @@
+import { Suspense } from "react";
 import { z } from "zod";
 
-import { UnreadyBanner } from "src/components/site/Unready";
-
-import { getServerSession } from "@/auth/server-session";
-import { getSettings } from "@/lib/settings/settings-server";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {
@@ -18,21 +16,15 @@ const QuerySchema = z.object({
 });
 type Query = z.infer<typeof QuerySchema>;
 
-export default async function Page({ searchParams }: Props) {
-  try {
-    const session = await getServerSession();
-    const settings = await getSettings();
+export default function Page({ searchParams }: Props) {
+  return (
+    <Suspense fallback={<UnreadyBanner />}>
+      <FeedScreenWrapper searchParams={searchParams} />
+    </Suspense>
+  );
+}
 
-    const { page } = QuerySchema.parse(await searchParams);
-
-    return (
-      <FeedScreen
-        page={page ?? 1}
-        initialSession={session}
-        initialSettings={settings}
-      />
-    );
-  } catch (error) {
-    return <UnreadyBanner error={error} />;
-  }
+async function FeedScreenWrapper({ searchParams }: Props) {
+  const { page } = QuerySchema.parse(await searchParams);
+  return <FeedScreen page={page ?? 1} />;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, Suspense } from "react";
 import { Toaster } from "sonner";
 import { SWRConfig } from "swr";
 
@@ -11,19 +11,21 @@ export function Providers({ children }: PropsWithChildren) {
   const provider = useCacheProvider();
 
   return (
-    <SWRConfig
-      value={{
-        keepPreviousData: true,
-        // provider: provider,
-      }}
-    >
-      <DndProvider>
-        <Toaster />
+    <Suspense fallback={children}>
+      <SWRConfig
+        value={{
+          keepPreviousData: true,
+          // provider: provider,
+        }}
+      >
+        <DndProvider>
+          <Toaster />
 
-        {/* -- */}
-        {children}
-        {/* -- */}
-      </DndProvider>
-    </SWRConfig>
+          {/* -- */}
+          {children}
+          {/* -- */}
+        </DndProvider>
+      </SWRConfig>
+    </Suspense>
   );
 }

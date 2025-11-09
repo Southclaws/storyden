@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { PropsWithChildren } from "react";
 
+import { getSettings } from "@/lib/settings/settings-server";
 import { styled } from "@/styled-system/jsx";
 
-export function Title({ children }: PropsWithChildren) {
+export async function Title() {
+  const { title } = await getSettings();
+
   return (
     <styled.h1
       fontSize="lg"
@@ -12,7 +14,7 @@ export function Title({ children }: PropsWithChildren) {
       overflow="hidden"
       textOverflow="ellipsis"
     >
-      <Link href="/">{children}</Link>
+      <Link href="/">{title}</Link>
     </styled.h1>
   );
 }

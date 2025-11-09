@@ -7,6 +7,7 @@ import { RequestError, buildRequest, buildResult } from "./common";
 
 type Options = RequestInit & {
   method: string;
+  nocookies?: boolean;
 };
 
 // Orval fetch generated code is a bit different to SWR fetcher for some reason.
@@ -17,7 +18,7 @@ type Result<T> = {
 
 export const fetcher = async <T>(
   url: string,
-  { method, ...opts }: Options,
+  { method, nocookies, ...opts }: Options,
 ): Promise<T> => {
   const { headers: requestHeaders, ...requestInit } = opts;
   const headers = Object.fromEntries(new Headers(requestHeaders).entries());
@@ -46,7 +47,9 @@ export const fetcher = async <T>(
     ...requestInit,
   });
 
-  req.headers.set("Cookie", await getCookieHeader());
+  if (!nocookies) {
+    req.headers.set("Cookie", await getCookieHeader());
+  }
 
   const response = await fetch(req);
 

@@ -1,6 +1,8 @@
-import { linkGet } from "@/api/openapi-server/links";
-import { UnreadyBanner } from "@/components/site/Unready";
-import { LinkScreen } from "@/screens/library/links/LinkScreen";
+import { Suspense } from "react";
+
+import { Unready } from "@/components/site/Unready";
+
+import { LinkPage } from "./LinkPage";
 
 type Props = {
   params: Promise<{
@@ -8,14 +10,10 @@ type Props = {
   }>;
 };
 
-export default async function Page(props: Props) {
-  try {
-    const params = await props.params;
-
-    const { data } = await linkGet(params.slug);
-
-    return <LinkScreen initialLink={data} slug={params.slug} />;
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
-  }
+export default function Page(props: Props) {
+  return (
+    <Suspense fallback={<Unready />}>
+      <LinkPage {...props} />
+    </Suspense>
+  );
 }

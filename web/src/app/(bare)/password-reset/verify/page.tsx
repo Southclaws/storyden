@@ -1,7 +1,8 @@
-import { z } from "zod";
+import { Suspense } from "react";
 
-import { UnreadyBanner } from "@/components/site/Unready";
-import { PasswordResetVerifyScreen } from "@/screens/auth/PasswordResetScreen/PasswordResetVerifyScreen";
+import { Unready } from "@/components/site/Unready";
+
+import { PasswordResetVerifyPage } from "./PasswordResetVerifyPage";
 
 type Props = {
   searchParams: Promise<{
@@ -9,24 +10,10 @@ type Props = {
   }>;
 };
 
-const QuerySchema = z.object({
-  token: z.string().optional(),
-});
-
-export default async function Page(props: Props) {
-  try {
-    const searchParams = await props.searchParams;
-
-    const parsed = QuerySchema.parse(searchParams);
-
-    const { token } = parsed;
-
-    if (!token) {
-      return <p>Please check your email for a verification link.</p>;
-    }
-
-    return <PasswordResetVerifyScreen token={token} />;
-  } catch (error) {
-    return <UnreadyBanner error={error} />;
-  }
+export default function Page(props: Props) {
+  return (
+    <Suspense fallback={<Unready />}>
+      <PasswordResetVerifyPage {...props} />
+    </Suspense>
+  );
 }
