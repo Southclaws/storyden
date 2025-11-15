@@ -70,7 +70,15 @@ export async function markdownToHTML(markdown: string): Promise<string> {
       if (node.tagName === "A") {
         const href = node.getAttribute("href");
         if (href && /^https?:\/\//i.test(href)) {
+          node.setAttribute("target", "_blank");
           node.setAttribute("rel", "noopener noreferrer");
+        }
+      }
+
+      if (node.tagName === "IMG") {
+        const src = node.getAttribute("src");
+        if (src && !/^(https?:\/\/|\/)/i.test(src)) {
+          node.removeAttribute("src");
         }
       }
     });
