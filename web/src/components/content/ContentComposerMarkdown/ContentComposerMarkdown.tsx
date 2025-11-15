@@ -52,22 +52,8 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
-    const parent = textarea.parentElement;
-    if (!parent) return;
-
-    const resizeObserver = new ResizeObserver(() => {
-      textarea.style.height = "0px";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    });
-
-    resizeObserver.observe(parent);
-
-    textarea.style.height = "0px";
+    textarea.style.height = "auto";
     textarea.style.height = `${textarea.scrollHeight}px`;
-
-    return () => {
-      resizeObserver.disconnect();
-    };
   }, [value, props.disabled]);
 
   async function onChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
