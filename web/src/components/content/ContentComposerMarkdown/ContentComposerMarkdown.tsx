@@ -244,14 +244,14 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
 
   if (props.disabled) {
     return (
-      <LStack position="relative" minHeight="8" flex="1">
+      <LStack position="relative" minHeight="8" maxHeight="fit">
         <Markdown className="typography">{value}</Markdown>
       </LStack>
     );
   }
 
   return (
-    <LStack position="relative" minHeight="8" flex="1">
+    <LStack position="relative" minHeight="8" maxHeight="fit">
       <EditorTools
         showPreview={showPreview}
         onChange={handleTogglePreview}
