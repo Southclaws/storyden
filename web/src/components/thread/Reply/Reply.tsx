@@ -1,7 +1,6 @@
 import { Controller, ControllerProps } from "react-hook-form";
 
-import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
-
+import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
 import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";

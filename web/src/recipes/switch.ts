@@ -13,7 +13,7 @@ export const switchRecipe = defineSlotRecipe({
     },
     control: {
       alignItems: "center",
-      background: "bg.emphasized",
+      background: "bg.muted",
       borderRadius: "full",
       cursor: "pointer",
       display: "inline-flex",
@@ -22,7 +22,7 @@ export const switchRecipe = defineSlotRecipe({
       transitionProperty: "background",
       transitionTimingFunction: "default",
       _checked: {
-        background: "colorPalette.default",
+        background: "bg.emphasized",
       },
     },
     label: {
@@ -38,7 +38,7 @@ export const switchRecipe = defineSlotRecipe({
       transitionTimingFunction: "default",
       _checked: {
         transform: "translateX(100%)",
-        background: { _osLight: "bg.default", _osDark: "colorPalette.fg" },
+        background: "fg.muted",
       },
     },
   },

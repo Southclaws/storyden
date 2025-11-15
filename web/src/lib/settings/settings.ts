@@ -3,10 +3,16 @@ import { z } from "zod";
 import { AuthMode, Info } from "@/api/openapi-schema";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
+import { EditorSettingsSchema } from "./editor";
 import { DefaultFeedConfig, FeedConfigSchema } from "./feed";
+
+export const DefaultEditorSettings = {
+  mode: "richtext" as const,
+} as const;
 
 export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
+  editor: DefaultEditorSettings,
 } as const;
 
 export const DefaultSettings = {
@@ -25,6 +31,7 @@ export const DefaultSettings = {
 export const FrontendConfigurationSchema = z
   .object({
     feed: FeedConfigSchema,
+    editor: EditorSettingsSchema.default(DefaultEditorSettings),
   })
   .default(DefaultFrontendConfig);
 export type FrontendConfiguration = z.infer<typeof FrontendConfigurationSchema>;

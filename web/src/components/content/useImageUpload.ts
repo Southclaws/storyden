@@ -28,3 +28,17 @@ export function isSupportedImage(mime: string): boolean {
       return false;
   }
 }
+
+export function hasImageFile(items: DataTransferItemList | DataTransferItem[]): boolean {
+  const itemArray = Array.from(items);
+  return itemArray.some((item) => {
+    if ("kind" in item && item.kind !== "file") {
+      return false;
+    }
+    return item.type.startsWith("image/");
+  });
+}
+
+export function getImageFiles(files: FileList | File[]): File[] {
+  return Array.from(files).filter((file) => isSupportedImage(file.type));
+}
