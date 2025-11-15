@@ -49,7 +49,8 @@ export function MemberInterfaceSettings(props: Props) {
             ]}
           />
           <FormHelperText>
-            Choose your preferred editor style for composing posts and replies.
+            Choose your preferred editor style for composing threads, replies
+            and pages.
           </FormHelperText>
         </FormControl>
       </CardBox>

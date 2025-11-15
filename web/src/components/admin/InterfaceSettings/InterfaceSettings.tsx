@@ -39,8 +39,7 @@ export function InterfaceSettingsForm(props: Props) {
             ]}
           />
           <FormHelperText>
-            Choose the default editor for composing posts and replies. Users can
-            still switch between editors when writing.
+            Choose the default editor for composing threads, replies and pages.
           </FormHelperText>
         </FormControl>
       </CardBox>

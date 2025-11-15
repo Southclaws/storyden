@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
+import { EditorModeSchema } from "@/lib/settings/editor";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 
@@ -11,7 +12,7 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  editorMode: z.enum(["richtext", "markdown"]),
+  editorMode: EditorModeSchema,
 });
 export type Form = z.infer<typeof FormSchema>;
 
