@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
+import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";

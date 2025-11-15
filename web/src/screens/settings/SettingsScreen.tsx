@@ -13,8 +13,9 @@ import { hasPermission } from "@/utils/permissions";
 import { MemberAccessKeysSettingsScreen } from "./MemberAccessKeysSettingsScreen";
 import { MemberAuthenticationSettingsScreen } from "./MemberAuthenticationSettingsScreen";
 import { MemberEmailSettingsScreen } from "./MemberEmailSettingsScreen";
+import { MemberInterfaceSettingsScreen } from "./MemberInterfaceSettingsScreen";
 
-const DEFAULT_TAB = "authentication";
+const DEFAULT_TAB = "interface";
 
 type Props = {
   initialSettings: Settings;
@@ -56,6 +57,7 @@ export function SettingsScreen({ initialSettings }: Props) {
       onValueChange={handleTabChange}
     >
       <Tabs.List>
+        <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         {emailEnabled && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
         {accessKeysEnabled && (
@@ -63,6 +65,10 @@ export function SettingsScreen({ initialSettings }: Props) {
         )}
         <Tabs.Indicator />
       </Tabs.List>
+
+      <Tabs.Content value="interface">
+        <MemberInterfaceSettingsScreen />
+      </Tabs.Content>
 
       <Tabs.Content value="authentication">
         <MemberAuthenticationSettingsScreen />

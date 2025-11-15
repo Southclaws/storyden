@@ -13,25 +13,12 @@ import { Asset } from "src/api/openapi-schema";
 import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 
+import { ContentComposerProps } from "../composer-props";
 import { useImageUpload } from "../useImageUpload";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-
-export type ContentComposerProps = {
-  className?: string;
-  disabled?: boolean;
-  resetKey?: string;
-  initialValue?: string;
-
-  // NOTE: This is not for making the editor controllable but for optimistic
-  // mutation/revalidation of disabled editors. Use with care!
-  value?: string;
-  placeholder?: string;
-  onChange?: (value: string, isEmpty: boolean) => void;
-  onAssetUpload?: (asset: Asset) => void;
-};
 
 export function useContentComposer(props: ContentComposerProps) {
   const { upload } = useImageUpload();

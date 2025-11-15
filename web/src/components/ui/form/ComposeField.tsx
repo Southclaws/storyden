@@ -1,7 +1,7 @@
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
-import { ContentComposerProps } from "@/components/content/ContentComposer/useContentComposer";
+import { ContentComposerProps } from "@/components/content/composer-props";
 
 type Props<T extends FieldValues> = Omit<ControllerProps<T>, "render"> &
   ContentComposerProps & {
