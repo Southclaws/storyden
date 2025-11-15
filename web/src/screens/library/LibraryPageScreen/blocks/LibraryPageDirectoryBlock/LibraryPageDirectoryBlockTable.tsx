@@ -7,7 +7,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { match } from "ts-pattern";
 
 import {
@@ -265,26 +265,6 @@ function Row({
     setOpen((prev) => !prev);
   }
 
-  // Manually handle click-away behaviour - the default menu behaviour has been
-  // overridden by making it a controlled component in order to allow for the
-  // drag handle to be used as a menu open trigger.
-  const elementRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleClickAway(event: MouseEvent) {
-      if (
-        elementRef.current &&
-        !elementRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("click", handleClickAway);
-    return () => document.removeEventListener("click", handleClickAway);
-  }, [isOpen]);
-
   // Check if we're dragging anything at all, to hide the tooltip.
   const { active } = useDndContext();
   const isDraggingAnything = active !== null;
@@ -427,14 +407,14 @@ function Row({
                       width="6"
                       height="6"
                       pointerEvents="none"
-                      // NOTE: ClickAway Does not work currently, need to do some shenanigans with portal
-                      ref={elementRef}
                     >
                       <LibraryPageMenu
                         variant="ghost"
                         node={child}
                         parentID={nodeID}
                         open={isOpen}
+                        onOpenChange={(details) => setOpen(details.open)}
+                        onInteractOutside={() => setOpen(false)}
                       >
                         <Box position="absolute" width="6" height="6" />
                       </LibraryPageMenu>
