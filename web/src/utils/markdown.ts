@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import DOMPurify from "dompurify";
 import html from "remark-html";
 import remarkParse from "remark-parse";
 import TurndownService from "turndown";
