@@ -11,15 +11,7 @@ import { ContentComposerProps } from "../composer-props";
 export function ContentComposer(props: ContentComposerProps) {
   const session = useSession();
 
-  if (!session) {
-    return (
-      <CardBox className={center()} p="8" color="fg.muted">
-        You must be signed in to compose content
-      </CardBox>
-    );
-  }
-
-  const editorMode = session.meta.editor.mode;
+  const editorMode = session?.meta.editor.mode;
 
   switch (editorMode) {
     case "richtext":
