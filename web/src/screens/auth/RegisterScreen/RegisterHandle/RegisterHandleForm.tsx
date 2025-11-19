@@ -28,10 +28,13 @@ export function RegisterHandleForm(props: Props) {
     >
       <Input
         type="text"
+        autoCapitalize="none"
+        autoCorrect="off"
+        autoComplete="username"
         w="full"
         size="sm"
         textAlign="center"
-        placeholder="choose your username"
+        placeholder="username"
         required
         {...register("identifier")}
       />

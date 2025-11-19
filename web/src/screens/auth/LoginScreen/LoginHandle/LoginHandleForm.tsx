@@ -27,6 +27,9 @@ export function LoginHandleForm() {
     >
       <Input
         type="text"
+        autoCapitalize="none"
+        autoCorrect="off"
+        autoComplete="username"
         w="full"
         size="sm"
         textAlign="center"

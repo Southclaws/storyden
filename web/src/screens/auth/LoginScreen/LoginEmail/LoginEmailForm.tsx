@@ -23,6 +23,9 @@ export function LoginEmailForm() {
       <FormControl>
         <Input
           type="text"
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="username"
           w="full"
           size="sm"
           textAlign="center"

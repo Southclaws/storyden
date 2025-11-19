@@ -23,6 +23,9 @@ export function RegisterEmailForm() {
       <FormControl>
         <Input
           type="email"
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="email"
           w="full"
           size="sm"
           textAlign="center"
@@ -36,10 +39,13 @@ export function RegisterEmailForm() {
       <FormControl>
         <Input
           type="text"
+          autoCapitalize="none"
+          autoCorrect="off"
+          autoComplete="username"
           w="full"
           size="sm"
           textAlign="center"
-          placeholder="@username"
+          placeholder="username"
           required
           {...form.register("handle")}
         />
