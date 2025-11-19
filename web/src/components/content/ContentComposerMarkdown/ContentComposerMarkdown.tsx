@@ -360,55 +360,63 @@ function EditorTools({
   const reveal = isWorking || isHovered;
 
   return (
-    <Box
-      position="absolute"
-      right="0"
-      p="1"
-      opacity={isHovered ? "full" : "5"}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      cursor="pointer"
-      backgroundColor="bg.subtle"
-      backdropBlur="frosted"
-      backdropFilter="auto"
-      borderRadius="md"
-      transition="all"
-    >
-      <HStack gap="2">
-        <AnimatePresence>
-          {reveal && (
-            <motion.div
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: "auto", opacity: 1 }}
-              exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              style={{ overflow: "hidden" }}
-            >
-              <HStack gap="2">
-                {isWorking && (
-                  <HStack gap="1">
-                    <Spinner w="4" h="4" />
-                    {workingCount > 1 && (
-                      <styled.span fontSize="xs" color="fg.muted">
-                        {workingCount}
-                      </styled.span>
-                    )}
-                  </HStack>
-                )}
-                {isHovered && (
-                  <Switch size="sm" checked={showPreview} onClick={onChange}>
-                    Preview
-                  </Switch>
-                )}
-              </HStack>
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <Box position="absolute" height="full" p="1" right="0" pointerEvents="none">
+      <Box
+        position="sticky"
+        top={{ base: "4", md: "20" }}
+        opacity={isHovered ? "full" : "5"}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        cursor="pointer"
+        backgroundColor="bg.subtle"
+        backdropBlur="frosted"
+        backdropFilter="auto"
+        borderRadius="md"
+        transition="all"
+        zIndex="sticky"
+        pointerEvents="auto"
+      >
+        <HStack gap="2">
+          <AnimatePresence>
+            {reveal && (
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: "auto", opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                style={{ overflow: "hidden" }}
+              >
+                <HStack gap="2">
+                  {isWorking && (
+                    <HStack gap="1">
+                      <Spinner w="4" h="4" />
+                      {workingCount > 1 && (
+                        <styled.span fontSize="xs" color="fg.muted">
+                          {workingCount}
+                        </styled.span>
+                      )}
+                    </HStack>
+                  )}
+                  {isHovered && (
+                    <Switch size="sm" checked={showPreview} onClick={onChange}>
+                      Preview
+                    </Switch>
+                  )}
+                </HStack>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <IconButton type="button" variant="ghost" size="xs" onClick={onChange}>
-          {showPreview ? <EditIcon w="4" /> : <ShowIcon w="4" />}
-        </IconButton>
-      </HStack>
+          <IconButton
+            type="button"
+            variant="ghost"
+            size="xs"
+            onClick={onChange}
+          >
+            {showPreview ? <EditIcon w="4" /> : <ShowIcon w="4" />}
+          </IconButton>
+        </HStack>
+      </Box>
     </Box>
   );
 }
