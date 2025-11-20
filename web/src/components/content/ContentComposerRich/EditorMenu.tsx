@@ -196,6 +196,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="file"
         multiple
         display="none"
+        accept="image/*"
         onChange={handlers.handleFileUpload}
       />
     </HStack>

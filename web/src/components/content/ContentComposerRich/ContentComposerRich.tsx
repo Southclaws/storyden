@@ -13,8 +13,14 @@ import { EditorMenu } from "./EditorMenu";
 import { useContentComposer } from "./useContentComposerRich";
 
 export function ContentComposerRich(props: ContentComposerProps) {
-  const { editor, initialValueHTML, uniqueID, handlers, format } =
-    useContentComposer(props);
+  const {
+    editor,
+    initialValueHTML,
+    uniqueID,
+    uploadingCount,
+    handlers,
+    format,
+  } = useContentComposer(props);
 
   return (
     <LStack
@@ -29,7 +35,7 @@ export function ContentComposerRich(props: ContentComposerProps) {
     >
       {editor ? (
         <>
-          <ComposerTools icon={<EditIcon />}>
+          <ComposerTools icon={<EditIcon />} workingCount={uploadingCount}>
             <EditorMenu
               editor={editor}
               uniqueID={uniqueID}

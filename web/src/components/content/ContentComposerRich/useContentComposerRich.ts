@@ -6,10 +6,11 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { ChangeEvent, useEffect, useId, useMemo } from "react";
+import { ChangeEvent, useEffect, useId, useState } from "react";
 
 import { Asset } from "src/api/openapi-schema";
 
+import { handle } from "@/api/client";
 import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 
@@ -22,6 +23,7 @@ export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 export function useContentComposer(props: ContentComposerProps) {
   const { upload } = useImageUpload();
+  const [uploadingCount, setUploadingCount] = useState(0);
 
   const extensions = [
     StarterKit,
@@ -118,14 +120,25 @@ export function useContentComposer(props: ContentComposerProps) {
 
     const assets: Asset[] = [];
     for (const f of files) {
-      const asset = await upload(f);
+      setUploadingCount((prev) => prev + 1);
 
-      const node = imageNode.create({ src: getAssetURL(asset.path) });
-      const transaction = view.state.tr.insert(selection.$head.pos, node);
-      view.dispatch(transaction);
+      await handle(
+        async () => {
+          const asset = await upload(f);
 
-      assets.push(asset);
-      props.onAssetUpload?.(asset);
+          const node = imageNode.create({ src: getAssetURL(asset.path) });
+          const transaction = view.state.tr.insert(selection.$head.pos, node);
+          view.dispatch(transaction);
+
+          assets.push(asset);
+          props.onAssetUpload?.(asset);
+        },
+        {
+          cleanup: async () => {
+            setUploadingCount((prev) => prev - 1);
+          },
+        },
+      );
     }
 
     return assets;
@@ -189,6 +202,7 @@ export function useContentComposer(props: ContentComposerProps) {
     editor,
     uniqueID,
     initialValueHTML,
+    uploadingCount,
     handlers: {
       handleFileUpload,
     },

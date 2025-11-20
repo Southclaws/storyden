@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { PropsWithChildren, useRef, useState } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
@@ -24,12 +24,6 @@ export function ComposerTools({
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isWorking = workingCount > 0;
-
-  // Logic: reveal the animated presence container if working or hovered, this
-  // allows the spinner to appear on its own when the editor is working. When
-  // hovered, we also include the preview switch. If the user hovers while the
-  // editor is working, the preview switch appears alongside the spinner.
-  const reveal = isWorking || isExpanded;
 
   const handleExpand = () => {
     if (isExpanded) {
@@ -75,30 +69,39 @@ export function ComposerTools({
         p="1"
       >
         <HStack gap="2">
-          <AnimatePresence>
-            {reveal && (
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: "auto", opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{ duration: 0.2, ease: "easeInOut" }}
-                style={{ overflow: "hidden" }}
-              >
-                {isWorking && (
-                  <HStack gap="1">
-                    <Spinner />
-                    {workingCount > 1 && (
-                      <styled.span fontSize="xs" color="fg.muted">
-                        {workingCount}
-                      </styled.span>
-                    )}
-                  </HStack>
+          <motion.div
+            animate={
+              isExpanded
+                ? {
+                    width: "auto",
+                  }
+                : {
+                    width: isWorking ? "24px" : "0",
+                  }
+            }
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            style={{ overflow: "hidden", display: "flex", gap: "8px" }}
+          >
+            {isWorking && (
+              <HStack gap="1">
+                <Spinner size="sm" />
+                {workingCount > 1 && (
+                  <styled.span fontSize="xs" color="fg.muted">
+                    {workingCount}
+                  </styled.span>
                 )}
-
-                {isExpanded && children}
-              </motion.div>
+              </HStack>
             )}
-          </AnimatePresence>
+
+            <div
+              style={{
+                visibility: isExpanded ? "visible" : "hidden",
+                width: isExpanded ? "auto" : 0,
+              }}
+            >
+              {children}
+            </div>
+          </motion.div>
 
           <IconButton
             type="button"

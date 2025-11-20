@@ -1,12 +1,14 @@
 import { assetUpload } from "src/api/openapi-client/assets";
 
+import { AssetUploadParams } from "@/api/openapi-schema";
+
 export function useImageUpload() {
-  async function upload(f: File) {
+  async function upload(f: File, params?: AssetUploadParams) {
     if (!isSupportedImage(f.type)) {
       throw new Error(`Unsupported image format ${f.type}`);
     }
 
-    const asset = await assetUpload(f);
+    const asset = await assetUpload(f, params);
 
     return asset;
   }
@@ -29,7 +31,9 @@ export function isSupportedImage(mime: string): boolean {
   }
 }
 
-export function hasImageFile(items: DataTransferItemList | DataTransferItem[]): boolean {
+export function hasImageFile(
+  items: DataTransferItemList | DataTransferItem[],
+): boolean {
   const itemArray = Array.from(items);
   return itemArray.some((item) => {
     if ("kind" in item && item.kind !== "file") {

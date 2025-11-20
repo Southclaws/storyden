@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
-import { assetUpload } from "@/api/openapi-client/assets";
 import { getAssetURL } from "@/utils/asset";
 import { htmlToMarkdown, markdownToHTML } from "@/utils/markdown";
 
@@ -10,6 +9,7 @@ import {
   getImageFiles,
   hasImageFile,
   isSupportedImage,
+  useImageUpload,
 } from "../useImageUpload";
 
 const PLACEHOLDER_SEPARATOR = "\n\n";
@@ -22,6 +22,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
     }
     return "";
   });
+  const { upload } = useImageUpload();
   const [previewHTML, setPreviewHTML] = useState<string>("");
   const [showPreview, setShowPreview] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -168,7 +169,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
 
     await handle(
       async () => {
-        const asset = await assetUpload(file, { filename: file.name });
+        const asset = await upload(file, { filename: file.name });
         const imageUrl = getAssetURL(asset.path);
         const markdownImage = `![${file.name}](${imageUrl})`;
 
