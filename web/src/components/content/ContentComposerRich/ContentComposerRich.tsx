@@ -1,14 +1,15 @@
 import { BubbleMenu, EditorContent } from "@tiptap/react";
 
+import { EditIcon } from "@/components/ui/icons/Edit";
 import { css, cx } from "@/styled-system/css";
 import { LStack } from "@/styled-system/jsx";
 
+import { ComposerTools } from "../ComposerTools";
 import { ContentComposerProps } from "../composer-props";
 
 import "./styles.css";
 
 import { EditorMenu } from "./EditorMenu";
-import { EditorTools } from "./EditorTools";
 import { useContentComposer } from "./useContentComposerRich";
 
 export function ContentComposerRich(props: ContentComposerProps) {
@@ -28,12 +29,14 @@ export function ContentComposerRich(props: ContentComposerProps) {
     >
       {editor ? (
         <>
-          <EditorTools
-            editor={editor}
-            uniqueID={uniqueID}
-            format={format}
-            handlers={handlers}
-          />
+          <ComposerTools icon={<EditIcon />}>
+            <EditorMenu
+              editor={editor}
+              uniqueID={uniqueID}
+              format={format}
+              handlers={handlers}
+            />
+          </ComposerTools>
           <BubbleMenu
             editor={editor}
             tippyOptions={{
