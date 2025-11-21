@@ -1,13 +1,12 @@
 import Image, { ImageOptions } from "@tiptap/extension-image";
 import {
-  NodeViewContent,
   NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
   mergeAttributes,
 } from "@tiptap/react";
-import { EditorView } from "prosemirror-view";
 import { Plugin } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 
 import { Asset } from "src/api/openapi-schema";
 
@@ -87,30 +86,6 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
             event.preventDefault();
             handleFiles(view, images);
             return true;
-          },
-          handleDOMEvents: {
-            drop(view, event) {
-              const hasFiles =
-                event.dataTransfer &&
-                event.dataTransfer.files &&
-                event.dataTransfer.files.length;
-
-              if (!hasFiles) {
-                return false;
-              }
-
-              const images = Array.from(event.dataTransfer.files).filter(
-                (file) => /image/i.test(file.type),
-              );
-
-              if (images.length === 0) {
-                return false;
-              }
-
-              event.preventDefault();
-              handleFiles(view, images);
-              return true;
-            },
           },
         },
       }),

@@ -5,6 +5,7 @@ import { css, cx } from "@/styled-system/css";
 import { LStack } from "@/styled-system/jsx";
 
 import { ComposerTools } from "../ComposerTools";
+import { ContentDragOverlay } from "../ContentDragOverlay";
 import { ContentComposerProps } from "../composer-props";
 
 import "./styles.css";
@@ -18,6 +19,9 @@ export function ContentComposerRich(props: ContentComposerProps) {
     initialValueHTML,
     uniqueID,
     uploadingCount,
+    isDragging,
+    isDragError,
+    getDragOverlayMessage,
     handlers,
     format,
   } = useContentComposer(props);
@@ -31,7 +35,10 @@ export function ContentComposerRich(props: ContentComposerProps) {
       w="full"
       gap="1"
       minHeight="8"
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={handlers.handleDragOver}
+      onDragEnter={handlers.handleDragEnter}
+      onDragLeave={handlers.handleDragLeave}
+      onDrop={handlers.handleDrop}
     >
       {editor ? (
         <>
@@ -119,6 +126,12 @@ export function ContentComposerRich(props: ContentComposerProps) {
         </>
       ) : (
         <div dangerouslySetInnerHTML={{ __html: initialValueHTML }} />
+      )}
+      {isDragging && (
+        <ContentDragOverlay
+          isError={isDragError}
+          message={getDragOverlayMessage()}
+        />
       )}
     </LStack>
   );

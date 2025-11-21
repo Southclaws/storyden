@@ -7,7 +7,7 @@ import { generateHTML, generateJSON } from "@tiptap/html";
 import { EditorView } from "@tiptap/pm/view";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { ChangeEvent, useEffect, useId, useState } from "react";
+import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 
 import { Asset } from "src/api/openapi-schema";
 
@@ -16,15 +16,26 @@ import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 
 import { ContentComposerProps } from "../composer-props";
-import { useImageUpload } from "../useImageUpload";
+import {
+  hasImageFile,
+  isSupportedImage,
+  useImageUpload,
+} from "../useImageUpload";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
+
+const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 export function useContentComposer(props: ContentComposerProps) {
   const { upload } = useImageUpload();
   const [uploadingCount, setUploadingCount] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDragError, setIsDragError] = useState(false);
+  const [dragErrorMessage, setDragErrorMessage] = useState("");
+  const [dragFileCount, setDragFileCount] = useState(0);
+  const dragCounterRef = useRef(0);
 
   const extensions = [
     StarterKit,
@@ -198,13 +209,92 @@ export function useContentComposer(props: ContentComposerProps) {
     return "p";
   }
 
+  function getDragOverlayMessage() {
+    if (isDragError) {
+      return dragErrorMessage;
+    }
+    return dragFileCount === 1
+      ? "Drop 1 file to upload"
+      : `Drop ${dragFileCount} files to upload`;
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+  }
+
+  function handleDragEnter(e: React.DragEvent) {
+    const items = Array.from(e.dataTransfer.items);
+    const hasFile = items.some((item) => item.kind === "file");
+
+    if (!hasFile) {
+      return;
+    }
+
+    e.preventDefault();
+    dragCounterRef.current += 1;
+    setIsDragging(true);
+
+    const hasImage = hasImageFile(e.dataTransfer.items);
+    const imageCount = items.filter((item) =>
+      isSupportedImage(item.type),
+    ).length;
+
+    if (!hasImage) {
+      setIsDragError(true);
+      setDragErrorMessage(ERROR_UNSUPPORTED_FILE_TYPE);
+    } else {
+      setIsDragError(false);
+      setDragErrorMessage("");
+    }
+
+    setDragFileCount(imageCount);
+  }
+
+  function handleDragLeave() {
+    dragCounterRef.current -= 1;
+    if (dragCounterRef.current === 0) {
+      setIsDragging(false);
+      setIsDragError(false);
+      setDragErrorMessage("");
+      setDragFileCount(0);
+    }
+  }
+
+  async function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+
+    dragCounterRef.current = 0;
+    setIsDragging(false);
+    setIsDragError(false);
+    setDragErrorMessage("");
+    setDragFileCount(0);
+
+    if (!editor) {
+      return;
+    }
+
+    const files = Array.from(e.dataTransfer.files);
+    const images = files.filter((file) => /image/i.test(file.type));
+
+    if (images.length > 0) {
+      await handleFiles(editor.view, images);
+    }
+  }
+
   return {
     editor,
     uniqueID,
     initialValueHTML,
     uploadingCount,
+    isDragging,
+    isDragError,
+    getDragOverlayMessage,
     handlers: {
       handleFileUpload,
+      handleDragOver,
+      handleDragEnter,
+      handleDragLeave,
+      handleDrop,
     },
     format: {
       text: {
