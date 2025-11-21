@@ -6,6 +6,7 @@ import {
   ReactNodeViewRenderer,
   mergeAttributes,
 } from "@tiptap/react";
+import { EditorView } from "prosemirror-view";
 import { Plugin } from "prosemirror-state";
 
 import { Asset } from "src/api/openapi-schema";
@@ -18,7 +19,7 @@ import { styled } from "@/styled-system/jsx";
 const COMPONENT_NAME = "img";
 
 type Options = {
-  handleFiles: (file: File[]) => Promise<Asset[]>;
+  handleFiles: (view: EditorView, files: File[]) => Promise<Asset[]>;
 };
 
 function Component(props: NodeViewProps) {
@@ -58,6 +59,35 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
     return [
       new Plugin({
         props: {
+          handlePaste(view, event) {
+            if (!event.clipboardData) {
+              return false;
+            }
+
+            const files: File[] = [];
+
+            // Use "items"
+            if (event.clipboardData.items?.length) {
+              for (const item of event.clipboardData.items) {
+                if (item.kind === "file") {
+                  const file = item.getAsFile();
+                  if (file) {
+                    files.push(file);
+                  }
+                }
+              }
+            }
+
+            const images = files.filter((file) => /image/i.test(file.type));
+
+            if (images.length === 0) {
+              return false;
+            }
+
+            event.preventDefault();
+            handleFiles(view, images);
+            return true;
+          },
           handleDOMEvents: {
             drop(view, event) {
               const hasFiles =
@@ -66,7 +96,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
                 event.dataTransfer.files.length;
 
               if (!hasFiles) {
-                return;
+                return false;
               }
 
               const images = Array.from(event.dataTransfer.files).filter(
@@ -74,33 +104,12 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
               );
 
               if (images.length === 0) {
-                return;
+                return false;
               }
 
               event.preventDefault();
-              handleFiles?.(images);
-            },
-
-            paste(view, event) {
-              const hasFiles =
-                event.clipboardData &&
-                event.clipboardData.files &&
-                event.clipboardData.files.length;
-
-              if (!hasFiles) {
-                return;
-              }
-
-              const images = Array.from(event.clipboardData.files).filter(
-                (file) => /image/i.test(file.type),
-              );
-
-              if (images.length === 0) {
-                return;
-              }
-
-              event.preventDefault();
-              handleFiles?.(images);
+              handleFiles(view, images);
+              return true;
             },
           },
         },

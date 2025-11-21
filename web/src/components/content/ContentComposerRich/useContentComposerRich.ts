@@ -4,6 +4,7 @@ import { FocusClasses } from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
+import { EditorView } from "@tiptap/pm/view";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useState } from "react";
@@ -103,12 +104,11 @@ export function useContentComposer(props: ContentComposerProps) {
     editor.setEditable(!props.disabled, false);
   }, [editor, props.disabled]);
 
-  async function handleFiles(files: File[]) {
-    if (!editor) {
+  async function handleFiles(view: EditorView, files: File[]) {
+    if (!view) {
       return [];
     }
 
-    const { view } = editor;
     const { state } = view;
     const { selection } = state;
     const { schema } = view.state;
@@ -145,7 +145,7 @@ export function useContentComposer(props: ContentComposerProps) {
   }
 
   async function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
-    if (!e.currentTarget.files) {
+    if (!e.currentTarget.files || !editor) {
       return;
     }
 
@@ -153,7 +153,7 @@ export function useContentComposer(props: ContentComposerProps) {
       /image/i.test(file.type),
     );
 
-    await handleFiles(images);
+    await handleFiles(editor.view, images);
   }
 
   function handleBlockType(kind: Block) {
