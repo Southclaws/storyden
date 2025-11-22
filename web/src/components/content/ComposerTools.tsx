@@ -1,7 +1,13 @@
 import { Portal } from "@ark-ui/react";
 import { autoUpdate } from "@floating-ui/react";
 import { motion } from "framer-motion";
-import { PropsWithChildren, useLayoutEffect, useRef, useState } from "react";
+import {
+  PropsWithChildren,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
@@ -27,6 +33,14 @@ export function ComposerTools({
   const [isExpanded, setIsExpanded] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Positioning logic - this is needed because in order to show editor tools
   // within a container with overflow:hidden, we need to portal the component.
   const anchorRef = useRef<HTMLDivElement>(null); // inside overflow container
@@ -49,11 +63,6 @@ export function ComposerTools({
   const isWorking = workingCount > 0;
 
   const handleExpand = () => {
-    if (isExpanded) {
-      onClick?.();
-      return;
-    }
-
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
