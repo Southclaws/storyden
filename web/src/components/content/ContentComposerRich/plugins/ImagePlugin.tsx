@@ -205,7 +205,6 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
 
             newState.doc.descendants((node, pos) => {
               const uploadId = node.attrs["data-upload-id"];
-              // const isUploading = node.attrs["data-uploading"] === "true";
 
               if (uploadId) {
                 newMap.set(uploadId, pos);
