@@ -24,6 +24,8 @@ import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
+import { LinkCardButton } from "../ContentComposer/LinkCardButton";
+
 import { LinkButton } from "./LinkButton";
 
 export type Props = {
@@ -140,6 +142,8 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
       </Button>
 
       <LinkButton editor={editor} />
+
+      <LinkCardButton editor={editor} />
 
       <Button
         type="button"

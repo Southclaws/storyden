@@ -1,8 +1,6 @@
 "use client";
 
 import { useSession } from "@/auth";
-import { CardBox } from "@/styled-system/jsx";
-import { center } from "@/styled-system/patterns";
 
 import { ContentComposerMarkdown } from "../ContentComposerMarkdown/ContentComposerMarkdown";
 import { ContentComposerRich } from "../ContentComposerRich/ContentComposerRich";
