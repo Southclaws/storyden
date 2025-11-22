@@ -4,7 +4,9 @@ import { FocusClasses } from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
+import { Extension } from "@tiptap/react";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
@@ -22,20 +24,78 @@ import {
   useImageUpload,
 } from "../useImageUpload";
 
-import { ImageExtended } from "./plugins/ImagePlugin";
+import { ImageExtended, uploadPositionsKey } from "./plugins/ImagePlugin";
 
 const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 export function useContentComposer(props: ContentComposerProps) {
-  const { upload } = useImageUpload();
+  const { uploadWithProgress } = useImageUpload();
   const [uploadingCount, setUploadingCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isDragError, setIsDragError] = useState(false);
   const [dragErrorMessage, setDragErrorMessage] = useState("");
   const [dragFileCount, setDragFileCount] = useState(0);
   const dragCounterRef = useRef(0);
+  const uploadCounterRef = useRef(0);
+  const activeUploadsRef = useRef<
+    Map<
+      string,
+      {
+        abortController: AbortController;
+        blobUrl: string;
+        file: File;
+        status: "uploading" | "failed" | "completed";
+      }
+    >
+  >(new Map());
+
+  // Extension to detect and abort uploads when image nodes are deleted
+  const UploadCleanupExtension = Extension.create({
+    name: "uploadCleanup",
+
+    addProseMirrorPlugins() {
+      return [
+        new Plugin({
+          key: new PluginKey("uploadCleanup"),
+          appendTransaction(_transactions, oldState, newState) {
+            const oldUploadingIds = new Set<string>();
+            oldState.doc.descendants((node) => {
+              if (node.type.name === "image" && node.attrs["data-upload-id"]) {
+                oldUploadingIds.add(node.attrs["data-upload-id"]);
+              }
+            });
+
+            const newUploadingIds = new Set<string>();
+            newState.doc.descendants((node) => {
+              if (node.type.name === "image" && node.attrs["data-upload-id"]) {
+                newUploadingIds.add(node.attrs["data-upload-id"]);
+              }
+            });
+
+            const deletedUploadIds = Array.from(oldUploadingIds).filter(
+              (id) => !newUploadingIds.has(id),
+            );
+
+            deletedUploadIds.forEach((uploadId) => {
+              const upload = activeUploadsRef.current.get(uploadId);
+              if (upload) {
+                upload.abortController.abort("embed deleted");
+                URL.revokeObjectURL(upload.blobUrl);
+                console.debug(
+                  `Upload for ID: ${uploadId} aborted due to node deletion.`,
+                );
+                activeUploadsRef.current.delete(uploadId);
+              }
+            });
+
+            return null;
+          },
+        }),
+      ];
+    },
+  });
 
   const extensions = [
     StarterKit,
@@ -52,12 +112,15 @@ export function useContentComposer(props: ContentComposerProps) {
         class: css({ borderRadius: "md" }),
       },
       handleFiles,
+      handleRetry,
+      handleCancel,
     }),
     Placeholder.configure({
       placeholder: props.placeholder ?? "Write your heart out...",
       includeChildren: true,
       showOnlyCurrent: false,
     }),
+    UploadCleanupExtension,
   ];
 
   // This is for the initial server render.
@@ -84,7 +147,21 @@ export function useContentComposer(props: ContentComposerProps) {
     extensions,
     content: props.initialValue ?? "<p></p>",
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
+      let html = editor.getHTML();
+
+      // Filter out images that are still uploading or failed
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+      const uploadingImages = doc.querySelectorAll(
+        'img[data-uploading="true"]',
+      );
+      const failedImages = doc.querySelectorAll("img[data-upload-error]");
+
+      uploadingImages.forEach((img) => img.remove());
+      failedImages.forEach((img) => img.remove());
+
+      html = doc.body.innerHTML;
+
       props.onChange?.(html, editor.isEmpty);
     },
   });
@@ -115,9 +192,194 @@ export function useContentComposer(props: ContentComposerProps) {
     editor.setEditable(!props.disabled, false);
   }, [editor, props.disabled]);
 
+  // -
+  // Image uploading logic.
+  // -
+
+  async function handleProgress(
+    view: EditorView,
+    uploadId: string,
+    percent: number,
+  ) {
+    if (!view) {
+      throw new Error("Unable to access text editor state.");
+    }
+
+    const positionMap = uploadPositionsKey.getState(view.state);
+    const pos = positionMap?.get(uploadId);
+
+    if (pos === undefined) {
+      console.warn(
+        `handleProgress: No position found for upload ID: ${uploadId}`,
+      );
+      return;
+    }
+
+    const node = view.state.doc.nodeAt(pos);
+    if (node) {
+      const tr = view.state.tr.setNodeMarkup(pos, undefined, {
+        ...node.attrs,
+        "data-upload-progress": Math.round(percent).toString(),
+      });
+      view.dispatch(tr);
+    }
+  }
+
+  function markUploadAsFailed(view: EditorView, uploadId: string) {
+    const currentState = view.state;
+
+    const positionMap = uploadPositionsKey.getState(view.state);
+    const pos = positionMap?.get(uploadId);
+
+    if (pos === undefined) {
+      console.warn(
+        `markUploadAsFailed: No position found for upload ID: ${uploadId}`,
+      );
+      return;
+    }
+
+    if (pos !== null) {
+      const errorTransaction = currentState.tr.setNodeMarkup(pos, undefined, {
+        ...currentState.doc.nodeAt(pos)?.attrs,
+        "data-uploading": null,
+        "data-upload-error": "Upload failed",
+      });
+
+      view.dispatch(errorTransaction);
+    }
+
+    const upload = activeUploadsRef.current.get(uploadId);
+    if (upload) {
+      upload.status = "failed";
+    }
+  }
+
+  function handleRetry(view: EditorView, uploadId: string) {
+    if (!view) {
+      throw new Error("Unable to access text editor state.");
+    }
+
+    const upload = activeUploadsRef.current.get(uploadId);
+    if (!upload) {
+      console.warn(`No active upload found for ID: ${uploadId}`);
+      return;
+    }
+
+    const positionMap = uploadPositionsKey.getState(view.state);
+    const pos = positionMap?.get(uploadId);
+
+    if (pos === undefined) {
+      console.warn(`handleRetry: No position found for upload ID: ${uploadId}`);
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    activeUploadsRef.current.set(uploadId, {
+      ...upload,
+      abortController,
+      status: "uploading",
+    });
+
+    const uploadingTransaction = view.state.tr.setNodeMarkup(pos, undefined, {
+      ...view.state.doc.nodeAt(pos)?.attrs,
+      "data-uploading": "true",
+      "data-upload-error": null,
+    });
+    view.dispatch(uploadingTransaction);
+
+    setUploadingCount((prev) => prev + 1);
+
+    // NOTE: No await here, we allow the handler to not block as we update the
+    // the button inside the image node via the upload progress itself.
+    handle(
+      async () => {
+        const asset = await uploadWithProgress(
+          upload.file,
+          (percent) => handleProgress(view, uploadId, percent),
+          undefined,
+          abortController,
+        );
+
+        // we search for the node again because the position might have changed.
+
+        const positionMap = uploadPositionsKey.getState(view.state);
+        const pos = positionMap?.get(uploadId);
+
+        if (pos === undefined) {
+          console.warn(
+            `handleRetry finished: No position found for upload ID: ${uploadId}`,
+          );
+          return;
+        }
+
+        const updateTransaction = view.state.tr.setNodeMarkup(pos, undefined, {
+          src: getAssetURL(asset.path),
+          alt: upload.file.name,
+          "data-upload-id": null,
+          "data-uploading": null,
+          "data-upload-error": null,
+          "data-upload-progress": null,
+        });
+
+        view.dispatch(updateTransaction);
+
+        URL.revokeObjectURL(upload.blobUrl);
+        const trackedUpload = activeUploadsRef.current.get(uploadId);
+        if (trackedUpload) {
+          trackedUpload.status = "completed";
+        }
+
+        props.onAssetUpload?.(asset);
+      },
+      {
+        onError: async () => {
+          markUploadAsFailed(view, uploadId);
+        },
+        cleanup: async () => {
+          setUploadingCount((prev) => Math.max(0, prev - 1));
+        },
+      },
+    );
+  }
+
+  function handleCancel(view: EditorView, uploadId: string) {
+    if (!view) {
+      throw new Error("Unable to access text editor state.");
+    }
+
+    const upload = activeUploadsRef.current.get(uploadId);
+
+    if (!upload) {
+      console.warn(`No active upload found for ID: ${uploadId}`);
+      return;
+    }
+
+    const positionMap = uploadPositionsKey.getState(view.state);
+    const pos = positionMap?.get(uploadId);
+
+    if (pos === undefined) {
+      console.warn(
+        `handleCancel: No position found for upload ID: ${uploadId}`,
+      );
+      return;
+    }
+
+    console.debug(
+      `Cancelling upload for ID: ${uploadId} and removing node at position ${pos}`,
+    );
+
+    const nodeSize = view.state.doc.nodeAt(pos)?.nodeSize ?? 1;
+    const transaction = view.state.tr.delete(pos, pos + nodeSize);
+    view.dispatch(transaction);
+
+    URL.revokeObjectURL(upload.blobUrl);
+    activeUploadsRef.current.delete(uploadId);
+  }
+
   async function handleFiles(view: EditorView, files: File[]) {
     if (!view) {
-      return [];
+      throw new Error("Unable to access text editor state.");
     }
 
     const { state } = view;
@@ -130,21 +392,98 @@ export function useContentComposer(props: ContentComposerProps) {
     }
 
     const assets: Asset[] = [];
+    const insertPos = selection.$head.pos;
+
     for (const f of files) {
+      uploadCounterRef.current += 1;
+      const uploadId = `upload-${Date.now()}-${uploadCounterRef.current}`;
+
+      // Create blob URL for immediate preview
+      const blobUrl = URL.createObjectURL(f);
+
+      // Create abort controller for this upload
+      const abortController = new AbortController();
+
+      // Track this upload
+      activeUploadsRef.current.set(uploadId, {
+        abortController,
+        blobUrl,
+        file: f,
+        status: "uploading",
+      });
+
+      // Insert placeholder image immediately
+      const placeholderNode = imageNode.create({
+        src: blobUrl,
+        alt: f.name,
+        "data-upload-id": uploadId,
+        "data-uploading": "true",
+      });
+
+      const insertTransaction = view.state.tr.insert(
+        insertPos,
+        placeholderNode,
+      );
+      view.dispatch(insertTransaction);
+
       setUploadingCount((prev) => prev + 1);
 
-      await handle(
+      handle(
         async () => {
-          const asset = await upload(f);
+          const asset = await uploadWithProgress(
+            f,
+            (percent) => handleProgress(view, uploadId, percent),
+            undefined,
+            abortController,
+          );
 
-          const node = imageNode.create({ src: getAssetURL(asset.path) });
-          const transaction = view.state.tr.insert(selection.$head.pos, node);
-          view.dispatch(transaction);
+          // Find the node with this upload-id and update it
+          const currentState = view.state;
+          let nodePos: number | null = null;
 
-          assets.push(asset);
-          props.onAssetUpload?.(asset);
+          currentState.doc.descendants((node, pos) => {
+            if (
+              node.type.name === "image" &&
+              node.attrs["data-upload-id"] === uploadId
+            ) {
+              nodePos = pos;
+              return false; // Stop searching
+            }
+            return true; // Continue searching
+          });
+
+          if (nodePos !== null) {
+            // Update the node with the real URL and remove upload attrs
+            const updateTransaction = currentState.tr.setNodeMarkup(
+              nodePos,
+              undefined,
+              {
+                src: getAssetURL(asset.path),
+                alt: f.name,
+                "data-upload-id": null,
+                "data-uploading": null,
+                "data-upload-error": null,
+                "data-upload-progress": null,
+              },
+            );
+
+            view.dispatch(updateTransaction);
+
+            // Clean up blob URL and mark as completed
+            URL.revokeObjectURL(blobUrl);
+            const upload = activeUploadsRef.current.get(uploadId);
+            if (upload) {
+              upload.status = "completed";
+            }
+
+            assets.push(asset);
+            props.onAssetUpload?.(asset);
+          }
         },
         {
+          onError: async () => {
+            markUploadAsFailed(view, uploadId);
+          },
           cleanup: async () => {
             setUploadingCount((prev) => prev - 1);
           },
@@ -166,6 +505,10 @@ export function useContentComposer(props: ContentComposerProps) {
 
     await handleFiles(editor.view, images);
   }
+
+  // -
+  // Text formatting logic.
+  // -
 
   function handleBlockType(kind: Block) {
     switch (kind) {
@@ -270,7 +613,7 @@ export function useContentComposer(props: ContentComposerProps) {
     setDragFileCount(0);
 
     if (!editor) {
-      return;
+      throw new Error("Unable to access text editor state.");
     }
 
     const files = Array.from(e.dataTransfer.files);

@@ -15,6 +15,7 @@ import { input } from "@/recipes/input";
 import { menu } from "@/recipes/menu";
 import { pinInput } from "@/recipes/pin-input";
 import { popover } from "@/recipes/popover";
+import { progress } from "@/recipes/progress";
 import { radioGroup } from "@/recipes/radio-group";
 import { richCard } from "@/recipes/rich-card";
 import { select } from "@/recipes/select";
@@ -204,6 +205,7 @@ export default defineConfig({
         menu: menu,
         fileUpload: fileUpload,
         popover: popover,
+        progress: progress,
         table: table,
         slider: slider,
         pinInput: pinInput,
