@@ -42,7 +42,11 @@ export function ContentComposerRich(props: ContentComposerProps) {
     >
       {editor ? (
         <>
-          <ComposerTools icon={<EditIcon />} workingCount={uploadingCount}>
+          <ComposerTools
+            enabled={!props.disabled}
+            icon={<EditIcon />}
+            workingCount={uploadingCount}
+          >
             <EditorMenu
               editor={editor}
               uniqueID={`${uniqueID}-toolbar`}

@@ -41,6 +41,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
   return (
     <LStack position="relative" minHeight="8" maxHeight="fit">
       <ComposerTools
+        enabled={!props.disabled}
         icon={<ShowIcon />}
         expandedIcon={<EditIcon />}
         onClick={handleTogglePreview}
