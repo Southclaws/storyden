@@ -2,8 +2,8 @@ import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const CardBoxConfig = {
-transform(props19) {
-  const { kind, display } = props19;
+transform(props20) {
+  const { kind, display } = props20;
   const padding = kind === "edge" ? "0" : "2";
   return {
     display,

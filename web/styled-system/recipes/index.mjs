@@ -17,6 +17,7 @@ export * from './combobox.mjs';
 export * from './menu.mjs';
 export * from './file-upload.mjs';
 export * from './popover.mjs';
+export * from './progress.mjs';
 export * from './table.mjs';
 export * from './slider.mjs';
 export * from './pin-input.mjs';

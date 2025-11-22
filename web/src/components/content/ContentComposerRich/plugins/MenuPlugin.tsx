@@ -1,11 +1,10 @@
-import { Editor, posToDOMRect } from "@tiptap/core";
+import { Editor } from "@tiptap/core";
 import { EditorState, Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
 import { useCurrentEditor } from "@tiptap/react";
 import { useEffect, useState } from "react";
 
 import { css, cx } from "@/styled-system/css";
-import { FrostedGlass } from "@/styled-system/patterns";
 
 const PLUGIN_KEY = "floatingMenu";
 
@@ -124,17 +123,10 @@ export class FloatingMenuView {
     this.element.setAttribute("style", `${style} visibility: hidden;`);
   }
 
-  getMenuOffset(view: EditorView) {
-    const { state } = view;
-    const { selection } = state;
-    const { from, to } = selection;
-
-    const { top: containerTop } = view.dom.getBoundingClientRect();
-    const { bottom: caretY } = posToDOMRect(view, from, to);
-
-    // NOTE: Left is -1px for optical alignment due to the border radius.
-    const offsetX = -1;
-    const offsetY = caretY - containerTop + 8;
+  getMenuOffset(_view: EditorView) {
+    // Position at top right of the editor container
+    const offsetX = 0;
+    const offsetY = 0;
 
     return { offsetX, offsetY };
   }
@@ -142,6 +134,7 @@ export class FloatingMenuView {
 
 export const FloatingMenu = (props: FloatingMenuProps) => {
   const [element, setElement] = useState<HTMLDivElement | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
   const { editor: currentEditor } = useCurrentEditor();
 
   useEffect(() => {
@@ -177,8 +170,10 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
   return (
     <div
       ref={setElement}
-      className={cx(menuStyles, FrostedGlass())}
+      className={cx(menuStyles, isHovered ? hoverStyles : defaultStyles)}
       style={{ visibility: "hidden" }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {props.children}
     </div>
@@ -188,14 +183,24 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
 const menuStyles = css({
   zIndex: "popover",
   position: "absolute",
-  borderRadius: "xl",
+  right: "0",
+  top: "0",
+  borderRadius: "md",
   display: "flex",
   flexWrap: "wrap",
   gap: "1",
   padding: "1",
-  boxShadow: "md",
-  borderColor: "border.default",
-  borderStyle: "solid",
-  borderWidth: "thin",
+  backgroundColor: "bg.subtle",
+  backdropBlur: "frosted",
+  backdropFilter: "auto",
   transition: "all",
+  cursor: "pointer",
+});
+
+const defaultStyles = css({
+  opacity: "5",
+});
+
+const hoverStyles = css({
+  opacity: "full",
 });
