@@ -37,9 +37,6 @@ export function ComposerTools({
 
     return autoUpdate(anchorRef.current, floatingRef.current, () => {
       const rect = anchorRef.current!.getBoundingClientRect();
-      const width = floatingRef.current!.getBoundingClientRect().width;
-
-      console.log(rect);
 
       Object.assign(floatingRef.current!.style, {
         top: `${rect.top}px`,
