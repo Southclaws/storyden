@@ -1,3 +1,4 @@
+import { Portal } from "@ark-ui/react";
 import { motion } from "framer-motion";
 import { PropsWithChildren, useRef, useState } from "react";
 
@@ -60,9 +61,9 @@ export function ComposerTools({
         onMouseEnter={handleExpand}
         onMouseLeave={handleContract}
         cursor="pointer"
-        backgroundColor={isExpanded ? "bg.subtle" : "transparent"}
-        backdropBlur="frosted"
-        backdropFilter="auto"
+        backgroundColor={isExpanded ? "bg.subtle/80" : "transparent"}
+        backdropBlur={isExpanded ? "sm" : undefined}
+        backdropFilter={isExpanded ? "auto" : undefined}
         borderRadius="md"
         transition="all"
         pointerEvents="auto"
