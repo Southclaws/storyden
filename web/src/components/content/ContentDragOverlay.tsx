@@ -1,6 +1,11 @@
 import { Box, styled } from "@/styled-system/jsx";
 
-export function ContentDragOverlay({ isError, message }) {
+type Props = {
+  isError: boolean;
+  message: string;
+};
+
+export function ContentDragOverlay({ isError, message }: Props) {
   return (
     <Box
       position="absolute"
