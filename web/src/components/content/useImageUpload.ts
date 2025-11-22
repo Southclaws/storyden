@@ -82,7 +82,7 @@ export function useImageUpload() {
         reject(new Error("Upload cancelled"));
       });
 
-      xhr.open("POST", url);
+      xhr.open("POST", url.toString());
       xhr.setRequestHeader("Content-Type", "application/octet-stream");
 
       // Send the file directly as the body
