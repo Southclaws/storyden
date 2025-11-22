@@ -238,15 +238,13 @@ export function useContentComposer(props: ContentComposerProps) {
       return;
     }
 
-    if (pos !== null) {
-      const errorTransaction = currentState.tr.setNodeMarkup(pos, undefined, {
-        ...currentState.doc.nodeAt(pos)?.attrs,
-        "data-uploading": null,
-        "data-upload-error": "Upload failed",
-      });
+    const errorTransaction = currentState.tr.setNodeMarkup(pos, undefined, {
+      ...currentState.doc.nodeAt(pos)?.attrs,
+      "data-uploading": null,
+      "data-upload-error": "Upload failed",
+    });
 
-      view.dispatch(errorTransaction);
-    }
+    view.dispatch(errorTransaction);
 
     const upload = activeUploadsRef.current.get(uploadId);
     if (upload) {
