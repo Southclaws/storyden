@@ -170,6 +170,7 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
     await handle(
       async () => {
         const asset = await upload(file, { filename: file.name });
+
         const imageUrl = getAssetURL(asset.path);
         const markdownImage = `![${file.name}](${imageUrl})`;
 
@@ -197,6 +198,8 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
 
           return newValue;
         });
+
+        props.onAssetUpload?.(asset);
       },
       {
         cleanup: async () => {
