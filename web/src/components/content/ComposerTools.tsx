@@ -52,10 +52,13 @@ export function ComposerTools({
     return autoUpdate(anchorRef.current, floatingRef.current, () => {
       const rect = anchorRef.current!.getBoundingClientRect();
 
+      const top = window.scrollY + rect.top;
+      const right = window.innerWidth - rect.right;
+
       Object.assign(floatingRef.current!.style, {
-        top: `${rect.top}px`,
+        top: `${top}px`,
         height: `${rect.height}px`,
-        right: `${window.innerWidth - rect.right}px`,
+        right: `${right}px`,
       });
     });
   }, []);
