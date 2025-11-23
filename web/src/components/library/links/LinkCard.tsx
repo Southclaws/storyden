@@ -10,9 +10,10 @@ import { getAssetURL } from "@/utils/asset";
 
 export type Props = {
   link: LinkReference;
+  disableAnchors?: boolean;
 } & RichCardVariantProps;
 
-export function LinkCard({ link, ...rest }: Props) {
+export function LinkCard({ link, disableAnchors, ...rest }: Props) {
   const title = link.title || link.url;
   const asset = link.primary_image;
 
@@ -26,6 +27,7 @@ export function LinkCard({ link, ...rest }: Props) {
       text={link.description || "(no description)"}
       image={getAssetURL(asset?.path)}
       shape="row"
+      disableAnchors={disableAnchors}
       {...rest}
     >
       <LinkRefButton link={link} />

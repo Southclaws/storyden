@@ -11,7 +11,17 @@ import { ContentComposerProps } from "../composer-props";
 import "./styles.css";
 
 import { EditorMenu } from "./EditorMenu";
+import { LinkPasteMenu } from "./LinkPasteMenu";
+import { LinkPreviewAttributes } from "./plugins/LinkPreviewPlugin";
 import { useContentComposer } from "./useContentComposerRich";
+
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    linkPreview: {
+      setLinkPreview: (attributes: { href: string }) => ReturnType;
+    };
+  }
+}
 
 export function ContentComposerRich(props: ContentComposerProps) {
   const {
@@ -127,6 +137,7 @@ export function ContentComposerRich(props: ContentComposerProps) {
             })}
             editor={editor}
           />
+          <LinkPasteMenu editor={editor} />
         </>
       ) : (
         <div dangerouslySetInnerHTML={{ __html: initialValueHTML }} />

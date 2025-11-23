@@ -6,8 +6,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { EditorView } from "@tiptap/pm/view";
-import { Extension } from "@tiptap/react";
-import { useEditor } from "@tiptap/react";
+import { Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 
@@ -25,6 +24,8 @@ import {
 } from "../useImageUpload";
 
 import { ImageExtended, uploadPositionsKey } from "./plugins/ImagePlugin";
+import { LinkPasteMenuPlugin } from "./plugins/LinkPasteMenuPlugin";
+import { LinkPreview } from "./plugins/LinkPreviewPlugin";
 
 const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
@@ -100,12 +101,26 @@ export function useContentComposer(props: ContentComposerProps) {
   const extensions = [
     StarterKit,
     FocusClasses,
+    LinkPreview,
+    LinkPasteMenuPlugin,
     Link.configure({
       // Disable navigation when clicking links in the editor if it's active.
       openOnClick: props.disabled ? true : false,
     }).extend({
       inclusive: false,
+      parseHTML() {
+        return [
+          {
+            tag: "a[href]:not([data-display])",
+            getAttrs: (dom) => {
+              const href = dom.getAttribute("href");
+              return href ? { href } : false;
+            },
+          },
+        ];
+      },
     }),
+
     ImageExtended.configure({
       allowBase64: false,
       HTMLAttributes: {

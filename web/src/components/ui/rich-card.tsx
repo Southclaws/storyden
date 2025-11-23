@@ -26,6 +26,7 @@ export type CardItem = {
   header?: React.ReactNode;
   menu?: React.ReactNode;
   controls?: React.ReactNode;
+  disableAnchors?: boolean;
 };
 
 export type Props = CardItem & RichCardVariantProps;
@@ -41,6 +42,7 @@ export function Card({
   menu,
   controls,
   shape,
+  disableAnchors = false,
   children,
 }: PropsWithChildren<Props>) {
   const hasImage = Boolean(image);
@@ -99,7 +101,11 @@ export function Card({
 
         {title && (
           <styled.h1 className={styles.titleContainer}>
-            <Link className={linkOverlay()} href={url}>
+            <Link
+              className={linkOverlay()}
+              href={url}
+              onClick={(e) => disableAnchors && e.preventDefault()}
+            >
               {title}
             </Link>
           </styled.h1>
@@ -108,7 +114,11 @@ export function Card({
         <div className={styles.contentContainer}>
           <div className={styles.textArea}>
             <div ref={textContainerRef} className={longContentStyles}>
-              <Link href={url} className={linkOverlay()}>
+              <Link
+                href={url}
+                className={linkOverlay()}
+                onClick={(e) => disableAnchors && e.preventDefault()}
+              >
                 {text && <p className={styles.text}>{text}</p>}
                 {content && (
                   <>
