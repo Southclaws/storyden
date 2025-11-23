@@ -9,8 +9,11 @@ import { useEffect } from "react";
 import { useLinkCreate } from "@/api/openapi-client/links";
 import { LinkCard } from "@/components/library/links/LinkCard";
 import { Spinner } from "@/components/ui/Spinner";
+import { Button } from "@/components/ui/button";
+import { WarningIcon } from "@/components/ui/icons/Warning";
+import { LinkButton } from "@/components/ui/link-button";
 import { css } from "@/styled-system/css";
-import { Center, styled } from "@/styled-system/jsx";
+import { Center, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 const TAG = "div";
@@ -24,7 +27,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
   const href = props.node.attrs["href"] as string;
   const isEditable = props.editor.isEditable;
 
-  const { data, error, trigger } = useLinkCreate();
+  const { data, error, isMutating, trigger } = useLinkCreate();
 
   useEffect(() => {
     trigger({
@@ -37,16 +40,14 @@ function LinkPreviewComponent(props: NodeViewProps) {
       className={css({
         position: "relative",
         display: "inline-block",
-        cursor: "pointer",
         width: "full",
       })}
     >
       <div data-no-typography>
         {!data ? (
-          <Center w="full" h="12">
+          <Center w="full" minH="12">
             {error ? (
-              <>
-                (
+              isEditable ? (
                 <styled.div
                   position="absolute"
                   inset="0"
@@ -55,9 +56,9 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   alignItems="center"
                   justifyContent="center"
                   backgroundColor="bg.error"
-                  opacity="9"
                   borderRadius="md"
-                  padding="3"
+                  padding="2"
+                  height="min"
                   gap="2"
                   userSelect="none"
                   contentEditable={false}
@@ -70,9 +71,27 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   >
                     Link preview failed: {deriveError(error)}
                   </styled.p>
+                  <Button
+                    type="button"
+                    size="xs"
+                    variant="subtle"
+                    onClick={() => trigger({ url: href })}
+                    loading={isMutating}
+                  >
+                    Retry
+                  </Button>
                 </styled.div>
-                )
-              </>
+              ) : (
+                <LStack w="full" gap="1" userSelect="none">
+                  <LinkButton size="xs" variant="subtle" href={href}>
+                    {href}
+                  </LinkButton>
+                  <styled.p fontSize="xs" color="fg.muted">
+                    <WarningIcon w="3" display="inline" />
+                    &nbsp;<span>Link preview failed to load</span>
+                  </styled.p>
+                </LStack>
+              )
             ) : (
               <Spinner />
             )}
