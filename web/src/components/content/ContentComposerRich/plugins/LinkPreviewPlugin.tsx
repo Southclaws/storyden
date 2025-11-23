@@ -24,6 +24,7 @@ export type LinkPreviewAttributes = {
 };
 
 function LinkPreviewComponent(props: NodeViewProps) {
+  const isSelected = props.selected;
   const href = props.node.attrs["href"] as string;
   const isEditable = props.editor.isEditable;
 
@@ -41,6 +42,17 @@ function LinkPreviewComponent(props: NodeViewProps) {
         position: "relative",
         display: "inline-block",
         width: "full",
+        outlineWidth: isSelected ? "medium" : "none",
+        outlineStyle: "solid",
+        outlineColor: isSelected ? "blue.a6" : "transparent",
+        borderRadius: "lg",
+        userSelect: isEditable ? "none" : "auto",
+        // subtle saturation bump, combined with...
+        saturate: isSelected && !isMutating ? "150%" : "100%",
+        filter: "auto",
+        // background mix with subtle selection colour
+        background: isSelected && !isMutating ? "blue.5" : "transparent",
+        mixBlendMode: isSelected && !isMutating ? "screen" : "normal",
       })}
     >
       <div data-no-typography>
@@ -56,7 +68,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   alignItems="center"
                   justifyContent="center"
                   backgroundColor="bg.error"
-                  borderRadius="md"
+                  borderRadius="lg"
                   padding="2"
                   height="min"
                   gap="2"
