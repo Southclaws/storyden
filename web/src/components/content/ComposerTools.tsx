@@ -66,7 +66,19 @@ export function ComposerTools({
 
   const isWorking = workingCount > 0;
 
-  const handleExpand = () => {
+  const handleClick = () => {
+    // Toggle the menu state
+    // On desktop (mouse): closes if already open from hover
+    // On mobile (touch): toggles because pointer events are ignored
+    setIsExpanded((prev) => !prev);
+
+    onClick?.();
+  };
+
+  const handlePointerEnter = (e: React.PointerEvent) => {
+    // Only respond to mouse hover, not touch events
+    if (e.pointerType === "touch") return;
+
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
@@ -74,7 +86,10 @@ export function ComposerTools({
     setIsExpanded(true);
   };
 
-  const handleContract = () => {
+  const handlePointerLeave = (e: React.PointerEvent) => {
+    // Only respond to mouse leave, not touch events
+    if (e.pointerType === "touch") return;
+
     closeTimeoutRef.current = setTimeout(() => {
       setIsExpanded(false);
     }, 650);
@@ -106,8 +121,8 @@ export function ComposerTools({
             top={{ base: "4", md: "20" }}
             zIndex="popover"
             opacity={isExpanded ? "full" : "5"}
-            onMouseEnter={handleExpand}
-            onMouseLeave={handleContract}
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
             cursor="pointer"
             backgroundColor={isExpanded ? "bg.subtle/80" : "transparent"}
             backdropBlur={isExpanded ? "sm" : undefined}
@@ -158,7 +173,7 @@ export function ComposerTools({
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={handleExpand}
+                onClick={handleClick}
                 aria-label="Show editor tools"
                 aria-expanded={isExpanded}
               >
