@@ -159,6 +159,7 @@ export const button = defineRecipe({
         px: "2",
         gap: "2",
         "& svg": {
+          flexShrink: "0",
           fontSize: "sm",
           width: "4",
           height: "4",

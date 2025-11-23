@@ -59,6 +59,7 @@ export function ComposerTools({
         top: `${top}px`,
         height: `${rect.height}px`,
         right: `${right}px`,
+        maxWidth: `${rect.width}px`,
       });
     });
   }, []);
@@ -145,6 +146,8 @@ export function ComposerTools({
                   style={{
                     visibility: isExpanded ? "visible" : "hidden",
                     width: isExpanded ? "auto" : 0,
+                    overflowX: isExpanded ? "scroll" : "hidden",
+                    scrollbarWidth: "none",
                   }}
                 >
                   {children}
