@@ -74,6 +74,8 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   gap="2"
                   userSelect="none"
                   contentEditable={false}
+                  role="alert"
+                  aria-live="polite"
                 >
                   <styled.p
                     fontSize="sm"
