@@ -24,9 +24,11 @@ export type LinkPreviewAttributes = {
 };
 
 function LinkPreviewComponent(props: NodeViewProps) {
-  const isSelected = props.selected;
   const href = props.node.attrs["href"] as string;
   const isEditable = props.editor.isEditable;
+  // selection is only ever really possible while editable. though prosemirror
+  // or tiptap (not sure who) sometimes sets selected to true when read-only.
+  const isSelected = props.selected && isEditable;
 
   const { data, error, isMutating, trigger } = useLinkCreate();
 
