@@ -41,6 +41,7 @@ export const semanticTokens = defineSemanticTokens({
   },
   spacing: {
     safeBottom: { value: "env(safe-area-inset-bottom)" },
+    safeTop: { value: "calc(env(keyboard-inset-height) + 4px)" },
     scrollGutter: { value: "var(--spacing-2)" },
   },
 });

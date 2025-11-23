@@ -79,7 +79,7 @@ export function ComposerTools({
     >
       <Box
         position="sticky"
-        top={{ base: "4", md: "20" }}
+        top={{ base: "safeTop", md: "20" }}
         width="full"
         display="flex"
         justifyContent="flex-end"

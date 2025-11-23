@@ -3091,6 +3091,10 @@ const tokens = {
     "value": "65ch",
     "variable": "var(--sizes-prose)"
   },
+  "spacing.safeTop": {
+    "value": "calc(env(keyboard-inset-height) + 4px)",
+    "variable": "var(--spacing-safe-top)"
+  },
   "spacing.-1": {
     "value": "calc(var(--spacing-1) * -1)",
     "variable": "var(--spacing-1)"
@@ -3234,6 +3238,10 @@ const tokens = {
   "spacing.-scrollGutter": {
     "value": "calc(var(--spacing-scroll-gutter) * -1)",
     "variable": "var(--spacing-scroll-gutter)"
+  },
+  "spacing.-safeTop": {
+    "value": "calc(var(--spacing-safe-top) * -1)",
+    "variable": "var(--spacing-safe-top)"
   },
   "colors.bg.default": {
     "value": "var(--colors-bg-default)",
