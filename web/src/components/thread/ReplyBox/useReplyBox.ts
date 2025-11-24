@@ -13,6 +13,8 @@ import { sendBeacon } from "@/lib/beacon/beacon";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { scrollToBottom } from "@/utils/scroll";
 
+import { useReplyContext } from "../ReplyContext";
+
 type Value = {
   body: string;
   isEmpty: boolean;
@@ -25,6 +27,7 @@ export type Form = z.infer<typeof FormSchema>;
 
 export function useReplyBox(thread: Thread) {
   const session = useSession();
+  const { replyTo, clearReplyTo } = useReplyContext();
   const { createReply, revalidate } = useThreadMutations(thread);
   const [resetKey, setResetKey] = useState("");
   const [isEmpty, setEmpty] = useState(true);
@@ -37,7 +40,10 @@ export function useReplyBox(thread: Thread) {
   const handleSubmit = form.handleSubmit(async (data: Form) => {
     await handle(
       async () => {
-        await createReply(data);
+        await createReply({
+          body: data.body,
+          reply_to: replyTo?.reply.id,
+        });
 
         // Mark the thread as read after successfully replying to it
         try {
@@ -52,6 +58,7 @@ export function useReplyBox(thread: Thread) {
         setResetKey(new Date().toISOString());
         form.reset();
         setEmpty(true);
+        clearReplyTo();
 
         scrollToBottom();
       },

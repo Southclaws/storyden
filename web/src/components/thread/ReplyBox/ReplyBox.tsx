@@ -6,9 +6,14 @@ import { Anchor } from "src/components/site/Anchor";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { Box, HStack, styled } from "@/styled-system/jsx";
+import { Box, HStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
+import { timestamp } from "@/utils/date";
+
+import { useReplyContext } from "../ReplyContext";
 
 import { Form, useReplyBox } from "./useReplyBox";
 
@@ -17,6 +22,7 @@ export type Props = {
 };
 
 export function ReplyBox(props: Thread) {
+  const { replyTo, clearReplyTo } = useReplyContext();
   const { isLoggedIn, isEmpty, isLoading, form, resetKey, handlers } =
     useReplyBox(props);
 
@@ -37,6 +43,32 @@ export function ReplyBox(props: Thread) {
         width="full"
         onSubmit={handlers.handleSubmit}
       >
+        {replyTo && (
+          <WStack py="1" px="2" borderRadius="md" bgColor="bg.muted">
+            <HStack gap="1" fontSize="sm" color="fg.muted">
+              <styled.span>Replying&nbsp;to</styled.span>
+              <MemberIdent
+                profile={replyTo.reply.author}
+                name="handle"
+                size="xs"
+              />
+              <styled.a href={`#${replyTo.reply.id}`}>
+                {timestamp(replyTo.reply.createdAt)}
+              </styled.a>
+            </HStack>
+
+            <IconButton
+              type="button"
+              size="xs"
+              variant="ghost"
+              aria-label="Clear reply-to"
+              onClick={clearReplyTo}
+            >
+              <CloseIcon />
+            </IconButton>
+          </WStack>
+        )}
+
         <HStack justifyContent="space-between">
           <HStack gap="1">
             <styled.span textWrap="nowrap">Reply to</styled.span>

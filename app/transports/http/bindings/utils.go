@@ -168,6 +168,7 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 		Reacts:    dt.Map(p.Reacts, serialiseReact),
 		Meta:      (*openapi.Metadata)(&p.Meta),
 		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
+		ReplyTo:   opt.Map(p.ReplyTo, func(id post.ID) openapi.Identifier { return openapi.Identifier(xid.ID(id).String()) }).Ptr(),
 	}
 }
 
