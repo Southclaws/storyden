@@ -22,15 +22,15 @@ export const DefaultMemberSettings: MemberCustomSettings = {
 };
 
 export function parseMemberSettings(
-  global: FrontendConfiguration,
   data: Account,
+  global?: FrontendConfiguration,
 ): Member {
   const parsed = MemberCustomSettingsSchema.safeParse(data.meta);
 
   const meta = parsed.success ? parsed.data : DefaultMemberSettings;
 
   if (meta.editor.mode === undefined) {
-    meta.editor.mode = global.editor.mode;
+    meta.editor.mode = global?.editor.mode ?? DefaultMemberSettings.editor.mode;
   }
 
   const settings = { ...data, meta } satisfies Member;

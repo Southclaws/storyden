@@ -15,11 +15,11 @@ export function useSession(
     },
   });
 
-  if (!data || !settings) {
+  if (!data) {
     return undefined;
   }
 
-  const session = parseMemberSettings(settings.metadata, data);
+  const session = parseMemberSettings(data, settings?.metadata);
 
   return session;
 }
