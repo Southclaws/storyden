@@ -1,4 +1,5 @@
 import { Portal } from "@ark-ui/react";
+import { Editor } from "@tiptap/core";
 import { match } from "ts-pattern";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ import { button } from "@/styled-system/recipes";
 import { LinkButton } from "./LinkButton";
 
 export type Props = {
-  editor: any;
+  editor: Editor;
   uniqueID: string;
   format: any;
   handlers: any;
@@ -37,7 +38,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
   return (
     <HStack gap="1">
       <Menu.Root
-        onSelect={(d) => format.text.set(d.value as any /* lazy */)}
+        onSelect={(d) => format.text.set(d.value)}
         positioning={{ gutter: 0 }}
       >
         <Menu.Trigger asChild>
