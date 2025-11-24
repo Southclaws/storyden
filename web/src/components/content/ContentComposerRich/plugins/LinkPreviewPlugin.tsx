@@ -36,7 +36,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
     trigger({
       url: href,
     });
-  }, [href]);
+  }, [href, trigger]);
 
   return (
     <NodeViewWrapper
@@ -134,18 +134,18 @@ export const LinkPreview = Node.create<{}>({
       href: {
         default: null,
         parseHTML: (element) => element.getAttribute("data-href"),
-        renderHTML: (href) => {
-          if (!href) {
+        renderHTML: (attributes: Record<string, any>) => {
+          if (!attributes["href"]) {
             return {};
           }
-          return { "data-href": href };
+          return { "data-href": attributes["href"] };
         },
       },
       "data-display": {
         default: "card",
         parseHTML: (element) => element.getAttribute("data-display"),
-        renderHTML: (display) => {
-          return { "data-display": display };
+        renderHTML: (attributes: Record<string, any>) => {
+          return { "data-display": attributes["data-display"] };
         },
       },
     };
