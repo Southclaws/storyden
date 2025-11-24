@@ -81,14 +81,14 @@ export function ContentComposerRich(props: ContentComposerProps) {
                     name: "flip",
                     options: {
                       fallbackPlacements: ["top-start"],
-                      boundary: editor?.view.dom,
+                      boundary: editor.view.dom,
                       padding: 8,
                     },
                   },
                   {
                     name: "preventOverflow",
                     options: {
-                      boundary: editor?.view.dom,
+                      boundary: editor.view.dom,
                       altAxis: true,
                       padding: {
                         top: 0,
