@@ -82,18 +82,19 @@ export const LinkPasteMenuPlugin = Extension.create({
             }
 
             const links = find(pastedText);
-            if (links.length === 0) {
+            if (links.length === 0 || links[0] === undefined) {
               return false;
             }
 
-            const isSingleURL =
-              links.length === 1 && links[0]?.value === pastedText;
+            const link = links[0];
+
+            const isSingleURL = links.length === 1 && link.value === pastedText;
 
             if (!isSingleURL) {
               return false;
             }
 
-            const url = links[0]?.href;
+            const url = link.href;
 
             event.preventDefault();
 
