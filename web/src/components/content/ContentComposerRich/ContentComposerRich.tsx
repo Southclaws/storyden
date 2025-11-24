@@ -12,7 +12,6 @@ import "./styles.css";
 
 import { EditorMenu } from "./EditorMenu";
 import { LinkPasteMenu } from "./LinkPasteMenu";
-import { LinkPreviewAttributes } from "./plugins/LinkPreviewPlugin";
 import { useContentComposer } from "./useContentComposerRich";
 
 declare module "@tiptap/core" {
