@@ -1,12 +1,13 @@
 "use client";
 
 import {
-  CategoryList,
+  Account,
   CategoryListResult,
   NodeListResult,
   ThreadListResult,
 } from "@/api/openapi-schema";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { Settings } from "@/lib/settings/settings";
+import { useSettings } from "@/lib/settings/settings-client";
 
 import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
 
@@ -22,10 +23,17 @@ export type InitialData = {
 
 type Props = {
   initialData: InitialData;
+  initialSettings: Settings;
+  initialSession?: Account;
 };
 
-export function FeedScreenContent({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+export function FeedScreenContent({
+  initialData,
+  initialSettings,
+  initialSession,
+}: Props) {
+  const { settings } = useSettings(initialSettings);
+  const feed = settings?.metadata.feed ?? initialSettings.metadata.feed;
 
   switch (feed.source.type) {
     case "threads":
@@ -37,11 +45,17 @@ export function FeedScreenContent({ initialData }: Props) {
           paginationBasePath="/"
           showCategorySelect={true}
           showQuickShare={feed.source.quickShare === "enabled"}
+          initialSession={initialSession}
         />
       );
 
     case "library":
-      return <LibraryFeedScreen initialData={initialData.library} />;
+      return (
+        <LibraryFeedScreen
+          initialData={initialData.library}
+          initialSettings={initialSettings}
+        />
+      );
 
     case "categories":
       return (
@@ -53,6 +67,7 @@ export function FeedScreenContent({ initialData }: Props) {
           initialThreadList={initialData.threads}
           initialThreadListPage={initialData.page}
           paginationBasePath="/"
+          initialSession={initialSession}
         />
       );
   }
