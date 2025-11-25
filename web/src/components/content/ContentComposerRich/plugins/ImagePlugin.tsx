@@ -38,7 +38,9 @@ function Component(props: NodeViewProps) {
   const uploadProgress = props.node.attrs["data-upload-progress"];
   const progressPercent = uploadProgress ? parseInt(uploadProgress, 10) : 0;
 
-  // Access extension options to get retry/cancel handlers
+  const isEditable = props.editor.isEditable;
+  const isSelected = props.selected && isEditable;
+
   const { handleRetry, handleCancel } = props.extension.options as Options;
 
   return (
@@ -47,10 +49,19 @@ function Component(props: NodeViewProps) {
         position: "relative",
         display: "inline-block",
         cursor: "pointer",
+        outlineWidth: isSelected ? "medium" : "none",
+        outlineStyle: "solid",
+        outlineColor: isSelected ? "blue.a6" : "transparent",
+        borderRadius: "lg",
+        userSelect: isEditable ? "none" : "auto",
+        saturate: isSelected && !isUploading ? "150%" : "100%",
+        filter: "auto",
+        background: isSelected && !isUploading ? "blue.5" : "transparent",
+        mixBlendMode: isSelected && !isUploading ? "screen" : "normal",
       })}
     >
       <styled.img
-        borderRadius="md"
+        borderRadius="lg"
         opacity={isUploading ? "5" : "full"}
         transition="all"
         {...props.node.attrs}
