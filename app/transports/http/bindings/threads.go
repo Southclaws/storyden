@@ -222,7 +222,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	}, nil
 }
 
-const threadGetCacheControl = "private, max-age=5, stale-while-revalidate=120"
+const threadGetCacheControl = "private, max-age=1"
 
 func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetRequestObject) (openapi.ThreadGetResponseObject, error) {
 	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))

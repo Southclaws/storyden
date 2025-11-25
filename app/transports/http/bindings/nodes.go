@@ -231,7 +231,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}, nil
 }
 
-const nodeGetCacheControl = "public, max-age=1, stale-while-revalidate=120"
+const nodeGetCacheControl = "public, max-age=1"
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
 	pp := deserialisePageParams(request.Params.Page, 100)
