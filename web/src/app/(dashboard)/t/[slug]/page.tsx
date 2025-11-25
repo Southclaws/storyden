@@ -27,7 +27,9 @@ export default async function Page(props: Props) {
 
   const { page } = QuerySchema.parse(searchParams);
 
-  const { data } = await threadGet(slug);
+  const { data } = await threadGet(slug, {
+    page: page?.toString(),
+  });
 
   return <ThreadScreen initialPage={page} slug={slug} thread={data} />;
 }
