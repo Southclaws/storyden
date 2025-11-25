@@ -2,10 +2,13 @@ package ai
 
 import (
 	"context"
+	"iter"
 	"math"
 	"time"
 
 	"golang.org/x/exp/rand"
+	"google.golang.org/adk/model"
+	"google.golang.org/genai"
 )
 
 type Mock struct{}
@@ -62,6 +65,17 @@ func (o *Mock) EmbeddingFunc() func(ctx context.Context, text string) ([]float32
 		}
 
 		return normalizeVector(embedding), nil
+	}
+}
+
+func (o *Mock) GenerateContent(ctx context.Context, req *model.LLMRequest, stream bool) iter.Seq2[*model.LLMResponse, error] {
+	return func(yield func(*model.LLMResponse, error) bool) {
+		text := "Mock response"
+		yield(&model.LLMResponse{
+			Content:      genai.NewContentFromText(text, genai.RoleModel),
+			FinishReason: genai.FinishReasonStop,
+			TurnComplete: true,
+		}, nil)
 	}
 }
 

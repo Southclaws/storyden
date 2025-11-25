@@ -7,9 +7,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/invopop/jsonschema"
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/packages/param"
-	"github.com/openai/openai-go/shared"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/packages/param"
+	"github.com/openai/openai-go/v3/shared"
 )
 
 func PromptObject[T any](ctx context.Context, prompter Prompter, description, input string, schema T) (*T, error) {
@@ -24,7 +24,7 @@ func PromptObject[T any](ctx context.Context, prompter Prompter, description, in
 	}
 
 	res, err := s.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Model: openai.ChatModelGPT4_1,
+		Model: openai.ChatModelGPT5,
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(input),
 		},
