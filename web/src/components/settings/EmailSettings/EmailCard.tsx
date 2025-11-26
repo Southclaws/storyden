@@ -11,6 +11,7 @@ import {
 import { AccountEmailAddress } from "@/api/openapi-schema";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { withUndo } from "@/lib/thread/undo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -27,15 +28,19 @@ export function EmailCard({ email }: Props) {
   async function handleRemove() {
     await handle(
       async () => {
-        await accountEmailRemove(email.id);
+        await withUndo({
+          message: "Email address deleted",
+          duration: 5000,
+          toastId: `email-${email.id}`,
+          action: async () => {
+            await accountEmailRemove(email.id);
+          },
+          onUndo: () => {},
+        });
       },
       {
-        async cleanup() {
+        cleanup: async () => {
           await mutate(getAccountGetKey());
-        },
-        promiseToast: {
-          loading: "Deleting email address...",
-          success: "Email deleted",
         },
       },
     );
