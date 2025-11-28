@@ -9,6 +9,7 @@ import { Byline } from "../../content/Byline";
 import { ReactList } from "../ReactList/ReactList";
 import { ReplyMenu } from "../ReplyMenu/ReplyMenu";
 
+import { ReplyToButton } from "./ReplyToButton";
 import { Form, Props, useReply } from "./useReply";
 
 export function Reply(props: Props) {
@@ -47,13 +48,29 @@ export function Reply(props: Props) {
               </>
             </HStack>
           ) : (
-            <ReplyMenu
-              thread={thread}
-              reply={reply}
-              onEdit={handlers.handleSetEditing}
-            />
+            <HStack>
+              <ReplyToButton thread={thread} reply={reply} />
+              <ReplyMenu
+                thread={thread}
+                reply={reply}
+                onEdit={handlers.handleSetEditing}
+              />
+            </HStack>
           )}
         </WStack>
+
+        {reply.reply_to && (
+          <WStack>
+            {/* TODO: Decide on: should we load the reply edge fully and return it on the API
+            pros: easy, cons: larger API response
+            
+            or, lazy load it here using the API and a /replies/{id} endpoint?
+            
+            replies should probably be page-aware anyway, potentially on the API.
+            */}
+            <p>this is a reply</p>
+          </WStack>
+        )}
 
         <ReplyBodyInput
           control={form.control}

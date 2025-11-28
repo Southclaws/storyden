@@ -102,6 +102,7 @@ func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
 		}).
+		WithReplyTo().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
