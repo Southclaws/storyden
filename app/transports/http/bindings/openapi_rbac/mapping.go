@@ -354,6 +354,10 @@ func (m *Mapping) PostDelete() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) PostLocationGet() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedThreads
+}
+
 func (m *Mapping) PostSearch() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionReadPublishedThreads
 }
