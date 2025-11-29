@@ -23,6 +23,7 @@ type Repository interface {
 	) (*Reply, error)
 
 	Get(ctx context.Context, id post.ID) (*Reply, error)
+	GetMany(ctx context.Context, ids ...post.ID) ([]*Reply, error)
 
 	Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error)
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)

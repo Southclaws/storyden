@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -108,6 +109,40 @@ func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 	}
 
 	return Map(p)
+}
+
+func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*Reply, error) {
+	if len(ids) == 0 {
+		return []*Reply{}, nil
+	}
+
+	xids := dt.Map(ids, func(id post.ID) xid.ID { return xid.ID(id) })
+
+	posts, err := d.db.Post.
+		Query().
+		Where(ent_post.IDIn(xids...)).
+		WithAuthor().
+		WithRoot(func(pq *ent.PostQuery) {
+			pq.WithAuthor()
+		}).
+		WithAssets(func(aq *ent.AssetQuery) {
+			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
+		}).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	replies := make([]*Reply, 0, len(posts))
+	for _, p := range posts {
+		r, err := Map(p)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		replies = append(replies, r)
+	}
+
+	return replies, nil
 }
 
 func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error) {
