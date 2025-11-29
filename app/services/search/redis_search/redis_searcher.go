@@ -126,16 +126,7 @@ func (c *RedisSearcher) createIndex(ctx context.Context) error {
 }
 
 func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
-	escapedQuery := escapeRedisSearch(q)
-
-	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
-		kindStrs := make([]string, len(kinds))
-		for i, k := range kinds {
-			kindStrs[i] = k.String()
-		}
-		kindFilter := fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|"))
-		escapedQuery = fmt.Sprintf("(%s) %s", escapedQuery, kindFilter)
-	}
+	escapedQuery := s.buildQuery(q, opts)
 
 	offset := (p.PageOneIndexed() - 1) * p.Size()
 	limit := p.Size()
@@ -221,6 +212,34 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 	}, nil
 }
 
+func (s *RedisSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
+	if s.client == nil {
+		return nil, searcher.ErrFastMatchesUnavailable
+	}
+
+	cmd := s.client.B().FtSearch().
+		Index(s.indexName).
+		Query(s.buildPrefixQuery(q, opts)).
+		Limit().OffsetNum(0, int64(limit)).
+		Build()
+
+	_, docs, err := s.client.Do(ctx, cmd).AsFtSearch()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to search redis index"))
+	}
+
+	matches := make(datagraph.MatchList, 0, len(docs))
+	for _, doc := range docs {
+		match, ok := s.matchFromDoc(doc.Doc)
+		if !ok {
+			continue
+		}
+		matches = append(matches, match)
+	}
+
+	return matches, nil
+}
+
 func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 	doc := Document{
 		ID:          item.GetID().String(),
@@ -252,6 +271,67 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 	}
 
 	return nil
+}
+
+func (s *RedisSearcher) buildQuery(q string, opts searcher.Options) string {
+	escapedQuery := escapeRedisSearch(q)
+
+	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
+		kindStrs := make([]string, len(kinds))
+		for i, k := range kinds {
+			kindStrs[i] = k.String()
+		}
+		kindFilter := fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|"))
+		return fmt.Sprintf("(%s) %s", escapedQuery, kindFilter)
+	}
+
+	return escapedQuery
+}
+
+func (s *RedisSearcher) buildPrefixQuery(q string, opts searcher.Options) string {
+	words := strings.Fields(q)
+	if len(words) == 0 {
+		return "*"
+	}
+
+	prefixTerms := make([]string, len(words))
+	for i, word := range words {
+		escaped := escapeRedisSearch(word)
+		prefixTerms[i] = escaped + "*"
+	}
+
+	nameQuery := fmt.Sprintf("@name:(%s)", strings.Join(prefixTerms, " "))
+
+	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
+		kindStrs := make([]string, len(kinds))
+		for i, k := range kinds {
+			kindStrs[i] = k.String()
+		}
+		kindFilter := fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|"))
+		return fmt.Sprintf("%s %s", nameQuery, kindFilter)
+	}
+
+	return nameQuery
+}
+
+func (s *RedisSearcher) matchFromDoc(fields map[string]string) (datagraph.Match, bool) {
+	id, err := xid.FromString(fields["id"])
+	if err != nil {
+		return datagraph.Match{}, false
+	}
+
+	kind, err := datagraph.NewKind(fields["kind"])
+	if err != nil {
+		return datagraph.Match{}, false
+	}
+
+	return datagraph.Match{
+		ID:          id,
+		Kind:        kind,
+		Slug:        fields["slug"],
+		Name:        fields["name"],
+		Description: fields["description"],
+	}, true
 }
 
 func (s *RedisSearcher) Deindex(ctx context.Context, ir datagraph.ItemRef) error {
