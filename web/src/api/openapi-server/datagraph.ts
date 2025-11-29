@@ -10,6 +10,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   DatagraphAskOKResponse,
   DatagraphAskParams,
+  DatagraphMatchesOKResponse,
+  DatagraphMatchesParams,
   DatagraphSearchOKResponse,
   DatagraphSearchParams,
 } from "../openapi-schema";
@@ -52,6 +54,62 @@ export const datagraphSearch = async (
 ): Promise<datagraphSearchResponse> => {
   return fetcher<Promise<datagraphSearchResponse>>(
     getDatagraphSearchUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Query the datagraph optimised for typeahead scenarios. This endpoint is
+only active when a `SEARCH_PROVIDER` that supports fast access is used.
+This includes providers such as Bleve and Redis.
+
+This endpoint will return a minified set of results directly from the
+configured search index, without hitting the database. This makes it
+suitable for performance sensitive use-cases such as type-ahead search,
+@ mentioning threads/pages, CTRL+K style menus, and more.
+
+Results will include a `kind` field and short content, but will not
+contain graph edges (such as authorship, links, etc.) due to constraints
+of the underlying search index and to keep payload sizes smaller.
+
+ */
+export type datagraphMatchesResponse = {
+  data: DatagraphMatchesOKResponse;
+  status: number;
+};
+
+export const getDatagraphMatchesUrl = (params: DatagraphMatchesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["kind"];
+
+    if (value instanceof Array && explodeParameters.includes(key)) {
+      value.forEach((v) =>
+        normalizedParams.append(key, v === null ? "null" : v.toString()),
+      );
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/datagraph/matches?${normalizedParams.toString()}`
+    : `/datagraph/matches`;
+};
+
+export const datagraphMatches = async (
+  params: DatagraphMatchesParams,
+  options?: RequestInit,
+): Promise<datagraphMatchesResponse> => {
+  return fetcher<Promise<datagraphMatchesResponse>>(
+    getDatagraphMatchesUrl(params),
     {
       ...options,
       method: "GET",
