@@ -1522,6 +1522,28 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
+
+  /posts/location:
+    get:
+      operationId: PostLocationGet
+      description: |
+        Locate a post just from its ID. This will tell you what kind of post it
+        is and where to find it. Where "a post is" is simple for threads, just
+        the slug. For replies, it will give you the thread slug and the position
+        within the thread: the index, the page and the position on the page.
+      tags: [posts]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { $ref: "#/components/schemas/Identifier" }
+          description: The post ID to locate
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/PostLocationGetOK" }
+
   #
   #                                     888
   #                                     888
@@ -3354,6 +3376,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Post"
+
+    PostLocationGetOK:
+      description: Post location retrieved successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PostLocation"
 
     PostReactAddOK:
       description: Post reaction added.
@@ -5519,6 +5548,30 @@ components:
         meta: { $ref: "#/components/schemas/Metadata" }
         reply_to: { $ref: "#/components/schemas/Identifier" }
         url: { $ref: "#/components/schemas/URL" }
+
+    PostLocation:
+      type: object
+      description: |
+        The location of a post. For threads, this is just the slug. For replies,
+        this includes the thread slug, the index, page number and position.
+      required: [slug, kind]
+      properties:
+        slug:
+          type: string
+          description: The thread slug for a thread or root slug for a reply.
+        kind:
+          type: string
+          enum: [thread, reply]
+          description: Whether this is a thread or a reply
+        index:
+          type: integer
+          description: The zero-based index of a reply within its thread.
+        page:
+          type: integer
+          description: The page number where the reply appears.
+        position:
+          type: integer
+          description: The position of the reply on its page.
 
     #
     # 8888888b.                            888

@@ -20,6 +20,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+const RepliesPerPage = 50
+
 type Reply struct {
 	post.Post
 

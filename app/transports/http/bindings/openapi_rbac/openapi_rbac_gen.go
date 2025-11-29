@@ -92,6 +92,7 @@ type OperationPermissions interface {
 	PostDelete() (bool, *rbac.Permission)
 	PostReactAdd() (bool, *rbac.Permission)
 	PostReactRemove() (bool, *rbac.Permission)
+	PostLocationGet() (bool, *rbac.Permission)
 	AssetUpload() (bool, *rbac.Permission)
 	AssetGet() (bool, *rbac.Permission)
 	LikePostGet() (bool, *rbac.Permission)
@@ -319,6 +320,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.PostReactAdd()
 	case "PostReactRemove":
 		return optable.PostReactRemove()
+	case "PostLocationGet":
+		return optable.PostLocationGet()
 	case "AssetUpload":
 		return optable.AssetUpload()
 	case "AssetGet":
