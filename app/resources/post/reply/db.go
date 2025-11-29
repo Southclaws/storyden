@@ -165,5 +165,5 @@ func (d *database) Probe(ctx context.Context, id post.ID) (*ReplyRef, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return MapRef(p)
+	return MapRef(p), nil
 }

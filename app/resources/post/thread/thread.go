@@ -195,3 +195,26 @@ func MapRef(m *ent.Post) *ThreadRef {
 		LastReplyAt: opt.New(m.LastReplyAt),
 	}
 }
+
+func ItemRef(t *ent.Post) (datagraph.Item, error) {
+	content, err := datagraph.NewRichText(t.Body)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return &Thread{
+		Post: post.Post{
+			ID:        post.ID(t.ID),
+			Content:   content,
+			Meta:      t.Metadata,
+			CreatedAt: t.CreatedAt,
+			UpdatedAt: t.UpdatedAt,
+			DeletedAt: opt.NewPtr(t.DeletedAt),
+		},
+
+		Title:      t.Title,
+		Slug:       t.Slug,
+		Short:      t.Short,
+		Visibility: visibility.NewVisibilityFromEnt(t.Visibility),
+	}, nil
+}

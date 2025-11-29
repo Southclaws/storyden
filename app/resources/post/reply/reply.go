@@ -188,7 +188,7 @@ func Mapper(
 	}
 }
 
-func MapRef(m *ent.Post) (*ReplyRef, error) {
+func MapRef(m *ent.Post) *ReplyRef {
 	root := func() xid.ID {
 		if m.RootPostID == nil {
 			return m.ID
@@ -199,5 +199,30 @@ func MapRef(m *ent.Post) (*ReplyRef, error) {
 	return &ReplyRef{
 		ID:         post.ID(m.ID),
 		RootPostID: post.ID(root),
+	}
+}
+
+func ItemRef(r *ent.Post) (datagraph.Item, error) {
+	content, err := datagraph.NewRichText(r.Body)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	var rootPostID post.ID
+	if r.RootPostID != nil {
+		rootPostID = post.ID(*r.RootPostID)
+	}
+
+	return &Reply{
+		Post: post.Post{
+			ID:        post.ID(r.ID),
+			Content:   content,
+			Meta:      r.Metadata,
+			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
+			DeletedAt: opt.NewPtr(r.DeletedAt),
+		},
+		RootPostID: rootPostID,
+		ReplyTo:    replyTo(r),
 	}, nil
 }

@@ -31,6 +31,9 @@ import (
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/report"
 	"github.com/Southclaws/storyden/app/services/search"
+	"github.com/Southclaws/storyden/app/services/search/bleve_search"
+	"github.com/Southclaws/storyden/app/services/search/redis_search"
+	"github.com/Southclaws/storyden/app/services/search/search_indexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -53,6 +56,9 @@ func Build() fx.Option {
 		post_liker.Build(),
 		react_manager.Build(),
 		search.Build(),
+		bleve_search.Build(),
+		redis_search.Build(),
+		search_indexer.Build(),
 		avatar.Build(),
 		asset.Build(),
 		thread_mark.Build(),

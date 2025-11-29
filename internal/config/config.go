@@ -284,6 +284,29 @@ type Config struct {
 	RedisURL url.URL `default:"" envconfig:"REDIS_URL"`
 
 	// -
+	// Search features
+	// -
+
+	/*
+	   Either:
+
+	   - `database` for the default database-driven search.  This is not recommended for larger deployments as it does not scale well and has limited search quality.
+	   - `bleve` for Bleve. This is a local full-text search engine that is fast and efficient for small to medium-sized deployments. This is best used when you are using local disk storage, such as SQLite and local asset storage.
+	   - `redis` for Redisearch. This is a fast and efficient search provider that is recommended for larger deployments. This is recommended of your environment is ephemeral and you're already using external providers for database and asset storage.
+	*/
+	SearchProvider string `default:"database" envconfig:"SEARCH_PROVIDER"`
+	/*
+	   When using `SEARCH_PROVIDER` set to either `bleve` or `redis`, this is the number of items that will be indexed in a single batch.
+
+	   Increasing this value will improve indexing performance, but will also increase memory usage during indexing.
+	*/
+	SearchIndexChunkSize int `default:"1000" envconfig:"SEARCH_INDEX_CHUNK_SIZE"`
+	// The path to the directory where Bleve will store search indexes. Only used when `SEARCH_PROVIDER` is set to `bleve`.
+	BlevePath string `default:"data/bleve" envconfig:"BLEVE_PATH"`
+	// The name of the Redis search index. Only used when `SEARCH_PROVIDER` is set to `redis`.
+	RedisSearchIndexName string `default:"storyden" envconfig:"REDIS_SEARCH_INDEX_NAME"`
+
+	// -
 	// Message queue
 	// -
 
