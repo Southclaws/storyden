@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/opt"
+
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 )
@@ -18,4 +19,9 @@ type Searcher interface {
 
 type SingleKindSearcher interface {
 	Search(ctx context.Context, query string, p pagination.Parameters) (*pagination.Result[datagraph.Item], error)
+}
+
+type Indexer interface {
+	Index(ctx context.Context, item datagraph.Item) error
+	Deindex(ctx context.Context, ir datagraph.ItemRef) error
 }

@@ -8,7 +8,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache/local"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache/redis"
@@ -27,27 +26,18 @@ type Store interface {
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(func(cfg config.Config) (Store, error) {
+		fx.Provide(func(cfg config.Config, redisClient rueidis.Client) (Store, error) {
 			switch cfg.CacheProvider {
 			case "":
 				c, err := local.New()
 				return c, err
 
 			case "redis":
-				password, _ := cfg.RedisURL.User.Password()
-
-				client, err := rueidis.NewClient(rueidis.ClientOption{
-					InitAddress:      []string{cfg.RedisURL.Host},
-					Username:         cfg.RedisURL.User.Username(),
-					Password:         password,
-					DisableCache:     true,
-					ConnWriteTimeout: 5 * time.Second,
-				})
-				if err != nil {
-					return nil, fault.Wrap(err, fmsg.With("failed to connect to redis"))
+				if redisClient == nil {
+					return nil, fault.New("REDIS_URL is required when CACHE_PROVIDER is set to 'redis'")
 				}
 
-				return redis.New(client), nil
+				return redis.New(redisClient), nil
 			}
 
 			panic("unknown cache provider: " + cfg.CacheProvider)
