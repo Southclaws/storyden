@@ -518,6 +518,10 @@ func (m *Mapping) DatagraphSearch() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) DatagraphMatches() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) DatagraphAsk() (bool, *rbac.Permission) {
 	return false, nil
 }

@@ -6,9 +6,11 @@ import (
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -60,30 +62,7 @@ func (s *BleveSearcher) Search(ctx context.Context, q string, p pagination.Param
 		return nil, fault.New("bleve client is not initialized")
 	}
 
-	textQuery := bleve.NewMatchQuery(q)
-
-	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
-		kindQueries := make([]query.Query, 0, len(kinds))
-		for _, k := range kinds {
-			kq := bleve.NewMatchQuery(k.String())
-			kq.SetField("kind")
-			kindQueries = append(kindQueries, kq)
-		}
-		kindQuery := bleve.NewDisjunctionQuery(kindQueries...)
-		combinedQuery := bleve.NewConjunctionQuery(textQuery, kindQuery)
-
-		req := bleve.NewSearchRequestOptions(combinedQuery, p.Size(), (p.PageOneIndexed()-1)*p.Size(), false)
-		req.Fields = []string{"id", "kind", "name", "slug", "description", "created_at"}
-		req.SortBy([]string{"-_score"})
-
-		result, err := s.client.Search(req)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-		return s.processResults(ctx, result, p)
-	}
-
-	req := bleve.NewSearchRequestOptions(textQuery, p.Size(), (p.PageOneIndexed()-1)*p.Size(), false)
+	req := bleve.NewSearchRequestOptions(s.buildQuery(q, opts), p.Size(), (p.PageOneIndexed()-1)*p.Size(), false)
 	req.Fields = []string{"id", "kind", "name", "slug", "description", "created_at"}
 	req.SortBy([]string{"-_score"})
 
@@ -93,6 +72,29 @@ func (s *BleveSearcher) Search(ctx context.Context, q string, p pagination.Param
 	}
 
 	return s.processResults(ctx, result, p)
+}
+
+func (s *BleveSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
+	if s.client == nil {
+		return nil, searcher.ErrFastMatchesUnavailable
+	}
+
+	req := bleve.NewSearchRequestOptions(s.buildQuery(q, opts), limit, 0, false)
+	req.Fields = []string{"id", "kind", "name", "slug", "description"}
+	req.SortBy([]string{"-_score"})
+
+	result, err := s.client.Search(req)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return dt.Reduce(result.Hits, func(acc datagraph.MatchList, hit *search.DocumentMatch) datagraph.MatchList {
+		match, ok := s.matchFromHit(hit)
+		if !ok {
+			return acc
+		}
+		return append(acc, match)
+	}, datagraph.MatchList{}), nil
 }
 
 func (s *BleveSearcher) processResults(ctx context.Context, result *bleve.SearchResult, p pagination.Parameters) (*pagination.Result[datagraph.Item], error) {
@@ -139,6 +141,58 @@ func (s *BleveSearcher) processResults(ctx context.Context, result *bleve.Search
 		NextPage:    nextPage,
 		Items:       items,
 	}, nil
+}
+
+func (s *BleveSearcher) buildQuery(q string, opts searcher.Options) query.Query {
+	textQuery := bleve.NewMatchQuery(q)
+
+	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
+		kindQueries := make([]query.Query, 0, len(kinds))
+		for _, k := range kinds {
+			kq := bleve.NewMatchQuery(k.String())
+			kq.SetField("kind")
+			kindQueries = append(kindQueries, kq)
+		}
+		kindQuery := bleve.NewDisjunctionQuery(kindQueries...)
+		return bleve.NewConjunctionQuery(textQuery, kindQuery)
+	}
+
+	return textQuery
+}
+
+func (s *BleveSearcher) matchFromHit(hit *search.DocumentMatch) (datagraph.Match, bool) {
+	id, err := xid.FromString(hit.ID)
+	if err != nil {
+		return datagraph.Match{}, false
+	}
+
+	kindStr, ok := hit.Fields["kind"].(string)
+	if !ok {
+		return datagraph.Match{}, false
+	}
+
+	kind, err := datagraph.NewKind(kindStr)
+	if err != nil {
+		return datagraph.Match{}, false
+	}
+
+	return datagraph.Match{
+		ID:          id,
+		Kind:        kind,
+		Slug:        valueAsString(hit.Fields, "slug"),
+		Name:        valueAsString(hit.Fields, "name"),
+		Description: valueAsString(hit.Fields, "description"),
+	}, true
+}
+
+func valueAsString(fields map[string]any, key string) string {
+	if v, ok := fields[key]; ok {
+		if s, ok := v.(string); ok {
+			return s
+		}
+	}
+
+	return ""
 }
 
 func (s *BleveSearcher) Index(ctx context.Context, item datagraph.Item) error {

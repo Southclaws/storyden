@@ -3,6 +3,8 @@ package searcher
 import (
 	"context"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -13,7 +15,10 @@ type Options struct {
 	Kinds opt.Optional[[]datagraph.Kind]
 }
 
+var ErrFastMatchesUnavailable = fault.New("datagraph matches are not enabled", ftag.With(ftag.InvalidArgument))
+
 type Searcher interface {
+	MatchFast(ctx context.Context, q string, limit int, opts Options) (datagraph.MatchList, error)
 	Search(ctx context.Context, q string, p pagination.Parameters, opts Options) (*pagination.Result[datagraph.Item], error)
 }
 

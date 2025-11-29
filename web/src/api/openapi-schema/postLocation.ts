@@ -11,18 +11,18 @@ import type { PostLocationKind } from "./postLocationKind";
 
 /**
  * The location of a post. For threads, this is just the slug. For replies,
-this includes the thread slug, the reply index, page number, and position.
+this includes the thread slug, the index, page number and position.
 
  */
 export interface PostLocation {
-  /** The zero-based index of the reply within the thread (only for replies) */
+  /** The zero-based index of a reply within its thread. */
   index?: number;
   /** Whether this is a thread or a reply */
   kind: PostLocationKind;
-  /** The page number where the reply appears (only for replies) */
+  /** The page number where the reply appears. */
   page?: number;
-  /** The position of the reply on its page (only for replies) */
+  /** The position of the reply on its page. */
   position?: number;
-  /** The thread slug (for threads) or root thread slug (for replies) */
+  /** The thread slug for a thread or root slug for a reply. */
   slug: string;
 }

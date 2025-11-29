@@ -2174,6 +2174,32 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphSearchOK" }
 
+  /datagraph/matches:
+    get:
+      operationId: DatagraphMatches
+      description: |
+        Query the datagraph optimised for typeahead scenarios. This endpoint is
+        only active when a `SEARCH_PROVIDER` that supports fast access is used.
+        This includes providers such as Bleve and Redis.
+
+        This endpoint will return a minified set of results directly from the
+        configured search index, without hitting the database. This makes it
+        suitable for performance sensitive use-cases such as type-ahead search,
+        @ mentioning threads/pages, CTRL+K style menus, and more.
+
+        Results will include a `kind` field and short content, but will not
+        contain graph edges (such as authorship, links, etc.) due to constraints
+        of the underlying search index and to keep payload sizes smaller.
+      tags: [datagraph]
+      parameters:
+        - $ref: "#/components/parameters/RequiredSearchQuery"
+        - $ref: "#/components/parameters/DatagraphKindQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/DatagraphMatchesOK" }
+
   /datagraph/ask:
     get:
       operationId: DatagraphAsk
@@ -3601,6 +3627,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
+
+    DatagraphMatchesOK:
+      description: Search results.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/DatagraphMatchResult" }
 
     DatagraphAskOK:
       description: Search results.
@@ -6294,9 +6326,19 @@ components:
           properties:
             items: { $ref: "#/components/schemas/DatagraphItemList" }
 
+    DatagraphMatchResult:
+      type: object
+      required: [items]
+      properties:
+        items: { $ref: "#/components/schemas/DatagraphMatchList" }
+
     DatagraphItemList:
       type: array
       items: { $ref: "#/components/schemas/DatagraphItem" }
+
+    DatagraphMatchList:
+      type: array
+      items: { $ref: "#/components/schemas/DatagraphMatch" }
 
     DatagraphItem:
       type: object
@@ -6349,6 +6391,19 @@ components:
       properties:
         kind: { $ref: "#/components/schemas/DatagraphItemKind" }
         ref: { $ref: "#/components/schemas/PublicProfile" }
+
+    DatagraphMatch:
+      type: object
+      required: [id, kind, slug, title]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
 
     DatagraphItemKind:
       type: string
