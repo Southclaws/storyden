@@ -117,6 +117,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		RootPostID:      rootPostID,
 		RootThreadMark:  m.Edges.Root.Slug,
 		RootThreadTitle: m.Edges.Root.Title,
+		Slug:            fmt.Sprintf("%s#%s", m.Edges.Root.Slug, m.ID),
 	}, nil
 }
 
@@ -224,5 +225,6 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 		},
 		RootPostID: rootPostID,
 		ReplyTo:    replyTo(r),
+		Slug:       fmt.Sprintf("%s#%s", r.RootPostID, r.ID),
 	}, nil
 }
