@@ -3,9 +3,14 @@ package bleve_search
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/blevesearch/bleve/v2"
+	"github.com/blevesearch/bleve/v2/analysis"
+	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/blevesearch/bleve/v2/registry"
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/blevesearch/bleve/v2/search/query"
 	"github.com/rs/xid"
@@ -23,13 +28,13 @@ import (
 )
 
 type Document struct {
-	ID          string
-	Kind        string
-	Name        string
-	Slug        string
-	Description string
-	Content     string
-	CreatedAt   int64
+	ID          string `json:"id"`
+	Kind        string `json:"kind"`
+	Name        string `json:"name"`
+	Slug        string `json:"slug"`
+	Description string `json:"description"`
+	Content     string `json:"content"`
+	CreatedAt   int64  `json:"created_at"`
 }
 
 type BleveSearcher struct {
@@ -58,11 +63,9 @@ func New(ctx context.Context, cfg config.Config, hydrator *hydrate.Hydrator) (*B
 }
 
 func (s *BleveSearcher) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
-	if s.client == nil {
-		return nil, fault.New("bleve client is not initialized")
-	}
+	searchQuery := s.buildSearchQuery(q, opts)
 
-	req := bleve.NewSearchRequestOptions(s.buildQuery(q, opts), p.Size(), (p.PageOneIndexed()-1)*p.Size(), false)
+	req := bleve.NewSearchRequestOptions(searchQuery, p.Size(), (p.PageOneIndexed()-1)*p.Size(), false)
 	req.Fields = []string{"id", "kind", "name", "slug", "description", "created_at"}
 	req.SortBy([]string{"-_score"})
 
@@ -75,13 +78,11 @@ func (s *BleveSearcher) Search(ctx context.Context, q string, p pagination.Param
 }
 
 func (s *BleveSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
-	if s.client == nil {
-		return nil, searcher.ErrFastMatchesUnavailable
-	}
+	matchQuery := s.buildMatchQuery(q, opts)
 
-	req := bleve.NewSearchRequestOptions(s.buildQuery(q, opts), limit, 0, false)
-	req.Fields = []string{"id", "kind", "name", "slug", "description"}
-	req.SortBy([]string{"-_score"})
+	req := bleve.NewSearchRequestOptions(matchQuery, limit, 0, false)
+	req.Fields = []string{"id", "kind", "name", "slug", "description", "created_at"}
+	req.SortBy([]string{"_score"})
 
 	result, err := s.client.Search(req)
 	if err != nil {
@@ -143,8 +144,34 @@ func (s *BleveSearcher) processResults(ctx context.Context, result *bleve.Search
 	}, nil
 }
 
-func (s *BleveSearcher) buildQuery(q string, opts searcher.Options) query.Query {
+func (s *BleveSearcher) buildSearchQuery(q string, opts searcher.Options) query.Query {
 	textQuery := bleve.NewMatchQuery(q)
+
+	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
+		kindQueries := make([]query.Query, 0, len(kinds))
+		for _, k := range kinds {
+			kq := bleve.NewMatchQuery(k.String())
+			kq.SetField("kind")
+			kindQueries = append(kindQueries, kq)
+		}
+		kindQuery := bleve.NewDisjunctionQuery(kindQueries...)
+		return bleve.NewConjunctionQuery(textQuery, kindQuery)
+	}
+
+	return textQuery
+}
+
+func (s *BleveSearcher) buildMatchQuery(q string, opts searcher.Options) query.Query {
+	lowercaseQ := strings.ToLower(q)
+	tokens := strings.Fields(lowercaseQ)
+
+	textQuery := bleve.NewBooleanQuery()
+
+	for _, tok := range tokens {
+		pq := bleve.NewPrefixQuery(tok)
+		pq.SetField("name")
+		textQuery.AddShould(pq)
+	}
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
 		kindQueries := make([]query.Query, 0, len(kinds))
@@ -202,7 +229,7 @@ func (s *BleveSearcher) Index(ctx context.Context, item datagraph.Item) error {
 		Name:        item.GetName(),
 		Slug:        item.GetSlug(),
 		Description: item.GetDesc(),
-		Content:     item.GetContent().HTML(),
+		Content:     item.GetContent().Plaintext(), // We index plaintext only.
 		CreatedAt:   item.GetCreated().Unix(),
 	}
 
@@ -223,6 +250,11 @@ func (s *BleveSearcher) Deindex(ctx context.Context, ir datagraph.ItemRef) error
 }
 
 func openOrCreateIndex(path string) (bleve.Index, error) {
+	err := registry.RegisterAnalyzer("intl", InternationalAnalyser)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to register international analyzer"))
+	}
+
 	index, err := bleve.Open(path)
 	if err == bleve.ErrorIndexPathDoesNotExist {
 		indexMapping := createIndexMapping()
@@ -242,39 +274,44 @@ func openOrCreateIndex(path string) (bleve.Index, error) {
 func createIndexMapping() mapping.IndexMapping {
 	indexMapping := bleve.NewIndexMapping()
 
+	indexMapping.DefaultAnalyzer = "intl"
+
 	docMapping := bleve.NewDocumentMapping()
 
 	idFieldMapping := bleve.NewTextFieldMapping()
 	idFieldMapping.Store = true
-	idFieldMapping.Index = true
+	idFieldMapping.Index = false
+	idFieldMapping.Analyzer = "keyword"
 	docMapping.AddFieldMappingsAt("id", idFieldMapping)
 
 	kindFieldMapping := bleve.NewTextFieldMapping()
 	kindFieldMapping.Store = true
 	kindFieldMapping.Index = true
+	kindFieldMapping.Analyzer = "keyword"
 	docMapping.AddFieldMappingsAt("kind", kindFieldMapping)
 
 	nameFieldMapping := bleve.NewTextFieldMapping()
 	nameFieldMapping.Store = true
 	nameFieldMapping.Index = true
-	nameFieldMapping.Analyzer = "en"
+	nameFieldMapping.Analyzer = "intl"
 	docMapping.AddFieldMappingsAt("name", nameFieldMapping)
 
 	slugFieldMapping := bleve.NewTextFieldMapping()
 	slugFieldMapping.Store = true
 	slugFieldMapping.Index = true
+	slugFieldMapping.Analyzer = "intl"
 	docMapping.AddFieldMappingsAt("slug", slugFieldMapping)
 
 	descFieldMapping := bleve.NewTextFieldMapping()
 	descFieldMapping.Store = true
 	descFieldMapping.Index = true
-	descFieldMapping.Analyzer = "en"
+	descFieldMapping.Analyzer = "intl"
 	docMapping.AddFieldMappingsAt("description", descFieldMapping)
 
 	contentFieldMapping := bleve.NewTextFieldMapping()
 	contentFieldMapping.Store = false
 	contentFieldMapping.Index = true
-	contentFieldMapping.Analyzer = "en"
+	contentFieldMapping.Analyzer = "intl"
 	docMapping.AddFieldMappingsAt("content", contentFieldMapping)
 
 	createdAtFieldMapping := bleve.NewNumericFieldMapping()
@@ -285,4 +322,25 @@ func createIndexMapping() mapping.IndexMapping {
 	indexMapping.DefaultMapping = docMapping
 
 	return indexMapping
+}
+
+// InternationalAnalyser is a copy of the "standard" analyser but without the
+// use of English stopwords. This makes it suitable for any language.
+func InternationalAnalyser(config map[string]interface{}, cache *registry.Cache) (analysis.Analyzer, error) {
+	tokenizer, err := cache.TokenizerNamed(unicode.Name)
+	if err != nil {
+		return nil, err
+	}
+	toLowerFilter, err := cache.TokenFilterNamed(lowercase.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	rv := analysis.DefaultAnalyzer{
+		Tokenizer: tokenizer,
+		TokenFilters: []analysis.TokenFilter{
+			toLowerFilter,
+		},
+	}
+	return &rv, nil
 }

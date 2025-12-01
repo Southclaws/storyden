@@ -23,7 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
-type indexer struct {
+type Indexer struct {
 	logger        *slog.Logger
 	db            *ent.Client
 	nodeQuerier   *node_querier.Querier
@@ -43,12 +43,12 @@ func newIndexer(
 	threadQuerier *thread_querier.Querier,
 	searchIndexer searcher.Indexer,
 	bus *pubsub.Bus,
-) {
+) *Indexer {
 	if cfg.SearchProvider == "" || cfg.SearchProvider == "database" {
-		return
+		return nil
 	}
 
-	idx := &indexer{
+	idx := &Indexer{
 		logger:        logger,
 		db:            db,
 		nodeQuerier:   nodeQuerier,
@@ -61,7 +61,7 @@ func newIndexer(
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		go func() {
 			time.Sleep(time.Second)
-			err := idx.reindexAll(hctx)
+			err := idx.ReindexAll(hctx)
 			if err != nil {
 				idx.logger.Error("failed to run initial reindex job", slog.String("error", err.Error()))
 			}
@@ -157,9 +157,11 @@ func newIndexer(
 
 		return nil
 	}))
+
+	return idx
 }
 
-func (idx *indexer) indexThread(ctx context.Context, id post.ID) error {
+func (idx *Indexer) indexThread(ctx context.Context, id post.ID) error {
 	thread, err := idx.threadQuerier.Get(ctx, id, pagination.NewPageParams(1, 1), opt.NewEmpty[account.AccountID]())
 	if err != nil {
 		idx.logger.Error("failed to get thread for indexing", slog.String("id", id.String()), slog.String("error", err.Error()))
@@ -175,7 +177,7 @@ func (idx *indexer) indexThread(ctx context.Context, id post.ID) error {
 	return nil
 }
 
-func (idx *indexer) deindexThread(ctx context.Context, id post.ID) error {
+func (idx *Indexer) deindexThread(ctx context.Context, id post.ID) error {
 	if err := idx.searchIndexer.Deindex(ctx, &datagraph.Ref{
 		ID:   xid.ID(id),
 		Kind: datagraph.KindThread,
@@ -188,7 +190,7 @@ func (idx *indexer) deindexThread(ctx context.Context, id post.ID) error {
 	return nil
 }
 
-func (idx *indexer) indexNode(ctx context.Context, id library.NodeID) error {
+func (idx *Indexer) indexNode(ctx context.Context, id library.NodeID) error {
 	node, err := idx.nodeQuerier.Get(ctx, library.NewID(xid.ID(id)))
 	if err != nil {
 		idx.logger.Error("failed to get node for indexing", slog.String("id", id.String()), slog.String("error", err.Error()))
@@ -204,7 +206,7 @@ func (idx *indexer) indexNode(ctx context.Context, id library.NodeID) error {
 	return nil
 }
 
-func (idx *indexer) deindexNode(ctx context.Context, id library.NodeID) error {
+func (idx *Indexer) deindexNode(ctx context.Context, id library.NodeID) error {
 	if err := idx.searchIndexer.Deindex(ctx, &datagraph.Ref{
 		ID:   xid.ID(id),
 		Kind: datagraph.KindNode,

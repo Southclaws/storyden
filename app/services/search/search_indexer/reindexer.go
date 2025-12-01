@@ -20,7 +20,8 @@ import (
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
 
-func (idx *indexer) reindexAll(ctx context.Context) error {
+func (idx *Indexer) ReindexAll(ctx context.Context) error {
+	started := time.Now().UTC()
 	idx.logger.Info("starting full reindex",
 		slog.Int("chunk_size", idx.chunkSize),
 	)
@@ -44,14 +45,17 @@ func (idx *indexer) reindexAll(ctx context.Context) error {
 
 	if processed > 0 {
 		idx.logger.Info("reindex completed",
+			slog.Duration("duration", time.Since(started)),
 			slog.Int("processed", processed),
 		)
+	} else {
+		idx.logger.Info("reindex skipped: nothing to reindex")
 	}
 
 	return nil
 }
 
-func (idx *indexer) reindexThreads(ctx context.Context) (int, error) {
+func (idx *Indexer) reindexThreads(ctx context.Context) (int, error) {
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		threads, err := idx.db.Post.Query().
 			Where(
@@ -84,7 +88,7 @@ func (idx *indexer) reindexThreads(ctx context.Context) (int, error) {
 	})
 }
 
-func (idx *indexer) reindexReplies(ctx context.Context) (int, error) {
+func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		replies, err := idx.db.Post.Query().
 			Where(
@@ -117,7 +121,7 @@ func (idx *indexer) reindexReplies(ctx context.Context) (int, error) {
 	})
 }
 
-func (idx *indexer) reindexNodes(ctx context.Context) (int, error) {
+func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 	return reindex(ctx, idx, func() ([]datagraph.Item, error) {
 		threads, err := idx.db.Node.Query().
 			Where(
@@ -151,7 +155,7 @@ func (idx *indexer) reindexNodes(ctx context.Context) (int, error) {
 
 func reindex[T datagraph.Item](
 	ctx context.Context,
-	idx *indexer,
+	idx *Indexer,
 	fetch func() ([]T, error),
 	update func([]xid.ID, time.Time) (int, error),
 ) (int, error) {

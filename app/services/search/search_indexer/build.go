@@ -6,6 +6,6 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Invoke(newIndexer),
+		fx.Provide(newIndexer),
 	)
 }
