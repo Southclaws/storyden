@@ -45,6 +45,10 @@ func (r *Reply) GetName() string {
 		return r.RootThreadTitle
 	}
 
+	if r.RootThreadTitle == "" {
+		return ""
+	}
+
 	return fmt.Sprintf("reply to: %s", r.RootThreadTitle)
 }
 
