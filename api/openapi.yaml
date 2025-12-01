@@ -6394,7 +6394,7 @@ components:
 
     DatagraphMatch:
       type: object
-      required: [id, kind, slug, title]
+      required: [id, kind, slug, name]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
         kind: { $ref: "#/components/schemas/DatagraphItemKind" }

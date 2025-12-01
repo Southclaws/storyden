@@ -294,14 +294,13 @@ func serialiseDatagraphMatchList(in datagraph.MatchList) openapi.DatagraphMatchL
 }
 
 func serialiseDatagraphMatch(in datagraph.Match) openapi.DatagraphMatch {
-	name := opt.NewIf(in.Name, func(s string) bool { return s != "" }).Ptr()
 	description := opt.NewIf(in.Description, func(s string) bool { return s != "" }).Ptr()
 
 	return openapi.DatagraphMatch{
 		Id:          openapi.Identifier(in.ID.String()),
 		Kind:        openapi.DatagraphItemKind(in.Kind.String()),
 		Slug:        in.Slug,
-		Name:        name,
+		Name:        in.Name,
 		Description: description,
 	}
 }
