@@ -14,6 +14,6 @@ export interface DatagraphMatch {
   description?: string;
   id: Identifier;
   kind: DatagraphItemKind;
-  name?: string;
+  name: string;
   slug: string;
 }
