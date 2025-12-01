@@ -28,7 +28,6 @@ type RedisSearcher struct {
 }
 
 type Document struct {
-	ID          string
 	Kind        string
 	Name        string
 	Slug        string
@@ -43,7 +42,7 @@ type SearchResult struct {
 }
 
 type SearchHit struct {
-	ID          string
+	ID          xid.ID
 	Kind        string
 	Name        string
 	Slug        string
@@ -84,6 +83,21 @@ func (c *RedisSearcher) key(item datagraph.ItemRef) string {
 		item.GetID().String())
 }
 
+// idFromKey gets the ID from "storyden:datagraph:thread:d3lal65o2dtv213s95o0"
+func (c *RedisSearcher) idFromKey(key string) (xid.ID, error) {
+	parts := strings.Split(key, ":")
+	if len(parts) < 4 {
+		return xid.NilID(), errors.New("invalid key format")
+	}
+
+	idStr := parts[3]
+	id, err := xid.FromString(idStr)
+	if err != nil {
+		return xid.NilID(), fault.Wrap(err, fmsg.With("failed to parse xid from key"))
+	}
+	return id, nil
+}
+
 func (c *RedisSearcher) prefix(k datagraph.Kind) string {
 	return fmt.Sprintf("%s:datagraph:%s:", c.indexName, k.String())
 }
@@ -107,13 +121,14 @@ func (c *RedisSearcher) createIndex(ctx context.Context) error {
 		OnHash().
 		Prefix(int64(len(p))).
 		Prefix(p...).
-		Schema().
-		FieldName("id").Text().Sortable().
-		FieldName("kind").Tag().Sortable().
-		FieldName("name").Text().Sortable().
-		FieldName("slug").Text().Sortable().
-		FieldName("description").Text().
-		FieldName("content").Text().
+		Stopwords(0). // Disable stopwords: Storyden is not just for English.
+		Schema().     // This has a very minor memory impact, but it's fine.
+		// NOTE: We also disable stemming, again, anglocentric. Can fix later.
+		FieldName("kind").Tag().
+		FieldName("name").Text().Nostem().
+		FieldName("slug").Text().Nostem().
+		FieldName("description").Text().Nostem().
+		FieldName("content").Text().Nostem().
 		FieldName("created_at").Numeric().Sortable().
 		Build()
 
@@ -147,8 +162,10 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 	for _, doc := range docs {
 		hit := SearchHit{}
 
-		if id, ok := doc.Doc["id"]; ok {
-			hit.ID = id
+		hit.ID, err = s.idFromKey(doc.Key)
+		if err != nil {
+			// TODO: Log error
+			continue
 		}
 		if kind, ok := doc.Doc["kind"]; ok {
 			hit.Kind = kind
@@ -173,16 +190,13 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 
 	refs := make([]*datagraph.Ref, 0, len(hits))
 	for _, hit := range hits {
-		id, err := xid.FromString(hit.ID)
-		if err != nil {
-			continue
-		}
+
 		kind, err := datagraph.NewKind(hit.Kind)
 		if err != nil {
 			continue
 		}
 		refs = append(refs, &datagraph.Ref{
-			ID:   id,
+			ID:   hit.ID,
 			Kind: kind,
 		})
 	}
@@ -213,10 +227,6 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 }
 
 func (s *RedisSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
-	if s.client == nil {
-		return nil, searcher.ErrFastMatchesUnavailable
-	}
-
 	cmd := s.client.B().FtSearch().
 		Index(s.indexName).
 		Query(s.buildPrefixQuery(q, opts)).
@@ -242,12 +252,11 @@ func (s *RedisSearcher) MatchFast(ctx context.Context, q string, limit int, opts
 
 func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 	doc := Document{
-		ID:          item.GetID().String(),
 		Kind:        item.GetKind().String(),
 		Name:        item.GetName(),
 		Slug:        item.GetSlug(),
 		Description: item.GetDesc(),
-		Content:     item.GetContent().HTML(),
+		Content:     item.GetContent().Plaintext(),
 		CreatedAt:   item.GetCreated().Unix(),
 	}
 
@@ -256,7 +265,6 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 	cmd := s.client.B().Hset().
 		Key(key).
 		FieldValue().
-		FieldValue("id", doc.ID).
 		FieldValue("kind", doc.Kind).
 		FieldValue("name", doc.Name).
 		FieldValue("slug", doc.Slug).
@@ -294,15 +302,30 @@ func (s *RedisSearcher) buildPrefixQuery(q string, opts searcher.Options) string
 		return "*"
 	}
 
-	prefixTerms := make([]string, len(words))
-	for i, word := range words {
-		escaped := escapeRedisSearch(word)
-		prefixTerms[i] = escaped + "*"
+	var terms []string
+	for i, w := range words {
+		esc := escapeRedisSearch(w)
+
+		isLast := i == len(words)-1
+
+		if isLast {
+			// redis ft prefix must be >= 2 chars
+			if len([]rune(w)) >= 2 {
+				terms = append(terms, esc)
+			}
+		} else {
+			// previous tokens: fixed terms
+			terms = append(terms, esc)
+		}
 	}
 
-	nameQuery := fmt.Sprintf("@name:(%s)", strings.Join(prefixTerms, " "))
+	nameQuery := fmt.Sprintf("@name:(%s*)", strings.Join(terms, " "))
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
+		// NOTE: kind = "reply" does not work here (replies have no "name".)
+		// TODO: Determine a path forward for this if it's ever useful.
+		// Probably not, typeahead is more about resource names. The only
+		// downside here is wasteful searching when kinds is empty (all kinds.)
 		kindStrs := make([]string, len(kinds))
 		for i, k := range kinds {
 			kindStrs[i] = k.String()
