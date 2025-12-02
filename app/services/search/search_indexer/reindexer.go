@@ -178,7 +178,7 @@ func reindex[T datagraph.Item](
 		for i, item := range v {
 			err := idx.searchIndexer.Index(ctx, item)
 			if err != nil {
-				idx.logger.Error("failed to index thread",
+				idx.logger.Error("failed to index item",
 					slog.String("kind", item.GetKind().String()),
 					slog.String("id", item.GetID().String()),
 					slog.String("error", err.Error()),

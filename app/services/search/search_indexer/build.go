@@ -7,5 +7,6 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(newIndexer),
+		fx.Invoke(runIndexerOnBoot),
 	)
 }

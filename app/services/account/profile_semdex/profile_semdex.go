@@ -50,14 +50,14 @@ func newProfileSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *message.EventAccountCreated) error {
+		_, err := pubsub.Subscribe(ctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *message.EventAccountCreated) error {
 			return bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
 			return bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
@@ -68,7 +68,7 @@ func newProfileSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *message.CommandProfileIndex) error {
+		_, err := pubsub.SubscribeCommand(ctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *message.CommandProfileIndex) error {
 			return s.indexProfile(ctx, cmd.ID)
 		})
 		if err != nil {

@@ -170,7 +170,7 @@ func (d *Querier) List(
 
 func (d *Querier) GetMany(ctx context.Context, threadIDs []post.ID, accountID opt.Optional[account.AccountID]) ([]*thread.Thread, error) {
 	ctx, span := d.ins.Instrument(ctx,
-		kv.String("thread_count", string(rune(len(threadIDs)))),
+		kv.Int("thread_count", len(threadIDs)),
 		kv.String("account_id", accountID.String()),
 	)
 	defer span.End()

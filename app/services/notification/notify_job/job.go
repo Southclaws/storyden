@@ -18,7 +18,7 @@ func runNotifyConsumer(
 	ic *notifyConsumer,
 ) {
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "notify_job.send_notification", func(ctx context.Context, cmd *message.CommandSendNotification) error {
+		_, err := pubsub.SubscribeCommand(ctx, bus, "notify_job.send_notification", func(ctx context.Context, cmd *message.CommandSendNotification) error {
 			if err := ic.notify(ctx, cmd.TargetID, cmd.SourceID, cmd.Event, cmd.Item); err != nil {
 				logger.Error("failed to notify", slog.String("error", err.Error()))
 				return err

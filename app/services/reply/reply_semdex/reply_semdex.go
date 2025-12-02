@@ -54,21 +54,21 @@ func newReplySemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+		_, err := pubsub.Subscribe(ctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
 			return bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
 			return bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *message.EventThreadReplyDeleted) error {
+		_, err = pubsub.Subscribe(ctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *message.EventThreadReplyDeleted) error {
 			return bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
 		})
 		if err != nil {
@@ -79,14 +79,14 @@ func newReplySemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *message.CommandReplyIndex) error {
+		_, err := pubsub.SubscribeCommand(ctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *message.CommandReplyIndex) error {
 			return re.indexReply(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.SubscribeCommand(hctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *message.CommandReplyDeindex) error {
+		_, err = pubsub.SubscribeCommand(ctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *message.CommandReplyDeindex) error {
 			return re.deindexReply(ctx, cmd.ID)
 		})
 		if err != nil {
