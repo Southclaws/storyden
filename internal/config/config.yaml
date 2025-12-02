@@ -443,7 +443,7 @@
 
         - `database` for the default database-driven search.  This is not recommended for larger deployments as it does not scale well and has limited search quality.
         - `bleve` for Bleve. This is a local full-text search engine that is fast and efficient for small to medium-sized deployments. This is best used when you are using local disk storage, such as SQLite and local asset storage.
-        - `redis` for Redisearch. This is a fast and efficient search provider that is recommended for larger deployments. This is recommended of your environment is ephemeral and you're already using external providers for database and asset storage.
+        - `redis` for Redisearch. This is a fast and efficient search provider that is recommended for larger deployments. This is recommended if your environment is ephemeral and you're already using external providers for database and asset storage.
 
     - env: SEARCH_INDEX_CHUNK_SIZE
       name: SearchIndexChunkSize
