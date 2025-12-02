@@ -351,7 +351,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphMatchesWithResponse(root, &openapi.DatagraphMatchesParams{
-					Q:    "机器",
+					Q:    "机",
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
