@@ -111,3 +111,7 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 
 	return result, nil
 }
+
+func (s *ParallelSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
+	return nil, searcher.ErrFastMatchesUnavailable
+}

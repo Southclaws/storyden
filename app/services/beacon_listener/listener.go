@@ -58,7 +58,7 @@ func runBeaconListener(
 	l *listener,
 ) {
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "beacon_listener.handler", func(ctx context.Context, cmd *message.CommandSendBeacon) error {
+		_, err := pubsub.SubscribeCommand(ctx, bus, "beacon_listener.handler", func(ctx context.Context, cmd *message.CommandSendBeacon) error {
 			return l.handleBeacon(ctx, cmd)
 		})
 

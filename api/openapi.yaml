@@ -1522,6 +1522,28 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
+
+  /posts/location:
+    get:
+      operationId: PostLocationGet
+      description: |
+        Locate a post just from its ID. This will tell you what kind of post it
+        is and where to find it. Where "a post is" is simple for threads, just
+        the slug. For replies, it will give you the thread slug and the position
+        within the thread: the index, the page and the position on the page.
+      tags: [posts]
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema: { $ref: "#/components/schemas/Identifier" }
+          description: The post ID to locate
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/PostLocationGetOK" }
+
   #
   #                                     888
   #                                     888
@@ -2151,6 +2173,32 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphSearchOK" }
+
+  /datagraph/matches:
+    get:
+      operationId: DatagraphMatches
+      description: |
+        Query the datagraph optimised for typeahead scenarios. This endpoint is
+        only active when a `SEARCH_PROVIDER` that supports fast access is used.
+        This includes providers such as Bleve and Redis.
+
+        This endpoint will return a minified set of results directly from the
+        configured search index, without hitting the database. This makes it
+        suitable for performance sensitive use-cases such as type-ahead search,
+        @ mentioning threads/pages, CTRL+K style menus, and more.
+
+        Results will include a `kind` field and short content, but will not
+        contain graph edges (such as authorship, links, etc.) due to constraints
+        of the underlying search index and to keep payload sizes smaller.
+      tags: [datagraph]
+      parameters:
+        - $ref: "#/components/parameters/RequiredSearchQuery"
+        - $ref: "#/components/parameters/DatagraphKindQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/DatagraphMatchesOK" }
 
   /datagraph/ask:
     get:
@@ -3355,6 +3403,13 @@ components:
           schema:
             $ref: "#/components/schemas/Post"
 
+    PostLocationGetOK:
+      description: Post location retrieved successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PostLocation"
+
     PostReactAddOK:
       description: Post reaction added.
       content:
@@ -3572,6 +3627,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
+
+    DatagraphMatchesOK:
+      description: Search results.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/DatagraphMatchResult" }
 
     DatagraphAskOK:
       description: Search results.
@@ -5520,6 +5581,30 @@ components:
         reply_to: { $ref: "#/components/schemas/Identifier" }
         url: { $ref: "#/components/schemas/URL" }
 
+    PostLocation:
+      type: object
+      description: |
+        The location of a post. For threads, this is just the slug. For replies,
+        this includes the thread slug, the index, page number and position.
+      required: [slug, kind]
+      properties:
+        slug:
+          type: string
+          description: The thread slug for a thread or root slug for a reply.
+        kind:
+          type: string
+          enum: [thread, reply]
+          description: Whether this is a thread or a reply
+        index:
+          type: integer
+          description: The zero-based index of a reply within its thread.
+        page:
+          type: integer
+          description: The page number where the reply appears.
+        position:
+          type: integer
+          description: The position of the reply on its page.
+
     #
     # 8888888b.                            888
     # 888   Y88b                           888
@@ -6241,9 +6326,19 @@ components:
           properties:
             items: { $ref: "#/components/schemas/DatagraphItemList" }
 
+    DatagraphMatchResult:
+      type: object
+      required: [items]
+      properties:
+        items: { $ref: "#/components/schemas/DatagraphMatchList" }
+
     DatagraphItemList:
       type: array
       items: { $ref: "#/components/schemas/DatagraphItem" }
+
+    DatagraphMatchList:
+      type: array
+      items: { $ref: "#/components/schemas/DatagraphMatch" }
 
     DatagraphItem:
       type: object
@@ -6296,6 +6391,19 @@ components:
       properties:
         kind: { $ref: "#/components/schemas/DatagraphItemKind" }
         ref: { $ref: "#/components/schemas/PublicProfile" }
+
+    DatagraphMatch:
+      type: object
+      required: [id, kind, slug, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
 
     DatagraphItemKind:
       type: string

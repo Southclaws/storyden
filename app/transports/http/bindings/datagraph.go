@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
@@ -147,7 +149,10 @@ func unwrapWriter(w http.ResponseWriter) http.ResponseWriter {
 	}
 }
 
-const datagraphSearchPageSize = 50
+const (
+	datagraphSearchPageSize = 50
+	datagraphMatchesLimit   = 20
+)
 
 func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.DatagraphSearchRequestObject) (openapi.DatagraphSearchResponseObject, error) {
 	pp := deserialisePageParams(request.Params.Page, datagraphSearchPageSize)
@@ -174,6 +179,29 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 			PageSize:    r.Size,
 			Results:     r.Results,
 			TotalPages:  r.TotalPages,
+		},
+	}, nil
+}
+
+func (d Datagraph) DatagraphMatches(ctx context.Context, request openapi.DatagraphMatchesRequestObject) (openapi.DatagraphMatchesResponseObject, error) {
+	kindFilter, err := opt.MapErr(opt.NewPtr(request.Params.Kind), deserialiseDatagraphKindList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	opts := searcher.Options{Kinds: kindFilter}
+
+	matches, err := d.searcher.MatchFast(ctx, request.Params.Q, datagraphMatchesLimit, opts)
+	if err != nil {
+		if errors.Is(err, searcher.ErrFastMatchesUnavailable) {
+			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("datagraph matches are not enabled"))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.DatagraphMatches200JSONResponse{
+		DatagraphMatchesOKJSONResponse: openapi.DatagraphMatchesOKJSONResponse{
+			Items: serialiseDatagraphMatchList(matches),
 		},
 	}, nil
 }
@@ -259,6 +287,22 @@ func serialiseDatagraphItemProfile(in *profile.Public) openapi.DatagraphItemProf
 
 func serialiseDatagraphItemList(in datagraph.ItemList) openapi.DatagraphItemList {
 	return dt.Map(in, serialiseDatagraphItem)
+}
+
+func serialiseDatagraphMatchList(in datagraph.MatchList) openapi.DatagraphMatchList {
+	return dt.Map(in, serialiseDatagraphMatch)
+}
+
+func serialiseDatagraphMatch(in datagraph.Match) openapi.DatagraphMatch {
+	description := opt.NewIf(in.Description, func(s string) bool { return s != "" }).Ptr()
+
+	return openapi.DatagraphMatch{
+		Id:          openapi.Identifier(in.ID.String()),
+		Kind:        openapi.DatagraphItemKind(in.Kind.String()),
+		Slug:        in.Slug,
+		Name:        in.Name,
+		Description: description,
+	}
 }
 
 func serialiseAskResponseChunkMeta(in semdex.AskResponseChunkMeta) ([]byte, error) {

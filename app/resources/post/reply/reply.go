@@ -20,6 +20,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+const RepliesPerPage = 50
+
 type Reply struct {
 	post.Post
 
@@ -36,6 +38,10 @@ func (*Reply) GetResourceName() string { return "post" }
 func (r *Reply) GetName() string {
 	if xid.ID(r.RootPostID).IsZero() {
 		return r.RootThreadTitle
+	}
+
+	if r.RootThreadTitle == "" {
+		return ""
 	}
 
 	return fmt.Sprintf("reply to: %s", r.RootThreadTitle)
@@ -112,6 +118,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		RootPostID:      rootPostID,
 		RootThreadMark:  m.Edges.Root.Slug,
 		RootThreadTitle: m.Edges.Root.Title,
+		Slug:            fmt.Sprintf("%s#%s", m.Edges.Root.Slug, m.ID),
 	}, nil
 }
 
@@ -181,4 +188,34 @@ func Mapper(
 
 		return reply, nil
 	}
+}
+
+func ItemRef(r *ent.Post) (datagraph.Item, error) {
+	content, err := datagraph.NewRichText(r.Body)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	var rootPostID post.ID
+	if r.RootPostID != nil {
+		rootPostID = post.ID(*r.RootPostID)
+	}
+
+	rootSlug := opt.NewPtrMap(r.Edges.Root, func(p ent.Post) string {
+		return p.Slug
+	}).Or(r.RootPostID.String())
+
+	return &Reply{
+		Post: post.Post{
+			ID:        post.ID(r.ID),
+			Content:   content,
+			Meta:      r.Metadata,
+			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
+			DeletedAt: opt.NewPtr(r.DeletedAt),
+		},
+		RootPostID: rootPostID,
+		ReplyTo:    replyTo(r),
+		Slug:       fmt.Sprintf("%s#%s", rootSlug, r.ID),
+	}, nil
 }

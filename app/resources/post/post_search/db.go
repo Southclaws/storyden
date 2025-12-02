@@ -2,14 +2,19 @@ package post_search
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -102,4 +107,63 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 	}
 
 	return posts, nil
+}
+
+type Location struct {
+	Slug     string
+	Kind     datagraph.Kind
+	Index    opt.Optional[int]
+	Page     opt.Optional[int]
+	Position opt.Optional[int]
+}
+
+func (d *database) Locate(ctx context.Context, id post.ID) (*Location, error) {
+	// fetch either the post or its root post.
+	p, err := d.db.Post.Query().
+		Where(
+			ent_post.ID(xid.ID(id)),
+		).
+		WithRoot(func(pq *ent.PostQuery) {
+			pq.Select(ent_post.FieldSlug)
+		}).
+		Select(ent_post.FieldSlug, ent_post.FieldRootPostID).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	// if we hit the id not the root id, it's a thread.
+	if p.Edges.Root == nil {
+		return &Location{
+			Slug: p.Slug,
+			Kind: datagraph.KindThread,
+		}, nil
+	}
+
+	count, err := d.db.Post.
+		Query().
+		Where(
+			ent_post.RootPostIDEQ(*p.RootPostID),
+			ent_post.DeletedAtIsNil(),
+			ent_post.IDLTE(xid.ID(id)),
+		).
+		Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	index := count - 1
+	page := index / reply.RepliesPerPage
+	position := index % reply.RepliesPerPage
+
+	return &Location{
+		Slug:     fmt.Sprintf("%s#%s", p.Edges.Root.Slug, id.String()),
+		Kind:     datagraph.KindReply,
+		Index:    opt.New(index),
+		Page:     opt.New(page),
+		Position: opt.New(position),
+	}, nil
 }

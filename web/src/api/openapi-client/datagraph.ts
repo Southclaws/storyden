@@ -14,6 +14,8 @@ import { fetcher } from "../client";
 import type {
   DatagraphAskOKResponse,
   DatagraphAskParams,
+  DatagraphMatchesOKResponse,
+  DatagraphMatchesParams,
   DatagraphSearchOKResponse,
   DatagraphSearchParams,
   InternalServerErrorResponse,
@@ -64,6 +66,73 @@ export const useDatagraphSearch = <
     swrOptions?.swrKey ??
     (() => (isEnabled ? getDatagraphSearchKey(params) : null));
   const swrFn = () => datagraphSearch(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Query the datagraph optimised for typeahead scenarios. This endpoint is
+only active when a `SEARCH_PROVIDER` that supports fast access is used.
+This includes providers such as Bleve and Redis.
+
+This endpoint will return a minified set of results directly from the
+configured search index, without hitting the database. This makes it
+suitable for performance sensitive use-cases such as type-ahead search,
+@ mentioning threads/pages, CTRL+K style menus, and more.
+
+Results will include a `kind` field and short content, but will not
+contain graph edges (such as authorship, links, etc.) due to constraints
+of the underlying search index and to keep payload sizes smaller.
+
+ */
+export const datagraphMatches = (params: DatagraphMatchesParams) => {
+  return fetcher<DatagraphMatchesOKResponse>({
+    url: `/datagraph/matches`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getDatagraphMatchesKey = (params: DatagraphMatchesParams) =>
+  [`/datagraph/matches`, ...(params ? [params] : [])] as const;
+
+export type DatagraphMatchesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof datagraphMatches>>
+>;
+export type DatagraphMatchesQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useDatagraphMatches = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  params: DatagraphMatchesParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof datagraphMatches>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getDatagraphMatchesKey(params) : null));
+  const swrFn = () => datagraphMatches(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

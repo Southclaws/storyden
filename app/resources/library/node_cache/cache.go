@@ -35,7 +35,7 @@ func New(
 
 	register := func(hook fx.Hook) { lc.Append(hook) }
 	register(fx.StartHook(func(hctx context.Context) error {
-		return c.subscribe(hctx, bus)
+		return c.subscribe(ctx, bus)
 	}))
 
 	return c

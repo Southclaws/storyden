@@ -65,7 +65,7 @@ func runScrapeConsumer(
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		// Subscribe to scrape commands
-		_, err := pubsub.SubscribeCommand(hctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *message.CommandScrapeLink) error {
+		_, err := pubsub.SubscribeCommand(ctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *message.CommandScrapeLink) error {
 			return ic.scrapeLink(ctx, cmd.URL, opt.NewPtr(cmd.Item))
 		})
 		if err != nil {
@@ -73,14 +73,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to thread events for URL hydration
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *message.EventThreadPublished) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *message.EventThreadPublished) error {
 			return ic.hydrateThreadURLs(ctx, evt.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_thread_updated", func(ctx context.Context, evt *message.EventThreadUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_updated", func(ctx context.Context, evt *message.EventThreadUpdated) error {
 			return ic.hydrateThreadURLs(ctx, evt.ID)
 		})
 		if err != nil {
@@ -88,14 +88,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to reply events for URL hydration
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
 			return ic.hydratePostURLs(ctx, evt.ReplyID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_reply_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
 			return ic.hydratePostURLs(ctx, evt.ReplyID)
 		})
 		if err != nil {
@@ -103,14 +103,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to node events for URL hydration
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_node_created", func(ctx context.Context, evt *message.EventNodeCreated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_created", func(ctx context.Context, evt *message.EventNodeCreated) error {
 			return ic.hydrateNodeURLs(ctx, evt.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "scrape_job.hydrate_node_updated", func(ctx context.Context, evt *message.EventNodeUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_updated", func(ctx context.Context, evt *message.EventNodeUpdated) error {
 			return ic.hydrateNodeURLs(ctx, evt.ID)
 		})
 		if err != nil {

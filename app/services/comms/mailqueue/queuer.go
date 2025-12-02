@@ -50,7 +50,7 @@ func Build() fx.Option {
 			}
 
 			lc.Append(fx.StartHook(func(hctx context.Context) error {
-				_, err := pubsub.SubscribeCommand(hctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *message.CommandSendEmail) error {
+				_, err := pubsub.SubscribeCommand(ctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *message.CommandSendEmail) error {
 					if err := sender.Send(ctx, cmd.Message); err != nil {
 						logger.Error("failed to send email", slog.String("error", err.Error()))
 						return err

@@ -7,23 +7,29 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Posts struct {
+	post_repo       post_search.Repository
 	reply_svc       reply_service.Service
 	thread_mark_svc thread_mark.Service
 }
 
 func NewPosts(
+	post_repo post_search.Repository,
 	reply_svc reply_service.Service,
 	thread_mark_svc thread_mark.Service,
 ) Posts {
 	return Posts{
+		post_repo:       post_repo,
 		reply_svc:       reply_svc,
 		thread_mark_svc: thread_mark_svc,
 	}
@@ -67,4 +73,26 @@ func (p *Posts) PostDelete(ctx context.Context, request openapi.PostDeleteReques
 	}
 
 	return openapi.PostDelete200Response{}, nil
+}
+
+func (p *Posts) PostLocationGet(ctx context.Context, request openapi.PostLocationGetRequestObject) (openapi.PostLocationGetResponseObject, error) {
+	id, err := xid.FromString(string(request.Params.Id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	location, err := p.post_repo.Locate(ctx, post.ID(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PostLocationGet200JSONResponse{
+		PostLocationGetOKJSONResponse: openapi.PostLocationGetOKJSONResponse{
+			Slug:     location.Slug,
+			Kind:     openapi.PostLocationKind(location.Kind.String()),
+			Index:    location.Index.Ptr(),
+			Page:     location.Page.Ptr(),
+			Position: location.Position.Ptr(),
+		},
+	}, nil
 }
