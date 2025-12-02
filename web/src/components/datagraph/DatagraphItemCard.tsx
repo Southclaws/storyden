@@ -88,7 +88,7 @@ export function DatagraphItemReplyCard({ item }: { item: DatagraphItemReply }) {
     <Card
       id={ref.id}
       url={url}
-      title={`Thread: ${ref.title}` || "(untitled thread)"}
+      title={ref.title ? `Thread: ${ref.title}` : "(untitled thread)"}
       text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
