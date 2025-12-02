@@ -33,6 +33,20 @@ type Indexer struct {
 	chunkSize     int
 }
 
+func runIndexerOnBoot(ctx context.Context, lc fx.Lifecycle, i *Indexer) {
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		go func() {
+			time.Sleep(time.Second)
+			err := i.ReindexAll(ctx)
+			if err != nil {
+				i.logger.Error("failed to run initial reindex job", slog.String("error", err.Error()))
+			}
+		}()
+
+		return nil
+	}))
+}
+
 func newIndexer(
 	ctx context.Context,
 	lc fx.Lifecycle,
@@ -57,18 +71,6 @@ func newIndexer(
 		bus:           bus,
 		chunkSize:     cfg.SearchIndexChunkSize,
 	}
-
-	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		go func() {
-			time.Sleep(time.Second)
-			err := idx.ReindexAll(hctx)
-			if err != nil {
-				idx.logger.Error("failed to run initial reindex job", slog.String("error", err.Error()))
-			}
-		}()
-
-		return nil
-	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		_, err := pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_published", func(ctx context.Context, evt *message.EventThreadPublished) error {

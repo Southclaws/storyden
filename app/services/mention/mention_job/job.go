@@ -18,7 +18,7 @@ func runMentionConsumer(
 	ic *mentionConsumer,
 ) {
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "mention_job.notify_mentions", func(ctx context.Context, evt *message.EventMemberMentioned) error {
+		_, err := pubsub.Subscribe(ctx, bus, "mention_job.notify_mentions", func(ctx context.Context, evt *message.EventMemberMentioned) error {
 			if err := ic.mention(ctx, evt.By, evt.Source, evt.Item); err != nil {
 				logger.Error("failed to record mention", slog.String("error", err.Error()))
 				return err

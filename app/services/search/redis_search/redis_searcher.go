@@ -240,7 +240,7 @@ func (s *RedisSearcher) MatchFast(ctx context.Context, q string, limit int, opts
 
 	matches := make(datagraph.MatchList, 0, len(docs))
 	for _, doc := range docs {
-		match, ok := s.matchFromDoc(doc.Doc)
+		match, ok := s.matchFromDoc(doc)
 		if !ok {
 			continue
 		}
@@ -337,13 +337,13 @@ func (s *RedisSearcher) buildPrefixQuery(q string, opts searcher.Options) string
 	return nameQuery
 }
 
-func (s *RedisSearcher) matchFromDoc(fields map[string]string) (datagraph.Match, bool) {
-	id, err := xid.FromString(fields["id"])
+func (s *RedisSearcher) matchFromDoc(doc rueidis.FtSearchDoc) (datagraph.Match, bool) {
+	id, err := s.idFromKey(doc.Key)
 	if err != nil {
 		return datagraph.Match{}, false
 	}
 
-	kind, err := datagraph.NewKind(fields["kind"])
+	kind, err := datagraph.NewKind(doc.Doc["kind"])
 	if err != nil {
 		return datagraph.Match{}, false
 	}
@@ -351,9 +351,9 @@ func (s *RedisSearcher) matchFromDoc(fields map[string]string) (datagraph.Match,
 	return datagraph.Match{
 		ID:          id,
 		Kind:        kind,
-		Slug:        fields["slug"],
-		Name:        fields["name"],
-		Description: fields["description"],
+		Slug:        doc.Doc["slug"],
+		Name:        doc.Doc["name"],
+		Description: doc.Doc["description"],
 	}, true
 }
 
@@ -375,7 +375,6 @@ func (c *RedisSearcher) ensureIndex(ctx context.Context) error {
 	if err != nil {
 		re := &rueidis.RedisError{}
 		if errors.As(err, &re) {
-			fmt.Println(re.Error())
 			// NOTE: Sketchy way to check for index existence, but rueidis
 			// doesn't expose proper sentinel errors for some reason.
 			if re.Error() == "Unknown index name" {

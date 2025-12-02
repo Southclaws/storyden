@@ -82,7 +82,7 @@ func (s *BleveSearcher) MatchFast(ctx context.Context, q string, limit int, opts
 
 	req := bleve.NewSearchRequestOptions(matchQuery, limit, 0, false)
 	req.Fields = []string{"id", "kind", "name", "slug", "description", "created_at"}
-	req.SortBy([]string{"_score"})
+	req.SortBy([]string{"-_score"})
 
 	result, err := s.client.Search(req)
 	if err != nil {

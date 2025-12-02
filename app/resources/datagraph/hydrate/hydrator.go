@@ -3,11 +3,12 @@ package hydrate
 
 import (
 	"context"
+	"fmt"
 	"sort"
-	"sync"
 
 	"github.com/Southclaws/dt"
 	"github.com/samber/lo"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -58,13 +59,10 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 
 	results := make(chan withRelevance, len(refs))
 
-	wg := sync.WaitGroup{}
+	eg, ctx := errgroup.WithContext(ctx)
 
 	for k, v := range parts {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
+		eg.Go(func() error {
 			relevanceMap := make(map[string]float64)
 			for _, r := range v {
 				relevanceMap[r.ID.String()] = r.Relevance
@@ -74,37 +72,41 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 			case datagraph.KindPost:
 				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
 				items, err := h.replies.GetMany(ctx, ids...)
-				if err == nil {
-					for _, item := range items {
-						results <- withRelevance{item, relevanceMap[item.ID.String()]}
-					}
+				if err != nil {
+					return fmt.Errorf("failed to get posts for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindThread:
 				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
 				items, err := h.threads.GetMany(ctx, ids, nil)
-				if err == nil {
-					for _, item := range items {
-						results <- withRelevance{item, relevanceMap[item.ID.String()]}
-					}
+				if err != nil {
+					return fmt.Errorf("failed to get threads for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindReply:
 				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
 				items, err := h.replies.GetMany(ctx, ids...)
-				if err == nil {
-					for _, item := range items {
-						results <- withRelevance{item, relevanceMap[item.ID.String()]}
-					}
+				if err != nil {
+					return fmt.Errorf("failed to get replies for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindNode:
 				ids := dt.Map(v, func(r *datagraph.Ref) library.NodeID { return library.NodeID(r.ID) })
 				items, err := h.nodeQuerier.ProbeMany(ctx, ids...)
-				if err == nil {
-					for _, item := range items {
-						results <- withRelevance{item, relevanceMap[item.GetID().String()]}
-					}
+				if err != nil {
+					return fmt.Errorf("failed to get nodes for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.GetID().String()]}
 				}
 
 			case datagraph.KindCollection:
@@ -116,18 +118,23 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 			case datagraph.KindEvent:
 				// TODO
 			}
-		}()
+
+			return nil
+		})
 	}
 
 	go func() {
-		wg.Wait()
-
+		eg.Wait()
 		close(results)
 	}()
 
 	var hydrated sortedByRelevance
 	for items := range results {
 		hydrated = append(hydrated, items)
+	}
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
 	}
 
 	sort.Sort(hydrated)
