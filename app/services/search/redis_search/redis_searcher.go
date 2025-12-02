@@ -48,6 +48,7 @@ type SearchHit struct {
 	Slug        string
 	Description string
 	CreatedAt   int64
+	Score       float64
 }
 
 func New(ctx context.Context, cfg config.Config, redisClient rueidis.Client, hydrator *hydrate.Hydrator) (*RedisSearcher, error) {
@@ -167,6 +168,7 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 			// TODO: Log error
 			continue
 		}
+		hit.Score = doc.Score
 		if kind, ok := doc.Doc["kind"]; ok {
 			hit.Kind = kind
 		}
@@ -196,8 +198,9 @@ func (s *RedisSearcher) Search(ctx context.Context, q string, p pagination.Param
 			continue
 		}
 		refs = append(refs, &datagraph.Ref{
-			ID:   hit.ID,
-			Kind: kind,
+			ID:        hit.ID,
+			Kind:      kind,
+			Relevance: hit.Score,
 		})
 	}
 

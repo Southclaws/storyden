@@ -114,8 +114,9 @@ func (s *BleveSearcher) processResults(ctx context.Context, result *bleve.Search
 			continue
 		}
 		refs = append(refs, &datagraph.Ref{
-			ID:   id,
-			Kind: kind,
+			ID:        id,
+			Kind:      kind,
+			Relevance: hit.Score,
 		})
 	}
 
