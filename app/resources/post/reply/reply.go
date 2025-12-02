@@ -220,6 +220,10 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 		rootPostID = post.ID(*r.RootPostID)
 	}
 
+	rootSlug := opt.NewPtrMap(r.Edges.Root, func(p ent.Post) string {
+		return p.Slug
+	}).Or(r.RootPostID.String())
+
 	return &Reply{
 		Post: post.Post{
 			ID:        post.ID(r.ID),
@@ -231,6 +235,6 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 		},
 		RootPostID: rootPostID,
 		ReplyTo:    replyTo(r),
-		Slug:       fmt.Sprintf("%s#%s", r.RootPostID, r.ID),
+		Slug:       fmt.Sprintf("%s#%s", rootSlug, r.ID),
 	}, nil
 }
