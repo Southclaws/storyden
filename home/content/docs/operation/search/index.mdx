@@ -1,0 +1,183 @@
+---
+title: Search
+description: Configure search capabilities for your Storyden deployment.
+---
+
+Storyden provides flexible search capabilities to help members discover content across threads and library pages. The platform supports three search providers, each designed for different deployment scenarios and scale requirements.
+
+## Configuration
+
+Search functionality is configured via the [`SEARCH_PROVIDER`](/docs/operation/configuration#search-features) environment variable. Each provider offers different trade-offs between simplicity, performance, and operational complexity.
+
+### Search Providers
+
+<Cards>
+  <Card title="Database" href="./search/database">
+    Simple, no configuration, doesn't scale well.
+  </Card>
+  <Card title="Bleve" href="./search/bleve">
+    Simple, local disk, fast.
+  </Card>
+  <Card title="Redis" href="./search/redis">
+    Complex, separate service, very fast.
+  </Card>
+</Cards>
+
+There are currently three search providers built in to Storyden. If you would like support for another system or service, [please open an issue!](https://github.com/Southclaws/storyden/issues/new)
+
+The comparison table below summarizes the key differences:
+
+| Feature               | Database      | Bleve              | Redis                 |
+| --------------------- | ------------- | ------------------ | --------------------- |
+| **Infrastructure**    | None required | Local disk storage | Redis with RediSearch |
+| **Setup complexity**  | None          | Low                | Medium                |
+| **Search quality**    | Basic keyword | Full-text          | Full-text             |
+| **Typeahead support** | No            | Yes                | Yes                   |
+| **Scale limit**       | Small         | Small-Medium       | Large                 |
+| **Multi-instance**    | Yes           | No                 | Yes                   |
+| **Disk usage**        | None          | Index files        | None                  |
+
+## Search Features
+
+All search providers support searching across the following content types:
+
+- **[Threads](/docs/introduction/discussion/threads)**: Discussion posts including titles, descriptions, and content
+- **Replies**: Individual responses to threads
+- **[Library pages](/docs/introduction/library)**: Notion-style knowledge-base pages
+
+## Technical details
+
+If you are using the API and building a custom frontend on top of the Storyden API, this section is for you!
+
+### Typeahead and Autocomplete
+
+Both Bleve and Redis providers support fast prefix matching for typeahead features via the [`/api/datagraph/matches`](/docs/api/datagraph/DatagraphMatches) endpoint. This enables real-time search suggestions as users type.
+
+<Callout type="warn">
+  The `database` provider does not support this feature and will return an error
+  if accessed.
+</Callout>
+
+### Indexed Fields
+
+Search providers index the following fields for each piece of content:
+
+- **Name**: The title of a thread or name of a page
+- **Slug**: URL-friendly identifier
+- **Description**: Short summary or excerpt
+- **Content**: Full text content in plain text form (not HTML)
+
+## Indexing Behavior
+
+Storyden automatically maintains search indexes through an event-driven system. When content is published, updated, or deleted, the search index is updated accordingly.
+
+### Re-indexing
+
+When Storyden starts with [Bleve](./search/bleve) or [Redis](./search/redis) search enabled, it performs an automatic reindexing of stale content. For more information see [reindexing](./search/reindexing)
+
+The initial indexing process runs in the background and processes content in batches. You can configure the batch size:
+
+```bash
+SEARCH_INDEX_CHUNK_SIZE=1000
+```
+
+Larger batch sizes improve indexing performance but increase memory usage during the indexing operation. The default value of 1000 is suitable for most deployments.
+
+### Real-time Updates
+
+After initial indexing, content changes are reflected in the search index immediately through the event system. This includes:
+
+- Publishing new threads or library pages
+- Updating existing content
+- Deleting or unpublishing content
+
+No manual reindexing is required during normal operation.
+
+## Migration Between Providers
+
+Switching search providers requires a configuration change and a [reindex](./search/reindexing) if moving between index-based providers. If you are simply upgrading from [`database`](./search/database) to another provider, the full re-index will happen automatically since none of the content items will have `indexed_at` set in the database.
+
+### Migration steps
+
+1. Update your environment configuration:
+
+```bash
+# Before
+SEARCH_PROVIDER=database # or, not set at all
+
+# After
+SEARCH_PROVIDER=bleve
+BLEVE_PATH=/data/bleve
+```
+
+2. Restart Storyden. The new provider will automatically index all content on startup.
+
+3. Verify search functionality works correctly with the new provider.
+
+### Language Support
+
+All index-based search providers use language-agnostic configurations to support multilingual content without special configuration.
+
+**Key characteristics:**
+
+- No stopword filtering (words like "the", "a", "is" are indexed) this results in slightly larger indexes
+- No language-specific stemming (searching "running" won't match "run")
+- Unicode normalization for consistent matching across character sets
+
+This design prioritizes predictable behavior across all languages over highly optimized single-language search. For most communities, this provides better results without requiring language detection or per-language configuration.
+
+<Callout type="info">
+  If you're using Redis as your search provider, once Storyden has automatically
+  created the index, you can modify the configration yourself. Storyden will not
+  attempt to change an index configuration once created.
+
+You can also create the index ahead of time if needed, with your own configuration set up. Just make sure you use the same index name as `REDIS_SEARCH_INDEX_NAME`. Dry-run against a local Redis instance to view the exact index configuration Storyden creates (such as the prefix and key format.)
+
+</Callout>
+
+### API Endpoints
+
+Search functionality is exposed through the [Datagraph API](/docs/api):
+
+- `GET /api/datagraph/search?q=query&page=1` - Full search with pagination (50 results per page)
+- `GET /api/datagraph/matches?q=query` - Fast typeahead ([Bleve](./search/bleve)/[Redis](./search/redis) only, returns up to 20 matches)
+
+Both endpoints support optional `kind` parameters to filter results by content type (`thread`, `node`, etc.).
+
+Example search request:
+
+```bash
+curl "https://my-storyden.com/api/datagraph/search?q=bread&kind=thread&page=1"
+```
+
+Example typeahead request:
+
+```bash
+curl "https://my-storyden.com/api/datagraph/matches?q=brea"
+```
+
+Refer to the [API documentation](/docs/api) for complete endpoint specifications and response schemas.
+
+### Related Configuration
+
+Search functionality integrates with other Storyden features:
+
+- [Cache configuration](/docs/operation/configuration#cache) - Redis URL shared between caching and Redis search
+- [Database configuration](/docs/operation/configuration#core-configuration) - Database provider affects search performance
+- [Rate limiting](/docs/operation/configuration#rate-limiting) - Applies to search API endpoints
+
+### Quick Reference
+
+#### Environment variables
+
+| Variable                  | Required   | Default      | Description                                    |
+| ------------------------- | ---------- | ------------ | ---------------------------------------------- |
+| `SEARCH_PROVIDER`         | No         | `database`   | Provider type: `database`, `bleve`, or `redis` |
+| `SEARCH_INDEX_CHUNK_SIZE` | No         | `1000`       | Batch size for indexing operations             |
+| `BLEVE_PATH`              | Bleve only | `data/bleve` | Directory path for Bleve index storage         |
+| `REDIS_URL`               | Redis only | -            | Redis connection URL                           |
+| `REDIS_SEARCH_INDEX_NAME` | Redis only | `storyden`   | Redis index name                               |
+
+- [Full configuration reference](/docs/operation/configuration#search-features) - All search-related environment variables
+- [API documentation](/docs/api) - Complete API endpoint specifications
+- [Datagraph concept](/docs/introduction/datagraph) - Understanding content relationships in search results

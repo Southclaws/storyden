@@ -1,0 +1,79 @@
+---
+title: Bleve
+description: Fast local-disk search capabilities via Bleve
+---
+
+Bleve is a full-text search engine written in Go that runs within the Storyden process. It stores search indexes on local disk and provides significantly better search quality than [database](./database) search.
+
+```bash
+SEARCH_PROVIDER=bleve
+# A directory path for Bleve to store its index files:
+BLEVE_PATH=./data/bleve
+```
+
+<Callout title="When to use Bleve">
+  A small to medium sized community forum running on a server with persistent
+  disk storage. The community has tens of thousands of
+  [Threads](/docs/introduction/discussion/threads) and hundreds of [Library
+  Pages](/docs/introduction/library). Members frequently use search to find
+  relevant content. The deployment uses a single Storyden instance with SQLite
+  or PostgreSQL database.
+</Callout>
+
+Bleve indexes content for fast term-based search. Storyden uses a language-agnostic index analyzer that works for many languages:
+
+- All Latin-based languages (English, Spanish, French, German, Italian, Portuguese, Dutch, etc.)
+- Slavic languages (Russian, Ukrainian, Polish, Czech, Slovak, Serbian, Croatian, Bulgarian)
+- Greek, Turkish, Georgian, Armenian
+- Hebrew, Arabic, Persian
+- Urdu, Hindi, Punjab, Nepali
+- Yoruba, Igbo, Hausa, Akan, Swahili
+
+<Callout type="warn">
+  Currently, Bleve search has limited functionality for Chinese, Japanese,
+  Korean and other languages that do not use whitespace to separate words, such
+  as Thai, Lao, Khmer, Burmese. We would love help from speakers of these
+  languages to make Storyden more useful for more people! Please [open an
+  issue](https://github.com/Southclaws/storyden/issues/new) if you are
+  interested in helping.
+</Callout>
+
+If you run into issues with search in your language, please [open an
+issue](https://github.com/Southclaws/storyden/issues/new) and help make Storyden better for everyone on earth!
+
+Upsides:
+
+- Improved search quality and speed over [database](./database) search
+- Runs well on a stateful server with local disk
+
+Considerations:
+
+- Does not handle very high-volume of queries or indexing well as it's single-threaded
+- Not suitable for ephemeral containers or scaled replica deployments
+- Single-instance only - index cannot be not shared across replicas
+
+## Indexing
+
+When performing a full index (indexing all content from scratch) the rate is rather slow at around 10,000 documents in 10 minutes. A million documents would take hours. This may be improved in future versions.
+
+In order to trigger a full re-index of content, see [reindexing](./reindexing).
+
+## Single-server deployment with Bleve
+
+Small to medium community running on a VPS or dedicated server:
+
+```bash
+# Database
+DATABASE_URL=sqlite:///var/lib/storyden/data.db
+
+# Search
+SEARCH_PROVIDER=bleve
+BLEVE_PATH=/var/lib/storyden/bleve
+SEARCH_INDEX_CHUNK_SIZE=1000
+
+# Asset storage
+ASSET_STORAGE_TYPE=local
+ASSET_STORAGE_LOCAL_PATH=/var/lib/storyden/assets
+```
+
+This configuration keeps all data local to the server. Ensure `/var/lib/storyden` has sufficient disk space and is included in your backup strategy.
