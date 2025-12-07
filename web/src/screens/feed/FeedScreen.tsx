@@ -1,4 +1,4 @@
-import { Account, ThreadListResult } from "@/api/openapi-schema";
+import { Account } from "@/api/openapi-schema";
 import { categoryList } from "@/api/openapi-server/categories";
 import { nodeList } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
@@ -21,13 +21,21 @@ export type Props = PageProps & {
 // admin may configure different sources/layouts which is post-hydration and
 // client side. In this case, there is no server side hydrated data available.
 // Not a problem just worth pointing out here.
-export async function FeedScreen({ page, initialSettings }: Props) {
+export async function FeedScreen({
+  page,
+  initialSettings,
+  initialSession,
+}: Props) {
   const feedConfig = initialSettings.metadata.feed;
   const initialData = await getInitialFeedData(feedConfig, page);
 
   return (
     <VStack>
-      <FeedScreenContent initialData={initialData} />
+      <FeedScreenContent
+        initialData={initialData}
+        initialSettings={initialSettings}
+        initialSession={initialSession}
+      />
     </VStack>
   );
 }

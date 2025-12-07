@@ -1,3 +1,5 @@
+"use client";
+
 import { UnreadyBanner } from "src/components/site/Unready";
 
 import { VStack } from "@/styled-system/jsx";
