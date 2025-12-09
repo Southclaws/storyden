@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/report"
 	"github.com/Southclaws/storyden/app/services/search"
+	"github.com/Southclaws/storyden/app/services/semdex/agent"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -64,6 +65,7 @@ func Build() fx.Option {
 		mention_job.Build(),
 		beacon_listener.Build(),
 		generative.Build(),
+		agent.Build(),
 		semdexer.Build(),
 		event.Build(),
 		moderation.Build(),
