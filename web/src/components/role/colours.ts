@@ -7,6 +7,7 @@ export function badgeColourCSS(c: string) {
     "--colors-color-palette-fg": fg,
     "--colors-color-palette-border": bo,
     "--colors-color-palette-bg": bg,
+    "--colors-color-palette-text": fg,
   } as React.CSSProperties;
 }
 

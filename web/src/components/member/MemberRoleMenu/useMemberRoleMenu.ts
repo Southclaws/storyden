@@ -12,7 +12,7 @@ export type Props = {
 };
 
 export function useMemberRoleMenu(props: Props) {
-  const { ready, data, error, addRole, removeRole, revalidate } =
+  const { ready, data, error, addRole, removeRole, revalidate, isUpdating } =
     useMemberRoles(props);
   if (!ready) {
     return {
@@ -50,6 +50,8 @@ export function useMemberRoleMenu(props: Props) {
   };
 
   const handleSelect = (details: MenuSelectionDetails) => {
+    if (isUpdating) return;
+
     const id = details.value;
     const role = roles.find((r) => r.id === id);
 
@@ -70,5 +72,6 @@ export function useMemberRoleMenu(props: Props) {
     handlers: {
       handleSelect,
     },
+    isUpdating,
   };
 }

@@ -83,8 +83,6 @@ var (
 	ErrEveryoneRole        = fault.New("cannot change default role", ftag.With(ftag.InvalidArgument), fmsg.WithDesc("default role", "You cannot change the default role."))
 )
 
-const accountGetCacheControl = "private, max-age=5, must-revalidate"
-
 func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
@@ -100,7 +98,6 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
 		return openapi.AccountGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: accountGetCacheControl,
 				LastModified: lastModified,
 			},
 		}, nil
@@ -120,7 +117,6 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
-				CacheControl: accountGetCacheControl,
 				LastModified: lastModified,
 			},
 		},

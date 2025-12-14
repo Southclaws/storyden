@@ -176,6 +176,8 @@ export function useThreadMutations(thread: ThreadReference) {
     });
 
     await postReactAdd(replyID, { emoji });
+
+    await mutate(key);
   };
 
   const reactionRemove = async (replyID: Identifier, reactID: Identifier) => {
