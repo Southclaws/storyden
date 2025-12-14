@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
-	"github.com/Southclaws/storyden/app/transports/mcp/tools"
+	"github.com/Southclaws/storyden/app/services/semdex/agent/tools"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
