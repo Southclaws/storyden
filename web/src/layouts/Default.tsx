@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode, Suspense } from "react";
 
 import { Navigation } from "src/components/site/Navigation/Navigation";
 
@@ -20,17 +20,19 @@ export async function Default({
       backgroundColor="bg.site"
       vaul-drawer-wrapper=""
     >
-      <Navigation contextpane={contextpane}>
-        <styled.main
-          containerType="inline-size"
-          width="full"
-          height="full"
-          minW="0"
-        >
-          {children}
-          <Box height="24"></Box>
-        </styled.main>
-      </Navigation>
+      <Suspense>
+        <Navigation contextpane={contextpane}>
+          <styled.main
+            containerType="inline-size"
+            width="full"
+            height="full"
+            minW="0"
+          >
+            {children}
+            <Box height="24"></Box>
+          </styled.main>
+        </Navigation>
+      </Suspense>
     </Flex>
   );
 }

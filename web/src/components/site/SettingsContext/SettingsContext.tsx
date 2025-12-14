@@ -1,11 +1,10 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
 
 import { handle } from "@/api/client";
-import { Account, Permission } from "@/api/openapi-schema";
+import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import {
   Editing,
@@ -13,12 +12,11 @@ import {
 } from "@/components/site/SiteContextPane/useSiteContextPane";
 import { FeedConfig } from "@/lib/settings/feed";
 import { useSettingsMutation } from "@/lib/settings/mutation";
-import { Settings } from "@/lib/settings/settings";
+import { DefaultFrontendConfig, Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
 import { hasPermission } from "@/utils/permissions";
 
 type SettingsContextProps = {
-  session: Account | undefined;
   feed: FeedConfig;
   isEditingEnabled: boolean;
   isEditing: boolean;
@@ -31,26 +29,26 @@ const context = createContext<SettingsContextProps | null>(null);
 export function useSettingsContext(): SettingsContextProps {
   const value = useContext(context);
   if (!value) {
-    throw new Error(
-      "useSettingsContext must be used within a SettingsContext provider",
-    );
+    // throw new Error(
+    //   "useSettingsContext must be used within a SettingsContext provider",
+    // );
+    return {
+      feed: DefaultFrontendConfig.feed,
+      isEditingEnabled: false,
+      isEditing: false,
+      handleToggleEditing: () => {},
+      updateFeed: async () => {},
+    };
   }
   return value;
 }
 
-export function SettingsContext({
-  initialSession,
-  initialSettings,
-  children,
-}: PropsWithChildren<{
-  initialSession: Account | undefined;
-  initialSettings: Settings;
-}>) {
-  const session = useSession(initialSession);
-  const { settings } = useSettings(initialSettings);
-  const { updateSettings } = useSettingsMutation(initialSettings);
+export function SettingsContext({ children }: PropsWithChildren<{}>) {
+  const session = useSession();
+  // const { settings } = useSettings();
+  // const { updateSettings } = useSettingsMutation({});
 
-  const feed: FeedConfig = (settings ?? initialSettings).metadata.feed;
+  // const feed: FeedConfig = settings.metadata.feed;
 
   const [editing, setEditing] = useQueryState<null | Editing>("editing", {
     defaultValue: null,
@@ -58,10 +56,7 @@ export function SettingsContext({
     parse: EditingSchema.parse,
   });
 
-  const isEditingEnabled = hasPermission(
-    initialSession,
-    Permission.MANAGE_SETTINGS,
-  );
+  const isEditingEnabled = hasPermission(session, Permission.MANAGE_SETTINGS);
 
   const isEditing = editing === "feed";
 
@@ -76,11 +71,11 @@ export function SettingsContext({
   const updateFeed = async (data: FeedConfig) => {
     await handle(
       async () => {
-        await updateSettings({
-          metadata: {
-            feed: data,
-          },
-        });
+        // await updateSettings({
+        //   metadata: {
+        //     feed: data,
+        //   },
+        // });
       },
       {
         promiseToast: {
@@ -94,11 +89,10 @@ export function SettingsContext({
   return (
     <context.Provider
       value={{
-        session,
         isEditingEnabled,
         isEditing,
         handleToggleEditing,
-        feed,
+        feed: DefaultFrontendConfig.feed,
         updateFeed,
       }}
     >

@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { cacheLife } from "next/cache";
 import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
-import { getServerSession } from "@/auth/server-session";
 import { SettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
@@ -17,9 +17,6 @@ import { Providers } from "./providers";
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
-  const session = await getServerSession();
-  const settings = await getSettings();
-
   return (
     <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
       <head>
@@ -45,12 +42,20 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       </head>
 
       <body>
-        <SettingsContext initialSession={session} initialSettings={settings}>
+        {/* TODO: Figure out how this shit works in next cache component mess */}
+        <SettingsWrapper>
           <Providers>{children}</Providers>
-        </SettingsContext>
+        </SettingsWrapper>
       </body>
     </html>
   );
+}
+
+async function SettingsWrapper({ children }: PropsWithChildren) {
+  "use cache";
+  cacheLife("hours");
+
+  return <SettingsContext>{children}</SettingsContext>;
 }
 
 export async function generateViewport(): Promise<Viewport> {
