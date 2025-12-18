@@ -34,7 +34,8 @@ export const baseOptions: BaseLayoutProps = {
           active: "nested-url",
           menu: {
             className: css({
-              gridRow: "span 2",
+              gridColumn: { md: "1" },
+              gridRow: { md: "1 / span 2" },
             }),
             banner: (
               <Box
@@ -73,24 +74,24 @@ export const baseOptions: BaseLayoutProps = {
           url: "/docs/introduction/what-is-storyden",
           menu: {
             className: css({
-              gridColumnStart: "2",
+              gridColumn: { md: "2" },
+              gridRow: { md: "1 / span 1" },
             }),
           },
         },
         {
-          // TODO: Replace with "Use Cases" page once that's done.
           icon: <MessageCircleHeartIcon />,
           text: "For discussion",
           description: "How does Storyden replace forums?",
           url: "/docs/introduction/discussion",
           menu: {
             className: css({
-              gridColumnStart: "2",
+              gridColumn: { md: "2" },
+              gridRow: { md: "2 / span 1" },
             }),
           },
         },
         {
-          // TODO: Replace with "Comparisons" page once that's done.
           icon: <LibraryBigIcon />,
           text: "Library",
           description:
@@ -98,8 +99,8 @@ export const baseOptions: BaseLayoutProps = {
           url: "/docs/introduction/library",
           menu: {
             className: css({
-              gridColumnStart: "3",
-              gridRowStart: "1",
+              gridColumn: { md: "1", lg: "3" },
+              gridRow: { md: "3 / span 1", lg: "1 / span 1" },
             }),
           },
         },
@@ -110,7 +111,8 @@ export const baseOptions: BaseLayoutProps = {
           url: "/docs/api",
           menu: {
             className: css({
-              gridColumnStart: "3",
+              gridColumn: { md: "2", lg: "3" },
+              gridRow: { md: "3 / span 1", lg: "2 / span 1" },
             }),
           },
         },
