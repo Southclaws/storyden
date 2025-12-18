@@ -1,19 +1,15 @@
-import { blog as blogPosts, docs } from "@/.source";
+import { blog as blogPosts, docs } from "@/.source/server";
 import { loader } from "fumadocs-core/source";
-import { createMDXSource } from "fumadocs-mdx";
-import { attachFile, openapiPlugin } from "fumadocs-openapi/server";
+import { toFumadocsSource } from "fumadocs-mdx/runtime/server";
+import { openapiPlugin } from "fumadocs-openapi/server";
 import { openapi } from "./openapi";
 
 export const source = loader({
   baseUrl: "/docs",
   source: docs.toFumadocsSource(),
-  pageTree: {
-    attachFile,
-  },
   plugins: [
     openapiPlugin(),
     {
-      // hack to fix openapi pages not having table of contents.
       name: "openapi-toc",
       transformPageTree: {
         file(node, filePath) {
@@ -36,7 +32,7 @@ export const source = loader({
 
 export const blog = loader({
   baseUrl: "/blog",
-  source: createMDXSource(blogPosts),
+  source: toFumadocsSource(blogPosts, []),
 });
 
 export { openapi };

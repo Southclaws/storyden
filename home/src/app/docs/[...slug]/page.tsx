@@ -27,7 +27,7 @@ export default async function Page(props: {
         owner: "Southclaws",
         repo: "storyden",
         sha: "main",
-        path: `home/content/docs/${page.file.path}`,
+        path: `home/content/docs/${page.path}`,
       }}
     >
       <DocsTitle>{page.data.title}</DocsTitle>
