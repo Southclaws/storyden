@@ -63,6 +63,12 @@ type Config struct {
 	   This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
 	*/
 	DevChaosFailRate float64 `envconfig:"DEV_CHAOS_FAIL_RATE"`
+	/*
+	   Simulates slow message delivery in the internal message queue.
+
+	   This will add a random delay between zero and this value to all messages in the internal message queue. This is useful for testing how the client handles delayed message processing.
+	*/
+	DevChaosSlowModeQueue time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE_QUEUE"`
 
 	// -
 	// Core configuration

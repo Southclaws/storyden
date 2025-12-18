@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -50,17 +51,20 @@ func Build() fx.Option {
 type service struct {
 	accountQuery  *account_querier.Querier
 	category_repo *category.Repository
+	cache         *category_cache.Cache
 	bus           *pubsub.Bus
 }
 
 func New(
 	accountQuery *account_querier.Querier,
 	category_repo *category.Repository,
+	cache *category_cache.Cache,
 	bus *pubsub.Bus,
 ) Service {
 	return &service{
 		accountQuery:  accountQuery,
 		category_repo: category_repo,
+		cache:         cache,
 		bus:           bus,
 	}
 }
@@ -112,6 +116,10 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 }
 
 func (s *service) Update(ctx context.Context, slug string, partial Partial) (*category.Category, error) {
+	if err := s.cache.Invalidate(ctx, slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	opts := []category.Option{}
 
 	if v, ok := partial.Name.Get(); ok {
@@ -147,6 +155,10 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 }
 
 func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category.Category, error) {
+	if err := s.cache.Invalidate(ctx, slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	parentOpt, deleteParent := move.Parent.Get()
 	parentProvided := deleteParent
 	var parentID *category.CategoryID

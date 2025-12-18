@@ -45,6 +45,7 @@ func Map(in *ent.React) (*React, error) {
 		ID:     ReactID(in.ID),
 		Emoji:  in.Emoji,
 		Author: *acc,
+		target: xid.ID(in.PostID),
 	}, nil
 }
 

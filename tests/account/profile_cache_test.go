@@ -65,9 +65,6 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, addEmail)
 
-			// Wait for the cache update event to be processed via pubsub
-			time.Sleep(200 * time.Millisecond)
-
 			// Now cache should be populated with timestamp from when email was added
 			cachedValue1, err := cacheStore.Get(root, cacheKey)
 			r.NoError(err, "cache value should exist after email added")
@@ -91,9 +88,6 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 			// Remove the email
 			removeEmail, err := cl.AccountEmailRemoveWithResponse(root, addEmail.JSON200.Id, session)
 			tests.Ok(t, err, removeEmail)
-
-			// Wait for the cache update event to be processed
-			time.Sleep(200 * time.Millisecond)
 
 			// Cache should be updated with a newer timestamp
 			cachedValue2, err := cacheStore.Get(root, cacheKey)
@@ -147,9 +141,6 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, updateResp)
 
-			// Wait for the cache update event to be processed
-			time.Sleep(200 * time.Millisecond)
-
 			// Cache should now be populated
 			cachedValue1, err := cacheStore.Get(root, cacheKey)
 			r.NoError(err, "cache value should exist after profile update")
@@ -166,8 +157,6 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 				Bio: &newBio2,
 			}, session)
 			tests.Ok(t, err, updateResp2)
-
-			time.Sleep(200 * time.Millisecond)
 
 			cachedValue2, err := cacheStore.Get(root, cacheKey)
 			r.NoError(err, "cache value should still exist after second profile update")

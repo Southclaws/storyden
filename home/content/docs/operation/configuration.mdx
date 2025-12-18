@@ -86,6 +86,17 @@ A value between 0 and 1 which simulates failed requests.
 
 This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
 
+### `DEV_CHAOS_SLOW_MODE_QUEUE`
+
+<table>
+<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Simulates slow message delivery in the internal message queue.
+
+This will add a random delay between zero and this value to all messages in the internal message queue. This is useful for testing how the client handles delayed message processing.
+
 ## Core configuration
 
 Configuration settings for core functionality, pretty much all of these will need to be configured for production installations, excepting perhaps `LISTEN_ADDR`.

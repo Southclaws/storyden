@@ -11,22 +11,26 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 // TODO: Should be named profile updater tbh, is not account-specific.
 type Updater struct {
-	writer *account_writer.Writer
-	bus    *pubsub.Bus
+	writer       *account_writer.Writer
+	profileCache *profile_cache.Cache
+	bus          *pubsub.Bus
 }
 
 func New(
 	writer *account_writer.Writer,
+	profileCache *profile_cache.Cache,
 	bus *pubsub.Bus,
 ) *Updater {
 	return &Updater{
-		writer: writer,
-		bus:    bus,
+		writer:       writer,
+		profileCache: profileCache,
+		bus:          bus,
 	}
 }
 
@@ -63,6 +67,11 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 	}
 	if v, ok := params.Meta.Get(); ok {
 		opts = append(opts, account_writer.SetMetadata(v))
+	}
+
+	err := u.profileCache.Invalidate(ctx, xid.ID(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	acc, err := u.writer.Update(ctx, id, opts...)

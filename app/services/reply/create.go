@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/message"
@@ -27,9 +28,18 @@ func (s *service) Create(
 
 	opts := partial.Opts()
 
-	p, err := s.post_repo.Create(ctx, authorID, parentID, opts...)
+	p, err := s.replyRepo.Create(ctx, authorID, parentID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
+	}
+
+	pref, err := s.replyRepo.Probe(ctx, p.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	s.bus.Publish(ctx, &message.EventThreadReplyCreated{
@@ -38,7 +48,6 @@ func (s *service) Create(
 		ThreadAuthorID: p.RootAuthor.ID,
 		ReplyAuthorID:  authorID,
 	})
-
 
 	return p, nil
 }

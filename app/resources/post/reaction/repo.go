@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
@@ -33,7 +34,10 @@ func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return Map(r)
@@ -49,7 +53,10 @@ func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postI
 		WithAccount().
 		Only(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return Map(r)
@@ -94,7 +101,13 @@ func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID
 			return nil, nil
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound),
+				fmsg.WithDesc("post not found", "The post you are trying to react to does not exist."),
+			)
+		}
+
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return &reactID, nil

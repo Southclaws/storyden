@@ -48,6 +48,15 @@ type Post struct {
 	IndexedAt opt.Optional[time.Time]
 }
 
+type PostRef struct {
+	ID   ID
+	Root ID
+}
+
+func (p *PostRef) IsThread() bool {
+	return p.ID == p.Root
+}
+
 func (p *Post) GetID() xid.ID                 { return xid.ID(p.ID) }
 func (p *Post) GetKind() datagraph.Kind       { return datagraph.KindPost }
 func (p *Post) GetName() string               { return p.Title }
@@ -114,4 +123,18 @@ func Map(in *ent.Post) (*Post, error) {
 		DeletedAt: opt.NewPtr(in.DeletedAt),
 		IndexedAt: opt.NewPtr(in.IndexedAt),
 	}, nil
+}
+
+func MapRef(in *ent.Post) *PostRef {
+	root := func() ID {
+		if in.RootPostID == nil {
+			return ID(in.ID)
+		}
+		return ID(*in.RootPostID)
+	}()
+
+	return &PostRef{
+		ID:   ID(in.ID),
+		Root: root,
+	}
 }

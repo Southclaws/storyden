@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -31,7 +32,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	p, err := s.post_repo.Get(ctx, threadID)
+	p, err := s.replyRepo.Get(ctx, threadID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -49,7 +50,16 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	opts := partial.Opts()
 
-	p, err = s.post_repo.Update(ctx, threadID, opts...)
+	pref, err := s.replyRepo.Probe(ctx, threadID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	p, err = s.replyRepo.Update(ctx, threadID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

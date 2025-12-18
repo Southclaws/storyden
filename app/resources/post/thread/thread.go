@@ -42,6 +42,15 @@ type Thread struct {
 	Related     datagraph.ItemList
 }
 
+type ThreadRef struct {
+	post.Post
+	Title       string
+	Slug        string
+	Short       string
+	Pinned      bool
+	LastReplyAt opt.Optional[time.Time]
+}
+
 func (*Thread) GetResourceName() string { return "thread" }
 
 func (t *Thread) GetKind() datagraph.Kind { return datagraph.KindThread }
@@ -166,5 +175,23 @@ func Mapper(
 			Category:    category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 		}, nil
+	}
+}
+
+func MapRef(m *ent.Post) *ThreadRef {
+	return &ThreadRef{
+		Post: post.Post{
+			ID: post.ID(m.ID),
+
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: opt.NewPtr(m.DeletedAt),
+		},
+
+		Title:       m.Title,
+		Slug:        m.Slug,
+		Short:       m.Short,
+		Pinned:      m.Pinned,
+		LastReplyAt: opt.New(m.LastReplyAt),
 	}
 }

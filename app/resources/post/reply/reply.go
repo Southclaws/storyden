@@ -31,6 +31,11 @@ type Reply struct {
 	ReplyTo         opt.Optional[post.ID]
 }
 
+type ReplyRef struct {
+	ID         post.ID
+	RootPostID post.ID
+}
+
 func (*Reply) GetResourceName() string { return "post" }
 
 func (r *Reply) GetName() string {
@@ -181,4 +186,18 @@ func Mapper(
 
 		return reply, nil
 	}
+}
+
+func MapRef(m *ent.Post) (*ReplyRef, error) {
+	root := func() xid.ID {
+		if m.RootPostID == nil {
+			return m.ID
+		}
+		return *m.RootPostID
+	}()
+
+	return &ReplyRef{
+		ID:         post.ID(m.ID),
+		RootPostID: post.ID(root),
+	}, nil
 }

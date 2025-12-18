@@ -34,6 +34,10 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, n.GetSlug()); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	oldVisibility := n.Visibility
 
 	pre, err := s.preMutation(ctx, p, opt.NewPtr(n))

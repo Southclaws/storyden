@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/message"
@@ -34,6 +35,10 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 	}
 
 	if err := s.authoriseThreadDelete(ctx, acc, thr); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(id)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
