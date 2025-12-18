@@ -55,21 +55,15 @@ export function useReactionList({ thread, reply }: Props) {
   const reacts = groupReactions(session, reply.reacts);
 
   const handleAdd = async (emoji: string) => {
-    await handle(
-      async () => {
-        await reactionAdd(reply.id, emoji);
-      },
-      { cleanup: () => revalidate(REACTION_THROTTLE) },
-    );
+    await handle(async () => {
+      await reactionAdd(reply.id, emoji);
+    });
   };
 
   const handleRemove = async (id: string) => {
-    await handle(
-      async () => {
-        await reactionRemove(reply.id, id);
-      },
-      { cleanup: () => revalidate(REACTION_THROTTLE) },
-    );
+    await handle(async () => {
+      await reactionRemove(reply.id, id);
+    });
   };
 
   const handleReactExisting = (emoji: string, retry?: boolean) => {

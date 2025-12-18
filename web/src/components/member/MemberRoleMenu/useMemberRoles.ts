@@ -1,6 +1,7 @@
 "use client";
 
 import { keyBy } from "lodash";
+import { useState } from "react";
 
 import {
   accountAddRole,
@@ -8,11 +9,7 @@ import {
 } from "@/api/openapi-client/accounts";
 import { useProfileGet } from "@/api/openapi-client/profiles";
 import { useRoleList } from "@/api/openapi-client/roles";
-import {
-  AccountRole,
-  Identifier,
-  ProfileReference,
-} from "@/api/openapi-schema";
+import { Identifier, ProfileReference } from "@/api/openapi-schema";
 
 export type Props = {
   profile: ProfileReference;
@@ -21,6 +18,8 @@ export type Props = {
 export function useMemberRoles(props: Props) {
   const accountID = props.profile.id;
   const accountHandle = props.profile.handle;
+
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const { data: roleData, error: roleError } = useRoleList();
 
@@ -48,47 +47,23 @@ export function useMemberRoles(props: Props) {
   });
 
   const addRole = async (id: Identifier) => {
-    await mutate(
-      (prev) => {
-        const current = prev ?? profileData;
-
-        const newRole = roleData.roles.find((r) => r.id === id);
-        if (!newRole) return;
-
-        const newHeldRole = { ...newRole } as AccountRole;
-        const nextRoles = [...current.roles, newHeldRole];
-
-        const nextProfile = {
-          ...current,
-          roles: nextRoles,
-        };
-
-        return nextProfile;
-      },
-      { revalidate: false },
-    );
-
-    await accountAddRole(accountHandle, id);
+    setIsUpdating(true);
+    try {
+      await accountAddRole(accountHandle, id);
+      await mutate();
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   const removeRole = async (id: Identifier) => {
-    await mutate(
-      (prev) => {
-        const current = prev ?? profileData;
-
-        const nextRoles = [...current.roles.filter((r) => r.id != id)];
-
-        const nextProfile = {
-          ...current,
-          roles: nextRoles,
-        };
-
-        return nextProfile;
-      },
-      { revalidate: false },
-    );
-
-    await accountRemoveRole(accountHandle, id);
+    setIsUpdating(true);
+    try {
+      await accountRemoveRole(accountHandle, id);
+      await mutate();
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return {
@@ -99,5 +74,6 @@ export function useMemberRoles(props: Props) {
     addRole,
     removeRole,
     revalidate: mutate,
+    isUpdating,
   };
 }

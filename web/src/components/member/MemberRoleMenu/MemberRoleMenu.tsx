@@ -15,7 +15,7 @@ import { HStack } from "@/styled-system/jsx";
 import { Props, useMemberRoleMenu } from "./useMemberRoleMenu";
 
 export function MemberRoleMenu(props: Props) {
-  const { ready, error, data, handlers } = useMemberRoleMenu(props);
+  const { ready, error, data, handlers, isUpdating } = useMemberRoleMenu(props);
   if (!ready) {
     return <Unready error={error} />;
   }
@@ -43,12 +43,18 @@ export function MemberRoleMenu(props: Props) {
               const styles = badgeColourCSS(r.colour);
 
               return (
-                <Menu.Item key={r.id} value={r.id} gap="2" style={styles}>
+                <Menu.Item
+                  key={r.id}
+                  value={r.id}
+                  gap="2"
+                  style={styles}
+                  disabled={isUpdating}
+                >
                   {r.selected ? (
                     <CheckCircleIcon
                       width="4"
                       style={{
-                        fill: "var(--colors-color-palette)",
+                        fill: "var(--colors-color-palette-bg)",
                         stroke: "var(--colors-color-palette-text)",
                       }}
                     />
