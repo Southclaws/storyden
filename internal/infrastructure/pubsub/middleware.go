@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"math/rand"
+	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/rs/xid"
@@ -114,5 +116,32 @@ func injectSessionContext(ctx context.Context, msg *message.Message) {
 
 	if scheme, err := session.GetSecurityScheme(ctx); err == nil {
 		msg.Metadata.Set(securitySchemeKey, scheme)
+	}
+}
+
+func newChaosDelayMiddleware(maxDelay time.Duration, logger *slog.Logger) message.HandlerMiddleware {
+	if maxDelay == 0 {
+		return func(h message.HandlerFunc) message.HandlerFunc {
+			return h
+		}
+	}
+
+	logger.Info("chaos delay: slow message consumption enabled",
+		slog.Duration("max_delay", maxDelay),
+	)
+
+	return func(h message.HandlerFunc) message.HandlerFunc {
+		return func(msg *message.Message) ([]*message.Message, error) {
+			delay := time.Duration(rand.Int63n(int64(maxDelay)))
+			if delay > 0 {
+				logger.Debug("chaos delay: delaying message consumption",
+					slog.String("message_uuid", msg.UUID),
+					slog.String("message_type", msg.Metadata.Get("name")),
+					slog.Duration("delay", delay),
+				)
+				time.Sleep(delay)
+			}
+			return h(msg)
+		}
 	}
 }

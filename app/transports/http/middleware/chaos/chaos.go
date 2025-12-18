@@ -17,7 +17,7 @@ type Middleware struct {
 
 func New(cfg config.Config) *Middleware {
 	return &Middleware{
-		enabled:  cfg.DevChaosFailRate > 0 || cfg.DevChaosSlowMode == 0,
+		enabled:  cfg.DevChaosFailRate > 0 || cfg.DevChaosSlowMode > 0 || cfg.DevChaosSlowModeQueue > 0,
 		failRate: cfg.DevChaosFailRate,
 		slowMode: cfg.DevChaosSlowMode,
 	}

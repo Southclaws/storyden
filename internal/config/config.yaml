@@ -55,6 +55,14 @@
 
         This will add a random delay between zero and this value to all requests. This is useful for testing how the client handles slow responses.
 
+    - env: "DEV_CHAOS_SLOW_MODE_QUEUE"
+      name: DevChaosSlowModeQueue
+      type: time.Duration
+      description: |-
+        Simulates slow message delivery in the internal message queue.
+
+        This will add a random delay between zero and this value to all messages in the internal message queue. This is useful for testing how the client handles delayed message processing.
+
     - env: "DEV_CHAOS_FAIL_RATE"
       name: DevChaosFailRate
       type: float64

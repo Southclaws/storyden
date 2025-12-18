@@ -27,6 +27,8 @@ type Repository interface {
 	Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error)
 	// EditPost(ctx context.Context, authorID, postID string, title *string, body *string) (*Post, error)
 	Delete(ctx context.Context, id post.ID) error
+
+	Probe(ctx context.Context, id post.ID) (*ReplyRef, error)
 }
 
 func WithID(id post.ID) Option {

@@ -104,9 +104,7 @@ func TestThreadCacheWithReactions(t *testing.T) {
 			tests.Ok(t, err, reactAdd)
 			a.Equal("👍", reactAdd.JSON200.Emoji)
 
-			// Wait for the cache update event to be processed via pubsub
-			time.Sleep(200 * time.Millisecond)
-
+			// SYNCHRONOUS: Cache is invalidated immediately, no wait needed
 			// Get the thread again and assert the reaction is present
 			threadGet2, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
 			tests.Ok(t, err, threadGet2)
@@ -142,6 +140,113 @@ func TestThreadCacheWithReactions(t *testing.T) {
 			// This should be equal to or after cachedTime2 since we just fetched it
 			a.True(lastModifiedFromCache.Equal(cachedTime2) || lastModifiedFromCache.After(cachedTime2),
 				"cache last modified should match the cached value")
+
+			// Now test with a CONDITIONAL REQUEST using old timestamp - should get 200 not 304
+			threadGetAfterReact, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-Modified-Since", lastModified1Header)
+				return nil
+			})
+			// Debug: Check what status we got
+			if threadGetAfterReact.HTTPResponse.StatusCode == 304 {
+				t.Logf("Got 304 - cache timestamps: before=%v, after=%v, last-modified header=%s",
+					cachedTime1, cachedTime2, lastModified1Header)
+				t.Logf("New Last-Modified header: %s", threadGetAfterReact.HTTPResponse.Header.Get("Last-Modified"))
+			}
+			tests.Ok(t, err, threadGetAfterReact)
+			r.NotNil(threadGetAfterReact.JSON200, "should return 200 with body after cache invalidation")
+			r.Len(threadGetAfterReact.JSON200.Reacts, 1, "should have the reaction in response")
+		}))
+	}))
+}
+
+func TestThreadCacheWithReplies(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+		cacheStore cache.Store,
+		threadCache *thread_cache.Cache,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			acc1ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			acc2ctx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			session1 := sh.WithSession(acc1ctx)
+			session2 := sh.WithSession(acc2ctx)
+
+			catName := "Category " + uuid.NewString()
+
+			catCreate, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Colour:      "#abcdef",
+				Description: "reply cache test",
+				Name:        catName,
+			}, session1)
+			tests.Ok(t, err, catCreate)
+
+			// Create a thread
+			threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>test thread for replies</p>").Ptr(),
+				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Title:      "Thread cache test - replies",
+			}, session1)
+			tests.Ok(t, err, threadCreate)
+			a.Len(threadCreate.JSON200.Replies.Replies, 0, "newly created thread should have no replies")
+
+			threadID := xid.ID(openapi.ParseID(threadCreate.JSON200.Id))
+
+			// Get the thread for the first time
+			threadGet1, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
+			tests.Ok(t, err, threadGet1)
+			a.Len(threadGet1.JSON200.Replies.Replies, 0, "thread should have no replies")
+			lastModified1Header := threadGet1.HTTPResponse.Header.Get("Last-Modified")
+			r.NotEmpty(lastModified1Header, "Last-Modified header should be present")
+
+			// Get cache timestamp before reply
+			cacheKey := "thread:last-modified:" + threadID.String()
+			cachedValue1, err := cacheStore.Get(root, cacheKey)
+			r.NoError(err, "cache value should exist")
+			cachedTime1, err := time.Parse(time.RFC3339Nano, cachedValue1)
+			r.NoError(err, "cached time should be parseable")
+
+			// Verify 304 works with conditional request
+			threadGet304, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-Modified-Since", lastModified1Header)
+				return nil
+			})
+			tests.Status(t, err, threadGet304, 304)
+
+			// Add a reply to the thread
+			replyCreate, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+				Body: "<p>This is a test reply</p>",
+			}, session2)
+			tests.Ok(t, err, replyCreate)
+
+			// SYNCHRONOUS: Cache should be invalidated IMMEDIATELY, no wait needed
+			cachedValue2, err := cacheStore.Get(root, cacheKey)
+			r.NoError(err, "cache value should still exist after reply")
+			cachedTime2, err := time.Parse(time.RFC3339Nano, cachedValue2)
+			r.NoError(err, "cached time should be parseable")
+
+			// Assert cache was updated immediately
+			a.True(cachedTime2.After(cachedTime1),
+				"cache should be updated IMMEDIATELY after reply (no async delay needed)")
+
+			// Conditional GET with old timestamp should now return 200 (not 304)
+			threadGet200, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-Modified-Since", lastModified1Header)
+				return nil
+			})
+			tests.Ok(t, err, threadGet200)
+			r.NotNil(threadGet200.JSON200, "should return 200 with body after cache invalidation")
+			r.Len(threadGet200.JSON200.Replies.Replies, 1, "thread should have the reply")
+			a.Equal("<body><p>This is a test reply</p></body>", threadGet200.JSON200.Replies.Replies[0].Body)
 		}))
 	}))
 }

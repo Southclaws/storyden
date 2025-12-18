@@ -40,6 +40,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/category_cache"
+	"github.com/Southclaws/storyden/app/resources/post/post_querier"
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
@@ -91,6 +92,7 @@ func Build() fx.Option {
 			reaction.New,
 			like_querier.New,
 			like_writer.New,
+			post_querier.New,
 			post_search.New,
 			post_writer.New,
 			post_read_state.New,

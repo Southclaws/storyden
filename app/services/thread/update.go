@@ -82,6 +82,10 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		}
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(threadID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	thr, err = s.threadWriter.Update(ctx, threadID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

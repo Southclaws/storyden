@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -20,11 +21,12 @@ import (
 type Assignment struct {
 	db             *ent.Client
 	accountQuerier *account_querier.Querier
+	profileCache   *profile_cache.Cache
 	bus            *pubsub.Bus
 }
 
-func New(db *ent.Client, accountQuerier *account_querier.Querier, bus *pubsub.Bus) *Assignment {
-	return &Assignment{db: db, accountQuerier: accountQuerier, bus: bus}
+func New(db *ent.Client, accountQuerier *account_querier.Querier, profileCache *profile_cache.Cache, bus *pubsub.Bus) *Assignment {
+	return &Assignment{db: db, accountQuerier: accountQuerier, profileCache: profileCache, bus: bus}
 }
 
 type Mutation struct {
@@ -78,7 +80,12 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 		mutation.SetAdmin(a)
 	}
 
-	_, err := update.Save(ctx)
+	err := w.profileCache.Invalidate(ctx, xid.ID(accountID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = update.Save(ctx)
 	if err != nil && !ent.IsConstraintError(err) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/reply/reply_notify"
@@ -56,24 +57,27 @@ func Build() fx.Option {
 
 type service struct {
 	accountQuery *account_querier.Querier
-	post_repo    reply.Repository
+	replyRepo    reply.Repository
 	fetcher      *fetcher.Fetcher
 	bus          *pubsub.Bus
 	cpm          *content_policy.Manager
+	cache        *thread_cache.Cache
 }
 
 func New(
 	accountQuery *account_querier.Querier,
-	post_repo reply.Repository,
+	replyRepo reply.Repository,
 	fetcher *fetcher.Fetcher,
 	bus *pubsub.Bus,
 	cpm *content_policy.Manager,
+	cache *thread_cache.Cache,
 ) Service {
 	return &service{
 		accountQuery: accountQuery,
-		post_repo:    post_repo,
+		replyRepo:    replyRepo,
 		fetcher:      fetcher,
 		bus:          bus,
 		cpm:          cpm,
+		cache:        cache,
 	}
 }

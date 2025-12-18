@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -24,7 +25,7 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	p, err := s.post_repo.Get(ctx, postID)
+	p, err := s.replyRepo.Get(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -40,7 +41,16 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.post_repo.Delete(ctx, postID)
+	pref, err := s.replyRepo.Probe(ctx, postID)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = s.replyRepo.Delete(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

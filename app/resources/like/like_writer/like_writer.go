@@ -2,10 +2,14 @@ package like_writer
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
-	"entgo.io/ent/dialect/sql"
+	ent_sql "entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -26,9 +30,19 @@ func (l *LikeWriter) AddPostLike(ctx context.Context, accountID account.AccountI
 	err := l.db.LikePost.Create().
 		SetPostID(xid.ID(postID)).
 		SetAccountID(xid.ID(accountID)).
-		OnConflict(sql.DoNothing()).
+		OnConflict(ent_sql.DoNothing()).
 		Exec(ctx)
 	if err != nil {
+		// NOTE: err no rows is a conflict-returning edge case.
+		// and the actual ent not found is where post/account doesn't exist.
+		// it's always the post, as the account is already checked earlier.
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
+		}
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound),
+				fmsg.WithDesc("post not found", "The liked post was not found."))
+		}
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

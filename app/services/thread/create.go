@@ -70,6 +70,10 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(thr.ID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	if thr.Visibility == visibility.VisibilityPublished {
 		s.bus.Publish(ctx, &message.EventThreadPublished{
 			ID: thr.ID,

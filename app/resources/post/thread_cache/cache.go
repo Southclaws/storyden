@@ -9,6 +9,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -66,6 +68,26 @@ func (c *Cache) Store(ctx context.Context, id xid.ID, ts time.Time) error {
 	return c.storeTimestamp(ctx, id, ts)
 }
 
+func (c *Cache) Invalidate(ctx context.Context, id xid.ID) error {
+	now := c.clock().UTC()
+
+	if ts, ok := c.cached(ctx, id); ok {
+		nowTrunc := now.Truncate(time.Second)
+		tsTrunc := ts.Truncate(time.Second)
+
+		if !nowTrunc.After(tsTrunc) {
+			now = tsTrunc.Add(time.Second)
+		}
+	}
+
+	err := c.storeTimestamp(ctx, id, now)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate cache for thread"))
+	}
+
+	return nil
+}
+
 func (c *Cache) cacheKey(id xid.ID) string {
 	return cachePrefix + id.String()
 }
@@ -97,11 +119,7 @@ func (c *Cache) storeTimestamp(ctx context.Context, id xid.ID, ts time.Time) err
 	return c.store.Set(ctx, c.cacheKey(id), ts.UTC().Format(storeTimeFmt), cacheTTL)
 }
 
-func (c *Cache) touch(ctx context.Context, id xid.ID) error {
-	return c.storeTimestamp(ctx, id, c.clock().UTC())
-}
-
-func (c *Cache) invalidate(ctx context.Context, id xid.ID) error {
+func (c *Cache) delete(ctx context.Context, id xid.ID) error {
 	return c.store.Delete(ctx, c.cacheKey(id))
 }
 
@@ -114,7 +132,7 @@ func (c *Cache) touchForReply(ctx context.Context, id xid.ID) error {
 		}
 		return err
 	}
-	return c.touch(ctx, threadID)
+	return c.Invalidate(ctx, threadID)
 }
 
 var errThreadNotFound = fault.New("thread not found")

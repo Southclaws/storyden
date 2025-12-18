@@ -155,3 +155,15 @@ func (d *database) Delete(ctx context.Context, id post.ID) error {
 
 	return nil
 }
+
+func (d *database) Probe(ctx context.Context, id post.ID) (*ReplyRef, error) {
+	p, err := d.db.Post.
+		Query().
+		Where(ent_post.IDEQ(xid.ID(id))).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return MapRef(p)
+}

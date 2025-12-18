@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -96,6 +97,7 @@ type service struct {
 	bus           *pubsub.Bus
 	mentioner     *mentioner.Mentioner
 	cpm           *content_policy.Manager
+	cache         *thread_cache.Cache
 }
 
 func New(
@@ -110,6 +112,7 @@ func New(
 	bus *pubsub.Bus,
 	mentioner *mentioner.Mentioner,
 	cpm *content_policy.Manager,
+	cache *thread_cache.Cache,
 ) Service {
 	return &service{
 		ins: ins.Build(),
@@ -123,5 +126,6 @@ func New(
 		bus:           bus,
 		mentioner:     mentioner,
 		cpm:           cpm,
+		cache:         cache,
 	}
 }

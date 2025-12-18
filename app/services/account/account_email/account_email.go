@@ -11,23 +11,30 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
 type Manager struct {
-	emailRepo *email.Repository
-	verifier  *email_verify.Verifier
-	bus       *pubsub.Bus
+	emailRepo    *email.Repository
+	verifier     *email_verify.Verifier
+	profileCache *profile_cache.Cache
+	bus          *pubsub.Bus
 }
 
-func New(emailRepo *email.Repository, verifier *email_verify.Verifier, bus *pubsub.Bus) *Manager {
-	return &Manager{emailRepo: emailRepo, verifier: verifier, bus: bus}
+func New(emailRepo *email.Repository, verifier *email_verify.Verifier, profileCache *profile_cache.Cache, bus *pubsub.Bus) *Manager {
+	return &Manager{emailRepo: emailRepo, verifier: verifier, profileCache: profileCache, bus: bus}
 }
 
 func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address mail.Address) (*account.EmailAddress, error) {
 	otp, err := otp.Generate()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -45,7 +52,12 @@ func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address 
 }
 
 func (m *Manager) Remove(ctx context.Context, accountID account.AccountID, id xid.ID) error {
-	err := m.emailRepo.Remove(ctx, accountID, id)
+	err := m.profileCache.Invalidate(ctx, xid.ID(accountID))
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = m.emailRepo.Remove(ctx, accountID, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

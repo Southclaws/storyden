@@ -86,10 +86,21 @@ func (c *Cache) storeTimestamp(ctx context.Context, key string, ts time.Time) er
 	return c.store.Set(ctx, c.cacheKey(key), ts.UTC().Format(storeTimeFmt), cacheTTL)
 }
 
-func (c *Cache) touch(ctx context.Context, key string) error {
-	return c.storeTimestamp(ctx, key, c.clock().UTC())
+func (c *Cache) Invalidate(ctx context.Context, key string) error {
+	now := c.clock().UTC()
+
+	if ts, ok := c.cached(ctx, key); ok {
+		nowTrunc := now.Truncate(time.Second)
+		tsTrunc := ts.Truncate(time.Second)
+
+		if !nowTrunc.After(tsTrunc) {
+			now = tsTrunc.Add(time.Second)
+		}
+	}
+
+	return c.storeTimestamp(ctx, key, now)
 }
 
-func (c *Cache) invalidate(ctx context.Context, key string) error {
+func (c *Cache) delete(ctx context.Context, key string) error {
 	return c.store.Delete(ctx, c.cacheKey(key))
 }

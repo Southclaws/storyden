@@ -58,6 +58,7 @@ func newBus(
 
 	router.AddMiddleware(middleware.Recoverer)
 	router.AddMiddleware(newSessionContextMiddleware(l))
+	router.AddMiddleware(newChaosDelayMiddleware(cfg.DevChaosSlowModeQueue, l))
 
 	poisonQueue, err := middleware.PoisonQueue(pub, "poison_queue")
 	if err != nil {

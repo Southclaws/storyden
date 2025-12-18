@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
@@ -54,6 +55,7 @@ type Manager struct {
 	nc           *node_children.Writer
 	fetcher      *fetcher.Fetcher
 	summariser   generative.Summariser
+	cache        *node_cache.Cache
 	bus          *pubsub.Bus
 }
 
@@ -69,6 +71,7 @@ func New(
 	nc *node_children.Writer,
 	fetcher *fetcher.Fetcher,
 	summariser generative.Summariser,
+	cache *node_cache.Cache,
 	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
@@ -83,6 +86,7 @@ func New(
 		nc:           nc,
 		fetcher:      fetcher,
 		summariser:   summariser,
+		cache:        cache,
 		bus:          bus,
 	}
 }

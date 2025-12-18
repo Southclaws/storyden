@@ -15,7 +15,7 @@ func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
 	}
 
 	if _, err := pubsub.Subscribe(ctx, bus, "profile_cache.touch_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
-		return c.touch(ctx, xid.ID(evt.ID))
+		return c.Invalidate(ctx, xid.ID(evt.ID))
 	}); err != nil {
 		return err
 	}
