@@ -1,4 +1,4 @@
-import { RootProvider } from "fumadocs-ui/provider";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import "fumadocs-ui/style.css";
 import type { ReactNode } from "react";
 
