@@ -222,8 +222,6 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	}, nil
 }
 
-const threadGetCacheControl = "private, max-age=1"
-
 func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetRequestObject) (openapi.ThreadGetResponseObject, error) {
 	postID, err := i.thread_mark_svc.Lookup(ctx, string(request.ThreadMark))
 	if err != nil {
@@ -239,7 +237,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	if i.thread_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID)) {
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: threadGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		}, nil
@@ -261,7 +259,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse{
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
-				CacheControl: threadGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		},

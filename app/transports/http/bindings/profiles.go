@@ -95,8 +95,6 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 	}, nil
 }
 
-const profileGetCacheControl = "public, max-age=60, stale-while-revalidate=120"
-
 func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
@@ -111,7 +109,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	if p.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(id)) {
 		return openapi.ProfileGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: profileGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		}, nil
@@ -131,7 +129,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Body: serialiseProfile(pro),
 			Headers: openapi.ProfileGetOKResponseHeaders{
-				CacheControl: profileGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		},

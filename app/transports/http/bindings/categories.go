@@ -75,9 +75,7 @@ func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryLi
 	}, nil
 }
 
-// When serving CC headers, given categories don't change that often, we can
-// afford to have a longer max-age and stale-while-revalidate cache lifetime.
-const categoryGetCacheControl = "public, max-age=60, stale-while-revalidate=3600"
+const categoryGetCacheControl = "public, no-cache"
 
 func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGetRequestObject) (openapi.CategoryGetResponseObject, error) {
 	slug := string(request.CategorySlug)

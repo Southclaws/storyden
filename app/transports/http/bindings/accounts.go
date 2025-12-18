@@ -83,7 +83,7 @@ var (
 	ErrEveryoneRole        = fault.New("cannot change default role", ftag.With(ftag.InvalidArgument), fmsg.WithDesc("default role", "You cannot change the default role."))
 )
 
-const accountGetCacheControl = "private, max-age=5, must-revalidate"
+const accountGetCacheControl = "private, no-cache"
 
 func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
 	accountID, err := session.GetAccountID(ctx)

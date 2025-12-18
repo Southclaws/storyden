@@ -1,6 +1,7 @@
 package bindings
 
 import (
+	"context"
 	"net/url"
 	"strconv"
 
@@ -18,8 +19,18 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
+
+func getAuthStateCacheControl(ctx context.Context, rest string) string {
+	authenticated := session.GetOptAccountID(ctx).Ok()
+	if authenticated {
+		return "private, " + rest
+	} else {
+		return "public, " + rest
+	}
+}
 
 func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 	invitedBy := opt.Map(acc.InvitedBy, func(ib account.Account) openapi.ProfileReference {

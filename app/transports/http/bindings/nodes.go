@@ -231,8 +231,6 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}, nil
 }
 
-const nodeGetCacheControl = "public, max-age=1"
-
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
 	pp := deserialisePageParams(request.Params.Page, 100)
 	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
@@ -251,7 +249,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	if c.node_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), cacheKey) {
 		return openapi.NodeGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: nodeGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		}, nil
@@ -271,7 +269,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse{
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
-				CacheControl: nodeGetCacheControl,
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
 				LastModified: lastModified,
 			},
 		},
