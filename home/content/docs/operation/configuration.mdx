@@ -75,17 +75,6 @@ Simulates slow requests.
 
 This will add a random delay between zero and this value to all requests. This is useful for testing how the client handles slow responses.
 
-### `DEV_CHAOS_FAIL_RATE`
-
-<table>
-<tr><td>type</td><td>float (e.g. `1.0`, `1.5`)</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-A value between 0 and 1 which simulates failed requests.
-
-This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
-
 ### `DEV_CHAOS_SLOW_MODE_QUEUE`
 
 <table>
@@ -96,6 +85,17 @@ This will add a random failure to all requests. This is useful for testing how t
 Simulates slow message delivery in the internal message queue.
 
 This will add a random delay between zero and this value to all messages in the internal message queue. This is useful for testing how the client handles delayed message processing.
+
+### `DEV_CHAOS_FAIL_RATE`
+
+<table>
+<tr><td>type</td><td>float (e.g. `1.0`, `1.5`)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+A value between 0 and 1 which simulates failed requests.
+
+This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
 
 ## Core configuration
 
