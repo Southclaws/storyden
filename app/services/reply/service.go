@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/reply/reply_notify"
-	"github.com/Southclaws/storyden/app/services/reply/reply_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -50,7 +49,6 @@ func (p Partial) Opts() (opts []reply.Option) {
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(New),
-		reply_semdex.Build(),
 		reply_notify.Build(),
 	)
 }

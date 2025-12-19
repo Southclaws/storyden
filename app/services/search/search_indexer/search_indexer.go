@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
@@ -16,24 +18,37 @@ import (
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Indexer struct {
-	logger        *slog.Logger
-	db            *ent.Client
-	nodeQuerier   *node_querier.Querier
-	threadQuerier *thread_querier.Querier
+	logger *slog.Logger
+	db     *ent.Client
+
 	searchIndexer searcher.Indexer
-	bus           *pubsub.Bus
-	chunkSize     int
+	semdexMutator semdex.Mutator
+
+	nodeQuerier    *node_querier.Querier
+	threadQuerier  *thread_querier.Querier
+	replyRepo      reply.Repository
+	profileQuerier *profile_querier.Querier
+
+	bus       *pubsub.Bus
+	chunkSize int
 }
 
 func runIndexerOnBoot(ctx context.Context, lc fx.Lifecycle, i *Indexer) {
+	if i == nil {
+		return
+	}
+
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		go func() {
 			time.Sleep(time.Second)
@@ -53,9 +68,15 @@ func newIndexer(
 	cfg config.Config,
 	logger *slog.Logger,
 	db *ent.Client,
+
+	searchIndexer searcher.Indexer,
+	semdexMutator semdex.Mutator,
+
 	nodeQuerier *node_querier.Querier,
 	threadQuerier *thread_querier.Querier,
-	searchIndexer searcher.Indexer,
+	replyRepo reply.Repository,
+	profileQuerier *profile_querier.Querier,
+
 	bus *pubsub.Bus,
 ) *Indexer {
 	if cfg.SearchProvider == "" || cfg.SearchProvider == "database" {
@@ -63,13 +84,19 @@ func newIndexer(
 	}
 
 	idx := &Indexer{
-		logger:        logger,
-		db:            db,
-		nodeQuerier:   nodeQuerier,
-		threadQuerier: threadQuerier,
+		logger: logger,
+		db:     db,
+
 		searchIndexer: searchIndexer,
-		bus:           bus,
-		chunkSize:     cfg.SearchIndexChunkSize,
+		semdexMutator: semdexMutator,
+
+		nodeQuerier:    nodeQuerier,
+		threadQuerier:  threadQuerier,
+		replyRepo:      replyRepo,
+		profileQuerier: profileQuerier,
+
+		bus:       bus,
+		chunkSize: cfg.SearchIndexChunkSize,
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
@@ -157,6 +184,62 @@ func newIndexer(
 			return err
 		}
 
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_deleted", func(ctx context.Context, evt *message.EventThreadReplyDeleted) error {
+			return idx.bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.SubscribeCommand(ctx, idx.bus, "search_indexer.index_reply", func(ctx context.Context, cmd *message.CommandReplyIndex) error {
+			return idx.indexReply(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.SubscribeCommand(ctx, idx.bus, "search_indexer.deindex_reply", func(ctx context.Context, cmd *message.CommandReplyDeindex) error {
+			return idx.deindexReply(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_created", func(ctx context.Context, evt *message.EventAccountCreated) error {
+			return idx.bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
+			return idx.bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.SubscribeCommand(ctx, idx.bus, "search_indexer.index_profile", func(ctx context.Context, cmd *message.CommandProfileIndex) error {
+			return idx.indexProfile(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
+
 		return nil
 	}))
 
@@ -175,6 +258,11 @@ func (idx *Indexer) indexThread(ctx context.Context, id post.ID) error {
 		return err
 	}
 
+	if _, err := idx.semdexMutator.Index(ctx, thread); err != nil {
+		idx.logger.Error("failed to semdex thread", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	idx.logger.Debug("indexed thread", slog.String("id", id.String()))
 	return nil
 }
@@ -186,6 +274,11 @@ func (idx *Indexer) deindexThread(ctx context.Context, id post.ID) error {
 	}); err != nil {
 		idx.logger.Error("failed to deindex thread", slog.String("id", id.String()), slog.String("error", err.Error()))
 		return err
+	}
+
+	if _, err := idx.semdexMutator.Delete(ctx, xid.ID(id)); err != nil {
+		idx.logger.Error("failed to desemdex thread", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	idx.logger.Debug("deindexed thread", slog.String("id", id.String()))
@@ -204,6 +297,11 @@ func (idx *Indexer) indexNode(ctx context.Context, id library.NodeID) error {
 		return err
 	}
 
+	if _, err := idx.semdexMutator.Index(ctx, node); err != nil {
+		idx.logger.Error("failed to semdex node", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	idx.logger.Debug("indexed node", slog.String("id", id.String()))
 	return nil
 }
@@ -217,6 +315,70 @@ func (idx *Indexer) deindexNode(ctx context.Context, id library.NodeID) error {
 		return err
 	}
 
+	if _, err := idx.semdexMutator.Delete(ctx, xid.ID(id)); err != nil {
+		idx.logger.Error("failed to desemdex node", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	idx.logger.Debug("deindexed node", slog.String("id", id.String()))
+	return nil
+}
+
+func (idx *Indexer) indexReply(ctx context.Context, id post.ID) error {
+	p, err := idx.replyRepo.Get(ctx, id)
+	if err != nil {
+		idx.logger.Error("failed to get reply for indexing", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := idx.searchIndexer.Index(ctx, p); err != nil {
+		idx.logger.Error("failed to index reply", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return err
+	}
+
+	if _, err := idx.semdexMutator.Index(ctx, p); err != nil {
+		idx.logger.Error("failed to semdex reply", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	idx.logger.Debug("indexed reply", slog.String("id", id.String()))
+	return nil
+}
+
+func (idx *Indexer) deindexReply(ctx context.Context, id post.ID) error {
+	if err := idx.searchIndexer.Deindex(ctx, &datagraph.Ref{
+		ID:   xid.ID(id),
+		Kind: datagraph.KindReply,
+	}); err != nil {
+		idx.logger.Error("failed to deindex reply", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return err
+	}
+
+	if _, err := idx.semdexMutator.Delete(ctx, xid.ID(id)); err != nil {
+		idx.logger.Error("failed to desemdex reply", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	idx.logger.Debug("deindexed reply", slog.String("id", id.String()))
+	return nil
+}
+
+func (idx *Indexer) indexProfile(ctx context.Context, id account.AccountID) error {
+	p, err := idx.profileQuerier.GetByID(ctx, id)
+	if err != nil {
+		idx.logger.Error("failed to get profile for indexing", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if p.GetContent().IsEmpty() {
+		return nil
+	}
+
+	if _, err := idx.semdexMutator.Index(ctx, p); err != nil {
+		idx.logger.Error("failed to semdex profile", slog.String("id", id.String()), slog.String("error", err.Error()))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	idx.logger.Debug("indexed profile", slog.String("id", id.String()))
 	return nil
 }
