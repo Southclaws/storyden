@@ -11,6 +11,7 @@ export const REACTION_THROTTLE = 180;
 export type Props = {
   thread: Thread;
   reply: Reply;
+  currentPage?: number;
 };
 
 export type ReactCount = {
@@ -40,10 +41,12 @@ function groupReactions(
   );
 }
 
-export function useReactionList({ thread, reply }: Props) {
+export function useReactionList({ thread, reply, currentPage }: Props) {
   const session = useSession();
-  const { reactionAdd, reactionRemove, revalidate } =
-    useThreadMutations(thread);
+  const { reactionAdd, reactionRemove, revalidate } = useThreadMutations(
+    thread,
+    currentPage,
+  );
 
   const isLoggedIn = Boolean(session);
 

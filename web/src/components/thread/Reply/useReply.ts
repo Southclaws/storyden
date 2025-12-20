@@ -19,8 +19,12 @@ export type Props = {
   currentPage?: number;
 };
 
-export function useReply({ thread, reply }: Props) {
-  const { revalidate, updateReply } = useThreadMutations(thread);
+export function useReply({ thread, reply, currentPage }: Props) {
+  const { revalidate, updateReply } = useThreadMutations(
+    thread,
+    currentPage,
+    undefined,
+  );
   const [resetKey, setResetKey] = useState("");
   const [isEditing, setEditing] = useState(false);
   const [isEmpty, setEmpty] = useState(true);

@@ -350,7 +350,6 @@ func (s *seeder) seedData(ctx context.Context, numThreads int, numAccounts int) 
 					SetUpdatedAt(replyCreated).
 					SetAccountPosts(account.ID).
 					SetRootPostID(thread.ID).
-					SetReplyToPostID(thread.ID).
 					SetMetadata(map[string]any{}).
 					Save(ctx)
 				if err != nil {

@@ -19,7 +19,7 @@ export type Props = {
 };
 
 export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
-  const { revalidate, deleteReply } = useThreadMutations(thread);
+  const { revalidate, deleteReply } = useThreadMutations(thread, currentPage);
 
   const account = useSession();
   const [, copyToClipboard] = useCopyToClipboard();

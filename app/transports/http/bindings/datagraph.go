@@ -267,7 +267,7 @@ func serialiseDatagraphItemPostThread(in *thread.Thread) openapi.DatagraphItemTh
 func serialiseDatagraphItemPostReply(in *reply.Reply) openapi.DatagraphItemReply {
 	return openapi.DatagraphItemReply{
 		Kind: openapi.DatagraphItemKindReply,
-		Ref:  serialiseReply(in),
+		Ref:  serialiseReplyPtr(in),
 	}
 }
 
