@@ -17,7 +17,16 @@ export function Reply(props: Props) {
   const { thread, reply } = props;
 
   return (
-    <CardBox id={reply.id}>
+    <CardBox
+      id={reply.id}
+      _target={{
+        scrollMarginTop: {
+          base: "16",
+          md: "24",
+        },
+        animation: "target-pulse",
+      }}
+    >
       <styled.form
         display="flex"
         flexDirection="column"

@@ -51,6 +51,10 @@ const tokens = {
     "value": "spin 1s linear infinite",
     "variable": "var(--animations-spin)"
   },
+  "animations.target-pulse": {
+    "value": "targetPulse 1s var(--easings-pulse) 2",
+    "variable": "var(--animations-target-pulse)"
+  },
   "blurs.sm": {
     "value": "4px",
     "variable": "var(--blurs-sm)"

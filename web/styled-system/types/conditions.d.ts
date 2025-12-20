@@ -2,6 +2,8 @@
 import type { AnySelector, Selectors } from './selectors';
 
 export interface Conditions {
+	/** `&:target` */
+	"_target": string
 	/** `&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])` */
 	"_checked": string
 	/** `&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])` */
@@ -44,8 +46,6 @@ export interface Conditions {
 	"_active": string
 	/** `&:visited` */
 	"_visited": string
-	/** `&:target` */
-	"_target": string
 	/** `&:is(:read-only, [data-read-only], [aria-readonly=true])` */
 	"_readOnly": string
 	/** `&:read-write` */

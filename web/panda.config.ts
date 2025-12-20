@@ -44,6 +44,7 @@ export default defineConfig({
   exclude: [],
 
   conditions: {
+    target: "&:target",
     checked:
       "&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])",
     indeterminate:
@@ -127,7 +128,7 @@ export default defineConfig({
           },
         },
         transform(props) {
-          const { kind, display } = props;
+          const { kind, display, ...rest } = props;
 
           const padding = kind === "edge" ? "0" : "2";
 
@@ -140,6 +141,7 @@ export default defineConfig({
             borderRadius: "lg",
             backgroundColor: "bg.default",
             padding,
+            ...rest,
           };
         },
       },
@@ -223,6 +225,10 @@ export default defineConfig({
       keyframes: {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
+        },
+        targetPulse: {
+          "0%, 100%": { backgroundColor: "transparent" },
+          "50%": { backgroundColor: "var(--colors-bg-emphasized)" },
         },
       },
       textStyles: defineTextStyles({
