@@ -13,6 +13,7 @@ type Event struct {
 
 var (
 	EventThreadReply          = Event{eventThreadReply}
+	EventReplyToReply         = Event{eventReplyToReply}
 	EventPostLike             = Event{eventPostLike}
 	EventFollow               = Event{eventFollow}
 	EventProfileMention       = Event{eventProfileMention}
@@ -63,6 +64,8 @@ func NewEvent(__iNpUt__ string) (Event, error) {
 	switch __iNpUt__ {
 	case string(eventThreadReply):
 		return EventThreadReply, nil
+	case string(eventReplyToReply):
+		return EventReplyToReply, nil
 	case string(eventPostLike):
 		return EventPostLike, nil
 	case string(eventFollow):

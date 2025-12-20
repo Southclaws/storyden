@@ -37,10 +37,12 @@ type EventThreadDeleted struct {
 }
 
 type EventThreadReplyCreated struct {
-	ThreadID       post.ID
-	ReplyID        post.ID
-	ThreadAuthorID account.AccountID
-	ReplyAuthorID  account.AccountID
+	ThreadID        post.ID
+	ReplyID         post.ID
+	ThreadAuthorID  account.AccountID
+	ReplyAuthorID   account.AccountID
+	ReplyToAuthorID opt.Optional[account.AccountID]
+	ReplyToTargetID opt.Optional[post.ID]
 }
 
 type EventThreadReplyDeleted struct {

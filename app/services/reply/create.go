@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -42,11 +43,20 @@ func (s *Mutator) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	replyToAuthorID := opt.Map(p.ReplyTo, func(r reply.Reply) account.AccountID {
+		return r.Author.ID
+	})
+	replyToReplyID := opt.Map(p.ReplyTo, func(r reply.Reply) post.ID {
+		return r.ID
+	})
+
 	s.bus.Publish(ctx, &message.EventThreadReplyCreated{
-		ThreadID:       p.RootPostID,
-		ReplyID:        p.ID,
-		ThreadAuthorID: p.RootAuthor.ID,
-		ReplyAuthorID:  authorID,
+		ThreadID:        p.RootPostID,
+		ReplyID:         p.ID,
+		ThreadAuthorID:  p.RootAuthor.ID,
+		ReplyAuthorID:   authorID,
+		ReplyToAuthorID: replyToAuthorID,
+		ReplyToTargetID: replyToReplyID,
 	})
 
 	return p, nil

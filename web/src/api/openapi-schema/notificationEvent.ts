@@ -19,6 +19,7 @@ export type NotificationEvent =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NotificationEvent = {
   thread_reply: "thread_reply",
+  reply_to_reply: "reply_to_reply",
   post_like: "post_like",
   follow: "follow",
   profile_mention: "profile_mention",

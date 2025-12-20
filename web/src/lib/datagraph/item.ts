@@ -7,30 +7,35 @@ export function getCommonProperties(item: DatagraphItem) {
         name: item.ref.title,
         description: item.ref.description,
         slug: item.ref.slug,
+        id: item.ref.id,
       };
     case DatagraphItemKind.thread:
       return {
         name: item.ref.title,
         description: item.ref.description,
         slug: item.ref.slug,
+        id: item.ref.id,
       };
     case DatagraphItemKind.reply:
       return {
         name: item.ref.title,
         description: item.ref.description,
         slug: item.ref.slug,
+        id: item.ref.id,
       };
     case DatagraphItemKind.node:
       return {
         name: item.ref.name,
         description: item.ref.description,
         slug: item.ref.slug,
+        id: item.ref.id,
       };
     case DatagraphItemKind.profile:
       return {
         name: item.ref.name,
         description: item.ref.bio,
         slug: item.ref.handle,
+        id: item.ref.id,
       };
   }
 }

@@ -2,6 +2,7 @@ package reply_notify
 
 import (
 	"context"
+	"errors"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -23,19 +24,36 @@ func Build() fx.Option {
 	) {
 		consumer := func(hctx context.Context) error {
 			_, err := pubsub.Subscribe(ctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
-				if evt.ReplyAuthorID == evt.ThreadAuthorID {
-					return nil
+				errs := []error{}
+
+				if evt.ReplyAuthorID != evt.ThreadAuthorID {
+					err := notifier.Send(ctx,
+						evt.ThreadAuthorID,
+						opt.New(evt.ReplyAuthorID),
+						notification.EventThreadReply,
+						&datagraph.Ref{
+							ID:   xid.ID(evt.ThreadID),
+							Kind: datagraph.KindPost,
+						},
+					)
+					errs = append(errs, err)
 				}
 
-				return notifier.Send(ctx,
-					evt.ThreadAuthorID,
-					opt.New(evt.ReplyAuthorID),
-					notification.EventThreadReply,
-					&datagraph.Ref{
-						ID:   xid.ID(evt.ThreadID),
-						Kind: datagraph.KindPost,
-					},
-				)
+				if rtid, ok := evt.ReplyToAuthorID.Get(); ok && rtid != evt.ReplyAuthorID {
+
+					err := notifier.Send(ctx,
+						rtid,
+						opt.New(evt.ReplyAuthorID),
+						notification.EventReplyToReply,
+						&datagraph.Ref{
+							ID:   xid.ID(evt.ReplyID),
+							Kind: datagraph.KindPost,
+						},
+					)
+					errs = append(errs, err)
+				}
+
+				return errors.Join(errs...)
 			})
 			return err
 		}

@@ -137,13 +137,15 @@ function getNotificationContent(n: Notification) {
   const p = n.item && getCommonProperties(n.item);
   switch (n.event) {
     case "thread_reply":
-      return { description: "replied to your post", url: `/t/${p?.slug}` };
+      return { description: "replied to your post", url: `/t/locate/${p?.id}` };
+    case "reply_to_reply":
+      return { description: "replied to you", url: `/t/locate/${p?.id}` };
     case "post_like":
-      return { description: "liked your post", url: `/t/${p?.slug}` };
+      return { description: "liked your post", url: `/t/locate/${p?.id}` };
     case "follow":
       return { description: "followed you", url: `/m/${n.source?.handle}` };
     case "profile_mention":
-      return { description: "mentioned you", url: `/t/${p?.slug}` };
+      return { description: "mentioned you", url: `/t/locate/${p?.id}` };
     case "event_host_added":
       return { description: "added you as an event host", url: `#` }; // not implemented
     case "member_attending_event":

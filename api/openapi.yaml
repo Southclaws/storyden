@@ -4883,6 +4883,7 @@ components:
       type: string
       enum:
         - thread_reply
+        - reply_to_reply
         - post_like
         - follow
         - profile_mention

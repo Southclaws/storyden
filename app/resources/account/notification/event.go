@@ -7,6 +7,7 @@ type eventEnum string
 // TODO: Maybe rename these, "Event" is duplicated on events management.
 const (
 	eventThreadReply          eventEnum = "thread_reply"
+	eventReplyToReply         eventEnum = "reply_to_reply"
 	eventPostLike             eventEnum = "post_like"
 	eventFollow               eventEnum = "follow"
 	eventProfileMention       eventEnum = "profile_mention"
