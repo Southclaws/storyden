@@ -80,23 +80,29 @@ func (d *Writer) Create(
 	parentID post.ID,
 	opts ...Option,
 ) (*reply.Reply, error) {
-	thread, err := d.db.Post.Get(ctx, xid.ID(parentID))
+	tx, err := d.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to start transaction"), fctx.With(ctx))
+	}
+	defer tx.Rollback()
+
+	thread, err := tx.Post.Get(ctx, xid.ID(parentID))
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.NotFound))
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Thread not found."))
 		}
 
-		return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx))
 	}
 
 	if thread.RootPostID != nil {
-		return nil, fault.New("attempt to create post under non-thread post")
+		return nil, fault.New("attempt to create post under non-thread post", fmsg.WithDesc("invalid parent", "Cannot reply to a non-thread post."))
 	}
 
-	q := d.db.Post.
+	q := tx.Post.
 		Create().
 		SetUpdatedAt(time.Now()).
-		SetLastReplyAt(time.Now()). // Required field, but unused for Reply view
+		SetLastReplyAt(time.Now()).
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID)).
 		SetVisibility(ent_post.VisibilityPublished)
@@ -108,13 +114,13 @@ func (d *Writer) Create(
 	p, err := q.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+			err = fault.Wrap(err, ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid reply", "Failed to create reply."))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fmsg.With("failed to create reply"), fctx.With(ctx))
 	}
 
-	p, err = d.db.Post.Query().
+	p, err = tx.Post.Query().
 		Where(ent_post.IDEQ(p.ID)).
 		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
@@ -124,18 +130,22 @@ func (d *Writer) Create(
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found after creation."))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fmsg.With("failed to query created reply"), fctx.With(ctx))
 	}
 
-	err = d.db.Post.
+	err = tx.Post.
 		UpdateOneID(xid.ID(parentID)).
 		SetLastReplyAt(time.Now()).
 		Exec(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fmsg.With("failed to update parent thread timestamp"), fctx.With(ctx))
+	}
+
+	if err = tx.Commit(); err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to commit transaction"), fctx.With(ctx))
 	}
 
 	return d.querier.Get(ctx, post.ID(p.ID))
@@ -149,14 +159,17 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply
 		fn(mutate)
 	}
 
-	// Only set the updated_at field if not changing the indexed_at field.
 	if _, set := mutate.IndexedAt(); !set {
 		mutate.SetUpdatedAt(time.Now())
 	}
 
 	err := update.Exec(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found."))
+		}
+
+		return nil, fault.Wrap(err, fmsg.With("failed to update reply"), fctx.With(ctx))
 	}
 
 	p, err := d.db.Post.
@@ -169,7 +182,11 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply
 		WithAssets().
 		Only(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found after update."))
+		}
+
+		return nil, fault.Wrap(err, fmsg.With("failed to query updated reply"), fctx.With(ctx))
 	}
 
 	return reply.Map(p)
@@ -181,7 +198,11 @@ func (d *Writer) Delete(ctx context.Context, id post.ID) error {
 		SetDeletedAt(time.Now()).
 		Exec(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread reply"))
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found."))
+		}
+
+		return fault.Wrap(err, fmsg.With("failed to delete reply"), fctx.With(ctx))
 	}
 
 	return nil
