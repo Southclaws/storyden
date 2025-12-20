@@ -27,7 +27,7 @@ info:
     a more fixed versioning strategy in the future. Ultimately, the primary way
     Storyden tracks versions is dates, there are no set release tags currently.
   title: storyden
-  version: "v1.25.11-canary"
+  version: "v1.25.12"
 
 servers:
   - url: "/api"
