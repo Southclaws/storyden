@@ -1,14 +1,18 @@
 import { useState } from "react";
 
 import { NAVIGATION_SIDEBAR_STATE_KEY } from "@/local/state-keys";
+import { SidebarDefaultState } from "@/lib/settings/sidebar";
 import { getCookie, setCookie } from "@/utils/cookie";
 
 import { parseSidebarCookie } from "./shared";
 
-export function useSidebar(initialValue: boolean) {
+export function useSidebar(
+  initialValue: boolean,
+  defaultState: SidebarDefaultState = "closed",
+) {
   const clientSideCookieValue = getCookie(NAVIGATION_SIDEBAR_STATE_KEY);
   const initialState =
-    initialValue ?? parseSidebarCookie(clientSideCookieValue);
+    initialValue ?? parseSidebarCookie(clientSideCookieValue, defaultState);
 
   const [showLeftBar, setLocalState] = useState(initialState);
 

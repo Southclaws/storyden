@@ -6,6 +6,7 @@ import { handle } from "@/api/client";
 import { EditorModeSchema } from "@/lib/settings/editor";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
+import { SidebarDefaultStateSchema } from "@/lib/settings/sidebar";
 
 export type Props = {
   settings: Settings;
@@ -13,6 +14,7 @@ export type Props = {
 
 export const FormSchema = z.object({
   editorMode: EditorModeSchema,
+  sidebarDefaultState: SidebarDefaultStateSchema,
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -22,6 +24,7 @@ export function useInterfaceSettings({ settings }: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       editorMode: settings.metadata.editor.mode,
+      sidebarDefaultState: settings.metadata.sidebar.defaultState,
     },
   });
 
@@ -33,6 +36,9 @@ export function useInterfaceSettings({ settings }: Props) {
             ...settings.metadata,
             editor: {
               mode: data.editorMode,
+            },
+            sidebar: {
+              defaultState: data.sidebarDefaultState,
             },
           },
         });
