@@ -20,16 +20,21 @@ import (
 )
 
 type ParallelSearcher struct {
-	searchers map[datagraph.Kind]searcher.SingleKindSearcher
+	searchers map[datagraph.Kind]searcher.Searcher
 }
 
 func NewParallelSearcher(
 	post_searcher post_search.Repository,
 	node_searcher node_search.Search,
 ) *ParallelSearcher {
+	// NOTE: We use the same postSearcher instance for Post, Thread, and Reply.
+	// Post is an abstract type over thread and reply, searcher returns both.
+	ps := &postSearcher{post_searcher}
 	return &ParallelSearcher{
-		searchers: map[datagraph.Kind]searcher.SingleKindSearcher{
-			datagraph.KindThread: &postSearcher{post_searcher},
+		searchers: map[datagraph.Kind]searcher.Searcher{
+			datagraph.KindPost:   ps, // Same instance
+			datagraph.KindThread: ps, // Same instance
+			datagraph.KindReply:  ps, // Same instance
 			datagraph.KindNode:   &nodeSearcher{node_searcher},
 		},
 	}
@@ -41,16 +46,23 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	var searchers []searcher.SingleKindSearcher
+	var searchers []searcher.Searcher
 
 	if kinds, ok := opts.Kinds.Get(); ok {
+		// TRICK: Deduplicate searchers by pointer identity. Post/Thread/Reply
+		// all use the same postSearcher instance, this map will prevent running
+		// the same searcher multiple times when searching multiple post kinds.
+		seenSearchers := make(map[searcher.Searcher]bool)
 		for _, k := range kinds {
-			if s, ok := s.searchers[k]; ok {
-				searchers = append(searchers, s)
+			if searcher, ok := s.searchers[k]; ok {
+				if !seenSearchers[searcher] {
+					searchers = append(searchers, searcher)
+					seenSearchers[searcher] = true
+				}
 			}
 		}
 	} else {
-		searchers = lo.Values(s.searchers)
+		searchers = lo.Uniq(lo.Values(s.searchers))
 	}
 
 	if len(searchers) == 0 {
@@ -63,9 +75,8 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 	subsearchParams := pagination.NewPageParams(uint(p.PageOneIndexed()), subsearchPageSize)
 
 	for _, v := range searchers {
-		v := v
 		eg.Go(func() error {
-			r, err := v.Search(ctx, q, subsearchParams)
+			r, err := v.Search(ctx, q, subsearchParams, opts)
 			if err != nil {
 				return err
 			}

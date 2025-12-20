@@ -11,13 +11,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
 )
 
 type nodeSearcher struct {
 	node_search node_search.Search
 }
 
-func (s *nodeSearcher) Search(ctx context.Context, query string, p pagination.Parameters) (*pagination.Result[datagraph.Item], error) {
+func (s *nodeSearcher) Search(ctx context.Context, query string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
 	rs, err := s.node_search.Search(ctx, p, node_search.WithNameContains(query), node_search.WithContentContains(query))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -28,4 +29,8 @@ func (s *nodeSearcher) Search(ctx context.Context, query string, p pagination.Pa
 	result := pagination.ConvertPageResult(*rs, items)
 
 	return &result, nil
+}
+
+func (s *nodeSearcher) MatchFast(ctx context.Context, q string, limit int, opts searcher.Options) (datagraph.MatchList, error) {
+	return nil, searcher.ErrFastMatchesUnavailable
 }

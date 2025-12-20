@@ -18,12 +18,8 @@ type Options struct {
 var ErrFastMatchesUnavailable = fault.New("datagraph matches are not enabled", ftag.With(ftag.InvalidArgument))
 
 type Searcher interface {
-	MatchFast(ctx context.Context, q string, limit int, opts Options) (datagraph.MatchList, error)
 	Search(ctx context.Context, q string, p pagination.Parameters, opts Options) (*pagination.Result[datagraph.Item], error)
-}
-
-type SingleKindSearcher interface {
-	Search(ctx context.Context, query string, p pagination.Parameters) (*pagination.Result[datagraph.Item], error)
+	MatchFast(ctx context.Context, q string, limit int, opts Options) (datagraph.MatchList, error)
 }
 
 type Indexer interface {
