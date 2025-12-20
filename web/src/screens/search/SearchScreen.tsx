@@ -11,6 +11,7 @@ import { DatagraphKindFilterField } from "@/components/ui/form/DatagraphKindFilt
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
+import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
@@ -87,6 +88,13 @@ export function SearchScreen(props: Props) {
               description: "Include discussion threads in the search.",
               icon: <DiscussionIcon />,
               value: DatagraphItemKind.thread,
+            },
+            {
+              label: "Replies",
+              description:
+                "Include replies to discussion threads in the search.",
+              icon: <ReplyIcon />,
+              value: DatagraphItemKind.reply,
             },
             {
               label: "Library",

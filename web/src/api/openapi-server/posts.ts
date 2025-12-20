@@ -8,6 +8,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.25.12-canary
  */
 import type {
+  PostLocationGetOKResponse,
+  PostLocationGetParams,
   PostReactAddBody,
   PostReactAddOKResponse,
   PostUpdateBody,
@@ -109,6 +111,45 @@ export const postReactRemove = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Locate a post just from its ID. This will tell you what kind of post it
+is and where to find it. Where "a post is" is simple for threads, just
+the slug. For replies, it will give you the thread slug and the position
+within the thread: the index, the page and the position on the page.
+
+ */
+export type postLocationGetResponse = {
+  data: PostLocationGetOKResponse;
+  status: number;
+};
+
+export const getPostLocationGetUrl = (params: PostLocationGetParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/posts/location?${normalizedParams.toString()}`
+    : `/posts/location`;
+};
+
+export const postLocationGet = async (
+  params: PostLocationGetParams,
+  options?: RequestInit,
+): Promise<postLocationGetResponse> => {
+  return fetcher<Promise<postLocationGetResponse>>(
+    getPostLocationGetUrl(params),
+    {
+      ...options,
+      method: "GET",
     },
   );
 };

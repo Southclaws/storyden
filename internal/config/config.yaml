@@ -430,6 +430,44 @@
 
         This is a full URL with `redis://` as the scheme. You can set the username and password using the URL format, for example: `redis://<username>:<password>@<host>:<port>`.
 
+- section: Search features
+  description: |-
+    Configuration for search features. This is not required for Storyden to run, by default search uses a simple database-driven keyword search. However, for larger deployments and better search quality, it is recommended to configure a search provider.
+  fields:
+    - env: "SEARCH_PROVIDER"
+      name: SearchProvider
+      type: string
+      default: "database"
+      description: |-
+        Either:
+
+        - `database` for the default database-driven search.  This is not recommended for larger deployments as it does not scale well and has limited search quality.
+        - `bleve` for Bleve. This is a local full-text search engine that is fast and efficient for small to medium-sized deployments. This is best used when you are using local disk storage, such as SQLite and local asset storage.
+        - `redis` for Redisearch. This is a fast and efficient search provider that is recommended for larger deployments. This is recommended if your environment is ephemeral and you're already using external providers for database and asset storage.
+
+    - env: SEARCH_INDEX_CHUNK_SIZE
+      name: SearchIndexChunkSize
+      type: int
+      default: "1000"
+      description: |-
+        When using `SEARCH_PROVIDER` set to either `bleve` or `redis`, this is the number of items that will be indexed in a single batch.
+
+        Increasing this value will improve indexing performance, but will also increase memory usage during indexing.
+
+    - env: "BLEVE_PATH"
+      name: BlevePath
+      type: string
+      default: "data/bleve"
+      description: |-
+        The path to the directory where Bleve will store search indexes. Only used when `SEARCH_PROVIDER` is set to `bleve`.
+
+    - env: "REDIS_SEARCH_INDEX_NAME"
+      name: RedisSearchIndexName
+      type: string
+      default: "storyden"
+      description: |-
+        The name of the Redis search index. Only used when `SEARCH_PROVIDER` is set to `redis`.
+
 - section: Message queue
   description: |-
     Configuration for message/job queue. This is not required for Storyden to run, but it can improve performance, reliability and reduce memory usage in larger deployments.

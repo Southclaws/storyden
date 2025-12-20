@@ -2,37 +2,20 @@
 package reply
 
 import (
-	"context"
-
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
+	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/reply/reply_notify"
-	"github.com/Southclaws/storyden/app/services/reply/reply_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
-
-type Service interface {
-	// Create a new thread in the specified category.
-	Create(
-		ctx context.Context,
-		authorID account.AccountID,
-		parentID post.ID,
-		partial Partial,
-	) (*reply.Reply, error)
-
-	Update(ctx context.Context, threadID post.ID, partial Partial) (*reply.Reply, error)
-
-	Delete(ctx context.Context, postID post.ID) error
-}
 
 type Partial struct {
 	Content opt.Optional[datagraph.Content]
@@ -40,24 +23,24 @@ type Partial struct {
 	Meta    opt.Optional[map[string]any]
 }
 
-func (p Partial) Opts() (opts []reply.Option) {
-	p.Content.Call(func(v datagraph.Content) { opts = append(opts, reply.WithContent(v)) })
-	p.ReplyTo.Call(func(v post.ID) { opts = append(opts, reply.WithReplyTo(v)) })
-	p.Meta.Call(func(v map[string]any) { opts = append(opts, reply.WithMeta(v)) })
+func (p Partial) Opts() (opts []reply_writer.Option) {
+	p.Content.Call(func(v datagraph.Content) { opts = append(opts, reply_writer.WithContent(v)) })
+	p.ReplyTo.Call(func(v post.ID) { opts = append(opts, reply_writer.WithReplyTo(v)) })
+	p.Meta.Call(func(v map[string]any) { opts = append(opts, reply_writer.WithMeta(v)) })
 	return
 }
 
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(New),
-		reply_semdex.Build(),
 		reply_notify.Build(),
 	)
 }
 
-type service struct {
+type Mutator struct {
 	accountQuery *account_querier.Querier
-	replyRepo    reply.Repository
+	replyQuerier *reply_querier.Querier
+	replyWriter  *reply_writer.Writer
 	fetcher      *fetcher.Fetcher
 	bus          *pubsub.Bus
 	cpm          *content_policy.Manager
@@ -66,15 +49,17 @@ type service struct {
 
 func New(
 	accountQuery *account_querier.Querier,
-	replyRepo reply.Repository,
+	replyQuerier *reply_querier.Querier,
+	replyWriter *reply_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	bus *pubsub.Bus,
 	cpm *content_policy.Manager,
 	cache *thread_cache.Cache,
-) Service {
-	return &service{
+) *Mutator {
+	return &Mutator{
 		accountQuery: accountQuery,
-		replyRepo:    replyRepo,
+		replyQuerier: replyQuerier,
+		replyWriter:  replyWriter,
 		fetcher:      fetcher,
 		bus:          bus,
 		cpm:          cpm,

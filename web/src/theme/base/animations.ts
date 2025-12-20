@@ -40,4 +40,7 @@ export const animations = defineTokens.animations({
   spin: {
     value: 'spin 1s linear infinite',
   },
+  'target-pulse': {
+    value: 'targetPulse 1s {easings.pulse} 2',
+  },
 })

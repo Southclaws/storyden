@@ -12,6 +12,7 @@ import {
 import { HStack, WStack } from "@/styled-system/jsx";
 import { ColorPalette } from "@/styled-system/tokens";
 import { getAssetURL } from "@/utils/asset";
+import { htmlToMarkdown } from "@/utils/markdown";
 
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
 import { Timestamp } from "../site/Timestamp";
@@ -31,7 +32,7 @@ export function DatagraphItemCard({ item }: Props) {
       return <DatagraphItemPostGenericCard item={item} />;
 
     case DatagraphItemKind.reply:
-      return <DatagraphItemPostGenericCard item={item} />;
+      return <DatagraphItemReplyCard item={item} />;
 
     case DatagraphItemKind.node:
       return <DatagraphItemNodeCard item={item} />;
@@ -50,7 +51,7 @@ export function DatagraphItemCard({ item }: Props) {
 export function DatagraphItemPostGenericCard({
   item,
 }: {
-  item: DatagraphItemPost | DatagraphItemThread | DatagraphItemReply;
+  item: DatagraphItemPost | DatagraphItemThread;
 }) {
   const { ref } = item;
   const url = `/t/${ref.slug}`;
@@ -60,7 +61,35 @@ export function DatagraphItemPostGenericCard({
       id={ref.id}
       url={url}
       title={ref.title || "(untitled post)"}
-      text={ref.description}
+      text={ref.description ?? htmlToMarkdown(ref.body)}
+      controls={
+        <WStack>
+          <HStack gap="1" minWidth="0" color="fg.subtle">
+            <MemberBadge
+              profile={ref.author}
+              size="sm"
+              name="full-horizontal"
+            />
+            <Timestamp created={ref.createdAt} />
+          </HStack>
+
+          <DatagraphItemBadge kind={item.kind} />
+        </WStack>
+      }
+    />
+  );
+}
+
+export function DatagraphItemReplyCard({ item }: { item: DatagraphItemReply }) {
+  const { ref } = item;
+  const url = `/t/locate/${ref.id}`;
+
+  return (
+    <Card
+      id={ref.id}
+      url={url}
+      title={ref.title ? `Thread: ${ref.title}` : "(untitled thread)"}
+      text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
           <HStack gap="1" minWidth="0" color="fg.subtle">

@@ -92,6 +92,7 @@ type OperationPermissions interface {
 	PostDelete() (bool, *rbac.Permission)
 	PostReactAdd() (bool, *rbac.Permission)
 	PostReactRemove() (bool, *rbac.Permission)
+	PostLocationGet() (bool, *rbac.Permission)
 	AssetUpload() (bool, *rbac.Permission)
 	AssetGet() (bool, *rbac.Permission)
 	LikePostGet() (bool, *rbac.Permission)
@@ -129,6 +130,7 @@ type OperationPermissions interface {
 	LinkList() (bool, *rbac.Permission)
 	LinkGet() (bool, *rbac.Permission)
 	DatagraphSearch() (bool, *rbac.Permission)
+	DatagraphMatches() (bool, *rbac.Permission)
 	DatagraphAsk() (bool, *rbac.Permission)
 	EventList() (bool, *rbac.Permission)
 	EventCreate() (bool, *rbac.Permission)
@@ -319,6 +321,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.PostReactAdd()
 	case "PostReactRemove":
 		return optable.PostReactRemove()
+	case "PostLocationGet":
+		return optable.PostLocationGet()
 	case "AssetUpload":
 		return optable.AssetUpload()
 	case "AssetGet":
@@ -393,6 +397,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.LinkGet()
 	case "DatagraphSearch":
 		return optable.DatagraphSearch()
+	case "DatagraphMatches":
+		return optable.DatagraphMatches()
 	case "DatagraphAsk":
 		return optable.DatagraphAsk()
 	case "EventList":

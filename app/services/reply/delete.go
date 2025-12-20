@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
-func (s *service) Delete(ctx context.Context, postID post.ID) error {
+func (s *Mutator) Delete(ctx context.Context, postID post.ID) error {
 	aid, err := session.GetAccountID(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -25,7 +25,7 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	p, err := s.replyRepo.Get(ctx, postID)
+	p, err := s.replyQuerier.Get(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -41,7 +41,7 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pref, err := s.replyRepo.Probe(ctx, postID)
+	pref, err := s.replyQuerier.Probe(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -50,7 +50,7 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.replyRepo.Delete(ctx, postID)
+	err = s.replyWriter.Delete(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

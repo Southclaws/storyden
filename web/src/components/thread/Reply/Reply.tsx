@@ -14,10 +14,19 @@ import { Form, Props, useReply } from "./useReply";
 export function Reply(props: Props) {
   const { isEmpty, isEditing, resetKey, form, handlers } = useReply(props);
 
-  const { thread, reply } = props;
+  const { thread, reply, currentPage } = props;
 
   return (
-    <CardBox id={reply.id}>
+    <CardBox
+      id={reply.id}
+      _target={{
+        scrollMarginTop: {
+          base: "0",
+          md: "20",
+        },
+        animation: "target-pulse",
+      }}
+    >
       <styled.form
         display="flex"
         flexDirection="column"
@@ -50,6 +59,7 @@ export function Reply(props: Props) {
             <ReplyMenu
               thread={thread}
               reply={reply}
+              currentPage={currentPage}
               onEdit={handlers.handleSetEditing}
             />
           )}

@@ -7,24 +7,30 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	reply_service "github.com/Southclaws/storyden/app/services/reply"
+	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Posts struct {
-	reply_svc       reply_service.Service
+	post_repo       post_search.Repository
+	replyMutator    *reply.Mutator
 	thread_mark_svc thread_mark.Service
 }
 
 func NewPosts(
-	reply_svc reply_service.Service,
+	post_repo post_search.Repository,
+	replyMutator *reply.Mutator,
 	thread_mark_svc thread_mark.Service,
 ) Posts {
 	return Posts{
-		reply_svc:       reply_svc,
+		post_repo:       post_repo,
+		replyMutator:    replyMutator,
 		thread_mark_svc: thread_mark_svc,
 	}
 }
@@ -40,12 +46,12 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	partial := reply_service.Partial{
+	partial := reply.Partial{
 		Content: richContent,
 		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
-	post, err := p.reply_svc.Update(ctx, postID, partial)
+	post, err := p.replyMutator.Update(ctx, postID, partial)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -61,10 +67,32 @@ func (p *Posts) PostDelete(ctx context.Context, request openapi.PostDeleteReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = p.reply_svc.Delete(ctx, postID)
+	err = p.replyMutator.Delete(ctx, postID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.PostDelete200Response{}, nil
+}
+
+func (p *Posts) PostLocationGet(ctx context.Context, request openapi.PostLocationGetRequestObject) (openapi.PostLocationGetResponseObject, error) {
+	id, err := xid.FromString(string(request.Params.Id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	location, err := p.post_repo.Locate(ctx, post.ID(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.PostLocationGet200JSONResponse{
+		PostLocationGetOKJSONResponse: openapi.PostLocationGetOKJSONResponse{
+			Slug:     location.Slug,
+			Kind:     openapi.PostLocationKind(location.Kind.String()),
+			Index:    location.Index.Ptr(),
+			Page:     location.Page.Ptr(),
+			Position: location.Position.Ptr(),
+		},
+	}, nil
 }

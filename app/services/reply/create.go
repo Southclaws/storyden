@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 )
 
-func (s *service) Create(
+func (s *Mutator) Create(
 	ctx context.Context,
 	authorID account.AccountID,
 	parentID post.ID,
@@ -28,12 +28,12 @@ func (s *service) Create(
 
 	opts := partial.Opts()
 
-	p, err := s.replyRepo.Create(ctx, authorID, parentID, opts...)
+	p, err := s.replyWriter.Create(ctx, authorID, parentID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
-	pref, err := s.replyRepo.Probe(ctx, p.ID)
+	pref, err := s.replyQuerier.Probe(ctx, p.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

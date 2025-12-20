@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/pdf"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
+	"github.com/Southclaws/storyden/internal/infrastructure/redis"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 	"github.com/Southclaws/storyden/internal/infrastructure/weaviate"
@@ -27,6 +28,7 @@ func Build() fx.Option {
 		logger.Build(),
 		instrumentation.Build(),
 		db.Build(),
+		redis.Build(),
 		cache.Build(),
 		fx.Provide(rate.NewFactory),
 		mailer.Build(),

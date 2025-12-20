@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { threadGet } from "@/api/openapi-server/threads";
-import { UnreadyBanner } from "@/components/site/Unready";
+import { getServerSession } from "@/auth/server-session";
 import { getSettings } from "@/lib/settings/settings-server";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
@@ -31,7 +31,16 @@ export default async function Page(props: Props) {
     page: page?.toString(),
   });
 
-  return <ThreadScreen initialPage={page} slug={slug} thread={data} />;
+  const session = await getServerSession();
+
+  return (
+    <ThreadScreen
+      initialSession={session}
+      initialPage={page}
+      slug={slug}
+      thread={data}
+    />
+  );
 }
 
 export async function generateMetadata(props: Props) {

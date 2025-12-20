@@ -16,11 +16,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -243,7 +243,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		}, nil
 	}
 
-	pp := deserialisePageParams(request.Params.Page, 50)
+	pp := deserialisePageParams(request.Params.Page, reply.RepliesPerPage)
 
 	thread, err := i.thread_svc.Get(ctx, postID, pp)
 	if err != nil {

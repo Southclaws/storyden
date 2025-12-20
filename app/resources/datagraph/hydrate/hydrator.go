@@ -3,18 +3,18 @@ package hydrate
 
 import (
 	"context"
+	"fmt"
 	"sort"
-	"sync"
 
 	"github.com/Southclaws/dt"
 	"github.com/samber/lo"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
-	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
@@ -22,14 +22,14 @@ import (
 type Hydrator struct {
 	ins         spanner.Instrumentation
 	threads     *thread_querier.Querier
-	replies     reply.Repository
+	replies     *reply_querier.Querier
 	nodeQuerier *node_querier.Querier
 }
 
 func New(
 	ins spanner.Builder,
 	threads *thread_querier.Querier,
-	replies reply.Repository,
+	replies *reply_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 ) *Hydrator {
 	return &Hydrator{
@@ -57,47 +57,56 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 
 	parts := lo.GroupBy(refs, func(r *datagraph.Ref) datagraph.Kind { return r.Kind })
 
-	// TODO: Use "GetMany" funcs so this is optimised at DB level.
-
 	results := make(chan withRelevance, len(refs))
 
-	wg := sync.WaitGroup{}
+	eg, ctx := errgroup.WithContext(ctx)
 
 	for k, v := range parts {
-		wg.Add(1)
-		go func() {
+		eg.Go(func() error {
+			relevanceMap := make(map[string]float64)
+			for _, r := range v {
+				relevanceMap[r.ID.String()] = r.Relevance
+			}
+
 			switch k {
 			case datagraph.KindPost:
-				// TODO: Repo for generic post types.
-				for _, r := range v {
-					i, err := h.replies.Get(ctx, post.ID(r.ID))
-					if err == nil {
-						results <- withRelevance{i, r.Relevance}
-					}
+				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
+				items, err := h.replies.GetMany(ctx, ids...)
+				if err != nil {
+					return fmt.Errorf("failed to get posts for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindThread:
-				for _, r := range v {
-					i, err := h.threads.Get(ctx, post.ID(r.ID), pagination.Parameters{}, nil)
-					if err == nil {
-						results <- withRelevance{i, r.Relevance}
-					}
+				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
+				items, err := h.threads.GetMany(ctx, ids, nil)
+				if err != nil {
+					return fmt.Errorf("failed to get threads for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindReply:
-				for _, r := range v {
-					i, err := h.replies.Get(ctx, post.ID(r.ID))
-					if err == nil {
-						results <- withRelevance{i, r.Relevance}
-					}
+				ids := dt.Map(v, func(r *datagraph.Ref) post.ID { return post.ID(r.ID) })
+				items, err := h.replies.GetMany(ctx, ids...)
+				if err != nil {
+					return fmt.Errorf("failed to get replies for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.ID.String()]}
 				}
 
 			case datagraph.KindNode:
-				for _, r := range v {
-					i, err := h.nodeQuerier.Probe(ctx, library.NodeID(r.ID))
-					if err == nil {
-						results <- withRelevance{i, r.Relevance}
-					}
+				ids := dt.Map(v, func(r *datagraph.Ref) library.NodeID { return library.NodeID(r.ID) })
+				items, err := h.nodeQuerier.ProbeMany(ctx, ids...)
+				if err != nil {
+					return fmt.Errorf("failed to get nodes for kind=%s ids=%v: %w", k, ids, err)
+				}
+				for _, item := range items {
+					results <- withRelevance{item, relevanceMap[item.GetID().String()]}
 				}
 
 			case datagraph.KindCollection:
@@ -110,19 +119,22 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 				// TODO
 			}
 
-			wg.Done()
-		}()
+			return nil
+		})
 	}
 
 	go func() {
-		wg.Wait()
-
+		eg.Wait()
 		close(results)
 	}()
 
 	var hydrated sortedByRelevance
 	for items := range results {
 		hydrated = append(hydrated, items)
+	}
+
+	if err := eg.Wait(); err != nil {
+		return nil, err
 	}
 
 	sort.Sort(hydrated)

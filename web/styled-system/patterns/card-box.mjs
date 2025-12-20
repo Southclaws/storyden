@@ -3,7 +3,7 @@ import { css } from '../css/index.mjs';
 
 const CardBoxConfig = {
 transform(props20) {
-  const { kind, display } = props20;
+  const { kind, display, ...rest } = props20;
   const padding = kind === "edge" ? "0" : "2";
   return {
     display,
@@ -13,7 +13,8 @@ transform(props20) {
     boxShadow: "sm",
     borderRadius: "lg",
     backgroundColor: "bg.default",
-    padding
+    padding,
+    ...rest
   };
 }}
 

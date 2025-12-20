@@ -109,3 +109,23 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 		return n, nil
 	}
 }
+
+func ItemRef(c *ent.Node) (datagraph.Item, error) {
+	content, err := opt.MapErr(opt.NewPtr(c.Content), datagraph.NewRichText)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Node{
+		Mark:        NewMark(c.ID, c.Slug),
+		CreatedAt:   c.CreatedAt,
+		UpdatedAt:   c.UpdatedAt,
+		IndexedAt:   opt.NewPtr(c.IndexedAt),
+		Name:        c.Name,
+		Content:     content,
+		Description: opt.NewPtr(c.Description),
+		Visibility:  visibility.NewVisibilityFromEnt(c.Visibility),
+		SortKey:     c.Sort,
+		Metadata:    c.Metadata,
+	}, nil
+}

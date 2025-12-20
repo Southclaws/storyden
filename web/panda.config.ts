@@ -44,12 +44,15 @@ export default defineConfig({
   exclude: [],
 
   conditions: {
+    target: "&:target",
     checked:
       "&:is(:checked, [data-checked], [aria-checked=true], [data-state=checked])",
     indeterminate:
       "&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])",
     closed: "&:is([data-state=closed])",
     open: "&:is([open], [data-state=open])",
+    on: "&:is([data-state=on])",
+    off: "&:is([data-state=off])",
     hidden: "&:is([hidden])",
     current: "&:is([data-current])",
     today: "&:is([data-today])",
@@ -125,7 +128,7 @@ export default defineConfig({
           },
         },
         transform(props) {
-          const { kind, display } = props;
+          const { kind, display, ...rest } = props;
 
           const padding = kind === "edge" ? "0" : "2";
 
@@ -138,6 +141,7 @@ export default defineConfig({
             borderRadius: "lg",
             backgroundColor: "bg.default",
             padding,
+            ...rest,
           };
         },
       },
@@ -221,6 +225,10 @@ export default defineConfig({
       keyframes: {
         shimmer: {
           "100%": { transform: "translateX(100%)" },
+        },
+        targetPulse: {
+          "0%, 100%": { backgroundColor: "transparent" },
+          "50%": { backgroundColor: "var(--colors-bg-emphasized)" },
         },
       },
       textStyles: defineTextStyles({

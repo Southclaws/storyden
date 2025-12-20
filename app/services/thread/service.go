@@ -26,7 +26,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/semdex"
-	"github.com/Southclaws/storyden/app/services/thread/thread_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -81,7 +80,6 @@ func (p Partial) Opts() (opts []thread_writer.Option) {
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(New),
-		thread_semdex.Build(),
 	)
 }
 

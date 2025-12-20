@@ -7,7 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.12-canary
  */
-import type { Arguments, Key } from "swr";
+import useSwr from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
@@ -15,6 +16,8 @@ import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
   NotFoundResponse,
+  PostLocationGetOKResponse,
+  PostLocationGetParams,
   PostReactAddBody,
   PostReactAddOKResponse,
   PostUpdateBody,
@@ -253,6 +256,65 @@ export const usePostReactRemove = <
   const swrFn = getPostReactRemoveMutationFetcher(postId, reactId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Locate a post just from its ID. This will tell you what kind of post it
+is and where to find it. Where "a post is" is simple for threads, just
+the slug. For replies, it will give you the thread slug and the position
+within the thread: the index, the page and the position on the page.
+
+ */
+export const postLocationGet = (params: PostLocationGetParams) => {
+  return fetcher<PostLocationGetOKResponse>({
+    url: `/posts/location`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getPostLocationGetKey = (params: PostLocationGetParams) =>
+  [`/posts/location`, ...(params ? [params] : [])] as const;
+
+export type PostLocationGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof postLocationGet>>
+>;
+export type PostLocationGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePostLocationGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  params: PostLocationGetParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof postLocationGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getPostLocationGetKey(params) : null));
+  const swrFn = () => postLocationGet(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

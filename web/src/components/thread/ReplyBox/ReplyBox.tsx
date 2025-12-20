@@ -1,6 +1,5 @@
 import { Controller, ControllerProps } from "react-hook-form";
 
-import { Thread } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
@@ -10,13 +9,9 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
 
-import { Form, useReplyBox } from "./useReplyBox";
+import { Form, Props, useReplyBox } from "./useReplyBox";
 
-export type Props = {
-  thread: Thread;
-};
-
-export function ReplyBox(props: Thread) {
+export function ReplyBox(props: Props) {
   const { isLoggedIn, isEmpty, isLoading, form, resetKey, handlers } =
     useReplyBox(props);
 
@@ -40,7 +35,11 @@ export function ReplyBox(props: Thread) {
         <HStack justifyContent="space-between">
           <HStack gap="1">
             <styled.span textWrap="nowrap">Reply to</styled.span>
-            <MemberIdent profile={props.author} name="handle" avatar="hidden" />
+            <MemberIdent
+              profile={props.thread.author}
+              name="handle"
+              avatar="hidden"
+            />
           </HStack>
 
           <Button type="submit" size="xs" disabled={isLoading || isEmpty}>

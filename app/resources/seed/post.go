@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -255,7 +256,7 @@ Storyden is still in development so please give the repository a watch if you're
 	}
 )
 
-func threads(tr *thread_writer.Writer, pr reply.Repository, rr *reaction.Writer, ar *asset_writer.Writer) {
+func threads(tr *thread_writer.Writer, pr *reply_writer.Writer, rr *reaction.Writer, ar *asset_writer.Writer) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
@@ -291,8 +292,8 @@ func threads(tr *thread_writer.Writer, pr reply.Repository, rr *reaction.Writer,
 			p, err = pr.Create(ctx,
 				p.Author.ID,
 				th.ID,
-				reply.WithContent(p.Content),
-				reply.WithID(p.ID))
+				reply_writer.WithContent(p.Content),
+				reply_writer.WithID(p.ID))
 			if err != nil {
 				if ent.IsConstraintError(err) {
 					continue
