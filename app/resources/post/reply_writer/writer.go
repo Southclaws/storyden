@@ -181,7 +181,7 @@ func (d *Writer) Delete(ctx context.Context, id post.ID) error {
 		SetDeletedAt(time.Now()).
 		Exec(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread root post"))
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to archive thread reply"))
 	}
 
 	return nil
