@@ -29,7 +29,7 @@ func newRedis(cfg config.Config) (rueidis.Client, error) {
 		InitAddress:      []string{cfg.RedisURL.Host},
 		Username:         cfg.RedisURL.User.Username(),
 		Password:         password,
-		DisableCache:     false,
+		DisableCache:     true,
 		ConnWriteTimeout: 5 * time.Second,
 	})
 	if err != nil {
