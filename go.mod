@@ -39,6 +39,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.5.1
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.2
 	github.com/alitto/pond/v2 v2.5.0
+	github.com/blevesearch/bleve/v2 v2.5.5
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cixtor/readability v1.0.0
 	github.com/coreos/go-oidc/v3 v3.16.0
@@ -108,7 +109,6 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/bits-and-blooms/bitset v1.22.0 // indirect
-	github.com/blevesearch/bleve/v2 v2.5.5 // indirect
 	github.com/blevesearch/bleve_index_api v1.2.11 // indirect
 	github.com/blevesearch/geo v0.2.4 // indirect
 	github.com/blevesearch/go-faiss v1.0.26 // indirect
