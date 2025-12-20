@@ -107,6 +107,54 @@ func TestThreads(t *testing.T) {
 				a.Equal(thread2get.JSON200.ReplyStatus.Replied, 1, "ctx2 replied")
 			})
 
+			t.Run("reply_to_reply", func(t *testing.T) {
+				t.Parallel()
+
+				r := require.New(t)
+				a := assert.New(t)
+
+				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       opt.New("<p>thread for nested replies</p>").Ptr(),
+					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
+					Title:      "Reply-to-reply testing",
+				}, session1)
+				tests.Ok(t, err, thread1create)
+
+				// acc2 creates first reply to thread
+				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+					Body: "first reply",
+				}, session2)
+				tests.Ok(t, err, reply1create)
+				a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
+				a.Nil(reply1create.JSON200.ReplyTo, "first reply should not have reply_to")
+
+				// acc1 creates a reply to reply1
+				reply2create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+					Body:    "nested reply",
+					ReplyTo: &reply1create.JSON200.Id,
+				}, session1)
+				tests.Ok(t, err, reply2create)
+				a.Equal(acc1.ID.String(), reply2create.JSON200.Author.Id)
+				r.NotNil(reply2create.JSON200.ReplyTo, "nested reply should have reply_to set")
+				a.Equal(reply1create.JSON200.Id, reply2create.JSON200.ReplyTo.Id, "nested reply should reference first reply")
+
+				// Get thread and verify both replies are present with correct relationships
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil)
+				tests.Ok(t, err, thread1get)
+				r.Len(thread1get.JSON200.Replies.Replies, 2)
+
+				replies := thread1get.JSON200.Replies.Replies
+				reply1get, found := lo.Find(replies, func(r openapi.Reply) bool { return r.Id == reply1create.JSON200.Id })
+				r.True(found)
+				a.Nil(reply1get.ReplyTo, "first reply should not have reply_to")
+
+				reply2get, found := lo.Find(replies, func(r openapi.Reply) bool { return r.Id == reply2create.JSON200.Id })
+				r.True(found)
+				r.NotNil(reply2get.ReplyTo, "nested reply should have reply_to")
+				a.Equal(reply1create.JSON200.Id, reply2get.ReplyTo.Id, "nested reply should reference first reply")
+			})
+
 			t.Run("threads_ordered_by_last_reply", func(t *testing.T) {
 				t.Parallel()
 

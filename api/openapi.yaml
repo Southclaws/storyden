@@ -5570,7 +5570,7 @@ components:
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
-        reply_to: { $ref: "#/components/schemas/Identifier" }
+        reply_to: { $ref: "#/components/schemas/Reply" }
 
     ReplyInitialProps:
       type: object

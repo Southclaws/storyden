@@ -63,6 +63,6 @@ func (p *Replies) ReplyCreate(ctx context.Context, request openapi.ReplyCreateRe
 	}
 
 	return openapi.ReplyCreate200JSONResponse{
-		ReplyCreateOKJSONResponse: openapi.ReplyCreateOKJSONResponse(serialiseReply(post)),
+		ReplyCreateOKJSONResponse: openapi.ReplyCreateOKJSONResponse(serialiseReplyPtr(post)),
 	}, nil
 }

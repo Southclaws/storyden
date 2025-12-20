@@ -29,7 +29,7 @@ type Reply struct {
 	RootThreadTitle string
 	RootAuthor      profile.Ref
 	Slug            string // The root slug with the post ID as a #fragment
-	ReplyTo         opt.Optional[post.ID]
+	ReplyTo         opt.Optional[Reply]
 }
 
 type ReplyRef struct {
@@ -65,14 +65,6 @@ func (p Reply) String() string {
 	return fmt.Sprintf("post %s by '%s' at %s\n'%s'", p.ID.String(), p.Author.Handle, p.CreatedAt, p.Content.Short())
 }
 
-func replyTo(m *ent.Post) opt.Optional[post.ID] {
-	if m.Edges.ReplyTo != nil {
-		return opt.New(post.ID(m.Edges.ReplyTo.ID))
-	}
-
-	return opt.NewEmpty[post.ID]()
-}
-
 func (r *Reply) GetCreated() time.Time { return r.CreatedAt }
 func (r *Reply) GetUpdated() time.Time { return r.UpdatedAt }
 
@@ -92,19 +84,23 @@ func Map(m *ent.Post) (*Reply, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	replyTo := replyTo(m)
+	replyTo, err := func(m *ent.Post) (opt.Optional[Reply], error) {
+		if m.Edges.ReplyTo == nil {
+			return opt.NewEmpty[Reply](), nil
+		}
 
-	rootAuthor, err := profile.MapRef(m.Edges.Root.Edges.Author)
+		r, err := Map(m.Edges.ReplyTo)
+		if err != nil {
+			return nil, err
+		}
+
+		return opt.New(*r), nil
+	}(m)
 	if err != nil {
 		return nil, err
 	}
 
-	var rootPostID post.ID
-	if m.RootPostID != nil {
-		rootPostID = post.ID(*m.RootPostID)
-	}
-
-	return &Reply{
+	reply := &Reply{
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
@@ -117,13 +113,35 @@ func Map(m *ent.Post) (*Reply, error) {
 			UpdatedAt: m.UpdatedAt,
 			DeletedAt: opt.NewPtr(m.DeletedAt),
 		},
-		ReplyTo:         replyTo,
-		RootAuthor:      *rootAuthor,
-		RootPostID:      rootPostID,
-		RootThreadMark:  m.Edges.Root.Slug,
-		RootThreadTitle: m.Edges.Root.Title,
-		Slug:            fmt.Sprintf("%s#%s", m.Edges.Root.Slug, m.ID),
-	}, nil
+		ReplyTo: replyTo,
+	}
+
+	if m.Edges.Root != nil {
+		var rootPostID post.ID
+		if m.RootPostID != nil {
+			rootPostID = post.ID(*m.RootPostID)
+		}
+		rootThreadMark := opt.NewPtr(m.Edges.Root).OrZero().Slug
+		rootThreadTitle := opt.NewPtr(m.Edges.Root).OrZero().Title
+
+		slug := fmt.Sprintf("%s#%s", rootThreadMark, m.ID)
+
+		reply.RootPostID = rootPostID
+		reply.RootThreadMark = rootThreadMark
+		reply.RootThreadTitle = rootThreadTitle
+
+		reply.Slug = slug
+
+		if m.Edges.Root.Edges.Author != nil {
+			p, err := profile.MapRef(m.Edges.Root.Edges.Author)
+			if err != nil {
+				return nil, err
+			}
+			reply.RootAuthor = *p
+		}
+	}
+
+	return reply, nil
 }
 
 func Mapper(
@@ -131,6 +149,19 @@ func Mapper(
 	ls post.PostLikesMap,
 	rl reaction.Lookup,
 ) func(m *ent.Post) (*Reply, error) {
+	mapReplyTo := func(m *ent.Post) (opt.Optional[Reply], error) {
+		if m.Edges.ReplyTo == nil {
+			return opt.NewEmpty[Reply](), nil
+		}
+
+		r, err := Mapper(am, ls, rl)(m.Edges.ReplyTo)
+		if err != nil {
+			return nil, err
+		}
+
+		return opt.New(*r), nil
+	}
+
 	return func(m *ent.Post) (*Reply, error) {
 		authorEdge := am[m.AccountPosts]
 		pro, err := profile.MapRef(authorEdge)
@@ -143,7 +174,10 @@ func Mapper(
 			return nil, fault.Wrap(err)
 		}
 
-		replyTo := replyTo(m)
+		replyTo, err := mapReplyTo(m)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
 
 		reacts := rl[xid.ID(m.ID)]
 
@@ -233,7 +267,6 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 			DeletedAt: opt.NewPtr(r.DeletedAt),
 		},
 		RootPostID: rootPostID,
-		ReplyTo:    replyTo(r),
 		Slug:       fmt.Sprintf("%s#%s", rootSlug, r.ID),
 	}, nil
 }

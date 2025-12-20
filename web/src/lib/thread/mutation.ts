@@ -23,7 +23,11 @@ import {
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 
-export function useThreadMutations(thread: ThreadReference) {
+export function useThreadMutations(
+  thread: ThreadReference,
+  currentPage?: number,
+  totalPages?: number,
+) {
   const sessionInitial = useSession();
   const sessionRef = useRef(sessionInitial);
   useEffect(() => {
@@ -32,7 +36,9 @@ export function useThreadMutations(thread: ThreadReference) {
 
   const { mutate } = useSWRConfig();
 
-  const threadGetKey = getThreadGetKey(thread.slug);
+  const threadGetKey = getThreadGetKey(thread.slug, {
+    page: (currentPage ?? 1).toString(),
+  });
   const key = (key: Arguments) => {
     if (!Array.isArray(key)) return false;
 
@@ -42,7 +48,9 @@ export function useThreadMutations(thread: ThreadReference) {
     const pathMatch = path === threadGetKey[0];
     if (!pathMatch) return false;
 
-    const paramsMatch = params?.page === threadGetKey[1]?.page;
+    // Default to page 1 for comparison.
+    const paramsMatch =
+      (params?.page ?? "1") === (threadGetKey[1]?.page ?? "1");
 
     const match = pathMatch && paramsMatch;
 
@@ -50,44 +58,52 @@ export function useThreadMutations(thread: ThreadReference) {
   };
 
   const createReply = async (reply: ReplyInitialProps) => {
-    const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
-      const session = sessionRef.current;
+    // Only apply optimistic update if we're on the last page
+    // where the new reply will actually appear
+    const isLastPage =
+      !currentPage || !totalPages || currentPage === totalPages;
 
-      if (!data || !session) return;
+    if (isLastPage) {
+      const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
+        const session = sessionRef.current;
 
-      const newReply = {
-        id: uniqueId("optimistic_reply_"),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        title: thread.title,
-        author: session,
-        assets: [],
-        collections: { has_collected: false, in_collections: 0 },
-        likes: { likes: 0, liked: false },
-        reacts: [],
-        body_links: [],
-        slug: thread.slug,
-        root_id: thread.id,
-        root_slug: thread.slug,
-        ...reply,
-      } satisfies Reply;
+        if (!data || !session) return;
 
-      const newData: Thread = {
-        ...data,
-        replies: {
-          ...data.replies,
-          replies: [...data.replies.replies, newReply],
-        },
+        const newReply = {
+          id: uniqueId("optimistic_reply_"),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          title: thread.title,
+          author: session,
+          assets: [],
+          collections: { has_collected: false, in_collections: 0 },
+          likes: { likes: 0, liked: false },
+          reacts: [],
+          body_links: [],
+          slug: thread.slug,
+          root_id: thread.id,
+          root_slug: thread.slug,
+          ...reply,
+          reply_to: undefined,
+        } satisfies Reply;
+
+        const newData: Thread = {
+          ...data,
+          replies: {
+            ...data.replies,
+            replies: [...data.replies.replies, newReply],
+          },
+        };
+
+        return newData;
       };
 
-      return newData;
-    };
+      await mutate(key, mutator, {
+        revalidate: false,
+      });
+    }
 
-    await mutate(key, mutator, {
-      revalidate: false,
-    });
-
-    await replyCreate(thread.slug, reply);
+    return await replyCreate(thread.slug, reply);
   };
 
   const updateReply = async (id: Identifier, updated: PostMutableProps) => {

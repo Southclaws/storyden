@@ -123,6 +123,7 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 			Limit(pageParams.Limit()).
 			Offset(pageParams.Offset()).
 			Order(ent.Asc(ent_post.FieldCreatedAt)).
+			WithReplyTo().
 			All(ctx)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -169,6 +170,11 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 	}
 
 	allPosts := append(repliesResult, threadResult)
+	for _, p := range repliesResult {
+		if p.Edges.ReplyTo != nil {
+			allPosts = append(allPosts, p.Edges.ReplyTo)
+		}
+	}
 	postIDs := dt.Map(allPosts, func(p *ent.Post) xid.ID { return p.ID })
 
 	accountIDs := dt.Map(allPosts, func(p *ent.Post) xid.ID { return p.AccountPosts })

@@ -146,7 +146,7 @@ func serialiseThreadRepliesPaginatedList(in pagination.Result[*reply.Reply]) ope
 		NextPage:    in.NextPage.Ptr(),
 		PageSize:    in.Size,
 		Results:     in.Results,
-		Replies:     dt.Map(in.Items, serialiseReply),
+		Replies:     dt.Map(in.Items, serialiseReplyPtr),
 		TotalPages:  in.TotalPages,
 	}
 }
@@ -165,7 +165,7 @@ func serialiseReadStatus(s post.ReadStatus) openapi.ReadStatus {
 	}
 }
 
-func serialiseReply(p *reply.Reply) openapi.Reply {
+func serialiseReplyPtr(p *reply.Reply) openapi.Reply {
 	description := p.Content.Short()
 	return openapi.Reply{
 		Id:          openapi.Identifier(xid.ID(p.ID).String()),
@@ -183,7 +183,12 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 		Reacts:      dt.Map(p.Reacts, serialiseReact),
 		Meta:        (*openapi.Metadata)(&p.Meta),
 		Assets:      dt.Map(p.Assets, serialiseAssetPtr),
+		ReplyTo:     opt.Map(p.ReplyTo, serialiseReply).Ptr(),
 	}
+}
+
+func serialiseReply(p reply.Reply) openapi.Reply {
+	return serialiseReplyPtr(&p)
 }
 
 func serialisePost(p *post.Post) openapi.Post {

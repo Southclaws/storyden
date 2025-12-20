@@ -8,10 +8,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.25.12-canary
  */
 import type { Identifier } from "./identifier";
+import type { Reply } from "./reply";
 import type { ThreadMark } from "./threadMark";
 
 export interface ReplyProps {
-  reply_to?: Identifier;
+  reply_to?: Reply;
   root_id: Identifier;
   root_slug: ThreadMark;
 }
