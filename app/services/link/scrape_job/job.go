@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -34,7 +34,7 @@ func Build() fx.Option {
 type scrapeConsumer struct {
 	fetcher     *fetcher.Fetcher
 	postWriter  *post_writer.PostWriter
-	postQuery   reply.Repository
+	postQuery   *reply_querier.Querier
 	nodeWriter  *node_writer.Writer
 	threadQuery *thread_querier.Querier
 	nodeQuery   *node_querier.Querier
@@ -48,7 +48,7 @@ func runScrapeConsumer(
 	bus *pubsub.Bus,
 	fetcher *fetcher.Fetcher,
 	postWriter *post_writer.PostWriter,
-	postQuery reply.Repository,
+	postQuery *reply_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	threadQuery *thread_querier.Querier,
 	nodeQuery *node_querier.Querier,

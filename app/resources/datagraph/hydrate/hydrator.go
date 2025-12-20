@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
@@ -22,14 +22,14 @@ import (
 type Hydrator struct {
 	ins         spanner.Instrumentation
 	threads     *thread_querier.Querier
-	replies     reply.Repository
+	replies     *reply_querier.Querier
 	nodeQuerier *node_querier.Querier
 }
 
 func New(
 	ins spanner.Builder,
 	threads *thread_querier.Querier,
-	replies reply.Repository,
+	replies *reply_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 ) *Hydrator {
 	return &Hydrator{

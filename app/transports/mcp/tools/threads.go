@@ -35,7 +35,7 @@ type threadTools struct {
 	tools []server.ServerTool
 
 	thread_svc      thread_service.Service
-	reply_svc       reply_service.Service
+	replyMutator    *reply_service.Mutator
 	thread_mark_svc thread_mark.Service
 	accountQuery    *account_querier.Querier
 	category_repo   *category.Repository
@@ -43,14 +43,14 @@ type threadTools struct {
 
 func newThreadTools(
 	thread_svc thread_service.Service,
-	reply_svc reply_service.Service,
+	replyMutator *reply_service.Mutator,
 	thread_mark_svc thread_mark.Service,
 	accountQuery *account_querier.Querier,
 	category_repo *category.Repository,
 ) *threadTools {
 	handler := &threadTools{
 		thread_svc:      thread_svc,
-		reply_svc:       reply_svc,
+		replyMutator:    replyMutator,
 		thread_mark_svc: thread_mark_svc,
 		accountQuery:    accountQuery,
 		category_repo:   category_repo,
@@ -384,7 +384,7 @@ func (t *threadTools) threadReply(ctx context.Context, request mcp.CallToolReque
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	reply, err := t.reply_svc.Create(ctx, accountID, postID, reply_service.Partial{
+	reply, err := t.replyMutator.Create(ctx, accountID, postID, reply_service.Partial{
 		Content: opt.New(richContent),
 	})
 	if err != nil {

@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
-func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*reply.Reply, error) {
+func (s *Mutator) Update(ctx context.Context, threadID post.ID, partial Partial) (*reply.Reply, error) {
 	if content, ok := partial.Content.Get(); ok {
 		if err := s.cpm.CheckContent(ctx, content); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
@@ -32,7 +32,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	p, err := s.replyRepo.Get(ctx, threadID)
+	p, err := s.replyQuerier.Get(ctx, threadID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -50,7 +50,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	opts := partial.Opts()
 
-	pref, err := s.replyRepo.Probe(ctx, threadID)
+	pref, err := s.replyQuerier.Probe(ctx, threadID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -59,7 +59,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	p, err = s.replyRepo.Update(ctx, threadID, opts...)
+	p, err = s.replyWriter.Update(ctx, threadID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -68,7 +68,6 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		ThreadID: p.RootPostID,
 		ReplyID:  p.ID,
 	})
-
 
 	return p, nil
 }

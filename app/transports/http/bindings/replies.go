@@ -10,22 +10,23 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/reply"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Replies struct {
-	reply_svc       reply_service.Service
+	replyMutator    *reply.Mutator
 	thread_mark_svc thread_mark.Service
 }
 
 func NewReplies(
-	reply_svc reply_service.Service,
+	replyMutator *reply.Mutator,
 	thread_mark_svc thread_mark.Service,
 ) Replies {
 	return Replies{
-		reply_svc:       reply_svc,
+		replyMutator:    replyMutator,
 		thread_mark_svc: thread_mark_svc,
 	}
 }
@@ -52,7 +53,7 @@ func (p *Replies) ReplyCreate(ctx context.Context, request openapi.ReplyCreateRe
 		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
-	post, err := p.reply_svc.Create(ctx,
+	post, err := p.replyMutator.Create(ctx,
 		accountID,
 		postID,
 		partial,

@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
@@ -37,7 +37,7 @@ type Indexer struct {
 
 	nodeQuerier    *node_querier.Querier
 	threadQuerier  *thread_querier.Querier
-	replyRepo      reply.Repository
+	replyQuerier   *reply_querier.Querier
 	profileQuerier *profile_querier.Querier
 
 	bus       *pubsub.Bus
@@ -74,7 +74,7 @@ func newIndexer(
 
 	nodeQuerier *node_querier.Querier,
 	threadQuerier *thread_querier.Querier,
-	replyRepo reply.Repository,
+	replyQuerier *reply_querier.Querier,
 	profileQuerier *profile_querier.Querier,
 
 	bus *pubsub.Bus,
@@ -92,7 +92,7 @@ func newIndexer(
 
 		nodeQuerier:    nodeQuerier,
 		threadQuerier:  threadQuerier,
-		replyRepo:      replyRepo,
+		replyQuerier:   replyQuerier,
 		profileQuerier: profileQuerier,
 
 		bus:       bus,
@@ -325,7 +325,7 @@ func (idx *Indexer) deindexNode(ctx context.Context, id library.NodeID) error {
 }
 
 func (idx *Indexer) indexReply(ctx context.Context, id post.ID) error {
-	p, err := idx.replyRepo.Get(ctx, id)
+	p, err := idx.replyQuerier.Get(ctx, id)
 	if err != nil {
 		idx.logger.Error("failed to get reply for indexing", slog.String("id", id.String()), slog.String("error", err.Error()))
 		return fault.Wrap(err, fctx.With(ctx))
