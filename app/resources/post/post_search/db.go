@@ -156,7 +156,7 @@ func (d *database) Locate(ctx context.Context, id post.ID) (*Location, error) {
 	}
 
 	index := count - 1
-	page := index / reply.RepliesPerPage
+	page := (index / reply.RepliesPerPage) + 1
 	position := index % reply.RepliesPerPage
 
 	return &Location{

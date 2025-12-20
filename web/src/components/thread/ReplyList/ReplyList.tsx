@@ -9,9 +9,10 @@ import { Reply } from "../Reply/Reply";
 
 type Props = {
   thread: Thread;
+  currentPage?: number;
 };
 
-export function ReplyList({ thread }: Props) {
+export function ReplyList({ thread, currentPage }: Props) {
   return (
     <styled.ol
       listStyleType="none"
@@ -31,7 +32,7 @@ export function ReplyList({ thread }: Props) {
             {start && <IntervalDivider interval={{ start, end }} />}
 
             <styled.li listStyleType="none" m="0">
-              <Reply thread={thread} reply={reply} />
+              <Reply thread={thread} reply={reply} currentPage={currentPage} />
             </styled.li>
           </Fragment>
         );

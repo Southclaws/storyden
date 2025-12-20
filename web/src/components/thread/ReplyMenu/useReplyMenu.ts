@@ -14,16 +14,17 @@ import { getPermalinkForPost } from "../utils";
 export type Props = {
   thread: Thread;
   reply: Reply;
+  currentPage?: number;
   onEdit: () => void;
 };
 
-export function useReplyMenu({ thread, reply, onEdit }: Props) {
+export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
   const { revalidate, deleteReply } = useThreadMutations(thread);
 
   const account = useSession();
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const permalink = getPermalinkForPost(thread.slug, reply.id);
+  const permalink = getPermalinkForPost(thread.slug, reply.id, currentPage);
 
   const isSharingEnabled = useShare();
   const isEditingEnabled = account?.id === reply.author.id;

@@ -16,6 +16,7 @@ export type Form = z.infer<typeof FormSchema>;
 export type Props = {
   thread: Thread;
   reply: Reply;
+  currentPage?: number;
 };
 
 export function useReply({ thread, reply }: Props) {

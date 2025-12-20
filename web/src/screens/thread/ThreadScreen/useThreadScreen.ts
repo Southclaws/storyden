@@ -6,10 +6,15 @@ import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { threadUpdate, useThreadGet } from "@/api/openapi-client/threads";
-import { DatagraphItemKind, ThreadGetResponse } from "@/api/openapi-schema";
+import {
+  Account,
+  DatagraphItemKind,
+  ThreadGetResponse,
+} from "@/api/openapi-schema";
 import { useBeacon } from "@/lib/beacon/useBeacon";
 
 export type Props = {
+  initialSession?: Account;
   initialPage?: number;
   slug: string;
   thread: ThreadGetResponse;

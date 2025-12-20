@@ -82,7 +82,7 @@ export function DatagraphItemPostGenericCard({
 
 export function DatagraphItemReplyCard({ item }: { item: DatagraphItemReply }) {
   const { ref } = item;
-  const url = `/t/${ref.slug || ref.root_slug || ref.root_id}`;
+  const url = `/t/locate/${ref.id}`;
 
   return (
     <Card

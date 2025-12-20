@@ -108,7 +108,7 @@ func TestPostLocation(t *testing.T) {
 				r.NotNil(resp.JSON200.Page)
 				r.NotNil(resp.JSON200.Position)
 				a.Equal(2, *resp.JSON200.Index)
-				a.Equal(0, *resp.JSON200.Page)
+				a.Equal(1, *resp.JSON200.Page)
 				a.Equal(2, *resp.JSON200.Position)
 			})
 
@@ -144,7 +144,7 @@ func TestPostLocation(t *testing.T) {
 				r.NotNil(resp.JSON200.Page)
 				r.NotNil(resp.JSON200.Position)
 				a.Equal(51, *resp.JSON200.Index)
-				a.Equal(1, *resp.JSON200.Page)
+				a.Equal(2, *resp.JSON200.Page)
 				a.Equal(1, *resp.JSON200.Position)
 			})
 

@@ -137,7 +137,10 @@ export function ThreadScreen(props: Props) {
           />
         )}
 
-        <ReplyList thread={thread} />
+        <ReplyList
+          thread={thread}
+          currentPage={data.thread.replies.current_page}
+        />
 
         {data.thread.replies.total_pages > 1 && (
           <PaginationControls
@@ -149,7 +152,7 @@ export function ThreadScreen(props: Props) {
         )}
       </VStack>
 
-      <ReplyBox {...thread} />
+      <ReplyBox initialSession={props.initialSession} thread={thread} />
     </LStack>
   );
 }
