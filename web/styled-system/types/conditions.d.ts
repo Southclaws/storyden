@@ -10,6 +10,10 @@ export interface Conditions {
 	"_closed": string
 	/** `&:is([open], [data-state=open])` */
 	"_open": string
+	/** `&:is([data-state=on])` */
+	"_on": string
+	/** `&:is([data-state=off])` */
+	"_off": string
 	/** `&:is([hidden])` */
 	"_hidden": string
 	/** `&:is([data-current])` */
