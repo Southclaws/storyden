@@ -166,7 +166,7 @@ function InReplyTo({ to, thread }: { to: ReplyType; thread: Thread }) {
           flexShrink: "1",
         })}
       >
-        <ReplyIcon w="4" />
+        <ReplyIcon w="4" minW="4" />
         <styled.span
           minW="0"
           overflow="hidden"
