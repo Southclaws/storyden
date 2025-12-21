@@ -32,7 +32,7 @@ export function AccountMenu({ account, size = "md" }: Props) {
         shift: size === "md" ? 24 : 0,
       }}
     >
-      <Menu.Trigger cursor="pointer">
+      <Menu.Trigger cursor="pointer" aria-label="Account menu">
         <MemberAvatar profile={account} size={size} />
       </Menu.Trigger>
 

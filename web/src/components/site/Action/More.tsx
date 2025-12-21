@@ -4,7 +4,7 @@ import { MoreIcon } from "@/components/ui/icons/More";
 
 export function MoreAction(props: ButtonProps) {
   return (
-    <IconButton variant="ghost" {...props}>
+    <IconButton variant="ghost" aria-label="More options" {...props}>
       <MoreIcon />
     </IconButton>
   );

@@ -20,7 +20,7 @@ export function NotificationsTrigger({
   ...props
 }: AnchorProps & ButtonProps & Props) {
   return (
-    <IconButton size="sm" {...props}>
+    <IconButton size="sm" aria-label="Notifications" {...props}>
       {NotificationsIcon}
       {!hideLabel && (
         <>
