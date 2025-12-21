@@ -32,6 +32,12 @@ type RateLimitConfig struct {
 	Period      string
 }
 
+type RouteMapping struct {
+	Path        string
+	Method      string
+	OperationID string
+}
+
 func run(filename, outfile string) error {
 	spec, err := os.ReadFile(filename)
 	if err != nil {
@@ -49,9 +55,24 @@ func run(filename, outfile string) error {
 	}
 
 	configs := []RateLimitConfig{}
+	routeMappings := []RouteMapping{}
 
-	for _, path := range docModel.Model.Paths.PathItems.FromOldest() {
-		for _, op := range path.GetOperations().FromOldest() {
+	// Iterate through paths to get path string and operations
+	for pathPair := docModel.Model.Paths.PathItems.First(); pathPair != nil; pathPair = pathPair.Next() {
+		path := pathPair.Key()
+		pathItem := pathPair.Value()
+
+		for opPair := pathItem.GetOperations().First(); opPair != nil; opPair = opPair.Next() {
+			method := opPair.Key()
+			op := opPair.Value()
+			
+			// Add route mapping for all operations
+			routeMappings = append(routeMappings, RouteMapping{
+				Path:        path,
+				Method:      method,
+				OperationID: op.OperationId,
+			})
+
 			// Check for x-storyden extension
 			if op.Extensions == nil {
 				continue
@@ -109,10 +130,10 @@ func run(filename, outfile string) error {
 		}
 	}
 
-	return generateCode(configs, outfile)
+	return generateCode(configs, routeMappings, outfile)
 }
 
-func generateCode(configs []RateLimitConfig, outfile string) error {
+func generateCode(configs []RateLimitConfig, routeMappings []RouteMapping, outfile string) error {
 	f := jen.NewFile("limiter")
 
 	f.PackageComment("Package limiter contains rate limiting middleware.")
@@ -162,6 +183,19 @@ func generateCode(configs []RateLimitConfig, outfile string) error {
 		}),
 	)
 
+	// Generate route to operation mapping
+	f.Comment("RouteToOperation maps HTTP method and path to operation ID")
+	f.Var().Id("RouteToOperation").Op("=").Map(jen.String()).String().Values(
+		jen.DictFunc(func(d jen.Dict) {
+			for _, mapping := range routeMappings {
+				// Convert OpenAPI path format {param} to Echo format :param
+				echoPath := convertPathFormat(mapping.Path)
+				key := mapping.Method + ":/api" + echoPath
+				d[jen.Lit(key)] = jen.Lit(mapping.OperationID)
+			}
+		}),
+	)
+
 	// Generate helper function
 	f.Comment("GetOperationConfig returns the rate limit config for an operation, or nil if not configured")
 	f.Func().Id("GetOperationConfig").Params(
@@ -178,6 +212,23 @@ func generateCode(configs []RateLimitConfig, outfile string) error {
 		jen.Return(jen.Nil()),
 	)
 
+	f.Comment("GetOperationIDFromRoute returns the operation ID for a given route")
+	f.Func().Id("GetOperationIDFromRoute").Params(
+		jen.Id("method").String(),
+		jen.Id("path").String(),
+	).Params(
+		jen.String(),
+	).Block(
+		jen.Id("key").Op(":=").Id("method").Op("+").Lit(":").Op("+").Id("path"),
+		jen.If(
+			jen.List(jen.Id("opID"), jen.Id("ok")).Op(":=").Id("RouteToOperation").Index(jen.Id("key")),
+			jen.Id("ok"),
+		).Block(
+			jen.Return(jen.Id("opID")),
+		),
+		jen.Return(jen.Lit("")),
+	)
+
 	return f.Save(outfile)
 }
 
@@ -188,3 +239,20 @@ func parseDurationToNanoseconds(s string) int64 {
 	}
 	return int64(d)
 }
+
+func convertPathFormat(openAPIPath string) string {
+	// Convert OpenAPI path format {param} to Echo format :param
+	result := ""
+	for _, ch := range openAPIPath {
+		if ch == '{' {
+			result += ":"
+		} else if ch == '}' {
+			// Skip closing brace
+			continue
+		} else {
+			result += string(ch)
+		}
+	}
+	return result
+}
+

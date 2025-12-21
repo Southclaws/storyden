@@ -61,7 +61,7 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 
 			// Try to get operation ID from Echo context
 			var operationID string
-			if echoCtx, ok := r.Context().Value(echo.ContextKey).(echo.Context); ok {
+			if echoCtx, ok := r.Context().Value("echo").(echo.Context); ok {
 				// Get the route path which we'll use as a lookup key
 				routePath := echoCtx.Path()
 				operationID = m.getOperationIDFromPath(routePath, r.Method)
@@ -108,7 +108,8 @@ func (m *Middleware) getLimiterAndCost(ctx context.Context, operationID string, 
 	// Check for settings override first
 	settingsData, err := m.settings.Get(ctx)
 	if err == nil && settingsData.RateLimitOverrides.Ok() {
-		if override, ok := settingsData.RateLimitOverrides.MustGet()[operationID]; ok {
+		overrides, _ := settingsData.RateLimitOverrides.Get()
+		if override, ok := overrides[operationID]; ok {
 			return m.createLimiterFromOverride(operationID, override), overrideCostOrDefault(override.Cost, cost)
 		}
 	}
@@ -158,27 +159,9 @@ func overrideCostOrDefault(overrideCost, defaultCost int) int {
 	return defaultCost
 }
 
-// getOperationIDFromPath maps a route path to an operation ID
-// This is a simple mapping that could be generated from OpenAPI spec
+// getOperationIDFromPath maps a route path to an operation ID using generated mapping
 func (m *Middleware) getOperationIDFromPath(path, method string) string {
-	// This mapping could be code-generated, but for now we'll use a simple map
-	// The key is method:path
-	key := method + ":" + path
-	
-	// Mapping from route paths to operation IDs
-	// This should ideally be generated from the OpenAPI spec
-	pathToOperation := map[string]string{
-		"POST:/api/auth/email/signup":     "AuthEmailSignup",
-		"POST:/api/auth/password/signup":  "AuthPasswordSignup",
-		"POST:/api/auth/password/reset":   "AuthPasswordReset",
-		// Add more mappings as needed
-	}
-	
-	if opID, ok := pathToOperation[key]; ok {
-		return opID
-	}
-	
-	return ""
+	return GetOperationIDFromRoute(method, path)
 }
 
 type KeyFunc func(r *http.Request) (string, error)
