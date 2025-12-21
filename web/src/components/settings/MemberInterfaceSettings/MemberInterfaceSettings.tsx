@@ -53,6 +53,22 @@ export function MemberInterfaceSettings(props: Props) {
             and pages.
           </FormHelperText>
         </FormControl>
+
+        <FormControl>
+          <FormLabel>Sidebar default state</FormLabel>
+          <RadioGroupField
+            control={control}
+            name="sidebarDefaultState"
+            items={[
+              { label: "Open", value: "open" },
+              { label: "Closed", value: "closed" },
+            ]}
+          />
+          <FormHelperText>
+            Choose your preferred default state for the sidebar when you visit
+            the site.
+          </FormHelperText>
+        </FormControl>
       </CardBox>
     </styled.form>
   );

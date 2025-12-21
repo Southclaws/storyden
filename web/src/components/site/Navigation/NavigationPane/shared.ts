@@ -1,14 +1,17 @@
 import { z } from "zod";
 
-const DEFAULT_SIDEBAR_STATE = false;
+import { SidebarDefaultState } from "@/lib/settings/sidebar";
 
 const CookieSchema = z.string().transform((value) => value === "true");
 
-export function parseSidebarCookie(cookieValue?: string) {
+export function parseSidebarCookie(
+  cookieValue?: string,
+  defaultState: SidebarDefaultState = "closed",
+) {
   const { success, data } = CookieSchema.safeParse(cookieValue);
 
   if (!success) {
-    return DEFAULT_SIDEBAR_STATE;
+    return defaultState === "open";
   }
 
   return data;

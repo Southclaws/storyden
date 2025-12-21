@@ -1,5 +1,8 @@
 import React, { PropsWithChildren } from "react";
 
+import { getServerSession } from "@/auth/server-session";
+import { parseMemberSettings } from "@/lib/settings/member-settings";
+import { getSettings } from "@/lib/settings/settings-server";
 import { Box } from "@/styled-system/jsx";
 
 import { Onboarding } from "../Onboarding/Onboarding";
@@ -20,7 +23,15 @@ export async function Navigation({
   contextpane,
   children,
 }: PropsWithChildren<Props>) {
-  const showLeftBar = await getServerSidebarState();
+  const globalSettings = await getSettings();
+  const sessionAccount = await getServerSession();
+  const session = sessionAccount
+    ? parseMemberSettings(sessionAccount, globalSettings.metadata)
+    : undefined;
+
+  const sidebarDefaultState =
+    session?.meta.sidebar.defaultState ?? globalSettings.metadata.sidebar.defaultState;
+  const showLeftBar = await getServerSidebarState(sidebarDefaultState);
 
   return (
     <Box
