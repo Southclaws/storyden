@@ -1,13 +1,17 @@
 package limiter
 
 import (
+	"context"
 	"net"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/labstack/echo/v4"
+
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
+	"github.com/Southclaws/storyden/app/resources/settings"
 )
 
 const (
@@ -19,20 +23,26 @@ const (
 )
 
 type Middleware struct {
-	rl        rate.Limiter
-	kf        KeyFunc
-	sizeLimit int64
+	rl          rate.Limiter
+	factory     *rate.LimiterFactory
+	settings    *settings.SettingsRepository
+	cfg         config.Config
+	kf          KeyFunc
+	sizeLimit   int64
 }
 
 func New(
 	cfg config.Config,
-
 	f *rate.LimiterFactory,
+	settingsRepo *settings.SettingsRepository,
 ) *Middleware {
 	rl := f.NewLimiter(cfg.RateLimit, cfg.RateLimitPeriod, cfg.RateLimitExpire)
 
 	return &Middleware{
 		rl:        rl,
+		factory:   f,
+		settings:  settingsRepo,
+		cfg:       cfg,
 		kf:        fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
 		sizeLimit: MaxRequestSizeBytes, // TODO: cfg.MaxRequestSize
 	}
@@ -49,10 +59,18 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 				return
 			}
 
-			// TODO: Generate costs per-operation from OpenAPI spec
-			cost := 1
+			// Try to get operation ID from Echo context
+			var operationID string
+			if echoCtx, ok := r.Context().Value(echo.ContextKey).(echo.Context); ok {
+				// Get the route path which we'll use as a lookup key
+				routePath := echoCtx.Path()
+				operationID = m.getOperationIDFromPath(routePath, r.Method)
+			}
 
-			status, allowed, err := m.rl.Increment(ctx, key, cost)
+			// Get the appropriate limiter and cost for this operation
+			limiter, cost := m.getLimiterAndCost(ctx, operationID, key)
+
+			status, allowed, err := limiter.Increment(ctx, key, cost)
 			if err != nil {
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
@@ -75,6 +93,92 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// getLimiterAndCost returns the appropriate limiter and cost for an operation
+func (m *Middleware) getLimiterAndCost(ctx context.Context, operationID string, key string) (rate.Limiter, int) {
+	// Default cost
+	cost := 1
+	
+	// If no operation ID, use global limiter
+	if operationID == "" {
+		return m.rl, cost
+	}
+
+	// Check for settings override first
+	settingsData, err := m.settings.Get(ctx)
+	if err == nil && settingsData.RateLimitOverrides.Ok() {
+		if override, ok := settingsData.RateLimitOverrides.MustGet()[operationID]; ok {
+			return m.createLimiterFromOverride(operationID, override), overrideCostOrDefault(override.Cost, cost)
+		}
+	}
+
+	// Check for OpenAPI spec config
+	if opConfig := GetOperationConfig(operationID); opConfig != nil {
+		cost = opConfig.Cost
+		
+		// If limit is specified in spec, create a specific limiter
+		if opConfig.Limit > 0 {
+			period := opConfig.Period
+			if period == 0 {
+				period = m.cfg.RateLimitPeriod
+			}
+			
+			limiterKey := operationID
+			return m.factory.GetOrCreateLimiter(limiterKey, opConfig.Limit, period, m.cfg.RateLimitExpire), cost
+		}
+	}
+
+	// Use global limiter with potentially custom cost
+	return m.rl, cost
+}
+
+// createLimiterFromOverride creates a limiter from settings override
+func (m *Middleware) createLimiterFromOverride(operationID string, override settings.RateLimitOverride) rate.Limiter {
+	limit := override.Limit
+	if limit == 0 {
+		limit = m.cfg.RateLimit
+	}
+
+	period := m.cfg.RateLimitPeriod
+	if override.Period != "" {
+		if d, err := time.ParseDuration(override.Period); err == nil {
+			period = d
+		}
+	}
+
+	limiterKey := "override:" + operationID
+	return m.factory.GetOrCreateLimiter(limiterKey, limit, period, m.cfg.RateLimitExpire)
+}
+
+func overrideCostOrDefault(overrideCost, defaultCost int) int {
+	if overrideCost > 0 {
+		return overrideCost
+	}
+	return defaultCost
+}
+
+// getOperationIDFromPath maps a route path to an operation ID
+// This is a simple mapping that could be generated from OpenAPI spec
+func (m *Middleware) getOperationIDFromPath(path, method string) string {
+	// This mapping could be code-generated, but for now we'll use a simple map
+	// The key is method:path
+	key := method + ":" + path
+	
+	// Mapping from route paths to operation IDs
+	// This should ideally be generated from the OpenAPI spec
+	pathToOperation := map[string]string{
+		"POST:/api/auth/email/signup":     "AuthEmailSignup",
+		"POST:/api/auth/password/signup":  "AuthPasswordSignup",
+		"POST:/api/auth/password/reset":   "AuthPasswordReset",
+		// Add more mappings as needed
+	}
+	
+	if opID, ok := pathToOperation[key]; ok {
+		return opID
+	}
+	
+	return ""
 }
 
 type KeyFunc func(r *http.Request) (string, error)

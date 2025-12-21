@@ -36,9 +36,23 @@ type Settings struct {
 	// are exposed to members during the frontend registration and login flows.
 	AuthenticationMode opt.Optional[authentication.Mode]
 
+	// RateLimitOverrides allows overriding per-operation rate limits at runtime.
+	// The map key is the operation ID from the OpenAPI spec.
+	RateLimitOverrides opt.Optional[map[string]RateLimitOverride]
+
 	// Metadata is an arbitrary object which can be used by frontends/clients to
 	// store vendor-specific configuration to control the client implementation.
 	Metadata opt.Optional[map[string]any]
+}
+
+// RateLimitOverride defines runtime overrides for rate limiting
+type RateLimitOverride struct {
+	// Cost is the number of requests this operation counts as (0 means use default from spec)
+	Cost int `json:"cost,omitempty"`
+	// Limit is the maximum number of requests allowed (0 means use default from spec or env)
+	Limit int `json:"limit,omitempty"`
+	// Period is the time window in Go duration format like "1h", "30m", etc (empty means use default)
+	Period string `json:"period,omitempty"`
 }
 
 // Merge will combine "updated" into "s" while overwriting any new values.
