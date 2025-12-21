@@ -84,7 +84,6 @@ func TestPostLocation(t *testing.T) {
 			})
 
 			t.Run("reply_single_page", func(t *testing.T) {
-				t.Parallel()
 				a := assert.New(t)
 				r := require.New(t)
 
@@ -113,7 +112,6 @@ func TestPostLocation(t *testing.T) {
 			})
 
 			t.Run("reply_second_page", func(t *testing.T) {
-				t.Parallel()
 				a := assert.New(t)
 				r := require.New(t)
 
@@ -149,7 +147,6 @@ func TestPostLocation(t *testing.T) {
 			})
 
 			t.Run("not_found", func(t *testing.T) {
-				t.Parallel()
 				randomID := openapi.Identifier(xid.New().String())
 				resp, err := cl.PostLocationGetWithResponse(root, &openapi.PostLocationGetParams{Id: randomID}, session)
 				tests.Status(t, err, resp, http.StatusNotFound)

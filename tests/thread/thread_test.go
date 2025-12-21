@@ -52,8 +52,6 @@ func TestThreads(t *testing.T) {
 			r.Equal(mark.Slugify(cat1name), cat1create.JSON200.Slug)
 
 			t.Run("thread_replies", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -108,8 +106,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("reply_to_reply", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -156,8 +152,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("threads_ordered_by_last_reply", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -234,8 +228,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("threads_ordered_by_last_reply_nulls_first", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -285,8 +277,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("delete_replies", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -320,8 +310,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("link_aggregation", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -392,8 +380,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("thread_without_category", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -468,8 +454,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("uncategorised_threads_in_thread_list", func(t *testing.T) {
-				t.Parallel()
-
 				a := assert.New(t)
 
 				cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
@@ -523,8 +507,6 @@ func TestThreads(t *testing.T) {
 			})
 
 			t.Run("thread_with_russian_slug", func(t *testing.T) {
-				t.Parallel()
-
 				a := assert.New(t)
 
 				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
