@@ -140,6 +140,7 @@ export function ThreadScreen(props: Props) {
           )}
 
           <ReplyList
+            initialSession={props.initialSession}
             thread={thread}
             currentPage={data.thread.replies.current_page}
           />

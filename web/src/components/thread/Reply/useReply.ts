@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Reply, Thread } from "src/api/openapi-schema";
+import { Account, Reply, Thread } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useThreadMutations } from "@/lib/thread/mutation";
@@ -14,6 +14,7 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
+  initialSession?: Account;
   thread: Thread;
   reply: Reply;
   currentPage?: number;

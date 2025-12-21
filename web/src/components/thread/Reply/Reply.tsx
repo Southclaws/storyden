@@ -23,7 +23,7 @@ export function Reply(props: Props) {
   const { isEmpty, isEditing, resetKey, form, handlers } = useReply(props);
   const isTargeted = useFragmentScroll(props.reply.id);
 
-  const { thread, reply, currentPage } = props;
+  const { initialSession, thread, reply, currentPage } = props;
 
   return (
     <CardBox
@@ -95,7 +95,7 @@ export function Reply(props: Props) {
         />
       </styled.form>
 
-      <ReactList thread={thread} reply={reply} currentPage={currentPage} />
+      <ReactList initialSession={initialSession} thread={thread} reply={reply} currentPage={currentPage} />
     </CardBox>
   );
 }

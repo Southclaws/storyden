@@ -9,6 +9,7 @@ import { useThreadMutations } from "@/lib/thread/mutation";
 export const REACTION_THROTTLE = 180;
 
 export type Props = {
+  initialSession?: Account;
   thread: Thread;
   reply: Reply;
   currentPage?: number;
@@ -41,8 +42,8 @@ function groupReactions(
   );
 }
 
-export function useReactionList({ thread, reply, currentPage }: Props) {
-  const session = useSession();
+export function useReactionList({ initialSession, thread, reply, currentPage }: Props) {
+  const session = useSession(initialSession);
   const { reactionAdd, reactionRemove, revalidate } = useThreadMutations(
     thread,
     currentPage,
