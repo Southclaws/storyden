@@ -250,3 +250,93 @@ func TestThreadCacheWithReplies(t *testing.T) {
 		}))
 	}))
 }
+
+func TestThreadCacheWithReplyUpdate(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+		cacheStore cache.Store,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			acc1ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			acc2ctx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			session1 := sh.WithSession(acc1ctx)
+			session2 := sh.WithSession(acc2ctx)
+
+			catName := "Category " + uuid.NewString()
+
+			catCreate, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Colour:      "#123456",
+				Description: "reply update cache test",
+				Name:        catName,
+			}, session1)
+			tests.Ok(t, err, catCreate)
+
+			threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>test thread for reply update</p>").Ptr(),
+				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Title:      "Thread cache test - reply update",
+			}, session1)
+			tests.Ok(t, err, threadCreate)
+
+			threadID := xid.ID(openapi.ParseID(threadCreate.JSON200.Id))
+			cacheKey := "thread:last-modified:" + threadID.String()
+
+			replyCreate, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+				Body: "<p>Original reply content</p>",
+			}, session2)
+			tests.Ok(t, err, replyCreate)
+			replyID := replyCreate.JSON200.Id
+
+			threadGet1, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
+			tests.Ok(t, err, threadGet1)
+			r.Len(threadGet1.JSON200.Replies.Replies, 1)
+			a.Equal("<body><p>Original reply content</p></body>", threadGet1.JSON200.Replies.Replies[0].Body)
+			lastModified1Header := threadGet1.HTTPResponse.Header.Get("Last-Modified")
+			r.NotEmpty(lastModified1Header, "Last-Modified header should be present")
+
+			cachedValue1, err := cacheStore.Get(root, cacheKey)
+			r.NoError(err, "cache value should exist")
+			cachedTime1, err := time.Parse(time.RFC3339Nano, cachedValue1)
+			r.NoError(err, "cached time should be parseable")
+
+			threadGet304, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-Modified-Since", lastModified1Header)
+				return nil
+			})
+			tests.Status(t, err, threadGet304, 304)
+
+			updatedBody := "<p>Updated reply content</p>"
+			postUpdate, err := cl.PostUpdateWithResponse(root, replyID, openapi.PostUpdateJSONRequestBody{
+				Body: &updatedBody,
+			}, session2)
+			tests.Ok(t, err, postUpdate)
+
+			cachedValue2, err := cacheStore.Get(root, cacheKey)
+			r.NoError(err, "cache value should still exist after reply update")
+			cachedTime2, err := time.Parse(time.RFC3339Nano, cachedValue2)
+			r.NoError(err, "cached time should be parseable")
+
+			a.True(cachedTime2.After(cachedTime1),
+				"cache should be updated IMMEDIATELY after reply update (cachedTime1: %v, cachedTime2: %v)", cachedTime1, cachedTime2)
+
+			threadGet200, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-Modified-Since", lastModified1Header)
+				return nil
+			})
+			tests.Ok(t, err, threadGet200)
+			r.NotNil(threadGet200.JSON200, "should return 200 with body after cache invalidation from reply update")
+			r.Len(threadGet200.JSON200.Replies.Replies, 1, "thread should have the reply")
+			a.Equal("<body><p>Updated reply content</p></body>", threadGet200.JSON200.Replies.Replies[0].Body)
+		}))
+	}))
+}
