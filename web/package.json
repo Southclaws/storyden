@@ -71,6 +71,7 @@
     "@pandacss/dev": "^1.4.3",
     "@pandacss/studio": "^1.4.3",
     "@pandacss/types": "^1.4.3",
+    "@playwright/test": "^1.57.0",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/chroma-js": "^3.1.1",

@@ -7,9 +7,10 @@ import { WEB_ADDRESS } from "src/config";
 const cookieName = "storyden-session";
 
 export async function GET() {
-  revalidateTag("accounts", "max");
-  revalidatePath("/", "layout");
   (await cookies()).delete(cookieName);
+
+  revalidateTag("accounts", { expire: 0 });
+  revalidatePath("/", "layout");
 
   return NextResponse.redirect(WEB_ADDRESS, {
     headers: {

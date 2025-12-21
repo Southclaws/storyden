@@ -46,14 +46,8 @@ jobs:
         with:
           go-version: "1.25"
           cache: true
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          cache-dependency-path: "**/go.sum"
+
       - run: go build ./cmd/backend
       - run: go run ./cmd/migrate
       - run: go test -p 4 ./...
@@ -66,14 +60,7 @@ jobs:
         with:
           go-version: "1.25"
           cache: true
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          cache-dependency-path: "**/go.sum"
       - run: go build ./cmd/backend
       - run: go run ./cmd/migrate
       - run: go test -p 4 ./...

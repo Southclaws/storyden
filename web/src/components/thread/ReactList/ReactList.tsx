@@ -201,6 +201,7 @@ function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
           variant="subtle"
           borderRadius="md"
           color="fg.muted"
+          aria-label="Add reaction"
         >
           <ReactionAddIcon />
         </IconButton>

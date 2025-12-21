@@ -8,7 +8,8 @@ vars:
     sh: go run ./version.go
 
   CURRENT_VERSION:
-    sh: git describe --tags --abbrev=0
+    # NOTE: In CI this doesn't work so we leave a default value so `task` works.
+    sh: git describe --tags --abbrev=0 || echo "NO_VERSION_SET_DO_NOT_PROCEED"
 
 tasks:
   version:
@@ -34,6 +35,10 @@ tasks:
       # Working directory must be clean (no staged or unstaged changes)
       - sh: '[ -z "$(git status --porcelain)" ]'
         msg: "Working directory must be clean (no uncommitted changes)"
+
+      # Must have a current version set
+      - sh: '[ "{{.CURRENT_VERSION}}" != "NO_VERSION_SET_DO_NOT_PROCEED" ]'
+        msg: "CURRENT_VERSION is invalid (no git tags found). Refusing to run release."
 
     cmds:
       - go run ./version.go -w
@@ -127,6 +132,34 @@ tasks:
   seed:
     cmds:
       - go run ./cmd/seed
+
+  # -
+  # End to end tests
+  # -
+
+  test:e2e:ui:
+    cmds:
+      - go run ./cmd/e2etest --ui
+
+  test:e2e:
+    cmds:
+      - go run ./cmd/e2etest
+
+  test:e2e:rebuild:
+    cmds:
+      - mkdir -p ./tests/e2e-data || true
+      - go build -o ./tests/e2e-data/backend.exe ./cmd/backend
+      - cd web ; yarn build ; cd ..
+
+  test:e2e:fresh:
+    deps: [test:e2e:rebuild]
+    cmds:
+      - go run ./cmd/e2etest --ui
+
+  test:e2e:ci:
+    deps: [test:e2e:rebuild]
+    cmds:
+      - go run ./cmd/e2etest
 
   # -
   # Container images
