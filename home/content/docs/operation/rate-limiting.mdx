@@ -1,0 +1,186 @@
+---
+title: Rate Limiting
+description: Configure rate limits to protect your Storyden instance from abuse
+---
+
+Storyden includes a flexible rate limiting system that helps protect your instance from abuse while allowing legitimate usage. Rate limits can be configured globally via environment variables and customized per-operation using the OpenAPI specification or runtime settings.
+
+## How Rate Limiting Works
+
+Rate limiting uses a sliding window counter algorithm to track requests from each client (identified by IP address). The system supports:
+
+- **Global rate limits**: Applied to all requests by default
+- **Per-operation rate limits**: Specific limits for individual API endpoints
+- **Runtime overrides**: Dynamically adjust limits without restarting the service
+
+### Client Identification
+
+Clients are identified by their IP address, with support for proxy headers:
+- `CF-Connecting-IP` (Cloudflare)
+- `X-Real-IP`
+- `True-Client-IP`
+
+## Global Configuration
+
+Set these environment variables to configure global rate limiting:
+
+```bash
+# Maximum number of requests per period
+RATE_LIMIT=1000
+
+# Time window for the limit (Go duration format)
+RATE_LIMIT_PERIOD=1h
+
+# How long to keep rate limit counters in cache
+RATE_LIMIT_EXPIRE=1m
+```
+
+## Per-Operation Rate Limits
+
+You can configure specific rate limits for individual API operations in the OpenAPI specification using the `x-storyden` extension:
+
+```yaml
+/auth/email/signup:
+  post:
+    operationId: AuthEmailSignup
+    x-storyden:
+      rateLimit:
+        cost: 10      # Each request counts as 10 requests
+        limit: 10     # Maximum 10 requests
+        period: 1h    # Within 1 hour
+```
+
+### Rate Limit Properties
+
+- **cost**: How many "requests" this operation counts as (default: 1)
+- **limit**: Maximum requests allowed in the period (0 = use global default)
+- **period**: Time window as a Go duration (e.g., "1h", "30m", "24h")
+
+### Code Generation
+
+After modifying rate limit configurations in the OpenAPI spec, regenerate the code:
+
+```bash
+task generate
+```
+
+This updates the generated rate limit configuration and route mappings.
+
+## Runtime Overrides
+
+Administrators can override rate limits at runtime through the settings API without needing to restart the service or modify the OpenAPI specification.
+
+### Structure
+
+Rate limit overrides are stored in the `RateLimitOverrides` field of the settings:
+
+```json
+{
+  "rateLimitOverrides": {
+    "AuthEmailSignup": {
+      "cost": 20,
+      "limit": 5,
+      "period": "2h"
+    }
+  }
+}
+```
+
+### Priority
+
+Rate limit configuration is applied in this order (highest to lowest priority):
+
+1. Runtime overrides from database settings
+2. Per-operation configuration from OpenAPI spec
+3. Global defaults from environment variables
+
+## Examples
+
+### Strict Email Signup Limits
+
+To heavily rate limit email signups (which can be abused for spam):
+
+```yaml
+x-storyden:
+  rateLimit:
+    cost: 10
+    limit: 10
+    period: 1h
+```
+
+This allows only 10 signup attempts per hour per IP address.
+
+### Lenient Read Operations
+
+For read-heavy operations like listing threads:
+
+```yaml
+x-storyden:
+  rateLimit:
+    cost: 1
+    limit: 1000
+    period: 1h
+```
+
+### Expensive AI Operations
+
+For operations that use AI/LLM features:
+
+```yaml
+x-storyden:
+  rateLimit:
+    cost: 50
+    limit: 100
+    period: 1h
+```
+
+This effectively allows only 2 AI requests per hour (100 / 50 = 2).
+
+## Monitoring
+
+Rate limit information is returned in response headers:
+
+- `X-RateLimit-Limit`: Maximum requests allowed
+- `X-RateLimit-Remaining`: Requests remaining in current window
+- `X-RateLimit-Reset`: Time when the rate limit resets (RFC1123 format)
+- `Retry-After`: When rate limited, indicates when to retry
+
+## Best Practices
+
+1. **Start Conservative**: Begin with stricter limits and relax them based on observed usage
+2. **Protect Sensitive Operations**: Apply stricter limits to authentication, registration, and write operations
+3. **Monitor Usage**: Track rate limit headers to understand typical usage patterns
+4. **Use Costs Wisely**: Set higher costs for expensive operations (AI, heavy queries)
+5. **Consider Caching**: Use `CACHE_PROVIDER=redis` for distributed rate limiting across multiple instances
+
+## Distributed Deployments
+
+For multi-instance deployments, configure Redis as the cache provider:
+
+```bash
+CACHE_PROVIDER=redis
+REDIS_URL=redis://user:password@localhost:6379
+```
+
+This ensures rate limits are shared across all instances of your Storyden deployment.
+
+## Troubleshooting
+
+### Rate Limits Not Applied
+
+1. Ensure code generation has been run: `task generate`
+2. Check that the operation ID in OpenAPI matches the generated route mapping
+3. Verify the middleware is properly initialized with settings repository access
+
+### Different Limits Than Expected
+
+Check the priority order:
+1. Runtime settings override spec configuration
+2. Spec configuration overrides global defaults
+3. Missing configuration falls back to global defaults
+
+### Rate Limited Unexpectedly
+
+- Check `X-RateLimit-*` headers in responses
+- Verify IP address detection is working correctly
+- Consider if you're behind a proxy that's not sending the correct headers

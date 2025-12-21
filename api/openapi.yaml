@@ -414,6 +414,11 @@ paths:
       operationId: AuthPasswordSignup
       description: Register a new account with a username and password.
       tags: [auth]
+      x-storyden:
+        rateLimit:
+          cost: 5
+          limit: 20
+          period: 1h
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
@@ -468,6 +473,11 @@ paths:
         Complete a password-reset flow using a token that was provided to the
         member via a reset request operation such as `AuthEmailPasswordReset`.
       tags: [auth]
+      x-storyden:
+        rateLimit:
+          cost: 5
+          limit: 10
+          period: 1h
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordReset" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -536,6 +546,11 @@ paths:
         Given that this is an unauthenticated endpoint that triggers an email to
         be sent to any public address, it MUST be heavily rate limited.
       tags: [auth]
+      x-storyden:
+        rateLimit:
+          cost: 10
+          limit: 10
+          period: 1h
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
       responses:
