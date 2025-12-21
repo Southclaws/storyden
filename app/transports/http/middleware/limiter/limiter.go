@@ -61,6 +61,10 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 			}
 
 			// Try to get operation ID from Echo context
+			// Note: This relies on Echo storing its context with a "echo" key.
+			// This is a known pattern in Echo middleware, but could break if Echo's
+			// internal implementation changes. Alternative approaches would require
+			// modifying the generated server code or using Echo-specific middleware.
 			var operationID string
 			if echoCtx, ok := r.Context().Value("echo").(echo.Context); ok {
 				// Get the route path which we'll use as a lookup key
