@@ -5,6 +5,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -161,7 +162,8 @@ func overrideCostOrDefault(overrideCost, defaultCost int) int {
 
 // getOperationIDFromPath maps a route path to an operation ID using generated mapping
 func (m *Middleware) getOperationIDFromPath(path, method string) string {
-	return GetOperationIDFromRoute(method, path)
+	// Methods in the generated map are lowercase
+	return GetOperationIDFromRoute(strings.ToLower(method), path)
 }
 
 type KeyFunc func(r *http.Request) (string, error)
