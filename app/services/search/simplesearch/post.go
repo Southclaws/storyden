@@ -7,12 +7,15 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 )
 
@@ -37,6 +40,18 @@ func (s *postSearcher) Search(ctx context.Context, query string, p pagination.Pa
 		}
 
 		o = append(o, post_search.WithKinds(ks...))
+	})
+
+	opts.Authors.Call(func(value []account.AccountID) {
+		o = append(o, post_search.WithAuthors(value...))
+	})
+
+	opts.Categories.Call(func(value []category.CategoryID) {
+		o = append(o, post_search.WithCategories(value...))
+	})
+
+	opts.Tags.Call(func(value []tag_ref.Name) {
+		o = append(o, post_search.WithTags(value...))
 	})
 
 	rs, err := s.post_search.Search(ctx, p, o...)

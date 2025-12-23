@@ -28,13 +28,16 @@ import (
 )
 
 type Document struct {
-	ID          string `json:"id"`
-	Kind        string `json:"kind"`
-	Name        string `json:"name"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
-	Content     string `json:"content"`
-	CreatedAt   int64  `json:"created_at"`
+	ID          string   `json:"id"`
+	Kind        string   `json:"kind"`
+	Name        string   `json:"name"`
+	Slug        string   `json:"slug"`
+	Description string   `json:"description"`
+	Content     string   `json:"content"`
+	CreatedAt   int64    `json:"created_at"`
+	AuthorID    string   `json:"author_id"`
+	CategoryID  string   `json:"category_id"`
+	Tags        []string `json:"tags"`
 }
 
 type BleveSearcher struct {
@@ -146,17 +149,69 @@ func (s *BleveSearcher) processResults(ctx context.Context, result *bleve.Search
 }
 
 func (s *BleveSearcher) buildSearchQuery(q string, opts searcher.Options) query.Query {
-	textQuery := bleve.NewMatchQuery(q)
+	var textQuery query.Query
+	if strings.TrimSpace(q) == "" {
+		textQuery = bleve.NewMatchAllQuery()
+	} else {
+		matchName := bleve.NewMatchQuery(q)
+		matchName.SetField("name")
+		matchSlug := bleve.NewMatchQuery(q)
+		matchSlug.SetField("slug")
+		matchDescription := bleve.NewMatchQuery(q)
+		matchDescription.SetField("description")
+		matchContent := bleve.NewMatchQuery(q)
+		matchContent.SetField("content")
+
+		textQuery = bleve.NewDisjunctionQuery(
+			matchName, matchSlug, matchDescription, matchContent,
+		)
+	}
+
+	filters := []query.Query{}
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
 		kindQueries := make([]query.Query, 0, len(kinds))
 		for _, k := range kinds {
-			kq := bleve.NewMatchQuery(k.String())
+			kq := bleve.NewTermQuery(k.String())
 			kq.SetField("kind")
 			kindQueries = append(kindQueries, kq)
 		}
-		kindQuery := bleve.NewDisjunctionQuery(kindQueries...)
-		return bleve.NewConjunctionQuery(textQuery, kindQuery)
+		filters = append(filters, bleve.NewDisjunctionQuery(kindQueries...))
+	}
+
+	if authors, ok := opts.Authors.Get(); ok && len(authors) > 0 {
+		authorQueries := make([]query.Query, 0, len(authors))
+		for _, a := range authors {
+			aq := bleve.NewTermQuery(a.String())
+			aq.SetField("author_id")
+			authorQueries = append(authorQueries, aq)
+		}
+		filters = append(filters, bleve.NewDisjunctionQuery(authorQueries...))
+	}
+
+	if categories, ok := opts.Categories.Get(); ok && len(categories) > 0 {
+		categoryQueries := make([]query.Query, 0, len(categories))
+		for _, c := range categories {
+			cq := bleve.NewTermQuery(c.String())
+			cq.SetField("category_id")
+			categoryQueries = append(categoryQueries, cq)
+		}
+		filters = append(filters, bleve.NewDisjunctionQuery(categoryQueries...))
+	}
+
+	if tags, ok := opts.Tags.Get(); ok && len(tags) > 0 {
+		tagQueries := make([]query.Query, 0, len(tags))
+		for _, t := range tags {
+			tq := bleve.NewTermQuery(t.String())
+			tq.SetField("tags")
+			tagQueries = append(tagQueries, tq)
+		}
+		filters = append(filters, bleve.NewConjunctionQuery(tagQueries...))
+	}
+
+	if len(filters) > 0 {
+		allQueries := append([]query.Query{textQuery}, filters...)
+		return bleve.NewConjunctionQuery(allQueries...)
 	}
 
 	return textQuery
@@ -174,6 +229,8 @@ func (s *BleveSearcher) buildMatchQuery(q string, opts searcher.Options) query.Q
 		textQuery.AddShould(pq)
 	}
 
+	filters := []query.Query{}
+
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
 		kindQueries := make([]query.Query, 0, len(kinds))
 		for _, k := range kinds {
@@ -181,8 +238,42 @@ func (s *BleveSearcher) buildMatchQuery(q string, opts searcher.Options) query.Q
 			kq.SetField("kind")
 			kindQueries = append(kindQueries, kq)
 		}
-		kindQuery := bleve.NewDisjunctionQuery(kindQueries...)
-		return bleve.NewConjunctionQuery(textQuery, kindQuery)
+		filters = append(filters, bleve.NewDisjunctionQuery(kindQueries...))
+	}
+
+	if authors, ok := opts.Authors.Get(); ok && len(authors) > 0 {
+		authorQueries := make([]query.Query, 0, len(authors))
+		for _, a := range authors {
+			aq := bleve.NewMatchQuery(a.String())
+			aq.SetField("author_id")
+			authorQueries = append(authorQueries, aq)
+		}
+		filters = append(filters, bleve.NewDisjunctionQuery(authorQueries...))
+	}
+
+	if categories, ok := opts.Categories.Get(); ok && len(categories) > 0 {
+		categoryQueries := make([]query.Query, 0, len(categories))
+		for _, c := range categories {
+			cq := bleve.NewMatchQuery(c.String())
+			cq.SetField("category_id")
+			categoryQueries = append(categoryQueries, cq)
+		}
+		filters = append(filters, bleve.NewDisjunctionQuery(categoryQueries...))
+	}
+
+	if tags, ok := opts.Tags.Get(); ok && len(tags) > 0 {
+		tagQueries := make([]query.Query, 0, len(tags))
+		for _, t := range tags {
+			tq := bleve.NewMatchQuery(t.String())
+			tq.SetField("tags")
+			tagQueries = append(tagQueries, tq)
+		}
+		filters = append(filters, bleve.NewConjunctionQuery(tagQueries...))
+	}
+
+	if len(filters) > 0 {
+		allQueries := append([]query.Query{textQuery}, filters...)
+		return bleve.NewConjunctionQuery(allQueries...)
 	}
 
 	return textQuery
@@ -232,6 +323,24 @@ func (s *BleveSearcher) Index(ctx context.Context, item datagraph.Item) error {
 		Description: item.GetDesc(),
 		Content:     item.GetContent().Plaintext(), // We index plaintext only.
 		CreatedAt:   item.GetCreated().Unix(),
+	}
+
+	if v, ok := item.(datagraph.WithAuthor); ok {
+		if v.GetAuthor().IsNil() {
+			return fault.New("index: item has zero-value author ID")
+		}
+		doc.AuthorID = v.GetAuthor().String()
+	}
+
+	if v, ok := item.(datagraph.WithCategory); ok {
+		if v.GetCategory().IsNil() {
+			return fault.New("index: item has zero-value category ID")
+		}
+		doc.CategoryID = v.GetCategory().String()
+	}
+
+	if v, ok := item.(datagraph.WithTagNames); ok {
+		doc.Tags = v.GetTags()
 	}
 
 	err := s.client.Index(item.GetID().String(), doc)
@@ -319,6 +428,24 @@ func createIndexMapping() mapping.IndexMapping {
 	createdAtFieldMapping.Store = true
 	createdAtFieldMapping.Index = true
 	docMapping.AddFieldMappingsAt("created_at", createdAtFieldMapping)
+
+	authorIDFieldMapping := bleve.NewTextFieldMapping()
+	authorIDFieldMapping.Store = true
+	authorIDFieldMapping.Index = true
+	authorIDFieldMapping.Analyzer = "keyword"
+	docMapping.AddFieldMappingsAt("author_id", authorIDFieldMapping)
+
+	categoryIDFieldMapping := bleve.NewTextFieldMapping()
+	categoryIDFieldMapping.Store = true
+	categoryIDFieldMapping.Index = true
+	categoryIDFieldMapping.Analyzer = "keyword"
+	docMapping.AddFieldMappingsAt("category_id", categoryIDFieldMapping)
+
+	tagsFieldMapping := bleve.NewTextFieldMapping()
+	tagsFieldMapping.Store = true
+	tagsFieldMapping.Index = true
+	tagsFieldMapping.Analyzer = "keyword"
+	docMapping.AddFieldMappingsAt("tags", tagsFieldMapping)
 
 	indexMapping.DefaultMapping = docMapping
 

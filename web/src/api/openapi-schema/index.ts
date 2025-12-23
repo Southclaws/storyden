@@ -156,6 +156,8 @@ export * from "./commonPropertiesMisc";
 export * from "./credentialRequestOptions";
 export * from "./datagraphAskOKResponse";
 export * from "./datagraphAskParams";
+export * from "./datagraphAuthorQueryParameter";
+export * from "./datagraphCategoryQueryParameter";
 export * from "./datagraphItem";
 export * from "./datagraphItemKind";
 export * from "./datagraphItemList";

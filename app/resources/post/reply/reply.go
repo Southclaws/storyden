@@ -67,6 +67,7 @@ func (p Reply) String() string {
 
 func (r *Reply) GetCreated() time.Time { return r.CreatedAt }
 func (r *Reply) GetUpdated() time.Time { return r.UpdatedAt }
+func (r *Reply) GetAuthor() xid.ID     { return xid.ID(r.Author.ID) }
 
 func Map(m *ent.Post) (*Reply, error) {
 	authorEdge, err := m.Edges.AuthorOrErr()

@@ -4,13 +4,18 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/account"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 //go:generate go run -mod=mod github.com/Southclaws/enumerator
@@ -68,8 +73,43 @@ func WithAuthorHandle(handle string) Filter {
 	return func(pq *ent.PostQuery) {
 		pq.Where(
 			ent_post.HasAuthorWith(
-				account.Handle(handle),
+				ent_account.Handle(handle),
 			),
 		)
+	}
+}
+
+func WithAuthors(ids ...account.AccountID) Filter {
+	return func(pq *ent.PostQuery) {
+		if len(ids) == 0 {
+			return
+		}
+		pq.Where(ent_post.AccountPostsIn(dt.Map(ids, func(id account.AccountID) xid.ID {
+			return xid.ID(id)
+		})...))
+	}
+}
+
+func WithCategories(ids ...category.CategoryID) Filter {
+	return func(pq *ent.PostQuery) {
+		if len(ids) == 0 {
+			return
+		}
+		pq.Where(ent_post.CategoryIDIn(dt.Map(ids, func(id category.CategoryID) xid.ID {
+			return xid.ID(id)
+		})...))
+	}
+}
+
+func WithTags(names ...tag_ref.Name) Filter {
+	return func(pq *ent.PostQuery) {
+		if len(names) == 0 {
+			return
+		}
+		predicates := make([]predicate.Post, len(names))
+		for i, name := range names {
+			predicates[i] = ent_post.HasTagsWith(ent_tag.NameEQ(name.String()))
+		}
+		pq.Where(ent_post.And(predicates...))
 	}
 }

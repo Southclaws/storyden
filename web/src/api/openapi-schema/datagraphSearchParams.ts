@@ -7,9 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.12-canary
  */
+import type { DatagraphAuthorQueryParameter } from "./datagraphAuthorQueryParameter";
+import type { DatagraphCategoryQueryParameter } from "./datagraphCategoryQueryParameter";
 import type { DatagraphKindQueryParameter } from "./datagraphKindQueryParameter";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { RequiredSearchQueryParameter } from "./requiredSearchQueryParameter";
+import type { TagNameListQueryParamParameter } from "./tagNameListQueryParamParameter";
 
 export type DatagraphSearchParams = {
   /**
@@ -20,6 +23,22 @@ export type DatagraphSearchParams = {
    * Datagraph item kind query.
    */
   kind?: DatagraphKindQueryParameter;
+  /**
+ * Datagraph item author query. When set, only items authored by the
+specified account IDs will be returned.
+
+ */
+  authors?: DatagraphAuthorQueryParameter;
+  /**
+ * Datagraph item category query. When set, only items assigned to the
+specified category slugs will be returned.
+
+ */
+  categories?: DatagraphCategoryQueryParameter;
+  /**
+   * Tags to filter by.
+   */
+  tags?: TagNameListQueryParamParameter;
   /**
    * Pagination query parameters.
    */

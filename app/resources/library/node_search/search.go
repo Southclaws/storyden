@@ -8,12 +8,17 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 type Search interface {
@@ -24,6 +29,8 @@ type query struct {
 	nameContains    string
 	contentContains string
 	visibility      []visibility.Visibility
+	authors         []account.AccountID
+	tags            []tag_ref.Name
 }
 
 type Option func(*query)
@@ -46,6 +53,18 @@ func WithVisibility(v []visibility.Visibility) Option {
 	}
 }
 
+func WithAuthors(ids ...account.AccountID) Option {
+	return func(q *query) {
+		q.authors = ids
+	}
+}
+
+func WithTags(names ...tag_ref.Name) Option {
+	return func(q *query) {
+		q.tags = names
+	}
+}
+
 type service struct {
 	db  *ent.Client
 	raw *sqlx.DB
@@ -65,7 +84,7 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		fn(q)
 	}
 
-	predicate := node.And(
+	baseQuery := s.db.Node.Query().Where(
 		node.Or(
 			node.NameContainsFold(q.nameContains),
 			node.ContentContainsFold(q.contentContains),
@@ -74,13 +93,25 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		node.DeletedAtIsNil(),
 	)
 
-	total, err := s.db.Node.Query().Where(predicate).Count(ctx)
+	if len(q.authors) > 0 {
+		authorIDs := dt.Map(q.authors, func(id account.AccountID) xid.ID {
+			return xid.ID(id)
+		})
+		baseQuery = baseQuery.Where(node.HasOwnerWith(ent_account.IDIn(authorIDs...)))
+	}
+
+	if len(q.tags) > 0 {
+		for _, tag := range q.tags {
+			baseQuery = baseQuery.Where(node.HasTagsWith(ent_tag.NameEQ(tag.String())))
+		}
+	}
+
+	total, err := baseQuery.Count(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	query := s.db.Node.Query().
-		Where(predicate).
+	query := baseQuery.
 		WithOwner().
 		WithNodes(func(cq *ent.NodeQuery) {
 			cq.WithOwner()

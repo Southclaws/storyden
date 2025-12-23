@@ -289,8 +289,56 @@ func TestBleveThreadSearch(t *testing.T) {
 			}, adminSession)
 			tests.Ok(t, err, threadAkan)
 
+			ctx1, authorOne := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			session1 := sh.WithSession(ctx1)
+			ctx2, authorTwo := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			session2 := sh.WithSession(ctx2)
+
+			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Name:   "Tech" + uuid.NewString(),
+				Colour: "#FF0000",
+			}, adminSession)
+			tests.Ok(t, err, cat1)
+
+			cat2, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Name:   "Food" + uuid.NewString(),
+				Colour: "#00FF00",
+			}, adminSession)
+			tests.Ok(t, err, cat2)
+
+			hot := "<p>searchable keyword content</p>"
+
+			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Title:      "Thread by Baldur in Tech with sharing",
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Tags:       &[]openapi.TagName{"sharing"},
+			}, session1)
+			tests.Ok(t, err, t1)
+
+			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Title:      "Thread by Loki in Food with tips",
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat2.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Tags:       &[]openapi.TagName{"tips"},
+			}, session2)
+			tests.Ok(t, err, t2)
+
+			t3, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Title:      "Thread by Baldur in Tech with sharing and tips",
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Tags:       &[]openapi.TagName{"sharing", "tips"},
+			}, session1)
+			tests.Ok(t, err, t3)
+
 			err = idx.ReindexAll(root)
 			r.NoError(err, "failed to reindex all items")
+
+			threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 
 			t.Run("exact_match", func(t *testing.T) {
 				r := require.New(t)
@@ -716,6 +764,105 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				a.GreaterOrEqual(len(resp.JSON200.Items), 1, "should find Akan thread")
 				r.NotNil(findThreadItem(resp.JSON200.Items, threadAkan.JSON200.Id), "should find the Akan thread about proverbs")
+			})
+
+			// -
+			// Filtering tests
+			// -
+
+			t.Run("filter_by_author", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:       "keyword",
+					Kind:    &threadKind,
+					Authors: &[]openapi.Identifier{openapi.Identifier(authorOne.ID.String())},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
+			})
+
+			t.Run("filter_by_category", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:          "keyword",
+					Kind:       &threadKind,
+					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
+			})
+
+			t.Run("filter_by_single_tag", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    "keyword",
+					Kind: &threadKind,
+					Tags: &[]openapi.TagName{"sharing"},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
+			})
+
+			t.Run("filter_by_multiple_tags_AND", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    "keyword",
+					Kind: &threadKind,
+					Tags: &[]openapi.TagName{"sharing", "tips"},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
+			})
+
+			t.Run("filter_by_multiple_authors_OR", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    "keyword",
+					Kind: &threadKind,
+					Authors: &[]openapi.Identifier{
+						openapi.Identifier(authorOne.ID.String()),
+						openapi.Identifier(authorTwo.ID.String()),
+					},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+			})
+
+			t.Run("filter_combined_author_AND_category_AND_tags", func(t *testing.T) {
+				r := require.New(t)
+
+				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:          "keyword",
+					Kind:       &threadKind,
+					Authors:    &[]openapi.Identifier{openapi.Identifier(authorOne.ID.String())},
+					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
+					Tags:       &[]openapi.TagName{"sharing"},
+				}, session1)
+				tests.Ok(t, err, resp)
+
+				r.NotNil(findThreadItem(resp.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findThreadItem(resp.JSON200.Items, t3.JSON200.Id))
+				r.Nil(findThreadItem(resp.JSON200.Items, t2.JSON200.Id))
 			})
 
 			// -

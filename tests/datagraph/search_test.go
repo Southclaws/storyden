@@ -307,3 +307,198 @@ func coerceDatagraphItem(i openapi.DatagraphItem) string {
 
 	return v.Ref.ID
 }
+
+func TestSearchFilters(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, &config.Config{}, e2e.Setup(), fx.Invoke(func(
+		root context.Context,
+		lc fx.Lifecycle,
+		cfg config.Config,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		if cfg.SemdexProvider == "" {
+			return
+		}
+
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+			ctx1, acc1 := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			session1 := sh.WithSession(ctx1)
+			ctx2, acc2 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			session2 := sh.WithSession(ctx2)
+
+			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: "Tech" + uuid.NewString(), Colour: "#000"}, adminSession)
+			tests.Ok(t, err, cat1)
+			cat2, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: "Food" + uuid.NewString(), Colour: "#111"}, adminSession)
+			tests.Ok(t, err, cat2)
+
+			published := openapi.Published
+			hot := "<p>keyword</p>"
+
+			// Create threads with different authors, categories, and tags
+			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Title:      "thread by baldur in tech with sharing",
+				Tags:       &[]openapi.TagName{"sharing"},
+			}, session1)
+			tests.Ok(t, err, t1)
+
+			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat2.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Title:      "thread by loki in food with tips",
+				Tags:       &[]openapi.TagName{"tips"},
+			}, session2)
+			tests.Ok(t, err, t2)
+
+			t3, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
+				Title:      "thread by baldur in tech with sharing and tips",
+				Tags:       &[]openapi.TagName{"sharing", "tips"},
+			}, session1)
+			tests.Ok(t, err, t3)
+
+			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				Name:       "node by odin with sharing" + uuid.NewString(),
+				Content:    &hot,
+				Visibility: &published,
+				Tags:       &[]openapi.TagName{"sharing"},
+			}, adminSession)
+			tests.Ok(t, err, n1)
+
+			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				Name:       "node by baldur with tips" + uuid.NewString(),
+				Content:    &hot,
+				Visibility: &published,
+				Tags:       &[]openapi.TagName{"tips"},
+			}, session1)
+			tests.Ok(t, err, n2)
+
+			t.Run("filter_by_author", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for threads by Baldur
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:       "keyword",
+					Authors: &[]openapi.Identifier{openapi.Identifier(acc1.ID.String())},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should find t1 and t3 (both by Baldur)
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, n2.JSON200.Id))
+				// Should not find t2 (by Loki) or n1 (by Odin)
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n1.JSON200.Id))
+			})
+
+			t.Run("filter_by_category", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for threads in Tech category
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:          "keyword",
+					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should find t1 and t3 (both in Tech)
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				// Should not find t2 (in Food)
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+			})
+
+			t.Run("filter_by_single_tag", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for items with "sharing" tag
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    "keyword",
+					Tags: &[]openapi.TagName{"sharing"},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should find t1, t3, and n1 (all have "sharing")
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, n1.JSON200.Id))
+				// Should not find t2 or n2 (don't have "sharing")
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n2.JSON200.Id))
+			})
+
+			t.Run("filter_by_multiple_tags_AND", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for items with BOTH "sharing" AND "tips" tags
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:    "keyword",
+					Tags: &[]openapi.TagName{"sharing", "tips"},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should only find t3 (has both tags)
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				// Should not find t1 (only "sharing"), t2 (only "tips"), n1 (only "sharing"), n2 (only "tips")
+				r.Nil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n1.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n2.JSON200.Id))
+			})
+
+			t.Run("filter_by_multiple_authors_OR", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for threads by Baldur OR Loki
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q: "keyword",
+					Authors: &[]openapi.Identifier{
+						openapi.Identifier(acc1.ID.String()),
+						openapi.Identifier(acc2.ID.String()),
+					},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should find t1, t2, t3 (by Baldur or Loki) and n2 (by Baldur)
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t2.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, n2.JSON200.Id))
+				// Should not find n1 (by Odin)
+				r.Nil(findItem(search.JSON200.Items, n1.JSON200.Id))
+			})
+
+			t.Run("filter_combined_author_AND_category_AND_tags", func(t *testing.T) {
+				r := require.New(t)
+
+				// Search for: Baldur AND Tech category AND "sharing" tag
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q:          "keyword",
+					Authors:    &[]openapi.Identifier{openapi.Identifier(acc1.ID.String())},
+					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
+					Tags:       &[]openapi.TagName{"sharing"},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				// Should find t1 and t3 (both match all criteria)
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.NotNil(findItem(search.JSON200.Items, t3.JSON200.Id))
+				// Should not find t2 (wrong author and category), n1 (no category), n2 (wrong tag)
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n1.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, n2.JSON200.Id))
+			})
+		}))
+	}))
+}
