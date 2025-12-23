@@ -34,6 +34,9 @@ type Document struct {
 	Description string
 	Content     string
 	CreatedAt   int64
+	AuthorID    string
+	CategoryID  string
+	Tags        []string
 }
 
 type SearchResult struct {
@@ -131,6 +134,9 @@ func (c *RedisSearcher) createIndex(ctx context.Context) error {
 		FieldName("description").Text().Nostem().
 		FieldName("content").Text().Nostem().
 		FieldName("created_at").Numeric().Sortable().
+		FieldName("author_id").Tag().
+		FieldName("category_id").Tag().
+		FieldName("tags").Tag().Separator(",").
 		Build()
 
 	err := c.client.Do(ctx, cmd).Error()
@@ -253,7 +259,7 @@ func (s *RedisSearcher) MatchFast(ctx context.Context, q string, limit int, opts
 	return matches, nil
 }
 
-func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
+func (s *RedisSearcher) buildDocument(item datagraph.Item) Document {
 	doc := Document{
 		Kind:        item.GetKind().String(),
 		Name:        item.GetName(),
@@ -263,9 +269,27 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 		CreatedAt:   item.GetCreated().Unix(),
 	}
 
+	if v, ok := item.(datagraph.WithAuthor); ok {
+		doc.AuthorID = v.GetAuthor().String()
+	}
+
+	if v, ok := item.(datagraph.WithCategory); ok {
+		doc.CategoryID = v.GetCategory().String()
+	}
+
+	if v, ok := item.(datagraph.WithTagNames); ok {
+		doc.Tags = v.GetTags()
+	}
+
+	return doc
+}
+
+func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
+	doc := s.buildDocument(item)
+
 	key := s.key(item)
 
-	cmd := s.client.B().Hset().
+	builder := s.client.B().Hset().
 		Key(key).
 		FieldValue().
 		FieldValue("kind", doc.Kind).
@@ -273,8 +297,21 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 		FieldValue("slug", doc.Slug).
 		FieldValue("description", doc.Description).
 		FieldValue("content", doc.Content).
-		FieldValue("created_at", strconv.FormatInt(doc.CreatedAt, 10)).
-		Build()
+		FieldValue("created_at", strconv.FormatInt(doc.CreatedAt, 10))
+
+	if doc.AuthorID != "" {
+		builder = builder.FieldValue("author_id", doc.AuthorID)
+	}
+
+	if doc.CategoryID != "" {
+		builder = builder.FieldValue("category_id", doc.CategoryID)
+	}
+
+	if len(doc.Tags) > 0 {
+		builder = builder.FieldValue("tags", strings.Join(doc.Tags, ","))
+	}
+
+	cmd := builder.Build()
 
 	err := s.client.Do(ctx, cmd).Error()
 	if err != nil {
@@ -286,14 +323,40 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 
 func (s *RedisSearcher) buildQuery(q string, opts searcher.Options) string {
 	escapedQuery := escapeRedisSearch(q)
+	filters := []string{}
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
 		kindStrs := make([]string, len(kinds))
 		for i, k := range kinds {
 			kindStrs[i] = k.String()
 		}
-		kindFilter := fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|"))
-		return fmt.Sprintf("(%s) %s", escapedQuery, kindFilter)
+		filters = append(filters, fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|")))
+	}
+
+	if authors, ok := opts.Authors.Get(); ok && len(authors) > 0 {
+		authorStrs := make([]string, len(authors))
+		for i, a := range authors {
+			authorStrs[i] = a.String()
+		}
+		filters = append(filters, fmt.Sprintf("@author_id:{%s}", strings.Join(authorStrs, "|")))
+	}
+
+	if categories, ok := opts.Categories.Get(); ok && len(categories) > 0 {
+		categoryStrs := make([]string, len(categories))
+		for i, c := range categories {
+			categoryStrs[i] = c.String()
+		}
+		filters = append(filters, fmt.Sprintf("@category_id:{%s}", strings.Join(categoryStrs, "|")))
+	}
+
+	if tags, ok := opts.Tags.Get(); ok && len(tags) > 0 {
+		for _, t := range tags {
+			filters = append(filters, fmt.Sprintf("@tags:{%s}", escapeRedisSearch(t.String())))
+		}
+	}
+
+	if len(filters) > 0 {
+		return fmt.Sprintf("(%s) %s", escapedQuery, strings.Join(filters, " "))
 	}
 
 	return escapedQuery
@@ -323,6 +386,7 @@ func (s *RedisSearcher) buildPrefixQuery(q string, opts searcher.Options) string
 	}
 
 	nameQuery := fmt.Sprintf("@name:(%s*)", strings.Join(terms, " "))
+	filters := []string{}
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {
 		// NOTE: kind = "reply" does not work here (replies have no "name".)
@@ -333,8 +397,33 @@ func (s *RedisSearcher) buildPrefixQuery(q string, opts searcher.Options) string
 		for i, k := range kinds {
 			kindStrs[i] = k.String()
 		}
-		kindFilter := fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|"))
-		return fmt.Sprintf("%s %s", nameQuery, kindFilter)
+		filters = append(filters, fmt.Sprintf("@kind:{%s}", strings.Join(kindStrs, "|")))
+	}
+
+	if authors, ok := opts.Authors.Get(); ok && len(authors) > 0 {
+		authorStrs := make([]string, len(authors))
+		for i, a := range authors {
+			authorStrs[i] = a.String()
+		}
+		filters = append(filters, fmt.Sprintf("@author_id:{%s}", strings.Join(authorStrs, "|")))
+	}
+
+	if categories, ok := opts.Categories.Get(); ok && len(categories) > 0 {
+		categoryStrs := make([]string, len(categories))
+		for i, c := range categories {
+			categoryStrs[i] = c.String()
+		}
+		filters = append(filters, fmt.Sprintf("@category_id:{%s}", strings.Join(categoryStrs, "|")))
+	}
+
+	if tags, ok := opts.Tags.Get(); ok && len(tags) > 0 {
+		for _, t := range tags {
+			filters = append(filters, fmt.Sprintf("@tags:{%s}", escapeRedisSearch(t.String())))
+		}
+	}
+
+	if len(filters) > 0 {
+		return fmt.Sprintf("%s %s", nameQuery, strings.Join(filters, " "))
 	}
 
 	return nameQuery

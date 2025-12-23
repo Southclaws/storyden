@@ -29,7 +29,7 @@ export const getDatagraphSearchUrl = (params: DatagraphSearchParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
-    const explodeParameters = ["kind"];
+    const explodeParameters = ["kind", "authors", "categories"];
 
     if (value instanceof Array && explodeParameters.includes(key)) {
       value.forEach((v) =>

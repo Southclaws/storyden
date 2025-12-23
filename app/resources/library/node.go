@@ -82,3 +82,11 @@ func (c *Node) GetProps() map[string]any      { return c.Metadata }
 func (c *Node) GetAssets() []*asset.Asset     { return c.Assets }
 func (c *Node) GetCreated() time.Time         { return c.CreatedAt }
 func (c *Node) GetUpdated() time.Time         { return c.UpdatedAt }
+func (c *Node) GetAuthor() xid.ID             { return xid.ID(c.Owner.ID) }
+func (c *Node) GetTags() []string {
+	tags := make([]string, len(c.Tags))
+	for i, tag := range c.Tags {
+		tags[i] = tag.Name.String()
+	}
+	return tags
+}

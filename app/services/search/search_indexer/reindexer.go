@@ -68,6 +68,7 @@ func (idx *Indexer) reindexThreads(ctx context.Context) (int, error) {
 					))
 				},
 			).
+			WithTags().
 			Order(ent_post.ByUpdatedAt(), ent_post.ByID()).
 			Limit(idx.chunkSize).
 			All(ctx)

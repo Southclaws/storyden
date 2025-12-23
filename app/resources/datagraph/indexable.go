@@ -25,6 +25,9 @@ type (
 	WithCreated  interface{ GetCreated() time.Time }     // Has a creation timestamp
 	WithUpdated  interface{ GetUpdated() time.Time }     // Has an update timestamp
 	WithCover    interface{ GetCover() OptAsset }        // Has a cover image
+	WithCategory interface{ GetCategory() xid.ID }       // Has a category ID
+	WithAuthor   interface{ GetAuthor() xid.ID }         // Has an author ID
+	WithTagNames interface{ GetTags() []string }         // Has a list of tag names
 )
 
 // Addressable describes a type that can be uniquely identified via either an ID

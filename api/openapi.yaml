@@ -2167,6 +2167,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/RequiredSearchQuery"
         - $ref: "#/components/parameters/DatagraphKindQuery"
+        - $ref: "#/components/parameters/DatagraphAuthorQuery"
+        - $ref: "#/components/parameters/DatagraphCategoryQuery"
+        - $ref: "#/components/parameters/TagNameListQueryParam"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2570,6 +2573,32 @@ components:
       schema:
         type: array
         items: { $ref: "#/components/schemas/DatagraphItemKind" }
+
+    DatagraphAuthorQuery:
+      description: |
+        Datagraph item author query. When set, only items authored by the
+        specified account IDs will be returned.
+      name: authors
+      in: query
+      required: false
+      allowEmptyValue: true
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/Identifier" }
+
+    DatagraphCategoryQuery:
+      description: |
+        Datagraph item category query. When set, only items assigned to the
+        specified category slugs will be returned.
+      name: categories
+      in: query
+      required: false
+      allowEmptyValue: true
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/Identifier" }
 
     PaginationQuery:
       description: Pagination query parameters.

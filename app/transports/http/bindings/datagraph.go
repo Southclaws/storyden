@@ -13,16 +13,20 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
@@ -159,11 +163,29 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 
 	kindFilter, err := opt.MapErr(opt.NewPtr(request.Params.Kind), deserialiseDatagraphKindList)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	authorFilter, err := opt.MapErr(opt.NewPtr(request.Params.Authors), deserialiseAuthorList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	categoryFilter, err := opt.MapErr(opt.NewPtr(request.Params.Categories), deserialiseCategoryList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	tagFilter, err := opt.MapErr(opt.NewPtr(request.Params.Tags), deserialiseTagList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
 	opts := searcher.Options{
-		Kinds: kindFilter,
+		Kinds:      kindFilter,
+		Authors:    authorFilter,
+		Categories: categoryFilter,
+		Tags:       tagFilter,
 	}
 
 	r, err := d.searcher.Search(ctx, request.Params.Q, pp, opts)
@@ -217,6 +239,32 @@ func deserialiseDatagraphKindList(ks []openapi.DatagraphItemKind) ([]datagraph.K
 
 func deserialiseDatagraphKind(v openapi.DatagraphItemKind) (datagraph.Kind, error) {
 	return datagraph.NewKind(string(v))
+}
+
+func deserialiseAuthorList(ids []openapi.Identifier) ([]account.AccountID, error) {
+	return dt.MapErr(ids, func(id openapi.Identifier) (account.AccountID, error) {
+		parsed, err := xid.FromString(string(id))
+		if err != nil {
+			return account.AccountID(xid.NilID()), err
+		}
+		return account.AccountID(parsed), nil
+	})
+}
+
+func deserialiseCategoryList(ids []openapi.Identifier) ([]category.CategoryID, error) {
+	return dt.MapErr(ids, func(id openapi.Identifier) (category.CategoryID, error) {
+		parsed, err := xid.FromString(string(id))
+		if err != nil {
+			return category.CategoryID(xid.NilID()), err
+		}
+		return category.CategoryID(parsed), nil
+	})
+}
+
+func deserialiseTagList(names []openapi.TagName) ([]tag_ref.Name, error) {
+	return dt.Map(names, func(name openapi.TagName) tag_ref.Name {
+		return tag_ref.NewName(string(name))
+	}), nil
 }
 
 func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {

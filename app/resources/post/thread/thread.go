@@ -59,6 +59,21 @@ func (t *Thread) GetSlug() string         { return t.Slug }
 func (t *Thread) GetDesc() string         { return t.Short }
 func (t *Thread) GetCreated() time.Time   { return t.CreatedAt }
 func (t *Thread) GetUpdated() time.Time   { return t.UpdatedAt }
+func (t *Thread) GetAuthor() xid.ID       { return xid.ID(t.Author.ID) }
+func (t *Thread) GetCategory() xid.ID {
+	if cat, ok := t.Category.Get(); ok {
+		return xid.ID(cat.ID)
+	}
+	return xid.NilID()
+}
+
+func (t *Thread) GetTags() []string {
+	tags := make([]string, len(t.Tags))
+	for i, tag := range t.Tags {
+		tags[i] = tag.Name.String()
+	}
+	return tags
+}
 
 func Map(m *ent.Post) (*Thread, error) {
 	category := opt.Map(opt.NewPtr(m.Edges.Category), func(in ent.Category) category.Category {
@@ -204,17 +219,24 @@ func ItemRef(t *ent.Post) (datagraph.Item, error) {
 
 	return &Thread{
 		Post: post.Post{
-			ID:        post.ID(t.ID),
-			Content:   content,
-			Meta:      t.Metadata,
+			ID:      post.ID(t.ID),
+			Content: content,
+			Meta:    t.Metadata,
+			Author: profile.Ref{
+				ID: account.AccountID(t.AccountPosts),
+			},
 			CreatedAt: t.CreatedAt,
 			UpdatedAt: t.UpdatedAt,
 			DeletedAt: opt.NewPtr(t.DeletedAt),
 		},
 
-		Title:      t.Title,
-		Slug:       t.Slug,
+		Title: t.Title,
+		Slug:  t.Slug,
+		Category: opt.New(category.Category{
+			ID: category.CategoryID(t.CategoryID),
+		}),
 		Short:      t.Short,
 		Visibility: visibility.NewVisibilityFromEnt(t.Visibility),
+		Tags:       dt.Map(t.Edges.Tags, tag_ref.Map(nil)),
 	}, nil
 }
