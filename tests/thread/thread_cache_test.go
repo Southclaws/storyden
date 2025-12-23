@@ -87,7 +87,7 @@ func TestThreadCacheWithReactions(t *testing.T) {
 			r.NoError(err, "cached time should be parseable")
 
 			// Wait a small amount to ensure time difference
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 
 			// Make a conditional request with If-Modified-Since - should return 304 Not Modified
 			threadGet304, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
