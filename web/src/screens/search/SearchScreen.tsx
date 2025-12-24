@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
+import { AdditionalFilters } from "./AdditionalFilters";
 import { Props, useSearchScreen } from "./useSearch";
 
 export function SearchScreen(props: Props) {
@@ -104,6 +105,7 @@ export function SearchScreen(props: Props) {
             },
           ]}
         />
+        <AdditionalFilters control={form.control} />
       </HStack>
 
       {results ? (

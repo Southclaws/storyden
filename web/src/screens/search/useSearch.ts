@@ -18,12 +18,18 @@ export type Props = {
   initialQuery: string;
   initialPage: number;
   initialKind: DatagraphItemKind[];
+  initialAuthors: string[];
+  initialCategories: string[];
+  initialTags: string[];
   initialResults?: DatagraphSearchOKResponse;
 };
 
 export const FormSchema = z.object({
   q: z.string().min(1, { message: "Please enter a search term" }),
   kind: z.array(DatagraphKindSchema).optional(),
+  authors: z.array(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -43,6 +49,9 @@ export function useSearchScreen(props: Props) {
   });
 
   const kind = form.watch("kind");
+  const authors = form.watch("authors");
+  const categories = form.watch("categories");
+  const tags = form.watch("tags");
 
   // NOTE: Because useQueryState does not support proper URL query arrays, we
   // modify the "kind" query parameter array directly using browser APIs.
@@ -62,6 +71,9 @@ export function useSearchScreen(props: Props) {
       q: query,
       kind: kind,
       page: page.toString(),
+      authors: authors,
+      categories: categories,
+      tags: tags,
     },
     {
       swr: {
