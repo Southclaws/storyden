@@ -40,12 +40,12 @@ func (s *SpamChecker) Check(ctx context.Context, targetID xid.ID, targetKind dat
 
 	if isSpam {
 		return &checker.Result{
-			RequiresReview: true,
-			Reason:         "Content flagged as potential spam by spam detector",
+			Action: checker.ActionReport,
+			Reason: "Content flagged as potential spam by spam detector",
 		}, nil
 	}
 
 	return &checker.Result{
-		RequiresReview: false,
+		Action: checker.ActionAllow,
 	}, nil
 }

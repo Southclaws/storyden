@@ -21,9 +21,17 @@ type Checker interface {
 	Enabled() bool
 }
 
+type Action int
+
+const (
+	ActionAllow Action = iota
+	ActionReject
+	ActionReport
+)
+
 type Result struct {
-	RequiresReview bool
-	Reason         string
+	Action Action
+	Reason string
 }
 
 // Registry holds all registered content moderation checkers.

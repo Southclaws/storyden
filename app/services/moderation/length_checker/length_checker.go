@@ -2,7 +2,6 @@ package length_checker
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/Southclaws/fault"
@@ -21,10 +20,10 @@ type LengthChecker struct {
 	settingsRepo *settings.SettingsRepository
 	bus          *pubsub.Bus
 
-	mu                  sync.RWMutex
-	maxThreadBodyLength int
-	maxReplyBodyLength  int
-	enabled             bool
+	mu                     sync.RWMutex
+	threadBodyLengthMax int
+	replyBodyLengthMax  int
+	enabled                bool
 }
 
 func NewLengthChecker(
@@ -33,11 +32,11 @@ func NewLengthChecker(
 	bus *pubsub.Bus,
 ) *LengthChecker {
 	l := &LengthChecker{
-		settingsRepo:        settingsRepo,
-		bus:                 bus,
-		maxThreadBodyLength: 60000,
-		maxReplyBodyLength:  10000,
-		enabled:             true,
+		settingsRepo:           settingsRepo,
+		bus:                    bus,
+		threadBodyLengthMax: 60000,
+		replyBodyLengthMax:  10000,
+		enabled:                true,
 	}
 
 	lc.Append(fx.StartHook(func(ctx context.Context) error {
@@ -67,11 +66,11 @@ func (l *LengthChecker) loadSettings(ctx context.Context) error {
 
 	if services, ok := s.Services.Get(); ok {
 		if moderation, ok := services.Moderation.Get(); ok {
-			if maxThread, ok := moderation.MaxThreadBodyLength.Get(); ok {
-				l.maxThreadBodyLength = maxThread
+			if maxThread, ok := moderation.ThreadBodyLengthMax.Get(); ok {
+				l.threadBodyLengthMax = maxThread
 			}
-			if maxReply, ok := moderation.MaxReplyBodyLength.Get(); ok {
-				l.maxReplyBodyLength = maxReply
+			if maxReply, ok := moderation.ReplyBodyLengthMax.Get(); ok {
+				l.replyBodyLengthMax = maxReply
 			}
 		}
 	}
@@ -101,9 +100,9 @@ func (l *LengthChecker) Check(ctx context.Context, targetID xid.ID, targetKind d
 	var maxLength int
 	switch targetKind {
 	case datagraph.KindThread:
-		maxLength = l.maxThreadBodyLength
+		maxLength = l.threadBodyLengthMax
 	case datagraph.KindReply:
-		maxLength = l.maxReplyBodyLength
+		maxLength = l.replyBodyLengthMax
 	default:
 		return nil, fault.Wrap(
 			fault.Newf("unsupported kind: %s", targetKind),
@@ -113,12 +112,12 @@ func (l *LengthChecker) Check(ctx context.Context, targetID xid.ID, targetKind d
 
 	if len(content.Plaintext()) > maxLength {
 		return &checker.Result{
-			RequiresReview: true,
-			Reason:         fmt.Sprintf("Content exceeds maximum length of %d characters", maxLength),
+			Action: checker.ActionReject,
+			Reason: "Content exceeds maximum allowed length",
 		}, nil
 	}
 
 	return &checker.Result{
-		RequiresReview: false,
+		Action: checker.ActionAllow,
 	}, nil
 }

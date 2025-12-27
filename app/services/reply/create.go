@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/moderation/checker"
 )
 
 func (s *Mutator) Create(
@@ -39,7 +40,7 @@ func (s *Mutator) Create(
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if result.RequiresReview {
+		if result.Action == checker.ActionReport {
 			updatedReply, err := s.replyWriter.Update(ctx, p.ID, reply_writer.WithVisibility(visibility.VisibilityReview))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))

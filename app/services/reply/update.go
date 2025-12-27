@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/moderation/checker"
 )
 
 func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) (*reply.Reply, error) {
@@ -62,7 +63,7 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if result.RequiresReview {
+		if result.Action == checker.ActionReport {
 			opts = append(opts, reply_writer.WithVisibility(visibility.VisibilityReview))
 		}
 	}
