@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 func main() {
@@ -73,10 +75,22 @@ func run(ctx context.Context, playwrightArgs []string) error {
 		return fmt.Errorf("backend did not become ready: %w", err)
 	}
 
+	log.Println("Creating admin account and access key...")
+	accessKey, err := setupAdminAccount(ctx, "http://localhost:8001/api")
+	if err != nil {
+		return fmt.Errorf("failed to setup admin account: %w", err)
+	}
+	log.Printf("Admin access key created: %s", accessKey)
+
 	log.Println("Services ready, running Playwright tests...")
 	playwrightCmdArgs := append([]string{"playwright", "test"}, playwrightArgs...)
 	playwrightCmd := exec.CommandContext(ctx, "npx", playwrightCmdArgs...)
 	playwrightCmd.Dir = "web"
+	playwrightCmd.Env = append(os.Environ(),
+		fmt.Sprintf("E2E_ADMIN_ACCESS_KEY=%s", accessKey),
+		"PUBLIC_API_ADDRESS=http://localhost:8001",
+		"PUBLIC_WEB_ADDRESS=http://localhost:3001",
+	)
 	playwrightCmd.Stdout = os.Stdout
 	playwrightCmd.Stderr = os.Stderr
 	if err := playwrightCmd.Run(); err != nil {
@@ -134,4 +148,55 @@ func waitForBackend(ctx context.Context, url string, timeout time.Duration) erro
 	}
 
 	return fmt.Errorf("timeout waiting for backend at %s", url)
+}
+
+func setupAdminAccount(ctx context.Context, apiURL string) (string, error) {
+	httpClient := &http.Client{Timeout: 10 * time.Second}
+	client, err := openapi.NewClientWithResponses(apiURL, openapi.WithHTTPClient(httpClient))
+	if err != nil {
+		return "", fmt.Errorf("failed to create API client: %w", err)
+	}
+
+	handle := "e2e_admin"
+	password := "E2EAdminPassword123!"
+	registerResp, err := client.AuthPasswordSignupWithResponse(ctx, nil, openapi.AuthPasswordSignupJSONRequestBody{
+		Identifier: handle,
+		Token:      password,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to register admin: %w", err)
+	}
+
+	if registerResp.StatusCode() != http.StatusOK {
+		return "", fmt.Errorf("register failed with status %d: %s", registerResp.StatusCode(), string(registerResp.Body))
+	}
+
+	var sessionCookie string
+	for _, cookie := range registerResp.HTTPResponse.Cookies() {
+		if cookie.Name == "storyden-session" {
+			sessionCookie = cookie.Value
+			break
+		}
+	}
+	if sessionCookie == "" {
+		return "", fmt.Errorf("no session cookie returned from register (found %d cookies)", len(registerResp.HTTPResponse.Cookies()))
+	}
+
+	sessionEditor := func(ctx context.Context, req *http.Request) error {
+		req.AddCookie(&http.Cookie{Name: "storyden-session", Value: sessionCookie})
+		return nil
+	}
+
+	keyResp, err := client.AccessKeyCreateWithResponse(ctx, openapi.AccessKeyInitialProps{
+		Name: "E2E Admin Key",
+	}, sessionEditor)
+	if err != nil {
+		return "", fmt.Errorf("failed to create access key: %w", err)
+	}
+
+	if keyResp.StatusCode() != http.StatusOK || keyResp.JSON200 == nil {
+		return "", fmt.Errorf("create key failed with status %d", keyResp.StatusCode())
+	}
+
+	return keyResp.JSON200.Secret, nil
 }

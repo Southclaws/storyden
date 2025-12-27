@@ -188,12 +188,55 @@ page.getByRole("tab", { name: "Email" });
 
 ## Test Patterns
 
-### Deterministic Test Data
+### Creating Test Accounts
 
-You get a fresh database each time, so use simple deterministic values:
+**ALWAYS use the account creation helpers in `web/tests/access_key_admin_assignment.ts`:**
 
 ```typescript
-const username = `testuser-01`;
+import {
+  createAdmin,
+  createAccountWithRole,
+  login,
+} from "../access_key_admin_assignment";
+
+test("admin_can_access_settings", async ({ browser }) => {
+  const context = await browser.newContext();
+  const username = `admin_${Date.now()}`;
+  const password = "TestPassword123!";
+
+  // Create admin account via API (with admin role assigned)
+  await createAdmin(context, username, password);
+
+  // Then login via UI
+  const page = await context.newPage();
+  await login(page, username, password);
+
+  // Now test admin functionality
+  await page.goto("/settings");
+  await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+});
+```
+
+**Available helpers:**
+
+- `createAdmin(context, username, password)` - Creates account and assigns Administrator role via API
+- `createAccountWithRole(context, username, password, "admin" | "member")` - Creates account with specified role
+- `login(page, username, password)` - Logs in via UI
+- `logout(page)` - Logs out via UI
+
+**Why use these helpers:**
+
+- No hacky workarounds or manual registration flows
+- Uses the e2e admin access key automatically
+- Assigns proper role IDs from the backend (`00000000000000000a00` for admin)
+- Idempotent - can create multiple accounts per test
+
+### Deterministic Test Data
+
+Keep IDs unique so we can run tests multiple times.
+
+```typescript
+const username = `testuser_${Date.now()}`;
 const password = "TestPassword123!";
 ```
 
