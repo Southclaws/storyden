@@ -60,6 +60,7 @@ func (c *LocalCache) Get(ctx context.Context, key string) (string, error) {
 
 func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
 	c.cache.SetWithTTL(key, []byte(value), 0, ttl)
+	c.cache.Wait()
 	return nil
 }
 
