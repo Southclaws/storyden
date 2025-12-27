@@ -25,12 +25,6 @@ func (s *service) Create(ctx context.Context,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
-	if content, ok := partial.Content.Get(); ok {
-		if err := s.cpm.CheckContent(ctx, content); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
 	opts := partial.Opts()
 	opts = append(opts,
 		thread_writer.WithMeta(meta),
@@ -68,6 +62,20 @@ func (s *service) Create(ctx context.Context,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
+	}
+
+	if content, ok := partial.Content.Get(); ok && thr.Visibility == visibility.VisibilityPublished {
+		result, err := s.cpm.CheckContent(ctx, xid.ID(thr.ID), datagraph.KindThread, title, content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if result.RequiresReview {
+			thr, err = s.threadWriter.Update(ctx, thr.ID, thread_writer.WithVisibility(visibility.VisibilityReview))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+		}
 	}
 
 	if err := s.cache.Invalidate(ctx, xid.ID(thr.ID)); err != nil {

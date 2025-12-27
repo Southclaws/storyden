@@ -48,7 +48,7 @@ export function SettingsContext({
 }>) {
   const session = useSession(initialSession);
   const { settings } = useSettings(initialSettings);
-  const { updateSettings } = useSettingsMutation(initialSettings);
+  const { updateSettings } = useSettingsMutation();
 
   const feed: FeedConfig = (settings ?? initialSettings).metadata.feed;
 

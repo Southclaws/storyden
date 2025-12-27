@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { AuthMode, Info } from "@/api/openapi-schema";
+import { AdminSettingsProps, AuthMode, Info } from "@/api/openapi-schema";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { EditorSettingsSchema } from "./editor";
@@ -44,10 +44,23 @@ export type Settings = Info & {
   metadata: FrontendConfiguration;
 };
 
+// AdminSettings is non-public administration settings + parsed metadata config.
+export type AdminSettings = AdminSettingsProps & {
+  metadata: FrontendConfiguration;
+};
+
 export function parseSettings(data: Info): Settings {
   const metadata = FrontendConfigurationSchema.parse(data.metadata);
 
   const settings = { ...data, metadata } satisfies Settings;
+
+  return settings;
+}
+
+export function parseAdminSettings(data: AdminSettingsProps): AdminSettings {
+  const metadata = FrontendConfigurationSchema.parse(data.metadata);
+
+  const settings = { ...data, metadata } satisfies AdminSettings;
 
   return settings;
 }

@@ -16,6 +16,7 @@ import type { ProfileReference } from "./profileReference";
 import type { ReactList } from "./reactList";
 import type { ThreadMark } from "./threadMark";
 import type { ThreadTitle } from "./threadTitle";
+import type { Visibility } from "./visibility";
 
 export interface PostReferenceProps {
   assets: AssetList;
@@ -27,4 +28,5 @@ export interface PostReferenceProps {
   reacts: ReactList;
   slug: ThreadMark;
   title: ThreadTitle;
+  visibility: Visibility;
 }

@@ -25,7 +25,9 @@ func (Report) Fields() []ent.Field {
 			Comment("The datagraph kind of resource being reported."),
 
 		field.String("reported_by_id").
-			GoType(xid.ID{}),
+			GoType(xid.ID{}).
+			Optional().
+			Nillable(),
 
 		field.String("handled_by_id").
 			GoType(xid.ID{}).
@@ -50,7 +52,6 @@ func (Report) Edges() []ent.Edge {
 		edge.From("reported_by", Account.Type).
 			Field("reported_by_id").
 			Ref("reports").
-			Required().
 			Unique(),
 
 		edge.From("handled_by", Account.Type).

@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
@@ -47,7 +48,17 @@ func (s *service) List(ctx context.Context,
 	vq := func() thread_querier.Query {
 		v, ok := opts.Visibility.Get()
 		if !ok {
-			return thread_querier.HasStatus(visibility.VisibilityPublished)
+			// NOTE: In the default path, we're querying for the main feed, and
+			// there are no additional filtering options specified so the engine
+			// builds a query specifically for moderators to see in-review posts
+			// as well as authors to see their own posts in-review while other
+			// members will just see published posts.
+			isModerator := false
+			if accountID.Ok() {
+				roles := session.GetRoles(ctx)
+				isModerator = roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator)
+			}
+			return thread_querier.HasPublishedOrOwnInReview(accountID, isModerator)
 		}
 
 		onlyRequestingPublished := len(v) == 1 && v[0] == visibility.VisibilityPublished
@@ -57,6 +68,14 @@ func (s *service) List(ctx context.Context,
 
 		filterByAccount, ok := opts.AccountID.Get()
 		if !ok {
+			// Not filtering by specific account - check if user has permission to see all review threads
+			if accountID.Ok() {
+				roles := session.GetRoles(ctx)
+				if roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+					return thread_querier.HasStatus(v...)
+				}
+			}
+
 			return thread_querier.HasStatus(visibility.VisibilityPublished)
 		}
 
@@ -68,9 +87,16 @@ func (s *service) List(ctx context.Context,
 		requestingOwnThreads := filterByAccount == requestedByAccount
 
 		if !requestingOwnThreads {
+			// Viewing someone else's threads - check if user has permission
+			roles := session.GetRoles(ctx)
+			if roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+				return thread_querier.HasStatus(v...)
+			}
+
 			return thread_querier.HasStatus(visibility.VisibilityPublished)
 		}
 
+		// Viewing own threads - allow all visibilities
 		return thread_querier.HasStatus(v...)
 	}()
 	q = append(q, vq)

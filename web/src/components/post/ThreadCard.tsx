@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import { ThreadReference, Visibility } from "src/api/openapi-schema";
+import {
+  Permission,
+  ThreadReference,
+  Visibility,
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
@@ -10,8 +14,10 @@ import { Card } from "@/components/ui/rich-card";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { timestamp } from "@/utils/date";
+import { hasPermission } from "@/utils/permissions";
 
 import { CategoryBadge } from "../category/CategoryBadge";
+import { PostReviewBadge } from "../thread/PostReviewBadge";
 import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
 import {
   DiscussionIcon,
@@ -19,6 +25,7 @@ import {
 } from "../ui/icons/Discussion";
 
 import { LikeButton } from "./LikeButton/LikeButton";
+import { useThreadCardModeration } from "./useThreadCardModeration";
 
 type Props = {
   thread: ThreadReference;
@@ -30,6 +37,13 @@ export const ThreadReferenceCard = memo(
     const session = useSession();
     const isDraft = thread.visibility === Visibility.draft;
     const permalink = isDraft ? `/new?id=${thread.id}` : `/t/${thread.slug}`;
+    const isModerator = hasPermission(
+      session,
+      Permission.MANAGE_POSTS,
+      Permission.ADMINISTRATOR,
+    );
+
+    const { isConfirmingDelete, handlers } = useThreadCardModeration(thread);
 
     const title = thread.title || thread.link?.title || "Untitled post";
 
@@ -49,6 +63,15 @@ export const ThreadReferenceCard = memo(
         ? `${newRepliesCount} ${newRepliesCount === 1 ? "reply" : "replies"} since you last visited ${timestamp(lastReadAt, false)} ago`
         : undefined;
 
+    const isInReview = thread.visibility === Visibility.review;
+
+    // Don't show images for in-review threads, too noisy.
+    const image = isInReview
+      ? undefined
+      : getAssetURL(
+          thread.assets?.[0]?.path ?? thread.link?.primary_image?.path,
+        );
+
     return (
       <Card
         shape="responsive"
@@ -56,17 +79,31 @@ export const ThreadReferenceCard = memo(
         title={title}
         text={thread.description}
         url={permalink}
-        image={getAssetURL(
-          thread.assets?.[0]?.path ?? thread.link?.primary_image?.path,
-        )}
+        image={image}
         controls={
           session && (
             <HStack>
               {!hideCategoryBadge && thread.category && (
                 <CategoryBadge category={thread.category} />
               )}
-              <LikeButton thread={thread} showCount />
-              <CollectionMenu account={session} thread={thread} />
+              {isInReview ? (
+                <>
+                  <PostReviewBadge
+                    isModerator={isModerator}
+                    postId={thread.id}
+                    onAccept={handlers.handleAcceptThread}
+                    onEditAndAccept={handlers.handleEditAndAccept}
+                    onDelete={handlers.handleConfirmDelete}
+                    isConfirmingDelete={isConfirmingDelete}
+                    onCancelDelete={handlers.handleCancelDelete}
+                  />
+                </>
+              ) : (
+                <>
+                  <LikeButton thread={thread} showCount />
+                  <CollectionMenu account={session} thread={thread} />
+                </>
+              )}
               <ThreadMenu thread={thread} />
             </HStack>
           )

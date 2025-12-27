@@ -6,6 +6,7 @@ import {
   getThreadListKey,
   threadCreate,
   threadDelete,
+  threadUpdate,
 } from "@/api/openapi-client/threads";
 import {
   Account,
@@ -14,6 +15,7 @@ import {
   ThreadInitialProps,
   ThreadListOKResponse,
   ThreadListParams,
+  ThreadMutableProps,
   ThreadReference,
   Visibility,
 } from "@/api/openapi-schema";
@@ -122,6 +124,53 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
     return await threadCreate(initial);
   }
 
+  async function updateThread(id: Identifier, updated: ThreadMutableProps) {
+    const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
+      if (!data) return;
+
+      return {
+        ...data,
+        threads: data.threads.map((t) => {
+          if (t.id !== id) {
+            return t;
+          }
+
+          const newThread = {
+            ...t,
+            ...updated,
+            category: t.category
+              ? {
+                  ...t.category,
+                  id: updated.category ?? t.category.id,
+                }
+              : updated.category
+                ? {
+                    id: updated.category,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    slug: "",
+                    colour: "",
+                    description: "",
+                    name: "",
+                    sort: 0,
+                    children: [],
+                  }
+                : undefined,
+            tags: t.tags,
+          } satisfies ThreadReference;
+
+          return newThread;
+        }),
+      };
+    };
+
+    await mutate(threadListKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await threadUpdate(id, updated);
+  }
+
   async function deleteThread(id: Identifier) {
     const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
       if (!data) return;
@@ -201,6 +250,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
   return {
     createThread,
+    updateThread,
     deleteThread,
     likePost,
     unlikePost,

@@ -185,7 +185,7 @@ func serialiseReport(in *report.Report) openapi.Report {
 		TargetId:   in.TargetItemID.String(),
 		TargetKind: openapi.DatagraphItemKind(in.TargetItemKind.String()),
 		Item:       item.Ptr(),
-		ReportedBy: serialiseProfileReferenceFromAccount(in.ReportedBy),
+		ReportedBy: opt.Map(in.ReportedBy, serialiseProfileReferenceFromAccount).Ptr(),
 		HandledBy:  opt.Map(in.HandledBy, serialiseProfileReferenceFromAccount).Ptr(),
 		Comment:    in.Comment.Ptr(),
 		Status:     openapi.ReportStatus(in.Status.String()),

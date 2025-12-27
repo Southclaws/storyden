@@ -19,7 +19,7 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useInterfaceSettings({ settings }: Props) {
-  const { revalidate, updateSettings } = useSettingsMutation(settings);
+  const { revalidate, updateSettings } = useSettingsMutation();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

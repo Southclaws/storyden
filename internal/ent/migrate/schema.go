@@ -935,7 +935,7 @@ var (
 		{Name: "comment", Type: field.TypeString, Nullable: true, Size: 2147483647},
 		{Name: "reason", Type: field.TypeString, Nullable: true},
 		{Name: "status", Type: field.TypeString, Default: "submitted"},
-		{Name: "reported_by_id", Type: field.TypeString, Size: 20},
+		{Name: "reported_by_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "handled_by_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// ReportsTable holds the schema information for the "reports" table.

@@ -36,9 +36,21 @@ type Settings struct {
 	// are exposed to members during the frontend registration and login flows.
 	AuthenticationMode opt.Optional[authentication.Mode]
 
+	Services opt.Optional[ServiceSettings]
+
 	// Metadata is an arbitrary object which can be used by frontends/clients to
 	// store vendor-specific configuration to control the client implementation.
 	Metadata opt.Optional[map[string]any]
+}
+
+type ServiceSettings struct {
+	Moderation opt.Optional[ModerationServiceSettings]
+}
+
+type ModerationServiceSettings struct {
+	MaxThreadBodyLength opt.Optional[int]
+	MaxReplyBodyLength  opt.Optional[int]
+	WordBlocklist       opt.Optional[[]string]
 }
 
 // Merge will combine "updated" into "s" while overwriting any new values.

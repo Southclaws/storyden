@@ -12,6 +12,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -25,12 +26,6 @@ import (
 )
 
 func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error) {
-	if content, ok := partial.Content.Get(); ok {
-		if err := s.cpm.CheckContent(ctx, content); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
 	aid, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -52,6 +47,19 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 	oldVisibility := thr.Visibility
 	opts := partial.Opts()
+
+	newContent, contentChanged := partial.Content.Get()
+	newTitle, titleChanged := partial.Title.Get()
+	if contentChanged || titleChanged {
+		result, err := s.cpm.CheckContent(ctx, xid.ID(threadID), datagraph.KindThread, newTitle, newContent)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if result.RequiresReview {
+			opts = append(opts, thread_writer.WithVisibility(visibility.VisibilityReview))
+		}
+	}
 
 	if tags, ok := partial.Tags.Get(); ok {
 		currentTagNames := thr.Tags.Names()

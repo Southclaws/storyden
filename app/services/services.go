@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/account/register"
+	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/asset"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
@@ -78,5 +79,6 @@ func Build() fx.Option {
 		fx.Provide(autotagger.New),
 		fx.Provide(instance_info.New),
 		fx.Provide(account_auth.New, account_email.New),
+		fx.Provide(settings_manager.New),
 	)
 }

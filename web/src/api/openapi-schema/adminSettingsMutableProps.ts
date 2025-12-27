@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.13-canary
  */
+import type { AdminSettingsServiceProps } from "./adminSettingsServiceProps";
 import type { AuthMode } from "./authMode";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
@@ -20,5 +21,6 @@ export interface AdminSettingsMutableProps {
 vendor-specific configuration data specific to the frontend itself.
  */
   metadata?: Metadata;
+  services?: AdminSettingsServiceProps;
   title?: string;
 }

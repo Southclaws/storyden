@@ -28,4 +28,10 @@ var DefaultSettings = Settings{
 	Content:            opt.New(defaultContent),
 	AccentColour:       opt.New(DefaultColour),
 	AuthenticationMode: opt.New(authentication.ModeHandle),
+	Services: opt.New(ServiceSettings{
+		Moderation: opt.New(ModerationServiceSettings{
+			MaxThreadBodyLength: opt.New(60000),
+			MaxReplyBodyLength:  opt.New(10000),
+		}),
+	}),
 }

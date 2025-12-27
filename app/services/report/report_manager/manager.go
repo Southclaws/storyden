@@ -108,9 +108,11 @@ func (m *Manager) Update(
 	}
 
 	m.bus.Publish(ctx, &message.EventReportUpdated{
-		ID:         rep.ID,
-		Target:     targetRef,
-		ReportedBy: rep.ReportedBy.ID,
+		ID:     rep.ID,
+		Target: targetRef,
+		ReportedBy: opt.Map(rep.ReportedBy, func(a account.Account) account.AccountID {
+			return a.ID
+		}),
 		HandledBy: opt.Map(rep.HandledBy, func(a account.Account) account.AccountID {
 			return a.ID
 		}),

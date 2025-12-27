@@ -16,11 +16,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
-
-// TODO: This should be configurable in settings.
-const MaxPostLength = 60_000
 
 // ID wraps the underlying xid type for all kinds of Storyden Post data type.
 type ID xid.ID
@@ -41,6 +39,7 @@ type Post struct {
 	Assets      []*asset.Asset
 	WebLink     opt.Optional[link_ref.LinkRef]
 	Meta        map[string]any
+	Visibility  visibility.Visibility
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -105,18 +104,24 @@ func Map(in *ent.Post) (*Post, error) {
 
 	assets := dt.Map(in.Edges.Assets, asset.Map)
 
+	vis, err := visibility.NewVisibility(string(in.Visibility))
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	return &Post{
 		ID:   ID(in.ID),
 		Root: rootID,
 
-		Title:   title,
-		Slug:    slug,
-		Content: content,
-		Author:  *pro,
-		Reacts:  reacts,
-		Assets:  assets,
-		WebLink: link,
-		Meta:    in.Metadata,
+		Title:      title,
+		Slug:       slug,
+		Content:    content,
+		Author:     *pro,
+		Reacts:     reacts,
+		Assets:     assets,
+		WebLink:    link,
+		Meta:       in.Metadata,
+		Visibility: vis,
 
 		CreatedAt: in.CreatedAt,
 		UpdatedAt: in.UpdatedAt,

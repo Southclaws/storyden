@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -105,10 +106,11 @@ func Map(m *ent.Post) (*Reply, error) {
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
-			Content: content,
-			Author:  *pro,
-			Assets:  dt.Map(m.Edges.Assets, asset.Map),
-			Meta:    m.Metadata,
+			Content:    content,
+			Author:     *pro,
+			Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
+			Assets:     dt.Map(m.Edges.Assets, asset.Map),
+			Meta:       m.Metadata,
 
 			CreatedAt: m.CreatedAt,
 			UpdatedAt: m.UpdatedAt,
@@ -188,6 +190,7 @@ func Mapper(
 
 				Content:     content,
 				Author:      *pro,
+				Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 				Likes:       ls.Status(m.ID),
 				Collections: collection_item_status.Status{
 					// NOTE: Members cannot yet add replies to collections.
@@ -260,12 +263,13 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 
 	return &Reply{
 		Post: post.Post{
-			ID:        post.ID(r.ID),
-			Content:   content,
-			Meta:      r.Metadata,
-			CreatedAt: r.CreatedAt,
-			UpdatedAt: r.UpdatedAt,
-			DeletedAt: opt.NewPtr(r.DeletedAt),
+			ID:         post.ID(r.ID),
+			Content:    content,
+			Visibility: visibility.NewVisibilityFromEnt(r.Visibility),
+			Meta:       r.Metadata,
+			CreatedAt:  r.CreatedAt,
+			UpdatedAt:  r.UpdatedAt,
+			DeletedAt:  opt.NewPtr(r.DeletedAt),
 		},
 		RootPostID: rootPostID,
 		Slug:       fmt.Sprintf("%s#%s", rootSlug, r.ID),

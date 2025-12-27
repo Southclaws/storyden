@@ -8,23 +8,29 @@ import {
   DatagraphItemProfile,
   DatagraphItemReply,
   DatagraphItemThread,
+  Identifier,
   Report,
 } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
+import { Badge } from "@/components/ui/badge";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
-function getItemPath(item: DatagraphItem): string | undefined {
+function getItemPath(
+  reportID: Identifier,
+  item: DatagraphItem,
+): string | undefined {
   switch (item.kind) {
     case DatagraphItemKind.post:
+      return `/t/locate/${item.ref.id}?ctx-report-id=${reportID}`;
     case DatagraphItemKind.thread:
-      return `/t/${item.ref.slug}`;
+      return `/t/${item.ref.slug}?ctx-report-id=${reportID}`;
     case DatagraphItemKind.reply:
-      return `/t/${item.ref.root_slug}#${item.ref.id}`;
+      return `/t/locate/${item.ref.id}?ctx-report-id=${reportID}`;
     case DatagraphItemKind.node:
-      return `/l/${item.ref.slug}`;
+      return `/l/${item.ref.slug}?ctx-report-id=${reportID}`;
     case DatagraphItemKind.profile:
-      return `/m/${item.ref.handle}`;
+      return `/m/${item.ref.handle}?ctx-report-id=${reportID}`;
     default:
       return undefined;
   }
@@ -51,11 +57,11 @@ export function ReportCardContent({ report }: Props) {
     case DatagraphItemKind.post:
     case DatagraphItemKind.thread:
     case DatagraphItemKind.reply:
-      return <PostContent item={item} />;
+      return <PostContent item={item} reportID={report.id} />;
     case DatagraphItemKind.node:
-      return <NodeContent item={item} />;
+      return <NodeContent item={item} reportID={report.id} />;
     case DatagraphItemKind.profile:
-      return <ProfileContent item={item} />;
+      return <ProfileContent item={item} reportID={report.id} />;
     default:
       return (
         <Box p="3" borderRadius="md" bg="bg.muted">
@@ -66,12 +72,13 @@ export function ReportCardContent({ report }: Props) {
 }
 
 type PostContentProps = {
+  reportID: Identifier;
   item: DatagraphItemPost | DatagraphItemThread | DatagraphItemReply;
 };
 
-function PostContent({ item }: PostContentProps) {
+function PostContent({ reportID, item }: PostContentProps) {
   const { ref } = item;
-  const path = getItemPath(item);
+  const path = getItemPath(reportID, item);
 
   return (
     <Box p="3" borderRadius="md" bg="bg.muted">
@@ -91,21 +98,24 @@ function PostContent({ item }: PostContentProps) {
           <Timestamp created={ref.createdAt} color="fg.subtle" large />
         </WStack>
 
-        <HStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
           <MemberBadge profile={ref.author} size="sm" name="handle" />
-        </HStack>
+
+          {ref.deletedAt !== undefined && <ContentDeletedBadge />}
+        </WStack>
       </LStack>
     </Box>
   );
 }
 
 type NodeContentProps = {
+  reportID: Identifier;
   item: DatagraphItemNode;
 };
 
-function NodeContent({ item }: NodeContentProps) {
+function NodeContent({ reportID, item }: NodeContentProps) {
   const { ref } = item;
-  const path = getItemPath(item);
+  const path = getItemPath(reportID, item);
 
   return (
     <Box p="3" borderRadius="md" bg="bg.muted">
@@ -131,7 +141,12 @@ function NodeContent({ item }: NodeContentProps) {
               {ref.description}
             </styled.p>
           </div>
-          <MemberBadge profile={ref.owner} size="sm" name="handle" />
+
+          <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+            <MemberBadge profile={ref.owner} size="sm" name="handle" />
+
+            {ref.deletedAt !== undefined && <ContentDeletedBadge />}
+          </WStack>
         </LStack>
       </LStack>
     </Box>
@@ -139,12 +154,13 @@ function NodeContent({ item }: NodeContentProps) {
 }
 
 type ProfileContentProps = {
+  reportID: Identifier;
   item: DatagraphItemProfile;
 };
 
-function ProfileContent({ item }: ProfileContentProps) {
+function ProfileContent({ reportID, item }: ProfileContentProps) {
   const { ref } = item;
-  const path = getItemPath(item);
+  const path = getItemPath(reportID, item);
 
   return (
     <Box p="3" borderRadius="md" bg="bg.muted">
@@ -164,8 +180,24 @@ function ProfileContent({ item }: ProfileContentProps) {
           <Timestamp created={ref.createdAt} color="fg.subtle" large />
         </WStack>
 
-        <MemberBadge profile={ref} size="sm" name="handle" />
+        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+          <MemberBadge profile={ref} size="sm" name="handle" />
+
+          {ref.deletedAt !== undefined && <ContentDeletedBadge />}
+        </WStack>
       </LStack>
     </Box>
+  );
+}
+
+function ContentDeletedBadge() {
+  return (
+    <Badge
+      bg="bg.destructive"
+      color="fg.destructive"
+      borderColor="border.destructive"
+    >
+      Content deleted
+    </Badge>
   );
 }

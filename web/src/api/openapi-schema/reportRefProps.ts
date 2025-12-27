@@ -15,7 +15,7 @@ import type { ReportStatus } from "./reportStatus";
 export interface ReportRefProps {
   comment?: string;
   handled_by?: ProfileReference;
-  reported_by: ProfileReference;
+  reported_by?: ProfileReference;
   status: ReportStatus;
   target_id: Identifier;
   target_kind: DatagraphItemKind;

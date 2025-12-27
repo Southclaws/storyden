@@ -37,7 +37,6 @@ type Thread struct {
 	ReplyStatus post.ReplyStatus
 	Replies     pagination.Result[*reply.Reply]
 	Category    opt.Optional[category.Category]
-	Visibility  visibility.Visibility
 	Tags        tag_ref.Tags
 	Related     datagraph.ItemList
 }
@@ -100,11 +99,12 @@ func Map(m *ent.Post) (*Thread, error) {
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
-			Content: content,
-			Author:  *pro,
-			Assets:  dt.Map(m.Edges.Assets, asset.Map),
-			WebLink: link,
-			Meta:    m.Metadata,
+			Content:    content,
+			Author:     *pro,
+			Assets:     dt.Map(m.Edges.Assets, asset.Map),
+			WebLink:    link,
+			Meta:       m.Metadata,
+			Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
 
 			CreatedAt: m.CreatedAt,
 			UpdatedAt: m.UpdatedAt,
@@ -117,9 +117,8 @@ func Map(m *ent.Post) (*Thread, error) {
 		Pinned:      m.Pinned,
 		LastReplyAt: opt.New(m.LastReplyAt),
 
-		Category:   category,
-		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
-		Tags:       tags,
+		Category: category,
+		Tags:     tags,
 	}, nil
 }
 
@@ -172,6 +171,7 @@ func Mapper(
 				Reacts:      reacts,
 				WebLink:     link,
 				Meta:        m.Metadata,
+				Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 
 				CreatedAt: m.CreatedAt,
 				UpdatedAt: m.UpdatedAt,
@@ -188,7 +188,6 @@ func Mapper(
 			ReadStatus:  rr.Status(m.ID),
 			ReplyStatus: rs.Status(m.ID),
 			Category:    category,
-			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 		}, nil
 	}
 }
@@ -225,9 +224,10 @@ func ItemRef(t *ent.Post) (datagraph.Item, error) {
 			Author: profile.Ref{
 				ID: account.AccountID(t.AccountPosts),
 			},
-			CreatedAt: t.CreatedAt,
-			UpdatedAt: t.UpdatedAt,
-			DeletedAt: opt.NewPtr(t.DeletedAt),
+			Visibility: visibility.NewVisibilityFromEnt(t.Visibility),
+			CreatedAt:  t.CreatedAt,
+			UpdatedAt:  t.UpdatedAt,
+			DeletedAt:  opt.NewPtr(t.DeletedAt),
 		},
 
 		Title: t.Title,
@@ -235,8 +235,7 @@ func ItemRef(t *ent.Post) (datagraph.Item, error) {
 		Category: opt.New(category.Category{
 			ID: category.CategoryID(t.CategoryID),
 		}),
-		Short:      t.Short,
-		Visibility: visibility.NewVisibilityFromEnt(t.Visibility),
-		Tags:       dt.Map(t.Edges.Tags, tag_ref.Map(nil)),
+		Short: t.Short,
+		Tags:  dt.Map(t.Edges.Tags, tag_ref.Map(nil)),
 	}, nil
 }

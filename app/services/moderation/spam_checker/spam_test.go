@@ -1,4 +1,4 @@
-package spam
+package spam_checker
 
 import (
 	_ "embed"

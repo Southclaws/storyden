@@ -24,7 +24,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
-	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
+	"github.com/Southclaws/storyden/app/services/moderation"
+	"github.com/Southclaws/storyden/app/services/report/system_report"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -86,16 +87,17 @@ func Build() fx.Option {
 type service struct {
 	ins spanner.Instrumentation
 
-	accountQuery  *account_querier.Querier
-	threadQuerier *thread_querier.Querier
-	threadWriter  *thread_writer.Writer
-	tagWriter     *tag_writer.Writer
-	fetcher       *fetcher.Fetcher
-	recommender   semdex.Recommender
-	bus           *pubsub.Bus
-	mentioner     *mentioner.Mentioner
-	cpm           *content_policy.Manager
-	cache         *thread_cache.Cache
+	accountQuery   *account_querier.Querier
+	threadQuerier  *thread_querier.Querier
+	threadWriter   *thread_writer.Writer
+	tagWriter      *tag_writer.Writer
+	fetcher        *fetcher.Fetcher
+	recommender    semdex.Recommender
+	bus            *pubsub.Bus
+	mentioner      *mentioner.Mentioner
+	cpm            *moderation.Manager
+	cache          *thread_cache.Cache
+	systemReporter *system_report.Manager
 }
 
 func New(
@@ -109,21 +111,23 @@ func New(
 	recommender semdex.Recommender,
 	bus *pubsub.Bus,
 	mentioner *mentioner.Mentioner,
-	cpm *content_policy.Manager,
+	cpm *moderation.Manager,
 	cache *thread_cache.Cache,
+	systemReporter *system_report.Manager,
 ) Service {
 	return &service{
 		ins: ins.Build(),
 
-		accountQuery:  accountQuery,
-		threadQuerier: threadQuerier,
-		threadWriter:  threadWriter,
-		tagWriter:     tagWriter,
-		fetcher:       fetcher,
-		recommender:   recommender,
-		bus:           bus,
-		mentioner:     mentioner,
-		cpm:           cpm,
-		cache:         cache,
+		accountQuery:   accountQuery,
+		threadQuerier:  threadQuerier,
+		threadWriter:   threadWriter,
+		tagWriter:      tagWriter,
+		fetcher:        fetcher,
+		recommender:    recommender,
+		bus:            bus,
+		mentioner:      mentioner,
+		cpm:            cpm,
+		cache:          cache,
+		systemReporter: systemReporter,
 	}
 }

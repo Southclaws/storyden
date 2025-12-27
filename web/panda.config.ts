@@ -12,7 +12,9 @@ import { datePicker } from "@/recipes/date-picker";
 import { fileUpload } from "@/recipes/file-upload";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
+import { inputGroup } from "@/recipes/input-group";
 import { menu } from "@/recipes/menu";
+import { numberInput } from "@/recipes/number-input";
 import { pinInput } from "@/recipes/pin-input";
 import { popover } from "@/recipes/popover";
 import { progress } from "@/recipes/progress";
@@ -202,6 +204,8 @@ export default defineConfig({
       slotRecipes: {
         alert: alert,
         clipboard: clipboard,
+        numberInput: numberInput,
+        inputGroup: inputGroup,
         datePicker: datePicker,
         select: select,
         colorPicker: colorPicker,

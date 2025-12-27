@@ -10,11 +10,36 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
   NoContentResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
+
+/**
+ * Retrieve all configuration settings for installation. This includes the
+publicly accessible information for the instance as well as admin-only
+access to sensitive configuration (environment variables) and settings.
+
+ */
+export type adminSettingsGetResponse = {
+  data: AdminSettingsGetOKResponse;
+  status: number;
+};
+
+export const getAdminSettingsGetUrl = () => {
+  return `/admin`;
+};
+
+export const adminSettingsGet = async (
+  options?: RequestInit,
+): Promise<adminSettingsGetResponse> => {
+  return fetcher<Promise<adminSettingsGetResponse>>(getAdminSettingsGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
 
 /**
  * Update non-env configuration settings for installation.

@@ -12,7 +12,6 @@ import type { LinkReference } from "./linkReference";
 import type { ReadStatus } from "./readStatus";
 import type { ReplyStatus } from "./replyStatus";
 import type { TagReferenceList } from "./tagReferenceList";
-import type { Visibility } from "./visibility";
 
 export interface ThreadReferenceProps {
   category?: CategoryReference;
@@ -24,5 +23,4 @@ export interface ThreadReferenceProps {
   read_status?: ReadStatus;
   reply_status: ReplyStatus;
   tags: TagReferenceList;
-  visibility: Visibility;
 }

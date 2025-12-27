@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -46,9 +47,17 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	vis, err := opt.MapErr(opt.NewPtr(request.Body.Visibility), func(v openapi.Visibility) (visibility.Visibility, error) {
+		return visibility.NewVisibility(string(v))
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	partial := reply.Partial{
-		Content: richContent,
-		Meta:    opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Content:    richContent,
+		Visibility: vis,
+		Meta:       opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	}
 
 	post, err := p.replyMutator.Update(ctx, postID, partial)

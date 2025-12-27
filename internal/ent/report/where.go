@@ -374,6 +374,16 @@ func ReportedByIDHasSuffix(v xid.ID) predicate.Report {
 	return predicate.Report(sql.FieldHasSuffix(FieldReportedByID, vc))
 }
 
+// ReportedByIDIsNil applies the IsNil predicate on the "reported_by_id" field.
+func ReportedByIDIsNil() predicate.Report {
+	return predicate.Report(sql.FieldIsNull(FieldReportedByID))
+}
+
+// ReportedByIDNotNil applies the NotNil predicate on the "reported_by_id" field.
+func ReportedByIDNotNil() predicate.Report {
+	return predicate.Report(sql.FieldNotNull(FieldReportedByID))
+}
+
 // ReportedByIDEqualFold applies the EqualFold predicate on the "reported_by_id" field.
 func ReportedByIDEqualFold(v xid.ID) predicate.Report {
 	vc := v.String()

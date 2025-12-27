@@ -10,6 +10,8 @@ export * from './typography-heading.mjs';
 export * from './rich-card.mjs';
 export * from './alert.mjs';
 export * from './clipboard.mjs';
+export * from './number-input.mjs';
+export * from './input-group.mjs';
 export * from './date-picker.mjs';
 export * from './select.mjs';
 export * from './color-picker.mjs';

@@ -1,6 +1,7 @@
 "use client";
 
 import { Controller, ControllerProps } from "react-hook-form";
+import { match } from "ts-pattern";
 
 import { Unready } from "src/components/site/Unready";
 
@@ -14,6 +15,7 @@ import { SaveAction } from "@/components/site/Action/Save";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
+import { PostReviewBadge } from "@/components/thread/PostReviewBadge";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyProvider } from "@/components/thread/ReplyContext";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
@@ -34,8 +36,18 @@ import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
 export function ThreadScreen(props: Props) {
-  const { ready, error, form, isEditing, isEmpty, resetKey, data, handlers } =
-    useThreadScreen(props);
+  const {
+    ready,
+    error,
+    form,
+    isEditing,
+    isEmpty,
+    resetKey,
+    isModerator,
+    isConfirmingDelete,
+    data,
+    handlers,
+  } = useThreadScreen(props);
 
   if (!ready) {
     return <Unready error={error} />;
@@ -91,9 +103,22 @@ export function ThreadScreen(props: Props) {
               {thread.category && <CategoryBadge category={thread.category} />}
             </HStack>
 
-            {thread.visibility !== Visibility.published && (
-              <VisibilityBadge visibility={thread.visibility} />
-            )}
+            {match(thread.visibility)
+              .with(Visibility.published, () => null)
+              .with(Visibility.review, () => (
+                <PostReviewBadge
+                  isModerator={isModerator}
+                  postId={thread.id}
+                  onAccept={handlers.handleAcceptThread}
+                  onEditAndAccept={handlers.handleEditAndAccept}
+                  onDelete={handlers.handleConfirmDelete}
+                  isConfirmingDelete={isConfirmingDelete}
+                  onCancelDelete={handlers.handleCancelDelete}
+                />
+              ))
+              .otherwise(() => (
+                <VisibilityBadge visibility={thread.visibility} />
+              ))}
           </WStack>
           <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 

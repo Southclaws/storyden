@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 )
@@ -74,6 +75,12 @@ func WithContentLinks(ids ...xid.ID) Option {
 	}
 }
 
+func WithVisibility(v visibility.Visibility) Option {
+	return func(pm *ent.PostMutation) {
+		pm.SetVisibility(ent_post.Visibility(v.String()))
+	}
+}
+
 func (d *Writer) Create(
 	ctx context.Context,
 	authorID account.AccountID,
@@ -104,8 +111,7 @@ func (d *Writer) Create(
 		SetUpdatedAt(time.Now()).
 		SetLastReplyAt(time.Now()).
 		SetRootID(xid.ID(parentID)).
-		SetAuthorID(xid.ID(authorID)).
-		SetVisibility(ent_post.VisibilityPublished)
+		SetAuthorID(xid.ID(authorID))
 
 	for _, fn := range opts {
 		fn(q.Mutation())

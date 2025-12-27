@@ -49,7 +49,7 @@ func (m *Manager) Submit(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	rep, err := m.reportWriter.Create(ctx, targetID, targetKind, acc.ID, comment)
+	rep, err := m.reportWriter.Create(ctx, targetID, targetKind, opt.New(acc.ID), comment)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -62,7 +62,7 @@ func (m *Manager) Submit(
 	m.bus.Publish(ctx, &message.EventReportCreated{
 		ID:         rep.ID,
 		Target:     targetRef,
-		ReportedBy: rep.ReportedBy.ID,
+		ReportedBy: opt.Map(rep.ReportedBy, func(a account.Account) account.AccountID { return a.ID }),
 	})
 
 	return rep, nil
@@ -103,7 +103,7 @@ func (m *Manager) Resolve(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if existing.ReportedBy.ID != acc.ID {
+	if existing.ReportedBy.OrZero().ID != acc.ID {
 		return nil, fault.Wrap(
 			fault.New("cannot resolve report submitted by another user"),
 			fctx.With(ctx),
@@ -127,9 +127,11 @@ func (m *Manager) Resolve(
 	}
 
 	m.bus.Publish(ctx, &message.EventReportUpdated{
-		ID:         rep.ID,
-		Target:     targetRef,
-		ReportedBy: rep.ReportedBy.ID,
+		ID:     rep.ID,
+		Target: targetRef,
+		ReportedBy: opt.Map(rep.ReportedBy, func(a account.Account) account.AccountID {
+			return a.ID
+		}),
 		HandledBy: opt.Map(rep.HandledBy, func(a account.Account) account.AccountID {
 			return a.ID
 		}),

@@ -57,11 +57,6 @@ export function ReportScreenMember(props: Props) {
         <>
           <ReportResultList reports={reports} />
 
-          <styled.p color="fg.subtle" fontSize="sm">
-            Showing {reports.length} of {results} report
-            {results === 1 ? "" : "s"}
-          </styled.p>
-
           <PaginationControls
             path="/reports"
             currentPage={current_page}
