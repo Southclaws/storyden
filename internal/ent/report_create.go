@@ -71,6 +71,14 @@ func (_c *ReportCreate) SetReportedByID(v xid.ID) *ReportCreate {
 	return _c
 }
 
+// SetNillableReportedByID sets the "reported_by_id" field if the given value is not nil.
+func (_c *ReportCreate) SetNillableReportedByID(v *xid.ID) *ReportCreate {
+	if v != nil {
+		_c.SetReportedByID(*v)
+	}
+	return _c
+}
+
 // SetHandledByID sets the "handled_by_id" field.
 func (_c *ReportCreate) SetHandledByID(v xid.ID) *ReportCreate {
 	_c.mutation.SetHandledByID(v)
@@ -218,9 +226,6 @@ func (_c *ReportCreate) check() error {
 	if _, ok := _c.mutation.TargetKind(); !ok {
 		return &ValidationError{Name: "target_kind", err: errors.New(`ent: missing required field "Report.target_kind"`)}
 	}
-	if _, ok := _c.mutation.ReportedByID(); !ok {
-		return &ValidationError{Name: "reported_by_id", err: errors.New(`ent: missing required field "Report.reported_by_id"`)}
-	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Report.status"`)}
 	}
@@ -228,9 +233,6 @@ func (_c *ReportCreate) check() error {
 		if err := report.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Report.id": %w`, err)}
 		}
-	}
-	if len(_c.mutation.ReportedByIDs()) == 0 {
-		return &ValidationError{Name: "reported_by", err: errors.New(`ent: missing required edge "Report.reported_by"`)}
 	}
 	return nil
 }
@@ -310,7 +312,7 @@ func (_c *ReportCreate) createSpec() (*Report, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ReportedByID = nodes[0]
+		_node.ReportedByID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.HandledByIDs(); len(nodes) > 0 {
@@ -427,6 +429,12 @@ func (u *ReportUpsert) SetReportedByID(v xid.ID) *ReportUpsert {
 // UpdateReportedByID sets the "reported_by_id" field to the value that was provided on create.
 func (u *ReportUpsert) UpdateReportedByID() *ReportUpsert {
 	u.SetExcluded(report.FieldReportedByID)
+	return u
+}
+
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (u *ReportUpsert) ClearReportedByID() *ReportUpsert {
+	u.SetNull(report.FieldReportedByID)
 	return u
 }
 
@@ -600,6 +608,13 @@ func (u *ReportUpsertOne) SetReportedByID(v xid.ID) *ReportUpsertOne {
 func (u *ReportUpsertOne) UpdateReportedByID() *ReportUpsertOne {
 	return u.Update(func(s *ReportUpsert) {
 		s.UpdateReportedByID()
+	})
+}
+
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (u *ReportUpsertOne) ClearReportedByID() *ReportUpsertOne {
+	return u.Update(func(s *ReportUpsert) {
+		s.ClearReportedByID()
 	})
 }
 
@@ -951,6 +966,13 @@ func (u *ReportUpsertBulk) SetReportedByID(v xid.ID) *ReportUpsertBulk {
 func (u *ReportUpsertBulk) UpdateReportedByID() *ReportUpsertBulk {
 	return u.Update(func(s *ReportUpsert) {
 		s.UpdateReportedByID()
+	})
+}
+
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (u *ReportUpsertBulk) ClearReportedByID() *ReportUpsertBulk {
+	return u.Update(func(s *ReportUpsert) {
+		s.ClearReportedByID()
 	})
 }
 

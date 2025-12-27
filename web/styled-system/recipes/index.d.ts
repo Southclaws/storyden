@@ -11,6 +11,8 @@ export * from './typography-heading';
 export * from './rich-card';
 export * from './alert';
 export * from './clipboard';
+export * from './number-input';
+export * from './input-group';
 export * from './date-picker';
 export * from './select';
 export * from './color-picker';

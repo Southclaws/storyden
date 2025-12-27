@@ -12,6 +12,7 @@ import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 
 import { Byline } from "../../content/Byline";
+import { PostReviewBadge } from "../PostReviewBadge";
 import { ReactList } from "../ReactList/ReactList";
 import { ReplyMenu } from "../ReplyMenu/ReplyMenu";
 
@@ -20,10 +21,21 @@ import { useFragmentScroll } from "./useFragmentScroll";
 import { Form, Props, useReply } from "./useReply";
 
 export function Reply(props: Props) {
-  const { isEmpty, isEditing, resetKey, form, handlers } = useReply(props);
+  const {
+    isEmpty,
+    isEditing,
+    isEditingInReview,
+    canManageReplies,
+    resetKey,
+    form,
+    isConfirmingDelete,
+    handlers,
+  } = useReply(props);
   const isTargeted = useFragmentScroll(props.reply.id);
 
   const { initialSession, thread, reply, currentPage } = props;
+
+  const isInReview = reply.visibility === "review";
 
   return (
     <CardBox
@@ -40,6 +52,7 @@ export function Reply(props: Props) {
         "&[data-targeted]": {
           animation: "target-pulse",
         },
+        backgroundColor: isInReview ? "bg.warning/30" : undefined,
       }}
     >
       <styled.form
@@ -66,7 +79,7 @@ export function Reply(props: Props) {
                   Discard
                 </CancelAction>
                 <SaveAction type="submit" disabled={isEmpty}>
-                  Save
+                  {isEditingInReview ? "Accept" : "Save"}
                 </SaveAction>
               </>
             </HStack>
@@ -95,7 +108,26 @@ export function Reply(props: Props) {
         />
       </styled.form>
 
-      <ReactList initialSession={initialSession} thread={thread} reply={reply} currentPage={currentPage} />
+      <WStack>
+        <ReactList
+          initialSession={initialSession}
+          thread={thread}
+          reply={reply}
+          currentPage={currentPage}
+        />
+
+        {isInReview && (
+          <PostReviewBadge
+            isModerator={canManageReplies}
+            postId={reply.id}
+            onAccept={handlers.handleAcceptReply}
+            onEditAndAccept={handlers.handleSetEditingInReview}
+            onDelete={handlers.handleConfirmDelete}
+            isConfirmingDelete={isConfirmingDelete}
+            onCancelDelete={handlers.handleCancelDelete}
+          />
+        )}
+      </WStack>
     </CardBox>
   );
 }

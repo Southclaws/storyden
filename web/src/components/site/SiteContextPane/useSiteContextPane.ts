@@ -51,7 +51,7 @@ export function useSiteContextPane({ session, initialSettings }: Props) {
     defaultValues: initialSettings,
   });
 
-  const { revalidate, updateSettings } = useSettingsMutation(initialSettings);
+  const { revalidate, updateSettings } = useSettingsMutation();
 
   const { ready, error, settings } = useSettings(initialSettings);
   if (!ready) {

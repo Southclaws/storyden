@@ -7,6 +7,7 @@ import { useSession } from "@/auth";
 import { DatagraphItemBadge } from "@/components/datagraph/DatagraphItemCard";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
+import { SystemBadge } from "@/components/system/SystemBadge";
 import { Button } from "@/components/ui/button";
 import {
   Box,
@@ -106,12 +107,16 @@ export function ReportCard({ report }: Props) {
             <styled.span fontSize="sm" color="fg.subtle" fontWeight="medium">
               Reporter:
             </styled.span>
-            <MemberBadge
-              profile={report.reported_by}
-              name="handle"
-              size="sm"
-              as="link"
-            />
+            {report.reported_by ? (
+              <MemberBadge
+                profile={report.reported_by}
+                name="handle"
+                size="sm"
+                as="link"
+              />
+            ) : (
+              <SystemBadge size="sm" name="visible" />
+            )}
           </HStack>
 
           <HStack gap="2" alignItems="center" minW="0" maxW="1/2">

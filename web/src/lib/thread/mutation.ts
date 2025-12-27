@@ -83,6 +83,7 @@ export function useThreadMutations(
           slug: thread.slug,
           root_id: thread.id,
           root_slug: thread.slug,
+          visibility: "published",
           ...reply,
           reply_to: undefined,
         } satisfies Reply;

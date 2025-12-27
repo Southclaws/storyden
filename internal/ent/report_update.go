@@ -79,6 +79,12 @@ func (_u *ReportUpdate) SetNillableReportedByID(v *xid.ID) *ReportUpdate {
 	return _u
 }
 
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (_u *ReportUpdate) ClearReportedByID() *ReportUpdate {
+	_u.mutation.ClearReportedByID()
+	return _u
+}
+
 // SetHandledByID sets the "handled_by_id" field.
 func (_u *ReportUpdate) SetHandledByID(v xid.ID) *ReportUpdate {
 	_u.mutation.SetHandledByID(v)
@@ -216,14 +222,6 @@ func (_u *ReportUpdate) defaults() {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (_u *ReportUpdate) check() error {
-	if _u.mutation.ReportedByCleared() && len(_u.mutation.ReportedByIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Report.reported_by"`)
-	}
-	return nil
-}
-
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *ReportUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReportUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -231,9 +229,6 @@ func (_u *ReportUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReportU
 }
 
 func (_u *ReportUpdate) sqlSave(ctx context.Context) (_node int, err error) {
-	if err := _u.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(report.Table, report.Columns, sqlgraph.NewFieldSpec(report.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -394,6 +389,12 @@ func (_u *ReportUpdateOne) SetNillableReportedByID(v *xid.ID) *ReportUpdateOne {
 	return _u
 }
 
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (_u *ReportUpdateOne) ClearReportedByID() *ReportUpdateOne {
+	_u.mutation.ClearReportedByID()
+	return _u
+}
+
 // SetHandledByID sets the "handled_by_id" field.
 func (_u *ReportUpdateOne) SetHandledByID(v xid.ID) *ReportUpdateOne {
 	_u.mutation.SetHandledByID(v)
@@ -544,14 +545,6 @@ func (_u *ReportUpdateOne) defaults() {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (_u *ReportUpdateOne) check() error {
-	if _u.mutation.ReportedByCleared() && len(_u.mutation.ReportedByIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Report.reported_by"`)
-	}
-	return nil
-}
-
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *ReportUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReportUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -559,9 +552,6 @@ func (_u *ReportUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Repo
 }
 
 func (_u *ReportUpdateOne) sqlSave(ctx context.Context) (_node *Report, err error) {
-	if err := _u.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(report.Table, report.Columns, sqlgraph.NewFieldSpec(report.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {

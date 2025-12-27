@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
   BadRequestResponse,
@@ -26,6 +27,51 @@ import type {
   UnauthorisedResponse,
 } from "../openapi-schema";
 
+/**
+ * Retrieve all configuration settings for installation. This includes the
+publicly accessible information for the instance as well as admin-only
+access to sensitive configuration (environment variables) and settings.
+
+ */
+export const adminSettingsGet = () => {
+  return fetcher<AdminSettingsGetOKResponse>({ url: `/admin`, method: "GET" });
+};
+
+export const getAdminSettingsGetKey = () => [`/admin`] as const;
+
+export type AdminSettingsGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminSettingsGet>>
+>;
+export type AdminSettingsGetQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAdminSettingsGet = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof adminSettingsGet>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAdminSettingsGetKey() : null));
+  const swrFn = () => adminSettingsGet();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 /**
  * Update non-env configuration settings for installation.
  */

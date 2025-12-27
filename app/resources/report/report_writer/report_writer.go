@@ -28,15 +28,15 @@ func (w *Writer) Create(
 	ctx context.Context,
 	targetID xid.ID,
 	targetKind datagraph.Kind,
-	reportedBy account.AccountID,
+	reportedBy opt.Optional[account.AccountID],
 	comment opt.Optional[string],
 ) (*report.Report, error) {
 	create := w.db.Report.Create().
 		SetTargetID(targetID).
 		SetTargetKind(targetKind.String()).
-		SetReportedByID(xid.ID(reportedBy)).
 		SetStatus(report.StatusSubmitted.String())
 
+	reportedBy.Call(func(value account.AccountID) { create.SetReportedByID(xid.ID(value)) })
 	comment.Call(func(value string) { create.SetComment(value) })
 
 	r, err := create.Save(ctx)

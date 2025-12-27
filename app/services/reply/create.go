@@ -10,9 +10,12 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 func (s *Mutator) Create(
@@ -21,17 +24,29 @@ func (s *Mutator) Create(
 	parentID post.ID,
 	partial Partial,
 ) (*reply.Reply, error) {
-	if content, ok := partial.Content.Get(); ok {
-		if err := s.cpm.CheckContent(ctx, content); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
 	opts := partial.Opts()
+	opts = append(opts, reply_writer.WithVisibility(visibility.VisibilityPublished))
 
 	p, err := s.replyWriter.Create(ctx, authorID, parentID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
+	}
+
+	wasMovedToReview := false
+	if content, ok := partial.Content.Get(); ok {
+		result, err := s.cpm.CheckContent(ctx, xid.ID(p.ID), datagraph.KindReply, "", content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if result.RequiresReview {
+			updatedReply, err := s.replyWriter.Update(ctx, p.ID, reply_writer.WithVisibility(visibility.VisibilityReview))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+			p = updatedReply
+			wasMovedToReview = true
+		}
 	}
 
 	pref, err := s.replyQuerier.Probe(ctx, p.ID)
@@ -50,14 +65,17 @@ func (s *Mutator) Create(
 		return r.ID
 	})
 
-	s.bus.Publish(ctx, &message.EventThreadReplyCreated{
-		ThreadID:        p.RootPostID,
-		ReplyID:         p.ID,
-		ThreadAuthorID:  p.RootAuthor.ID,
-		ReplyAuthorID:   authorID,
-		ReplyToAuthorID: replyToAuthorID,
-		ReplyToTargetID: replyToReplyID,
-	})
+	// Only emit created event (which triggers indexing) if reply is published
+	if !wasMovedToReview {
+		s.bus.Publish(ctx, &message.EventThreadReplyCreated{
+			ThreadID:        p.RootPostID,
+			ReplyID:         p.ID,
+			ThreadAuthorID:  p.RootAuthor.ID,
+			ReplyAuthorID:   authorID,
+			ReplyToAuthorID: replyToAuthorID,
+			ReplyToTargetID: replyToReplyID,
+		})
+	}
 
 	return p, nil
 }

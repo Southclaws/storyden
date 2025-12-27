@@ -9,6 +9,7 @@ import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
+import { useReportContext } from "@/lib/report/useReportContext";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
 import { useShare } from "@/utils/client";
@@ -29,6 +30,7 @@ export function useThreadMenu({
 }: Props) {
   const router = useRouter();
   const account = useSession();
+  const { resolveReport } = useReportContext();
   const [_, setEditing] = useQueryState("edit", parseAsBoolean);
   const [, copyToClipboard] = useCopyToClipboard();
   const pathname = usePathname();
@@ -75,6 +77,7 @@ export function useThreadMenu({
           toastId: `thread-${thread.id}`,
           action: async () => {
             await deleteThread(thread.id);
+            await resolveReport();
 
             if (isOnThreadPage) {
               router.push("/");

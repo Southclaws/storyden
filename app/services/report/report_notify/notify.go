@@ -60,15 +60,13 @@ func sendReportSubmitted(
 	accountQuerier *account_querier.Querier,
 	evt *message.EventReportCreated,
 ) error {
-	source := opt.New(evt.ReportedBy)
-
 	accs, err := accountQuerier.ListByHeldPermission(ctx, rbac.PermissionAdministrator, rbac.PermissionManageReports)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	for _, acc := range accs {
-		if err := notifier.Send(ctx, acc.ID, source, notification.EventReportSubmitted, evt.Target); err != nil {
+		if err := notifier.Send(ctx, acc.ID, evt.ReportedBy, notification.EventReportSubmitted, evt.Target); err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 	}
@@ -93,12 +91,17 @@ func sendReportUpdated(
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if rep.ReportedBy.ID != source {
+	reportedBy, ok := rep.ReportedBy.Get()
+	if !ok {
+		return nil
+	}
+
+	if reportedBy.ID != source {
 		// Moderator updated the report; notify author.
 
 		if err := notifier.Send(
 			ctx,
-			rep.ReportedBy.ID,
+			reportedBy.ID,
 			opt.NewEmpty[account.AccountID](),
 			notification.EventReportUpdated,
 			nil,

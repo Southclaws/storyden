@@ -177,6 +177,7 @@ func serialiseReplyPtr(p *reply.Reply) openapi.Reply {
 		Slug:        p.Slug,
 		Title:       p.RootThreadTitle,
 		Body:        p.Content.HTML(),
+		Visibility:  serialiseVisibility(p.Visibility),
 		Description: &description,
 		Author:      serialiseProfileReference(p.Author),
 		Likes:       serialiseLikeStatus(&p.Likes),
@@ -208,20 +209,22 @@ func serialisePost(p *post.Post) openapi.Post {
 		Likes:       serialiseLikeStatus(&p.Likes),
 		Reacts:      dt.Map(p.Reacts, serialiseReact),
 		Meta:        (*openapi.Metadata)(&p.Meta),
+		Visibility:  serialiseVisibility(p.Visibility),
 	}
 }
 
 func serialisePostRef(p *post.Post) openapi.PostReference {
 	return openapi.PostReference{
-		Id:        openapi.Identifier(xid.ID(p.ID).String()),
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		DeletedAt: p.DeletedAt.Ptr(),
-		Author:    serialiseProfileReference(p.Author),
-		Likes:     serialiseLikeStatus(&p.Likes),
-		Reacts:    dt.Map(p.Reacts, serialiseReact),
-		Meta:      (*openapi.Metadata)(&p.Meta),
-		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
+		Id:         openapi.Identifier(xid.ID(p.ID).String()),
+		CreatedAt:  p.CreatedAt,
+		UpdatedAt:  p.UpdatedAt,
+		DeletedAt:  p.DeletedAt.Ptr(),
+		Author:     serialiseProfileReference(p.Author),
+		Likes:      serialiseLikeStatus(&p.Likes),
+		Reacts:     dt.Map(p.Reacts, serialiseReact),
+		Meta:       (*openapi.Metadata)(&p.Meta),
+		Assets:     dt.Map(p.Assets, serialiseAssetPtr),
+		Visibility: serialiseVisibility(p.Visibility),
 	}
 }
 

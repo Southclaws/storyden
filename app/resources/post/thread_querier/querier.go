@@ -108,6 +108,35 @@ func HasStatus(status ...visibility.Visibility) Query {
 	}
 }
 
+func HasPublishedOrOwnInReview(accountID opt.Optional[account.AccountID], isModerator bool) Query {
+	return func(q *ent.PostQuery) {
+		publishedStatus := ent_post.Visibility(visibility.VisibilityPublished.String())
+		reviewStatus := ent_post.Visibility(visibility.VisibilityReview.String())
+
+		authorID, hasAuthor := accountID.Get()
+		if !hasAuthor {
+			q.Where(ent_post.VisibilityEQ(publishedStatus))
+			return
+		}
+
+		if isModerator {
+			q.Where(ent_post.Or(
+				ent_post.VisibilityEQ(publishedStatus),
+				ent_post.VisibilityEQ(reviewStatus),
+			))
+			return
+		}
+
+		q.Where(ent_post.Or(
+			ent_post.VisibilityEQ(publishedStatus),
+			ent_post.And(
+				ent_post.VisibilityEQ(reviewStatus),
+				ent_post.HasAuthorWith(ent_account.ID(xid.ID(authorID))),
+			),
+		))
+	}
+}
+
 func HasNotBeenDeleted() Query {
 	return func(q *ent.PostQuery) {
 		q.Where(ent_post.DeletedAtIsNil())

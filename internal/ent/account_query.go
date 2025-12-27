@@ -2141,9 +2141,12 @@ func (_q *AccountQuery) loadReports(ctx context.Context, query *ReportQuery, nod
 	}
 	for _, n := range neighbors {
 		fk := n.ReportedByID
-		node, ok := nodeids[fk]
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "reported_by_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "reported_by_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "reported_by_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

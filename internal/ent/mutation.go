@@ -25745,7 +25745,7 @@ func (m *ReportMutation) ReportedByID() (r xid.ID, exists bool) {
 // OldReportedByID returns the old "reported_by_id" field's value of the Report entity.
 // If the Report object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ReportMutation) OldReportedByID(ctx context.Context) (v xid.ID, err error) {
+func (m *ReportMutation) OldReportedByID(ctx context.Context) (v *xid.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldReportedByID is only allowed on UpdateOne operations")
 	}
@@ -25759,9 +25759,22 @@ func (m *ReportMutation) OldReportedByID(ctx context.Context) (v xid.ID, err err
 	return oldValue.ReportedByID, nil
 }
 
+// ClearReportedByID clears the value of the "reported_by_id" field.
+func (m *ReportMutation) ClearReportedByID() {
+	m.reported_by = nil
+	m.clearedFields[report.FieldReportedByID] = struct{}{}
+}
+
+// ReportedByIDCleared returns if the "reported_by_id" field was cleared in this mutation.
+func (m *ReportMutation) ReportedByIDCleared() bool {
+	_, ok := m.clearedFields[report.FieldReportedByID]
+	return ok
+}
+
 // ResetReportedByID resets all changes to the "reported_by_id" field.
 func (m *ReportMutation) ResetReportedByID() {
 	m.reported_by = nil
+	delete(m.clearedFields, report.FieldReportedByID)
 }
 
 // SetHandledByID sets the "handled_by_id" field.
@@ -25955,7 +25968,7 @@ func (m *ReportMutation) ClearReportedBy() {
 
 // ReportedByCleared reports if the "reported_by" edge to the Account entity was cleared.
 func (m *ReportMutation) ReportedByCleared() bool {
-	return m.clearedreported_by
+	return m.ReportedByIDCleared() || m.clearedreported_by
 }
 
 // ReportedByIDs returns the "reported_by" edge IDs in the mutation.
@@ -26218,6 +26231,9 @@ func (m *ReportMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ReportMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(report.FieldReportedByID) {
+		fields = append(fields, report.FieldReportedByID)
+	}
 	if m.FieldCleared(report.FieldHandledByID) {
 		fields = append(fields, report.FieldHandledByID)
 	}
@@ -26241,6 +26257,9 @@ func (m *ReportMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ReportMutation) ClearField(name string) error {
 	switch name {
+	case report.FieldReportedByID:
+		m.ClearReportedByID()
+		return nil
 	case report.FieldHandledByID:
 		m.ClearHandledByID()
 		return nil

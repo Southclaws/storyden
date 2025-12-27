@@ -24,7 +24,7 @@ type Report struct {
 	TargetItemKind datagraph.Kind
 	TargetItemID   xid.ID
 	TargetItem     datagraph.Item
-	ReportedBy     account.Account
+	ReportedBy     opt.Optional[account.Account]
 	HandledBy      opt.Optional[account.Account]
 	Comment        opt.Optional[string]
 }
@@ -42,7 +42,7 @@ type ReportRef struct {
 
 	Status     Status
 	TargetRef  datagraph.Ref
-	ReportedBy account.Account
+	ReportedBy opt.Optional[account.Account]
 	HandledBy  opt.Optional[account.Account]
 	Comment    opt.Optional[string]
 }
@@ -50,7 +50,14 @@ type ReportRef struct {
 type ReportRefs []*ReportRef
 
 func Map(r *ent.Report) (*ReportRef, error) {
-	reportedBy, err := account.MapRef(r.Edges.ReportedBy)
+	reportedByEdge := opt.NewPtr(r.Edges.ReportedBy)
+	reportedBy, err := opt.MapErr(reportedByEdge, func(a ent.Account) (account.Account, error) {
+		p, err := account.MapRef(&a)
+		if err != nil {
+			return account.Account{}, err
+		}
+		return *p, nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +93,7 @@ func Map(r *ent.Report) (*ReportRef, error) {
 			Kind: targetKind,
 		},
 		Status:     status,
-		ReportedBy: *reportedBy,
+		ReportedBy: reportedBy,
 		HandledBy:  handledBy,
 		Comment:    opt.NewPtr(r.Comment),
 	}, nil

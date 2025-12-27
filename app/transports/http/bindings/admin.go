@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
+	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -24,44 +25,41 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Admin struct {
-	accountQuery *account_querier.Querier
-	profileQuery *profile_querier.Querier
-	as           account_suspension.Service
-	sr           *settings.SettingsRepository
-	akr          *access_key.Repository
+	accountQuery    *account_querier.Querier
+	profileQuery    *profile_querier.Querier
+	as              account_suspension.Service
+	settingsManager *settings_manager.Manager
+	akr             *access_key.Repository
 }
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
 	profileQuery *profile_querier.Querier,
 	as account_suspension.Service,
-	sr *settings.SettingsRepository,
+	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
 ) Admin {
 	return Admin{
-		accountQuery: accountQuery,
-		profileQuery: profileQuery,
-		as:           as,
-		sr:           sr,
-		akr:          akr,
+		accountQuery:    accountQuery,
+		profileQuery:    profileQuery,
+		as:              as,
+		settingsManager: settingsManager,
+		akr:             akr,
 	}
 }
 
+func (a *Admin) AdminSettingsGet(ctx context.Context, request openapi.AdminSettingsGetRequestObject) (openapi.AdminSettingsGetResponseObject, error) {
+	settings, err := a.settingsManager.Get(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminSettingsGet200JSONResponse{
+		AdminSettingsGetOKJSONResponse: openapi.AdminSettingsGetOKJSONResponse(serialiseSettings(settings)),
+	}, nil
+}
+
 func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSettingsUpdateRequestObject) (openapi.AdminSettingsUpdateResponseObject, error) {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := a.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if !acc.Admin {
-		return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
-	}
-
 	content, err := opt.MapErr(opt.NewPtr(request.Body.Content), datagraph.NewRichText)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -72,12 +70,25 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	settings, err := a.sr.Set(ctx, settings.Settings{
+	var services opt.Optional[settings.ServiceSettings]
+	if request.Body.Services != nil && request.Body.Services.Moderation != nil {
+		moderation := request.Body.Services.Moderation
+		services = opt.New(settings.ServiceSettings{
+			Moderation: opt.New(settings.ModerationServiceSettings{
+				MaxThreadBodyLength: opt.NewPtr(moderation.ThreadBodySizeLimit),
+				MaxReplyBodyLength:  opt.NewPtr(moderation.ReplyBodySizeLimit),
+				WordBlocklist:       opt.NewPtr(moderation.WordBlockList),
+			}),
+		})
+	}
+
+	settings, err := a.settingsManager.Set(ctx, settings.Settings{
 		Title:              opt.NewPtr(request.Body.Title),
 		Description:        opt.NewPtr(request.Body.Description),
 		Content:            content,
 		AccentColour:       opt.NewPtr(request.Body.AccentColour),
 		AuthenticationMode: authMode,
+		Services:           services,
 		Metadata:           opt.NewPtr((*map[string]any)(request.Body.Metadata)),
 	})
 	if err != nil {
@@ -190,7 +201,22 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		Content:            in.Content.OrZero().HTML(),
 		Title:              in.Title.OrZero(),
 		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		Services:           opt.Map(in.Services, serialiseServiceSettings).Ptr(),
 		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
+	}
+}
+
+func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettingsServiceProps {
+	return openapi.AdminSettingsServiceProps{
+		Moderation: opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
+	}
+}
+
+func serialiseModerationSettings(in settings.ModerationServiceSettings) openapi.ModerationServiceSettings {
+	return openapi.ModerationServiceSettings{
+		ThreadBodySizeLimit: in.MaxThreadBodyLength.Ptr(),
+		ReplyBodySizeLimit:  in.MaxReplyBodyLength.Ptr(),
+		WordBlockList:       in.WordBlocklist.Ptr(),
 	}
 }
 

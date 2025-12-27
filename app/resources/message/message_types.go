@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/report"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
@@ -51,6 +52,16 @@ type EventThreadReplyDeleted struct {
 }
 
 type EventThreadReplyUpdated struct {
+	ThreadID post.ID
+	ReplyID  post.ID
+}
+
+type EventThreadReplyPublished struct {
+	ThreadID post.ID
+	ReplyID  post.ID
+}
+
+type EventThreadReplyUnpublished struct {
 	ThreadID post.ID
 	ReplyID  post.ID
 }
@@ -192,13 +203,13 @@ type CommandSendBeacon struct {
 type EventReportCreated struct {
 	ID         report.ID
 	Target     *datagraph.Ref
-	ReportedBy account.AccountID
+	ReportedBy opt.Optional[account.AccountID]
 }
 
 type EventReportUpdated struct {
 	ID         report.ID
 	Target     *datagraph.Ref
-	ReportedBy account.AccountID
+	ReportedBy opt.Optional[account.AccountID]
 	HandledBy  opt.Optional[account.AccountID]
 	Status     report.Status
 }
@@ -230,4 +241,12 @@ type EventActivityDeleted struct {
 
 type EventActivityPublished struct {
 	ID event_ref.EventID
+}
+
+// -
+// Settings events
+// -
+
+type EventSettingsUpdated struct {
+	Settings *settings.Settings
 }

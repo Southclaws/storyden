@@ -205,6 +205,20 @@ func newIndexer(
 			return err
 		}
 
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_published", func(ctx context.Context, evt *message.EventThreadReplyPublished) error {
+			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
+		})
+		if err != nil {
+			return err
+		}
+
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_unpublished", func(ctx context.Context, evt *message.EventThreadReplyUnpublished) error {
+			return idx.bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
+		})
+		if err != nil {
+			return err
+		}
+
 		_, err = pubsub.SubscribeCommand(ctx, idx.bus, "search_indexer.index_reply", func(ctx context.Context, cmd *message.CommandReplyIndex) error {
 			return idx.indexReply(ctx, cmd.ID)
 		})

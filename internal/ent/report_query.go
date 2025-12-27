@@ -453,7 +453,10 @@ func (_q *ReportQuery) loadReportedBy(ctx context.Context, query *AccountQuery, 
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Report)
 	for i := range nodes {
-		fk := nodes[i].ReportedByID
+		if nodes[i].ReportedByID == nil {
+			continue
+		}
+		fk := *nodes[i].ReportedByID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}

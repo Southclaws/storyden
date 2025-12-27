@@ -258,6 +258,18 @@ paths:
   #
 
   /admin:
+    get:
+      operationId: AdminSettingsGet
+      description: |
+        Retrieve all configuration settings for installation. This includes the
+        publicly accessible information for the instance as well as admin-only
+        access to sensitive configuration (environment variables) and settings.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AdminSettingsGetOK" }
+
     patch:
       operationId: AdminSettingsUpdate
       description: Update non-env configuration settings for installation.
@@ -3117,6 +3129,13 @@ components:
           schema:
             $ref: "#/components/schemas/Info"
 
+    AdminSettingsGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AdminSettingsProps"
+
     AdminSettingsUpdateOK:
       description: OK
       content:
@@ -4026,6 +4045,10 @@ components:
           type: string
         authentication_mode:
           $ref: "#/components/schemas/AuthMode"
+        capabilities:
+          $ref: "#/components/schemas/InstanceCapabilityList"
+        services:
+          $ref: "#/components/schemas/AdminSettingsServiceProps"
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -4042,11 +4065,39 @@ components:
           type: string
         authentication_mode:
           $ref: "#/components/schemas/AuthMode"
+        services:
+          $ref: "#/components/schemas/AdminSettingsServiceProps"
         metadata:
           description: |
             The settings metadata may be used by frontends to store arbitrary
             vendor-specific configuration data specific to the frontend itself.
           $ref: "#/components/schemas/Metadata"
+
+    AdminSettingsServiceProps:
+      type: object
+      properties:
+        moderation:
+          $ref: "#/components/schemas/ModerationServiceSettings"
+
+    ModerationServiceSettings:
+      type: object
+      properties:
+        thread_body_size_limit:
+          type: integer
+          description: |
+            The maximum allowed size (in bytes) for thread bodies. Posts that
+            exceed this size will be rejected by the moderation service.
+        reply_body_size_limit:
+          type: integer
+          description: |
+            The maximum allowed size (in bytes) for reply bodies. Posts that
+            exceed this size will be rejected by the moderation service.
+        word_block_list:
+          type: array
+          description: |
+            A list of blocklisted words that are not allowed in posts.
+          items:
+            type: string
 
     #
     # 8888888b.          888
@@ -4975,7 +5026,7 @@ components:
 
     ReportRefProps:
       type: object
-      required: [target_id, target_kind, reported_by, status]
+      required: [target_id, target_kind, status]
       properties:
         target_id:
           $ref: "#/components/schemas/Identifier"
@@ -5405,12 +5456,21 @@ components:
 
     PostReferenceProps:
       type: object
-      required: [title, slug, author, assets, reacts, collections, likes]
+      required:
+        - title
+        - slug
+        - author
+        - visibility
+        - assets
+        - reacts
+        - collections
+        - likes
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         description: { $ref: "#/components/schemas/PostDescription" }
         slug: { $ref: "#/components/schemas/ThreadMark" }
         author: { $ref: "#/components/schemas/ProfileReference" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         assets: { $ref: "#/components/schemas/AssetList" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         collections: { $ref: "#/components/schemas/CollectionStatus" }
@@ -5426,6 +5486,7 @@ components:
       properties:
         body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
         url: { $ref: "#/components/schemas/URL" }
 
     PostDescription:
@@ -5499,7 +5560,6 @@ components:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
-        visibility: { $ref: "#/components/schemas/Visibility" }
         read_status: { $ref: "#/components/schemas/ReadStatus" }
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }

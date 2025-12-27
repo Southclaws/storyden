@@ -28,7 +28,7 @@ type Report struct {
 	// The datagraph kind of resource being reported.
 	TargetKind string `json:"target_kind,omitempty"`
 	// ReportedByID holds the value of the "reported_by_id" field.
-	ReportedByID xid.ID `json:"reported_by_id,omitempty"`
+	ReportedByID *xid.ID `json:"reported_by_id,omitempty"`
 	// HandledByID holds the value of the "handled_by_id" field.
 	HandledByID *xid.ID `json:"handled_by_id,omitempty"`
 	// Comment holds the value of the "comment" field.
@@ -81,13 +81,13 @@ func (*Report) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case report.FieldHandledByID:
+		case report.FieldReportedByID, report.FieldHandledByID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case report.FieldTargetKind, report.FieldComment, report.FieldReason, report.FieldStatus:
 			values[i] = new(sql.NullString)
 		case report.FieldCreatedAt, report.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case report.FieldID, report.FieldTargetID, report.FieldReportedByID:
+		case report.FieldID, report.FieldTargetID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -135,10 +135,11 @@ func (_m *Report) assignValues(columns []string, values []any) error {
 				_m.TargetKind = value.String
 			}
 		case report.FieldReportedByID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field reported_by_id", values[i])
-			} else if value != nil {
-				_m.ReportedByID = *value
+			} else if value.Valid {
+				_m.ReportedByID = new(xid.ID)
+				*_m.ReportedByID = *value.S.(*xid.ID)
 			}
 		case report.FieldHandledByID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -225,8 +226,10 @@ func (_m *Report) String() string {
 	builder.WriteString("target_kind=")
 	builder.WriteString(_m.TargetKind)
 	builder.WriteString(", ")
-	builder.WriteString("reported_by_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.ReportedByID))
+	if v := _m.ReportedByID; v != nil {
+		builder.WriteString("reported_by_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := _m.HandledByID; v != nil {
 		builder.WriteString("handled_by_id=")
