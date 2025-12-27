@@ -126,6 +126,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				schema.WithDropIndex(true),
 				schema.WithDropColumn(true),
 				schema.WithApplyHook(populateLastReplyAt()),
+				schema.WithApplyHook(migrateReplyVisibility()),
 			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}
@@ -253,6 +254,40 @@ func populateLastReplyAt() schema.ApplyHook {
 				if err != nil {
 					return fault.Wrap(err, fmsg.With("failed to populate last_reply_at"))
 				}
+			}
+
+			return next.Apply(ctx, conn, plan)
+		})
+	}
+}
+
+// migrateReplyVisibility is a data migration hook that updates all replies in
+// draft visibility to published visibility. This is needed for upgrades from
+// versions ≤ v1.25.12 where replies defaulted to 'draft' visibility (even
+// though draft replies were not a functional feature at that time).
+//
+// Starting in v1.25.12, replies are created with 'published' visibility, and
+// v1.25.14+ adds content moderation with 'review' visibility. This migration
+// ensures old draft replies don't disappear when visibility filtering is done.
+//
+// Safe to run unconditionally because:
+// - Draft replies were never a functional feature before v1.25.14
+// - Only affects replies (posts with root_post_id set)
+// - Idempotent (can run multiple times safely)
+//
+// TODO: Remove this hook after v1.26.0 once version tracking is implemented.
+func migrateReplyVisibility() schema.ApplyHook {
+	return func(next schema.Applier) schema.Applier {
+		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			// Always run this migration on schema creation/update.
+			// It's idempotent and safe since draft replies weren't functional.
+			err := conn.Exec(ctx, `
+				UPDATE posts
+				SET visibility = 'published'
+				WHERE root_post_id IS NOT NULL AND visibility = 'draft'
+			`, []any{}, nil)
+			if err != nil {
+				return fault.Wrap(err, fmsg.With("failed to migrate reply visibility from draft to published"))
 			}
 
 			return next.Apply(ctx, conn, plan)

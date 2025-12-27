@@ -94,20 +94,7 @@ func (idx *Indexer) reindexReplies(ctx context.Context) (int, error) {
 		replies, err := idx.db.Post.Query().
 			Where(
 				ent_post.RootPostIDNotNil(),
-				// NOTE: Prior to version v1.25.12, replies would always be set
-				// to visibility draft on creation, as visibility was never used
-				// for replies. Since v1.25.12, replies always get visibility
-				// published (semantically correct, and we may use it in future
-				// for draft replies, etc.) However, to ensure older instances
-				// are indexed correctly in 1.25.12+, we do not filter by the
-				// visibility. Yet... this will change once replies have a use
-				// case for visibility. The hope is, someone won't jump from
-				// version < 1.25.11 to whatever that version is that will add
-				// draft reply support, and thus removing this filter. Reason
-				// being is, we wouldn't want non-published replies to end up
-				// in the search index. For now, we leave this commented out and
-				// that bridge to be crossed when the time comes.
-				// ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+				ent_post.VisibilityEQ(ent_post.VisibilityPublished),
 				func(s *sql.Selector) {
 					s.Where(sql.Or(
 						sql.IsNull(ent_post.FieldIndexedAt),
