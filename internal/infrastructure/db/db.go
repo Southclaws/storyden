@@ -279,6 +279,10 @@ func populateLastReplyAt() schema.ApplyHook {
 func migrateReplyVisibility() schema.ApplyHook {
 	return func(next schema.Applier) schema.Applier {
 		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			if err := next.Apply(ctx, conn, plan); err != nil {
+				return err
+			}
+
 			// Always run this migration on schema creation/update.
 			// It's idempotent and safe since draft replies weren't functional.
 			err := conn.Exec(ctx, `
@@ -290,7 +294,7 @@ func migrateReplyVisibility() schema.ApplyHook {
 				return fault.Wrap(err, fmsg.With("failed to migrate reply visibility from draft to published"))
 			}
 
-			return next.Apply(ctx, conn, plan)
+			return nil
 		})
 	}
 }
