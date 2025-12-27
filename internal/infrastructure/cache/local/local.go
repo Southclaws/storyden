@@ -170,6 +170,7 @@ func (c *LocalCache) Expire(ctx context.Context, key string, expiration time.Dur
 	v, exists := c.cache.Get(key)
 	if exists {
 		c.cache.SetWithTTL(key, v, 0, expiration)
+		c.cache.Wait()
 	}
 
 	return nil
