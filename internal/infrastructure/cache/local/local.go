@@ -60,6 +60,7 @@ func (c *LocalCache) Get(ctx context.Context, key string) (string, error) {
 
 func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
 	c.cache.SetWithTTL(key, []byte(value), 0, ttl)
+	c.cache.Wait()
 	return nil
 }
 
@@ -117,6 +118,7 @@ func (c *LocalCache) setHSET(key string, hset HSet) error {
 	}
 
 	c.cache.Set(key, buf.Bytes(), 0)
+	c.cache.Wait()
 	return nil
 }
 
@@ -168,6 +170,7 @@ func (c *LocalCache) Expire(ctx context.Context, key string, expiration time.Dur
 	v, exists := c.cache.Get(key)
 	if exists {
 		c.cache.SetWithTTL(key, v, 0, expiration)
+		c.cache.Wait()
 	}
 
 	return nil
