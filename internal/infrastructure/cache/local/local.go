@@ -118,6 +118,7 @@ func (c *LocalCache) setHSET(key string, hset HSet) error {
 	}
 
 	c.cache.Set(key, buf.Bytes(), 0)
+	c.cache.Wait()
 	return nil
 }
 
