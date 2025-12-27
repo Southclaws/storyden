@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
 	"github.com/Southclaws/storyden/app/services/moderation/length_checker"
 	"github.com/Southclaws/storyden/app/services/moderation/spam_checker"
-	"github.com/Southclaws/storyden/app/services/moderation/wordblock_checker"
+	"github.com/Southclaws/storyden/app/services/moderation/word_checker"
 )
 
 func Build() fx.Option {
@@ -18,18 +18,18 @@ func Build() fx.Option {
 			// Register individual checkers
 			length_checker.NewLengthChecker,
 			spam_checker.NewSpamChecker,
-			wordblock_checker.NewWordBlockChecker,
+			word_checker.NewWordChecker,
 
 			// Build the registry with all checkers
 			func(
 				lengthChecker *length_checker.LengthChecker,
 				spamChecker *spam_checker.SpamChecker,
-				wordBlockChecker *wordblock_checker.WordBlockChecker,
+				wordChecker *word_checker.WordChecker,
 			) *checker.Registry {
 				return checker.NewRegistry(
 					lengthChecker,
 					spamChecker,
-					wordBlockChecker,
+					wordChecker,
 				)
 			},
 

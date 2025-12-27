@@ -30,8 +30,8 @@ var DefaultSettings = Settings{
 	AuthenticationMode: opt.New(authentication.ModeHandle),
 	Services: opt.New(ServiceSettings{
 		Moderation: opt.New(ModerationServiceSettings{
-			MaxThreadBodyLength: opt.New(60000),
-			MaxReplyBodyLength:  opt.New(10000),
+			ThreadBodyLengthMax: opt.New(60000),
+			ReplyBodyLengthMax:  opt.New(10000),
 		}),
 	}),
 }

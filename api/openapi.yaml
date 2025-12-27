@@ -4082,12 +4082,12 @@ components:
     ModerationServiceSettings:
       type: object
       properties:
-        thread_body_size_limit:
+        thread_body_length_max:
           type: integer
           description: |
             The maximum allowed size (in bytes) for thread bodies. Posts that
             exceed this size will be rejected by the moderation service.
-        reply_body_size_limit:
+        reply_body_length_max:
           type: integer
           description: |
             The maximum allowed size (in bytes) for reply bodies. Posts that
@@ -4095,7 +4095,14 @@ components:
         word_block_list:
           type: array
           description: |
-            A list of blocklisted words that are not allowed in posts.
+            A list of blocklisted words that reject posts without reporting.
+          items:
+            type: string
+        word_report_list:
+          type: array
+          description: |
+            A list of blocklisted words that will automatically report and hide
+            any posts that contain them.
           items:
             type: string
 

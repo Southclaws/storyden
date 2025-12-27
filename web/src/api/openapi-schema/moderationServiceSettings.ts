@@ -12,12 +12,16 @@ export interface ModerationServiceSettings {
   /** The maximum allowed size (in bytes) for reply bodies. Posts that
 exceed this size will be rejected by the moderation service.
  */
-  reply_body_size_limit?: number;
+  reply_body_length_max?: number;
   /** The maximum allowed size (in bytes) for thread bodies. Posts that
 exceed this size will be rejected by the moderation service.
  */
-  thread_body_size_limit?: number;
-  /** A list of blocklisted words that are not allowed in posts.
+  thread_body_length_max?: number;
+  /** A list of blocklisted words that reject posts without reporting.
    */
   word_block_list?: string[];
+  /** A list of blocklisted words that will automatically report and hide
+any posts that contain them.
+ */
+  word_report_list?: string[];
 }

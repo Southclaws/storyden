@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/moderation/checker"
 )
 
 func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error) {
@@ -56,7 +57,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if result.RequiresReview {
+		if result.Action == checker.ActionReport {
 			opts = append(opts, thread_writer.WithVisibility(visibility.VisibilityReview))
 		}
 	}

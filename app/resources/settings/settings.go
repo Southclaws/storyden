@@ -48,9 +48,10 @@ type ServiceSettings struct {
 }
 
 type ModerationServiceSettings struct {
-	MaxThreadBodyLength opt.Optional[int]
-	MaxReplyBodyLength  opt.Optional[int]
-	WordBlocklist       opt.Optional[[]string]
+	ThreadBodyLengthMax opt.Optional[int]
+	ReplyBodyLengthMax  opt.Optional[int]
+	WordBlockList       opt.Optional[[]string]
+	WordReportList      opt.Optional[[]string]
 }
 
 // Merge will combine "updated" into "s" while overwriting any new values.

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/moderation/checker"
 )
 
 func (s *service) Create(ctx context.Context,
@@ -70,7 +71,7 @@ func (s *service) Create(ctx context.Context,
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if result.RequiresReview {
+		if result.Action == checker.ActionReport {
 			thr, err = s.threadWriter.Update(ctx, thr.ID, thread_writer.WithVisibility(visibility.VisibilityReview))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))

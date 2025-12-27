@@ -14,6 +14,7 @@ export const FormSchema = z.object({
   threadBodyMaxSize: z.number().min(0).max(1_000_000),
   replyBodyMaxSize: z.number().min(0).max(1_000_000),
   wordBlockList: z.array(z.string()),
+  wordReportList: z.array(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -23,10 +24,11 @@ export function useModerationSettings({ settings }: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       threadBodyMaxSize:
-        settings.services?.moderation?.thread_body_size_limit ?? 60_000,
+        settings.services?.moderation?.thread_body_length_max ?? 60_000,
       replyBodyMaxSize:
-        settings.services?.moderation?.reply_body_size_limit ?? 10_000,
+        settings.services?.moderation?.reply_body_length_max ?? 10_000,
       wordBlockList: settings.services?.moderation?.word_block_list ?? [],
+      wordReportList: settings.services?.moderation?.word_report_list ?? [],
     },
   });
 
@@ -36,9 +38,10 @@ export function useModerationSettings({ settings }: Props) {
         await updateSettings({
           services: {
             moderation: {
-              thread_body_size_limit: data.threadBodyMaxSize,
-              reply_body_size_limit: data.replyBodyMaxSize,
+              thread_body_length_max: data.threadBodyMaxSize,
+              reply_body_length_max: data.replyBodyMaxSize,
               word_block_list: data.wordBlockList,
+              word_report_list: data.wordReportList,
             },
           },
         });

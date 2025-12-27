@@ -2,6 +2,7 @@ package thread_test
 
 import (
 	"context"
+	"net/http"
 	"strings"
 	"testing"
 	"time"
@@ -36,23 +37,12 @@ func TestThreadModerationLength(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 
-			userCtx, user := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			userCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			sessionUser := sh.WithSession(userCtx)
 
-			updatedSettings, err := settingsRepo.Set(root, settings.Settings{
-				Services: opt.New(settings.ServiceSettings{
-					Moderation: opt.New(settings.ModerationServiceSettings{
-						MaxThreadBodyLength: opt.New(1),
-					}),
-				}),
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				ThreadBodyLengthMax: opt.New(1),
 			})
-			r.NoError(err, "should be able to update settings")
-
-			bus.Publish(root, &message.EventSettingsUpdated{
-				Settings: updatedSettings,
-			})
-
-			time.Sleep(100 * time.Millisecond)
 
 			longContent := "<p>" + strings.Repeat("a", 100) + "</p>"
 			threadCreate, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
@@ -60,30 +50,16 @@ func TestThreadModerationLength(t *testing.T) {
 				Title:      "Test Thread",
 				Visibility: opt.New(openapi.Published).Ptr(),
 			}, sessionUser)
-			r.NoError(err)
-			if threadCreate.StatusCode() != 200 {
-				t.Logf("Thread create response: %+v", threadCreate)
-				r.Fail("Expected 200 status code")
+			tests.Status(t, err, threadCreate, http.StatusBadRequest)
+			r.NotNil(threadCreate.JSONDefault, "expected API error when content is rejected")
+			if threadCreate.JSONDefault != nil {
+				r.NotNil(threadCreate.JSONDefault.Message, "expected rejection reason")
+				r.Equal("Content exceeds maximum allowed length", *threadCreate.JSONDefault.Message)
 			}
 
-			r.Equal(openapi.Review, threadCreate.JSON200.Visibility, "thread with too-long content should be flagged for review")
-			r.Equal(user.ID.String(), threadCreate.JSON200.Author.Id)
-			r.Equal("Test Thread", threadCreate.JSON200.Title)
-
-			updatedSettings2, err := settingsRepo.Set(root, settings.Settings{
-				Services: opt.New(settings.ServiceSettings{
-					Moderation: opt.New(settings.ModerationServiceSettings{
-						MaxThreadBodyLength: opt.New(10000),
-					}),
-				}),
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				ThreadBodyLengthMax: opt.New(10000),
 			})
-			r.NoError(err)
-
-			bus.Publish(root, &message.EventSettingsUpdated{
-				Settings: updatedSettings2,
-			})
-
-			time.Sleep(100 * time.Millisecond)
 
 			normalContent := "<p>Normal sized content</p>"
 			threadCreate2, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
@@ -96,4 +72,136 @@ func TestThreadModerationLength(t *testing.T) {
 			r.Equal(openapi.Published, threadCreate2.JSON200.Visibility, "thread with acceptable content should be published")
 		}))
 	}))
+}
+
+func TestThreadModerationWordLists(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+		settingsRepo *settings.SettingsRepository,
+		bus *pubsub.Bus,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+
+			userCtx, user := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			sessionUser := sh.WithSession(userCtx)
+
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				WordBlockList:  opt.New([]string{"banned"}),
+				WordReportList: opt.New([]string{}),
+			})
+
+			blockedThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>This contains a banned topic</p>").Ptr(),
+				Title:      "Banned content",
+				Visibility: opt.New(openapi.Published).Ptr(),
+			}, sessionUser)
+			tests.Status(t, err, blockedThread, http.StatusBadRequest)
+			r.NotNil(blockedThread.JSONDefault)
+			if blockedThread.JSONDefault != nil {
+				r.NotNil(blockedThread.JSONDefault.Message)
+				r.Equal("Content violates community guidelines", *blockedThread.JSONDefault.Message)
+			}
+
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				WordBlockList:  opt.New([]string{}),
+				WordReportList: opt.New([]string{"flagged"}),
+			})
+
+			reviewThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>This should be flagged for review</p>").Ptr(),
+				Title:      "Flagged thread",
+				Visibility: opt.New(openapi.Published).Ptr(),
+			}, sessionUser)
+			tests.Ok(t, err, reviewThread)
+			r.Equal(openapi.Review, reviewThread.JSON200.Visibility, "thread with report-listed content should be sent to review")
+			r.Equal(user.ID.String(), reviewThread.JSON200.Author.Id)
+		}))
+	}))
+}
+
+func TestReplyModerationWordLists(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+		settingsRepo *settings.SettingsRepository,
+		bus *pubsub.Bus,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+
+			threadCtx, threadAuthor := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			replierCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			sessionThreadAuthor := sh.WithSession(threadCtx)
+			sessionReplier := sh.WithSession(replierCtx)
+
+			threadCreate, err := cl.ThreadCreateWithResponse(threadCtx, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>Safe thread content</p>").Ptr(),
+				Title:      "Reply moderation",
+				Visibility: opt.New(openapi.Published).Ptr(),
+			}, sessionThreadAuthor)
+			tests.Ok(t, err, threadCreate)
+			r.Equal(threadAuthor.ID.String(), threadCreate.JSON200.Author.Id)
+
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				WordBlockList:  opt.New([]string{"banned"}),
+				WordReportList: opt.New([]string{}),
+			})
+
+			blockedReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+				Body: "this reply mentions a banned topic",
+			}, sessionReplier)
+			tests.Status(t, err, blockedReply, http.StatusBadRequest)
+			r.NotNil(blockedReply.JSONDefault)
+			if blockedReply.JSONDefault != nil {
+				r.NotNil(blockedReply.JSONDefault.Message)
+				r.Equal("Content violates community guidelines", *blockedReply.JSONDefault.Message)
+			}
+
+			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
+				WordBlockList:  opt.New([]string{}),
+				WordReportList: opt.New([]string{"flagged"}),
+			})
+
+			reviewReply, err := cl.ReplyCreateWithResponse(root, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
+				Body: "this reply contains flagged content",
+			}, sessionReplier)
+			tests.Ok(t, err, reviewReply)
+			r.Equal(openapi.Review, reviewReply.JSON200.Visibility, "reply with report-listed content should enter review")
+		}))
+	}))
+}
+
+func updateModerationSettings(
+	t testing.TB,
+	ctx context.Context,
+	repo *settings.SettingsRepository,
+	bus *pubsub.Bus,
+	moderation settings.ModerationServiceSettings,
+) {
+	t.Helper()
+
+	updatedSettings, err := repo.Set(ctx, settings.Settings{
+		Services: opt.New(settings.ServiceSettings{
+			Moderation: opt.New(moderation),
+		}),
+	})
+	require.NoError(t, err, "should be able to update settings")
+
+	bus.Publish(ctx, &message.EventSettingsUpdated{
+		Settings: updatedSettings,
+	})
+
+	time.Sleep(100 * time.Millisecond)
 }

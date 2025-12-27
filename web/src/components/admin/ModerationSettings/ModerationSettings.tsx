@@ -8,7 +8,6 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { NumberInputField } from "@/components/ui/form/NumberInputField";
-import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
@@ -84,73 +83,152 @@ export function ModerationSettingsForm(props: Props) {
           </FormControl>
         </Flex>
 
-        <FormControl>
-          <FormLabel>Word block-list</FormLabel>
+        <Flex
+          flexDir={{
+            base: "column",
+            md: "row",
+          }}
+          gap="2"
+        >
+          <FormControl>
+            <FormLabel>Word report list</FormLabel>
 
-          <Controller
-            control={control}
-            name="wordBlockList"
-            render={({ field, fieldState, formState }) => {
-              const [newWord, setNewWord] = useState("");
+            <Controller
+              control={control}
+              name="wordReportList"
+              render={({ field, fieldState, formState }) => {
+                const [newWord, setNewWord] = useState("");
 
-              function handleNewWordChange(v: ChangeEvent<HTMLInputElement>) {
-                setNewWord(v.target.value);
-              }
+                function handleNewWordChange(v: ChangeEvent<HTMLInputElement>) {
+                  setNewWord(v.target.value);
+                }
 
-              function handleNewWordSubmit() {
-                const trimmed = newWord.trim();
-                if (trimmed === "") return;
-                const newList = uniq([...(field.value ?? []), trimmed]);
-                field.onChange(newList);
-                setNewWord("");
-              }
+                function handleNewWordSubmit() {
+                  const trimmed = newWord.trim();
+                  if (trimmed === "") return;
+                  const newList = uniq([...(field.value ?? []), trimmed]);
+                  field.onChange(newList);
+                  setNewWord("");
+                }
 
-              function handleRemoveWord(wordToRemove: string) {
-                const newList = field.value?.filter((w) => w !== wordToRemove) ?? [];
-                field.onChange(newList);
-              }
+                function handleRemoveWord(wordToRemove: string) {
+                  const newList =
+                    field.value?.filter((w) => w !== wordToRemove) ?? [];
+                  field.onChange(newList);
+                }
 
-              return (
-                <LStack>
-                  <Flex flexWrap="wrap">
-                    {field.value?.map((word) => (
-                      <Badge key={word} pr="0">
-                        {word}
-                        <IconButton
-                          type="button"
-                          size="xs"
-                          variant="ghost"
-                          onClick={() => handleRemoveWord(word)}
-                        >
-                          <CancelIcon />
-                        </IconButton>
-                      </Badge>
-                    ))}
-                  </Flex>
+                return (
+                  <LStack>
+                    <Flex flexWrap="wrap">
+                      {field.value?.map((word) => (
+                        <Badge key={word} pr="0">
+                          {word}
+                          <IconButton
+                            type="button"
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => handleRemoveWord(word)}
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </Badge>
+                      ))}
+                    </Flex>
 
-                  <HStack>
-                    <Input
-                      size="sm"
-                      value={newWord}
-                      onChange={handleNewWordChange}
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={handleNewWordSubmit}
-                    >
-                      Add
-                    </Button>
-                  </HStack>
-                </LStack>
-              );
-            }}
-          />
+                    <HStack>
+                      <Input
+                        size="sm"
+                        value={newWord}
+                        onChange={handleNewWordChange}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleNewWordSubmit}
+                      >
+                        Add
+                      </Button>
+                    </HStack>
+                  </LStack>
+                );
+              }}
+            />
 
-          <FormHelperText>
-            Words and phrases that will be rejected and flagged for review.
-          </FormHelperText>
-        </FormControl>
+            <FormHelperText>
+              Words and phrases that will automatically report and hide posts
+              that contain them.
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Word block list</FormLabel>
+
+            <Controller
+              control={control}
+              name="wordBlockList"
+              render={({ field, fieldState, formState }) => {
+                const [newWord, setNewWord] = useState("");
+
+                function handleNewWordChange(v: ChangeEvent<HTMLInputElement>) {
+                  setNewWord(v.target.value);
+                }
+
+                function handleNewWordSubmit() {
+                  const trimmed = newWord.trim();
+                  if (trimmed === "") return;
+                  const newList = uniq([...(field.value ?? []), trimmed]);
+                  field.onChange(newList);
+                  setNewWord("");
+                }
+
+                function handleRemoveWord(wordToRemove: string) {
+                  const newList =
+                    field.value?.filter((w) => w !== wordToRemove) ?? [];
+                  field.onChange(newList);
+                }
+
+                return (
+                  <LStack>
+                    <Flex flexWrap="wrap">
+                      {field.value?.map((word) => (
+                        <Badge key={word} pr="0">
+                          {word}
+                          <IconButton
+                            type="button"
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => handleRemoveWord(word)}
+                          >
+                            <CancelIcon />
+                          </IconButton>
+                        </Badge>
+                      ))}
+                    </Flex>
+
+                    <HStack>
+                      <Input
+                        size="sm"
+                        value={newWord}
+                        onChange={handleNewWordChange}
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleNewWordSubmit}
+                      >
+                        Add
+                      </Button>
+                    </HStack>
+                  </LStack>
+                );
+              }}
+            />
+
+            <FormHelperText>
+              Words and phrases that will instantly reject posts without
+              creating a report.
+            </FormHelperText>
+          </FormControl>
+        </Flex>
       </CardBox>
     </styled.form>
   );

@@ -75,9 +75,10 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		moderation := request.Body.Services.Moderation
 		services = opt.New(settings.ServiceSettings{
 			Moderation: opt.New(settings.ModerationServiceSettings{
-				MaxThreadBodyLength: opt.NewPtr(moderation.ThreadBodySizeLimit),
-				MaxReplyBodyLength:  opt.NewPtr(moderation.ReplyBodySizeLimit),
-				WordBlocklist:       opt.NewPtr(moderation.WordBlockList),
+				ThreadBodyLengthMax: opt.NewPtr(moderation.ThreadBodyLengthMax),
+				ReplyBodyLengthMax:  opt.NewPtr(moderation.ReplyBodyLengthMax),
+				WordBlockList:       opt.NewPtr(moderation.WordBlockList),
+				WordReportList:      opt.NewPtr(moderation.WordReportList),
 			}),
 		})
 	}
@@ -214,9 +215,10 @@ func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettings
 
 func serialiseModerationSettings(in settings.ModerationServiceSettings) openapi.ModerationServiceSettings {
 	return openapi.ModerationServiceSettings{
-		ThreadBodySizeLimit: in.MaxThreadBodyLength.Ptr(),
-		ReplyBodySizeLimit:  in.MaxReplyBodyLength.Ptr(),
-		WordBlockList:       in.WordBlocklist.Ptr(),
+		ThreadBodyLengthMax: in.ThreadBodyLengthMax.Ptr(),
+		ReplyBodyLengthMax:  in.ReplyBodyLengthMax.Ptr(),
+		WordBlockList:       in.WordBlockList.Ptr(),
+		WordReportList:      in.WordReportList.Ptr(),
 	}
 }
 
