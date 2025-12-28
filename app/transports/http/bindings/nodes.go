@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
@@ -240,17 +241,13 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	qk := deserialiseNodeMark(request.NodeSlug)
 	cacheKey := qk.String()
 
-	cacheTime := c.node_cache.LastModified(ctx, cacheKey)
-	lastModified := ""
-	if cacheTime != nil {
-		lastModified = cacheTime.UTC().Format(time.RFC1123)
-	}
-
-	if c.node_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), cacheKey) {
+	etag, notModified := c.node_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), cacheKey)
+	if notModified {
 		return openapi.NodeGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		}, nil
 	}
@@ -260,9 +257,9 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if lastModified == "" {
+	if etag == nil {
 		c.node_cache.Store(ctx, cacheKey, node.UpdatedAt)
-		lastModified = node.UpdatedAt.UTC().Format(time.RFC1123)
+		etag = cachecontrol.NewETag(node.UpdatedAt)
 	}
 
 	return openapi.NodeGet200JSONResponse{
@@ -270,7 +267,8 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		},
 	}, nil

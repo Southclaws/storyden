@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -91,17 +92,13 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cacheTime := i.profile_cache.LastModified(ctx, xid.ID(accountID))
-	lastModified := ""
-	if cacheTime != nil {
-		lastModified = cacheTime.Format(time.RFC1123)
-	}
-
-	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
+	etag, notModified := i.profile_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID))
+	if notModified {
 		return openapi.AccountGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: accountGetCacheControl,
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		}, nil
 	}
@@ -111,9 +108,9 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if lastModified == "" {
+	if etag == nil {
 		i.profile_cache.Store(ctx, xid.ID(accountID), acc.UpdatedAt)
-		lastModified = acc.UpdatedAt.Format(time.RFC1123)
+		etag = cachecontrol.NewETag(acc.UpdatedAt)
 	}
 
 	return openapi.AccountGet200JSONResponse{
@@ -121,7 +118,8 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
 				CacheControl: accountGetCacheControl,
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		},
 	}, nil

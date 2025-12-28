@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/rs/xid"
@@ -13,9 +12,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -30,8 +27,6 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
-		cacheStore cache.Store,
-		profileCache *profile_cache.Cache,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -47,16 +42,12 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 			tests.Ok(t, err, signup)
 			session := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
 
-			accountID := openapi.ParseID(signup.JSON200.Id)
-
 			accGet1, err := cl.AccountGetWithResponse(root, session)
 			tests.Ok(t, err, accGet1)
 			a.Len(accGet1.JSON200.EmailAddresses, 1, "account should have one email")
 
-			lastModified1Header := accGet1.HTTPResponse.Header.Get("Last-Modified")
-			r.NotEmpty(lastModified1Header, "Last-Modified header should be present")
-
-			cacheKey := "profile:last-modified:" + accountID.String()
+			etag1 := accGet1.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(etag1, "ETag header should be present")
 
 			email2 := xid.New().String() + "second@example.com"
 
@@ -65,22 +56,17 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, addEmail)
 
-			// Now cache should be populated with timestamp from when email was added
-			cachedValue1, err := cacheStore.Get(root, cacheKey)
-			r.NoError(err, "cache value should exist after email added")
-			cachedTime1, err := time.Parse(time.RFC3339Nano, cachedValue1)
-			r.NoError(err, "cached time should be parseable")
-
 			accGet2, err := cl.AccountGetWithResponse(root, session)
 			tests.Ok(t, err, accGet2)
 			r.Len(accGet2.JSON200.EmailAddresses, 2, "account should now have two emails")
 
-			lastModified2Header := accGet2.HTTPResponse.Header.Get("Last-Modified")
-			r.NotEmpty(lastModified2Header, "Last-Modified header should be present")
+			etag2 := accGet2.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(etag2, "ETag header should be present")
+			a.NotEqual(etag1, etag2, "ETag should change after adding email")
 
-			// Make a conditional request - should return 304 since cache timestamp is newer
+			// Make a conditional request - should return 304 since cache is current
 			accGet304, err := cl.AccountGetWithResponse(root, session, func(ctx context.Context, req *http.Request) error {
-				req.Header.Set("If-Modified-Since", lastModified2Header)
+				req.Header.Set("If-None-Match", etag2)
 				return nil
 			})
 			tests.Status(t, err, accGet304, 304)
@@ -89,17 +75,14 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 			removeEmail, err := cl.AccountEmailRemoveWithResponse(root, addEmail.JSON200.Id, session)
 			tests.Ok(t, err, removeEmail)
 
-			// Cache should be updated with a newer timestamp
-			cachedValue2, err := cacheStore.Get(root, cacheKey)
-			r.NoError(err, "cache value should still exist after email removed")
-			cachedTime2, err := time.Parse(time.RFC3339Nano, cachedValue2)
-			r.NoError(err, "cached time should be parseable")
-
-			a.True(cachedTime2.After(cachedTime1), "cached time should be updated after removing email (cachedTime1: %v, cachedTime2: %v)", cachedTime1, cachedTime2)
-
-			accGet3, err := cl.AccountGetWithResponse(root, session)
-			tests.Ok(t, err, accGet3)
-			r.Len(accGet3.JSON200.EmailAddresses, 1, "account should be back to one email")
+			// Conditional GET with old ETag should now return 200 (not 304)
+			accGet200, err := cl.AccountGetWithResponse(root, session, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", etag2)
+				return nil
+			})
+			tests.Ok(t, err, accGet200)
+			r.NotNil(accGet200.JSON200, "should return 200 with body after cache invalidation")
+			r.Len(accGet200.JSON200.EmailAddresses, 1, "account should be back to one email")
 		}))
 	}))
 }
@@ -113,8 +96,6 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
-		cacheStore cache.Store,
-		profileCache *profile_cache.Cache,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -130,9 +111,12 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			tests.Ok(t, err, signup)
 			session := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
 
-			accountID := openapi.ParseID(signup.JSON200.Id)
+			// Get initial account state
+			accGet1, err := cl.AccountGetWithResponse(root, session)
+			tests.Ok(t, err, accGet1)
 
-			cacheKey := "profile:last-modified:" + accountID.String()
+			etag1 := accGet1.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(etag1, "ETag header should be present")
 
 			// Update the profile
 			newBio := "This is my new bio"
@@ -141,15 +125,20 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, updateResp)
 
-			// Cache should now be populated
-			cachedValue1, err := cacheStore.Get(root, cacheKey)
-			r.NoError(err, "cache value should exist after profile update")
-			cachedTime1, err := time.Parse(time.RFC3339Nano, cachedValue1)
-			r.NoError(err, "cached time should be parseable")
-
 			accGet2, err := cl.AccountGetWithResponse(root, session)
 			tests.Ok(t, err, accGet2)
 			a.Contains(accGet2.JSON200.Bio, newBio, "bio should contain the updated text")
+
+			etag2 := accGet2.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(etag2, "ETag header should be present")
+			a.NotEqual(etag1, etag2, "ETag should change after profile update")
+
+			// Verify 304 with current ETag
+			accGet304, err := cl.AccountGetWithResponse(root, session, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", etag2)
+				return nil
+			})
+			tests.Status(t, err, accGet304, 304)
 
 			// Update again
 			newBio2 := "This is my second bio"
@@ -158,12 +147,14 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, updateResp2)
 
-			cachedValue2, err := cacheStore.Get(root, cacheKey)
-			r.NoError(err, "cache value should still exist after second profile update")
-			cachedTime2, err := time.Parse(time.RFC3339Nano, cachedValue2)
-			r.NoError(err, "cached time should be parseable")
-
-			a.True(cachedTime2.After(cachedTime1), "cached time should be updated after profile update (cachedTime1: %v, cachedTime2: %v)", cachedTime1, cachedTime2)
+			// Conditional GET with old ETag should now return 200 (not 304)
+			accGet200, err := cl.AccountGetWithResponse(root, session, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", etag2)
+				return nil
+			})
+			tests.Ok(t, err, accGet200)
+			r.NotNil(accGet200.JSON200, "should return 200 with body after cache invalidation")
+			a.Contains(accGet200.JSON200.Bio, newBio2, "bio should contain the second updated text")
 		}))
 	}))
 }

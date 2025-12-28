@@ -15,6 +15,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
@@ -228,17 +229,13 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cacheTime := i.thread_cache.LastModified(ctx, xid.ID(postID))
-	lastModified := ""
-	if cacheTime != nil {
-		lastModified = cacheTime.Format(time.RFC1123)
-	}
-
-	if i.thread_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID)) {
+	etag, notModified := i.thread_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID))
+	if notModified {
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		}, nil
 	}
@@ -250,9 +247,9 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if lastModified == "" {
+	if etag == nil {
 		i.thread_cache.Store(ctx, xid.ID(thread.ID), thread.UpdatedAt)
-		lastModified = thread.UpdatedAt.Format(time.RFC1123)
+		etag = cachecontrol.NewETag(thread.UpdatedAt)
 	}
 
 	return openapi.ThreadGet200JSONResponse{
@@ -260,7 +257,8 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		},
 	}, nil

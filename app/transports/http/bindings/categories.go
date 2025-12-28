@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
@@ -80,17 +81,13 @@ const categoryGetCacheControl = "public, no-cache"
 func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGetRequestObject) (openapi.CategoryGetResponseObject, error) {
 	slug := string(request.CategorySlug)
 
-	cacheTime := c.category_cache.LastModified(ctx, slug)
-	lastModified := ""
-	if cacheTime != nil {
-		lastModified = cacheTime.Format(time.RFC1123)
-	}
-
-	if c.category_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), slug) {
+	etag, notModified := c.category_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), slug)
+	if notModified {
 		return openapi.CategoryGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: categoryGetCacheControl,
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		}, nil
 	}
@@ -100,9 +97,9 @@ func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGet
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if lastModified == "" {
+	if etag == nil {
 		c.category_cache.Store(ctx, slug, cat.UpdatedAt)
-		lastModified = cat.UpdatedAt.Format(time.RFC1123)
+		etag = cachecontrol.NewETag(cat.UpdatedAt)
 	}
 
 	return openapi.CategoryGet200JSONResponse{
@@ -110,7 +107,8 @@ func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGet
 			Body: serialiseCategory(cat),
 			Headers: openapi.CategoryGetOKResponseHeaders{
 				CacheControl: categoryGetCacheControl,
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		},
 	}, nil
