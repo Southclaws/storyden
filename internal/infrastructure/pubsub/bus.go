@@ -51,7 +51,7 @@ func newBus(
 
 	router, err := message.NewRouter(message.RouterConfig{
 		CloseTimeout: time.Second * 30,
-	}, logger)
+	}, nil)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
