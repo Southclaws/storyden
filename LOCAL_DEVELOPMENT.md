@@ -11,6 +11,7 @@ To run Storyden locally, you need to have the following installed:
 - **Go** - the API is written in Go!
 - **Node.js** - the frontend is built with Next.js
 - **Yarn** - the package manager for the frontend
+- **[Task](https://taskfile.dev)** - task runner for code generation and development workflows
 
 If anything is missing from this list, please open an issue!
 
@@ -51,8 +52,6 @@ yarn
 yarn dev
 ```
 
-**Note:** Currently, Storyden's web frontend does not support Next.js `--turbo` due to some minor issues with Panda CSS.
-
 The frontend will be available at `http://localhost:3000` and will by default automatically connect to the API at `http://localhost:8000`.
 
 ## Development Workflow
@@ -68,6 +67,9 @@ go test ./tests/thread/...
 
 # Run tests with verbose output
 go test -v ./...
+
+# Run end-to-end tests - automatically boots fresh backend and frontend on ports 8001/3001 then shuts them down after the tests finish
+task test:e2e
 ```
 
 ### Code Generation
@@ -75,7 +77,7 @@ go test -v ./...
 Storyden uses heavy code generation. After modifying schemas or API specs, run:
 
 ```bash
-# Regenerate everything (requires Task installed)
+# Regenerate everything
 task generate
 
 # Or manually:
@@ -94,10 +96,9 @@ go run ./cmd/seed
 
 # Clean database
 go run ./cmd/clean
-
-# Run migrations
-go run ./cmd/migrate
 ```
+
+Note: Storyden automatically handles database migrations on startup, so you don't need to run migrations manually.
 
 ### Frontend Development
 
@@ -162,6 +163,17 @@ cd web
 PORT=3001 yarn dev
 ```
 
+If you change ports or need to run on different addresses, make sure to update the address configuration:
+
+```ini
+PUBLIC_WEB_ADDRESS=http://localhost:3001 \
+PUBLIC_API_ADDRESS=http://localhost:8080 \
+LISTEN_ADDR=0.0.0.0:8080 \
+go run ./cmd/backend
+```
+
+These environment variables control CORS and cookie settings. See `./internal/config/config.yaml` for all available configuration options.
+
 ### Database Issues
 
 If you encounter database issues, you can reset it:
@@ -174,39 +186,28 @@ go run ./cmd/seed     # Optional: add test data
 
 ### Code Generation Errors
 
-If you see errors about missing generated files:
+If you see errors about missing generated files, regenerate the code:
 
 ```bash
-# Make sure Task is installed
-brew install go-task/tap/go-task  # macOS
-# or
-go install github.com/go-task/task/v3/cmd/task@latest
-
-# Then regenerate
 task generate
 ```
+
 ### API Testing
 
 The OpenAPI documentation is available at:
+
 - Local: `http://localhost:8000/api/docs`
-- Interactive testing via Swagger UI
+- Interactive testing via Scalar UI
 
 You can also use tools like:
+
 - **Postman** - import from `api/openapi.yaml`
 - **curl** - for quick testing
 - **httpie** - for human-friendly HTTP requests
 
 ## Hot Reload
 
-Both backend and frontend support hot reload:
-
-- **Backend**: Use `air` for hot reload (optional)
-  ```bash
-  go install github.com/cosmtrek/air@latest
-  air
-  ```
-
-- **Frontend**: Next.js has built-in hot reload with `yarn dev`
+The frontend has built-in hot reload with Next.js when running `yarn dev`.
 
 ## Additional Resources
 
@@ -222,4 +223,3 @@ If you encounter issues:
 1. Check the [documentation](https://www.storyden.org/docs)
 2. Search [existing issues](https://github.com/Southclaws/storyden/issues)
 3. Open a new issue with details about your environment and the problem
-
