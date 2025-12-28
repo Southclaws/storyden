@@ -69,4 +69,6 @@ The short version is: most forums are decades old, insecure, abandoned or just n
 
 ## Contributing
 
+See [LOCAL_DEVELOPMENT.md](./LOCAL_DEVELOPMENT.md) for local development documenation.
+
 Contributions are very very welcome! ❤️ Until we get a proper guide set up, please open an issue if you have any questions!
