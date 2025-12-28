@@ -87,3 +87,73 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 		}))
 	}))
 }
+
+func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+
+			visibility := openapi.Published
+			name := "cache-test-schema-" + uuid.NewString()
+			slug := name
+			ptype := openapi.Text
+
+			nodeCreate, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name,
+				Slug:       &slug,
+				Visibility: &visibility,
+				Properties: &openapi.PropertyMutationList{
+					{
+						Name:  "test_field",
+						Type:  &ptype,
+						Value: "initial value",
+					},
+				},
+			}, session)
+			tests.Ok(t, err, nodeCreate)
+
+			nodeGet1, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{})
+			tests.Ok(t, err, nodeGet1)
+
+			etag1 := nodeGet1.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(etag1, "ETag header should be present")
+
+			nodeGet304, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", etag1)
+				return nil
+			})
+			tests.Status(t, err, nodeGet304, 304)
+
+			schemaUpdate, err := cl.NodeUpdatePropertySchemaWithResponse(ctx, slug, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+				{
+					Name: "new_field",
+					Type: openapi.Text,
+					Sort: "b",
+				},
+			}, session)
+			tests.Ok(t, err, schemaUpdate)
+
+			nodeGetAfterSchema, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", etag1)
+				return nil
+			})
+			tests.Ok(t, err, nodeGetAfterSchema)
+			r.NotNil(nodeGetAfterSchema.JSON200, "should return 200 with body after schema update invalidates cache")
+
+			etag2 := nodeGetAfterSchema.HTTPResponse.Header.Get("ETag")
+			a.NotEqual(etag1, etag2, "ETag should change after property schema update")
+		}))
+	}))
+}

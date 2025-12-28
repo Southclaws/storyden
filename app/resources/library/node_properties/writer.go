@@ -13,18 +13,29 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type SchemaWriter struct {
-	db *ent.Client
+	db    *ent.Client
+	cache *node_cache.Cache
+	bus   *pubsub.Bus
 }
 
-func New(db *ent.Client) (*SchemaWriter, *Writer) {
+func New(
+	db *ent.Client,
+	cache *node_cache.Cache,
+	bus *pubsub.Bus,
+) (*SchemaWriter, *Writer) {
 	return &SchemaWriter{
-			db: db,
+			db:    db,
+			cache: cache,
+			bus:   bus,
 		}, &Writer{
 			db: db,
 		}
@@ -45,10 +56,19 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchema, schemas, node)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	w.bus.Publish(ctx, message.EventNodeUpdated{
+		ID:   library.NodeID(node.ID),
+		Slug: node.Slug,
+	})
 
 	return w.Get(ctx, *schemaID)
 }
@@ -69,7 +89,36 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		return &library.PropertySchema{}, nil
 	}
 
-	return w.updateNodes(ctx, schemas, children...)
+	events := []message.EventNodeUpdated{
+		{
+			ID:   library.NodeID(parent.ID),
+			Slug: parent.Slug,
+		},
+	}
+
+	if err := w.cache.Invalidate(ctx, parent.Slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	for _, node := range children {
+		if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		events = append(events, message.EventNodeUpdated{
+			ID:   library.NodeID(node.ID),
+			Slug: node.Slug,
+		})
+	}
+
+	schema, err := w.updateNodes(ctx, schemas, children...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	w.bus.PublishMany(ctx, events)
+
+	return schema, nil
 }
 
 func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
@@ -93,7 +142,35 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return w.updateNodes(ctx, schemas, siblings...)
+	events := []message.EventNodeUpdated{
+		{
+			ID:   library.NodeID(current.ID),
+			Slug: current.Slug,
+		},
+	}
+
+	if err := w.cache.Invalidate(ctx, current.Slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	for _, node := range siblings {
+		if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		events = append(events, message.EventNodeUpdated{
+			ID:   library.NodeID(node.ID),
+			Slug: node.Slug,
+		})
+	}
+
+	schema, err := w.updateNodes(ctx, schemas, siblings...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	w.bus.PublishMany(ctx, events)
+
+	return schema, nil
 }
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
