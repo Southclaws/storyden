@@ -13,6 +13,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
@@ -101,16 +102,13 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cacheTime := p.profile_cache.LastModified(ctx, xid.ID(id))
-	lastModified := ""
-	if cacheTime != nil {
-		lastModified = cacheTime.Format(time.RFC1123)
-	}
-	if p.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(id)) {
+	etag, notModified := p.profile_cache.Check(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(id))
+	if notModified {
 		return openapi.ProfileGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		}, nil
 	}
@@ -120,9 +118,9 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if lastModified == "" {
+	if etag == nil {
 		p.profile_cache.Store(ctx, xid.ID(id), pro.Updated)
-		lastModified = pro.Updated.Format(time.RFC1123)
+		etag = cachecontrol.NewETag(pro.Updated)
 	}
 
 	return openapi.ProfileGet200JSONResponse{
@@ -130,7 +128,8 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 			Body: serialiseProfile(pro),
 			Headers: openapi.ProfileGetOKResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: lastModified,
+				LastModified: etag.Time.Format(time.RFC1123),
+				ETag:         etag.String(),
 			},
 		},
 	}, nil

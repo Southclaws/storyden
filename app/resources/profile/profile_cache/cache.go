@@ -45,16 +45,12 @@ func New(
 	return c
 }
 
-func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid.ID) bool {
-	notModified := cq.NotModified(func() *time.Time {
+func (c *Cache) Check(ctx context.Context, cq cachecontrol.Query, id xid.ID) (*cachecontrol.ETag, bool) {
+	etag, notModified := cq.Check(func() *time.Time {
 		return c.lastModified(ctx, id)
 	})
 
-	return notModified
-}
-
-func (c *Cache) LastModified(ctx context.Context, id xid.ID) *time.Time {
-	return c.lastModified(ctx, id)
+	return etag, notModified
 }
 
 func (c *Cache) Store(ctx context.Context, id xid.ID, ts time.Time) error {
@@ -63,15 +59,6 @@ func (c *Cache) Store(ctx context.Context, id xid.ID, ts time.Time) error {
 
 func (c *Cache) Invalidate(ctx context.Context, id xid.ID) error {
 	now := c.clock().UTC()
-
-	if ts, ok := c.cached(ctx, id); ok {
-		nowTrunc := now.Truncate(time.Second)
-		tsTrunc := ts.Truncate(time.Second)
-
-		if !nowTrunc.After(tsTrunc) {
-			now = tsTrunc.Add(time.Second)
-		}
-	}
 
 	err := c.storeTimestamp(ctx, id, now)
 	if err != nil {
