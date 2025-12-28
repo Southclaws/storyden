@@ -136,6 +136,11 @@ export function useLibraryMutation(node?: Node) {
     await mutate(nodeListPrivateKeyFn, mutator, { revalidate: false });
 
     const parent = parentID ?? parentSlug;
+    if (parent) {
+      const childListKeyFn = buildNodeChildrenListKey(parent);
+      await mutate(childListKeyFn, mutator, { revalidate: false });
+    }
+
     const created = await nodeCreate({
       name,
       slug,

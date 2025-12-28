@@ -48,7 +48,7 @@ export function LibraryPageDirectoryBlockContents() {
     handleSearch(event.target.value);
   }
 
-  const { data, error, tags } = useChildrenWithTags(
+  const { data, hasChildren, error, tags } = useChildrenWithTags(
     nodeID,
     initialChildren,
     childrenSort,
@@ -82,7 +82,7 @@ export function LibraryPageDirectoryBlockContents() {
 
           {editing && (
             <HStack gap="1">
-              <AddPropertyMenu>
+              <AddPropertyMenu unavailable={!hasChildren}>
                 <IconButton
                   size="xs"
                   variant="ghost"

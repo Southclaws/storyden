@@ -118,6 +118,46 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 	}))
 }
 
+func TestNodesPropertySchemas_EmptyNode(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+
+			parentname := "parent"
+			parentslug := parentname + uuid.NewString()
+			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: parentname,
+				Slug: &parentslug,
+			}, session)
+			tests.Ok(t, err, parent)
+
+			t.Run("empty_node_schema_update", func(t *testing.T) {
+				r := require.New(t)
+
+				res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
+					{Name: "weight", Type: openapi.Number, Sort: "1"},
+				}, session)
+				tests.Ok(t, err, res)
+
+				r.Empty(res.JSON200.Properties, "updating property schema on a node with no children should return empty properties")
+
+				parentRefreshed, err := cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, &openapi.NodeGetParams{}, session)
+				tests.Ok(t, err, parentRefreshed)
+				r.Empty(parentRefreshed.JSON200.ChildPropertySchema, "child property schema should remain empty when node has no children")
+			})
+		}))
+	}))
+}
+
 func matchSchema(t *testing.T, want openapi.PropertySchemaList, got openapi.PropertySchemaList) {
 	t.Helper()
 	a := assert.New(t)

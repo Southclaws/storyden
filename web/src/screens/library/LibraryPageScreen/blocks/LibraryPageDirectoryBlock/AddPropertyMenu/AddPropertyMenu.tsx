@@ -1,5 +1,4 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { useClickAway } from "@/utils/useClickAway";
 import { PropsWithChildren, useState } from "react";
 
 import { handle } from "@/api/client";
@@ -7,12 +6,21 @@ import { nodeUpdateChildrenPropertySchema } from "@/api/openapi-client/nodes";
 import { PropertyType } from "@/api/openapi-schema";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
+import { styled } from "@/styled-system/jsx";
+import { useClickAway } from "@/utils/useClickAway";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
 import { useDirectoryBlock } from "../useDirectoryBlock";
 
-export function AddPropertyMenu({ children }: PropsWithChildren) {
+type AddPropertyMenuProps = PropsWithChildren<{
+  unavailable?: boolean;
+}>;
+
+export function AddPropertyMenu({
+  children,
+  unavailable = false,
+}: AddPropertyMenuProps) {
   const { nodeID, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
   const { addChildProperty } = store.getState();
@@ -113,26 +121,26 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
           <Menu.Content minW="36">
             <Menu.ItemGroup pl="2" py="1">
               <Menu.ItemGroupLabel>New property</Menu.ItemGroupLabel>
-              <Input size="sm" value={name} onChange={handleColumnNameChange} />
+              <Input
+                size="sm"
+                value={name}
+                onChange={handleColumnNameChange}
+                disabled={unavailable}
+              />
             </Menu.ItemGroup>
 
-            {/* <Menu.ItemGroup>
-              <Menu.Item value="hide-show">
-                <EyeIcon />
-                &nbsp;Hide
-              </Menu.Item>
-            </Menu.ItemGroup> */}
-
             <Menu.ItemGroup pl="2" py="1">
-              <Menu.Item
-                value="create"
-                bgColor="bg.subtle"
-                _hover={{
-                  bgColor: "bg.muted",
-                }}
-              >
+              <Menu.Item value="create" disabled={unavailable}>
                 Create
               </Menu.Item>
+
+              {unavailable && (
+                <Menu.ItemGroup>
+                  <styled.p fontSize="xs" color="fg.muted">
+                    Properties require at least one sub-page.
+                  </styled.p>
+                </Menu.ItemGroup>
+              )}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

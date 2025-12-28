@@ -59,6 +59,7 @@ export function useChildrenWithTags(
     ready: true as const,
     data: filteredChildren,
     tags,
+    hasChildren: allChildren.nodes.length > 0,
   };
 }
 
