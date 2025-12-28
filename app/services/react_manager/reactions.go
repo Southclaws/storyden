@@ -65,7 +65,10 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventPostReacted{PostID: postID})
+	s.bus.Publish(ctx, &message.EventPostReacted{
+		PostID:     postID,
+		RootPostID: pref.Root,
+	})
 
 	return r, nil
 }
@@ -115,7 +118,8 @@ func (s *Reactor) Remove(ctx context.Context, reactID reaction.ReactID) error {
 	}
 
 	s.bus.Publish(ctx, &message.EventPostUnreacted{
-		PostID: targetID,
+		PostID:     targetID,
+		RootPostID: pref.Root,
 	})
 
 	return nil

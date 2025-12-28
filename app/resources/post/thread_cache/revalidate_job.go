@@ -56,25 +56,25 @@ func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
 	}
 
 	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_reacted", func(ctx context.Context, evt *message.EventPostReacted) error {
-		return c.touchForReply(ctx, xid.ID(evt.PostID))
+		return c.Invalidate(ctx, xid.ID(evt.RootPostID))
 	}); err != nil {
 		return err
 	}
 
 	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_unreacted", func(ctx context.Context, evt *message.EventPostUnreacted) error {
-		return c.touchForReply(ctx, xid.ID(evt.PostID))
+		return c.Invalidate(ctx, xid.ID(evt.RootPostID))
 	}); err != nil {
 		return err
 	}
 
 	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_liked", func(ctx context.Context, evt *message.EventPostLiked) error {
-		return c.touchForReply(ctx, xid.ID(evt.PostID))
+		return c.Invalidate(ctx, xid.ID(evt.RootPostID))
 	}); err != nil {
 		return err
 	}
 
 	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_unliked", func(ctx context.Context, evt *message.EventPostUnliked) error {
-		return c.touchForReply(ctx, xid.ID(evt.PostID))
+		return c.Invalidate(ctx, xid.ID(evt.RootPostID))
 	}); err != nil {
 		return err
 	}

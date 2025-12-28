@@ -2,7 +2,6 @@ package thread_cache
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/rs/xid"
@@ -13,7 +12,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -112,37 +110,4 @@ func (c *Cache) storeTimestamp(ctx context.Context, id xid.ID, ts time.Time) err
 
 func (c *Cache) delete(ctx context.Context, id xid.ID) error {
 	return c.store.Delete(ctx, c.cacheKey(id))
-}
-
-// Replies do not have their own thread cache entry so we need to find the root.
-func (c *Cache) touchForReply(ctx context.Context, id xid.ID) error {
-	threadID, err := c.threadIDForReply(ctx, id)
-	if err != nil {
-		if errors.Is(err, errThreadNotFound) {
-			return nil
-		}
-		return err
-	}
-	return c.Invalidate(ctx, threadID)
-}
-
-var errThreadNotFound = fault.New("thread not found")
-
-func (c *Cache) threadIDForReply(ctx context.Context, id xid.ID) (xid.ID, error) {
-	postRow, err := c.db.Post.Query().
-		Select(post.FieldID, post.FieldRootPostID).
-		Where(post.ID(id)).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return xid.ID{}, errThreadNotFound
-		}
-		return xid.ID{}, err
-	}
-
-	if postRow.RootPostID == nil {
-		return postRow.ID, nil
-	}
-
-	return *postRow.RootPostID, nil
 }

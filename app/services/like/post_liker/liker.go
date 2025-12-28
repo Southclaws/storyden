@@ -51,7 +51,8 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 	}
 
 	l.bus.Publish(ctx, &message.EventPostLiked{
-		PostID: postID,
+		PostID:     postID,
+		RootPostID: postRef.Root,
 	})
 
 	return nil
@@ -73,7 +74,8 @@ func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.Accoun
 	}
 
 	l.bus.Publish(ctx, &message.EventPostUnliked{
-		PostID: postID,
+		PostID:     postID,
+		RootPostID: postRef.Root,
 	})
 
 	return nil

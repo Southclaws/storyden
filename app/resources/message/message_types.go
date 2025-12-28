@@ -67,19 +67,23 @@ type EventThreadReplyUnpublished struct {
 }
 
 type EventPostLiked struct {
-	PostID post.ID
+	PostID     post.ID
+	RootPostID post.ID
 }
 
 type EventPostUnliked struct {
-	PostID post.ID
+	PostID     post.ID
+	RootPostID post.ID
 }
 
 type EventPostReacted struct {
-	PostID post.ID
+	PostID     post.ID
+	RootPostID post.ID
 }
 
 type EventPostUnreacted struct {
-	PostID post.ID
+	PostID     post.ID
+	RootPostID post.ID
 }
 
 // -
