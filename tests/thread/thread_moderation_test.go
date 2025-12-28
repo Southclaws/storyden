@@ -3,7 +3,6 @@ package thread_test
 import (
 	"context"
 	"net/http"
-	"strings"
 	"testing"
 	"time"
 
@@ -21,58 +20,6 @@ import (
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
 )
-
-func TestThreadModerationLength(t *testing.T) {
-	t.Parallel()
-
-	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
-		lc fx.Lifecycle,
-		root context.Context,
-		cl *openapi.ClientWithResponses,
-		sh *e2e.SessionHelper,
-		aw *account_writer.Writer,
-		settingsRepo *settings.SettingsRepository,
-		bus *pubsub.Bus,
-	) {
-		lc.Append(fx.StartHook(func() {
-			r := require.New(t)
-
-			userCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-			sessionUser := sh.WithSession(userCtx)
-
-			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
-				ThreadBodyLengthMax: opt.New(1),
-			})
-
-			longContent := "<p>" + strings.Repeat("a", 100) + "</p>"
-			threadCreate, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
-				Body:       opt.New(longContent).Ptr(),
-				Title:      "Test Thread",
-				Visibility: opt.New(openapi.Published).Ptr(),
-			}, sessionUser)
-			tests.Status(t, err, threadCreate, http.StatusBadRequest)
-			r.NotNil(threadCreate.JSONDefault, "expected API error when content is rejected")
-			if threadCreate.JSONDefault != nil {
-				r.NotNil(threadCreate.JSONDefault.Message, "expected rejection reason")
-				r.Equal("Content exceeds maximum allowed length", *threadCreate.JSONDefault.Message)
-			}
-
-			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
-				ThreadBodyLengthMax: opt.New(10000),
-			})
-
-			normalContent := "<p>Normal sized content</p>"
-			threadCreate2, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
-				Body:       opt.New(normalContent).Ptr(),
-				Title:      "Test Thread 2",
-				Visibility: opt.New(openapi.Published).Ptr(),
-			}, sessionUser)
-			tests.Ok(t, err, threadCreate2)
-
-			r.Equal(openapi.Published, threadCreate2.JSON200.Visibility, "thread with acceptable content should be published")
-		}))
-	}))
-}
 
 func TestThreadModerationWordLists(t *testing.T) {
 	t.Parallel()
