@@ -81,32 +81,32 @@ export const ThreadReferenceCard = memo(
         url={permalink}
         image={image}
         controls={
-          session && (
-            <HStack>
-              {!hideCategoryBadge && thread.category && (
-                <CategoryBadge category={thread.category} />
-              )}
-              {isInReview ? (
-                <>
-                  <PostReviewBadge
-                    isModerator={isModerator}
-                    postId={thread.id}
-                    onAccept={handlers.handleAcceptThread}
-                    onEditAndAccept={handlers.handleEditAndAccept}
-                    onDelete={handlers.handleConfirmDelete}
-                    isConfirmingDelete={isConfirmingDelete}
-                    onCancelDelete={handlers.handleCancelDelete}
-                  />
-                </>
-              ) : (
-                <>
-                  <LikeButton thread={thread} showCount />
+          <HStack>
+            {!hideCategoryBadge && thread.category && (
+              <CategoryBadge category={thread.category} />
+            )}
+            {isInReview ? (
+              <>
+                <PostReviewBadge
+                  isModerator={isModerator}
+                  postId={thread.id}
+                  onAccept={handlers.handleAcceptThread}
+                  onEditAndAccept={handlers.handleEditAndAccept}
+                  onDelete={handlers.handleConfirmDelete}
+                  isConfirmingDelete={isConfirmingDelete}
+                  onCancelDelete={handlers.handleCancelDelete}
+                />
+              </>
+            ) : (
+              <>
+                <LikeButton thread={thread} showCount />
+                {session && (
                   <CollectionMenu account={session} thread={thread} />
-                </>
-              )}
-              <ThreadMenu thread={thread} />
-            </HStack>
-          )
+                )}
+              </>
+            )}
+            <ThreadMenu thread={thread} />
+          </HStack>
         }
       >
         <Byline
