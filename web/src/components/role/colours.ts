@@ -12,7 +12,13 @@ export function badgeColourCSS(c: string) {
 }
 
 export function badgeColours(c: string) {
-  const colour = chroma(c);
+  let colour;
+  try {
+    colour = chroma(c);
+  } catch {
+    // Default to green if colour is invalid or empty
+    colour = chroma("#22c55e");
+  }
 
   const bg = colour.brighten(2).desaturate(3).css();
   const bo = colour.darken(1).desaturate(1).alpha(0.2).css();
