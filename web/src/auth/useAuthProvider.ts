@@ -24,7 +24,7 @@ export function useAuthProvider() {
       push("/register");
     }
     if (loggedIn && (pathname === "/register" || pathname === "/login")) {
-      push("/");
+      push("/community");
     }
   }, [isLoading, loggedIn, isPrivate, pathname, push]);
 
