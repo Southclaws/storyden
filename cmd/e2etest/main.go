@@ -49,6 +49,9 @@ func run(ctx context.Context, playwrightArgs []string) error {
 		"PROXY_FRONTEND_ADDRESS=http://localhost:3001",
 		"PUBLIC_API_ADDRESS=http://localhost:8001",
 		"PUBLIC_WEB_ADDRESS=http://localhost:3001",
+		"RATE_LIMIT=100000",
+		"RATE_LIMIT_PERIOD=1m",
+		"RATE_LIMIT_EXPIRE=1s",
 	}
 	backendCmd.Stdout = os.Stdout
 	backendCmd.Stderr = os.Stderr
