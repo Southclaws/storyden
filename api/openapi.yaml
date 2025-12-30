@@ -1168,6 +1168,10 @@ paths:
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/ProfilesSortByQuery"
+        - $ref: "#/components/parameters/ProfilesRoleFilterQuery"
+        - $ref: "#/components/parameters/ProfilesJoinRangeQuery"
+        - $ref: "#/components/parameters/ProfilesInvitedByQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2423,6 +2427,39 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/AccountHandle"
+
+    ProfilesSortByQuery:
+      description: Profiles sort by query
+      name: sort
+      in: query
+      schema:
+        type: string
+
+    ProfilesRoleFilterQuery:
+      description: Profiles role filter query
+      name: roles
+      in: query
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/Identifier" }
+
+    ProfilesJoinRangeQuery:
+      description: Profiles join range query
+      name: joined
+      in: query
+      schema:
+        type: string
+        format: iso8601-interval
+
+    ProfilesInvitedByQuery:
+      description: Profiles invited by query (account handles)
+      name: invited_by
+      in: query
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/AccountHandle" }
 
     AccountHandleQueryParam:
       description: Account handle.

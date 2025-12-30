@@ -8,6 +8,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.25.13-canary
  */
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
+import type { ProfilesInvitedByQueryParameter } from "./profilesInvitedByQueryParameter";
+import type { ProfilesJoinRangeQueryParameter } from "./profilesJoinRangeQueryParameter";
+import type { ProfilesRoleFilterQueryParameter } from "./profilesRoleFilterQueryParameter";
+import type { ProfilesSortByQueryParameter } from "./profilesSortByQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 
 export type ProfileListParams = {
@@ -19,4 +23,20 @@ export type ProfileListParams = {
    * Pagination query parameters.
    */
   page?: PaginationQueryParameter;
+  /**
+   * Profiles sort by query
+   */
+  sort?: ProfilesSortByQueryParameter;
+  /**
+   * Profiles role filter query
+   */
+  roles?: ProfilesRoleFilterQueryParameter;
+  /**
+   * Profiles join range query
+   */
+  joined?: ProfilesJoinRangeQueryParameter;
+  /**
+   * Profiles invited by query (account handles)
+   */
+  invited_by?: ProfilesInvitedByQueryParameter;
 };

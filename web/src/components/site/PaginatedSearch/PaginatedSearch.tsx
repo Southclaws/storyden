@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,8 +26,9 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function usePaginatedSearch({ initialQuery, initialPage }: Props) {
+export function usePaginatedSearch({ initialQuery, initialPage, index }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [page, setPage] = useQueryState("page", {
     ...parseAsInteger,
@@ -43,13 +44,26 @@ export function usePaginatedSearch({ initialQuery, initialPage }: Props) {
 
   const { q } = form.watch();
 
+  // Get all current params as an object
+  const currentParams = Object.fromEntries(searchParams.entries());
+
   const handleSubmit = form.handleSubmit(async (data) => {
-    router.push(`/m?q=${data.q}`);
+    const { page, ...paramsWithoutPage } = currentParams;
+    const params = new URLSearchParams({
+      ...paramsWithoutPage,
+      q: data.q,
+      page: "1",
+    });
+    router.push(`${index}?${params.toString()}`);
   });
 
   const handleReset = async () => {
     form.reset();
-    router.push("/m");
+    // Preserve all params except 'q' and 'page'
+    const { q, page, ...restParams } = currentParams;
+    const params = new URLSearchParams(restParams);
+    const url = params.toString() ? `${index}?${params.toString()}` : index;
+    router.push(url);
   };
 
   const handlePage = async (nextPage: number) => {
@@ -60,6 +74,7 @@ export function usePaginatedSearch({ initialQuery, initialPage }: Props) {
     form,
     query: q,
     page,
+    currentParams,
     handlers: {
       handleSubmit,
       handleReset,
@@ -69,7 +84,8 @@ export function usePaginatedSearch({ initialQuery, initialPage }: Props) {
 }
 
 export function PaginatedSearch(props: Props) {
-  const { form, query, page, handlers } = usePaginatedSearch(props);
+  const { form, query, page, currentParams, handlers } =
+    usePaginatedSearch(props);
 
   return (
     <VStack w="full">
@@ -112,7 +128,7 @@ export function PaginatedSearch(props: Props) {
 
       <PaginationControls
         path={props.index}
-        params={{ q: query ?? "" }}
+        params={currentParams}
         currentPage={page}
         totalPages={props.totalPages}
         pageSize={props.pageSize}

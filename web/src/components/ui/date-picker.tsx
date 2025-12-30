@@ -315,3 +315,102 @@ export const DatePicker = (props: ArkDatePicker.RootBaseProps) => {
     </Root>
   );
 };
+
+export type DateRangePickerProps = ArkDatePicker.RootBaseProps & {
+  active?: boolean;
+  triggerClassName?: string;
+  hideInputs?: boolean;
+};
+
+export const DateRangePicker = ({
+  active,
+  triggerClassName,
+  hideInputs,
+  ...props
+}: DateRangePickerProps) => {
+  return (
+    <Root
+      positioning={{ sameWidth: true }}
+      startOfWeek={1}
+      selectionMode="range"
+      {...props}
+    >
+      <Control>
+        {!hideInputs && (
+          <>
+            <Input index={0} asChild>
+              <UIInput size="sm" placeholder="Start date" />
+            </Input>
+            <Input index={1} asChild>
+              <UIInput size="sm" placeholder="End date" />
+            </Input>
+          </>
+        )}
+        <Trigger asChild>
+          <IconButton
+            size="sm"
+            type="button"
+            variant={active ? "solid" : "subtle"}
+            aria-label="Open date picker"
+            className={triggerClassName}
+          >
+            <CalendarIcon />
+          </IconButton>
+        </Trigger>
+      </Control>
+      <Positioner>
+        <Content>
+          <View view="day">
+            <DatePickerContext>
+              {(api) => (
+                <>
+                  <ViewControl>
+                    <PrevTrigger asChild>
+                      <IconButton type="button" variant="ghost" size="sm">
+                        <ChevronLeftIcon />
+                      </IconButton>
+                    </PrevTrigger>
+                    <ViewTrigger asChild>
+                      <Button type="button" variant="ghost" size="sm">
+                        <RangeText />
+                      </Button>
+                    </ViewTrigger>
+                    <NextTrigger asChild>
+                      <IconButton type="button" variant="ghost" size="sm">
+                        <ChevronRightIcon />
+                      </IconButton>
+                    </NextTrigger>
+                  </ViewControl>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        {api.weekDays.map((weekDay, id) => (
+                          <TableHeader key={id}>{weekDay.narrow}</TableHeader>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {api.weeks.map((week, id) => (
+                        <TableRow key={id}>
+                          {week.map((day, id) => (
+                            <TableCell key={id} value={day}>
+                              <TableCellTrigger asChild>
+                                <IconButton type="button" variant="ghost">
+                                  {day.day}
+                                </IconButton>
+                              </TableCellTrigger>
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </>
+              )}
+            </DatePickerContext>
+          </View>
+        </Content>
+      </Positioner>
+    </Root>
+  );
+};

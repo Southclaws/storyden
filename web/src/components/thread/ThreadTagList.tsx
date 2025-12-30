@@ -4,7 +4,7 @@ import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
 import { TagNameList, TagReferenceList, Thread } from "@/api/openapi-schema";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
-import { Combotags } from "@/components/ui/combotags";
+import { Combotags, CombotagsItem } from "@/components/ui/combotags";
 
 export type Props = {
   editing: boolean;
@@ -15,7 +15,7 @@ export type Props = {
 export function ThreadTagList(props: Props) {
   const currentTags = props.initialTags?.map((t) => t.name) ?? [];
 
-  async function handleQuery(q: string): Promise<TagNameList> {
+  async function handleQuery(q: string): Promise<CombotagsItem[]> {
     const tags =
       (await handle(async () => {
         const { tags } = await tagList({ q });
@@ -24,7 +24,7 @@ export function ThreadTagList(props: Props) {
 
     const filtered = tags.filter((t) => !currentTags.includes(t));
 
-    return filtered;
+    return filtered.map((name) => ({ id: name, label: name }));
   }
 
   if (props.editing) {

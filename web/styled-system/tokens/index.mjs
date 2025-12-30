@@ -3611,6 +3611,10 @@ const tokens = {
     "value": "var(--colors-blue-text)",
     "variable": "var(--colors-blue-text)"
   },
+  "colors.overflow-fade": {
+    "value": "var(--colors-overflow-fade)",
+    "variable": "var(--colors-overflow-fade)"
+  },
   "colors.colorPalette": {
     "value": "var(--colors-color-palette)",
     "variable": "var(--colors-color-palette)"

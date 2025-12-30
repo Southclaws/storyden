@@ -7,6 +7,7 @@ import { LStack, styled } from "@/styled-system/jsx";
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
+import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 
@@ -48,6 +49,7 @@ export function ContentNavigationList(props: Props) {
         <CollectionsAnchor />
         <LinksAnchor />
         <MembersAnchor />
+        <RolesAnchor />
       </LStack>
     </styled.nav>
   );
