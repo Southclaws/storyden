@@ -20,3 +20,4 @@ clean
 migrate
 seed
 .serena
+*.md
