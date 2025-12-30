@@ -28,4 +28,12 @@ export const colours = defineSemanticTokens.colors({
   backgroundGradientV: {
     value: "linear-gradient(0deg, var(--colors-bg), transparent)",
   },
+  "overflow-fade": {
+    value: {
+      _osLight:
+        "linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 1) 80%)",
+      _osDark:
+        "linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 1) 80%)",
+    },
+  },
 });

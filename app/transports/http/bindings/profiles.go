@@ -9,16 +9,20 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
+	"github.com/Southclaws/storyden/app/resources/sortrule"
+	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/profile/following"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -30,7 +34,7 @@ type Profiles struct {
 	apiAddress    url.URL
 	profileQuery  *profile_querier.Querier
 	profile_cache *profile_cache.Cache
-	ps            profile_search.Repository
+	ps            *profile_search.Querier
 	followQuerier *follow_querier.Querier
 	followManager *following.FollowManager
 }
@@ -39,7 +43,7 @@ func NewProfiles(
 	cfg config.Config,
 	profileQuery *profile_querier.Querier,
 	profile_cache *profile_cache.Cache,
-	ps profile_search.Repository,
+	ps *profile_search.Querier,
 	followQuerier *follow_querier.Querier,
 	followManager *following.FollowManager,
 ) Profiles {
@@ -54,16 +58,15 @@ func NewProfiles(
 }
 
 func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListRequestObject) (openapi.ProfileListResponseObject, error) {
-	pageSize := 50
-
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
+	page := opt.NewPtrMap(request.Params.Page, func(s string) uint {
+		v, err := strconv.ParseUint(s, 10, 32)
 		if err != nil {
-			return 0
+			return 1
 		}
-
-		return max(1, int(v))
+		return uint(max(1, int(v)))
 	}).Or(1)
+
+	params := pagination.NewPageParams(page, 50)
 
 	opts := []profile_search.Filter{}
 
@@ -73,25 +76,64 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 		)
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
+	if request.Params.Sort != nil {
+		sortRule := sortrule.Parse(*request.Params.Sort)
+		opts = append(opts,
+			profile_search.WithSortBy(sortRule),
+		)
+	} else {
+		// Default sort: created_at descending (newest first)
+		opts = append(opts,
+			profile_search.WithSortBy(sortrule.Parse("-created_at")),
+		)
+	}
 
-	result, err := p.ps.Search(ctx, page, pageSize, opts...)
+	if request.Params.Roles != nil && len(*request.Params.Roles) > 0 {
+		roleIDs := make([]xid.ID, 0, len(*request.Params.Roles))
+		for _, id := range *request.Params.Roles {
+			parsed, err := xid.FromString(string(id))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+			}
+			roleIDs = append(roleIDs, parsed)
+		}
+		opts = append(opts,
+			profile_search.WithRoles(roleIDs),
+		)
+	}
+
+	if request.Params.Joined != nil {
+		tr, err := timerange.Parse(*request.Params.Joined)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		opts = append(opts,
+			profile_search.WithJoinedInRange(tr),
+		)
+	}
+
+	if request.Params.InvitedBy != nil && len(*request.Params.InvitedBy) > 0 {
+		handles := dt.Map(*request.Params.InvitedBy, func(h openapi.AccountHandle) string {
+			return string(h)
+		})
+		opts = append(opts,
+			profile_search.WithInvitedByHandles(handles),
+		)
+	}
+
+	result, err := p.ps.Search(ctx, params, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
-
 	return openapi.ProfileList200JSONResponse{
 		ProfileListOKJSONResponse: openapi.ProfileListOKJSONResponse{
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
-			CurrentPage: page,
+			CurrentPage: result.CurrentPage,
 			NextPage:    result.NextPage.Ptr(),
-			Profiles:    dt.Map(result.Profiles, serialiseProfile),
+			Profiles:    dt.Map(result.Items, serialiseProfile),
 		},
 	}, nil
 }

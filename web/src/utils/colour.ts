@@ -111,3 +111,17 @@ function readableColorWithFallback(rgb: string): string {
     return "black";
   }
 }
+
+export function deriveColour(s: string): string {
+  const bytes = new TextEncoder().encode(s);
+
+  const hash = bytes.reduce((r, b) => {
+    const s = b * 42;
+    const x = ((r + 1) * s) % 360;
+    return x;
+  }, 69);
+
+  const hue = hash;
+
+  return chroma(0.7226, 0.12, hue, "oklch").hex();
+}

@@ -2,10 +2,13 @@
 
 import { Unready } from "src/components/site/Unready";
 
+import { InvitedByFilter } from "@/components/library/members/MemberFilters/InvitedByFilter";
+import { JoinedDateFilter } from "@/components/library/members/MemberFilters/JoinedDateFilter";
+import { RoleFilter } from "@/components/library/members/MemberFilters/RoleFilter";
+import { SortMenu } from "@/components/library/members/MemberFilters/SortMenu";
 import { MemberList } from "@/components/library/members/MemberList";
-import { RolesAnchor } from "@/components/site/Navigation/Anchors/Roles";
 import { PaginatedSearch } from "@/components/site/PaginatedSearch/PaginatedSearch";
-import { VStack, WStack } from "@/styled-system/jsx";
+import { Flex, VStack } from "@/styled-system/jsx";
 
 import { Props, useMemberIndexScreen } from "./useMemberIndexScreen";
 
@@ -25,9 +28,19 @@ export function MemberIndexScreen(props: Props) {
         pageSize={data.page_size}
       />
 
-      <WStack>
-        <RolesAnchor variant="subtle" />
-      </WStack>
+      <Flex
+        w="full"
+        gap="2"
+        flexDir={{
+          base: "column",
+          md: "row",
+        }}
+      >
+        <RoleFilter />
+        <InvitedByFilter />
+        <JoinedDateFilter />
+        <SortMenu />
+      </Flex>
 
       <MemberList profiles={data.profiles} />
     </VStack>

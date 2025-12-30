@@ -2,31 +2,27 @@ package profile_search
 
 import (
 	"context"
-	"math"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/sortrule"
+	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 )
 
 type Filter func(*ent.AccountQuery)
 
-type Result struct {
-	PageSize    int
-	Results     int
-	TotalPages  int
-	CurrentPage int
-	NextPage    opt.Optional[int]
-	Profiles    []*profile.Public
-}
-
-type Repository interface {
-	Search(ctx context.Context, page int, pageSize int, opts ...Filter) (*Result, error)
+type Querier struct {
+	db *ent.Client
 }
 
 func WithDisplayNameContains(q string) Filter {
@@ -50,65 +46,122 @@ func WithNamesLike(q string) Filter {
 	}
 }
 
-type database struct {
-	db *ent.Client
-}
+func WithSortBy(rule sortrule.SortRule) Filter {
+	return func(pq *ent.AccountQuery) {
+		if rule.Field() == "" {
+			return
+		}
 
-func New(db *ent.Client) Repository {
-	return &database{db}
-}
-
-func (d *database) Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error) {
-	total, err := d.db.Account.Query().Count(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		switch rule.Field() {
+		case "created_at":
+			if rule.IsDescending() {
+				pq.Order(ent.Desc(account.FieldCreatedAt))
+			} else {
+				pq.Order(ent.Asc(account.FieldCreatedAt))
+			}
+		case "name":
+			if rule.IsDescending() {
+				pq.Order(ent.Desc(account.FieldName))
+			} else {
+				pq.Order(ent.Asc(account.FieldName))
+			}
+		case "handle":
+			if rule.IsDescending() {
+				pq.Order(ent.Desc(account.FieldHandle))
+			} else {
+				pq.Order(ent.Asc(account.FieldHandle))
+			}
+		}
 	}
+}
 
+func WithRoles(roleIDs []xid.ID) Filter {
+	return func(pq *ent.AccountQuery) {
+		if len(roleIDs) == 0 {
+			return
+		}
+
+		for _, roleID := range roleIDs {
+			pq.Where(account.HasAccountRolesWith(
+				accountroles.RoleIDEQ(roleID),
+			))
+		}
+	}
+}
+
+func WithJoinedInRange(tr timerange.TimeRange) Filter {
+	return func(pq *ent.AccountQuery) {
+		tr.Start.Call(func(start time.Time) {
+			pq.Where(account.CreatedAtGTE(start))
+		})
+
+		tr.End.Call(func(end time.Time) {
+			pq.Where(account.CreatedAtLTE(end))
+		})
+	}
+}
+
+func WithInvitedBy(accountIDs []xid.ID) Filter {
+	return func(pq *ent.AccountQuery) {
+		if len(accountIDs) == 0 {
+			return
+		}
+
+		pq.Where(account.HasInvitedByWith(
+			invitation.CreatorAccountIDIn(accountIDs...),
+		))
+	}
+}
+
+func WithInvitedByHandles(handles []string) Filter {
+	return func(pq *ent.AccountQuery) {
+		if len(handles) == 0 {
+			return
+		}
+
+		pq.Where(account.HasInvitedByWith(
+			invitation.HasCreatorWith(
+				account.HandleIn(handles...),
+			),
+		))
+	}
+}
+
+func New(db *ent.Client) *Querier {
+	return &Querier{db: db}
+}
+
+func (d *Querier) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*profile.Public], error) {
 	q := d.db.Account.Query().
 		WithTags().
 		WithEmails().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
-		WithAuthentication().
-		Limit(size + 1).
-		Offset(page * size).
-		Order(ent.Desc(account.FieldCreatedAt))
+		WithAuthentication()
 
 	for _, fn := range filters {
 		fn(q)
 	}
+
+	total, err := q.Clone().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	q.Limit(params.Limit()).Offset(params.Offset())
 
 	r, err := q.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nextPage := opt.NewSafe(page+1, len(r) >= size)
-
-	if len(r) > size {
-		r = r[:len(r)-1]
-	}
-
-	// hr, err := d.roleQuerier.ListFor(ctx, result)
-	// if err != nil {
-	// 	return nil, fault.Wrap(err, fctx.With(ctx))
-	// }
-
 	profiles, err := dt.MapErr(r, profile.Map(nil))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return &Result{
-		PageSize:    size,
-		Results:     len(profiles),
-		TotalPages:  int(math.Ceil(float64(total) / float64(size))),
-		CurrentPage: page,
-		NextPage:    nextPage,
-		Profiles:    profiles,
-	}, nil
+	result := pagination.NewPageResult(params, total, profiles)
+
+	return &result, nil
 }

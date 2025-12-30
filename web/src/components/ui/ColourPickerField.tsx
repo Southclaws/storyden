@@ -39,11 +39,10 @@ export function ColourPickerField<T extends FieldValues>(props: Props<T>) {
           field.onChange(d.valueAsString);
         }
 
+        const value = safeParseColour(field.value);
+
         return (
-          <ColorPicker.Root
-            value={parseColor(field.value)}
-            onValueChange={handleChange}
-          >
+          <ColorPicker.Root value={value} onValueChange={handleChange}>
             <ColorPicker.Context>
               {(api) => (
                 <>
@@ -107,4 +106,12 @@ export function ColourPickerField<T extends FieldValues>(props: Props<T>) {
       }}
     />
   );
+}
+
+function safeParseColour(c: string) {
+  try {
+    return parseColor(c);
+  } catch (_) {
+    return parseColor("green");
+  }
 }

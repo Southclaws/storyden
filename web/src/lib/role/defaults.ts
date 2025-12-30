@@ -20,6 +20,10 @@ export function isGuestRole(role: Role) {
   return role.id === DefaultRoleGuestID;
 }
 
+export function isMemberRole(role: Role) {
+  return role.id === DefaultRoleMemberID;
+}
+
 // Tells you if a default role has been edited with custom permissions.
 export function isStoredDefaultRole(role: Role) {
   if (!isDefaultRole(role)) {

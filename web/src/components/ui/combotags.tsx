@@ -14,9 +14,15 @@ import * as TagsInput from "@/components/ui/tags-input";
 
 import { DeleteSmallIcon } from "./icons/Delete";
 
+export type CombotagsItem = {
+  id: string;
+  label: string;
+};
+
 export type Props = {
+  placeholder?: string;
   initialValue?: string[];
-  onQuery: (query: string) => Promise<string[]>;
+  onQuery: (query: string) => Promise<CombotagsItem[]>;
   onChange: (values: string[]) => Promise<void>;
 };
 
@@ -27,12 +33,14 @@ export type CombotagsHandle = {
 
 // Combotags provides a mix of a tags input and a combobox where the tags input
 // field is used to filter the combobox results. The combobox results are then
-// used to add new tags to the tags input. It also allows just hitting enter or
-// comma to add a custom tag value to the tags list for creating new tags.
+// used to add items to the tags input.
 export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [searchResults, setSearchResults] = useState<CombotagsItem[]>([]);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Map<string, string>>(
+    new Map(),
+  );
 
   // NOTE: Because we're combining the combobox with a tags input, we need to
   // use the context provider here for easier control of the tags input values.
@@ -79,8 +87,15 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
   }
 
   async function handleValueChange({ value }) {
+    // Update selected items map
+    const newMap = new Map<string, string>();
+    value.forEach((id: string) => {
+      newMap.set(id, selectedItems.get(id) || id);
+    });
+    setSelectedItems(newMap);
+
     // Immediately update the local list, filtering out the newly added values.
-    setSearchResults(searchResults.filter((item) => !value.includes(item)));
+    setSearchResults(searchResults.filter((item) => !value.includes(item.id)));
 
     // NOTE: Not awaited to facilitate optimistic updates.
     props.onChange(value);
@@ -90,20 +105,28 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
     setIsComboboxOpen(() => false);
   }
 
-  const handleSelect = (value: string) => () => {
-    if (tagsInputRef.current.value.includes(value)) {
+  const handleSelect = (item: CombotagsItem) => () => {
+    if (tagsInputRef.current.value.includes(item.id)) {
       // Don't add duplicates.
       return;
     }
 
+    // Update selected items map with label
+    setSelectedItems((prev) => new Map(prev).set(item.id, item.label));
+
     // This is necessary because `addValue` is broken at the moment.
-    const newValue = [...tagsInputRef.current.value, value];
+    const newValue = [...tagsInputRef.current.value, item.id];
     tagsInputRef.current.setValue(newValue);
 
     setSearchQuery("");
   };
 
-  const collection = createListCollection({ items: searchResults });
+  const collection = createListCollection({
+    items: searchResults,
+    itemToValue(item) {
+      return item.id;
+    },
+  });
   const rect = inputControlRef.current?.getBoundingClientRect();
   const offset = rect?.height ?? 0;
 
@@ -119,10 +142,12 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
           {(api) => (
             <>
               <TagsInput.Control ref={inputControlRef}>
-                {api.value.map((value, index) => (
-                  <TagsInput.Item key={index} index={index} value={value}>
+                {api.value.map((id, index) => (
+                  <TagsInput.Item key={index} index={index} value={id}>
                     <TagsInput.ItemPreview>
-                      <TagsInput.ItemText>{value}</TagsInput.ItemText>
+                      <TagsInput.ItemText>
+                        {selectedItems.get(id) || id}
+                      </TagsInput.ItemText>
                       <TagsInput.ItemDeleteTrigger asChild>
                         <IconButton variant="link" size="xs">
                           <DeleteSmallIcon />
@@ -133,7 +158,7 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
                     <TagsInput.HiddenInput />
                   </TagsInput.Item>
                 ))}
-                <TagsInput.Input placeholder="Tags..." />
+                <TagsInput.Input placeholder={props.placeholder || "Tags..."} />
               </TagsInput.Control>
             </>
           )}
@@ -154,8 +179,8 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
           <Combobox.Content maxH="64" overflowY="scroll">
             {searchResults.map((item) => (
               <Combobox.Item
-                key={item}
-                id={item}
+                key={item.id}
+                id={item.id}
                 item={item}
                 onClick={handleSelect(item)}
               >
@@ -166,7 +191,7 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
                   overflow="hidden"
                   textOverflow="ellipsis"
                 >
-                  {item}
+                  {item.label}
                 </Combobox.ItemText>
               </Combobox.Item>
             ))}

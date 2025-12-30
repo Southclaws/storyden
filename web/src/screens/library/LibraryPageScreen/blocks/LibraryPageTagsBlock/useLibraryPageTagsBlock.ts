@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
 import { InstanceCapability, TagNameList } from "@/api/openapi-schema";
-import { CombotagsHandle } from "@/components/ui/combotags";
+import { CombotagsHandle, CombotagsItem } from "@/components/ui/combotags";
 import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
@@ -30,7 +30,7 @@ export function useLibraryPageTagsBlockEditing() {
     }
   }, [currentTags]);
 
-  async function handleQuery(q: string): Promise<TagNameList> {
+  async function handleQuery(q: string): Promise<CombotagsItem[]> {
     const tags =
       (await handle(async () => {
         const { tags } = await tagList({ q });
@@ -39,7 +39,7 @@ export function useLibraryPageTagsBlockEditing() {
 
     const filtered = tags.filter((t) => !currentTags.includes(t));
 
-    return filtered;
+    return filtered.map((name) => ({ id: name, label: name }));
   }
 
   async function handleSuggestTags() {
