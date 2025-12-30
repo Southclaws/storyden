@@ -23,7 +23,6 @@ export * from './progress.mjs';
 export * from './table.mjs';
 export * from './slider.mjs';
 export * from './pin-input.mjs';
-export * from './tags-input.mjs';
 export * from './tabs.mjs';
 export * from './radio-group.mjs';
 export * from './tree-view.mjs';

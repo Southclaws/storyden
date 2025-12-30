@@ -24,7 +24,6 @@ export * from './progress';
 export * from './table';
 export * from './slider';
 export * from './pin-input';
-export * from './tags-input';
 export * from './tabs';
 export * from './radio-group';
 export * from './tree-view';

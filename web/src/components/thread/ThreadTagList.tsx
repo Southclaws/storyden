@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
-import { TagNameList, TagReferenceList, Thread } from "@/api/openapi-schema";
+import { TagNameList, TagReferenceList } from "@/api/openapi-schema";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
-import { Combotags, CombotagsItem } from "@/components/ui/combotags";
+import {
+  MultiSelectPicker,
+  MultiSelectPickerItem,
+} from "@/components/ui/MultiSelectPicker";
 
 export type Props = {
   editing: boolean;
@@ -13,29 +17,48 @@ export type Props = {
 };
 
 export function ThreadTagList(props: Props) {
-  const currentTags = props.initialTags?.map((t) => t.name) ?? [];
+  const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>(
+    [],
+  );
 
-  async function handleQuery(q: string): Promise<CombotagsItem[]> {
-    const tags =
-      (await handle(async () => {
-        const { tags } = await tagList({ q });
-        return tags.map((t) => t.name);
-      })) ?? [];
+  const currentTags: MultiSelectPickerItem[] =
+    props.initialTags?.map((t) => ({
+      label: t.name,
+      value: t.name,
+    })) ?? [];
 
-    const filtered = tags.filter((t) => !currentTags.includes(t));
+  function handleQuery(q: string) {
+    handle(async () => {
+      const { tags } = await tagList({ q });
+      const filtered = tags.filter(
+        (t) => !currentTags.some((ct) => ct.value === t.name),
+      );
+      setQueryResults(
+        filtered.map((t) => ({
+          label: t.name,
+          value: t.name,
+        })),
+      );
+    });
+  }
 
-    return filtered.map((name) => ({ id: name, label: name }));
+  async function handleChange(items: MultiSelectPickerItem[]) {
+    const tagNames = items.map((item) => item.value);
+    await props.onChange(tagNames);
   }
 
   if (props.editing) {
     return (
-      <>
-        <Combotags
-          initialValue={currentTags}
-          onQuery={handleQuery}
-          onChange={props.onChange}
-        />
-      </>
+      <MultiSelectPicker
+        value={currentTags}
+        onChange={handleChange}
+        onQuery={handleQuery}
+        queryResults={queryResults}
+        allowNewValues={true}
+        inputPlaceholder="Add tags..."
+        autoColour={true}
+        size="sm"
+      />
     );
   }
 
@@ -65,10 +88,13 @@ export function TagListField<T extends FieldValues>({
           field.onChange(tags);
         }
 
+        const fieldTags =
+          field.value?.map((name: string) => ({ name })) || initialTags || [];
+
         return (
           <ThreadTagList
             editing={true}
-            initialTags={initialTags}
+            initialTags={fieldTags}
             onChange={handleChange}
           />
         );

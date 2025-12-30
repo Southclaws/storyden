@@ -25,7 +25,6 @@ import { slider } from "@/recipes/slider";
 import { switchRecipe } from "@/recipes/switch";
 import { table } from "@/recipes/table";
 import { tabs } from "@/recipes/tabs";
-import { tagsInput } from "@/recipes/tags-input";
 import { text } from "@/recipes/text";
 import { toggleGroup } from "@/recipes/toggle-group";
 import { tooltip } from "@/recipes/tooltip";
@@ -217,7 +216,6 @@ export default defineConfig({
         table: table,
         slider: slider,
         pinInput: pinInput,
-        tagsInput: tagsInput,
         tabs: tabs,
         radioGroup: radioGroup,
         treeView: treeView,

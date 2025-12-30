@@ -1,6 +1,6 @@
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
-import { Combotags } from "@/components/ui/combotags";
+import { MultiSelectPicker } from "@/components/ui/MultiSelectPicker";
 import { HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
@@ -23,8 +23,8 @@ export function LibraryPageTagsBlock() {
 
 export function LibraryPageTagsBlockEditing() {
   const {
-    ref,
-    currentTags,
+    currentTagItems,
+    queryResults,
     isSuggestEnabled,
     loadingTags,
     handleQuery,
@@ -34,11 +34,15 @@ export function LibraryPageTagsBlockEditing() {
 
   return (
     <HStack w="full" gap="1" alignItems="start">
-      <Combotags
-        ref={ref}
-        initialValue={currentTags}
-        onQuery={handleQuery}
+      <MultiSelectPicker
+        value={currentTagItems}
         onChange={handleChange}
+        onQuery={handleQuery}
+        queryResults={queryResults}
+        allowNewValues={true}
+        inputPlaceholder="Add tags..."
+        autoColour={true}
+        size="sm"
       />
       {isSuggestEnabled && (
         <IntelligenceAction

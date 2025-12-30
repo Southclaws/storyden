@@ -180,7 +180,10 @@ export function MultiSelectPicker({
       {...menuVariantProps}
     >
       <Menu.Trigger
+        w="full"
+        flexShrink="1"
         justifyContent="space-between"
+        cursor="pointer"
         aria-label={`Select items${value.length > 0 ? `, ${value.length} selected` : ""}`}
         {...triggerProps}
       >
@@ -320,10 +323,9 @@ export function MultiSelectPicker({
                           key={item.value}
                           value={item.value}
                           closeOnSelect={false}
+                          onSelect={handleAddResult(item)}
                         >
-                          <span onClick={handleAddResult(item)}>
-                            {item.label}
-                          </span>
+                          {item.label}
                         </Menu.Item>
                       );
                     })}
@@ -336,10 +338,9 @@ export function MultiSelectPicker({
                     <Menu.Item
                       value={`new-${queryInput}`}
                       closeOnSelect={false}
+                      onSelect={handleAddNewValue}
                     >
-                      <span onClick={handleAddNewValue}>
-                        Create "{queryInput}"
-                      </span>
+                      Create "{queryInput}"
                     </Menu.Item>
                   </Menu.ItemGroup>
                 )}
