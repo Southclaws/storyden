@@ -1,6 +1,6 @@
 import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
-import { categoryList } from "@/api/openapi-server/categories";
-import { nodeList } from "@/api/openapi-server/nodes";
+import { categoryListCached } from "@/lib/category/server-category-list";
+import { nodeListCached } from "@/lib/library/server-node-list";
 import { Box, styled } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
@@ -10,11 +10,11 @@ import { AdminZone } from "./AdminZone/AdminZone";
 
 export async function NavigationPane() {
   try {
-    const { data: initialNodeList } = await nodeList({
+    const { data: initialNodeList } = await nodeListCached({
       // NOTE: This doesn't work due to a bug in Orval.
       // visibility: ["draft", "review", "unlisted", "published"],
     });
-    const { data: initialCategoryList } = await categoryList();
+    const { data: initialCategoryList } = await categoryListCached();
 
     return (
       <NavigationPaneContent

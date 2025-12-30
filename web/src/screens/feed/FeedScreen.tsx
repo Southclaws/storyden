@@ -1,8 +1,8 @@
-import { Account, ThreadListResult } from "@/api/openapi-schema";
-import { categoryList } from "@/api/openapi-server/categories";
-import { nodeList } from "@/api/openapi-server/nodes";
+import { Account } from "@/api/openapi-schema";
 import { threadList } from "@/api/openapi-server/threads";
+import { categoryListCached } from "@/lib/category/server-category-list";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
+import { nodeListCached } from "@/lib/library/server-node-list";
 import { FrontendConfiguration, Settings } from "@/lib/settings/settings";
 import { VStack } from "@/styled-system/jsx";
 
@@ -59,12 +59,12 @@ async function getInitialFeedData(
 
       case "library":
         return {
-          library: (await nodeList()).data,
+          library: (await nodeListCached()).data,
         };
 
       case "categories": {
         const mode = feedConfig.source.threadListMode ?? "all";
-        const categories = (await categoryList()).data;
+        const categories = (await categoryListCached()).data;
 
         const threadParams = getCategoryThreadListParams(mode, page);
         const threads = (

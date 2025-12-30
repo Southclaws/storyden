@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { UnreadyBanner } from "src/components/site/Unready";
 
-import { categoryGet, categoryList } from "@/api/openapi-server/categories";
+import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { CategoryScreen } from "@/screens/category/CategoryScreen";
 

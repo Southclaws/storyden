@@ -1,4 +1,4 @@
-import { categoryGet, categoryList } from "@/api/openapi-server/categories";
+import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { CategoryScreenContextPane } from "@/screens/category/CategoryScreenContextPane";
 

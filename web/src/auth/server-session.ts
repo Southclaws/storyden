@@ -1,9 +1,16 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 import { RequestError } from "@/api/common";
 import { accountGet } from "@/api/openapi-server/accounts";
+
+const getSessionCached = cache(async () => {
+  return await accountGet({
+    cache: "default",
+  });
+});
 
 export async function getServerSession() {
   const session = (await cookies()).get("storyden-session");
@@ -11,9 +18,7 @@ export async function getServerSession() {
   if (!session) return;
 
   try {
-    const { data } = await accountGet({
-      next: { tags: ["accounts"] },
-    });
+    const { data } = await getSessionCached();
 
     return data;
   } catch (e) {

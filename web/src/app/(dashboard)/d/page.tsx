@@ -1,8 +1,8 @@
 import z from "zod";
 
-import { categoryList } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { categoryListCached } from "@/lib/category/server-category-list";
 import { CategoryIndexScreen } from "@/screens/category/CategoryIndexScreen";
 
 type Props = {
@@ -21,7 +21,7 @@ export default async function Page({ searchParams }: Props) {
   try {
     const { page } = QuerySchema.parse(await searchParams);
 
-    const { data: categories } = await categoryList();
+    const { data: categories } = await categoryListCached();
     const { data: threads } = await threadList({
       page: page?.toString() ?? "1",
       // NOTE: The string "null" is a special case that yields all threads that
