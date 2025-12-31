@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useSession } from "src/auth";
 
 import { ProfileReference } from "@/api/openapi-schema";
+import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
 import { hasPermission } from "@/utils/permissions";
@@ -14,7 +15,6 @@ import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 import { MemberIdent } from "../MemberBadge/MemberIdent";
 import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
-import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 
 export type Props = {
   profile: ProfileReference;
@@ -54,6 +54,7 @@ export function MemberOptionsMenu({
         maxW="full"
         cursor="pointer"
         asChild={props.asChild}
+        textAlign="start"
       >
         {children}
       </Menu.Trigger>
