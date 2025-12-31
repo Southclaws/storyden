@@ -19,9 +19,14 @@ import type {
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
+  AuditEventCreatedOKResponse,
+  AuditEventGetOKResponse,
+  AuditEventListOKResponse,
+  AuditEventListParams,
   BadRequestResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
+  ModerationActionCreateBody,
   NoContentResponse,
   NotFoundResponse,
   UnauthorisedResponse,
@@ -122,6 +127,179 @@ export const useAdminSettingsUpdate = <
 
   const swrKey = swrOptions?.swrKey ?? getAdminSettingsUpdateMutationKey();
   const swrFn = getAdminSettingsUpdateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List audit events for the installation. Audit events track important
+actions taken by accounts with elevated permissions such as admin
+accounts and moderators. It also provides error logs for system internal
+components that could not be responded to the client directly such as
+background job failures and configuration issues.
+
+ */
+export const auditEventList = (params?: AuditEventListParams) => {
+  return fetcher<AuditEventListOKResponse>({
+    url: `/admin/audit-events`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getAuditEventListKey = (params?: AuditEventListParams) =>
+  [`/admin/audit-events`, ...(params ? [params] : [])] as const;
+
+export type AuditEventListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof auditEventList>>
+>;
+export type AuditEventListQueryError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAuditEventList = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  params?: AuditEventListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof auditEventList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAuditEventListKey(params) : null));
+  const swrFn = () => auditEventList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Retrieve a specific audit event by ID.
+ */
+export const auditEventGet = (auditEventId: string) => {
+  return fetcher<AuditEventGetOKResponse>({
+    url: `/admin/audit-events/${auditEventId}`,
+    method: "GET",
+  });
+};
+
+export const getAuditEventGetKey = (auditEventId: string) =>
+  [`/admin/audit-events/${auditEventId}`] as const;
+
+export type AuditEventGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof auditEventGet>>
+>;
+export type AuditEventGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuditEventGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  auditEventId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof auditEventGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!auditEventId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAuditEventGetKey(auditEventId) : null));
+  const swrFn = () => auditEventGet(auditEventId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create a new moderation action such as a ban or content purge.
+ */
+export const moderationActionCreate = (
+  moderationActionCreateBody: ModerationActionCreateBody,
+) => {
+  return fetcher<AuditEventCreatedOKResponse>({
+    url: `/admin/actions`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: moderationActionCreateBody,
+  });
+};
+
+export const getModerationActionCreateMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: ModerationActionCreateBody },
+  ): Promise<AuditEventCreatedOKResponse> => {
+    return moderationActionCreate(arg);
+  };
+};
+export const getModerationActionCreateMutationKey = () =>
+  [`/admin/actions`] as const;
+
+export type ModerationActionCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof moderationActionCreate>>
+>;
+export type ModerationActionCreateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useModerationActionCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof moderationActionCreate>>,
+    TError,
+    Key,
+    ModerationActionCreateBody,
+    Awaited<ReturnType<typeof moderationActionCreate>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getModerationActionCreateMutationKey();
+  const swrFn = getModerationActionCreateMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

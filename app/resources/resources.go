@@ -19,6 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
+	"github.com/Southclaws/storyden/app/resources/audit/audit_querier"
+	"github.com/Southclaws/storyden/app/resources/audit/audit_writer"
 	collection_items "github.com/Southclaws/storyden/app/resources/collection/collection_item"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
@@ -79,6 +81,8 @@ func Build() fx.Option {
 			invitation_writer.New,
 			asset_querier.New,
 			asset_writer.New,
+			audit_querier.New,
+			audit_writer.New,
 			authentication.New,
 			category.New,
 			category_cache.New,

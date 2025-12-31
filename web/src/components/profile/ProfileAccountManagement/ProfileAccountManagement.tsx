@@ -17,6 +17,8 @@ import {
 } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
+import { AccountPurgeTrigger } from "./AccountPurgeModal/AccountPurgeTrigger";
+
 type Props = {
   accountId: string;
 };
@@ -99,9 +101,17 @@ export function ProfileAccountManagement({ accountId }: Props) {
       borderRadius="sm"
     >
       <Box bgColor="bg.warning" borderTopRadius="sm" pl="3" pr="2" py="1">
-        <HStack gap="1" color="fg.warning" fontSize="xs">
-          <AdminIcon w="4" />
-          <p>Account information</p>
+        <HStack
+          gap="1"
+          color="fg.warning"
+          fontSize="xs"
+          justifyContent="space-between"
+        >
+          <HStack gap="1">
+            <AdminIcon w="4" />
+            <p>Account information</p>
+          </HStack>
+          <AccountPurgeTrigger accountId={account.id} handle={account.handle} />
         </HStack>
       </Box>
       <Flex

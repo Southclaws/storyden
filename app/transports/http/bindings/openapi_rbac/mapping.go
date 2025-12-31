@@ -50,6 +50,18 @@ func (m *Mapping) AdminSettingsUpdate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSettings
 }
 
+func (m *Mapping) AuditEventList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AuditEventGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) ModerationActionCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) AdminAccountBanCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSuspensions
 }

@@ -18,6 +18,9 @@ type AccountRoles func(*sql.Selector)
 // Asset is the predicate function for asset builders.
 type Asset func(*sql.Selector)
 
+// AuditLog is the predicate function for auditlog builders.
+type AuditLog func(*sql.Selector)
+
 // Authentication is the predicate function for authentication builders.
 type Authentication func(*sql.Selector)
 

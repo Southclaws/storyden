@@ -14,6 +14,9 @@ type OperationPermissions interface {
 	SendBeacon() (bool, *rbac.Permission)
 	AdminSettingsGet() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
+	AuditEventList() (bool, *rbac.Permission)
+	AuditEventGet() (bool, *rbac.Permission)
+	ModerationActionCreate() (bool, *rbac.Permission)
 	AdminAccountBanCreate() (bool, *rbac.Permission)
 	AdminAccountBanRemove() (bool, *rbac.Permission)
 	AdminAccessKeyList() (bool, *rbac.Permission)
@@ -166,6 +169,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminSettingsGet()
 	case "AdminSettingsUpdate":
 		return optable.AdminSettingsUpdate()
+	case "AuditEventList":
+		return optable.AuditEventList()
+	case "AuditEventGet":
+		return optable.AuditEventGet()
+	case "ModerationActionCreate":
+		return optable.ModerationActionCreate()
 	case "AdminAccountBanCreate":
 		return optable.AdminAccountBanCreate()
 	case "AdminAccountBanRemove":

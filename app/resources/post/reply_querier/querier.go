@@ -37,6 +37,7 @@ func (d *Querier) Get(ctx context.Context, id post.ID) (*reply.Reply, error) {
 		}).
 		WithReplyTo(func(pq *ent.PostQuery) {
 			pq.WithAuthor()
+			pq.Where(ent_post.DeletedAtIsNil())
 		}).
 		Only(ctx)
 	if err != nil {

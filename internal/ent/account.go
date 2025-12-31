@@ -99,11 +99,13 @@ type AccountEdges struct {
 	Reports []*Report `json:"reports,omitempty"`
 	// HandledReports holds the value of the handled_reports edge.
 	HandledReports []*Report `json:"handled_reports,omitempty"`
+	// AuditLogs holds the value of the audit_logs edge.
+	AuditLogs []*AuditLog `json:"audit_logs,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [24]bool
+	loadedTypes [25]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -315,10 +317,19 @@ func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
 	return nil, &NotLoadedError{edge: "handled_reports"}
 }
 
+// AuditLogsOrErr returns the AuditLogs value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
+	if e.loadedTypes[23] {
+		return e.AuditLogs, nil
+	}
+	return nil, &NotLoadedError{edge: "audit_logs"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[24] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -567,6 +578,11 @@ func (_m *Account) QueryReports() *ReportQuery {
 // QueryHandledReports queries the "handled_reports" edge of the Account entity.
 func (_m *Account) QueryHandledReports() *ReportQuery {
 	return NewAccountClient(_m.config).QueryHandledReports(_m)
+}
+
+// QueryAuditLogs queries the "audit_logs" edge of the Account entity.
+func (_m *Account) QueryAuditLogs() *AuditLogQuery {
+	return NewAccountClient(_m.config).QueryAuditLogs(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.
