@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/otp"
@@ -46,6 +47,14 @@ func ImportAccounts(ctx context.Context, w *writer.Writer, data *loader.MyBBData
 		createdAt := time.Unix(user.RegDate, 0)
 
 		handle := mark.Slugify(user.Username)
+
+		// If slugify returns empty (username was all special chars/emojis), use a fallback
+		if handle == "" {
+			handle = fmt.Sprintf("user-%d", user.UID)
+			logger.Info(fmt.Sprintf("Generated fallback handle for user '%s' (uid:%d) → @%s", user.Username, user.UID, handle))
+		}
+
+		// Handle duplicates
 		if count, exists := handleMap[handle]; exists {
 			handleMap[handle] = count + 1
 			handle = fmt.Sprintf("%s-%d", handle, count+1)
@@ -73,6 +82,9 @@ func ImportAccounts(ctx context.Context, w *writer.Writer, data *loader.MyBBData
 		}
 
 		accountBuilders = append(accountBuilders, accountBuilder)
+
+		// Log account import with sexy formatting
+		// logger.Account(user.UID, user.Username, handle, isAdmin)
 
 		randomPassword, err := generateRandomPassword()
 		if err != nil {
