@@ -1,7 +1,9 @@
+import { keyBy } from "lodash/fp";
 import { z } from "zod";
 
 import { SearchScreen } from "src/screens/search/SearchScreen";
 
+import { categoryList } from "@/api/openapi-server/categories";
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
@@ -62,13 +64,26 @@ export default async function Page(props: Props) {
 
     const params = QuerySchema.parse(searchParams);
 
+    let categoryIDs: string[] = [];
+    if (params.categories?.length) {
+      const { data } = await categoryList();
+      const bySlug = keyBy("slug", data.categories);
+
+      for (const slug of params.categories) {
+        const category = bySlug[slug];
+        if (category) {
+          categoryIDs.push(category.id);
+        }
+      }
+    }
+
     const { data } = params.q
       ? await datagraphSearch({
           q: params.q,
           page: params.page?.toString(),
           kind: params.kind,
           authors: params.authors,
-          categories: params.categories,
+          categories: categoryIDs,
           tags: params.tags,
         })
       : {
