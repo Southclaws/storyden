@@ -15,7 +15,7 @@ import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { Props, useSearchScreen } from "./useSearch";
@@ -109,7 +109,14 @@ export function SearchScreen(props: Props) {
           ]}
         />
 
-        <HStack w="full">
+        <Flex
+          w="full"
+          gap="2"
+          flexDirection={{
+            base: "column",
+            md: "row",
+          }}
+        >
           <MultiSelectPicker
             value={filters.authorsValue}
             onChange={handlers.handleAuthorsChange}
@@ -158,7 +165,7 @@ export function SearchScreen(props: Props) {
               }}
             />
           )}
-        </HStack>
+        </Flex>
       </LStack>
 
       {unready ? (
