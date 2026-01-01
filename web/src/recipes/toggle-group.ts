@@ -112,13 +112,13 @@ export const toggleGroup = defineSlotRecipe({
       sm: {
         item: {
           px: "2",
-          h: "9",
-          minW: "9",
+          h: "8",
+          minW: "8",
           textStyle: "sm",
           gap: "2",
           "& svg": {
-            width: "4.5",
-            height: "4.5",
+            width: "4",
+            height: "4",
           },
         },
       },
@@ -150,4 +150,42 @@ export const toggleGroup = defineSlotRecipe({
       },
     },
   },
+  compoundVariants: [
+    {
+      variant: "outline",
+      size: "xs",
+      css: {
+        item: {
+          h: "{sizes.5.5}",
+        },
+      },
+    },
+    {
+      variant: "outline",
+      size: "sm",
+      css: {
+        item: {
+          h: "7.5",
+        },
+      },
+    },
+    {
+      variant: "outline",
+      size: "md",
+      css: {
+        item: {
+          h: "9.5",
+        },
+      },
+    },
+    {
+      variant: "outline",
+      size: "lg",
+      css: {
+        item: {
+          h: "10.5",
+        },
+      },
+    },
+  ],
 });

@@ -19,6 +19,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -34,19 +35,22 @@ import (
 )
 
 type Datagraph struct {
-	searcher searcher.Searcher
-	asker    semdex.Asker
+	searcher       searcher.Searcher
+	asker          semdex.Asker
+	accountQuerier *account_querier.Querier
 }
 
 func NewDatagraph(
 	info *instance_info.Provider,
 	searcher searcher.Searcher,
 	asker semdex.Asker,
+	accountQuerier *account_querier.Querier,
 	router *echo.Echo,
 ) Datagraph {
 	d := Datagraph{
-		searcher: searcher,
-		asker:    asker,
+		searcher:       searcher,
+		asker:          asker,
+		accountQuerier: accountQuerier,
 	}
 
 	// The generated OpenAPI code does not expose the underlying ResponseWriter
@@ -166,7 +170,9 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	authorFilter, err := opt.MapErr(opt.NewPtr(request.Params.Authors), deserialiseAuthorList)
+	authorFilter, err := opt.MapErr(opt.NewPtr(request.Params.Authors), func(ids []openapi.Identifier) ([]account.AccountID, error) {
+		return d.resolveAuthorFilter(ctx, ids)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -241,14 +247,35 @@ func deserialiseDatagraphKind(v openapi.DatagraphItemKind) (datagraph.Kind, erro
 	return datagraph.NewKind(string(v))
 }
 
-func deserialiseAuthorList(ids []openapi.Identifier) ([]account.AccountID, error) {
-	return dt.MapErr(ids, func(id openapi.Identifier) (account.AccountID, error) {
-		parsed, err := xid.FromString(string(id))
-		if err != nil {
-			return account.AccountID(xid.NilID()), err
+func (d *Datagraph) resolveAuthorFilter(ctx context.Context, identifiers []openapi.Identifier) ([]account.AccountID, error) {
+	if len(identifiers) == 0 {
+		return []account.AccountID{}, nil
+	}
+
+	var ids []account.AccountID
+	var handles []string
+
+	for _, identifier := range identifiers {
+		idStr := string(identifier)
+		if parsed, err := xid.FromString(idStr); err == nil {
+			ids = append(ids, account.AccountID(parsed))
+		} else {
+			handles = append(handles, idStr)
 		}
-		return account.AccountID(parsed), nil
-	})
+	}
+
+	if len(handles) > 0 {
+		accounts, err := d.accountQuerier.ProbeMany(ctx, handles...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		for _, acc := range accounts {
+			ids = append(ids, acc.ID)
+		}
+	}
+
+	return ids, nil
 }
 
 func deserialiseCategoryList(ids []openapi.Identifier) ([]category.CategoryID, error) {

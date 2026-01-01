@@ -2651,6 +2651,22 @@ const tokens = {
     "value": "1.125rem",
     "variable": "var(--sizes-4\\.5)"
   },
+  "sizes.5.5": {
+    "value": "1.375rem",
+    "variable": "var(--sizes-5\\.5)"
+  },
+  "sizes.7.5": {
+    "value": "1.875rem",
+    "variable": "var(--sizes-7\\.5)"
+  },
+  "sizes.9.5": {
+    "value": "2.375rem",
+    "variable": "var(--sizes-9\\.5)"
+  },
+  "sizes.10.5": {
+    "value": "2.625rem",
+    "variable": "var(--sizes-10\\.5)"
+  },
   "sizes.safeBottom": {
     "value": "env(safe-area-inset-bottom)",
     "variable": "var(--sizes-safe-bottom)"
@@ -2886,6 +2902,22 @@ const tokens = {
   "spacing.4.5": {
     "value": "1.125rem",
     "variable": "var(--spacing-4\\.5)"
+  },
+  "spacing.5.5": {
+    "value": "1.375rem",
+    "variable": "var(--spacing-5\\.5)"
+  },
+  "spacing.7.5": {
+    "value": "1.875rem",
+    "variable": "var(--spacing-7\\.5)"
+  },
+  "spacing.9.5": {
+    "value": "2.375rem",
+    "variable": "var(--spacing-9\\.5)"
+  },
+  "spacing.10.5": {
+    "value": "2.625rem",
+    "variable": "var(--spacing-10\\.5)"
   },
   "spacing.safeBottom": {
     "value": "env(safe-area-inset-bottom)",
@@ -3234,6 +3266,22 @@ const tokens = {
   "spacing.-4.5": {
     "value": "calc(var(--spacing-4\\.5) * -1)",
     "variable": "var(--spacing-4\\.5)"
+  },
+  "spacing.-5.5": {
+    "value": "calc(var(--spacing-5\\.5) * -1)",
+    "variable": "var(--spacing-5\\.5)"
+  },
+  "spacing.-7.5": {
+    "value": "calc(var(--spacing-7\\.5) * -1)",
+    "variable": "var(--spacing-7\\.5)"
+  },
+  "spacing.-9.5": {
+    "value": "calc(var(--spacing-9\\.5) * -1)",
+    "variable": "var(--spacing-9\\.5)"
+  },
+  "spacing.-10.5": {
+    "value": "calc(var(--spacing-10\\.5) * -1)",
+    "variable": "var(--spacing-10\\.5)"
   },
   "spacing.-safeBottom": {
     "value": "calc(var(--spacing-safe-bottom) * -1)",

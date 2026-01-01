@@ -25,7 +25,8 @@ export type DatagraphSearchParams = {
   kind?: DatagraphKindQueryParameter;
   /**
  * Datagraph item author query. When set, only items authored by the
-specified account IDs will be returned.
+specified members will be returned. This query supports either account
+IDs or handles for filtering.
 
  */
   authors?: DatagraphAuthorQueryParameter;
