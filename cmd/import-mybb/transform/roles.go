@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/rs/xid"
@@ -21,7 +24,10 @@ func ImportRoles(ctx context.Context, w *writer.Writer, data *loader.MyBBData) e
 	builders := make([]*ent.RoleCreate, 0, len(data.UserGroups))
 
 	for _, group := range data.UserGroups {
-		id := xid.New()
+		id, isDefaultRole := mapDefaultRoleID(group.Title)
+		if !isDefaultRole {
+			id = xid.New()
+		}
 
 		permissions := mapMyBBPermissions(group)
 
@@ -34,6 +40,8 @@ func ImportRoles(ctx context.Context, w *writer.Writer, data *loader.MyBBData) e
 
 		builders = append(builders, builder)
 		w.RoleIDMap[group.GID] = id
+
+		logger.Role(group.GID, group.Title, permissions)
 	}
 
 	roles, err := w.CreateRoles(ctx, builders)
@@ -43,6 +51,21 @@ func ImportRoles(ctx context.Context, w *writer.Writer, data *loader.MyBBData) e
 
 	log.Printf("Imported %d roles", len(roles))
 	return nil
+}
+
+func mapDefaultRoleID(title string) (xid.ID, bool) {
+	normalised := strings.ToLower(strings.TrimSpace(title))
+
+	switch normalised {
+	case "guests":
+		return xid.ID(role.DefaultRoleGuestID), true
+	case "members":
+		return xid.ID(role.DefaultRoleMemberID), true
+	case "admin":
+		return xid.ID(role.DefaultRoleAdminID), true
+	default:
+		return xid.ID{}, false
+	}
 }
 
 func mapMyBBPermissions(group loader.MyBBUserGroup) []string {

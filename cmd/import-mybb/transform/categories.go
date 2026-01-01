@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/rs/xid"
@@ -23,7 +24,7 @@ func ImportCategories(ctx context.Context, w *writer.Writer, data *loader.MyBBDa
 
 	for _, forum := range data.Forums {
 		if forum.Active == 0 {
-			log.Printf("Skipping inactive forum: %s", forum.Name)
+			logger.Skip("category", fmt.Sprintf("inactive forum: %s", forum.Name))
 			continue
 		}
 
@@ -31,11 +32,12 @@ func ImportCategories(ctx context.Context, w *writer.Writer, data *loader.MyBBDa
 		w.CategoryIDMap[forum.FID] = id
 
 		parentID := parseParentFromList(forum.ParentList, w)
+		slug := mark.Slugify(forum.Name)
 
 		builder := w.Client().Category.Create().
 			SetID(id).
 			SetName(forum.Name).
-			SetSlug(mark.Slugify(forum.Name)).
+			SetSlug(slug).
 			SetSort(forum.DispOrder)
 
 		if forum.Description != "" {
@@ -47,6 +49,8 @@ func ImportCategories(ctx context.Context, w *writer.Writer, data *loader.MyBBDa
 		}
 
 		builders = append(builders, builder)
+
+		logger.Category(forum.FID, forum.Name, slug)
 	}
 
 	categories, err := w.CreateCategories(ctx, builders)

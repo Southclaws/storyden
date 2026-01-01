@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/rs/xid"
@@ -32,6 +33,8 @@ func ImportTags(ctx context.Context, w *writer.Writer, data *loader.MyBBData) er
 			SetName(prefix.Prefix)
 
 		builders = append(builders, builder)
+
+		logger.Tag(prefix.PID, prefix.Prefix)
 	}
 
 	tags, err := w.CreateTags(ctx, builders)

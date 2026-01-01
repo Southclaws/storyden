@@ -8,6 +8,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -35,7 +36,7 @@ func ImportThreads(ctx context.Context, w *writer.Writer, data *loader.MyBBData)
 		// Find the first post for this thread
 		firstPost, ok := postMap[thread.FirstPost]
 		if !ok {
-			log.Printf("Skipping thread %d: first post PID %d not found", thread.TID, thread.FirstPost)
+			logger.Skip("thread", fmt.Sprintf("tid:%d - first post PID %d not found", thread.TID, thread.FirstPost))
 			continue
 		}
 
@@ -44,13 +45,13 @@ func ImportThreads(ctx context.Context, w *writer.Writer, data *loader.MyBBData)
 
 		accountID, ok := w.AccountIDMap[firstPost.UID]
 		if !ok {
-			log.Printf("Skipping thread %d: author UID %d not found", thread.TID, firstPost.UID)
+			logger.Skip("thread", fmt.Sprintf("tid:%d - author UID %d not found", thread.TID, firstPost.UID))
 			continue
 		}
 
 		categoryID, ok := w.CategoryIDMap[thread.FID]
 		if !ok {
-			log.Printf("Skipping thread %d: category FID %d not found", thread.TID, thread.FID)
+			logger.Skip("thread", fmt.Sprintf("tid:%d - category FID %d not found", thread.TID, thread.FID))
 			continue
 		}
 
@@ -98,6 +99,8 @@ func ImportThreads(ctx context.Context, w *writer.Writer, data *loader.MyBBData)
 		}
 
 		builders = append(builders, builder)
+
+		// logger.Thread(thread.TID, thread.Subject, threadSlug)
 	}
 
 	// Store firstPostPIDs in writer for use in ImportPosts
@@ -130,13 +133,13 @@ func ImportPosts(ctx context.Context, w *writer.Writer, data *loader.MyBBData) e
 
 		accountID, ok := w.AccountIDMap[p.UID]
 		if !ok {
-			log.Printf("Skipping post %d: author UID %d not found", p.PID, p.UID)
+			logger.Skip("reply", fmt.Sprintf("pid:%d - author UID %d not found", p.PID, p.UID))
 			continue
 		}
 
 		rootPostID, ok := w.PostIDMap[p.TID]
 		if !ok {
-			log.Printf("Skipping post %d: thread TID %d not found", p.PID, p.TID)
+			logger.Skip("reply", fmt.Sprintf("pid:%d - thread TID %d not found", p.PID, p.TID))
 			continue
 		}
 
@@ -165,8 +168,11 @@ func ImportPosts(ctx context.Context, w *writer.Writer, data *loader.MyBBData) e
 		}
 
 		// MyBB doesn't support nested replies, so skip ReplyToPostID
+		// TODO: We MIGHT be able to infer quote-replies from mybb and build reply-to tree from that.
 
 		builders = append(builders, builder)
+
+		// logger.Reply(p.PID, p.Subject)
 	}
 
 	posts, err := w.CreatePosts(ctx, builders)

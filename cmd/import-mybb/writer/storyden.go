@@ -2,7 +2,9 @@ package writer
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/rs/xid"
 )
@@ -39,8 +41,99 @@ func (w *Writer) BatchSize() int {
 	return w.batchSize
 }
 
+func (w *Writer) DeleteAllData(ctx context.Context) (err error) {
+	var i int
+
+	i, err = w.client.Post.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Posts: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Posts (Threads and Replies)", i))
+
+	i, err = w.client.Account.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Accounts: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Accounts", i))
+
+	i, err = w.client.Role.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Roles: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Roles", i))
+
+	i, err = w.client.Authentication.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Authentications: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Authentications", i))
+
+	i, err = w.client.AccountRoles.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete AccountRoless: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing AccountRoless", i))
+
+	i, err = w.client.Email.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Emails: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Emails", i))
+
+	i, err = w.client.Category.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Categorys: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Categories", i))
+
+	i, err = w.client.Tag.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Tags: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Tags", i))
+
+	i, err = w.client.React.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Reacts: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Reacts", i))
+
+	i, err = w.client.LikePost.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete LikePosts: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing LikePosts", i))
+
+	i, err = w.client.PostRead.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete PostReads: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing PostReads", i))
+
+	i, err = w.client.Report.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Reports: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Reports", i))
+
+	i, err = w.client.Asset.Delete().Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete Assets: %w", err)
+	}
+	logger.Success(fmt.Sprintf("Deleted %d existing Assets", i))
+
+	return nil
+}
+
 func (w *Writer) CreateRoles(ctx context.Context, builders []*ent.RoleCreate) ([]*ent.Role, error) {
-	return w.client.Role.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.Role.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d Roles", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreateAccounts(ctx context.Context, builders []*ent.AccountCreate) ([]*ent.Account, error) {
@@ -56,6 +149,9 @@ func (w *Writer) CreateAccounts(ctx context.Context, builders []*ent.AccountCrea
 		}
 		result = append(result, batch...)
 	}
+
+	logger.Success(fmt.Sprintf("Imported %d Accounts", len(result)))
+
 	return result, nil
 }
 
@@ -72,6 +168,9 @@ func (w *Writer) CreateAuthentications(ctx context.Context, builders []*ent.Auth
 		}
 		result = append(result, batch...)
 	}
+
+	logger.Success(fmt.Sprintf("Imported %d Authentications", len(result)))
+
 	return result, nil
 }
 
@@ -88,6 +187,9 @@ func (w *Writer) CreateAccountRoles(ctx context.Context, builders []*ent.Account
 		}
 		result = append(result, batch...)
 	}
+
+	logger.Success(fmt.Sprintf("Imported %d AccountRoless", len(result)))
+
 	return result, nil
 }
 
@@ -104,15 +206,32 @@ func (w *Writer) CreateEmails(ctx context.Context, builders []*ent.EmailCreate) 
 		}
 		result = append(result, batch...)
 	}
+
+	logger.Success(fmt.Sprintf("Imported %d Emails", len(result)))
+
 	return result, nil
 }
 
 func (w *Writer) CreateCategories(ctx context.Context, builders []*ent.CategoryCreate) ([]*ent.Category, error) {
-	return w.client.Category.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.Category.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d Categories", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreateTags(ctx context.Context, builders []*ent.TagCreate) ([]*ent.Tag, error) {
-	return w.client.Tag.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.Tag.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d Tags", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreatePosts(ctx context.Context, builders []*ent.PostCreate) ([]*ent.Post, error) {
@@ -128,25 +247,63 @@ func (w *Writer) CreatePosts(ctx context.Context, builders []*ent.PostCreate) ([
 		}
 		result = append(result, batch...)
 	}
+
+	logger.Success(fmt.Sprintf("Imported %d Posts (Threads and Replies)", len(result)))
+
 	return result, nil
 }
 
 func (w *Writer) CreateReacts(ctx context.Context, builders []*ent.ReactCreate) ([]*ent.React, error) {
-	return w.client.React.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.React.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d React", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreateLikePosts(ctx context.Context, builders []*ent.LikePostCreate) ([]*ent.LikePost, error) {
-	return w.client.LikePost.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.LikePost.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d LikePost", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreatePostReads(ctx context.Context, builders []*ent.PostReadCreate) ([]*ent.PostRead, error) {
-	return w.client.PostRead.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.PostRead.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d PostRead", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreateReports(ctx context.Context, builders []*ent.ReportCreate) ([]*ent.Report, error) {
-	return w.client.Report.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.Report.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d Reports", len(r)))
+
+	return r, nil
 }
 
 func (w *Writer) CreateAssets(ctx context.Context, builders []*ent.AssetCreate) ([]*ent.Asset, error) {
-	return w.client.Asset.CreateBulk(builders...).Save(ctx)
+	r, err := w.client.Asset.CreateBulk(builders...).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Success(fmt.Sprintf("Imported %d Assets", len(r)))
+
+	return r, nil
 }

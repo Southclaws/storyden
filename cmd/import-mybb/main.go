@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"log"
 
+	"entgo.io/ent/dialect/sql/schema"
 	_ "github.com/glebarez/go-sqlite"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
+	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
 	"github.com/Southclaws/storyden/cmd/import-mybb/transform"
 	"github.com/Southclaws/storyden/cmd/import-mybb/writer"
 	"github.com/Southclaws/storyden/internal/config"
@@ -60,7 +62,7 @@ func run(ctx context.Context, mybbDSN, storydenDB string, dryRun bool, batchSize
 	defer storydenClient.Close()
 
 	log.Println("Running schema migrations...")
-	if err := storydenClient.Schema.Create(ctx); err != nil {
+	if err := storydenClient.Schema.Create(ctx, schema.WithDropColumn(true), schema.WithDropIndex(true)); err != nil {
 		return fmt.Errorf("failed to create schema: %w", err)
 	}
 
@@ -81,52 +83,58 @@ func run(ctx context.Context, mybbDSN, storydenDB string, dryRun bool, batchSize
 	log.Println("Transforming and importing data...")
 	w := writer.New(storydenClient, batchSize)
 
-	log.Println("Phase 0: Settings (from mybb_settings)")
+	logger.Phase(-1, "Clearing existing Storyden data")
+	if err = w.DeleteAllData(ctx); err != nil {
+		return fmt.Errorf("failed to clear existing data: %w", err)
+	}
+
+	logger.Phase(0, "Settings (from mybb_settings)")
 	if err := transform.ImportSettings(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import settings: %w", err)
 	}
 
-	log.Println("Phase 1: Roles (from mybb_usergroups)")
+	logger.Phase(1, "Roles (from mybb_usergroups)")
 	if err := transform.ImportRoles(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import roles: %w", err)
 	}
 
-	log.Println("Phase 2: Accounts (from mybb_users)")
+	logger.Phase(2, "Accounts (from mybb_users)")
 	if err := transform.ImportAccounts(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import accounts: %w", err)
 	}
 
-	log.Println("Phase 3: Categories (from mybb_forums)")
+	logger.Phase(3, "Categories (from mybb_forums)")
 	if err := transform.ImportCategories(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import categories: %w", err)
 	}
 
-	log.Println("Phase 4: Tags (from mybb_threadprefixes)")
+	logger.Phase(4, "Tags (from mybb_threadprefixes)")
 	if err := transform.ImportTags(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import tags: %w", err)
 	}
 
-	log.Println("Phase 5: Posts - Threads (from mybb_threads)")
+	logger.Phase(5, "Posts - Threads (from mybb_threads)")
 	if err := transform.ImportThreads(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import threads: %w", err)
 	}
 
-	log.Println("Phase 6: Posts - Replies (from mybb_posts)")
+	logger.Phase(6, "Posts - Replies (from mybb_posts)")
 	if err := transform.ImportPosts(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import posts: %w", err)
 	}
 
-	log.Println("Phase 7: Interactions (reacts, likes, reads, reports)")
+	logger.Phase(7, "Interactions (reacts, likes, reads, reports)")
 	if err := transform.ImportInteractions(ctx, w, mybbData); err != nil {
 		return fmt.Errorf("failed to import interactions: %w", err)
 	}
 
 	if !skipAssets {
-		log.Println("Phase 8: Assets (from mybb_attachments)")
+		logger.Phase(8, "Assets (from mybb_attachments)")
 		if err := transform.ImportAssets(ctx, w, mybbData); err != nil {
 			return fmt.Errorf("failed to import assets: %w", err)
 		}
 	}
 
+	logger.Success("Import completed successfully!")
 	return nil
 }

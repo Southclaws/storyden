@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/cmd/import-mybb/loader"
 	"github.com/Southclaws/storyden/cmd/import-mybb/logger"
@@ -83,7 +84,6 @@ func ImportAccounts(ctx context.Context, w *writer.Writer, data *loader.MyBBData
 
 		accountBuilders = append(accountBuilders, accountBuilder)
 
-		// Log account import with sexy formatting
 		// logger.Account(user.UID, user.Username, handle, isAdmin)
 
 		randomPassword, err := generateRandomPassword()
@@ -207,7 +207,7 @@ func parseUserGroups(user loader.MyBBUser, w *writer.Writer) []xid.ID {
 	roleIDs := make([]xid.ID, 0)
 
 	if roleID, ok := w.RoleIDMap[user.UserGroup]; ok {
-		if !roleIDSet[roleID] {
+		if !roleIDSet[roleID] && shouldAssignRole(roleID) {
 			roleIDSet[roleID] = true
 			roleIDs = append(roleIDs, roleID)
 		}
@@ -221,7 +221,7 @@ func parseUserGroups(user loader.MyBBUser, w *writer.Writer) []xid.ID {
 				continue
 			}
 			if roleID, ok := w.RoleIDMap[gid]; ok {
-				if !roleIDSet[roleID] {
+				if !roleIDSet[roleID] && shouldAssignRole(roleID) {
 					roleIDSet[roleID] = true
 					roleIDs = append(roleIDs, roleID)
 				}
@@ -230,6 +230,16 @@ func parseUserGroups(user loader.MyBBUser, w *writer.Writer) []xid.ID {
 	}
 
 	return roleIDs
+}
+
+func shouldAssignRole(roleID xid.ID) bool {
+	if roleID == xid.ID(role.DefaultRoleGuestID) {
+		return false
+	}
+	if roleID == xid.ID(role.DefaultRoleMemberID) {
+		return false
+	}
+	return true
 }
 
 func generateRandomPassword() (string, error) {
