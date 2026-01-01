@@ -26,8 +26,6 @@ export function SearchScreen(props: Props) {
 
   const { query, page, results } = data;
 
-  const unready = !results || isLoading || error !== undefined;
-
   return (
     <styled.form
       className={vstack()}
@@ -43,7 +41,6 @@ export function SearchScreen(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          defaultValue={props.initialQuery}
           background="bg.default"
           placeholder={`Search...`}
           _focus={{
@@ -168,9 +165,9 @@ export function SearchScreen(props: Props) {
         </Flex>
       </LStack>
 
-      {unready ? (
+      {isLoading || error !== undefined ? (
         <UnreadyBanner error={error} />
-      ) : (
+      ) : results?.items.length ? (
         <>
           <PaginationControls
             path="/search"
@@ -179,19 +176,16 @@ export function SearchScreen(props: Props) {
             totalPages={results.total_pages}
             pageSize={results.page_size}
           />
-
-          {results.items.length > 0 ? (
-            <DatagraphSearchResults result={results} />
-          ) : (
-            <EmptyState hideContributionLabel>
-              {query
-                ? page > results.total_pages
-                  ? "You've gone past the last page! Nothing to see here."
-                  : "No search results."
-                : "Go forth, seek far and wide."}
-            </EmptyState>
-          )}
+          <DatagraphSearchResults result={results} />
         </>
+      ) : (
+        <EmptyState hideContributionLabel>
+          {query
+            ? results && page > results?.total_pages
+              ? "You've gone past the last page! Nothing to see here."
+              : "No search results."
+            : "Go forth, seek far and wide."}
+        </EmptyState>
       )}
     </styled.form>
   );

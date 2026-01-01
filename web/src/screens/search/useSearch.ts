@@ -250,7 +250,7 @@ export function useSearchScreen(props: Props) {
     window.history.replaceState({}, "", url.toString());
   }, [kind]);
 
-  const { data, error, isLoading } = useDatagraphSearch(
+  const { data, error, isLoading, mutate } = useDatagraphSearch(
     {
       q: query,
       kind: kind,
@@ -279,8 +279,16 @@ export function useSearchScreen(props: Props) {
   });
 
   const handleReset = async () => {
+    await mutate({
+      current_page: 1,
+      total_pages: 0,
+      results: 0,
+      items: [],
+      page_size: 50,
+    });
+    form.clearErrors();
     form.reset();
-    setQuery(null);
+    setQuery("");
   };
 
   return {
