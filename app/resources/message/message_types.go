@@ -176,6 +176,14 @@ type EventAccountUpdated struct {
 	ID account.AccountID
 }
 
+type EventAccountSuspended struct {
+	ID account.AccountID
+}
+
+type EventAccountUnsuspended struct {
+	ID account.AccountID
+}
+
 type CommandProfileIndex struct {
 	ID account.AccountID
 }

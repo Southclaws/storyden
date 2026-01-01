@@ -15,6 +15,7 @@ type WithStatusCode interface {
 	StatusCode() int
 }
 
+// Deprecated: use AssertRequest instead.
 func Ok(t *testing.T, err error, resp WithStatusCode) {
 	t.Helper()
 
@@ -24,6 +25,7 @@ func Ok(t *testing.T, err error, resp WithStatusCode) {
 	require.Equal(t, http.StatusOK, resp.StatusCode())
 }
 
+// Deprecated: use AssertRequest instead.
 func Status(t *testing.T, err error, resp WithStatusCode, status int) {
 	t.Helper()
 
@@ -37,6 +39,8 @@ func AssertRequest[T interface {
 	StatusCode() int
 }](v T, err error) func(t *testing.T, want int) T {
 	return func(t *testing.T, want int) T {
+		require.NoError(t, err)
+		require.NotNil(t, v)
 		require.Equal(t, want, v.StatusCode())
 
 		return v

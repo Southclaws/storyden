@@ -12,7 +12,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	authentication_repo "github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {
@@ -27,6 +29,7 @@ func Build() fx.Option {
 type service struct {
 	auth_repo      authentication_repo.Repository
 	account_writer *account_writer.Writer
+	bus            *pubsub.Bus
 
 	auth_svc *authentication.Manager
 }
@@ -34,12 +37,14 @@ type service struct {
 func New(
 	auth_repo authentication_repo.Repository,
 	account_writer *account_writer.Writer,
+	bus *pubsub.Bus,
 
 	auth_svc *authentication.Manager,
 ) Service {
 	return &service{
 		auth_repo:      auth_repo,
 		account_writer: account_writer,
+		bus:            bus,
 		auth_svc:       auth_svc,
 	}
 }
@@ -50,6 +55,10 @@ func (s *service) Suspend(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	s.bus.Publish(ctx, &message.EventAccountSuspended{
+		ID: id,
+	})
+
 	return acc, nil
 }
 
@@ -58,6 +67,10 @@ func (s *service) Reinstate(ctx context.Context, id account.AccountID) (*account
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	s.bus.Publish(ctx, &message.EventAccountUnsuspended{
+		ID: id,
+	})
 
 	return acc, nil
 }

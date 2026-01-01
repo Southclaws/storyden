@@ -123,7 +123,9 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 			Limit(pageParams.Limit()).
 			Offset(pageParams.Offset()).
 			Order(ent.Asc(ent_post.FieldCreatedAt)).
-			WithReplyTo().
+			WithReplyTo(func(rq *ent.PostQuery) {
+				rq.Where(ent_post.DeletedAtIsNil())
+			}).
 			All(ctx)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))

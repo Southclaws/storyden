@@ -114,5 +114,8 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("handled_reports", Report.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("audit_logs", AuditLog.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

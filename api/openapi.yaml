@@ -281,6 +281,50 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
 
+  /admin/audit-events:
+    get:
+      operationId: AuditEventList
+      description: |
+        List audit events for the installation. Audit events track important
+        actions taken by accounts with elevated permissions such as admin
+        accounts and moderators. It also provides error logs for system internal
+        components that could not be responded to the client directly such as
+        background job failures and configuration issues.
+      tags: [admin]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/AuditEventTypeFilterQuery"
+        - $ref: "#/components/parameters/AuditEventTimeRangeQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuditEventListOK" }
+
+  /admin/audit-events/{audit_event_id}:
+    get:
+      operationId: AuditEventGet
+      description: Retrieve a specific audit event by ID.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/AuditEventIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuditEventGetOK" }
+
+  /admin/actions:
+    post:
+      operationId: ModerationActionCreate
+      description: Create a new moderation action such as a ban or content purge.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/ModerationActionCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "201": { $ref: "#/components/responses/AuditEventCreatedOK" }
+
   /admin/bans/{account_handle}:
     post:
       operationId: AdminAccountBanCreate
@@ -2395,6 +2439,31 @@ components:
         type: integer
         x-go-type: int64
 
+    AuditEventTypeFilterQuery:
+      description: Audit event type filter query
+      name: types
+      in: query
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/AuditEventType" }
+
+    AuditEventTimeRangeQuery:
+      description: Audit event time range query
+      name: range
+      in: query
+      schema:
+        type: string
+        format: iso8601-interval
+
+    AuditEventIDParam:
+      description: Audit event ID
+      in: path
+      name: audit_event_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     RoleIDParam:
       description: Role ID
       in: path
@@ -2870,6 +2939,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AdminSettingsMutableProps" }
 
+    ModerationActionCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ModerationActionInitialProps" }
+
     RoleCreate:
       content:
         application/json:
@@ -3179,6 +3253,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AdminSettingsProps"
+
+    AuditEventListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuditEventListResult"
+
+    AuditEventGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuditEvent"
+
+    AuditEventCreatedOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AuditEventProps"
 
     RoleCreateOK:
       description: OK
@@ -4142,6 +4237,138 @@ components:
             any posts that contain them.
           items:
             type: string
+
+    AuditEvent:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AuditEventProps"
+        - $ref: "#/components/schemas/AuditEventTypeProps"
+
+    AuditEventType:
+      type: string
+      enum:
+        - thread_deleted
+        - thread_reply_deleted
+        - account_suspended
+        - account_unsuspended
+        - account_content_purged
+
+    AuditEventProps:
+      required: [id, type, timestamp]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        timestamp:
+          type: string
+          format: date-time
+        enacted_by:
+          $ref: "#/components/schemas/ProfileReference"
+
+    AuditEventTypeProps:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          thread_deleted: "#/components/schemas/AuditEventThreadDeleted"
+          thread_reply_deleted: "#/components/schemas/AuditEventThreadReplyDeleted"
+          account_suspended: "#/components/schemas/AuditEventAccountSuspended"
+          account_unsuspended: "#/components/schemas/AuditEventAccountUnsuspended"
+          account_content_purged: "#/components/schemas/AuditEventAccountContentPurged"
+      oneOf:
+        - $ref: "#/components/schemas/AuditEventThreadDeleted"
+        - $ref: "#/components/schemas/AuditEventThreadReplyDeleted"
+        - $ref: "#/components/schemas/AuditEventAccountSuspended"
+        - $ref: "#/components/schemas/AuditEventAccountUnsuspended"
+        - $ref: "#/components/schemas/AuditEventAccountContentPurged"
+
+    AuditEventThreadDeleted:
+      type: object
+      required: [type, thread_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        thread_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventThreadReplyDeleted:
+      type: object
+      required: [type, reply_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        reply_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountSuspended:
+      type: object
+      required: [type, account_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountUnsuspended:
+      type: object
+      required: [type, account_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountContentPurged:
+      type: object
+      required: [type, account_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        included:
+          $ref: "#/components/schemas/ModerationActionPurgeAccountContentTypeList"
+
+    AuditEventList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AuditEvent"
+
+    AuditEventListResult:
+      type: object
+      required: [events]
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          properties:
+            events: { $ref: "#/components/schemas/AuditEventList" }
+
+    ModerationActionInitialProps:
+      type: object
+      discriminator:
+        propertyName: action
+        mapping:
+          purge_account: "#/components/schemas/ModerationActionCreatePurgeAccount"
+      oneOf:
+        - $ref: "#/components/schemas/ModerationActionCreatePurgeAccount"
+
+    ModerationActionCreatePurgeAccount:
+      description: |
+        A moderation action to purge content created by a specific account.
+      type: object
+      required: [account_id, action, include]
+      properties:
+        action:
+          type: string
+          enum: [purge_account]
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        include:
+          $ref: "#/components/schemas/ModerationActionPurgeAccountContentTypeList"
+
+    ModerationActionPurgeAccountContentTypeList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ModerationActionPurgeAccountContentType"
+
+    ModerationActionPurgeAccountContentType:
+      type: string
+      enum:
+        - threads
+        - replies
+        - reacts
+        - likes
+        - nodes
+        - collections
+        - profile_bio
 
     #
     # 8888888b.          888

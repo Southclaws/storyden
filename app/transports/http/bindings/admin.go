@@ -2,6 +2,8 @@ package bindings
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -9,42 +11,54 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
+	"github.com/Southclaws/storyden/app/resources/audit"
+	"github.com/Southclaws/storyden/app/resources/audit/audit_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Admin struct {
-	accountQuery    *account_querier.Querier
-	profileQuery    *profile_querier.Querier
-	as              account_suspension.Service
-	settingsManager *settings_manager.Manager
-	akr             *access_key.Repository
+	accountQuery     *account_querier.Querier
+	profileQuery     *profile_querier.Querier
+	auditQuerier     *audit_querier.Querier
+	as               account_suspension.Service
+	settingsManager  *settings_manager.Manager
+	akr              *access_key.Repository
+	actionDispatcher *action_dispatcher.Service
 }
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
 	profileQuery *profile_querier.Querier,
+	auditQuerier *audit_querier.Querier,
 	as account_suspension.Service,
 	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
+	actionDispatcher *action_dispatcher.Service,
 ) Admin {
 	return Admin{
-		accountQuery:    accountQuery,
-		profileQuery:    profileQuery,
-		as:              as,
-		settingsManager: settingsManager,
-		akr:             akr,
+		accountQuery:     accountQuery,
+		profileQuery:     profileQuery,
+		auditQuerier:     auditQuerier,
+		as:               as,
+		settingsManager:  settingsManager,
+		akr:              akr,
+		actionDispatcher: actionDispatcher,
 	}
 }
 
@@ -99,6 +113,149 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	return openapi.AdminSettingsUpdate200JSONResponse{
 		AdminSettingsUpdateOKJSONResponse: openapi.AdminSettingsUpdateOKJSONResponse(serialiseSettings(settings)),
 	}, nil
+}
+
+func (a *Admin) AuditEventList(ctx context.Context, request openapi.AuditEventListRequestObject) (openapi.AuditEventListResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	page := opt.NewPtrMap(request.Params.Page, func(pq openapi.PaginationQuery) int {
+		v, err := strconv.ParseInt(pq, 10, 32)
+		if err != nil {
+			return 1
+		}
+		return max(1, int(v))
+	}).Or(1)
+
+	params := pagination.NewPageParams(uint(page), 50)
+
+	var eventTypes opt.Optional[[]audit.EventType]
+	if request.Params.Types != nil && len(*request.Params.Types) > 0 {
+		types, err := dt.MapErr(*request.Params.Types, func(t openapi.AuditEventType) (audit.EventType, error) {
+			return audit.NewEventType(string(t))
+		})
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		eventTypes = opt.New(types)
+	}
+
+	var filterTimeRange opt.Optional[audit_querier.TimeRange]
+	if request.Params.Range != nil {
+		tr, err := timerange.Parse(*request.Params.Range)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		if tr.Start.Ok() || tr.End.Ok() {
+			var start, end time.Time
+			tr.Start.Call(func(t time.Time) { start = t })
+			tr.End.Call(func(t time.Time) { end = t })
+
+			filterTimeRange = opt.New(audit_querier.TimeRange{
+				Start: start,
+				End:   end,
+			})
+		}
+	}
+
+	result, err := a.auditQuerier.List(ctx, params, audit_querier.Filter{
+		Types:     eventTypes,
+		TimeRange: filterTimeRange,
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	events := dt.Map(result.Items, serialiseAuditEvent)
+	eventList := openapi.AuditEventList(events)
+
+	return openapi.AuditEventList200JSONResponse{
+		AuditEventListOKJSONResponse: openapi.AuditEventListOKJSONResponse{
+			CurrentPage: result.CurrentPage,
+			Events:      &eventList,
+			NextPage:    result.NextPage.Ptr(),
+			PageSize:    result.Size,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+		},
+	}, nil
+}
+
+func (a *Admin) AuditEventGet(ctx context.Context, request openapi.AuditEventGetRequestObject) (openapi.AuditEventGetResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	id := deserialiseID(request.AuditEventId)
+
+	auditLog, err := a.auditQuerier.Get(ctx, audit.AuditLogID(id))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	event := serialiseAuditEvent(auditLog)
+
+	return openapi.AuditEventGet200JSONResponse{
+		AuditEventGetOKJSONResponse: openapi.AuditEventGetOKJSONResponse(event),
+	}, nil
+}
+
+func (a *Admin) ModerationActionCreate(ctx context.Context, request openapi.ModerationActionCreateRequestObject) (openapi.ModerationActionCreateResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	enactedBy, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	discriminator, err := request.Body.Discriminator()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	switch discriminator {
+	case "purge_account":
+		purgeBody, err := request.Body.AsModerationActionCreatePurgeAccount()
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		accountID := account.AccountID(deserialiseID(purgeBody.AccountId))
+
+		contentTypes, err := dt.MapErr(purgeBody.Include, func(ct openapi.ModerationActionPurgeAccountContentType) (action_dispatcher.ContentType, error) {
+			return action_dispatcher.NewContentType(string(ct))
+		})
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		auditLog, err := a.actionDispatcher.PurgeAccountContent(
+			ctx,
+			accountID,
+			opt.New(enactedBy),
+			contentTypes,
+		)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		props := serialiseAuditEventProps(auditLog)
+
+		return openapi.ModerationActionCreate201JSONResponse{
+			AuditEventCreatedOKJSONResponse: openapi.AuditEventCreatedOKJSONResponse(props),
+		}, nil
+
+	default:
+		return nil, fault.Wrap(
+			fault.New("unknown moderation action: "+discriminator),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
+	}
 }
 
 func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.AdminAccountBanCreateRequestObject) (openapi.AdminAccountBanCreateResponseObject, error) {
@@ -235,4 +392,85 @@ func serialiseOwnedAccessKey(in *authentication.Authentication) openapi.OwnedAcc
 
 func serialiseOwnedAccessKeyList(in []*authentication.Authentication) openapi.OwnedAccessKeyList {
 	return dt.Map(in, serialiseOwnedAccessKey)
+}
+
+func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
+	out := openapi.AuditEvent{
+		Id:        openapi.Identifier(in.ID.String()),
+		Type:      openapi.AuditEventType(in.Type.String()),
+		Timestamp: in.CreatedAt,
+	}
+
+	in.EnactedBy.Call(func(acc account.Account) {
+		ref := serialiseProfileReferenceFromAccount(acc)
+		out.EnactedBy = &ref
+	})
+
+	var err error
+
+	switch in.Type {
+	case audit.EventTypeThreadDeleted:
+		err = out.FromAuditEventThreadDeleted(openapi.AuditEventThreadDeleted{
+			Type:     openapi.ThreadDeleted,
+			ThreadId: openapi.Identifier(in.Target.OrZero().ID.String()),
+		})
+
+	case audit.EventTypeThreadReplyDeleted:
+		err = out.FromAuditEventThreadReplyDeleted(openapi.AuditEventThreadReplyDeleted{
+			Type:    openapi.ThreadReplyDeleted,
+			ReplyId: openapi.Identifier(in.Target.OrZero().ID.String()),
+		})
+
+	case audit.EventTypeAccountSuspended:
+		accountID := in.Metadata["account_id"].(string)
+		err = out.FromAuditEventAccountSuspended(openapi.AuditEventAccountSuspended{
+			Type:      openapi.AccountSuspended,
+			AccountId: openapi.Identifier(accountID),
+		})
+
+	case audit.EventTypeAccountUnsuspended:
+		accountID := in.Metadata["account_id"].(string)
+		err = out.FromAuditEventAccountUnsuspended(openapi.AuditEventAccountUnsuspended{
+			Type:      openapi.AccountUnsuspended,
+			AccountId: openapi.Identifier(accountID),
+		})
+
+	case audit.EventTypeAccountContentPurged:
+		accountID := in.Metadata["account_id"].(string)
+		var included []openapi.ModerationActionPurgeAccountContentType
+		if inc, ok := in.Metadata["included"].([]interface{}); ok {
+			for _, item := range inc {
+				if str, ok := item.(string); ok {
+					included = append(included, openapi.ModerationActionPurgeAccountContentType(str))
+				}
+			}
+		}
+
+		err = out.FromAuditEventAccountContentPurged(openapi.AuditEventAccountContentPurged{
+			Type:      openapi.AccountContentPurged,
+			AccountId: openapi.Identifier(accountID),
+			Included:  &included,
+		})
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
+	return out
+}
+
+func serialiseAuditEventProps(in *audit.AuditLog) openapi.AuditEventProps {
+	var enactedBy *openapi.ProfileReference
+	in.EnactedBy.Call(func(acc account.Account) {
+		ref := serialiseProfileReferenceFromAccount(acc)
+		enactedBy = &ref
+	})
+
+	return openapi.AuditEventProps{
+		Id:        openapi.Identifier(in.ID.String()),
+		Type:      openapi.AuditEventType(in.Type.String()),
+		Timestamp: in.CreatedAt,
+		EnactedBy: enactedBy,
+	}
 }

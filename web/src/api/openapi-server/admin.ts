@@ -13,6 +13,11 @@ import type {
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
+  AuditEventCreatedOKResponse,
+  AuditEventGetOKResponse,
+  AuditEventListOKResponse,
+  AuditEventListParams,
+  ModerationActionCreateBody,
   NoContentResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -64,6 +69,107 @@ export const adminSettingsUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(adminSettingsUpdateBody),
+    },
+  );
+};
+
+/**
+ * List audit events for the installation. Audit events track important
+actions taken by accounts with elevated permissions such as admin
+accounts and moderators. It also provides error logs for system internal
+components that could not be responded to the client directly such as
+background job failures and configuration issues.
+
+ */
+export type auditEventListResponse = {
+  data: AuditEventListOKResponse;
+  status: number;
+};
+
+export const getAuditEventListUrl = (params?: AuditEventListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["types"];
+
+    if (value instanceof Array && explodeParameters.includes(key)) {
+      value.forEach((v) =>
+        normalizedParams.append(key, v === null ? "null" : v.toString()),
+      );
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/admin/audit-events?${normalizedParams.toString()}`
+    : `/admin/audit-events`;
+};
+
+export const auditEventList = async (
+  params?: AuditEventListParams,
+  options?: RequestInit,
+): Promise<auditEventListResponse> => {
+  return fetcher<Promise<auditEventListResponse>>(
+    getAuditEventListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Retrieve a specific audit event by ID.
+ */
+export type auditEventGetResponse = {
+  data: AuditEventGetOKResponse;
+  status: number;
+};
+
+export const getAuditEventGetUrl = (auditEventId: string) => {
+  return `/admin/audit-events/${auditEventId}`;
+};
+
+export const auditEventGet = async (
+  auditEventId: string,
+  options?: RequestInit,
+): Promise<auditEventGetResponse> => {
+  return fetcher<Promise<auditEventGetResponse>>(
+    getAuditEventGetUrl(auditEventId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create a new moderation action such as a ban or content purge.
+ */
+export type moderationActionCreateResponse = {
+  data: AuditEventCreatedOKResponse;
+  status: number;
+};
+
+export const getModerationActionCreateUrl = () => {
+  return `/admin/actions`;
+};
+
+export const moderationActionCreate = async (
+  moderationActionCreateBody: ModerationActionCreateBody,
+  options?: RequestInit,
+): Promise<moderationActionCreateResponse> => {
+  return fetcher<Promise<moderationActionCreateResponse>>(
+    getModerationActionCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(moderationActionCreateBody),
     },
   );
 };
