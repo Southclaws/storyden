@@ -6,6 +6,7 @@ import { UnreadyBanner } from "src/components/site/Unready";
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
+import { MultiSelectPicker } from "@/components/ui/MultiSelectPicker";
 import { Button } from "@/components/ui/button";
 import { DatagraphKindFilterField } from "@/components/ui/form/DatagraphKindFilterField";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
@@ -14,15 +15,18 @@ import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
-import { HStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { Props, useSearchScreen } from "./useSearch";
 
 export function SearchScreen(props: Props) {
-  const { form, error, isLoading, data, handlers } = useSearchScreen(props);
+  const { ready, form, error, isLoading, data, handlers, filters } =
+    useSearchScreen(props);
 
   const { query, page, results } = data;
+
+  const unready = !results || isLoading || error !== undefined;
 
   return (
     <styled.form
@@ -78,7 +82,7 @@ export function SearchScreen(props: Props) {
         </Button>
       </WStack>
 
-      <HStack w="full">
+      <LStack w="full" gap="2">
         <DatagraphKindFilterField
           control={form.control}
           name="kind"
@@ -104,9 +108,62 @@ export function SearchScreen(props: Props) {
             },
           ]}
         />
-      </HStack>
 
-      {results ? (
+        <HStack w="full">
+          <MultiSelectPicker
+            value={filters.authorsValue}
+            onChange={handlers.handleAuthorsChange}
+            onQuery={handlers.handleQueryAuthors}
+            queryResults={filters.authorsResults}
+            queryError={filters.authorsError}
+            inputPlaceholder="Authors..."
+            size="sm"
+            triggerProps={{
+              width: "full",
+              minW: "32",
+              flexShrink: "1",
+            }}
+          />
+
+          {filters.showCategories && (
+            <MultiSelectPicker
+              value={filters.categoriesValue}
+              onChange={handlers.handleCategoriesChange}
+              onQuery={handlers.handleQueryCategories}
+              queryResults={filters.categoriesResults}
+              queryError={filters.categoriesError}
+              inputPlaceholder="Categories..."
+              size="sm"
+              triggerProps={{
+                width: "full",
+                minW: "32",
+                flexShrink: "1",
+              }}
+            />
+          )}
+
+          {filters.showTags && (
+            <MultiSelectPicker
+              value={filters.tagsValue}
+              onChange={handlers.handleTagsChange}
+              onQuery={handlers.handleQueryTags}
+              queryResults={filters.tagsResults}
+              queryError={filters.tagsError}
+              inputPlaceholder="Tags..."
+              size="sm"
+              triggerProps={{
+                width: "full",
+                minW: "32",
+                flexShrink: "1",
+              }}
+            />
+          )}
+        </HStack>
+      </LStack>
+
+      {unready ? (
+        <UnreadyBanner error={error} />
+      ) : (
         <>
           <PaginationControls
             path="/search"
@@ -116,7 +173,7 @@ export function SearchScreen(props: Props) {
             pageSize={results.page_size}
           />
 
-          {results?.items.length > 0 ? (
+          {results.items.length > 0 ? (
             <DatagraphSearchResults result={results} />
           ) : (
             <EmptyState hideContributionLabel>
@@ -128,8 +185,6 @@ export function SearchScreen(props: Props) {
             </EmptyState>
           )}
         </>
-      ) : (
-        isLoading && <UnreadyBanner error={error} />
       )}
     </styled.form>
   );

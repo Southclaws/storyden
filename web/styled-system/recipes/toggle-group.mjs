@@ -5,7 +5,44 @@ const toggleGroupDefaultVariants = {
   "size": "md",
   "variant": "outline"
 }
-const toggleGroupCompoundVariants = []
+const toggleGroupCompoundVariants = [
+  {
+    "variant": "outline",
+    "size": "xs",
+    "css": {
+      "item": {
+        "h": "{sizes.5.5}"
+      }
+    }
+  },
+  {
+    "variant": "outline",
+    "size": "sm",
+    "css": {
+      "item": {
+        "h": "7.5"
+      }
+    }
+  },
+  {
+    "variant": "outline",
+    "size": "md",
+    "css": {
+      "item": {
+        "h": "9.5"
+      }
+    }
+  },
+  {
+    "variant": "outline",
+    "size": "lg",
+    "css": {
+      "item": {
+        "h": "10.5"
+      }
+    }
+  }
+]
 
 const toggleGroupSlotNames = [
   [

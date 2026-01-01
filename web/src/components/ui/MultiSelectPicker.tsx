@@ -175,7 +175,6 @@ export function MultiSelectPicker({
       lazyMount
       positioning={{
         placement: "bottom-end",
-        sameWidth: true,
       }}
       {...menuVariantProps}
     >
@@ -261,7 +260,7 @@ export function MultiSelectPicker({
               )}
             </>
           ) : (
-            <Text size="sm" color="fg.subtle">
+            <Text size="sm" color="fg.muted">
               {inputPlaceholder || "Select items..."}
             </Text>
           )}

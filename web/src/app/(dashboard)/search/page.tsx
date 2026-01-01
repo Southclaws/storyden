@@ -25,6 +25,33 @@ const QuerySchema = z.object({
       return arg;
     }, z.array(DatagraphKindSchema))
     .optional(),
+  authors: z
+    .preprocess((arg: unknown) => {
+      if (typeof arg === "string") {
+        return [arg];
+      }
+
+      return arg;
+    }, z.array(z.string()))
+    .optional(),
+  categories: z
+    .preprocess((arg: unknown) => {
+      if (typeof arg === "string") {
+        return [arg];
+      }
+
+      return arg;
+    }, z.array(z.string()))
+    .optional(),
+  tags: z
+    .preprocess((arg: unknown) => {
+      if (typeof arg === "string") {
+        return [arg];
+      }
+
+      return arg;
+    }, z.array(z.string()))
+    .optional(),
 });
 
 type Query = z.infer<typeof QuerySchema>;
@@ -40,6 +67,9 @@ export default async function Page(props: Props) {
           q: params.q,
           page: params.page?.toString(),
           kind: params.kind,
+          authors: params.authors,
+          categories: params.categories,
+          tags: params.tags,
         })
       : {
           data: undefined,
@@ -50,6 +80,9 @@ export default async function Page(props: Props) {
         initialQuery={params.q ?? ""}
         initialPage={params.page ?? 1}
         initialKind={params.kind ?? []}
+        initialAuthors={params.authors ?? []}
+        initialCategories={params.categories ?? []}
+        initialTags={params.tags ?? []}
         initialResults={data}
       />
     );

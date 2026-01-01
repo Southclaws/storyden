@@ -2696,7 +2696,8 @@ components:
     DatagraphAuthorQuery:
       description: |
         Datagraph item author query. When set, only items authored by the
-        specified account IDs will be returned.
+        specified members will be returned. This query supports either account
+        IDs or handles for filtering.
       name: authors
       in: query
       required: false
@@ -2704,7 +2705,8 @@ components:
       explode: true
       schema:
         type: array
-        items: { $ref: "#/components/schemas/Identifier" }
+        items:
+          type: string
 
     DatagraphCategoryQuery:
       description: |

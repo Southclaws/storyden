@@ -99,6 +99,22 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 	return acc, true, nil
 }
 
+func (d *Querier) ProbeMany(ctx context.Context, handles ...string) ([]*account.Account, error) {
+	if len(handles) == 0 {
+		return []*account.Account{}, nil
+	}
+
+	accounts, err := d.db.Account.
+		Query().
+		Where(account_ent.HandleIn(handles...)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return dt.MapErr(accounts, account.MapRef)
+}
+
 func (d *Querier) ListByHeldPermission(ctx context.Context, perms ...rbac.Permission) ([]*account.Account, error) {
 	if len(perms) == 0 {
 		return []*account.Account{}, nil

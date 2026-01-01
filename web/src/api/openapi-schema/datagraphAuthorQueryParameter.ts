@@ -7,11 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.13-canary
  */
-import type { Identifier } from "./identifier";
 
 /**
  * Datagraph item author query. When set, only items authored by the
-specified account IDs will be returned.
+specified members will be returned. This query supports either account
+IDs or handles for filtering.
 
  */
-export type DatagraphAuthorQueryParameter = Identifier[];
+export type DatagraphAuthorQueryParameter = string[];
