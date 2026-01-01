@@ -35,7 +35,7 @@ type Post struct {
 	// Slug holds the value of the "slug" field.
 	Slug string `json:"slug,omitempty"`
 	// Pinned holds the value of the "pinned" field.
-	Pinned bool `json:"pinned,omitempty"`
+	Pinned int `json:"pinned,omitempty"`
 	// LastReplyAt holds the value of the "last_reply_at" field.
 	LastReplyAt time.Time `json:"last_reply_at,omitempty"`
 	// RootPostID holds the value of the "root_post_id" field.
@@ -265,7 +265,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 		case post.FieldMetadata:
 			values[i] = new([]byte)
 		case post.FieldPinned:
-			values[i] = new(sql.NullBool)
+			values[i] = new(sql.NullInt64)
 		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt, post.FieldIndexedAt, post.FieldLastReplyAt:
@@ -332,10 +332,10 @@ func (_m *Post) assignValues(columns []string, values []any) error {
 				_m.Slug = value.String
 			}
 		case post.FieldPinned:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field pinned", values[i])
 			} else if value.Valid {
-				_m.Pinned = value.Bool
+				_m.Pinned = int(value.Int64)
 			}
 		case post.FieldLastReplyAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

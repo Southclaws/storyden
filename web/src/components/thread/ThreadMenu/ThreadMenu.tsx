@@ -16,6 +16,7 @@ import { CancelAction } from "@/components/site/Action/Cancel";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { LinkIcon } from "@/components/ui/icons/Link";
+import { PinIcon, PinOffIcon } from "@/components/ui/icons/Pin";
 import { ShareIcon } from "@/components/ui/icons/Share";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
@@ -30,6 +31,8 @@ export function ThreadMenu(props: Props) {
     isMovingEnabled,
     isDeletingEnabled,
     isConfirmingDelete,
+    canPinThread,
+    isThreadPinned,
     handlers,
   } = useThreadMenu(props);
 
@@ -92,6 +95,22 @@ export function ThreadMenu(props: Props) {
                 headline={thread.title || "Untitled thread"}
                 body={truncateBody(thread.description)}
               />
+
+              {canPinThread && !isThreadPinned && (
+                <Menu.Item value="pin" onClick={handlers.handlePinThread}>
+                  <HStack gap="1">
+                    <PinIcon /> Pin thread
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {canPinThread && isThreadPinned && (
+                <Menu.Item value="unpin" onClick={handlers.handleUnpinThread}>
+                  <HStack gap="1">
+                    <PinOffIcon /> Unpin thread
+                  </HStack>
+                </Menu.Item>
+              )}
 
               {isEditingEnabled && (
                 <Menu.Item value="edit" onClick={handlers.handleEdit}>

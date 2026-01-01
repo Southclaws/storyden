@@ -102,7 +102,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
         },
         likes: { likes: 0, liked: false },
         reacts: [],
-        pinned: false,
+        pinned: initial.pinned ?? 0,
         reply_status: { replies: 0, replied: 0 },
         tags: [],
         visibility: Visibility.draft,

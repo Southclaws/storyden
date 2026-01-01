@@ -2,7 +2,8 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const richCardDefaultVariants = {
-  "shape": "row"
+  "shape": "row",
+  "backgroundColor": "default"
 }
 const richCardCompoundVariants = []
 
@@ -26,6 +27,10 @@ const richCardSlotNames = [
   [
     "titleContainer",
     "rich-card__titleContainer"
+  ],
+  [
+    "title",
+    "rich-card__title"
   ],
   [
     "contentContainer",
@@ -71,6 +76,7 @@ const richCardFn = memo((props = {}) => {
 })
 
 const richCardVariantKeys = [
+  "backgroundColor",
   "shape"
 ]
 const getVariantProps = (variants) => ({ ...richCardDefaultVariants, ...compact(variants) })
@@ -82,6 +88,11 @@ export const richCard = /* @__PURE__ */ Object.assign(richCardFn, {
   classNameMap: {},
   variantKeys: richCardVariantKeys,
   variantMap: {
+  "backgroundColor": [
+    "default",
+    "emphasized",
+    "accent"
+  ],
   "shape": [
     "row",
     "responsive",

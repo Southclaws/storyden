@@ -21,6 +21,7 @@ export type CardItem = {
   title?: string;
   url: string;
   text?: string;
+  titleIcon?: React.ReactNode;
   content?: string;
   image?: string;
   header?: React.ReactNode;
@@ -36,12 +37,14 @@ export function Card({
   title,
   url,
   text,
+  titleIcon,
   content,
   image,
   header,
   menu,
   controls,
   shape,
+  backgroundColor,
   disableAnchors = false,
   children,
 }: PropsWithChildren<Props>) {
@@ -69,6 +72,7 @@ export function Card({
 
   const styles = richCard({
     shape,
+    backgroundColor,
   });
 
   const longContentStyles = css({
@@ -100,15 +104,19 @@ export function Card({
         {menu && <div className={styles.menuContainer}>{menu}</div>}
 
         {title && (
-          <styled.h1 className={styles.titleContainer}>
-            <Link
-              className={linkOverlay()}
-              href={url}
-              onClick={(e) => disableAnchors && e.preventDefault()}
-            >
-              {title}
-            </Link>
-          </styled.h1>
+          <styled.div className={styles.titleContainer}>
+            {titleIcon && <Box>{titleIcon}</Box>}
+
+            <styled.h1 className={styles.title}>
+              <Link
+                className={linkOverlay()}
+                href={url}
+                onClick={(e) => disableAnchors && e.preventDefault()}
+              >
+                {title}
+              </Link>
+            </styled.h1>
+          </styled.div>
         )}
 
         <div className={styles.contentContainer}>

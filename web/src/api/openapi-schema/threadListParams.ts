@@ -12,6 +12,7 @@ import type { CategorySlugListQueryParameter } from "./categorySlugListQueryPara
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
+import type { ThreadsIgnorePinnedQueryParameter } from "./threadsIgnorePinnedQueryParameter";
 import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
 export type ThreadListParams = {
@@ -23,6 +24,14 @@ export type ThreadListParams = {
    * Pagination query parameters.
    */
   page?: PaginationQueryParameter;
+  /**
+ * When set to true, pinned threads will be ignored in the results and the
+result will be ordered entirely by the most recent reply. By default,
+this is not set and pinned threads will appear at the top of the first
+page.
+
+ */
+  ignore_pinned?: ThreadsIgnorePinnedQueryParameter;
   /**
    * Show only results creeated by this user.
    */

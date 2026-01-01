@@ -78,6 +78,12 @@ func WithMeta(meta map[string]any) Option {
 	}
 }
 
+func WithPinned(v int) Option {
+	return func(m *ent.PostMutation) {
+		m.SetPinned(v)
+	}
+}
+
 func WithAssets(a []asset.AssetID) Option {
 	return func(m *ent.PostMutation) {
 		m.AddAssetIDs(a...)

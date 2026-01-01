@@ -50,9 +50,12 @@ func (d *Querier) List(
 	}
 
 	query := d.db.Post.Query().Where(ent_post.RootPostIDIsNil())
+	queryOptions := threadListOptions{
+		q: query,
+	}
 
 	for _, fn := range opts {
-		fn(query)
+		fn(&queryOptions)
 	}
 
 	query.
@@ -67,8 +70,18 @@ func (d *Querier) List(
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
-		}).
-		Order(ent.Desc(ent_post.FieldLastReplyAt))
+		})
+
+	if queryOptions.ignorePinned {
+		query.Order(
+			ent.Desc(ent_post.FieldLastReplyAt),
+		)
+	} else {
+		query.Order(
+			ent.Desc(ent_post.FieldPinned),
+			ent.Desc(ent_post.FieldLastReplyAt),
+		)
+	}
 
 	total, err := query.Count(ctx)
 	if err != nil {

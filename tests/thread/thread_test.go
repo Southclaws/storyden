@@ -2,6 +2,7 @@ package thread_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/Southclaws/dt"
@@ -41,12 +42,13 @@ func TestThreads(t *testing.T) {
 
 			cat1name := "Category " + uuid.NewString()
 
-			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-				Colour:      "#fe4efd",
-				Description: "category testing",
-				Name:        cat1name,
-			}, session1)
-			tests.Ok(t, err, cat1create)
+			cat1create := tests.AssertRequest(
+				cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+					Colour:      "#fe4efd",
+					Description: "category testing",
+					Name:        cat1name,
+				}, session1),
+			)(t, http.StatusOK)
 			r.Equal(cat1name, cat1create.JSON200.Name)
 			r.Equal("category testing", cat1create.JSON200.Description)
 			r.Equal(mark.Slugify(cat1name), cat1create.JSON200.Slug)
@@ -55,39 +57,45 @@ func TestThreads(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>this is a thread</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread testing",
-				}, session1)
-				tests.Ok(t, err, thread1create)
+				thread1create := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>this is a thread</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread testing",
+					}, session1),
+				)(t, http.StatusOK)
 				a.Nil(thread1create.JSON200.DeletedAt)
 				a.Equal(acc1.ID.String(), thread1create.JSON200.Author.Id)
 				a.Equal("Thread testing", thread1create.JSON200.Title)
 				a.Contains(thread1create.JSON200.Slug, "thread-testing")
 				a.Equal("<body><p>this is a thread</p></body>", thread1create.JSON200.Body)
 				a.Equal("this is a thread", *thread1create.JSON200.Description)
-				a.Equal(false, thread1create.JSON200.Pinned)
+				a.Equal(0, thread1create.JSON200.Pinned)
 				a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)
 				a.Len(thread1create.JSON200.Replies.Replies, 0, "a newly created thread has zero replies")
 				a.Len(thread1create.JSON200.Reacts, 0)
 				a.Equal(thread1create.JSON200.ReplyStatus.Replies, 0)
 				a.Equal(thread1create.JSON200.ReplyStatus.Replied, 0)
 
-				// Get list of all threads
+				// Get list of threads in this category
 
-				threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-				tests.Ok(t, err, threadlist)
+				categoryFilter := []string{cat1create.JSON200.Slug}
+				threadlist := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &categoryFilter,
+					}),
+				)(t, http.StatusOK)
 				ids := dt.Map(threadlist.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 				a.Contains(ids, thread1create.JSON200.Id)
 
 				// Reply to the thread
 
-				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
-					Body: "this is a reply",
-				}, session2)
-				tests.Ok(t, err, reply1create)
+				reply1create := tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "this is a reply",
+					}, session2),
+				)(t, http.StatusOK)
 				a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
 
 				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil)
@@ -99,8 +107,8 @@ func TestThreads(t *testing.T) {
 				a.Equal(thread1get.JSON200.ReplyStatus.Replies, 1)
 				a.Equal(thread1get.JSON200.ReplyStatus.Replied, 0)
 
-				thread2get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session2)
-				tests.Ok(t, err, thread2get)
+				thread2get := tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session2))(t, http.StatusOK)
 				a.Equal(thread2get.JSON200.ReplyStatus.Replies, 1)
 				a.Equal(thread2get.JSON200.ReplyStatus.Replied, 1, "ctx2 replied")
 			})
@@ -109,35 +117,39 @@ func TestThreads(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>thread for nested replies</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Reply-to-reply testing",
-				}, session1)
-				tests.Ok(t, err, thread1create)
+				thread1create := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>thread for nested replies</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Reply-to-reply testing",
+					}, session1),
+				)(t, http.StatusOK)
 
 				// acc2 creates first reply to thread
-				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
-					Body: "first reply",
-				}, session2)
-				tests.Ok(t, err, reply1create)
+				reply1create := tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "first reply",
+					}, session2),
+				)(t, http.StatusOK)
 				a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
 				a.Nil(reply1create.JSON200.ReplyTo, "first reply should not have reply_to")
 
 				// acc1 creates a reply to reply1
-				reply2create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
-					Body:    "nested reply",
-					ReplyTo: &reply1create.JSON200.Id,
-				}, session1)
-				tests.Ok(t, err, reply2create)
+				reply2create := tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+						Body:    "nested reply",
+						ReplyTo: &reply1create.JSON200.Id,
+					}, session1),
+				)(t, http.StatusOK)
 				a.Equal(acc1.ID.String(), reply2create.JSON200.Author.Id)
 				r.NotNil(reply2create.JSON200.ReplyTo, "nested reply should have reply_to set")
 				a.Equal(reply1create.JSON200.Id, reply2create.JSON200.ReplyTo.Id, "nested reply should reference first reply")
 
 				// Get thread and verify both replies are present with correct relationships
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil)
-				tests.Ok(t, err, thread1get)
+				thread1get := tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil),
+				)(t, http.StatusOK)
 				r.Len(thread1get.JSON200.Replies.Replies, 2)
 
 				replies := thread1get.JSON200.Replies.Replies
@@ -155,27 +167,33 @@ func TestThreads(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>thread one</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "1",
-				}, session1)
-				tests.Ok(t, err, thread1create)
+				thread1create := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>thread one</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "1",
+					}, session1),
+				)(t, http.StatusOK)
 
-				thread2create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>thread two</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "2",
-				}, session1)
-				tests.Ok(t, err, thread2create)
+				thread2create := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>thread two</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "2",
+					}, session1),
+				)(t, http.StatusOK)
 
 				id1, id2 := thread1create.JSON200.Id, thread2create.JSON200.Id
 
 				{
-					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-					tests.Ok(t, err, threadlist)
+					categoryFilter := []string{cat1create.JSON200.Slug}
+					threadlist := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &categoryFilter,
+						}),
+					)(t, http.StatusOK)
 					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
 					ids := getIDs(threads)
 					r.Len(ids, 2)
@@ -188,14 +206,19 @@ func TestThreads(t *testing.T) {
 				}
 
 				// Reply to thread 1, bumping it to the top
-				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
-					Body: "this is a reply",
-				}, session2)
-				tests.Ok(t, err, reply1create)
+				tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "this is a reply",
+					}, session2),
+				)(t, http.StatusOK)
 
 				{
-					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-					tests.Ok(t, err, threadlist)
+					categoryFilter := []string{cat1create.JSON200.Slug}
+					threadlist := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &categoryFilter,
+						}),
+					)(t, http.StatusOK)
 					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
 					ids2 := getIDs(threads)
 					r.Len(ids2, 2)
@@ -208,14 +231,19 @@ func TestThreads(t *testing.T) {
 				}
 
 				// Reply to thread 2, bumping it to the top
-				reply2create, err := cl.ReplyCreateWithResponse(root, thread2create.JSON200.Slug, openapi.ReplyInitialProps{
-					Body: "this is a reply",
-				}, session2)
-				tests.Ok(t, err, reply2create)
+				tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, thread2create.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "this is a reply",
+					}, session2),
+				)(t, http.StatusOK)
 
 				{
-					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-					tests.Ok(t, err, threadlist)
+					categoryFilter := []string{cat1create.JSON200.Slug}
+					threadlist := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &categoryFilter,
+						}),
+					)(t, http.StatusOK)
 					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
 					ids2 := getIDs(threads)
 					r.Len(ids2, 2)
@@ -232,34 +260,41 @@ func TestThreads(t *testing.T) {
 				a := assert.New(t)
 
 				// create thread a and reply to it (so it gets last_reply_at set)
-				threadA, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>thread A</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread A",
-				}, session1)
-				tests.Ok(t, err, threadA)
+				threadA := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>thread A</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread A",
+					}, session1),
+				)(t, http.StatusOK)
 
-				replyA, err := cl.ReplyCreateWithResponse(root, threadA.JSON200.Slug, openapi.ReplyInitialProps{
-					Body: "reply to thread A",
-				}, session2)
-				tests.Ok(t, err, replyA)
+				tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, threadA.JSON200.Slug, openapi.ReplyInitialProps{
+						Body: "reply to thread A",
+					}, session2),
+				)(t, http.StatusOK)
 
 				// create thread b (no replies, so last_reply_at will be null)
-				threadB, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>thread B</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread B",
-				}, session1)
-				tests.Ok(t, err, threadB)
+				threadB := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>thread B</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread B",
+					}, session1),
+				)(t, http.StatusOK)
 
 				idA := threadA.JSON200.Id
 				idB := threadB.JSON200.Id
 
 				// check ordering: threadb (no last_reply_at) should appear first
-				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-				tests.Ok(t, err, threadList)
+				categoryFilter := []string{cat1create.JSON200.Slug}
+				threadList := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &categoryFilter,
+					}),
+				)(t, http.StatusOK)
 
 				threads := filterThreads(threadList.JSON200.Threads, idA, idB)
 				r.Len(threads, 2)
@@ -280,30 +315,36 @@ func TestThreads(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>t1</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "t1",
-				}, session1)
-				tests.Ok(t, err, t1)
+				t1 := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>t1</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "t1",
+					}, session1),
+				)(t, http.StatusOK)
 
-				r1, err := cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r1"}, session2)
-				tests.Ok(t, err, r1)
-				r2, err := cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r2"}, session2)
-				tests.Ok(t, err, r2)
-				r3, err := cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r3"}, session2)
-				tests.Ok(t, err, r3)
+				r1 := tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r1"}, session2))(t, http.StatusOK)
+				tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r2"}, session2))(t, http.StatusOK)
+				tests.AssertRequest(
+					cl.ReplyCreateWithResponse(root, t1.JSON200.Slug, openapi.ReplyInitialProps{Body: "r3"}, session2))(t, http.StatusOK)
 
-				r1del, err := cl.PostDeleteWithResponse(root, r1.JSON200.Id, session2)
-				tests.Ok(t, err, r1del)
+				tests.AssertRequest(
+					cl.PostDeleteWithResponse(root, r1.JSON200.Id, session2))(t, http.StatusOK)
 
-				t1get, err := cl.ThreadGetWithResponse(root, t1.JSON200.Slug, nil)
-				tests.Ok(t, err, t1get)
+				t1get := tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, t1.JSON200.Slug, nil),
+				)(t, http.StatusOK)
 				a.Equal(2, t1get.JSON200.ReplyStatus.Replies)
 
-				tlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, session2)
-				tests.Ok(t, err, tlist)
+				categoryFilter := []string{cat1create.JSON200.Slug}
+				tlist := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &categoryFilter,
+					}, session2),
+				)(t, http.StatusOK)
 				tlist1, found := lo.Find(tlist.JSON200.Threads, func(t openapi.ThreadReference) bool { return t.Id == t1.JSON200.Id })
 				r.True(found)
 				a.Equal(2, tlist1.ReplyStatus.Replies)
@@ -317,22 +358,22 @@ func TestThreads(t *testing.T) {
 				session := sh.WithSession(ctx1)
 
 				catname := "Category " + uuid.NewString()
-				cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-					Colour:      "#fe4efd",
-					Description: "category testing",
-					Name:        catname,
-				}, session)
-				tests.Ok(t, err, cat)
+				cat := tests.AssertRequest(
+					cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+						Colour:      "#fe4efd",
+						Description: "category testing",
+						Name:        catname,
+					}, session))(t, http.StatusOK)
 
 				url := "https://ogp.me"
-				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>this is a thread</p>").Ptr(),
-					Category:   opt.New(cat.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread URL link aggregation",
-					Url:        &url,
-				}, session)
-				tests.Ok(t, err, thread1create)
+				thread1create := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>this is a thread</p>").Ptr(),
+						Category:   opt.New(cat.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread URL link aggregation",
+						Url:        &url,
+					}, session))(t, http.StatusOK)
 				r.NotNil(thread1create.JSON200.Link)
 				a.Equal(url, thread1create.JSON200.Link.Url)
 				a.Equal("ogp-me", thread1create.JSON200.Link.Slug)
@@ -346,8 +387,8 @@ func TestThreads(t *testing.T) {
 
 				// Get the thread just created, ensure link is present.
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session)
-				tests.Ok(t, err, thread1get)
+				thread1get := tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session))(t, http.StatusOK)
 				r.NotNil(thread1get.JSON200.Link)
 				a.Equal(url, thread1get.JSON200.Link.Url)
 				a.Equal("ogp-me", thread1get.JSON200.Link.Slug)
@@ -361,8 +402,12 @@ func TestThreads(t *testing.T) {
 
 				// List threads, ensure link is present.
 
-				threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-				tests.Ok(t, err, threadlist)
+				categoryFilter := []string{cat.JSON200.Slug}
+				threadlist := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &categoryFilter,
+					}),
+				)(t, http.StatusOK)
 				listThread, found := lo.Find(threadlist.JSON200.Threads, func(th openapi.ThreadReference) bool {
 					return th.Id == thread1create.JSON200.Id
 				})
@@ -384,12 +429,13 @@ func TestThreads(t *testing.T) {
 				a := assert.New(t)
 
 				// Create a thread without a category as a draft
-				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-					Visibility: opt.New(openapi.Draft).Ptr(),
-					Title:      "Thread without category",
-				}, session1)
-				tests.Ok(t, err, threadCreate)
+				threadCreate := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
+						Visibility: opt.New(openapi.Draft).Ptr(),
+						Title:      "Thread without category",
+					}, session1),
+				)(t, http.StatusOK)
 
 				{
 					// Verify the thread was created successfully
@@ -399,7 +445,7 @@ func TestThreads(t *testing.T) {
 					a.Contains(threadCreate.JSON200.Slug, "thread-without-category")
 					a.Equal("<body><p>this is a thread without category</p></body>", threadCreate.JSON200.Body)
 					a.Equal("this is a thread without category", *threadCreate.JSON200.Description)
-					a.Equal(false, threadCreate.JSON200.Pinned)
+					a.Equal(0, threadCreate.JSON200.Pinned)
 					a.Nil(threadCreate.JSON200.Category, "thread should not have a category")
 					r.Len(threadCreate.JSON200.Replies.Replies, 0, "a newly created thread has zero replies")
 					a.Equal(threadCreate.JSON200.ReplyStatus.Replies, 0)
@@ -408,11 +454,12 @@ func TestThreads(t *testing.T) {
 				}
 
 				// Update the thread to add a category and change visibility to published
-				threadUpdate, err := cl.ThreadUpdateWithResponse(root, threadCreate.JSON200.Slug, openapi.ThreadMutableProps{
-					Category:   &cat1create.JSON200.Id,
-					Visibility: opt.New(openapi.Published).Ptr(),
-				}, session1)
-				tests.Ok(t, err, threadUpdate)
+				threadUpdate := tests.AssertRequest(
+					cl.ThreadUpdateWithResponse(root, threadCreate.JSON200.Slug, openapi.ThreadMutableProps{
+						Category:   &cat1create.JSON200.Id,
+						Visibility: opt.New(openapi.Published).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
 
 				{
 					// Verify the thread was updated successfully
@@ -425,8 +472,9 @@ func TestThreads(t *testing.T) {
 
 				{
 					// Get the thread to verify the changes persisted
-					threadGet, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
-					tests.Ok(t, err, threadGet)
+					threadGet := tests.AssertRequest(
+						cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil),
+					)(t, http.StatusOK)
 					a.Equal("Thread without category", threadGet.JSON200.Title)
 					a.NotNil(threadGet.JSON200.Category, "thread should have a category after update")
 					a.Equal(cat1create.JSON200.Id, threadGet.JSON200.Category.Id)
@@ -436,18 +484,23 @@ func TestThreads(t *testing.T) {
 
 				{
 					// Verify the thread appears in the thread list since it's now published
-					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-					tests.Ok(t, err, threadList)
+					categoryFilter := []string{cat1create.JSON200.Slug}
+					threadList := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &categoryFilter,
+						}),
+					)(t, http.StatusOK)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.Contains(ids, threadCreate.JSON200.Id, "published thread should appear in list")
 				}
 
 				{
 					// Verify the thread does not appear in the uncategorised list
-					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-						Categories: &[]string{"null"},
-					})
-					tests.Ok(t, err, threadList)
+					threadList := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &[]string{"null"},
+						}),
+					)(t, http.StatusOK)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.NotContains(ids, threadCreate.JSON200.Id, "categorised thread should not appear in query for uncategorised threads")
 				}
@@ -456,70 +509,163 @@ func TestThreads(t *testing.T) {
 			t.Run("uncategorised_threads_in_thread_list", func(t *testing.T) {
 				a := assert.New(t)
 
-				cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-					Colour:      "#fe4efd",
-					Description: "categorised threads",
-					Name:        "categorised " + uuid.NewString(),
-				}, session1)
-				tests.Ok(t, err, cat1create)
+				uncatCat := tests.AssertRequest(
+					cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+						Colour:      "#fe4efd",
+						Description: "categorised threads",
+						Name:        "categorised " + uuid.NewString(),
+					}, session1),
+				)(t, http.StatusOK)
 
-				categorisedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread without category",
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-				}, session1)
-				tests.Ok(t, err, categorisedThread)
-				uncategorisedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Thread without category",
-				}, session1)
-				tests.Ok(t, err, uncategorisedThread)
+				categorisedThread := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread without category",
+						Category:   opt.New(uncatCat.JSON200.Id).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+				uncategorisedThread := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Thread without category",
+					}, session1),
+				)(t, http.StatusOK)
 
 				{
-					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-						Categories: &[]string{"null"},
-					})
-					tests.Ok(t, err, threadList)
+					threadList := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &[]string{"null"},
+						}),
+					)(t, http.StatusOK)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.Contains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
 					a.NotContains(ids, categorisedThread.JSON200.Id, "categorised thread should not appear in uncategorised list")
 				}
 
 				{
-					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
-					tests.Ok(t, err, threadList)
+					threadList := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}))(t, http.StatusOK)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.Contains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
 					a.Contains(ids, categorisedThread.JSON200.Id, "categorised thread should appear in list")
 				}
 
 				{
-					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-						Categories: &[]string{cat1create.JSON200.Slug},
-					})
-					tests.Ok(t, err, threadList)
+					categoryFilter := []string{uncatCat.JSON200.Slug}
+					threadList := tests.AssertRequest(
+						cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+							Categories: &categoryFilter,
+						}),
+					)(t, http.StatusOK)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.NotContains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
 					a.Contains(ids, categorisedThread.JSON200.Id, "categorised thread should appear in list")
 				}
 			})
 
+			t.Run("pinned_threads_ignore_parameter", func(t *testing.T) {
+				r := require.New(t)
+
+				pinCategoryName := "Pinned category " + uuid.NewString()
+				pinCategory := tests.AssertRequest(
+					cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+						Colour:      "#123456",
+						Description: "pinning tests",
+						Name:        pinCategoryName,
+					}, session1),
+				)(t, http.StatusOK)
+
+				pinnedThread := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>pinned thread</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Pinned thread " + uuid.NewString(),
+						Category:   opt.New(pinCategory.JSON200.Id).Ptr(),
+						Pinned:     opt.New(openapi.PinnedRank(1)).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+				r.Equal(1, pinnedThread.JSON200.Pinned)
+
+				standardThread := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>standard thread</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Standard thread " + uuid.NewString(),
+						Category:   opt.New(pinCategory.JSON200.Id).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+
+				categoryFilter := []string{pinCategory.JSON200.Slug}
+				defaultList := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &categoryFilter,
+					}),
+				)(t, http.StatusOK)
+				r.Len(defaultList.JSON200.Threads, 2)
+				r.Equal(pinnedThread.JSON200.Id, defaultList.JSON200.Threads[0].Id)
+				r.Equal(standardThread.JSON200.Id, defaultList.JSON200.Threads[1].Id)
+
+				ignorePinned := openapi.ThreadsIgnorePinnedQuery(true)
+				ignoredList := tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories:   &categoryFilter,
+						IgnorePinned: &ignorePinned,
+					}),
+				)(t, http.StatusOK)
+				r.Len(ignoredList.JSON200.Threads, 2)
+				r.Equal(standardThread.JSON200.Id, ignoredList.JSON200.Threads[0].Id)
+
+				updatedPinned := tests.AssertRequest(
+					cl.ThreadUpdateWithResponse(root, pinnedThread.JSON200.Slug, openapi.ThreadMutableProps{
+						Pinned: opt.New(openapi.PinnedRank(0)).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+				r.Equal(0, updatedPinned.JSON200.Pinned)
+			})
+
+			t.Run("pin_permission_required", func(t *testing.T) {
+				a := assert.New(t)
+
+				threadCreate := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>non-moderator thread</p>").Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Cannot pin thread",
+					}, session2),
+				)(t, http.StatusOK)
+
+				tests.AssertRequest(
+					cl.ThreadUpdateWithResponse(root, threadCreate.JSON200.Slug, openapi.ThreadMutableProps{
+						Pinned: opt.New(openapi.PinnedRank(1)).Ptr(),
+					}, session2),
+				)(t, http.StatusForbidden)
+
+				threadUpdate := tests.AssertRequest(
+					cl.ThreadUpdateWithResponse(root, threadCreate.JSON200.Slug, openapi.ThreadMutableProps{
+						Pinned: opt.New(openapi.PinnedRank(1)).Ptr(),
+					}, session1),
+				)(t, http.StatusOK)
+				a.Equal(1, threadUpdate.JSON200.Pinned)
+			})
+
 			t.Run("thread_with_russian_slug", func(t *testing.T) {
 				a := assert.New(t)
 
-				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-					Body:       opt.New("<p>test content</p>").Ptr(),
-					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
-					Title:      "Бабочки",
-				}, session1)
-				tests.Ok(t, err, threadCreate)
+				threadCreate := tests.AssertRequest(
+					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+						Body:       opt.New("<p>test content</p>").Ptr(),
+						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+						Visibility: opt.New(openapi.Published).Ptr(),
+						Title:      "Бабочки",
+					}, session1),
+				)(t, http.StatusOK)
 				a.Contains(threadCreate.JSON200.Slug, "бабочки")
 
-				threadGet, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
-				tests.Ok(t, err, threadGet)
+				threadGet := tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil),
+				)(t, http.StatusOK)
 				a.Equal("Бабочки", threadGet.JSON200.Title)
 				a.Contains(threadGet.JSON200.Slug, "бабочки")
 			})

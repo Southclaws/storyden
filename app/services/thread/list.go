@@ -25,6 +25,7 @@ type Params struct {
 	Visibility    opt.Optional[[]visibility.Visibility]
 	Tags          opt.Optional[[]xid.ID]
 	Categories    opt.Optional[thread_querier.CategoryFilter]
+	IgnorePinned  opt.Optional[bool]
 }
 
 func (s *service) List(ctx context.Context,
@@ -44,6 +45,7 @@ func (s *service) List(ctx context.Context,
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread_querier.HasAuthor(a)) })
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread_querier.HasTags(a)) })
 	opts.Categories.Call(func(cf thread_querier.CategoryFilter) { q = append(q, thread_querier.HasCategories(cf)) })
+	opts.IgnorePinned.Call(func(value bool) { q = append(q, thread_querier.HasNoPinnedOrdering(value)) })
 
 	vq := func() thread_querier.Query {
 		v, ok := opts.Visibility.Get()

@@ -14,8 +14,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
 )
@@ -26,6 +28,10 @@ func (s *service) Create(ctx context.Context,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
+	if err := authoriseMutation(ctx, partial); err != nil {
+		return nil, err
+	}
+
 	opts := partial.Opts()
 	opts = append(opts,
 		thread_writer.WithMeta(meta),
@@ -93,4 +99,18 @@ func (s *service) Create(ctx context.Context,
 	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)
 
 	return thr, nil
+}
+
+func authoriseMutation(ctx context.Context, partial Partial) error {
+	if partial.Pinned.Ok() {
+		err := session.Authorise(ctx, nil, rbac.PermissionManagePosts)
+		if err != nil {
+			return fault.Wrap(err,
+				fctx.With(ctx),
+				fmsg.WithDesc("pinned state", "You do not have permission to create a pinned thread."),
+			)
+		}
+	}
+
+	return nil
 }

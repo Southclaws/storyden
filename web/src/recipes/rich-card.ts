@@ -8,6 +8,7 @@ export const richCard = defineSlotRecipe({
     "headerContainer",
     "menuContainer",
     "titleContainer",
+    "title",
     "contentContainer",
     "mediaContainer",
     "footerContainer",
@@ -53,6 +54,12 @@ export const richCard = defineSlotRecipe({
     },
 
     titleContainer: {
+      display: "flex",
+      flexDirection: "row",
+      gap: "1",
+    },
+
+    title: {
       lineClamp: "1",
       fontWeight: "bold",
     },
@@ -113,6 +120,23 @@ export const richCard = defineSlotRecipe({
     },
   },
   variants: {
+    backgroundColor: {
+      default: {
+        root: {
+          backgroundColor: "bg.default",
+        },
+      },
+      emphasized: {
+        root: {
+          backgroundColor: "bg.emphasized",
+        },
+      },
+      accent: {
+        root: {
+          backgroundColor: "bg.accent",
+        },
+      },
+    },
     shape: {
       row: {
         root: {
@@ -446,6 +470,7 @@ export const richCard = defineSlotRecipe({
   compoundVariants: [],
   defaultVariants: {
     shape: "row",
+    backgroundColor: "default",
   },
   jsx: ["Card", "NodeCard"],
 });
