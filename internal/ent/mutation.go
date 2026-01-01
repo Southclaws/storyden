@@ -19980,7 +19980,8 @@ type PostMutation struct {
 	indexed_at           *time.Time
 	title                *string
 	slug                 *string
-	pinned               *bool
+	pinned               *int
+	addpinned            *int
 	last_reply_at        *time.Time
 	body                 *string
 	short                *string
@@ -20408,12 +20409,13 @@ func (m *PostMutation) ResetSlug() {
 }
 
 // SetPinned sets the "pinned" field.
-func (m *PostMutation) SetPinned(b bool) {
-	m.pinned = &b
+func (m *PostMutation) SetPinned(i int) {
+	m.pinned = &i
+	m.addpinned = nil
 }
 
 // Pinned returns the value of the "pinned" field in the mutation.
-func (m *PostMutation) Pinned() (r bool, exists bool) {
+func (m *PostMutation) Pinned() (r int, exists bool) {
 	v := m.pinned
 	if v == nil {
 		return
@@ -20424,7 +20426,7 @@ func (m *PostMutation) Pinned() (r bool, exists bool) {
 // OldPinned returns the old "pinned" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldPinned(ctx context.Context) (v bool, err error) {
+func (m *PostMutation) OldPinned(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPinned is only allowed on UpdateOne operations")
 	}
@@ -20438,9 +20440,28 @@ func (m *PostMutation) OldPinned(ctx context.Context) (v bool, err error) {
 	return oldValue.Pinned, nil
 }
 
+// AddPinned adds i to the "pinned" field.
+func (m *PostMutation) AddPinned(i int) {
+	if m.addpinned != nil {
+		*m.addpinned += i
+	} else {
+		m.addpinned = &i
+	}
+}
+
+// AddedPinned returns the value that was added to the "pinned" field in this mutation.
+func (m *PostMutation) AddedPinned() (r int, exists bool) {
+	v := m.addpinned
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
 // ResetPinned resets all changes to the "pinned" field.
 func (m *PostMutation) ResetPinned() {
 	m.pinned = nil
+	m.addpinned = nil
 }
 
 // SetLastReplyAt sets the "last_reply_at" field.
@@ -21859,7 +21880,7 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		m.SetSlug(v)
 		return nil
 	case post.FieldPinned:
-		v, ok := value.(bool)
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -21942,13 +21963,21 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *PostMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addpinned != nil {
+		fields = append(fields, post.FieldPinned)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *PostMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case post.FieldPinned:
+		return m.AddedPinned()
+	}
 	return nil, false
 }
 
@@ -21957,6 +21986,13 @@ func (m *PostMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *PostMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case post.FieldPinned:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPinned(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Post numeric field %s", name)
 }

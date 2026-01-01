@@ -87,7 +87,7 @@ func Slug(v string) predicate.Post {
 }
 
 // Pinned applies equality check predicate on the "pinned" field. It's identical to PinnedEQ.
-func Pinned(v bool) predicate.Post {
+func Pinned(v int) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldPinned, v))
 }
 
@@ -462,13 +462,43 @@ func SlugContainsFold(v string) predicate.Post {
 }
 
 // PinnedEQ applies the EQ predicate on the "pinned" field.
-func PinnedEQ(v bool) predicate.Post {
+func PinnedEQ(v int) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldPinned, v))
 }
 
 // PinnedNEQ applies the NEQ predicate on the "pinned" field.
-func PinnedNEQ(v bool) predicate.Post {
+func PinnedNEQ(v int) predicate.Post {
 	return predicate.Post(sql.FieldNEQ(FieldPinned, v))
+}
+
+// PinnedIn applies the In predicate on the "pinned" field.
+func PinnedIn(vs ...int) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldPinned, vs...))
+}
+
+// PinnedNotIn applies the NotIn predicate on the "pinned" field.
+func PinnedNotIn(vs ...int) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldPinned, vs...))
+}
+
+// PinnedGT applies the GT predicate on the "pinned" field.
+func PinnedGT(v int) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldPinned, v))
+}
+
+// PinnedGTE applies the GTE predicate on the "pinned" field.
+func PinnedGTE(v int) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldPinned, v))
+}
+
+// PinnedLT applies the LT predicate on the "pinned" field.
+func PinnedLT(v int) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldPinned, v))
+}
+
+// PinnedLTE applies the LTE predicate on the "pinned" field.
+func PinnedLTE(v int) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldPinned, v))
 }
 
 // LastReplyAtEQ applies the EQ predicate on the "last_reply_at" field.

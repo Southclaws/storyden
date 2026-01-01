@@ -28,8 +28,8 @@ export const bg = {
   },
   emphasized: {
     value: {
-      _osLight: "{colors.accent.light.2}",
-      _osDark: "{colors.accent.dark.4}",
+      _osLight: "{colors.accent.light.1}",
+      _osDark: "{colors.accent.dark.6}",
     },
   },
   disabled: {

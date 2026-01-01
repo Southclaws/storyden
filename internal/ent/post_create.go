@@ -112,13 +112,13 @@ func (_c *PostCreate) SetNillableSlug(v *string) *PostCreate {
 }
 
 // SetPinned sets the "pinned" field.
-func (_c *PostCreate) SetPinned(v bool) *PostCreate {
+func (_c *PostCreate) SetPinned(v int) *PostCreate {
 	_c.mutation.SetPinned(v)
 	return _c
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (_c *PostCreate) SetNillablePinned(v *bool) *PostCreate {
+func (_c *PostCreate) SetNillablePinned(v *int) *PostCreate {
 	if v != nil {
 		_c.SetPinned(*v)
 	}
@@ -616,7 +616,7 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.Slug = value
 	}
 	if value, ok := _c.mutation.Pinned(); ok {
-		_spec.SetField(post.FieldPinned, field.TypeBool, value)
+		_spec.SetField(post.FieldPinned, field.TypeInt, value)
 		_node.Pinned = value
 	}
 	if value, ok := _c.mutation.LastReplyAt(); ok {
@@ -1037,7 +1037,7 @@ func (u *PostUpsert) ClearSlug() *PostUpsert {
 }
 
 // SetPinned sets the "pinned" field.
-func (u *PostUpsert) SetPinned(v bool) *PostUpsert {
+func (u *PostUpsert) SetPinned(v int) *PostUpsert {
 	u.Set(post.FieldPinned, v)
 	return u
 }
@@ -1045,6 +1045,12 @@ func (u *PostUpsert) SetPinned(v bool) *PostUpsert {
 // UpdatePinned sets the "pinned" field to the value that was provided on create.
 func (u *PostUpsert) UpdatePinned() *PostUpsert {
 	u.SetExcluded(post.FieldPinned)
+	return u
+}
+
+// AddPinned adds v to the "pinned" field.
+func (u *PostUpsert) AddPinned(v int) *PostUpsert {
+	u.Add(post.FieldPinned, v)
 	return u
 }
 
@@ -1348,9 +1354,16 @@ func (u *PostUpsertOne) ClearSlug() *PostUpsertOne {
 }
 
 // SetPinned sets the "pinned" field.
-func (u *PostUpsertOne) SetPinned(v bool) *PostUpsertOne {
+func (u *PostUpsertOne) SetPinned(v int) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.SetPinned(v)
+	})
+}
+
+// AddPinned adds v to the "pinned" field.
+func (u *PostUpsertOne) AddPinned(v int) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.AddPinned(v)
 	})
 }
 
@@ -1853,9 +1866,16 @@ func (u *PostUpsertBulk) ClearSlug() *PostUpsertBulk {
 }
 
 // SetPinned sets the "pinned" field.
-func (u *PostUpsertBulk) SetPinned(v bool) *PostUpsertBulk {
+func (u *PostUpsertBulk) SetPinned(v int) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.SetPinned(v)
+	})
+}
+
+// AddPinned adds v to the "pinned" field.
+func (u *PostUpsertBulk) AddPinned(v int) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.AddPinned(v)
 	})
 }
 

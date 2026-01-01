@@ -51,11 +51,16 @@ type CategoryFilter struct {
 	Uncategorised bool
 }
 
-type Query func(q *ent.PostQuery)
+type threadListOptions struct {
+	q            *ent.PostQuery
+	ignorePinned bool
+}
+
+type Query func(*threadListOptions)
 
 func HasKeyword(s string) Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.Or(
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.Or(
 			ent_post.TitleContainsFold(s),
 			ent_post.SlugContainsFold(s),
 			ent_post.BodyContainsFold(s),
@@ -64,36 +69,36 @@ func HasKeyword(s string) Query {
 }
 
 func HasCreatedDateBefore(t time.Time) Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.CreatedAtLT(t))
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.CreatedAtLT(t))
 	}
 }
 
 func HasUpdatedDateBefore(t time.Time) Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.UpdatedAtLT(t))
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.UpdatedAtLT(t))
 	}
 }
 
 func HasAuthor(id account.AccountID) Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.HasAuthorWith(ent_account.ID(xid.ID(id))))
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.HasAuthorWith(ent_account.ID(xid.ID(id))))
 	}
 }
 
 func HasTags(ids []xid.ID) Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.HasTagsWith(ent_tag.IDIn(ids...)))
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.HasTagsWith(ent_tag.IDIn(ids...)))
 	}
 }
 
 func HasCategories(cf CategoryFilter) Query {
-	return func(q *ent.PostQuery) {
+	return func(q *threadListOptions) {
 		if len(cf.Slugs) > 0 {
-			q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(cf.Slugs...)))
+			q.q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(cf.Slugs...)))
 		} else {
 			if cf.Uncategorised {
-				q.Where(ent_post.CategoryIDIsNil())
+				q.q.Where(ent_post.CategoryIDIsNil())
 			} else {
 				// No filter, fetch all threads.
 			}
@@ -103,31 +108,31 @@ func HasCategories(cf CategoryFilter) Query {
 
 func HasStatus(status ...visibility.Visibility) Query {
 	pv := dt.Map(status, func(v visibility.Visibility) ent_post.Visibility { return ent_post.Visibility(v.String()) })
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.VisibilityIn(pv...))
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.VisibilityIn(pv...))
 	}
 }
 
 func HasPublishedOrOwnInReview(accountID opt.Optional[account.AccountID], isModerator bool) Query {
-	return func(q *ent.PostQuery) {
+	return func(q *threadListOptions) {
 		publishedStatus := ent_post.Visibility(visibility.VisibilityPublished.String())
 		reviewStatus := ent_post.Visibility(visibility.VisibilityReview.String())
 
 		authorID, hasAuthor := accountID.Get()
 		if !hasAuthor {
-			q.Where(ent_post.VisibilityEQ(publishedStatus))
+			q.q.Where(ent_post.VisibilityEQ(publishedStatus))
 			return
 		}
 
 		if isModerator {
-			q.Where(ent_post.Or(
+			q.q.Where(ent_post.Or(
 				ent_post.VisibilityEQ(publishedStatus),
 				ent_post.VisibilityEQ(reviewStatus),
 			))
 			return
 		}
 
-		q.Where(ent_post.Or(
+		q.q.Where(ent_post.Or(
 			ent_post.VisibilityEQ(publishedStatus),
 			ent_post.And(
 				ent_post.VisibilityEQ(reviewStatus),
@@ -138,7 +143,13 @@ func HasPublishedOrOwnInReview(accountID opt.Optional[account.AccountID], isMode
 }
 
 func HasNotBeenDeleted() Query {
-	return func(q *ent.PostQuery) {
-		q.Where(ent_post.DeletedAtIsNil())
+	return func(q *threadListOptions) {
+		q.q.Where(ent_post.DeletedAtIsNil())
+	}
+}
+
+func HasNoPinnedOrdering(ignorePinned bool) Query {
+	return func(q *threadListOptions) {
+		q.ignorePinned = ignorePinned
 	}
 }

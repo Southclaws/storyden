@@ -23,6 +23,7 @@ import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
 } from "../ui/icons/Discussion";
+import { PinIcon } from "../ui/icons/Pin";
 
 import { LikeButton } from "./LikeButton/LikeButton";
 import { useThreadCardModeration } from "./useThreadCardModeration";
@@ -64,6 +65,8 @@ export const ThreadReferenceCard = memo(
         : undefined;
 
     const isInReview = thread.visibility === Visibility.review;
+    const isPinned = (thread.pinned ?? 0) > 0;
+    const cardBackground = isPinned ? "emphasized" : "default";
 
     // Don't show images for in-review threads, too noisy.
     const image = isInReview
@@ -75,8 +78,10 @@ export const ThreadReferenceCard = memo(
     return (
       <Card
         shape="responsive"
+        backgroundColor={cardBackground}
         id={thread.id}
         title={title}
+        titleIcon={isPinned ? <PinIcon w="4" /> : undefined}
         text={thread.description}
         url={permalink}
         image={image}

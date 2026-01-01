@@ -46,6 +46,10 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := authoriseMutation(ctx, partial); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	oldVisibility := thr.Visibility
 	opts := partial.Opts()
 

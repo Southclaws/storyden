@@ -828,7 +828,7 @@ func init() {
 	// postDescPinned is the schema descriptor for pinned field.
 	postDescPinned := postFields[2].Descriptor()
 	// post.DefaultPinned holds the default value on creation for the pinned field.
-	post.DefaultPinned = postDescPinned.Default.(bool)
+	post.DefaultPinned = postDescPinned.Default.(int)
 	// postDescID is the schema descriptor for id field.
 	postDescID := postMixinFields0[0].Descriptor()
 	// post.DefaultID holds the default value on creation for the id field.

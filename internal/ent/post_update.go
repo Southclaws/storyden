@@ -136,16 +136,23 @@ func (_u *PostUpdate) ClearSlug() *PostUpdate {
 }
 
 // SetPinned sets the "pinned" field.
-func (_u *PostUpdate) SetPinned(v bool) *PostUpdate {
+func (_u *PostUpdate) SetPinned(v int) *PostUpdate {
+	_u.mutation.ResetPinned()
 	_u.mutation.SetPinned(v)
 	return _u
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (_u *PostUpdate) SetNillablePinned(v *bool) *PostUpdate {
+func (_u *PostUpdate) SetNillablePinned(v *int) *PostUpdate {
 	if v != nil {
 		_u.SetPinned(*v)
 	}
+	return _u
+}
+
+// AddPinned adds value to the "pinned" field.
+func (_u *PostUpdate) AddPinned(v int) *PostUpdate {
+	_u.mutation.AddPinned(v)
 	return _u
 }
 
@@ -887,7 +894,10 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
 	if value, ok := _u.mutation.Pinned(); ok {
-		_spec.SetField(post.FieldPinned, field.TypeBool, value)
+		_spec.SetField(post.FieldPinned, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPinned(); ok {
+		_spec.AddField(post.FieldPinned, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
@@ -1664,16 +1674,23 @@ func (_u *PostUpdateOne) ClearSlug() *PostUpdateOne {
 }
 
 // SetPinned sets the "pinned" field.
-func (_u *PostUpdateOne) SetPinned(v bool) *PostUpdateOne {
+func (_u *PostUpdateOne) SetPinned(v int) *PostUpdateOne {
+	_u.mutation.ResetPinned()
 	_u.mutation.SetPinned(v)
 	return _u
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (_u *PostUpdateOne) SetNillablePinned(v *bool) *PostUpdateOne {
+func (_u *PostUpdateOne) SetNillablePinned(v *int) *PostUpdateOne {
 	if v != nil {
 		_u.SetPinned(*v)
 	}
+	return _u
+}
+
+// AddPinned adds value to the "pinned" field.
+func (_u *PostUpdateOne) AddPinned(v int) *PostUpdateOne {
+	_u.mutation.AddPinned(v)
 	return _u
 }
 
@@ -2445,7 +2462,10 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
 	if value, ok := _u.mutation.Pinned(); ok {
-		_spec.SetField(post.FieldPinned, field.TypeBool, value)
+		_spec.SetField(post.FieldPinned, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPinned(); ok {
+		_spec.AddField(post.FieldPinned, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)

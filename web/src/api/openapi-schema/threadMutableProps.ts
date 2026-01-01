@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
+import type { PinnedRank } from "./pinnedRank";
 import type { PostContent } from "./postContent";
 import type { TagNameList } from "./tagNameList";
 import type { ThreadTitle } from "./threadTitle";
@@ -19,6 +20,7 @@ export interface ThreadMutableProps {
   body?: PostContent;
   category?: Identifier;
   meta?: Metadata;
+  pinned?: PinnedRank;
   tags?: TagNameList;
   title?: ThreadTitle;
   url?: Url;

@@ -22,7 +22,7 @@ func (Post) Fields() []ent.Field {
 		// parent posts
 		field.String("title").Optional(),
 		field.String("slug").Optional(),
-		field.Bool("pinned").Default(false),
+		field.Int("pinned").Default(0),
 		field.Time("last_reply_at"),
 
 		// child posts
@@ -49,8 +49,8 @@ func (Post) Indexes() []ent.Index {
 		// Thread listing queries:
 		// - root post + soft delete + visibility always used for filtering
 		// - last_reply_at always used for ordering (denormalized, always populated)
-		index.Fields("root_post_id", "deleted_at", "visibility", "last_reply_at"),
-		index.Fields("root_post_id", "deleted_at", "visibility", "category_id", "last_reply_at"),
+		index.Fields("root_post_id", "deleted_at", "visibility", "pinned", "last_reply_at"),
+		index.Fields("root_post_id", "deleted_at", "visibility", "category_id", "pinned", "last_reply_at"),
 
 		// Reply queries:
 		// - root post + soft delete always used for filtering

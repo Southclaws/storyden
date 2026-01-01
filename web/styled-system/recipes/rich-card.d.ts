@@ -4,6 +4,10 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface RichCardVariant {
   /**
+ * @default "default"
+ */
+backgroundColor: "default" | "emphasized" | "accent"
+/**
  * @default "row"
  */
 shape: "row" | "responsive" | "box" | "fill"
@@ -13,7 +17,7 @@ type RichCardVariantMap = {
   [key in keyof RichCardVariant]: Array<RichCardVariant[key]>
 }
 
-type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
+type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "title" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
 
 export type RichCardVariantProps = {
   [key in keyof RichCardVariant]?: ConditionalValue<RichCardVariant[key]> | undefined

@@ -88,6 +88,10 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	pinned := opt.NewPtrMap(request.Body.Pinned, func(p openapi.PinnedRank) int {
+		return int(p)
+	})
+
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		accountID,
@@ -98,6 +102,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 			Tags:       tags,
 			Visibility: status,
 			URL:        url,
+			Pinned:     pinned,
 		},
 	)
 	if err != nil {
@@ -129,12 +134,17 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	pinned := opt.NewPtrMap(request.Body.Pinned, func(p openapi.PinnedRank) int {
+		return int(p)
+	})
+
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:      opt.NewPtr(request.Body.Title),
 		Content:    richContent,
 		Tags:       tags,
 		Category:   opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Visibility: Visibility,
+		Pinned:     pinned,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -190,14 +200,16 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	})
 
 	cats := deserialiseCategorySlugQueryParam(request.Params.Categories)
+	ignorePinned := opt.NewPtr(request.Params.IgnorePinned)
 
 	page = max(0, page-1)
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
-		Query:      query,
-		AccountID:  author,
-		Visibility: visibilities,
-		Tags:       tags,
-		Categories: cats,
+		Query:        query,
+		AccountID:    author,
+		Visibility:   visibilities,
+		Tags:         tags,
+		Categories:   cats,
+		IgnorePinned: ignorePinned,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

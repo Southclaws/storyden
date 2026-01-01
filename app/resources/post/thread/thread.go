@@ -30,7 +30,7 @@ type Thread struct {
 	Title       string
 	Slug        string
 	Short       string
-	Pinned      bool
+	Pinned      int
 	LastReplyAt opt.Optional[time.Time]
 
 	ReadStatus  opt.Optional[post.ReadStatus]
@@ -46,7 +46,7 @@ type ThreadRef struct {
 	Title       string
 	Slug        string
 	Short       string
-	Pinned      bool
+	Pinned      int
 	LastReplyAt opt.Optional[time.Time]
 }
 

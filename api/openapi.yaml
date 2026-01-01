@@ -1435,6 +1435,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/ThreadsIgnorePinnedQuery"
         - name: author
           description: Show only results creeated by this user.
           required: false
@@ -2762,6 +2763,18 @@ components:
       required: false
       schema:
         type: string
+
+    ThreadsIgnorePinnedQuery:
+      description: |
+        When set to true, pinned threads will be ignored in the results and the
+        result will be ordered entirely by the most recent reply. By default,
+        this is not set and pinned threads will appear at the top of the first
+        page.
+      name: ignore_pinned
+      in: query
+      required: false
+      schema:
+        type: boolean
 
     CategorySlugParam:
       description: Unique category URL slug.
@@ -4115,6 +4128,13 @@ components:
       type: string
       description: The title of a thread.
       example: Hello world!
+
+    PinnedRank:
+      type: integer
+      description: |
+        If the post is pinned, this indicates its rank among other pinned
+        threads. Lower numbers are pinned higher up. A value of zero indicates
+        that the post is not pinned.
 
     PostContent:
       description: |
@@ -5789,6 +5809,7 @@ components:
       required: [title]
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
+        pinned: { $ref: "#/components/schemas/PinnedRank" }
         body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
@@ -5800,6 +5821,7 @@ components:
       type: object
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
+        pinned: { $ref: "#/components/schemas/PinnedRank" }
         body: { $ref: "#/components/schemas/PostContent" }
         tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
@@ -5828,9 +5850,7 @@ components:
         - reply_status
         - collections
       properties:
-        pinned:
-          type: boolean
-          description: Whether the thread is pinned in this category.
+        pinned: { $ref: "#/components/schemas/PinnedRank" }
         read_status: { $ref: "#/components/schemas/ReadStatus" }
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
