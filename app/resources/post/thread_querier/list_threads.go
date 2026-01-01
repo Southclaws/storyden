@@ -78,7 +78,7 @@ func (d *Querier) List(
 		)
 	} else {
 		query.Order(
-			ent.Desc(ent_post.FieldPinned),
+			ent.Desc(ent_post.FieldPinnedRank),
 			ent.Desc(ent_post.FieldLastReplyAt),
 		)
 	}

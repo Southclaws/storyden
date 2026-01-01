@@ -825,10 +825,10 @@ func init() {
 	postDescCreatedAt := postMixinFields1[0].Descriptor()
 	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
-	// postDescPinned is the schema descriptor for pinned field.
-	postDescPinned := postFields[2].Descriptor()
-	// post.DefaultPinned holds the default value on creation for the pinned field.
-	post.DefaultPinned = postDescPinned.Default.(int)
+	// postDescPinnedRank is the schema descriptor for pinned_rank field.
+	postDescPinnedRank := postFields[2].Descriptor()
+	// post.DefaultPinnedRank holds the default value on creation for the pinned_rank field.
+	post.DefaultPinnedRank = postDescPinnedRank.Default.(int)
 	// postDescID is the schema descriptor for id field.
 	postDescID := postMixinFields0[0].Descriptor()
 	// post.DefaultID holds the default value on creation for the id field.

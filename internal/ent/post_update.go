@@ -135,24 +135,24 @@ func (_u *PostUpdate) ClearSlug() *PostUpdate {
 	return _u
 }
 
-// SetPinned sets the "pinned" field.
-func (_u *PostUpdate) SetPinned(v int) *PostUpdate {
-	_u.mutation.ResetPinned()
-	_u.mutation.SetPinned(v)
+// SetPinnedRank sets the "pinned_rank" field.
+func (_u *PostUpdate) SetPinnedRank(v int) *PostUpdate {
+	_u.mutation.ResetPinnedRank()
+	_u.mutation.SetPinnedRank(v)
 	return _u
 }
 
-// SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (_u *PostUpdate) SetNillablePinned(v *int) *PostUpdate {
+// SetNillablePinnedRank sets the "pinned_rank" field if the given value is not nil.
+func (_u *PostUpdate) SetNillablePinnedRank(v *int) *PostUpdate {
 	if v != nil {
-		_u.SetPinned(*v)
+		_u.SetPinnedRank(*v)
 	}
 	return _u
 }
 
-// AddPinned adds value to the "pinned" field.
-func (_u *PostUpdate) AddPinned(v int) *PostUpdate {
-	_u.mutation.AddPinned(v)
+// AddPinnedRank adds value to the "pinned_rank" field.
+func (_u *PostUpdate) AddPinnedRank(v int) *PostUpdate {
+	_u.mutation.AddPinnedRank(v)
 	return _u
 }
 
@@ -893,11 +893,11 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.SlugCleared() {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
-	if value, ok := _u.mutation.Pinned(); ok {
-		_spec.SetField(post.FieldPinned, field.TypeInt, value)
+	if value, ok := _u.mutation.PinnedRank(); ok {
+		_spec.SetField(post.FieldPinnedRank, field.TypeInt, value)
 	}
-	if value, ok := _u.mutation.AddedPinned(); ok {
-		_spec.AddField(post.FieldPinned, field.TypeInt, value)
+	if value, ok := _u.mutation.AddedPinnedRank(); ok {
+		_spec.AddField(post.FieldPinnedRank, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
@@ -1673,24 +1673,24 @@ func (_u *PostUpdateOne) ClearSlug() *PostUpdateOne {
 	return _u
 }
 
-// SetPinned sets the "pinned" field.
-func (_u *PostUpdateOne) SetPinned(v int) *PostUpdateOne {
-	_u.mutation.ResetPinned()
-	_u.mutation.SetPinned(v)
+// SetPinnedRank sets the "pinned_rank" field.
+func (_u *PostUpdateOne) SetPinnedRank(v int) *PostUpdateOne {
+	_u.mutation.ResetPinnedRank()
+	_u.mutation.SetPinnedRank(v)
 	return _u
 }
 
-// SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (_u *PostUpdateOne) SetNillablePinned(v *int) *PostUpdateOne {
+// SetNillablePinnedRank sets the "pinned_rank" field if the given value is not nil.
+func (_u *PostUpdateOne) SetNillablePinnedRank(v *int) *PostUpdateOne {
 	if v != nil {
-		_u.SetPinned(*v)
+		_u.SetPinnedRank(*v)
 	}
 	return _u
 }
 
-// AddPinned adds value to the "pinned" field.
-func (_u *PostUpdateOne) AddPinned(v int) *PostUpdateOne {
-	_u.mutation.AddPinned(v)
+// AddPinnedRank adds value to the "pinned_rank" field.
+func (_u *PostUpdateOne) AddPinnedRank(v int) *PostUpdateOne {
+	_u.mutation.AddPinnedRank(v)
 	return _u
 }
 
@@ -2461,11 +2461,11 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	if _u.mutation.SlugCleared() {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
-	if value, ok := _u.mutation.Pinned(); ok {
-		_spec.SetField(post.FieldPinned, field.TypeInt, value)
+	if value, ok := _u.mutation.PinnedRank(); ok {
+		_spec.SetField(post.FieldPinnedRank, field.TypeInt, value)
 	}
-	if value, ok := _u.mutation.AddedPinned(); ok {
-		_spec.AddField(post.FieldPinned, field.TypeInt, value)
+	if value, ok := _u.mutation.AddedPinnedRank(); ok {
+		_spec.AddField(post.FieldPinnedRank, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)

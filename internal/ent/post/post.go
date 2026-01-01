@@ -28,8 +28,8 @@ const (
 	FieldTitle = "title"
 	// FieldSlug holds the string denoting the slug field in the database.
 	FieldSlug = "slug"
-	// FieldPinned holds the string denoting the pinned field in the database.
-	FieldPinned = "pinned"
+	// FieldPinnedRank holds the string denoting the pinned_rank field in the database.
+	FieldPinnedRank = "pinned_rank"
 	// FieldLastReplyAt holds the string denoting the last_reply_at field in the database.
 	FieldLastReplyAt = "last_reply_at"
 	// FieldRootPostID holds the string denoting the root_post_id field in the database.
@@ -187,7 +187,7 @@ var Columns = []string{
 	FieldIndexedAt,
 	FieldTitle,
 	FieldSlug,
-	FieldPinned,
+	FieldPinnedRank,
 	FieldLastReplyAt,
 	FieldRootPostID,
 	FieldReplyToPostID,
@@ -228,8 +228,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultPinned holds the default value on creation for the "pinned" field.
-	DefaultPinned int
+	// DefaultPinnedRank holds the default value on creation for the "pinned_rank" field.
+	DefaultPinnedRank int
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -302,9 +302,9 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSlug, opts...).ToFunc()
 }
 
-// ByPinned orders the results by the pinned field.
-func ByPinned(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPinned, opts...).ToFunc()
+// ByPinnedRank orders the results by the pinned_rank field.
+func ByPinnedRank(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPinnedRank, opts...).ToFunc()
 }
 
 // ByLastReplyAt orders the results by the last_reply_at field.

@@ -19980,8 +19980,8 @@ type PostMutation struct {
 	indexed_at           *time.Time
 	title                *string
 	slug                 *string
-	pinned               *int
-	addpinned            *int
+	pinned_rank          *int
+	addpinned_rank       *int
 	last_reply_at        *time.Time
 	body                 *string
 	short                *string
@@ -20408,60 +20408,60 @@ func (m *PostMutation) ResetSlug() {
 	delete(m.clearedFields, post.FieldSlug)
 }
 
-// SetPinned sets the "pinned" field.
-func (m *PostMutation) SetPinned(i int) {
-	m.pinned = &i
-	m.addpinned = nil
+// SetPinnedRank sets the "pinned_rank" field.
+func (m *PostMutation) SetPinnedRank(i int) {
+	m.pinned_rank = &i
+	m.addpinned_rank = nil
 }
 
-// Pinned returns the value of the "pinned" field in the mutation.
-func (m *PostMutation) Pinned() (r int, exists bool) {
-	v := m.pinned
+// PinnedRank returns the value of the "pinned_rank" field in the mutation.
+func (m *PostMutation) PinnedRank() (r int, exists bool) {
+	v := m.pinned_rank
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldPinned returns the old "pinned" field's value of the Post entity.
+// OldPinnedRank returns the old "pinned_rank" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldPinned(ctx context.Context) (v int, err error) {
+func (m *PostMutation) OldPinnedRank(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPinned is only allowed on UpdateOne operations")
+		return v, errors.New("OldPinnedRank is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPinned requires an ID field in the mutation")
+		return v, errors.New("OldPinnedRank requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPinned: %w", err)
+		return v, fmt.Errorf("querying old value for OldPinnedRank: %w", err)
 	}
-	return oldValue.Pinned, nil
+	return oldValue.PinnedRank, nil
 }
 
-// AddPinned adds i to the "pinned" field.
-func (m *PostMutation) AddPinned(i int) {
-	if m.addpinned != nil {
-		*m.addpinned += i
+// AddPinnedRank adds i to the "pinned_rank" field.
+func (m *PostMutation) AddPinnedRank(i int) {
+	if m.addpinned_rank != nil {
+		*m.addpinned_rank += i
 	} else {
-		m.addpinned = &i
+		m.addpinned_rank = &i
 	}
 }
 
-// AddedPinned returns the value that was added to the "pinned" field in this mutation.
-func (m *PostMutation) AddedPinned() (r int, exists bool) {
-	v := m.addpinned
+// AddedPinnedRank returns the value that was added to the "pinned_rank" field in this mutation.
+func (m *PostMutation) AddedPinnedRank() (r int, exists bool) {
+	v := m.addpinned_rank
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetPinned resets all changes to the "pinned" field.
-func (m *PostMutation) ResetPinned() {
-	m.pinned = nil
-	m.addpinned = nil
+// ResetPinnedRank resets all changes to the "pinned_rank" field.
+func (m *PostMutation) ResetPinnedRank() {
+	m.pinned_rank = nil
+	m.addpinned_rank = nil
 }
 
 // SetLastReplyAt sets the "last_reply_at" field.
@@ -21710,8 +21710,8 @@ func (m *PostMutation) Fields() []string {
 	if m.slug != nil {
 		fields = append(fields, post.FieldSlug)
 	}
-	if m.pinned != nil {
-		fields = append(fields, post.FieldPinned)
+	if m.pinned_rank != nil {
+		fields = append(fields, post.FieldPinnedRank)
 	}
 	if m.last_reply_at != nil {
 		fields = append(fields, post.FieldLastReplyAt)
@@ -21763,8 +21763,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Title()
 	case post.FieldSlug:
 		return m.Slug()
-	case post.FieldPinned:
-		return m.Pinned()
+	case post.FieldPinnedRank:
+		return m.PinnedRank()
 	case post.FieldLastReplyAt:
 		return m.LastReplyAt()
 	case post.FieldRootPostID:
@@ -21806,8 +21806,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldTitle(ctx)
 	case post.FieldSlug:
 		return m.OldSlug(ctx)
-	case post.FieldPinned:
-		return m.OldPinned(ctx)
+	case post.FieldPinnedRank:
+		return m.OldPinnedRank(ctx)
 	case post.FieldLastReplyAt:
 		return m.OldLastReplyAt(ctx)
 	case post.FieldRootPostID:
@@ -21879,12 +21879,12 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSlug(v)
 		return nil
-	case post.FieldPinned:
+	case post.FieldPinnedRank:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetPinned(v)
+		m.SetPinnedRank(v)
 		return nil
 	case post.FieldLastReplyAt:
 		v, ok := value.(time.Time)
@@ -21964,8 +21964,8 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *PostMutation) AddedFields() []string {
 	var fields []string
-	if m.addpinned != nil {
-		fields = append(fields, post.FieldPinned)
+	if m.addpinned_rank != nil {
+		fields = append(fields, post.FieldPinnedRank)
 	}
 	return fields
 }
@@ -21975,8 +21975,8 @@ func (m *PostMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *PostMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case post.FieldPinned:
-		return m.AddedPinned()
+	case post.FieldPinnedRank:
+		return m.AddedPinnedRank()
 	}
 	return nil, false
 }
@@ -21986,12 +21986,12 @@ func (m *PostMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *PostMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case post.FieldPinned:
+	case post.FieldPinnedRank:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddPinned(v)
+		m.AddPinnedRank(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Post numeric field %s", name)
@@ -22095,8 +22095,8 @@ func (m *PostMutation) ResetField(name string) error {
 	case post.FieldSlug:
 		m.ResetSlug()
 		return nil
-	case post.FieldPinned:
-		m.ResetPinned()
+	case post.FieldPinnedRank:
+		m.ResetPinnedRank()
 		return nil
 	case post.FieldLastReplyAt:
 		m.ResetLastReplyAt()

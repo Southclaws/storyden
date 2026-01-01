@@ -693,7 +693,7 @@ var (
 		{Name: "indexed_at", Type: field.TypeTime, Nullable: true},
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
-		{Name: "pinned", Type: field.TypeInt, Default: 0},
+		{Name: "pinned_rank", Type: field.TypeInt, Default: 0},
 		{Name: "last_reply_at", Type: field.TypeTime},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
@@ -744,12 +744,12 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "post_root_post_id_deleted_at_visibility_pinned_last_reply_at",
+				Name:    "post_root_post_id_deleted_at_visibility_pinned_rank_last_reply_at",
 				Unique:  false,
 				Columns: []*schema.Column{PostsColumns[16], PostsColumns[3], PostsColumns[12], PostsColumns[7], PostsColumns[8]},
 			},
 			{
-				Name:    "post_root_post_id_deleted_at_visibility_category_id_pinned_last_reply_at",
+				Name:    "post_root_post_id_deleted_at_visibility_category_id_pinned_rank_last_reply_at",
 				Unique:  false,
 				Columns: []*schema.Column{PostsColumns[16], PostsColumns[3], PostsColumns[12], PostsColumns[14], PostsColumns[7], PostsColumns[8]},
 			},
