@@ -106,7 +106,10 @@ func (d *Querier) ProbeMany(ctx context.Context, handles ...string) ([]*account.
 
 	accounts, err := d.db.Account.
 		Query().
-		Where(account_ent.HandleIn(handles...)).
+		Where(
+			account_ent.HandleIn(handles...),
+			account_ent.DeletedAtIsNil(),
+		).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
