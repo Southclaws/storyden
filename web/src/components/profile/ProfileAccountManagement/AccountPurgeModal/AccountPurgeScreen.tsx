@@ -43,13 +43,13 @@ const CONTENT_TYPE_LABELS: Record<
   },
 };
 
-const CONTENT_TYPES = Object.entries(ModerationActionPurgeAccountContentType).map(
-  ([_, value]) => ({
-    value,
-    label: CONTENT_TYPE_LABELS[value].name,
-    description: CONTENT_TYPE_LABELS[value].description,
-  }),
-);
+const CONTENT_TYPES = Object.entries(
+  ModerationActionPurgeAccountContentType,
+).map(([_, value]) => ({
+  value,
+  label: CONTENT_TYPE_LABELS[value].name,
+  description: CONTENT_TYPE_LABELS[value].description,
+}));
 
 export function AccountPurgeScreen(props: Props) {
   const {
@@ -79,8 +79,8 @@ export function AccountPurgeScreen(props: Props) {
                 Destructive Action
               </styled.p>
               <styled.p fontSize="xs">
-                This will permanently delete the selected content types from this
-                account. This action cannot be undone.
+                This will permanently delete the selected content types from
+                this account. This action cannot be undone.
               </styled.p>
             </LStack>
           </HStack>
@@ -103,8 +103,8 @@ export function AccountPurgeScreen(props: Props) {
         <Button
           flexGrow="1"
           variant="solid"
-          bgColor="bg.destructive"
           disabled={!form.formState.isDirty || form.formState.isSubmitting}
+          loading={form.formState.isSubmitting}
           type="submit"
         >
           Purge Selected Content
