@@ -8,11 +8,13 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http"
 	"github.com/Southclaws/storyden/app/transports/mcp"
+	"github.com/Southclaws/storyden/app/transports/sse"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		http.Build(),
 		mcp.Build(),
+		sse.Build(),
 	)
 }

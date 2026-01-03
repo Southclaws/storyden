@@ -1,0 +1,49 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLinkCreate
+x-storyden-role: CREATE_POST
+title: link_create
+description: Create or update a link in the shared bookmarks list. Fetches the
+  URL and extracts OpenGraph metadata (title, description) and plain text
+  content. Useful for bookmarking websites, articles, or any web content.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLinkCreateInput"
+  output:
+    $ref: "#/definitions/ToolLinkCreateOutput"
+definitions:
+  ToolLinkCreateInput:
+    type: object
+    required:
+      - url
+    properties:
+      url:
+        type: string
+        format: uri
+        description: The URL to create a bookmark for. Must be a valid HTTP/HTTPS URL.
+    additionalProperties: false
+  ToolLinkCreateOutput:
+    type: object
+    required:
+      - slug
+      - url
+    properties:
+      slug:
+        type: string
+        description: Unique identifier for the link
+      url:
+        type: string
+        description: The bookmarked URL
+      opengraph_title:
+        type: string
+        description: Title extracted from OpenGraph metadata
+      opengraph_description:
+        type: string
+        description: Description extracted from OpenGraph metadata
+      plain_text:
+        type: string
+        description: Plain text content extracted from the page
+    additionalProperties: false

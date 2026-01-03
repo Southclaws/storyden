@@ -1,0 +1,78 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolThreadUpdate
+x-storyden-role: MANAGE_POSTS
+title: thread_update
+description: Update an existing thread's properties
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadUpdateInput"
+  output:
+    $ref: "#/definitions/ToolThreadUpdateOutput"
+definitions:
+  ToolThreadUpdateInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The unique identifier of the thread to update
+      title:
+        type: string
+        description: New title for the thread
+      body:
+        type: string
+        minLength: 1
+        description: New content for the thread in HTML format
+      visibility:
+        type: string
+        enum:
+          - published
+          - draft
+        description: "New visibility: published or draft"
+      tags:
+        type: array
+        description: New tags for the thread
+        items:
+          type: string
+    additionalProperties: false
+  ToolThreadUpdateOutput:
+    type: object
+    required:
+      - slug
+      - title
+    properties:
+      slug:
+        type: string
+        description: The thread slug
+      title:
+        type: string
+        description: The thread title
+      created_at:
+        type: string
+        description: Creation timestamp
+      content:
+        type: string
+        description: Thread content as plain text
+      visibility:
+        type: string
+        description: Thread visibility
+      author:
+        type: string
+        description: Author handle
+      category:
+        type: string
+        description: Category name
+      tags:
+        type: array
+        items:
+          type: string
+      url:
+        type: string
+        description: Associated URL if present
+    additionalProperties: false

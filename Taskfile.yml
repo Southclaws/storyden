@@ -105,7 +105,7 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:openapi]
+    deps: [generate:db, generate:openapi, generate:mcp]
 
   generate:db:
     cmds: [go generate ./internal/ent]
@@ -117,13 +117,28 @@ tasks:
       - generate:openapi:docs
 
   generate:openapi:backend:
-    cmds: [go generate .]
+    cmds: [go generate ./api]
   generate:openapi:frontend:
     dir: web
     cmds: [yarn openapi]
   generate:openapi:docs:
     dir: home
     cmds: [yarn openapi]
+
+  generate:mcp:
+    deps:
+      - generate:mcp:backend
+      - generate:mcp:frontend
+
+  generate:mcp:backend:
+    cmds:
+      - go generate ./api
+    dir: .
+
+  generate:mcp:frontend:
+    cmds:
+      - yarn mcp-schema
+    dir: web
 
   # -
   # Database

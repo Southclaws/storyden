@@ -1,5 +1,5 @@
 package: openapi
-output: app/transports/http/openapi/server_gen.go
+output: ../app/transports/http/openapi/server_gen.go
 output-options:
   nullable-type: true
 generate:

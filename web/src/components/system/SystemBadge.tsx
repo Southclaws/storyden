@@ -1,4 +1,4 @@
-import { SystemIcon } from "@/components/ui/icons/Robot";
+import { SystemIcon } from "@/components/ui/icons/System";
 import { HStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -29,11 +29,17 @@ export function SystemBadge({ size = "sm", name = "visible" }: Props) {
         justifyContent="center"
         borderRadius="md"
         bg="bg.muted"
-        w={size === "xs" ? "4" : size === "sm" ? "6" : size === "md" ? "8" : "10"}
-        h={size === "xs" ? "4" : size === "sm" ? "6" : size === "md" ? "8" : "10"}
+        w={
+          size === "xs" ? "4" : size === "sm" ? "6" : size === "md" ? "8" : "10"
+        }
+        h={
+          size === "xs" ? "4" : size === "sm" ? "6" : size === "md" ? "8" : "10"
+        }
       >
         <SystemIcon
-          size={size === "xs" ? 12 : size === "sm" ? 16 : size === "md" ? 20 : 24}
+          size={
+            size === "xs" ? 12 : size === "sm" ? 16 : size === "md" ? 20 : 24
+          }
         />
       </styled.div>
       {name === "visible" && (

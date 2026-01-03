@@ -5,6 +5,7 @@ import { parseMemberSettings } from "@/lib/settings/member-settings";
 import { getSettings } from "@/lib/settings/settings-server";
 import { Box } from "@/styled-system/jsx";
 
+import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 
 import styles from "./navigation.module.css";
@@ -30,7 +31,8 @@ export async function Navigation({
     : undefined;
 
   const sidebarDefaultState =
-    session?.meta.sidebar.defaultState ?? globalSettings.metadata.sidebar.defaultState;
+    session?.meta.sidebar.defaultState ??
+    globalSettings.metadata.sidebar.defaultState;
   const showLeftBar = await getServerSidebarState(sidebarDefaultState);
 
   return (
@@ -73,6 +75,8 @@ export async function Navigation({
           <MobileCommandBar />
         </Box>
       </Box>
+
+      <CommandPalette />
     </Box>
   );
 }
