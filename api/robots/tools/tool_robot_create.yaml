@@ -1,0 +1,58 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotCreate
+x-storyden-role: MANAGE_ROBOTS
+title: robot_create
+description: Create a new Robot (agent) with a specific purpose and behavior.
+  Robots are customizable automations that can help users with specific
+  workflows using tailored tools and instructions.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotCreateInput"
+  output:
+    $ref: "#/definitions/ToolRobotCreateOutput"
+definitions:
+  ToolRobotCreateInput:
+    type: object
+    required:
+      - name
+      - description
+      - playbook
+    properties:
+      name:
+        type: string
+        minLength: 1
+        description: The name of the Robot - should be descriptive and help identify its
+          purpose
+      description:
+        type: string
+        description: Optional human-readable description of the Robot's purpose and
+          capabilities
+      playbook:
+        type: string
+        minLength: 1
+        description: The directive/system prompt that defines how the Robot behaves,
+          what it helps with, and its personality. This is the primary
+          instruction that guides the Robot's behavior.
+      tools:
+        type: array
+        description: List of tool names that the Robot can use.
+        items:
+          type: string
+    additionalProperties: false
+  ToolRobotCreateOutput:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the created Robot
+      name:
+        type: string
+        description: The name of the Robot
+    additionalProperties: false

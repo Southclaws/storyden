@@ -1,0 +1,60 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageSearch
+x-storyden-role: READ_PUBLISHED_LIBRARY
+title: search_library_pages
+description: Search for pages in the library wiki. Returns matching pages based
+  on the search query.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageSearchInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageSearchOutput"
+definitions:
+  ToolLibraryPageSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: The search query text
+    additionalProperties: false
+  ToolLibraryPageSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of matching library pages
+        items:
+          $ref: "#/definitions/LibraryPageSearchItem"
+    additionalProperties: false
+  LibraryPageSearchItem:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: URL-friendly identifier
+      name:
+        type: string
+        description: Page name/title
+      description:
+        type: string
+        description: Brief description
+      content:
+        type: string
+        description: Page content excerpt
+    additionalProperties: false
