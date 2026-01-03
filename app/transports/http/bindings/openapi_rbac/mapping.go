@@ -571,3 +571,7 @@ func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	// Requires PermissionManageEvents unless deleting self
 	return true, nil
 }
+
+func (m *Mapping) RobotsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}

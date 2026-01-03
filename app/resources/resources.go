@@ -47,6 +47,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
@@ -96,6 +97,7 @@ func Build() fx.Option {
 			thread_querier.New,
 			thread_cache.New,
 			reaction.New,
+			robot_querier.New,
 			like_querier.New,
 			like_writer.New,
 			post_querier.New,

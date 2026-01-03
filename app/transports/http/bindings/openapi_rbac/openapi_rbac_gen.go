@@ -49,6 +49,7 @@ type OperationPermissions interface {
 	AccessKeyCreate() (bool, *rbac.Permission)
 	AccessKeyDelete() (bool, *rbac.Permission)
 	AuthProviderLogout() (bool, *rbac.Permission)
+	RobotsList() (bool, *rbac.Permission)
 	AccountGet() (bool, *rbac.Permission)
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountView() (bool, *rbac.Permission)
@@ -239,6 +240,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccessKeyDelete()
 	case "AuthProviderLogout":
 		return optable.AuthProviderLogout()
+	case "RobotsList":
+		return optable.RobotsList()
 	case "AccountGet":
 		return optable.AccountGet()
 	case "AccountUpdate":

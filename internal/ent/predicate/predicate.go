@@ -87,6 +87,15 @@ type React func(*sql.Selector)
 // Report is the predicate function for report builders.
 type Report func(*sql.Selector)
 
+// Robot is the predicate function for robot builders.
+type Robot func(*sql.Selector)
+
+// RobotSession is the predicate function for robotsession builders.
+type RobotSession func(*sql.Selector)
+
+// RobotSessionMessage is the predicate function for robotsessionmessage builders.
+type RobotSessionMessage func(*sql.Selector)
+
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 

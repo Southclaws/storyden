@@ -91,6 +91,8 @@ tags:
     description: Content graph (posts, nodes, links) APIs.
   - name: events
     description: Event scheduling, invites and management.
+  - name: robots
+    description: Robots (AI Agents)
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -816,6 +818,20 @@ paths:
   #  888  888 Y88b.   Y88b.   Y88..88P Y88b 888 888  888 Y88b.       X88
   #  "Y888888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888  88888P'
   #
+
+  /robots:
+    get:
+      operationId: RobotsList
+      summary: List robots
+      description: Get a paginated list of all available robots.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotsListOK" }
 
   /accounts:
     get:
@@ -3859,6 +3875,13 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Event" }
+
+    RobotsListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotsListResult"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -7026,6 +7049,50 @@ components:
     EventCapacity:
       description: The maximum number of attendees that can attend the event.
       type: integer
+
+    #
+    # 8888888b.          888               888
+    # 888   Y88b         888               888
+    # 888    888         888               888
+    # 888   d88P .d88b.  88888b.   .d88b.  888888
+    # 8888888P" d88""88b 888 "88b d88""88b 888
+    # 888 T88b  888  888 888  888 888  888 888
+    # 888  T88b Y88..88P 888 d88P Y88..88P Y88b.
+    # 888   T88b "Y88P"  88888P"   "Y88P"   "Y888
+    #
+
+    Robot:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotProps"
+
+    RobotProps:
+      type: object
+      required: [name, description, playbook, author]
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotList:
+      type: array
+      items: { $ref: "#/components/schemas/Robot" }
+
+    RobotsListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [robots]
+          properties:
+            robots: { $ref: "#/components/schemas/RobotList" }
 
   securitySchemes:
     browser:

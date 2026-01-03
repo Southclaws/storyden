@@ -1,0 +1,58 @@
+"use client";
+
+import { Command } from "cmdk";
+
+import { WStack, styled } from "@/styled-system/jsx";
+
+import "./styles.css";
+
+import { CommandPaletteContent } from "./CommandPaletteContent";
+import { CommandPaletteProvider, useCommandPalette } from "./Context";
+import { RobotChatContext } from "./RobotChat/RobotChatContext";
+import { RobotCommandPaletteStatusBar } from "./RobotChat/RobotCommandPaletteStatusBar";
+
+export function CommandPalette() {
+  return (
+    <CommandPaletteProvider>
+      <CommandPaletteDialog />
+    </CommandPaletteProvider>
+  );
+}
+
+function CommandPaletteDialog() {
+  const { open, dialogRef } = useCommandPalette();
+
+  return (
+    <Command.Dialog
+      ref={dialogRef}
+      open={open}
+      label="Command Menu"
+      aria-description="The command palette allows you to quickly navigate and perform actions in Storyden."
+    >
+      <RobotChatContext>
+        <CommandPaletteContent />
+
+        <WStack fontSize="xs" color="fg.muted" lineHeight="tight" px="1" pt="2">
+          <CommandPaletteStatusBar />
+        </WStack>
+      </RobotChatContext>
+    </Command.Dialog>
+  );
+}
+
+function CommandPaletteStatusBar() {
+  const { mode } = useCommandPalette();
+
+  switch (mode) {
+    case "chat":
+      return <RobotCommandPaletteStatusBar />;
+
+    default:
+      return (
+        <>
+          <styled.p>Storyden</styled.p>
+          <styled.p>{mode}</styled.p>
+        </>
+      );
+  }
+}
