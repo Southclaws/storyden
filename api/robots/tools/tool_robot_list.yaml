@@ -1,0 +1,54 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotList
+x-storyden-role: MANAGE_ROBOTS
+title: robot_list
+description: List all available Robots. Use this to see what Robots have been
+  created and what they do.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotListInput"
+  output:
+    $ref: "#/definitions/ToolRobotListOutput"
+definitions:
+  ToolRobotListInput:
+    type: object
+    properties:
+      limit:
+        type: integer
+        description: Maximum number of Robots to return (default 20)
+    additionalProperties: false
+  ToolRobotListOutput:
+    type: object
+    required:
+      - robots
+      - total
+    properties:
+      robots:
+        type: array
+        description: List of Robots
+        items:
+          $ref: "#/definitions/RobotItem"
+      total:
+        type: integer
+        description: Total number of Robots found
+    additionalProperties: false
+  RobotItem:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: Unique identifier
+      name:
+        type: string
+        description: Robot name
+      description:
+        type: string
+        description: Human-readable description of the Robot's purpose
+    additionalProperties: false

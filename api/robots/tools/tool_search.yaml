@@ -1,0 +1,92 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "ToolSearch"
+title: search
+x-storyden-role: USE_ROBOTS
+description: "Search the Storyden knowledge base for library pages, forum threads, and other content. Returns relevant results matching the query."
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolSearchInput"
+  output:
+    $ref: "#/definitions/ToolSearchOutput"
+definitions:
+  ToolSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: The search query text
+      kind:
+        type: array
+        description: "Filter by content types."
+        items:
+          $ref: "../../common/DatagraphItemKind.yaml"
+      authors:
+        type: array
+        description: "Filter by author handles (usernames). Do not use '@' prefix."
+        items:
+          type: string
+          pattern: "^[a-zA-Z0-9_-]+$"
+      categories:
+        type: array
+        description: "Filter by category names (for forum threads). Category names are case-insensitive."
+        items:
+          type: string
+      tags:
+        type: array
+        description: "Filter by tag names. Tags are case-sensitive."
+        items:
+          type: string
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum number of results to return (default 10, max 100)
+    additionalProperties: false
+
+  ToolSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of search results
+        items:
+          $ref: "#/definitions/SearchedItem"
+    additionalProperties: false
+
+  SearchedItem:
+    type: object
+    required:
+      - id
+      - kind
+      - slug
+      - name
+    properties:
+      id:
+        type: string
+        description: Unique identifier
+      kind:
+        type: string
+        description: Type of content
+      slug:
+        type: string
+        description: URL friendly identifier
+      name:
+        type: string
+        description: Title or name
+      description:
+        type: string
+        description: Brief description or excerpt
+    additionalProperties: false

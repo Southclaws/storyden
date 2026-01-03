@@ -31,6 +31,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
@@ -544,6 +547,51 @@ func (_c *AccountCreate) AddAuditLogs(v ...*AuditLog) *AccountCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddAuditLogIDs(ids...)
+}
+
+// AddRobotIDs adds the "robots" edge to the Robot entity by IDs.
+func (_c *AccountCreate) AddRobotIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRobotIDs(ids...)
+	return _c
+}
+
+// AddRobots adds the "robots" edges to the Robot entity.
+func (_c *AccountCreate) AddRobots(v ...*Robot) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotIDs(ids...)
+}
+
+// AddRobotSessionIDs adds the "robot_sessions" edge to the RobotSession entity by IDs.
+func (_c *AccountCreate) AddRobotSessionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRobotSessionIDs(ids...)
+	return _c
+}
+
+// AddRobotSessions adds the "robot_sessions" edges to the RobotSession entity.
+func (_c *AccountCreate) AddRobotSessions(v ...*RobotSession) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotSessionIDs(ids...)
+}
+
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (_c *AccountCreate) AddRobotMessageIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRobotMessageIDs(ids...)
+	return _c
+}
+
+// AddRobotMessages adds the "robot_messages" edges to the RobotSessionMessage entity.
+func (_c *AccountCreate) AddRobotMessages(v ...*RobotSessionMessage) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotMessageIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
@@ -1123,6 +1171,54 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(auditlog.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotsTable,
+			Columns: []string{account.RobotsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robot.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotSessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotSessionsTable,
+			Columns: []string{account.RobotSessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsession.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotMessagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotMessagesTable,
+			Columns: []string{account.RobotMessagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

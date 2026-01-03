@@ -39,6 +39,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -130,6 +133,9 @@ func checkColumn(t, c string) error {
 			question.Table:            question.ValidColumn,
 			react.Table:               react.ValidColumn,
 			report.Table:              report.ValidColumn,
+			robot.Table:               robot.ValidColumn,
+			robotsession.Table:        robotsession.ValidColumn,
+			robotsessionmessage.Table: robotsessionmessage.ValidColumn,
 			role.Table:                role.ValidColumn,
 			session.Table:             session.ValidColumn,
 			setting.Table:             setting.ValidColumn,

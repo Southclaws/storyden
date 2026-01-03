@@ -1,0 +1,86 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPagePropertySchemaUpdate
+x-storyden-role: MANAGE_LIBRARY
+title: library_page_property_schema_update
+description: Update the property schema for a library page's children. This defines what properties child pages can have. Fields without an ID will be created as new fields. Fields with an ID will be updated. Existing fields not in the list will be removed.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPagePropertySchemaUpdateInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPagePropertySchemaUpdateOutput"
+definitions:
+  ToolLibraryPagePropertySchemaUpdateInput:
+    type: object
+    required:
+      - id
+      - fields
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The slug or ID of the parent library page whose children's schema to update
+      fields:
+        type: array
+        description: The schema fields to set. Fields with an ID update existing fields, fields without an ID create new ones. Omitted existing fields will be removed.
+        items:
+          $ref: "#/definitions/PropertySchemaFieldMutation"
+    additionalProperties: false
+  ToolLibraryPagePropertySchemaUpdateOutput:
+    type: object
+    required:
+      - fields
+    properties:
+      fields:
+        type: array
+        description: The updated schema fields
+        items:
+          $ref: "#/definitions/PropertySchemaFieldResult"
+    additionalProperties: false
+  PropertySchemaFieldMutation:
+    type: object
+    required:
+      - name
+      - type
+    properties:
+      id:
+        type: string
+        description: Field ID - if provided, updates an existing field. If omitted, creates a new field.
+      name:
+        type: string
+        minLength: 1
+        description: Display name of the field
+      type:
+        type: string
+        enum:
+          - text
+          - number
+          - timestamp
+          - boolean
+        description: Data type of the field
+    additionalProperties: false
+  PropertySchemaFieldResult:
+    type: object
+    required:
+      - id
+      - name
+      - type
+    properties:
+      id:
+        type: string
+        description: Unique identifier for this field
+      name:
+        type: string
+        description: Display name of the field
+      type:
+        type: string
+        enum:
+          - text
+          - number
+          - timestamp
+          - boolean
+        description: Data type of the field
+    additionalProperties: false

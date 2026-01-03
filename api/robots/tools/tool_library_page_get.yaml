@@ -1,0 +1,53 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageGet
+x-storyden-role: READ_PUBLISHED_LIBRARY
+title: get_library_page
+description: Get detailed information about a specific library page by its slug.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageGetInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageGetOutput"
+definitions:
+  ToolLibraryPageGetInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The unique identifier of the library page to retrieve
+    additionalProperties: false
+  ToolLibraryPageGetOutput:
+    type: object
+    required:
+      - slug
+      - name
+      - tags
+      - child_pages
+    properties:
+      slug:
+        type: string
+        description: URL-friendly identifier for the page
+      name:
+        type: string
+        description: Display name of the page
+      description:
+        type: string
+        description: Brief description of the page
+      tags:
+        type: array
+        description: Tags associated with this page
+        items:
+          type: string
+      child_pages:
+        type: array
+        description: Slugs of child pages
+        items:
+          type: string
+    additionalProperties: false

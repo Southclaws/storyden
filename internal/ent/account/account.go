@@ -88,6 +88,12 @@ const (
 	EdgeHandledReports = "handled_reports"
 	// EdgeAuditLogs holds the string denoting the audit_logs edge name in mutations.
 	EdgeAuditLogs = "audit_logs"
+	// EdgeRobots holds the string denoting the robots edge name in mutations.
+	EdgeRobots = "robots"
+	// EdgeRobotSessions holds the string denoting the robot_sessions edge name in mutations.
+	EdgeRobotSessions = "robot_sessions"
+	// EdgeRobotMessages holds the string denoting the robot_messages edge name in mutations.
+	EdgeRobotMessages = "robot_messages"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -256,6 +262,27 @@ const (
 	AuditLogsInverseTable = "audit_logs"
 	// AuditLogsColumn is the table column denoting the audit_logs relation/edge.
 	AuditLogsColumn = "enacted_by_id"
+	// RobotsTable is the table that holds the robots relation/edge.
+	RobotsTable = "robots"
+	// RobotsInverseTable is the table name for the Robot entity.
+	// It exists in this package in order to avoid circular dependency with the "robot" package.
+	RobotsInverseTable = "robots"
+	// RobotsColumn is the table column denoting the robots relation/edge.
+	RobotsColumn = "author_id"
+	// RobotSessionsTable is the table that holds the robot_sessions relation/edge.
+	RobotSessionsTable = "robot_sessions"
+	// RobotSessionsInverseTable is the table name for the RobotSession entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsession" package.
+	RobotSessionsInverseTable = "robot_sessions"
+	// RobotSessionsColumn is the table column denoting the robot_sessions relation/edge.
+	RobotSessionsColumn = "account_id"
+	// RobotMessagesTable is the table that holds the robot_messages relation/edge.
+	RobotMessagesTable = "robot_session_messages"
+	// RobotMessagesInverseTable is the table name for the RobotSessionMessage entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsessionmessage" package.
+	RobotMessagesInverseTable = "robot_session_messages"
+	// RobotMessagesColumn is the table column denoting the robot_messages relation/edge.
+	RobotMessagesColumn = "account_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -733,6 +760,48 @@ func ByAuditLogs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByRobotsCount orders the results by robots count.
+func ByRobotsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRobotsStep(), opts...)
+	}
+}
+
+// ByRobots orders the results by robots terms.
+func ByRobots(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRobotsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRobotSessionsCount orders the results by robot_sessions count.
+func ByRobotSessionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRobotSessionsStep(), opts...)
+	}
+}
+
+// ByRobotSessions orders the results by robot_sessions terms.
+func ByRobotSessions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRobotSessionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRobotMessagesCount orders the results by robot_messages count.
+func ByRobotMessagesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRobotMessagesStep(), opts...)
+	}
+}
+
+// ByRobotMessages orders the results by robot_messages terms.
+func ByRobotMessages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRobotMessagesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -912,6 +981,27 @@ func newAuditLogsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuditLogsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AuditLogsTable, AuditLogsColumn),
+	)
+}
+func newRobotsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RobotsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RobotsTable, RobotsColumn),
+	)
+}
+func newRobotSessionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RobotSessionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RobotSessionsTable, RobotSessionsColumn),
+	)
+}
+func newRobotMessagesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RobotMessagesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RobotMessagesTable, RobotMessagesColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

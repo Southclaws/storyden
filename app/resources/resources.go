@@ -60,6 +60,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/resources/report/report_querier"
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_writer"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
@@ -96,6 +99,9 @@ func Build() fx.Option {
 			thread_querier.New,
 			thread_cache.New,
 			reaction.New,
+			robot_querier.New,
+			robot_writer.New,
+			robot_session.New,
 			like_querier.New,
 			like_writer.New,
 			post_querier.New,

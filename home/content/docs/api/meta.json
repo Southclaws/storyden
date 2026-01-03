@@ -24,6 +24,7 @@
     "nodes",
     "links",
     "datagraph",
-    "events"
+    "events",
+    "robots"
   ]
 }

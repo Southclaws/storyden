@@ -5,6 +5,7 @@ import { parseMemberSettings } from "@/lib/settings/member-settings";
 import { getSettings } from "@/lib/settings/settings-server";
 import { Box } from "@/styled-system/jsx";
 
+import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
@@ -79,6 +80,8 @@ export async function Navigation({
           <MobileCommandBar />
         </Box>
       </Box>
+
+      <CommandPalette />
     </Box>
   );
 }

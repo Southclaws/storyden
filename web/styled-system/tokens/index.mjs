@@ -3127,6 +3127,10 @@ const tokens = {
     "value": "65ch",
     "variable": "var(--sizes-prose)"
   },
+  "sizes.viewportHeight": {
+    "value": "\n        calc(\n          100dvh\n          - var(--app-nav-h, 72px)\n          - env(safe-area-inset-top)\n          - env(safe-area-inset-bottom)\n          - env(keyboard-inset-height, 0px)\n        )\n      ",
+    "variable": "var(--sizes-viewport-height)"
+  },
   "spacing.safeTop": {
     "value": "calc(env(keyboard-inset-height) + 4px)",
     "variable": "var(--spacing-safe-top)"
@@ -3662,6 +3666,10 @@ const tokens = {
   "colors.overflow-fade": {
     "value": "var(--colors-overflow-fade)",
     "variable": "var(--colors-overflow-fade)"
+  },
+  "colors.scroll-fade-top": {
+    "value": "var(--colors-scroll-fade-top)",
+    "variable": "var(--colors-scroll-fade-top)"
   },
   "colors.colorPalette": {
     "value": "var(--colors-color-palette)",

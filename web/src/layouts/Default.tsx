@@ -28,7 +28,7 @@ export async function Default({
           minW="0"
         >
           {children}
-          <Box height="24"></Box>
+          {/* <Box height="24"></Box> */}
         </styled.main>
       </Navigation>
     </Flex>

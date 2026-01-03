@@ -1,0 +1,54 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotGet
+x-storyden-role: MANAGE_ROBOTS
+title: robot_get
+description: Get details of a specific Robot by its ID. Use this to view the
+  full configuration of a Robot.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotGetInput"
+  output:
+    $ref: "#/definitions/ToolRobotGetOutput"
+definitions:
+  ToolRobotGetInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        pattern: ^[0-9a-v]{20}$
+        description: "The unique identifier of the Robot to retrieve. Must be a valid
+          XID format (20 character alphanumeric string). Example:
+          cq3pqt0q91s73dq8r000"
+    additionalProperties: false
+  ToolRobotGetOutput:
+    type: object
+    required:
+      - id
+      - name
+      - playbook
+      - tools
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the Robot
+      name:
+        type: string
+        description: The name of the Robot
+      description:
+        type: string
+        description: Human-readable description of the Robot's purpose
+      playbook:
+        type: string
+        description: The Robot's directive
+      tools:
+        type: array
+        description: List of tool names that the Robot can use
+        items:
+          type: string
+    additionalProperties: false

@@ -1,0 +1,51 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolThreadReply
+x-storyden-role: CREATE_POST
+title: thread_reply
+description: Add a reply to an existing thread
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadReplyInput"
+  output:
+    $ref: "#/definitions/ToolThreadReplyOutput"
+definitions:
+  ToolThreadReplyInput:
+    type: object
+    required:
+      - id
+      - body
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The unique identifier of the thread to reply to
+      body:
+        type: string
+        minLength: 1
+        description: The reply content in HTML format
+    additionalProperties: false
+  ToolThreadReplyOutput:
+    type: object
+    required:
+      - author
+      - content
+      - created_at
+      - updated_at
+    properties:
+      author:
+        type: string
+        description: Author handle
+      content:
+        type: string
+        description: Reply content as plain text
+      created_at:
+        type: string
+        description: Creation timestamp
+      updated_at:
+        type: string
+        description: Update timestamp
+    additionalProperties: false

@@ -117,5 +117,14 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("audit_logs", AuditLog.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("robots", Robot.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_sessions", RobotSession.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_messages", RobotSessionMessage.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }
