@@ -35,11 +35,6 @@ export function BrandSettingsForm(props: Props) {
 
   return (
     <CardBox className={lstack()}>
-      <WStack>
-        <Heading size="md">Brand settings</Heading>
-        <Button type="submit">Save</Button>
-      </WStack>
-
       <styled.form
         width="full"
         display="flex"
@@ -48,6 +43,11 @@ export function BrandSettingsForm(props: Props) {
         alignItems="start"
         onSubmit={onSubmit}
       >
+        <WStack>
+          <Heading size="md">Brand settings</Heading>
+          <Button type="submit">Save</Button>
+        </WStack>
+
         <Stack
           gap="4"
           direction={{

@@ -50,7 +50,11 @@ export type AdminSettings = AdminSettingsProps & {
 };
 
 export function parseSettings(data: Info): Settings {
-  const metadata = FrontendConfigurationSchema.parse(data.metadata);
+  const parsed = FrontendConfigurationSchema.safeParse(data.metadata);
+  const metadata = parsed.success ? parsed.data : DefaultFrontendConfig;
+  if (parsed.error) {
+    console.warn("Failed to parse frontend configuration:", parsed.error);
+  }
 
   const settings = { ...data, metadata } satisfies Settings;
 
@@ -58,7 +62,11 @@ export function parseSettings(data: Info): Settings {
 }
 
 export function parseAdminSettings(data: AdminSettingsProps): AdminSettings {
-  const metadata = FrontendConfigurationSchema.parse(data.metadata);
+  const parsed = FrontendConfigurationSchema.safeParse(data.metadata);
+  const metadata = parsed.success ? parsed.data : DefaultFrontendConfig;
+  if (parsed.error) {
+    console.warn("Failed to parse frontend configuration:", parsed.error);
+  }
 
   const settings = { ...data, metadata } satisfies AdminSettings;
 
