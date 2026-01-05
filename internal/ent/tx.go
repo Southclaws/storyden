@@ -68,6 +68,12 @@ type Tx struct {
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
 	Report *ReportClient
+	// Robot is the client for interacting with the Robot builders.
+	Robot *RobotClient
+	// RobotSession is the client for interacting with the RobotSession builders.
+	RobotSession *RobotSessionClient
+	// RobotSessionMessage is the client for interacting with the RobotSessionMessage builders.
+	RobotSessionMessage *RobotSessionMessageClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// Session is the client for interacting with the Session builders.
@@ -234,6 +240,9 @@ func (tx *Tx) init() {
 	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Report = NewReportClient(tx.config)
+	tx.Robot = NewRobotClient(tx.config)
+	tx.RobotSession = NewRobotSessionClient(tx.config)
+	tx.RobotSessionMessage = NewRobotSessionMessageClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)

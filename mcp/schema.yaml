@@ -1,0 +1,1200 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+definitions:
+  ToolSearch:
+    title: search
+    description: "Search the Storyden knowledge base for library pages, forum threads, and other content. Returns relevant results matching the query."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolSearchInput"
+      output:
+        $ref: "#/definitions/ToolSearchOutput"
+
+  ToolSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: The search query text
+      kinds:
+        type: array
+        description: "Filter by content types. Valid values: 'post', 'thread', 'reply', 'node' (wiki pages), 'collection', 'profile', 'event'. Invalid kind values will be reported in the error message while still searching with valid kinds."
+        items:
+          type: string
+          enum:
+            [
+              "post",
+              "thread",
+              "reply",
+              "node",
+              "collection",
+              "profile",
+              "event",
+            ]
+      authors:
+        type: array
+        description: "Filter by author handles (usernames). Author handles that don't exist will be reported in the error message while still searching with valid authors. Do not use '@' prefix."
+        items:
+          type: string
+          pattern: "^[a-zA-Z0-9_-]+$"
+      categories:
+        type: array
+        description: "Filter by category names (for forum threads). Category names are case-insensitive. Categories that don't exist will be reported in the error message while still searching with valid categories."
+        items:
+          type: string
+      tags:
+        type: array
+        description: "Filter by tag names. Tags are case-sensitive."
+        items:
+          type: string
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum number of results to return (default 10, max 100)
+    additionalProperties: false
+
+  ToolSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of search results
+        items:
+          $ref: "#/definitions/SearchedItem"
+    additionalProperties: false
+
+  SearchedItem:
+    type: object
+    required:
+      - id
+      - kind
+      - slug
+      - name
+    properties:
+      id:
+        type: string
+        description: Unique identifier
+      kind:
+        type: string
+        description: Type of content
+      slug:
+        type: string
+        description: URL friendly identifier
+      name:
+        type: string
+        description: Title or name
+      description:
+        type: string
+        description: Brief description or excerpt
+    additionalProperties: false
+
+  ToolRobotSwitch:
+    title: robot_switch
+    description: "Switch the current conversation to a different Robot (agent). Use this when the user wants to talk to a different specialized agent or when a different agent would be better suited to help with the user's request."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotSwitchInput"
+      output:
+        $ref: "#/definitions/ToolRobotSwitchOutput"
+
+  ToolRobotSwitchInput:
+    type: object
+    required:
+      - robot_id
+    properties:
+      robot_id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: "The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs."
+    additionalProperties: false
+
+  ToolRobotSwitchOutput:
+    type: object
+    required:
+      - success
+      - robot_id
+    properties:
+      success:
+        type: boolean
+        description: Whether the agent switch was successful
+      robot_id:
+        type: string
+        description: The ID of the robot that was switched to
+    additionalProperties: false
+
+  ToolRobotGetAllToolNames:
+    title: get_all_tool_names
+    description: "Get a list of all available tool names and their descriptions. This is useful when creating or updating a Robot to know what tools are available without loading full schemas. Returns a lightweight list of tool names and brief descriptions."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotGetAllToolNamesInput"
+      output:
+        $ref: "#/definitions/ToolRobotGetAllToolNamesOutput"
+
+  ToolRobotGetAllToolNamesInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+
+  ToolRobotGetAllToolNamesOutput:
+    type: array
+    description: "List of all available tools with their names and descriptions"
+    items:
+      $ref: "#/definitions/ToolInfo"
+
+  ToolInfo:
+    type: object
+    required:
+      - name
+      - description
+    properties:
+      name:
+        type: string
+        description: "The tool name identifier"
+      description:
+        type: string
+        description: "Brief description of what the tool does"
+    additionalProperties: false
+
+  ToolRobotCreate:
+    title: robot_create
+    description: "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotCreateInput"
+      output:
+        $ref: "#/definitions/ToolRobotCreateOutput"
+
+  ToolRobotCreateInput:
+    type: object
+    required:
+      - name
+      - playbook
+    properties:
+      name:
+        type: string
+        minLength: 1
+        description: The name of the Robot - should be descriptive and help identify its purpose
+      description:
+        type: string
+        description: Optional human-readable description of the Robot's purpose and capabilities
+      playbook:
+        type: string
+        minLength: 1
+        description: The directive/system prompt that defines how the Robot behaves, what it helps with, and its personality. This is the primary instruction that guides the Robot's behavior.
+      tools:
+        type: array
+        description: "List of tool names that the Robot can use. Valid tool names are: search, robot_switch, robot_create, robot_list, robot_get, robot_update, robot_delete. Invalid tool names will be rejected with an error message."
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolRobotCreateOutput:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the created Robot
+      name:
+        type: string
+        description: The name of the Robot
+    additionalProperties: false
+
+  ToolRobotList:
+    title: robot_list
+    description: "List all available Robots. Use this to see what Robots have been created and what they do."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotListInput"
+      output:
+        $ref: "#/definitions/ToolRobotListOutput"
+
+  ToolRobotListInput:
+    type: object
+    properties:
+      limit:
+        type: integer
+        description: Maximum number of Robots to return (default 20)
+    additionalProperties: false
+
+  ToolRobotListOutput:
+    type: object
+    required:
+      - robots
+      - total
+    properties:
+      robots:
+        type: array
+        description: List of Robots
+        items:
+          $ref: "#/definitions/RobotItem"
+      total:
+        type: integer
+        description: Total number of Robots found
+    additionalProperties: false
+
+  RobotItem:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: Unique identifier
+      name:
+        type: string
+        description: Robot name
+      description:
+        type: string
+        description: Human-readable description of the Robot's purpose
+    additionalProperties: false
+
+  ToolRobotGet:
+    title: robot_get
+    description: "Get details of a specific Robot by its ID. Use this to view the full configuration of a Robot."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotGetInput"
+      output:
+        $ref: "#/definitions/ToolRobotGetOutput"
+
+  ToolRobotGetInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: "The unique identifier of the Robot to retrieve. Must be a valid XID format (20 character alphanumeric string). Example: cq3pqt0q91s73dq8r000"
+    additionalProperties: false
+
+  ToolRobotGetOutput:
+    type: object
+    required:
+      - id
+      - name
+      - playbook
+      - tools
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the Robot
+      name:
+        type: string
+        description: The name of the Robot
+      description:
+        type: string
+        description: Human-readable description of the Robot's purpose
+      playbook:
+        type: string
+        description: The Robot's directive
+      tools:
+        type: array
+        description: List of tool names that the Robot can use
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolRobotUpdate:
+    title: robot_update
+    description: "Update a Robot's configuration. You can modify its name, description, playbook (directive), or tools. Only provide the fields you want to change."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotUpdateInput"
+      output:
+        $ref: "#/definitions/ToolRobotUpdateOutput"
+
+  ToolRobotUpdateInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: "The unique identifier of the Robot to update. Must be a valid XID format (20 character alphanumeric string)."
+      name:
+        type: string
+        minLength: 1
+        description: The new name for the Robot
+      description:
+        type: string
+        description: The new description for the Robot
+      playbook:
+        type: string
+        minLength: 1
+        description: The new directive/system prompt for the Robot
+      tools:
+        type: array
+        description: "The new list of tool names that the Robot can use. Valid tool names are: search, robot_switch, robot_create, robot_list, robot_get, robot_update, robot_delete. Invalid tool names will be rejected with an error message."
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolRobotUpdateOutput:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the updated Robot
+      name:
+        type: string
+        description: The Robot's name
+    additionalProperties: false
+
+  ToolRobotDelete:
+    title: robot_delete
+    description: "Delete a Robot permanently."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolRobotDeleteInput"
+      output:
+        $ref: "#/definitions/ToolRobotDeleteOutput"
+
+  ToolRobotDeleteInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        pattern: "^[0-9a-v]{20}$"
+        description: "The unique identifier of the Robot to delete. Must be a valid XID format (20 character alphanumeric string)."
+    additionalProperties: false
+
+  ToolRobotDeleteOutput:
+    type: object
+    required:
+      - success
+      - id
+    properties:
+      success:
+        type: boolean
+        description: Whether the deletion was successful
+      id:
+        type: string
+        description: The ID of the deleted Robot
+    additionalProperties: false
+
+  ToolLibraryPageTree:
+    title: get_library_page_tree
+    description: "Get the full tree structure of pages in the library. Returns a hierarchical view of all wiki pages showing their parent-child relationships."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLibraryPageTreeInput"
+      output:
+        $ref: "#/definitions/ToolLibraryPageTreeOutput"
+
+  ToolLibraryPageTreeInput:
+    type: object
+    properties:
+      depth:
+        type: integer
+        minimum: -1
+        description: "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)"
+    additionalProperties: false
+
+  ToolLibraryPageTreeOutput:
+    type: object
+    required:
+      - pages
+    properties:
+      pages:
+        type: array
+        description: List of pages in tree structure
+        items:
+          $ref: "#/definitions/LibraryPageTreeNode"
+    additionalProperties: false
+
+  LibraryPageTreeNode:
+    type: object
+    required:
+      - slug
+      - name
+      - description
+    properties:
+      slug:
+        type: string
+        description: URL-friendly identifier for the page
+      name:
+        type: string
+        description: Display name of the page
+      description:
+        type: string
+        description: Brief description of the page
+      parent:
+        type: string
+        description: Slug of the parent page (omitted for root pages)
+      tags:
+        type: array
+        description: Tags associated with this page
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolLibraryPageGet:
+    title: get_library_page
+    description: "Get detailed information about a specific library page by its slug."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLibraryPageGetInput"
+      output:
+        $ref: "#/definitions/ToolLibraryPageGetOutput"
+
+  ToolLibraryPageGetInput:
+    type: object
+    required:
+      - slug
+    properties:
+      slug:
+        type: string
+        minLength: 1
+        description: "The unique slug of the library page to retrieve"
+    additionalProperties: false
+
+  ToolLibraryPageGetOutput:
+    type: object
+    required:
+      - slug
+      - name
+      - tags
+      - child_pages
+    properties:
+      slug:
+        type: string
+        description: URL-friendly identifier for the page
+      name:
+        type: string
+        description: Display name of the page
+      description:
+        type: string
+        description: Brief description of the page
+      tags:
+        type: array
+        description: Tags associated with this page
+        items:
+          type: string
+      child_pages:
+        type: array
+        description: Slugs of child pages
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolLibraryPageCreate:
+    title: create_library_page
+    description: "Create a new page in the library. A slug will be generated automatically if not provided."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLibraryPageCreateInput"
+      output:
+        $ref: "#/definitions/ToolLibraryPageCreateOutput"
+
+  ToolLibraryPageCreateInput:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        minLength: 1
+        description: "The name/title of the page"
+      slug:
+        type: string
+        description: "The unique slug for this page. If not provided, one will be generated from the name."
+      content:
+        type: string
+        description: "The content of the page in HTML format"
+      parent:
+        type: string
+        description: "Slug of the parent page. Only include if you already have a parent slug available. Leave empty to create a root-level page."
+      visibility:
+        type: string
+        enum: ["published", "draft"]
+        description: "Visibility of the page (default: published)"
+      url:
+        type: string
+        format: uri
+        description: "Optional external URL if this page references a topic on another website"
+    additionalProperties: false
+
+  ToolLibraryPageCreateOutput:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: "The slug of the created page"
+      name:
+        type: string
+        description: "The name of the created page"
+    additionalProperties: false
+
+  ToolLibraryPageUpdate:
+    title: update_library_page
+    description: "Update an existing page in the library. Only provide the fields you want to change."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLibraryPageUpdateInput"
+      output:
+        $ref: "#/definitions/ToolLibraryPageUpdateOutput"
+
+  ToolLibraryPageUpdateInput:
+    type: object
+    required:
+      - slug
+    properties:
+      slug:
+        type: string
+        minLength: 1
+        description: "The slug of the page to update"
+      name:
+        type: string
+        minLength: 1
+        description: "The new name/title of the page"
+      content:
+        type: string
+        description: "The new content of the page in HTML format"
+      visibility:
+        type: string
+        enum: ["published", "draft"]
+        description: "New visibility of the page"
+      url:
+        type: string
+        format: uri
+        description: "New external URL reference"
+      parent:
+        type: string
+        description: "New parent page slug. Provide to move the page to a different parent."
+    additionalProperties: false
+
+  ToolLibraryPageUpdateOutput:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: "The slug of the updated page"
+      name:
+        type: string
+        description: "The name of the updated page"
+    additionalProperties: false
+
+  ToolLibraryPageSearch:
+    title: search_library_pages
+    description: "Search for pages in the library wiki. Returns matching pages based on the search query."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLibraryPageSearchInput"
+      output:
+        $ref: "#/definitions/ToolLibraryPageSearchOutput"
+
+  ToolLibraryPageSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: "The search query text"
+    additionalProperties: false
+
+  ToolLibraryPageSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: "Total number of results found"
+      items:
+        type: array
+        description: "List of matching library pages"
+        items:
+          $ref: "#/definitions/LibraryPageSearchItem"
+    additionalProperties: false
+
+  LibraryPageSearchItem:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: "URL-friendly identifier"
+      name:
+        type: string
+        description: "Page name/title"
+      description:
+        type: string
+        description: "Brief description"
+      content:
+        type: string
+        description: "Page content excerpt"
+    additionalProperties: false
+
+  ToolTagList:
+    title: tag_list
+    description: "Get a list of all tags on the site or search for tags by name. Tags are labels used to categorize and organize content. Each tag includes its name and the number of items tagged with it."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolTagListInput"
+      output:
+        $ref: "#/definitions/ToolTagListOutput"
+
+  ToolTagListInput:
+    type: object
+    properties:
+      query:
+        type: string
+        description: "Optional search query to filter tags by name. If not provided, returns all tags."
+    additionalProperties: false
+
+  ToolTagListOutput:
+    type: object
+    required:
+      - tags
+    properties:
+      tags:
+        type: array
+        description: "List of tags"
+        items:
+          $ref: "#/definitions/TagItem"
+    additionalProperties: false
+
+  TagItem:
+    type: object
+    required:
+      - name
+      - item_count
+    properties:
+      name:
+        type: string
+        description: "The tag name"
+      item_count:
+        type: integer
+        description: "Number of items tagged with this tag"
+    additionalProperties: false
+
+  ToolLinkCreate:
+    title: link_create
+    description: "Create or update a link in the shared bookmarks list. Fetches the URL and extracts OpenGraph metadata (title, description) and plain text content. Useful for bookmarking websites, articles, or any web content."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolLinkCreateInput"
+      output:
+        $ref: "#/definitions/ToolLinkCreateOutput"
+
+  ToolLinkCreateInput:
+    type: object
+    required:
+      - url
+    properties:
+      url:
+        type: string
+        format: uri
+        description: "The URL to create a bookmark for. Must be a valid HTTP/HTTPS URL."
+    additionalProperties: false
+
+  ToolLinkCreateOutput:
+    type: object
+    required:
+      - slug
+      - url
+    properties:
+      slug:
+        type: string
+        description: "Unique identifier for the link"
+      url:
+        type: string
+        description: "The bookmarked URL"
+      opengraph_title:
+        type: string
+        description: "Title extracted from OpenGraph metadata"
+      opengraph_description:
+        type: string
+        description: "Description extracted from OpenGraph metadata"
+      plain_text:
+        type: string
+        description: "Plain text content extracted from the page"
+    additionalProperties: false
+
+  ToolThreadCreate:
+    title: thread_create
+    description: "Create a new discussion thread in the forum. Threads are discussions organized by category with tags for better discovery."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolThreadCreateInput"
+      output:
+        $ref: "#/definitions/ToolThreadCreateOutput"
+
+  ToolThreadCreateInput:
+    type: object
+    required:
+      - title
+      - body
+      - category
+    properties:
+      title:
+        type: string
+        minLength: 1
+        description: "The title of the thread"
+      body:
+        type: string
+        minLength: 1
+        description: "The content of the thread in HTML format"
+      category:
+        type: string
+        description: "The category slug for the thread. Use category_list to see available categories."
+      visibility:
+        type: string
+        enum: ["published", "draft"]
+        description: "Thread visibility (default: published)"
+      url:
+        type: string
+        format: uri
+        description: "Optional URL if this thread is about a specific link"
+      tags:
+        type: array
+        description: "Optional tags for the thread"
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolThreadCreateOutput:
+    type: object
+    required:
+      - slug
+      - title
+    properties:
+      slug:
+        type: string
+        description: "The thread slug"
+      title:
+        type: string
+        description: "The thread title"
+      created_at:
+        type: string
+        description: "Creation timestamp"
+      content:
+        type: string
+        description: "Thread content as plain text"
+      visibility:
+        type: string
+        description: "Thread visibility"
+      author:
+        type: string
+        description: "Author handle"
+      category:
+        type: string
+        description: "Category name"
+      tags:
+        type: array
+        items:
+          type: string
+      url:
+        type: string
+        description: "Associated URL if present"
+    additionalProperties: false
+
+  ToolThreadList:
+    title: thread_list
+    description: "List and search discussion threads with filtering and pagination."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolThreadListInput"
+      output:
+        $ref: "#/definitions/ToolThreadListOutput"
+
+  ToolThreadListInput:
+    type: object
+    properties:
+      query:
+        type: string
+        description: "Search query to filter threads"
+      visibility:
+        type: string
+        enum: ["draft", "published"]
+        description: "Filter by visibility"
+      page:
+        type: integer
+        minimum: 1
+        description: "Page number (default: 1)"
+    additionalProperties: false
+
+  ToolThreadListOutput:
+    type: object
+    required:
+      - threads
+      - current_page
+      - total_pages
+      - total_results
+    properties:
+      threads:
+        type: array
+        items:
+          $ref: "#/definitions/ThreadSummary"
+      current_page:
+        type: integer
+      total_pages:
+        type: integer
+      total_results:
+        type: integer
+      next_page:
+        type: integer
+        description: "Next page number if available"
+    additionalProperties: false
+
+  ThreadSummary:
+    type: object
+    required:
+      - slug
+      - title
+      - excerpt
+      - author
+      - category
+    properties:
+      slug:
+        type: string
+      title:
+        type: string
+      excerpt:
+        type: string
+        description: "Short excerpt of the thread"
+      author:
+        type: string
+        description: "Author handle"
+      category:
+        type: string
+        description: "Category name"
+    additionalProperties: false
+
+  ToolThreadGet:
+    title: thread_get
+    description: "Get a specific thread with its content. Returns the thread details including author, content, and category information."
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolThreadGetInput"
+      output:
+        $ref: "#/definitions/ToolThreadGetOutput"
+
+  ToolThreadGetInput:
+    type: object
+    required:
+      - slug
+    properties:
+      slug:
+        type: string
+        minLength: 1
+        description: "The thread URL slug"
+      page:
+        type: integer
+        minimum: 1
+        description: "Page number for replies (default: 1)"
+    additionalProperties: false
+
+  ToolThreadGetOutput:
+    type: object
+    required:
+      - slug
+      - title
+      - content
+      - visibility
+      - author
+      - category
+      - tags
+      - created_at
+    properties:
+      slug:
+        type: string
+      title:
+        type: string
+      content:
+        type: string
+        description: "Thread content as plain text"
+      visibility:
+        type: string
+      author:
+        type: string
+        description: "Author handle"
+      category:
+        type: string
+        description: "Category name"
+      tags:
+        type: array
+        items:
+          type: string
+      created_at:
+        type: string
+        description: "Creation timestamp"
+      url:
+        type: string
+        description: "Associated URL if present"
+    additionalProperties: false
+  ToolThreadUpdate:
+    title: thread_update
+    description: "Update an existing thread's properties"
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolThreadUpdateInput"
+      output:
+        $ref: "#/definitions/ToolThreadUpdateOutput"
+
+  ToolThreadUpdateInput:
+    type: object
+    required:
+      - slug
+    properties:
+      slug:
+        type: string
+        minLength: 1
+        description: "The thread slug to update"
+      title:
+        type: string
+        description: "New title for the thread"
+      body:
+        type: string
+        minLength: 1
+        description: "New content for the thread in HTML format"
+      visibility:
+        type: string
+        enum: ["published", "draft"]
+        description: "New visibility: published or draft"
+      tags:
+        type: array
+        description: "New tags for the thread"
+        items:
+          type: string
+    additionalProperties: false
+
+  ToolThreadUpdateOutput:
+    type: object
+    required:
+      - slug
+      - title
+    properties:
+      slug:
+        type: string
+        description: "The thread slug"
+      title:
+        type: string
+        description: "The thread title"
+      created_at:
+        type: string
+        description: "Creation timestamp"
+      content:
+        type: string
+        description: "Thread content as plain text"
+      visibility:
+        type: string
+        description: "Thread visibility"
+      author:
+        type: string
+        description: "Author handle"
+      category:
+        type: string
+        description: "Category name"
+      tags:
+        type: array
+        items:
+          type: string
+      url:
+        type: string
+        description: "Associated URL if present"
+    additionalProperties: false
+
+  ToolThreadReply:
+    title: thread_reply
+    description: "Add a reply to an existing thread"
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolThreadReplyInput"
+      output:
+        $ref: "#/definitions/ToolThreadReplyOutput"
+
+  ToolThreadReplyInput:
+    type: object
+    required:
+      - slug
+      - body
+    properties:
+      slug:
+        type: string
+        minLength: 1
+        description: "The thread slug to reply to"
+      body:
+        type: string
+        minLength: 1
+        description: "The reply content in HTML format"
+    additionalProperties: false
+
+  ToolThreadReplyOutput:
+    type: object
+    required:
+      - author
+      - content
+      - created_at
+      - updated_at
+    properties:
+      author:
+        type: string
+        description: "Author handle"
+      content:
+        type: string
+        description: "Reply content as plain text"
+      created_at:
+        type: string
+        description: "Creation timestamp"
+      updated_at:
+        type: string
+        description: "Update timestamp"
+    additionalProperties: false
+
+  ToolCategoryList:
+    title: category_list
+    description: "List all thread categories with their names and descriptions"
+    type: object
+    required:
+      - input
+      - output
+    properties:
+      input:
+        $ref: "#/definitions/ToolCategoryListInput"
+      output:
+        $ref: "#/definitions/ToolCategoryListOutput"
+
+  ToolCategoryListInput:
+    type: object
+    additionalProperties: false
+
+  ToolCategoryListOutput:
+    type: object
+    required:
+      - categories
+    properties:
+      categories:
+        type: array
+        items:
+          $ref: "#/definitions/CategoryItem"
+    additionalProperties: false
+
+  CategoryItem:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: "Category slug"
+      name:
+        type: string
+        description: "Category name"
+      description:
+        type: string
+        description: "Category description"
+    additionalProperties: false
