@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "v1.26.2",
+  "version": "v1.26.2-canary",
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
