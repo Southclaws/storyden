@@ -33,6 +33,18 @@ export const slider = defineSlotRecipe({
       boxShadow: "sm",
       outline: "none",
       zIndex: "1",
+      transition: "box-shadow 0.2s, transform 0.2s",
+      _focusVisible: {
+        boxShadow: "0 0 0 3px token(colors.colorPalette.a4)",
+        outline: "2px solid token(colors.colorPalette.default)",
+        outlineOffset: "2px",
+      },
+      _hover: {
+        transform: "scale(1.1)",
+      },
+      _active: {
+        transform: "scale(0.95)",
+      },
     },
     label: {
       color: "fg.default",
@@ -40,11 +52,12 @@ export const slider = defineSlotRecipe({
     },
     markerGroup: {
       mt: "-1",
+      minHeight: "1lh",
     },
     marker: {
       "--before-background": {
-        _light: "white",
-        _osDark: "colors.colorPalette.fg",
+        _osLight: "white",
+        _osDark: "black",
       },
       color: "fg.muted",
       _before: {
@@ -88,7 +101,7 @@ export const slider = defineSlotRecipe({
             top: "-2.5",
             width: "1",
           },
-          textStyle: "sm",
+          textStyle: "xs",
         },
         label: {
           textStyle: "sm",
@@ -114,7 +127,7 @@ export const slider = defineSlotRecipe({
             top: "-3",
             width: "1",
           },
-          textStyle: "sm",
+          textStyle: "xs",
         },
         label: {
           textStyle: "sm",
@@ -140,7 +153,7 @@ export const slider = defineSlotRecipe({
             top: "-15px",
             width: "1.5",
           },
-          textStyle: "md",
+          textStyle: "sm",
         },
         label: {
           textStyle: "md",

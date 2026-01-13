@@ -591,6 +591,8 @@ paths:
 
         Given that this is an unauthenticated endpoint that triggers an email to
         be sent to any public address, it MUST be heavily rate limited.
+      x-storyden:
+        rate-limit-cost: 10
       tags: [auth]
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
@@ -4230,8 +4232,61 @@ components:
     AdminSettingsServiceProps:
       type: object
       properties:
+        rate_limiting:
+          $ref: "#/components/schemas/RateLimitServiceSettings"
         moderation:
           $ref: "#/components/schemas/ModerationServiceSettings"
+
+    RateLimitServiceSettings:
+      type: object
+      properties:
+        rate_limit:
+          type: integer
+          description: |
+            Maximum number of "units" allowed within the sliding window defined by `rate_limit_period`.
+
+            Most incoming requests consume 1 unit for authenticated users, and `rate_limit_guest_cost`
+            units for unauthenticated (guest) visitors.
+
+            Certain endpoints are more expensive by default, such as those that trigger password resets, sending emails, etc.
+
+        rate_limit_period:
+          type: integer
+          description: |
+            Sliding window duration used to enforce `rate_limit`, in seconds.
+
+            On each request, Storyden considers the total number of units consumed in the last
+            `rate_limit_period` (not aligned to the hour/minute boundary).
+
+            For example: 3600 = 1 hour, 1800 = 30 minutes.
+
+        rate_limit_bucket:
+          type: integer
+          description: |
+            Bucket size (granularity) used to approximate the sliding window, in seconds.
+
+            Requests are counted into discrete time buckets of this size (e.g. 1 minute = 60 seconds). When
+            checking the limit, Storyden sums all buckets whose timestamps fall within the last
+            `rate_limit_period` and discards older buckets.
+
+            For example: 60 = 1 minute, 300 = 5 minutes.
+
+        rate_limit_guest_cost:
+          type: integer
+          description: |
+            The cost multiplier applied to rate limit operations for unauthenticated (guest) visitors.
+
+            For example, if set to 5, each operation will consume 5 units from a guest's rate limit
+            quota instead of 1. This allows you to apply more restrictive rate limiting to guests while
+            authenticated users consume the normal cost.
+
+        cost_overrides:
+          type: object
+          description: |
+            A map of operation names to their rate limiting cost overrides.
+          additionalProperties:
+            type: integer
+            description: The cost value for the corresponding action.
 
     ModerationServiceSettings:
       type: object

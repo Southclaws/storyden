@@ -1,12 +1,23 @@
 package limiter
 
 import (
+	"context"
+	"log/slog"
 	"net"
 	"net/http"
 	"strconv"
+	"sync/atomic"
 	"time"
 
+	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
+	"github.com/Southclaws/storyden/app/transports/http/openapi/operation"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 )
 
@@ -19,23 +30,122 @@ const (
 )
 
 type Middleware struct {
-	rl        rate.Limiter
-	kf        KeyFunc
-	sizeLimit int64
+	rl               atomic.Pointer[rate.Limiter]
+	factory          *rate.LimiterFactory
+	currentLimit     atomic.Int32
+	currentPeriod    atomic.Int64
+	currentBucket    atomic.Int64
+	currentGuestCost atomic.Int32
+	configLimit      int
+	configPeriod     time.Duration
+	configBucket     time.Duration
+	configGuestCost  int
+	kf               KeyFunc
+	sizeLimit        int64
+	settingsRepo     *settings.SettingsRepository
+	logger           *slog.Logger
 }
 
 func New(
+	ctx context.Context,
+	lc fx.Lifecycle,
 	cfg config.Config,
-
 	f *rate.LimiterFactory,
+	settingsRepo *settings.SettingsRepository,
+	bus *pubsub.Bus,
+	logger *slog.Logger,
 ) *Middleware {
-	rl := f.NewLimiter(cfg.RateLimit, cfg.RateLimitPeriod, cfg.RateLimitExpire)
-
-	return &Middleware{
-		rl:        rl,
-		kf:        fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
-		sizeLimit: MaxRequestSizeBytes, // TODO: cfg.MaxRequestSize
+	m := &Middleware{
+		factory:         f,
+		configLimit:     cfg.RateLimit,
+		configPeriod:    cfg.RateLimitPeriod,
+		configBucket:    cfg.RateLimitBucket,
+		configGuestCost: cfg.RateLimitGuestCost,
+		kf:              fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
+		sizeLimit:       MaxRequestSizeBytes,
+		settingsRepo:    settingsRepo,
+		logger:          logger,
 	}
+
+	m.reconfigureLimiter(ctx)
+
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := pubsub.Subscribe(ctx, bus, "limiter.settings_updated", func(ctx context.Context, evt *message.EventSettingsUpdated) error {
+			m.reconfigureLimiter(ctx)
+			return nil
+		})
+		return err
+	}))
+
+	return m
+}
+
+func (m *Middleware) getConfiguration(ctx context.Context) (limit int, period time.Duration, bucket time.Duration, guestCost int) {
+	limit = m.configLimit
+	period = m.configPeriod
+	bucket = m.configBucket
+	guestCost = m.configGuestCost
+
+	appSettings, err := m.settingsRepo.Get(ctx)
+	if err != nil {
+		m.logger.Warn("failed to fetch settings for rate limiter reconfiguration",
+			slog.String("error", err.Error()),
+		)
+		return
+	}
+
+	svc, ok := appSettings.Services.Get()
+	if !ok {
+		return
+	}
+
+	rl, ok := svc.RateLimit.Get()
+	if !ok {
+		return
+	}
+
+	if v, ok := rl.RateLimit.Get(); ok && v > 0 {
+		limit = v
+	}
+	if v, ok := rl.RateLimitPeriod.Get(); ok && v > 0 {
+		period = v
+	}
+	if v, ok := rl.RateLimitBucket.Get(); ok && v > 0 {
+		bucket = v
+	}
+	if v, ok := rl.RateLimitGuestCost.Get(); ok && v > 0 {
+		guestCost = v
+	}
+
+	return limit, period, bucket, guestCost
+}
+
+func (m *Middleware) reconfigureLimiter(ctx context.Context) {
+	currentLimit := int(m.currentLimit.Load())
+	currentPeriod := time.Duration(m.currentPeriod.Load())
+	currentBucket := time.Duration(m.currentBucket.Load())
+	currentGuestCost := int(m.currentGuestCost.Load())
+
+	limit, period, bucket, guestCost := m.getConfiguration(ctx)
+
+	if m.rl.Load() != nil && limit == currentLimit && period == currentPeriod && bucket == currentBucket && guestCost == currentGuestCost {
+		return
+	}
+
+	m.logger.Debug("reconfiguring rate limiter",
+		slog.Int("limit", limit),
+		slog.Duration("period", period),
+		slog.Duration("bucket", bucket),
+		slog.Int("guest_cost", guestCost),
+	)
+
+	m.currentLimit.Store(int32(limit))
+	m.currentPeriod.Store(int64(period))
+	m.currentBucket.Store(int64(bucket))
+	m.currentGuestCost.Store(int32(guestCost))
+
+	newLimiter := m.factory.NewLimiter(limit, period, bucket)
+	m.rl.Store(&newLimiter)
 }
 
 func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
@@ -45,15 +155,43 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 
 			key, err := m.kf(r)
 			if err != nil {
+				m.logger.Error("failed to extract rate limit key from request",
+					slog.String("error", err.Error()),
+					slog.String("path", r.URL.Path),
+					slog.String("method", r.Method),
+				)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
 
-			// TODO: Generate costs per-operation from OpenAPI spec
-			cost := 1
+			isAuthenticated := session.GetOptAccountID(ctx).Ok()
 
-			status, allowed, err := m.rl.Increment(ctx, key, cost)
+			cost := m.getCost(ctx)
+
+			if !isAuthenticated {
+				guestCost := int(m.currentGuestCost.Load())
+				cost = cost * guestCost
+			}
+
+			limiter := m.rl.Load()
+			if limiter == nil {
+				m.logger.Error("rate limiter not initialized",
+					slog.String("path", r.URL.Path),
+					slog.String("method", r.Method),
+				)
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				panic("limiter: rl pointer is null")
+			}
+
+			status, allowed, err := (*limiter).Increment(ctx, key, cost)
 			if err != nil {
+				m.logger.Error("failed to increment rate limit counter",
+					slog.String("error", err.Error()),
+					slog.String("key", key),
+					slog.Int("cost", cost),
+					slog.String("path", r.URL.Path),
+					slog.String("method", r.Method),
+				)
 				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
@@ -75,6 +213,48 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func (m *Middleware) getCost(ctx context.Context) int {
+	operationID, err := operation.NewOperationID(reqinfo.GetOperationID(ctx))
+	if err != nil {
+		return 1
+	}
+
+	overrides := m.getLookup(ctx)
+
+	if cost, ok := overrides[operationID.String()]; ok {
+		return cost
+	}
+
+	if cost, ok := operation.RateLimitCostOverrides[operationID]; ok {
+		return cost
+	}
+
+	return 1
+}
+
+func (m *Middleware) getLookup(ctx context.Context) map[string]int {
+	appSettings, err := m.settingsRepo.Get(ctx)
+	if err != nil {
+		return nil
+	}
+	svc, ok := appSettings.Services.Get()
+	if !ok {
+		return nil
+	}
+
+	rl, ok := svc.RateLimit.Get()
+	if !ok {
+		return nil
+	}
+
+	overrides, ok := rl.CostOverrides.Get()
+	if !ok {
+		return nil
+	}
+
+	return overrides
 }
 
 type KeyFunc func(r *http.Request) (string, error)

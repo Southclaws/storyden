@@ -110,16 +110,44 @@ type Config struct {
 	// Rate limiting
 	// -
 
-	// The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
-	RateLimit int `default:"1000" envconfig:"RATE_LIMIT"`
 	/*
-	   The period of time in which the `RATE_LIMIT` is applied.
+	   Maximum number of "units" allowed within the sliding window defined by `RATE_LIMIT_PERIOD`.
 
-	   This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT_PERIOD` of requests.
+	   Most incoming requests will consume `1` unit for authenticated users, and `RATE_LIMIT_GUEST_COST`
+	   units for unauthenticated (guest) visitors.
+
+	   Certain endpoints are more expensive by default, such as those that trigger password resets, sending emails, etc.
+
+	   You can also configure custom overrides in the System Settings screen. However, you cannot configure custom overrides via environment variables.
+	*/
+	RateLimit int `default:"5000" envconfig:"RATE_LIMIT"`
+	/*
+	   Sliding window duration used to enforce `RATE_LIMIT`.
+
+	   On each request, Storyden considers the total number of units consumed in the last
+	   `RATE_LIMIT_PERIOD` (not aligned to the hour/minute boundary).
 	*/
 	RateLimitPeriod time.Duration `default:"1h" envconfig:"RATE_LIMIT_PERIOD"`
-	// The expiry time of the rate limit counters.
-	RateLimitExpire time.Duration `default:"1m" envconfig:"RATE_LIMIT_EXPIRE"`
+	/*
+	   Bucket size (granularity) used to approximate the sliding window.
+
+	   Requests are counted into discrete time buckets of this size (e.g. 1 minute). When
+	   checking the limit, Storyden sums all buckets whose timestamps fall within the last
+	   `RATE_LIMIT_PERIOD` and discards older buckets.
+
+	   Smaller buckets = more accurate sliding-window behaviour but more storage/CPU overhead.
+	   Larger buckets = cheaper but "chunkier" enforcement.
+
+	   Rule of thumb: set this to ~1/60 of `RATE_LIMIT_PERIOD` (e.g. 1m buckets for a 1h period).
+	*/
+	RateLimitBucket time.Duration `default:"1m" envconfig:"RATE_LIMIT_BUCKET"`
+	/*
+	   Cost multiplier applied to unauthenticated (guest) requests.
+
+	   Example: if set to 5, each guest request consumes 5 units from the same `RATE_LIMIT`
+	   budget, effectively allowing guests ~1/5th the throughput of authenticated users.
+	*/
+	RateLimitGuestCost int `default:"1" envconfig:"RATE_LIMIT_GUEST_COST"`
 
 	// -
 	// Telemetry and monitoring

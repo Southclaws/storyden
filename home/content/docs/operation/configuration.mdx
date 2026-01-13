@@ -154,22 +154,33 @@ Please note that both the public API address and public web address must share t
 
 ## Rate limiting
 
-You can (and should) set rate limiting parameters for any production deployment. Storyden uses a sliding-window-incrementing-counters algorithm to track usage by members and bots which is friendly to bursts of activity while still preventing persistent abuse patterns.
+Storyden includes a rate limiter to reduce abusive traffic (scraping, brute force, etc.)
+while staying friendly to normal "bursty" browsing.
 
-The default values should be sufficient for a small to medium-sized deployment, but you may want to increase them for larger deployments while maintaining adequate hardware and database resources.
+The limiter uses a sliding-window counter implemented as fixed time buckets (a hash map of
+`bucket_timestamp` → `count`). Each request increments the current bucket. To decide whether
+a request is allowed, Storyden sums all buckets within the last `RATE_LIMIT_PERIOD`.
 
-Currently, rate limits are applied based on the client's IP address (taking into account various proxy-forwarded headers.)
+Rate limits are keyed by the client’s IP address (respecting proxy-forwarded headers).
 
-The rate limiter will store its state in-memory unless a `CACHE_PROVIDER` is configured. In that case, the rate limiter will store its state in the cache provider.
+Rate-limit state is stored in-memory by default. If `CACHE_PROVIDER` is configured, state is
+stored in the cache provider instead.
 
 ### `RATE_LIMIT`
 
 <table>
 <tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`1000`</td></tr>
+<tr><td>default</td><td>`5000`</td></tr>
 </table>
 
-The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
+Maximum number of "units" allowed within the sliding window defined by `RATE_LIMIT_PERIOD`.
+
+Most incoming requests will consume `1` unit for authenticated users, and `RATE_LIMIT_GUEST_COST`
+units for unauthenticated (guest) visitors.
+
+Certain endpoints are more expensive by default, such as those that trigger password resets, sending emails, etc.
+
+You can also configure custom overrides in the System Settings screen. However, you cannot configure custom overrides via environment variables.
 
 ### `RATE_LIMIT_PERIOD`
 
@@ -178,18 +189,40 @@ The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
 <tr><td>default</td><td>`1h`</td></tr>
 </table>
 
-The period of time in which the `RATE_LIMIT` is applied.
+Sliding window duration used to enforce `RATE_LIMIT`.
 
-This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT_PERIOD` of requests.
+On each request, Storyden considers the total number of units consumed in the last
+`RATE_LIMIT_PERIOD` (not aligned to the hour/minute boundary).
 
-### `RATE_LIMIT_EXPIRE`
+### `RATE_LIMIT_BUCKET`
 
 <table>
 <tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
 <tr><td>default</td><td>`1m`</td></tr>
 </table>
 
-The expiry time of the rate limit counters.
+Bucket size (granularity) used to approximate the sliding window.
+
+Requests are counted into discrete time buckets of this size (e.g. 1 minute). When
+checking the limit, Storyden sums all buckets whose timestamps fall within the last
+`RATE_LIMIT_PERIOD` and discards older buckets.
+
+Smaller buckets = more accurate sliding-window behaviour but more storage/CPU overhead.
+Larger buckets = cheaper but "chunkier" enforcement.
+
+Rule of thumb: set this to ~1/60 of `RATE_LIMIT_PERIOD` (e.g. 1m buckets for a 1h period).
+
+### `RATE_LIMIT_GUEST_COST`
+
+<table>
+<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
+<tr><td>default</td><td>`1`</td></tr>
+</table>
+
+Cost multiplier applied to unauthenticated (guest) requests.
+
+Example: if set to 5, each guest request consumes 5 units from the same `RATE_LIMIT`
+budget, effectively allowing guests ~1/5th the throughput of authenticated users.
 
 ## Telemetry and monitoring
 

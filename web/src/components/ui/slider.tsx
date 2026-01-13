@@ -25,6 +25,16 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
   const { children, className, ...rootProps } = localProps;
   const styles = slider(variantProps);
 
+  const handleDoubleClick = () => {
+    // Reset to default value on double-click
+    if (rootProps.defaultValue !== undefined && rootProps.onValueChange) {
+      const defaultVal = Array.isArray(rootProps.defaultValue)
+        ? rootProps.defaultValue
+        : [rootProps.defaultValue];
+      rootProps.onValueChange({ value: defaultVal });
+    }
+  };
+
   return (
     <ArkSlider.Root
       ref={ref}
@@ -48,6 +58,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>((props, ref) => {
                   key={index}
                   index={index}
                   className={styles.thumb}
+                  onDoubleClick={handleDoubleClick}
                 />
               ))}
             </ArkSlider.Control>
