@@ -104,6 +104,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		AccentColour:       opt.NewPtr(request.Body.AccentColour),
 		AuthenticationMode: authMode,
 		Services:           services,
+		QuickReactions:     opt.NewPtr(request.Body.QuickReactions),
 		Metadata:           opt.NewPtr((*map[string]any)(request.Body.Metadata)),
 	})
 	if err != nil {
@@ -353,6 +354,8 @@ func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminA
 }
 
 func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
+	quickReactions := in.QuickReactions.Or(settings.DefaultQuickReactions)
+
 	return openapi.AdminSettingsProps{
 		AccentColour:       in.AccentColour.OrZero(),
 		Description:        in.Description.OrZero(),
@@ -360,6 +363,7 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		Title:              in.Title.OrZero(),
 		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		Services:           opt.Map(in.Services, serialiseServiceSettings).Ptr(),
+		QuickReactions:     quickReactions,
 		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
 	}
 }

@@ -12,6 +12,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+// DefaultQuickReactions is the default set of emoji reactions shown in the UI.
+var DefaultQuickReactions = []string{"❤️", "😂", "😮", "😢", "😠", "👍"}
+
 // Settings is the global Storyden settings data that can be changed at runtime.
 type Settings struct {
 	// Title is the primary name of the instance, it's commonly used for things
@@ -37,6 +40,10 @@ type Settings struct {
 	AuthenticationMode opt.Optional[authentication.Mode]
 
 	Services opt.Optional[ServiceSettings]
+
+	// QuickReactions is a list of emoji characters that are shown as quick
+	// reaction options in the UI. Only verified users can add reactions.
+	QuickReactions opt.Optional[[]string]
 
 	// Metadata is an arbitrary object which can be used by frontends/clients to
 	// store vendor-specific configuration to control the client implementation.
