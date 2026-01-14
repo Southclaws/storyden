@@ -3949,6 +3949,7 @@ components:
         - authentication_mode
         - capabilities
         - onboarding_status
+        - quick_reactions
       properties:
         title:
           type: string
@@ -3964,6 +3965,13 @@ components:
           $ref: "#/components/schemas/AuthMode"
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
+        quick_reactions:
+          description: |
+            A list of emoji characters shown as quick reaction options in the UI.
+            Only verified users with the CREATE_REACTION permission can add reactions.
+          type: array
+          items:
+            type: string
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -4188,6 +4196,7 @@ components:
         - content
         - accent_colour
         - authentication_mode
+        - quick_reactions
       properties:
         title:
           type: string
@@ -4203,6 +4212,13 @@ components:
           $ref: "#/components/schemas/InstanceCapabilityList"
         services:
           $ref: "#/components/schemas/AdminSettingsServiceProps"
+        quick_reactions:
+          description: |
+            A list of emoji characters shown as quick reaction options in the UI.
+            Only verified users with the CREATE_REACTION permission can add reactions.
+          type: array
+          items:
+            type: string
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -4221,6 +4237,13 @@ components:
           $ref: "#/components/schemas/AuthMode"
         services:
           $ref: "#/components/schemas/AdminSettingsServiceProps"
+        quick_reactions:
+          description: |
+            A list of emoji characters shown as quick reaction options in the UI.
+            Only verified users with the CREATE_REACTION permission can add reactions.
+          type: array
+          items:
+            type: string
         metadata:
           description: |
             The settings metadata may be used by frontends to store arbitrary

@@ -79,7 +79,12 @@ function Hero() {
             <Link
               className={linkButton({
                 backgroundColor: "white",
+                color: "black",
                 boxShadow: "xl",
+                _dark: {
+                  backgroundColor: "gray.900",
+                  color: "white",
+                },
               })}
               href="/docs/introduction"
             >
@@ -98,6 +103,13 @@ function Hero() {
                   _hover: {
                     color: "black",
                     background: "white",
+                  },
+                  _dark: {
+                    backgroundColor: "rgba(200, 200, 200, 0.2)",
+                    _hover: {
+                      color: "white",
+                      background: "gray.800",
+                    },
                   },
                 })
               )}

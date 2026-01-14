@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/branding/banner"
 	"github.com/Southclaws/storyden/app/services/branding/icon"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
@@ -94,6 +95,8 @@ func (i Info) BannerUpload(ctx context.Context, request openapi.BannerUploadRequ
 }
 
 func serialiseInfo(info *instance_info.Info) openapi.Info {
+	quickReactions := info.Settings.QuickReactions.Or(settings.DefaultQuickReactions)
+
 	return openapi.Info{
 		Title:              info.Settings.Title.OrZero(),
 		Description:        info.Settings.Description.OrZero(),
@@ -102,6 +105,7 @@ func serialiseInfo(info *instance_info.Info) openapi.Info {
 		OnboardingStatus:   openapi.OnboardingStatus(info.OnboardingStatus.String()),
 		AuthenticationMode: openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		Capabilities:       serialiseCapabilitiesList(info.Capabilities),
+		QuickReactions:     quickReactions,
 		Metadata:           (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
 	}
 }

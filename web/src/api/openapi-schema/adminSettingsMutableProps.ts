@@ -21,6 +21,10 @@ export interface AdminSettingsMutableProps {
 vendor-specific configuration data specific to the frontend itself.
  */
   metadata?: Metadata;
+  /** A list of emoji characters shown as quick reaction options in the UI.
+Only verified users with the CREATE_REACTION permission can add reactions.
+ */
+  quick_reactions?: string[];
   services?: AdminSettingsServiceProps;
   title?: string;
 }

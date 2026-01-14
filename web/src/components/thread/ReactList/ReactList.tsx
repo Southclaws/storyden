@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { ReactionAddIcon } from "@/components/ui/icons/Reaction";
 import * as Popover from "@/components/ui/popover";
+import { useSettings } from "@/lib/settings/settings-client";
 import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -33,11 +34,16 @@ const reactButtonStyles = css({
   paddingX: "2",
 });
 
+const DEFAULT_QUICK_REACTIONS = ["❤️", "😂", "😮", "😢", "😠", "👍"];
+
 export function ReactList(props: Props) {
   const { data, handlers } = useReactionList(props);
+  const { settings } = useSettings();
 
   const { isLoggedIn, reacts } = data;
   const { handleReactExisting, handleReactPicker } = handlers;
+
+  const quickReactions = settings?.quick_reactions ?? DEFAULT_QUICK_REACTIONS;
 
   return (
     <HStack flexWrap="wrap" gap="1">
@@ -50,7 +56,13 @@ export function ReactList(props: Props) {
         />
       ))}
 
-      {isLoggedIn && <ReactionPickerTrigger onSelect={handleReactPicker} />}
+      {isLoggedIn && (
+        <QuickReactionPicker
+          quickReactions={quickReactions}
+          existingReacts={reacts}
+          onSelect={handleReactPicker}
+        />
+      )}
     </HStack>
   );
 }
@@ -163,15 +175,32 @@ function ReactTrigger({ react, disabled, onClick }: ReactionProps) {
   );
 }
 
-type ReactionPickerTriggerProps = {
+type QuickReactionPickerProps = {
+  quickReactions: string[];
+  existingReacts: ReactCount[];
   onSelect: (emoji: string) => void;
 };
 
-function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
+function QuickReactionPicker({
+  quickReactions,
+  existingReacts,
+  onSelect,
+}: QuickReactionPickerProps) {
   const { isOpen, onToggle, onClose } = useDisclosure();
 
-  function handleSelect(e: EmojiClickData) {
-    props.onSelect(e.emoji);
+  // Filter out emojis that already have reactions shown
+  const existingEmojis = new Set(existingReacts.map((r) => r.emoji));
+  const availableQuickReactions = quickReactions.filter(
+    (emoji) => !existingEmojis.has(emoji),
+  );
+
+  function handleQuickReact(emoji: string) {
+    onSelect(emoji);
+    onClose();
+  }
+
+  function handlePickerSelect(e: EmojiClickData) {
+    onSelect(e.emoji);
     onClose();
   }
 
@@ -210,15 +239,89 @@ function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
       <Portal>
         <Popover.Positioner minW="0">
           <Popover.Content
-            padding="0"
-            bgColor="transparent"
-            border="none"
-            boxShadow={"none" as any}
+            padding="2"
+            bgColor="bg.default"
+            borderRadius="xl"
+            boxShadow="lg"
           >
             <Popover.Arrow>
               <Popover.ArrowTip />
             </Popover.Arrow>
 
+            <HStack gap="1" mb={availableQuickReactions.length > 0 ? "2" : "0"}>
+              {availableQuickReactions.map((emoji) => (
+                <Button
+                  key={emoji}
+                  size="sm"
+                  variant="ghost"
+                  padding="1"
+                  minW="8"
+                  height="8"
+                  fontSize="lg"
+                  onClick={() => handleQuickReact(emoji)}
+                  title={`React with ${emoji}`}
+                >
+                  {emoji}
+                </Button>
+              ))}
+              <FullEmojiPickerTrigger onSelect={handlePickerSelect} />
+            </HStack>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover.Root>
+  );
+}
+
+type FullEmojiPickerTriggerProps = {
+  onSelect: (e: EmojiClickData) => void;
+};
+
+function FullEmojiPickerTrigger({ onSelect }: FullEmojiPickerTriggerProps) {
+  const { isOpen, onToggle, onClose } = useDisclosure();
+
+  function handleSelect(e: EmojiClickData) {
+    onSelect(e);
+    onClose();
+  }
+
+  return (
+    <Popover.Root
+      lazyMount
+      open={isOpen}
+      positioning={{
+        gutter: 8,
+        overflowPadding: 12,
+        fitViewport: true,
+        placement: "bottom",
+        flip: true,
+      }}
+      onInteractOutside={onClose}
+      onEscapeKeyDown={onClose}
+    >
+      <Popover.Trigger type="button" cursor="pointer" onClick={onToggle} asChild>
+        <IconButton
+          size="sm"
+          variant="ghost"
+          padding="1"
+          minW="8"
+          height="8"
+          color="fg.muted"
+          aria-label="More reactions"
+          title="More reactions"
+        >
+          +
+        </IconButton>
+      </Popover.Trigger>
+
+      <Portal>
+        <Popover.Positioner minW="0">
+          <Popover.Content
+            padding="0"
+            bgColor="transparent"
+            border="none"
+            boxShadow={"none" as any}
+          >
             <EmojiPicker
               onEmojiClick={handleSelect}
               emojiStyle={EmojiStyle.NATIVE}

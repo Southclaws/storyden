@@ -12,7 +12,7 @@ import Image from "next/image";
 
 export const baseOptions: BaseLayoutProps = {
   themeSwitch: {
-    enabled: false,
+    enabled: true,
   },
   nav: {
     title: (
