@@ -120,36 +120,68 @@
 
 - section: Rate limiting
   description: |-
-    You can (and should) set rate limiting parameters for any production deployment. Storyden uses a sliding-window-incrementing-counters algorithm to track usage by members and bots which is friendly to bursts of activity while still preventing persistent abuse patterns.
+    Storyden includes a rate limiter to reduce abusive traffic (scraping, brute force, etc.)
+    while staying friendly to normal "bursty" browsing.
 
-    The default values should be sufficient for a small to medium-sized deployment, but you may want to increase them for larger deployments while maintaining adequate hardware and database resources.
+    The limiter uses a sliding-window counter implemented as fixed time buckets (a hash map of
+    `bucket_timestamp` → `count`). Each request increments the current bucket. To decide whether
+    a request is allowed, Storyden sums all buckets within the last `RATE_LIMIT_PERIOD`.
 
-    Currently, rate limits are applied based on the client's IP address (taking into account various proxy-forwarded headers.)
+    Rate limits are keyed by the client’s IP address (respecting proxy-forwarded headers).
 
-    The rate limiter will store its state in-memory unless a `CACHE_PROVIDER` is configured. In that case, the rate limiter will store its state in the cache provider.
+    Rate-limit state is stored in-memory by default. If `CACHE_PROVIDER` is configured, state is
+    stored in the cache provider instead.
+
   fields:
     - env: "RATE_LIMIT"
       name: RateLimit
       type: int
-      default: "1000"
+      default: "5000"
       description: |-
-        The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
+        Maximum number of "units" allowed within the sliding window defined by `RATE_LIMIT_PERIOD`.
+
+        Most incoming requests will consume `1` unit for authenticated users, and `RATE_LIMIT_GUEST_COST`
+        units for unauthenticated (guest) visitors.
+
+        Certain endpoints are more expensive by default, such as those that trigger password resets, sending emails, etc.
+
+        You can also configure custom overrides in the System Settings screen. However, you cannot configure custom overrides via environment variables.
 
     - env: "RATE_LIMIT_PERIOD"
       name: RateLimitPeriod
       type: time.Duration
       default: "1h"
       description: |-
-        The period of time in which the `RATE_LIMIT` is applied.
+        Sliding window duration used to enforce `RATE_LIMIT`.
 
-        This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT_PERIOD` of requests.
+        On each request, Storyden considers the total number of units consumed in the last
+        `RATE_LIMIT_PERIOD` (not aligned to the hour/minute boundary).
 
-    - env: "RATE_LIMIT_EXPIRE"
-      name: RateLimitExpire
+    - env: "RATE_LIMIT_BUCKET"
+      name: RateLimitBucket
       type: time.Duration
       default: "1m"
       description: |-
-        The expiry time of the rate limit counters.
+        Bucket size (granularity) used to approximate the sliding window.
+
+        Requests are counted into discrete time buckets of this size (e.g. 1 minute). When
+        checking the limit, Storyden sums all buckets whose timestamps fall within the last
+        `RATE_LIMIT_PERIOD` and discards older buckets.
+
+        Smaller buckets = more accurate sliding-window behaviour but more storage/CPU overhead.
+        Larger buckets = cheaper but "chunkier" enforcement.
+
+        Rule of thumb: set this to ~1/60 of `RATE_LIMIT_PERIOD` (e.g. 1m buckets for a 1h period).
+
+    - env: "RATE_LIMIT_GUEST_COST"
+      name: RateLimitGuestCost
+      type: int
+      default: "1"
+      description: |-
+        Cost multiplier applied to unauthenticated (guest) requests.
+
+        Example: if set to 5, each guest request consumes 5 units from the same `RATE_LIMIT`
+        budget, effectively allowing guests ~1/5th the throughput of authenticated users.
 
 - section: Telemetry and monitoring
   description: |-

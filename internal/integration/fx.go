@@ -35,9 +35,9 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		PublicAPIAddress: *utils.Must(url.Parse("http://localhost")),
 		PublicWebAddress: *utils.Must(url.Parse("http://localhost")),
 		JWTSecret:        []byte("00000000000000000000000000000000"),
-		RateLimit:        1000,
+		RateLimit:        5000,
 		RateLimitPeriod:  time.Hour,
-		RateLimitExpire:  time.Minute,
+		RateLimitBucket:  time.Minute,
 		EmailProvider:    "mock",
 	}
 

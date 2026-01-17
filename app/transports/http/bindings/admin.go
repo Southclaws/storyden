@@ -85,16 +85,36 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	}
 
 	var services opt.Optional[settings.ServiceSettings]
-	if request.Body.Services != nil && request.Body.Services.Moderation != nil {
-		moderation := request.Body.Services.Moderation
-		services = opt.New(settings.ServiceSettings{
-			Moderation: opt.New(settings.ModerationServiceSettings{
-				ThreadBodyLengthMax: opt.NewPtr(moderation.ThreadBodyLengthMax),
-				ReplyBodyLengthMax:  opt.NewPtr(moderation.ReplyBodyLengthMax),
-				WordBlockList:       opt.NewPtr(moderation.WordBlockList),
-				WordReportList:      opt.NewPtr(moderation.WordReportList),
-			}),
-		})
+	if request.Body.Services != nil {
+		var rateLimit opt.Optional[settings.RateLimitServiceSettings]
+		if request.Body.Services.RateLimiting != nil {
+			rl := request.Body.Services.RateLimiting
+			rateLimit = opt.New(settings.RateLimitServiceSettings{
+				RateLimit:          opt.NewPtr(rl.RateLimit),
+				RateLimitPeriod:    opt.NewPtrMap(rl.RateLimitPeriod, func(seconds int) time.Duration { return time.Duration(seconds) * time.Second }),
+				RateLimitBucket:    opt.NewPtrMap(rl.RateLimitBucket, func(seconds int) time.Duration { return time.Duration(seconds) * time.Second }),
+				RateLimitGuestCost: opt.NewPtr(rl.RateLimitGuestCost),
+				CostOverrides:      opt.NewPtr(rl.CostOverrides),
+			})
+		}
+
+		var moderation opt.Optional[settings.ModerationServiceSettings]
+		if request.Body.Services.Moderation != nil {
+			moderationBody := request.Body.Services.Moderation
+			moderation = opt.New(settings.ModerationServiceSettings{
+				ThreadBodyLengthMax: opt.NewPtr(moderationBody.ThreadBodyLengthMax),
+				ReplyBodyLengthMax:  opt.NewPtr(moderationBody.ReplyBodyLengthMax),
+				WordBlockList:       opt.NewPtr(moderationBody.WordBlockList),
+				WordReportList:      opt.NewPtr(moderationBody.WordReportList),
+			})
+		}
+
+		if rateLimit.Ok() || moderation.Ok() {
+			services = opt.New(settings.ServiceSettings{
+				RateLimit:  rateLimit,
+				Moderation: moderation,
+			})
+		}
 	}
 
 	settings, err := a.settingsManager.Set(ctx, settings.Settings{
@@ -366,7 +386,18 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 
 func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettingsServiceProps {
 	return openapi.AdminSettingsServiceProps{
-		Moderation: opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
+		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
+		Moderation:   opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
+	}
+}
+
+func serialiseRateLimitSettings(in settings.RateLimitServiceSettings) openapi.RateLimitServiceSettings {
+	return openapi.RateLimitServiceSettings{
+		RateLimit:          in.RateLimit.Ptr(),
+		RateLimitPeriod:    opt.Map(in.RateLimitPeriod, func(d time.Duration) int { return int(d.Seconds()) }).Ptr(),
+		RateLimitBucket:    opt.Map(in.RateLimitBucket, func(d time.Duration) int { return int(d.Seconds()) }).Ptr(),
+		RateLimitGuestCost: in.RateLimitGuestCost.Ptr(),
+		CostOverrides:      in.CostOverrides.Ptr(),
 	}
 }
 

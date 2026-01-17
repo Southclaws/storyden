@@ -12,6 +12,7 @@ import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
 import { BrandSettingsScreen } from "./BrandSettingsScreen";
 import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
+import { SystemSettingsScreen } from "./SystemSettingsScreen";
 
 const DEFAULT_TAB = "brand";
 
@@ -47,6 +48,7 @@ export function AdminScreen() {
       <Tabs.List>
         <Tabs.Trigger value="brand">Brand</Tabs.Trigger>
         <Tabs.Trigger value="moderation">Moderation</Tabs.Trigger>
+        <Tabs.Trigger value="system">System</Tabs.Trigger>
         <Tabs.Trigger value="audit">Audit Log</Tabs.Trigger>
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
@@ -60,6 +62,10 @@ export function AdminScreen() {
 
       <Tabs.Content value="moderation">
         <ModerationSettingsScreen />
+      </Tabs.Content>
+
+      <Tabs.Content value="system">
+        <SystemSettingsScreen />
       </Tabs.Content>
 
       <Tabs.Content value="audit">

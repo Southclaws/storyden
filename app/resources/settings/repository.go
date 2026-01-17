@@ -13,6 +13,7 @@ import (
 	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils/errutil"
 )
@@ -26,6 +27,7 @@ const StorydenPrimarySettingsKey = "storyden_system"
 type SettingsRepository struct {
 	logger *slog.Logger
 	db     *ent.Client
+	config config.Config
 
 	// cached stores the most recent copy of all the settings from the database.
 	// Directly changing settings via external database queries will result in
@@ -37,10 +39,11 @@ type SettingsRepository struct {
 	cacheLastFetch time.Time
 }
 
-func New(ctx context.Context, lc fx.Lifecycle, logger *slog.Logger, db *ent.Client) (*SettingsRepository, error) {
+func New(ctx context.Context, lc fx.Lifecycle, logger *slog.Logger, db *ent.Client, cfg config.Config) (*SettingsRepository, error) {
 	d := &SettingsRepository{
 		logger:         logger,
 		db:             db,
+		config:         cfg,
 		cachedSettings: xsync.NewMap[string, any](),
 	}
 
@@ -113,7 +116,7 @@ func (d *SettingsRepository) Set(ctx context.Context, s Settings) (*Settings, er
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	settings, err := mapSettings(r)
+	settings, err := d.hydrateConfigDefaults(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -137,7 +140,7 @@ func (d *SettingsRepository) setDefaults(ctx context.Context) (*Settings, error)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return mapSettings(s)
+	return d.hydrateConfigDefaults(s)
 }
 
 func (d *SettingsRepository) get(ctx context.Context) (*Settings, error) {
@@ -151,7 +154,7 @@ func (d *SettingsRepository) get(ctx context.Context) (*Settings, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	settings, err := mapSettings(r)
+	settings, err := d.hydrateConfigDefaults(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

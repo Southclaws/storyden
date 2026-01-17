@@ -7,10 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.2-canary
  */
-import type { ModerationServiceSettings } from "./moderationServiceSettings";
-import type { RateLimitServiceSettings } from "./rateLimitServiceSettings";
 
-export interface AdminSettingsServiceProps {
-  moderation?: ModerationServiceSettings;
-  rate_limiting?: RateLimitServiceSettings;
-}
+/**
+ * A map of operation names to their rate limiting cost overrides.
+
+ */
+export type RateLimitServiceSettingsCostOverrides = { [key: string]: number };

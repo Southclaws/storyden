@@ -13,13 +13,14 @@ import (
 )
 
 type Info struct {
-	UserAgent  useragent.UserAgent
-	CacheQuery cachecontrol.Query
+	OperationID string
+	UserAgent   useragent.UserAgent
+	CacheQuery  cachecontrol.Query
 }
 
 type infoKey struct{}
 
-func WithRequestInfo(ctx context.Context, r *http.Request) context.Context {
+func WithRequestInfo(ctx context.Context, r *http.Request, opid string) context.Context {
 	ua := useragent.Parse(r.Header.Get("User-Agent"))
 
 	ifNoneMatch := opt.NewIf(r.Header.Get("If-None-Match"), notEmpty)
@@ -33,11 +34,22 @@ func WithRequestInfo(ctx context.Context, r *http.Request) context.Context {
 	}
 
 	info := Info{
-		UserAgent:  ua,
-		CacheQuery: cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
+		OperationID: opid,
+		UserAgent:   ua,
+		CacheQuery:  cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
 	}
 
 	return context.WithValue(ctx, infoKey{}, info)
+}
+
+func GetOperationID(ctx context.Context) string {
+	v := ctx.Value(infoKey{})
+	i, ok := v.(Info)
+	if !ok {
+		return "unknown"
+	}
+
+	return i.OperationID
 }
 
 func GetDeviceName(ctx context.Context) string {

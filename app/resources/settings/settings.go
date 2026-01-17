@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"time"
 
 	"dario.cat/mergo"
 	"github.com/Southclaws/fault"
@@ -44,7 +45,16 @@ type Settings struct {
 }
 
 type ServiceSettings struct {
+	RateLimit  opt.Optional[RateLimitServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
+}
+
+type RateLimitServiceSettings struct {
+	RateLimit          opt.Optional[int]
+	RateLimitPeriod    opt.Optional[time.Duration]
+	RateLimitBucket    opt.Optional[time.Duration]
+	RateLimitGuestCost opt.Optional[int]
+	CostOverrides      opt.Optional[map[string]int]
 }
 
 type ModerationServiceSettings struct {
