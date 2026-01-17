@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/logger"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
-	"github.com/Southclaws/storyden/internal/infrastructure/pdf"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 	"github.com/Southclaws/storyden/internal/infrastructure/redis"
@@ -41,6 +40,5 @@ func Build() fx.Option {
 		fx.Provide(ai.New),
 		jwt.Build(),
 		pubsub.Build(),
-		fx.Provide(pdf.New),
 	)
 }
