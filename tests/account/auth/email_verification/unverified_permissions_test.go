@@ -23,6 +23,8 @@ import (
 	"github.com/Southclaws/storyden/tests"
 )
 
+// TestUnverifiedUserPermissions verifies that unverified users receive guest permissions
+// and gain full permissions after email verification.
 func TestUnverifiedUserPermissions(t *testing.T) {
 	t.Parallel()
 

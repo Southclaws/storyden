@@ -36,6 +36,7 @@ const reactButtonStyles = css({
 
 const DEFAULT_QUICK_REACTIONS = ["❤️", "😂", "😮", "😢", "😠", "👍"];
 
+/** Displays a list of reactions with counts and allows adding new reactions. */
 export function ReactList(props: Props) {
   const { data, handlers } = useReactionList(props);
   const { settings } = useSettings();
@@ -73,6 +74,7 @@ type ReactionProps = {
   onClick: (emoji: string) => void;
 };
 
+/** Renders a single reaction button with animated count display. */
 function ReactTrigger({ react, disabled, onClick }: ReactionProps) {
   const [count, setCount] = useState(react.count);
   const [direction, setDirection] = useState(1); // To track up or down animation
@@ -181,6 +183,7 @@ type QuickReactionPickerProps = {
   onSelect: (emoji: string) => void;
 };
 
+/** Shows quick reaction options and a full emoji picker for adding reactions. */
 function QuickReactionPicker({
   quickReactions,
   existingReacts,
@@ -277,6 +280,7 @@ type FullEmojiPickerTriggerProps = {
   onSelect: (e: EmojiClickData) => void;
 };
 
+/** Opens a full emoji picker popover for selecting any emoji. */
 function FullEmojiPickerTrigger({ onSelect }: FullEmojiPickerTriggerProps) {
   const { isOpen, onToggle, onClose } = useDisclosure();
 

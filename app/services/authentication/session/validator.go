@@ -46,6 +46,7 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // 	return ctx, nil
 // }
 
+// resolveRolesForAccount returns guest roles for unverified accounts, otherwise their assigned roles.
 func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
 	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
 		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
