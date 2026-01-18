@@ -46,6 +46,17 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // 	return ctx, nil
 // }
 
+func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithRoles) (role.Roles, error) {
+	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		return role.Roles{guestRole}, nil
+	}
+	return acc.Roles.Roles(), nil
+}
+
 func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (context.Context, error) {
 	t, err := token.FromString(raw)
 	if err != nil {
@@ -57,21 +68,14 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Cache-backed repository for accounts.
 	acc, err := v.accountQuerier.GetByID(ctx, tv.AccountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// If the account's email is not verified, use guest role instead of their
-	// normal roles. This treats unverified members as guests for permissions.
-	roles := acc.Roles.Roles()
-	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
-		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-		roles = role.Roles{guestRole}
+	roles, err := v.resolveRolesForAccount(ctx, acc)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return WithAccountAndToken(ctx, acc.Account, roles, raw), nil
