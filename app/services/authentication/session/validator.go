@@ -87,43 +87,32 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Lookup the access key record by the access key token identifier
-	// this is the part before the hash, such as "sdpak_12345678abef".
 	ar, err := v.akRepo.LookupByToken(ctx, ak)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Convert the retrieved authentication record into an access key record.
 	ark, err := access_key.AccessKeyRecordFromAuthenticationRecord(*ar)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Validate the access key record by argon2 verifying the secret + hash.
 	_, err = ak.Validate(*ark)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Cache-backed repository for accounts.
 	acc, err := v.accountQuerier.GetByID(ctx, ar.Account.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// If the account's email is not verified, use guest role instead of their
-	// normal roles. This treats unverified members as guests for permissions.
-	roles := acc.Roles.Roles()
-	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
-		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-		roles = role.Roles{guestRole}
+	roles, err := v.resolveRolesForAccount(ctx, acc)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, ar.Account, roles), nil
+	return WithAccessKey(ctx, acc.Account, roles), nil
 }
 
 func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
