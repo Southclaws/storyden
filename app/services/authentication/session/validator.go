@@ -46,7 +46,7 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // 	return ctx, nil
 // }
 
-func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithRoles) (role.Roles, error) {
+func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
 	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
 		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 		if err != nil {
