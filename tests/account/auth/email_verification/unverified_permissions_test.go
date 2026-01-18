@@ -80,7 +80,10 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 
 				// Verify email
 				verification := inbox.GetLast()
-				code := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)[1]
+				match := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)
+				r.NotNil(match, "verification email should contain a 6-digit code")
+				r.GreaterOrEqual(len(match), 2, "regex match should have at least 2 elements (full match and capture group)")
+				code := match[1]
 				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: code}, unverifiedSession)
 				tests.Ok(t, err, verify)
 
@@ -193,7 +196,10 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 
 				// Verify email
 				verification := inbox.GetLast()
-				code := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)[1]
+				match := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)
+				r.NotNil(match, "verification email should contain a 6-digit code")
+				r.GreaterOrEqual(len(match), 2, "regex match should have at least 2 elements (full match and capture group)")
+				code := match[1]
 				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: code}, unverifiedSession)
 				tests.Ok(t, err, verify)
 
