@@ -21,6 +21,7 @@ type Validator struct {
 	akRepo         *access_key.Repository
 }
 
+// NewValidator creates a new session validator with the required dependencies.
 func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository) *Validator {
 	return &Validator{
 		tokenRepo:      tokenRepo,
@@ -58,6 +59,7 @@ func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.Acc
 	return acc.Roles.Roles(), nil
 }
 
+// ValidateSessionToken validates a session token and returns a context with account info.
 func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (context.Context, error) {
 	t, err := token.FromString(raw)
 	if err != nil {
@@ -82,6 +84,7 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 	return WithAccountAndToken(ctx, acc.Account, roles, raw), nil
 }
 
+// ValidateAccessKeyToken validates an access key token and returns a context with account info.
 func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (context.Context, error) {
 	ak, err := access_key.ParseAccessKeyToken(raw)
 	if err != nil {
@@ -116,6 +119,7 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 	return WithAccessKey(ctx, acc.Account, roles), nil
 }
 
+// WithUnauthenticatedRoles returns a context with guest role permissions.
 func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
 	guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 	if err != nil {
