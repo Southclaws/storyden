@@ -2,6 +2,7 @@
     "pages": [
         "introduction",
         "operation",
+        "reference",
         "api"
     ]
 }

@@ -1,0 +1,7 @@
+{
+    "pages": [
+        "sqlite",
+        "postgresql",
+        "turso"
+    ]
+}

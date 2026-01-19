@@ -1,0 +1,45 @@
+---
+title: PostgreSQL
+description: A proven relational database for serious deployments
+---
+
+PostgreSQL is a long-standing, reliable relational database that scales from small community sites to large, high-traffic installations. It’s a common choice for self-hosted forums and content platforms where data integrity, flexibility, and long-term stability matter.
+
+```bash
+DATABASE_URL=postgresql://user:password@localhost:5432/storyden
+```
+
+<Callout title="When to use PostgreSQL">
+  High-traffic communities where a single SQLite instance can't keep up, or when
+  you're already running PostgreSQL for other applications and want to keep
+  everything in one place.
+</Callout>
+
+## Supported PostgreSQL-Compatible Databases
+
+Storyden works with PostgreSQL and any PostgreSQL-compatible database or service:
+
+- **PostgreSQL** - The original, available everywhere
+- **CockroachDB** - Distributed SQL with PostgreSQL compatibility
+- **Neon** - Serverless PostgreSQL with branching
+- **Supabase** - PostgreSQL with additional features and tooling
+
+Any service that speaks the PostgreSQL wire protocol should work. If you encounter compatibility issues with a specific provider, [open an issue](https://github.com/Southclaws/storyden/issues/new).
+
+## Performance Characteristics
+
+PostgreSQL excels at concurrent reads and writes. Unlike SQLite's single-writer limitation, PostgreSQL can handle many concurrent writers, making it suitable for high-traffic deployments with a focus on more content being posted.
+
+Upsides:
+
+- Native support for multiple concurrent writers
+- Horizontal scaling across multiple Storyden instances
+- Rich ecosystem of extensions and tools
+- Managed service options from every major cloud provider
+
+Considerations:
+
+- Requires separate database service to operate
+- More complex operational overhead than SQLite
+- Network latency between application and database
+- Higher memory and CPU requirements than SQLite

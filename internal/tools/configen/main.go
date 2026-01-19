@@ -13,7 +13,7 @@ import (
 func main() {
 	schemaFlag := flag.String("schema", "internal/config/config.yaml", "path to config schema")
 	outputPkgFlag := flag.String("pkg", "internal/config/config.go", "path to output config.go struct file")
-	outputDocFlag := flag.String("doc", "home/content/docs/operation/configuration.mdx", "path to output docs markdown file")
+	outputDocFlag := flag.String("doc", "home/content/docs/reference/configuration.mdx", "path to output docs markdown file")
 
 	flag.Parse()
 

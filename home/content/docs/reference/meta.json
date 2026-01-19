@@ -1,0 +1,17 @@
+{
+    "root": true,
+    "title": "Reference",
+    "description": "Reference manuals for specific Storyden features.",
+    "pages": [
+        "---Introduction---",
+        "index",
+        "---Configuring Storyden---",
+        "configuration",
+        "settings",
+        "---Data management---",
+        "database",
+        "search",
+        "---Authentication---",
+        "access-keys"
+    ]
+}

@@ -1,0 +1,75 @@
+---
+title: SQLite
+description: Fast embedded database with zero configuration
+---
+
+SQLite is the default database for Storyden and is production-ready for most deployments. It's an embedded database that runs in-process with your application, requiring no separate database server or complex configuration.
+
+```bash
+DATABASE_URL=sqlite://data/data.db?_pragma=foreign_keys(1)
+```
+
+<Callout title="When to use SQLite">
+  A small to medium community running on a single server with persistent disk
+  storage. SQLite can handle hundreds of thousands of posts and thousands of
+  concurrent readers. It's perfect for communities that value operational
+  simplicity and don't need horizontal scaling across multiple instances.
+</Callout>
+
+SQLite is one of the most widely deployed database engines in the world. It's used in browsers, mobile apps, embedded systems, and increasingly in web applications. Despite its "lite" name, SQLite is extremely capable and can handle gigabytes of data with excellent performance.
+
+## Performance Characteristics
+
+SQLite's performance is often misunderstood. For read-heavy workloads like forums and community platforms, SQLite can outperform many client-server databases because there's no network overhead. Data access is direct file I/O, which is incredibly fast on modern SSDs.
+
+Upsides:
+
+- Zero infrastructure overhead - no separate database server to manage
+- Extremely fast reads with WAL mode enabled
+- Simple backup and restore - just copy the file
+- Low memory footprint
+- Runs great on modest hardware
+
+Considerations:
+
+- Single writer at a time (though many concurrent readers)
+- Not suitable for multiple application instances without something like [Litestream](https://litestream.io)
+- Requires persistent disk storage
+- Database file must be on the same filesystem as the application
+
+## Single-Server Deployment with SQLite
+
+Small to large community running on a VPS or dedicated server:
+
+```bash
+# Database
+DATABASE_URL=sqlite:///var/lib/storyden/data.db?_pragma=foreign_keys(1)
+
+# Search (optional but recommended)
+SEARCH_PROVIDER=bleve
+BLEVE_PATH=/var/lib/storyden/bleve
+
+# Asset storage
+ASSET_STORAGE_TYPE=local
+ASSET_STORAGE_LOCAL_PATH=/var/lib/storyden/assets
+```
+
+This configuration keeps all data local to the server. Ensure `/var/lib/storyden` has sufficient disk space and is included in your backup strategy.
+
+## Scaling Considerations
+
+SQLite scales vertically, not horizontally. If you need to run multiple application instances for redundancy or load distribution, consider:
+
+1. Use Litestream with periodic restarts to sync database state
+2. Switch to PostgreSQL for native multi-instance support
+3. Use a read-replica strategy with Litestream's restore capabilities
+
+For most communities, a single instance with SQLite provides excellent performance and operational simplicity. Don't prematurely optimize for scale you don't need.
+
+### Migration Warning
+
+Switching databases is hard. If you foresee scaling needs in future, consider making that choice early on.
+
+While you can extract JSON form Storyden resources via the API, it's not trivial to re-create them and maintain things like ownership state. Migrating data directly is also tricky as there's no standard data format outside of the procedural SQL commands you may get in a dump.
+
+And, although SQLite is relatively close to a "vanilla" SQL implementation, SQL dialects vary significantly in practice, and dumps often require translation or adjustment when targeting a different database engine.

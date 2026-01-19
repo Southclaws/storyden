@@ -1,0 +1,52 @@
+---
+title: Reference
+description: The instruction manual for Storyden. Print it out and staple it together!
+---
+
+In this section you'll find various reference documentation for all of Storyden's features and systems.
+
+Use it to look up configuration options, system behaviour, supported backends, and other factual details.
+
+## In this section
+
+### Configuring Storyden
+
+There are two ways to customize Storyden to your needs:
+
+<Cards>
+  <Card href="/docs/operation/configuration" title="Configuration">
+    Environment variables passed to the application at startup time. The kinds
+    of things under configuration don't change very often once set, so they
+    require a restart to take effect.
+  </Card>
+  <Card href="/docs/operation/settings" title="Settings">
+    Runtime settings you can change via the administration menu inside the app
+    itself. These are stored in the database and can be changed at any time
+    without a restart.
+  </Card>
+</Cards>
+
+### Data Management
+
+<Cards>
+  <Card href="reference/database" title="Database Choice">
+    Pick from a handful of databases based on your needs.
+  </Card>
+  <Card href="reference/search" title="Search Providers">
+    Search providers, configuration and comparisons.
+  </Card>
+</Cards>
+
+## Operation of a Storyden Instance
+
+Storyden is designed to be simple to operate compared to traditional forum software. There's no complex web-based setup wizard, no manual database migrations, and no tangled web of configuration files scattered across the filesystem. Storyden is designed with ephemeral cloud-based infrastructure in mind, while maintaining a sane setup for traditional stateful server environments.
+
+Infrastructure configuration follows [12-factor app](https://12factor.net/) principles using environment variables for settings that rarely change after initial setup - things like database URLs, API keys, and service endpoints. This makes Storyden straightforward to deploy anywhere from a single VPS to containerized cloud environments.
+
+Meanwhile, community settings you'll want to experiment with - like rate limits, feature toggles, and appearance options - live in the admin UI where you can adjust them without restarting anything.
+
+## Processes
+
+Storyden runs as a single binary process that can optionally launch the frontend alongside it. This makes deployment dead simple - no complex multi-service orchestration required unless you choose to add optional enhancements like Redis caching or external databases.
+
+The platform is built with zero mandatory service dependencies. Everything needed for a production deployment is built in: SQLite for the database, local disk for file storage, in-process memory for caching, and Go channels for message queuing. You can add external services as you scale, but they're not required to get started.
