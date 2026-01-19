@@ -1,0 +1,58 @@
+---
+title: OAuth2 Providers
+description: Configure third-party authentication for your Storyden community
+---
+
+Storyden supports OAuth2 authentication with popular identity providers, allowing members to sign in using their existing accounts. OAuth providers require JWT_SECRET to be configured for state validation during the authentication flow.
+
+## Prerequisites
+
+Before enabling any OAuth provider, you must configure a JWT secret:
+
+```bash
+JWT_SECRET=your-random-secret-here
+```
+
+Generate a secure random secret using:
+
+```bash
+openssl rand -hex 32
+```
+
+The JWT secret is used to sign and verify the OAuth state tokens that protect against CSRF attacks during the authentication flow.
+
+## Available Providers
+
+Each provider has a unique identifier and callback URL that you'll need when configuring the OAuth application with the provider.
+
+| Provider | Identifier       | Callback URL                                           | Setup Guide                                      |
+| -------- | ---------------- | ------------------------------------------------------ | ------------------------------------------------ |
+| Google   | `oauth_google`   | `https://your-domain.com/auth/oauth_google/callback`   | [Google Setup](/docs/reference/oauth/google)     |
+| GitHub   | `oauth_github`   | `https://your-domain.com/auth/oauth_github/callback`   | [GitHub Setup](/docs/reference/oauth/github)     |
+| Discord  | `oauth_discord`  | `https://your-domain.com/auth/oauth_discord/callback`  | [Discord Setup](/docs/reference/oauth/discord)   |
+| Keycloak | `oauth_keycloak` | `https://your-domain.com/auth/oauth_keycloak/callback` | [Keycloak Setup](/docs/reference/oauth/keycloak) |
+
+<Callout type="info">
+  Replace `your-domain.com` with your actual domain. Make sure
+  `PUBLIC_WEB_ADDRESS` is set correctly as it determines the base URL for
+  callbacks.
+</Callout>
+
+## User Profile Mapping
+
+When a user signs in via OAuth for the first time, Storyden creates a new account with information from the OAuth provider:
+
+- **Username/Handle**: Derived from the provider's username or email
+- **Display Name**: Full name from the provider profile
+- **Email**: Used to link the account and prevent duplicates/hijacking
+- **OAuth Token**: Stored for the authentication method
+
+Subsequent sign-ins with the same provider will match to the existing account by the OAuth provider's unique user ID.
+
+## Security Considerations
+
+- OAuth tokens are stored unencrypted in the database
+- The `JWT_SECRET` must be kept secure
+- Each OAuth provider requires separate client credentials
+- Callback URLs must match exactly what's configured with the provider
+- State tokens expire after 10 minutes for security

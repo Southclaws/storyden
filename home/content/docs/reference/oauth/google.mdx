@@ -1,0 +1,36 @@
+---
+title: Google OAuth
+description: Configure Google Sign-In for your Storyden community
+---
+
+Google OAuth 2.0 allows members to sign in using their Google accounts. This is one of the most widely supported authentication methods since most people have a Google account.
+
+## Configuration
+
+Set these environment variables to enable Google OAuth:
+
+```bash
+JWT_SECRET=your-random-secret-here
+OAUTH_GOOGLE_ENABLED=true
+OAUTH_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+OAUTH_GOOGLE_CLIENT_SECRET=your-client-secret
+```
+
+## Setting Up Google OAuth
+
+Create an OAuth 2.0 Client ID in the [Google Cloud Console](https://console.cloud.google.com/) under "APIs & Services" → "Credentials":
+
+- **Type**: Web application
+- **Authorized JavaScript origins**: `https://your-domain.com`
+- **Authorized redirect URIs**: `https://your-domain.com/auth/oauth_google/callback`
+
+Configure the OAuth consent screen with the `userinfo.email` and `userinfo.profile` scopes.
+
+## Local Development
+
+For local development, use `http://localhost:3000` as the domain:
+
+- **Authorized JavaScript origins**: `http://localhost:3000`
+- **Authorized redirect URIs**: `http://localhost:3000/auth/oauth_google/callback`
+
+Make sure `PUBLIC_WEB_ADDRESS` is set to `http://localhost:3000`.

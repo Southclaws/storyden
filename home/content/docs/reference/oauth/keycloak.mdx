@@ -1,0 +1,63 @@
+---
+title: Keycloak OAuth
+description: Use Keycloak or any OIDC-compatible provider for authentication
+---
+
+Keycloak is an open-source identity and access management solution that provides single sign-on (SSO) capabilities. Storyden's Keycloak integration uses OpenID Connect (OIDC) discovery, which means it also works with other OIDC-compatible identity providers.
+
+## Configuration
+
+Set these environment variables to enable Keycloak OAuth:
+
+```bash
+JWT_SECRET=your-random-secret-here
+OAUTH_KEYCLOAK_ENABLED=true
+OAUTH_KEYCLOAK_CLIENT_ID=your-client-id
+OAUTH_KEYCLOAK_CLIENT_SECRET=your-client-secret
+OAUTH_KEYCLOAK_ISSUER_URL=https://auth.example.com/realms/YourRealm
+```
+
+## Setting Up Keycloak
+
+Create an OpenID Connect client in your Keycloak realm with:
+- **Client authentication**: Enabled
+- **Standard flow**: Enabled
+- **Valid redirect URI**: `https://your-domain.com/auth/oauth_keycloak/callback`
+
+The issuer URL format is `https://<keycloak-domain>/realms/<realm-name>`.
+
+## OIDC Discovery
+
+Storyden uses OIDC discovery to automatically configure endpoints from `{issuer}/.well-known/openid-configuration`. This means it works with any OIDC-compatible provider that supports discovery.
+
+## Using with Other OIDC Providers
+
+Since Storyden uses standard OIDC discovery, you can use this integration with other identity providers that support OIDC:
+
+### Authentik
+
+```bash
+OAUTH_KEYCLOAK_ISSUER_URL=https://auth.example.com/application/o/your-app/
+```
+
+### Auth0
+
+```bash
+OAUTH_KEYCLOAK_ISSUER_URL=https://your-tenant.auth0.com/
+```
+
+### Okta
+
+```bash
+OAUTH_KEYCLOAK_ISSUER_URL=https://your-domain.okta.com/oauth2/default
+```
+
+### Azure AD / Microsoft Entra ID
+
+```bash
+OAUTH_KEYCLOAK_ISSUER_URL=https://login.microsoftonline.com/{tenant-id}/v2.0
+```
+
+## Local Development
+
+For local development, use `http://localhost:3000` as the redirect URI in your Keycloak client and set `PUBLIC_WEB_ADDRESS=http://localhost:3000`.

@@ -1,0 +1,35 @@
+---
+title: GitHub OAuth
+description: Enable GitHub authentication for developer communities
+---
+
+GitHub OAuth allows members to sign in using their GitHub accounts. This is particularly useful for developer-focused communities and technical forums.
+
+## Configuration
+
+Set these environment variables to enable GitHub OAuth:
+
+```bash
+JWT_SECRET=your-random-secret-here
+OAUTH_GITHUB_ENABLED=true
+OAUTH_GITHUB_CLIENT_ID=your-client-id
+OAUTH_GITHUB_CLIENT_SECRET=your-client-secret
+```
+
+## Setting Up GitHub OAuth
+
+Register a new OAuth App in [GitHub Developer Settings](https://github.com/settings/developers):
+
+- **Homepage URL**: `https://your-domain.com`
+- **Authorization callback URL**: `https://your-domain.com/auth/oauth_github/callback`
+
+After creating the app, generate a client secret and add both to your environment.
+
+## Local Development
+
+For local development, use `http://localhost:3000` as the domain:
+
+- **Homepage URL**: `http://localhost:3000`
+- **Authorization callback URL**: `http://localhost:3000/auth/oauth_github/callback`
+
+Make sure `PUBLIC_WEB_ADDRESS` is set to `http://localhost:3000`.

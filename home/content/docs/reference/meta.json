@@ -12,6 +12,7 @@
         "database",
         "search",
         "---Authentication---",
+        "oauth",
         "access-keys"
     ]
 }
