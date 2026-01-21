@@ -1,77 +1,94 @@
 "use client";
 
-import { Arguments, useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 
+import { mutateTransaction } from "@/api/mutate";
 import {
   adminSettingsUpdate,
   getAdminSettingsGetKey,
 } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
-import { AdminSettingsMutableProps, Info } from "@/api/openapi-schema";
+import {
+  AdminSettingsMutableProps,
+  AdminSettingsProps,
+  Info,
+} from "@/api/openapi-schema";
 
 import { AdminSettings } from "./settings";
 
 export function useSettingsMutation() {
   const { mutate } = useSWRConfig();
 
-  const infoKey = getGetInfoKey()[0];
+  const infoKey = getGetInfoKey();
   const adminSettingsKey = getAdminSettingsGetKey();
 
-  function keyFilterFn(key: Arguments) {
-    return Array.isArray(key) && key[0].startsWith(infoKey);
-  }
-
   async function revalidate(data?: Info) {
-    await mutate(keyFilterFn, data);
+    await mutate(infoKey, data);
   }
 
-  async function updateSettings(data: AdminSettingsMutableProps) {
-    await mutate(
-      adminSettingsKey,
-      (current: AdminSettings | undefined) => {
-        if (!current) return undefined;
-
-        return {
-          ...current,
-          ...data,
-          metadata: {
-            ...current.metadata,
-            ...data.metadata,
+  async function updateSettings(patch: AdminSettingsMutableProps) {
+    await mutateTransaction(
+      mutate,
+      [
+        {
+          key: adminSettingsKey,
+          optimistic: (current: AdminSettings | undefined) =>
+            current
+              ? {
+                  ...current,
+                  ...patch,
+                  metadata: {
+                    ...current.metadata,
+                    ...patch.metadata,
+                  },
+                }
+              : current,
+          commit: (_current, result) => {
+            return result;
           },
-        } satisfies AdminSettings;
-      },
-      { revalidate: false },
-    );
+        },
+        {
+          key: infoKey,
+          optimistic: (current: Info | undefined) => {
+            if (!current) return current;
+            const { services, ...publicPatch } = patch;
 
-    await mutate(
-      keyFilterFn,
-      (currentInfo: Info | undefined) => {
-        if (!currentInfo) return undefined;
-
-        // NOTE: This is kinda hacky, we need to rework this in future. It's
-        // because the very old /info endpoint returns a subset of settings that
-        // are public, then the admin settings includes additional fields that
-        // are not public. This doesn't expose any data (as it's just a mutation
-        // for the current session) but it's still not ideal.
-        const { services, ...infoData } = data;
-
-        return {
-          ...currentInfo,
-          ...infoData,
-          metadata: {
-            ...currentInfo.metadata,
-            ...data.metadata,
+            return {
+              ...current,
+              ...publicPatch,
+              metadata: {
+                ...current.metadata,
+                ...patch.metadata,
+              },
+            } satisfies Info;
           },
-        } satisfies Info;
-      },
-      { revalidate: false },
-    );
+          commit: (current, result) => {
+            const updated = result;
+            if (!current) return current;
 
-    await adminSettingsUpdate(data);
+            return adminToInfo(updated);
+          },
+        },
+      ],
+      async () => {
+        return await adminSettingsUpdate(patch);
+      },
+      {
+        revalidate: true,
+      },
+    );
   }
 
   return {
     updateSettings,
     revalidate,
+  };
+}
+
+function adminToInfo(admin: AdminSettingsProps): Info {
+  return {
+    ...admin,
+    capabilities: admin.capabilities ?? [],
+    onboarding_status: "complete",
   };
 }
