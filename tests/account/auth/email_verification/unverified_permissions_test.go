@@ -37,13 +37,21 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
+			// Set authentication mode to Email for these tests
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			emailMode := openapi.Email
+			_, err := cl.AdminSettingsUpdateWithResponse(adminCtx, openapi.AdminSettingsUpdateJSONRequestBody{
+				AuthenticationMode: &emailMode,
+			}, adminSession)
+			if err != nil {
+				t.Fatalf("Failed to set authentication mode: %v", err)
+			}
+
 			t.Run("unverified_user_has_guest_permissions", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
-
-				// Create a category using an admin account (verified)
-				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-				adminSession := sh.WithSession(adminCtx)
 
 				catName := "Category " + uuid.NewString()
 				cat := tests.AssertRequest(

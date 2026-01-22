@@ -52,6 +52,10 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // }
 
 func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
+	if acc.Admin {
+		return acc.Roles.Roles(), nil
+	}
+
 	requiresEmailVerification, err := v.installationRequiresEmailVerification(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -74,7 +78,7 @@ func (v *Validator) installationRequiresEmailVerification(ctx context.Context) (
 		return false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	authMode := s.AuthenticationMode.OrZero()
+	authMode := s.AuthenticationMode.Or(authentication.ModeHandle)
 
 	return authMode == authentication.ModeEmail, nil
 }
