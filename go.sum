@@ -580,6 +580,8 @@ github.com/vmware-labs/yaml-jsonpath v0.3.2 h1:/5QKeCBGdsInyDCyVNLbXyilb61MXGi9N
 github.com/vmware-labs/yaml-jsonpath v0.3.2/go.mod h1:U6whw1z03QyqgWdgXxvVnQ90zN1BWz5V+51Ewf8k+rQ=
 github.com/weaviate/weaviate v1.33.0 h1:9QZRul+qfgcng3E+z0I/0K3xvuCJuzHLuTA4GAucg0U=
 github.com/weaviate/weaviate v1.33.0/go.mod h1:d9Xpwp5AIdbm8BxYeasQnddJcJtYsLR4wwIPRLUHAmg=
+github.com/weaviate/weaviate v1.33.4 h1:eA37l538+3pEBJAZ3/mFBHG0IEWcj5/aAJSzFhrYuUA=
+github.com/weaviate/weaviate v1.33.4/go.mod h1:PcHPXXLxsZGzSTZQKX5FYiH9JoqLesuAnokZEWwbgPc=
 github.com/weaviate/weaviate-go-client/v5 v5.5.0 h1:+5qkHodrL3/Qc7kXvMXnDaIxSBN5+djivLqzmCx7VS4=
 github.com/weaviate/weaviate-go-client/v5 v5.5.0/go.mod h1:Zdm2MEXG27I0Nf6fM0FZ3P2vLR4JM0iJZrOxwc+Zj34=
 github.com/wk8/go-ordered-map/v2 v2.1.9-0.20250401010720-46d686821e33 h1:VDXCpjGQPaNBkmuHllIpYxsjuugfoaFD0zIDjtqevjk=
