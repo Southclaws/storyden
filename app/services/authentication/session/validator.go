@@ -8,10 +8,12 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/token"
+	"github.com/Southclaws/storyden/app/resources/settings"
 )
 
 type Validator struct {
@@ -19,15 +21,17 @@ type Validator struct {
 	accountQuerier *account_querier.Querier
 	roleQuerier    *role_querier.Querier
 	akRepo         *access_key.Repository
+	settings       *settings.SettingsRepository
 }
 
 // NewValidator creates a new session validator with the required dependencies.
-func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository) *Validator {
+func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository, settings *settings.SettingsRepository) *Validator {
 	return &Validator{
 		tokenRepo:      tokenRepo,
 		accountQuerier: accountQuerier,
 		roleQuerier:    roleQuerier,
 		akRepo:         akRepo,
+		settings:       settings,
 	}
 }
 
@@ -48,14 +52,31 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // }
 
 func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
-	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+	requiresEmailVerification, err := v.installationRequiresEmailVerification(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if requiresEmailVerification && acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
 		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 		return role.Roles{guestRole}, nil
 	}
+
 	return acc.Roles.Roles(), nil
+}
+
+func (v *Validator) installationRequiresEmailVerification(ctx context.Context) (bool, error) {
+	s, err := v.settings.Get(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	authMode := s.AuthenticationMode.OrZero()
+
+	return authMode == authentication.ModeEmail, nil
 }
 
 // ValidateSessionToken validates a session token and returns a context with account info.
