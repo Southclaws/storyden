@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/role"
@@ -62,7 +63,18 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccountAndToken(ctx, acc.Account, acc.Roles.Roles(), raw), nil
+	// If the account's email is not verified, use guest role instead of their
+	// normal roles. This treats unverified members as guests for permissions.
+	roles := acc.Roles.Roles()
+	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		roles = role.Roles{guestRole}
+	}
+
+	return WithAccountAndToken(ctx, acc.Account, roles, raw), nil
 }
 
 func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (context.Context, error) {
@@ -96,7 +108,18 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, ar.Account, acc.Roles.Roles()), nil
+	// If the account's email is not verified, use guest role instead of their
+	// normal roles. This treats unverified members as guests for permissions.
+	roles := acc.Roles.Roles()
+	if acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		roles = role.Roles{guestRole}
+	}
+
+	return WithAccessKey(ctx, ar.Account, roles), nil
 }
 
 func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
