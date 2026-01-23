@@ -6,11 +6,14 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/token"
+	"github.com/Southclaws/storyden/app/resources/settings"
 )
 
 type Validator struct {
@@ -18,14 +21,17 @@ type Validator struct {
 	accountQuerier *account_querier.Querier
 	roleQuerier    *role_querier.Querier
 	akRepo         *access_key.Repository
+	settings       *settings.SettingsRepository
 }
 
-func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository) *Validator {
+// NewValidator creates a new session validator with the required dependencies.
+func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository, settings *settings.SettingsRepository) *Validator {
 	return &Validator{
 		tokenRepo:      tokenRepo,
 		accountQuerier: accountQuerier,
 		roleQuerier:    roleQuerier,
 		akRepo:         akRepo,
+		settings:       settings,
 	}
 }
 
@@ -45,6 +51,39 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 // 	return ctx, nil
 // }
 
+func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
+	if acc.Admin {
+		return acc.Roles.Roles(), nil
+	}
+
+	requiresEmailVerification, err := v.installationRequiresEmailVerification(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if requiresEmailVerification && acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		return role.Roles{guestRole}, nil
+	}
+
+	return acc.Roles.Roles(), nil
+}
+
+func (v *Validator) installationRequiresEmailVerification(ctx context.Context) (bool, error) {
+	s, err := v.settings.Get(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	authMode := s.AuthenticationMode.Or(authentication.ModeHandle)
+
+	return authMode == authentication.ModeEmail, nil
+}
+
+// ValidateSessionToken validates a session token and returns a context with account info.
 func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (context.Context, error) {
 	t, err := token.FromString(raw)
 	if err != nil {
@@ -56,49 +95,55 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Cache-backed repository for accounts.
 	acc, err := v.accountQuerier.GetByID(ctx, tv.AccountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccountAndToken(ctx, acc.Account, acc.Roles.Roles(), raw), nil
+	roles, err := v.resolveRolesForAccount(ctx, acc)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithAccountAndToken(ctx, acc.Account, roles, raw), nil
 }
 
+// ValidateAccessKeyToken validates an access key token and returns a context with account info.
 func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (context.Context, error) {
 	ak, err := access_key.ParseAccessKeyToken(raw)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Lookup the access key record by the access key token identifier
-	// this is the part before the hash, such as "sdpak_12345678abef".
 	ar, err := v.akRepo.LookupByToken(ctx, ak)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Convert the retrieved authentication record into an access key record.
 	ark, err := access_key.AccessKeyRecordFromAuthenticationRecord(*ar)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Validate the access key record by argon2 verifying the secret + hash.
 	_, err = ak.Validate(*ark)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Cache-backed repository for accounts.
 	acc, err := v.accountQuerier.GetByID(ctx, ar.Account.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, ar.Account, acc.Roles.Roles()), nil
+	roles, err := v.resolveRolesForAccount(ctx, acc)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithAccessKey(ctx, acc.Account, roles), nil
 }
 
+// WithUnauthenticatedRoles returns a context with guest role permissions.
 func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
 	guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 	if err != nil {
