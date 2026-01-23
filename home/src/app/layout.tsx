@@ -57,8 +57,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       >
         <RootProvider
           theme={{
-            defaultTheme: "light",
-            enableSystem: false,
+            defaultTheme: "system",
+            enableSystem: true,
           }}
         >
           {children}
