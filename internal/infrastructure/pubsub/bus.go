@@ -2,6 +2,7 @@ package pubsub
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/components/cqrs"
@@ -26,6 +28,7 @@ type Bus struct {
 	logger           *slog.Logger
 	cfg              config.Config
 	pub              message.Publisher
+	contextPub       message.Publisher
 	sub              message.Subscriber
 	router           *message.Router
 	eventBus         *cqrs.EventBus
@@ -196,6 +199,7 @@ func newBus(
 		logger:           l,
 		cfg:              cfg,
 		pub:              pub,
+		contextPub:       contextPub,
 		sub:              sub,
 		router:           router,
 		eventBus:         eventBus,
@@ -221,6 +225,29 @@ func (b *Bus) PublishMany(ctx context.Context, events ...any) {
 	for _, e := range events {
 		b.Publish(ctx, e)
 	}
+}
+
+// PublishNamed publishes arbitrary payloads to an explicit topic, bypassing the
+// type-reflection based topic generation used by CQRS helpers.
+func (b *Bus) PublishNamed(ctx context.Context, topic string, event any) error {
+	payload, err := json.Marshal(event)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to marshal named event"))
+	}
+
+	msg := message.NewMessage(watermill.NewUUID(), payload)
+	msg.SetContext(ctx)
+	msg.Metadata.Set("name", topic)
+
+	if err := b.contextPub.Publish(topic, msg); err != nil {
+		b.logger.Error("failed to publish named event",
+			slog.String("topic", topic),
+			slog.String("error", err.Error()),
+		)
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
 
 // MustPublish is for when publishing is a critical requirement and errors must
@@ -272,18 +299,25 @@ type Subscription struct {
 	closed         bool
 	mu             sync.Mutex
 	messageHandler *message.Handler
+	subscriber     message.Subscriber
 }
 
-func (s *Subscription) Close() {
+func (s *Subscription) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.closed {
-		return
+		return nil
 	}
 
 	if s.messageHandler != nil {
 		s.messageHandler.Stop()
+	}
+
+	if s.subscriber != nil {
+		if err := s.subscriber.Close(); err != nil {
+			return fault.Wrap(err, fmsg.With("failed to close subscriber"))
+		}
 	}
 
 	s.closed = true
@@ -291,11 +325,14 @@ func (s *Subscription) Close() {
 	s.bus.mu.Lock()
 	delete(s.bus.subscriptions, s.subkey)
 	s.bus.mu.Unlock()
+
+	return nil
 }
 
 type (
 	HandlerFunc[T any]        func(ctx context.Context, event *T) error
 	CommandHandlerFunc[T any] func(ctx context.Context, command *T) error
+	DynamicHandlerFunc        func(ctx context.Context, payload json.RawMessage) error
 )
 
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
@@ -361,6 +398,56 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 		bus:    bus,
 		subkey: subkey,
 		topic:  topic,
+	}
+
+	bus.subscriptions[subkey] = sub
+
+	return sub, nil
+}
+
+func SubscribeNamed(ctx context.Context, bus *Bus, topicName string, handlerName string, handler DynamicHandlerFunc) (*Subscription, error) {
+	subkey := subscriptionKey(handlerName)
+
+	bus.mu.Lock()
+	defer bus.mu.Unlock()
+	if _, exists := bus.subscriptions[subkey]; exists {
+		return nil, fmt.Errorf("subscription already exists: %s", subkey)
+	}
+
+	subscriber := bus.sub
+	var amqpSubscriber message.Subscriber
+	if bus.cfg.QueueType == "amqp" {
+		apsc := amqp.NewDurablePubSubConfig(bus.cfg.AmqpURL, func(topic string) string {
+			return topic + "." + handlerName
+		})
+		s, err := amqp.NewSubscriber(apsc, watermill.NewSlogLogger(bus.logger.With("component", "watermill")))
+		if err != nil {
+			return nil, err
+		}
+		subscriber = s
+		amqpSubscriber = s
+	}
+
+	messageHandler := bus.router.AddConsumerHandler(
+		handlerName,
+		topicName,
+		subscriber,
+		func(msg *message.Message) error {
+			mctx := msg.Context()
+			return handler(mctx, json.RawMessage(msg.Payload))
+		},
+	)
+
+	if err := bus.router.RunHandlers(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	sub := &Subscription{
+		bus:            bus,
+		subkey:         subkey,
+		topic:          topicName,
+		messageHandler: messageHandler,
+		subscriber:     amqpSubscriber,
 	}
 
 	bus.subscriptions[subkey] = sub
