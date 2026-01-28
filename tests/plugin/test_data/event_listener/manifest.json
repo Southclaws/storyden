@@ -1,0 +1,11 @@
+{
+  "id": "event-listener-test",
+  "author": "storyden",
+  "name": "Event Listener Test Plugin",
+  "description": "Test plugin that listens to events and writes them to JSON files",
+  "version": "1.0.0",
+  "command": "./event_listener",
+  "events_consumed": [
+    "EventThreadPublished"
+  ]
+}

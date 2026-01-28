@@ -33,6 +33,8 @@ const (
 	FieldStatusMessage = "status_message"
 	// FieldStatusDetails holds the string denoting the status_details field in the database.
 	FieldStatusDetails = "status_details"
+	// FieldAuthSecret holds the string denoting the auth_secret field in the database.
+	FieldAuthSecret = "auth_secret"
 	// FieldAddedBy holds the string denoting the added_by field in the database.
 	FieldAddedBy = "added_by"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -60,6 +62,7 @@ var Columns = []string{
 	FieldActiveStateChangedAt,
 	FieldStatusMessage,
 	FieldStatusDetails,
+	FieldAuthSecret,
 	FieldAddedBy,
 }
 
@@ -122,6 +125,11 @@ func ByActiveStateChangedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByStatusMessage orders the results by the status_message field.
 func ByStatusMessage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatusMessage, opts...).ToFunc()
+}
+
+// ByAuthSecret orders the results by the auth_secret field.
+func ByAuthSecret(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAuthSecret, opts...).ToFunc()
 }
 
 // ByAddedBy orders the results by the added_by field.

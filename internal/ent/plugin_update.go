@@ -132,6 +132,20 @@ func (_u *PluginUpdate) ClearStatusDetails() *PluginUpdate {
 	return _u
 }
 
+// SetAuthSecret sets the "auth_secret" field.
+func (_u *PluginUpdate) SetAuthSecret(v string) *PluginUpdate {
+	_u.mutation.SetAuthSecret(v)
+	return _u
+}
+
+// SetNillableAuthSecret sets the "auth_secret" field if the given value is not nil.
+func (_u *PluginUpdate) SetNillableAuthSecret(v *string) *PluginUpdate {
+	if v != nil {
+		_u.SetAuthSecret(*v)
+	}
+	return _u
+}
+
 // SetAddedBy sets the "added_by" field.
 func (_u *PluginUpdate) SetAddedBy(v xid.ID) *PluginUpdate {
 	_u.mutation.SetAddedBy(v)
@@ -259,6 +273,9 @@ func (_u *PluginUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.StatusDetailsCleared() {
 		_spec.ClearField(entplugin.FieldStatusDetails, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.AuthSecret(); ok {
+		_spec.SetField(entplugin.FieldAuthSecret, field.TypeString, value)
 	}
 	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -408,6 +425,20 @@ func (_u *PluginUpdateOne) SetStatusDetails(v map[string]interface{}) *PluginUpd
 // ClearStatusDetails clears the value of the "status_details" field.
 func (_u *PluginUpdateOne) ClearStatusDetails() *PluginUpdateOne {
 	_u.mutation.ClearStatusDetails()
+	return _u
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (_u *PluginUpdateOne) SetAuthSecret(v string) *PluginUpdateOne {
+	_u.mutation.SetAuthSecret(v)
+	return _u
+}
+
+// SetNillableAuthSecret sets the "auth_secret" field if the given value is not nil.
+func (_u *PluginUpdateOne) SetNillableAuthSecret(v *string) *PluginUpdateOne {
+	if v != nil {
+		_u.SetAuthSecret(*v)
+	}
 	return _u
 }
 
@@ -568,6 +599,9 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 	}
 	if _u.mutation.StatusDetailsCleared() {
 		_spec.ClearField(entplugin.FieldStatusDetails, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.AuthSecret(); ok {
+		_spec.SetField(entplugin.FieldAuthSecret, field.TypeString, value)
 	}
 	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{

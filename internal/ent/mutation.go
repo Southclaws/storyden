@@ -20069,6 +20069,7 @@ type PluginMutation struct {
 	active_state_changed_at *time.Time
 	status_message          *string
 	status_details          *map[string]interface{}
+	auth_secret             *string
 	clearedFields           map[string]struct{}
 	account                 *xid.ID
 	clearedaccount          bool
@@ -20531,6 +20532,42 @@ func (m *PluginMutation) ResetStatusDetails() {
 	delete(m.clearedFields, entplugin.FieldStatusDetails)
 }
 
+// SetAuthSecret sets the "auth_secret" field.
+func (m *PluginMutation) SetAuthSecret(s string) {
+	m.auth_secret = &s
+}
+
+// AuthSecret returns the value of the "auth_secret" field in the mutation.
+func (m *PluginMutation) AuthSecret() (r string, exists bool) {
+	v := m.auth_secret
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthSecret returns the old "auth_secret" field's value of the Plugin entity.
+// If the Plugin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PluginMutation) OldAuthSecret(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthSecret is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthSecret requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthSecret: %w", err)
+	}
+	return oldValue.AuthSecret, nil
+}
+
+// ResetAuthSecret resets all changes to the "auth_secret" field.
+func (m *PluginMutation) ResetAuthSecret() {
+	m.auth_secret = nil
+}
+
 // SetAddedBy sets the "added_by" field.
 func (m *PluginMutation) SetAddedBy(x xid.ID) {
 	m.account = &x
@@ -20641,7 +20678,7 @@ func (m *PluginMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PluginMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, entplugin.FieldCreatedAt)
 	}
@@ -20668,6 +20705,9 @@ func (m *PluginMutation) Fields() []string {
 	}
 	if m.status_details != nil {
 		fields = append(fields, entplugin.FieldStatusDetails)
+	}
+	if m.auth_secret != nil {
+		fields = append(fields, entplugin.FieldAuthSecret)
 	}
 	if m.account != nil {
 		fields = append(fields, entplugin.FieldAddedBy)
@@ -20698,6 +20738,8 @@ func (m *PluginMutation) Field(name string) (ent.Value, bool) {
 		return m.StatusMessage()
 	case entplugin.FieldStatusDetails:
 		return m.StatusDetails()
+	case entplugin.FieldAuthSecret:
+		return m.AuthSecret()
 	case entplugin.FieldAddedBy:
 		return m.AddedBy()
 	}
@@ -20727,6 +20769,8 @@ func (m *PluginMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldStatusMessage(ctx)
 	case entplugin.FieldStatusDetails:
 		return m.OldStatusDetails(ctx)
+	case entplugin.FieldAuthSecret:
+		return m.OldAuthSecret(ctx)
 	case entplugin.FieldAddedBy:
 		return m.OldAddedBy(ctx)
 	}
@@ -20800,6 +20844,13 @@ func (m *PluginMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStatusDetails(v)
+		return nil
+	case entplugin.FieldAuthSecret:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthSecret(v)
 		return nil
 	case entplugin.FieldAddedBy:
 		v, ok := value.(xid.ID)
@@ -20898,6 +20949,9 @@ func (m *PluginMutation) ResetField(name string) error {
 		return nil
 	case entplugin.FieldStatusDetails:
 		m.ResetStatusDetails()
+		return nil
+	case entplugin.FieldAuthSecret:
+		m.ResetAuthSecret()
 		return nil
 	case entplugin.FieldAddedBy:
 		m.ResetAddedBy()

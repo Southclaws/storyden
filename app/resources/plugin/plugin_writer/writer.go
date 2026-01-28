@@ -13,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/plugin"
+	"github.com/Southclaws/storyden/app/services/plugin/plugin_auth"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
@@ -42,6 +43,11 @@ func (w *Writer) Add(ctx context.Context, acc account.AccountID, pl *plugin.Vali
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	authSecret, err := plugin_auth.GenerateSecret()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	r, err := w.db.Plugin.Create().
 		SetAccountID(xid.ID(acc)).
 		SetConfig(map[string]any{}).
@@ -49,6 +55,7 @@ func (w *Writer) Add(ctx context.Context, acc account.AccountID, pl *plugin.Vali
 		SetActiveState(plugin.ActiveStateInactive.String()).
 		SetActiveStateChangedAt(time.Now()).
 		SetPath(p).
+		SetAuthSecret(authSecret).
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
@@ -68,7 +75,7 @@ func (w *Writer) Add(ctx context.Context, acc account.AccountID, pl *plugin.Vali
 	}, nil
 }
 
-func (w *Writer) Remove(ctx context.Context, plid plugin.ID) error {
+func (w *Writer) Remove(ctx context.Context, plid plugin.InstallationID) error {
 	r, err := w.db.Plugin.Get(ctx, xid.ID(plid))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -86,4 +93,38 @@ func (w *Writer) Remove(ctx context.Context, plid plugin.ID) error {
 	}
 
 	return nil
+}
+
+func (w *Writer) SetActiveState(ctx context.Context, plid plugin.InstallationID, state plugin.ActiveState) error {
+	_, err := w.db.Plugin.UpdateOneID(xid.ID(plid)).
+		SetActiveState(state.String()).
+		SetActiveStateChangedAt(time.Now()).
+		Save(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (w *Writer) CycleAuthSecret(ctx context.Context, plid plugin.InstallationID) (string, error) {
+	newSecret, err := plugin_auth.GenerateSecret()
+	if err != nil {
+		return "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = w.db.Plugin.UpdateOneID(xid.ID(plid)).
+		SetAuthSecret(newSecret).
+		Save(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+		return "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return newSecret, nil
 }

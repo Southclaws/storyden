@@ -14,25 +14,29 @@ import (
 
 const PluginDirectory = "plugins"
 
-type ID xid.ID
+type InstallationID xid.ID
+
+func (id InstallationID) String() string {
+	return xid.ID(id).String()
+}
 
 // Record represents the database record for a plugin. It's the source of truth
 // for plugins in general, it stores a copy of the manifest, who added it and
 // the file path for the plugin's WASM binary application.
 type Record struct {
-	ID       ID
-	Created  time.Time
-	AddedBy  account.AccountID
-	Manifest plugin.Manifest
-	FilePath string
+	InstallationID InstallationID
+	Created        time.Time
+	AddedBy        account.AccountID
+	Manifest       plugin.Manifest
+	FilePath       string
 
 	State          ActiveState
 	StateChangedAt time.Time
 	StatusMessage  string
 	Details        map[string]any
 
-	// TODO: Invariant type?
-	StartedAt time.Time
+	ReportedState ReportedState
+	StartedAt     time.Time
 }
 
 type Loaded struct {
@@ -75,11 +79,11 @@ func MapRecord(in *ent.Plugin) (*Record, error) {
 	}
 
 	return &Record{
-		ID:       ID(in.ID),
-		Created:  in.CreatedAt,
-		AddedBy:  account.AccountID(in.AddedBy),
-		Manifest: in.Manifest,
-		FilePath: in.Path,
+		InstallationID: InstallationID(in.ID),
+		Created:        in.CreatedAt,
+		AddedBy:        account.AccountID(in.AddedBy),
+		Manifest:       in.Manifest,
+		FilePath:       in.Path,
 
 		State:          desiredActiveState,
 		StateChangedAt: in.ActiveStateChangedAt,

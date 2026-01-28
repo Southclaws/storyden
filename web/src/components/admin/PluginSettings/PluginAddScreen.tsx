@@ -101,7 +101,7 @@ export function PluginAddScreen({ isOpen, onClose }: Props) {
         <FileUpload.Root
           maxFiles={1}
           accept=".wasm"
-          maxFileSize={10 * 1024 * 1024} // 10MB
+          maxFileSize={50 * 1024 * 1024} // 50MB
           onFileAccept={handleFileAccept}
           onFileReject={handleFileReject}
           disabled={isUploading}

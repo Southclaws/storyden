@@ -20,24 +20,27 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
-	lib_plugin "github.com/Southclaws/storyden/lib/plugin"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Manager struct {
 	pluginWriter  *plugin_writer.Writer
 	pluginQuerier *plugin_reader.Reader
 	runner        plugin_runner.Runner
+	bus           *pubsub.Bus
 }
 
 func New(
 	pluginWriter *plugin_writer.Writer,
 	pluginQuerier *plugin_reader.Reader,
 	runner plugin_runner.Runner,
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
 		pluginWriter:  pluginWriter,
 		pluginQuerier: pluginQuerier,
 		runner:        runner,
+		bus:           bus,
 	}
 }
 
@@ -84,15 +87,10 @@ func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Availabl
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Validating here is probably not necessary any more, Load can return
-	// the session + manifest and perform validation.
-	pl, err := plugin.Binary(b).Validate(ctx, func(b []byte) (*lib_plugin.Manifest, error) {
-		mb, err := m.runner.Validate(ctx, b)
-		if err != nil {
-			return nil, err
-		}
-		return mb, nil
-	})
+	pl, err := m.runner.Validate(ctx, b)
+	if err != nil {
+		return nil, err
+	}
 	if err != nil {
 		details := getValidationDetails(err)
 
@@ -101,11 +99,6 @@ func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Availabl
 			ftag.With(ftag.InvalidArgument),
 			fmsg.WithDesc("invalid", "The provided plugin file is invalid: "+details),
 		)
-	}
-
-	_, err = m.runner.Load(ctx, pl.Binary)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	pa, err := m.pluginWriter.Add(ctx, acc.ID, pl)
@@ -119,7 +112,7 @@ func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Availabl
 	return pa, nil
 }
 
-func (m *Manager) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error) {
+func (m *Manager) Get(ctx context.Context, id plugin.InstallationID) (*plugin.Record, error) {
 	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -129,14 +122,11 @@ func (m *Manager) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sess, err := m.runner.GetSession(ctx, record.Manifest.ID)
+	sess, err := m.runner.GetSession(ctx, record.InstallationID)
 	if err != nil {
-		// TODO: Better distinguish between error paths.
-		// particularly around the state on the record (desired?) and runtime.
-		record.State = plugin.ActiveStateError
-		record.StatusMessage = "Plugin is not running"
+		record.StatusMessage = "Session not found"
 	} else {
-		hydrateSession(record, *sess)
+		hydrateSession(record, sess)
 	}
 
 	return record, nil
@@ -156,28 +146,29 @@ func (m *Manager) List(ctx context.Context) ([]*plugin.Record, error) {
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	sessionMap := lo.KeyBy(sessions, func(s *plugin_runner.PluginSession) lib_plugin.ID {
+	sessionMap := lo.KeyBy(sessions, func(s plugin_runner.Session) plugin.InstallationID {
 		return s.ID()
 	})
 
 	// match up sessions to records
 	for _, record := range records {
-		if sess, ok := sessionMap[record.Manifest.ID]; ok {
-			hydrateSession(record, *sess)
+		if sess, ok := sessionMap[record.InstallationID]; ok {
+			hydrateSession(record, sess)
 		} else {
-			// TODO: If desired state is running, but session not here, mark as error?
-			record.StatusMessage = "Plugin is not running"
+			record.StatusMessage = "Session not found"
 		}
 	}
 
 	return records, nil
 }
 
-func hydrateSession(record *plugin.Record, sess plugin_runner.PluginSession) {
+func hydrateSession(record *plugin.Record, sess plugin_runner.Session) {
+	record.ReportedState = sess.GetReportedState()
 	record.StartedAt = sess.GetStartedAt().OrZero()
+	record.StatusMessage = sess.GetErrorMessage()
 }
 
-func (m *Manager) Delete(ctx context.Context, id plugin.ID) error {
+func (m *Manager) Delete(ctx context.Context, id plugin.InstallationID) error {
 	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -187,7 +178,7 @@ func (m *Manager) Delete(ctx context.Context, id plugin.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err = m.runner.Unload(ctx, rec.Manifest.ID); err != nil {
+	if err = m.runner.Unload(ctx, rec.InstallationID); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

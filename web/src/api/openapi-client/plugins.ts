@@ -74,7 +74,7 @@ export const pluginAdd = (pluginAddBody: PluginAddBody) => {
   return fetcher<PluginGetOKResponse>({
     url: `/plugins`,
     method: "POST",
-    headers: { "Content-Type": "application/octet-stream" },
+    headers: { "Content-Type": "application/zip" },
     data: pluginAddBody,
   });
 };

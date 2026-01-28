@@ -31,6 +31,8 @@ func (Plugin) Fields() []ent.Field {
 		field.JSON("status_details", map[string]any{}).
 			Optional(),
 
+		field.String("auth_secret"),
+
 		field.String("added_by").
 			GoType(xid.ID{}),
 	}

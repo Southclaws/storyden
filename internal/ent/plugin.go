@@ -39,6 +39,8 @@ type Plugin struct {
 	StatusMessage *string `json:"status_message,omitempty"`
 	// StatusDetails holds the value of the "status_details" field.
 	StatusDetails map[string]interface{} `json:"status_details,omitempty"`
+	// AuthSecret holds the value of the "auth_secret" field.
+	AuthSecret string `json:"auth_secret,omitempty"`
 	// AddedBy holds the value of the "added_by" field.
 	AddedBy xid.ID `json:"added_by,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -74,7 +76,7 @@ func (*Plugin) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case entplugin.FieldManifest, entplugin.FieldConfig, entplugin.FieldStatusDetails:
 			values[i] = new([]byte)
-		case entplugin.FieldPath, entplugin.FieldActiveState, entplugin.FieldStatusMessage:
+		case entplugin.FieldPath, entplugin.FieldActiveState, entplugin.FieldStatusMessage, entplugin.FieldAuthSecret:
 			values[i] = new(sql.NullString)
 		case entplugin.FieldCreatedAt, entplugin.FieldUpdatedAt, entplugin.FieldActiveStateChangedAt:
 			values[i] = new(sql.NullTime)
@@ -162,6 +164,12 @@ func (_m *Plugin) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field status_details: %w", err)
 				}
 			}
+		case entplugin.FieldAuthSecret:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field auth_secret", values[i])
+			} else if value.Valid {
+				_m.AuthSecret = value.String
+			}
 		case entplugin.FieldAddedBy:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field added_by", values[i])
@@ -237,6 +245,9 @@ func (_m *Plugin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status_details=")
 	builder.WriteString(fmt.Sprintf("%v", _m.StatusDetails))
+	builder.WriteString(", ")
+	builder.WriteString("auth_secret=")
+	builder.WriteString(_m.AuthSecret)
 	builder.WriteString(", ")
 	builder.WriteString("added_by=")
 	builder.WriteString(fmt.Sprintf("%v", _m.AddedBy))

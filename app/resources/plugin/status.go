@@ -7,5 +7,12 @@ type activeStateEnum string
 const (
 	activeStateActive   activeStateEnum = "active"
 	activeStateInactive activeStateEnum = "inactive"
-	activeStateError    activeStateEnum = "error"
+)
+
+type reportedStateEnum string
+
+const (
+	reportedStateActive   reportedStateEnum = "active"
+	reportedStateInactive reportedStateEnum = "inactive"
+	reportedStateError    reportedStateEnum = "errored"
 )

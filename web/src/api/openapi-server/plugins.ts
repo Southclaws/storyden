@@ -60,10 +60,7 @@ export const pluginAdd = async (
   return fetcher<Promise<pluginAddResponse>>(getPluginAddUrl(), {
     ...options,
     method: "POST",
-    headers: {
-      "Content-Type": "application/octet-stream",
-      ...options?.headers,
-    },
+    headers: { "Content-Type": "application/zip", ...options?.headers },
     body: JSON.stringify(pluginAddBody),
   });
 };

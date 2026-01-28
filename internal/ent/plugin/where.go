@@ -86,6 +86,11 @@ func StatusMessage(v string) predicate.Plugin {
 	return predicate.Plugin(sql.FieldEQ(FieldStatusMessage, v))
 }
 
+// AuthSecret applies equality check predicate on the "auth_secret" field. It's identical to AuthSecretEQ.
+func AuthSecret(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldEQ(FieldAuthSecret, v))
+}
+
 // AddedBy applies equality check predicate on the "added_by" field. It's identical to AddedByEQ.
 func AddedBy(v xid.ID) predicate.Plugin {
 	return predicate.Plugin(sql.FieldEQ(FieldAddedBy, v))
@@ -424,6 +429,71 @@ func StatusDetailsIsNil() predicate.Plugin {
 // StatusDetailsNotNil applies the NotNil predicate on the "status_details" field.
 func StatusDetailsNotNil() predicate.Plugin {
 	return predicate.Plugin(sql.FieldNotNull(FieldStatusDetails))
+}
+
+// AuthSecretEQ applies the EQ predicate on the "auth_secret" field.
+func AuthSecretEQ(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldEQ(FieldAuthSecret, v))
+}
+
+// AuthSecretNEQ applies the NEQ predicate on the "auth_secret" field.
+func AuthSecretNEQ(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldNEQ(FieldAuthSecret, v))
+}
+
+// AuthSecretIn applies the In predicate on the "auth_secret" field.
+func AuthSecretIn(vs ...string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldIn(FieldAuthSecret, vs...))
+}
+
+// AuthSecretNotIn applies the NotIn predicate on the "auth_secret" field.
+func AuthSecretNotIn(vs ...string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldNotIn(FieldAuthSecret, vs...))
+}
+
+// AuthSecretGT applies the GT predicate on the "auth_secret" field.
+func AuthSecretGT(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldGT(FieldAuthSecret, v))
+}
+
+// AuthSecretGTE applies the GTE predicate on the "auth_secret" field.
+func AuthSecretGTE(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldGTE(FieldAuthSecret, v))
+}
+
+// AuthSecretLT applies the LT predicate on the "auth_secret" field.
+func AuthSecretLT(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldLT(FieldAuthSecret, v))
+}
+
+// AuthSecretLTE applies the LTE predicate on the "auth_secret" field.
+func AuthSecretLTE(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldLTE(FieldAuthSecret, v))
+}
+
+// AuthSecretContains applies the Contains predicate on the "auth_secret" field.
+func AuthSecretContains(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldContains(FieldAuthSecret, v))
+}
+
+// AuthSecretHasPrefix applies the HasPrefix predicate on the "auth_secret" field.
+func AuthSecretHasPrefix(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldHasPrefix(FieldAuthSecret, v))
+}
+
+// AuthSecretHasSuffix applies the HasSuffix predicate on the "auth_secret" field.
+func AuthSecretHasSuffix(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldHasSuffix(FieldAuthSecret, v))
+}
+
+// AuthSecretEqualFold applies the EqualFold predicate on the "auth_secret" field.
+func AuthSecretEqualFold(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldEqualFold(FieldAuthSecret, v))
+}
+
+// AuthSecretContainsFold applies the ContainsFold predicate on the "auth_secret" field.
+func AuthSecretContainsFold(v string) predicate.Plugin {
+	return predicate.Plugin(sql.FieldContainsFold(FieldAuthSecret, v))
 }
 
 // AddedByEQ applies the EQ predicate on the "added_by" field.

@@ -10,13 +10,21 @@ import (
 )
 
 type Manifest struct {
-	ID           ID              `json:"id"`
-	Author       Author          `json:"author"`
-	Name         Name            `json:"name"`
-	Description  string          `json:"description,omitempty"`
-	Version      *semver.Version `json:"version"`
-	Capabilities []*Capability   `json:"capabilities"`
-	Events       []string        `json:"events,omitempty"`
+	ID             ID              `json:"id"`
+	Author         Author          `json:"author"`
+	Name           Name            `json:"name"`
+	Description    string          `json:"description"`
+	Version        *semver.Version `json:"version"`
+	Command        string          `json:"command"`
+	EventsConsumed []string        `json:"events_consumed"`
+}
+
+func ParseManifest(data []byte) (*Manifest, error) {
+	var m Manifest
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, fmt.Errorf("failed to parse plugin manifest: %w", err)
+	}
+	return &m, nil
 }
 
 func (final *Manifest) UnmarshalJSON(data []byte) error {

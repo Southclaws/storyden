@@ -104,6 +104,12 @@ func (_c *PluginCreate) SetStatusDetails(v map[string]interface{}) *PluginCreate
 	return _c
 }
 
+// SetAuthSecret sets the "auth_secret" field.
+func (_c *PluginCreate) SetAuthSecret(v string) *PluginCreate {
+	_c.mutation.SetAuthSecret(v)
+	return _c
+}
+
 // SetAddedBy sets the "added_by" field.
 func (_c *PluginCreate) SetAddedBy(v xid.ID) *PluginCreate {
 	_c.mutation.SetAddedBy(v)
@@ -207,6 +213,9 @@ func (_c *PluginCreate) check() error {
 	if _, ok := _c.mutation.ActiveStateChangedAt(); !ok {
 		return &ValidationError{Name: "active_state_changed_at", err: errors.New(`ent: missing required field "Plugin.active_state_changed_at"`)}
 	}
+	if _, ok := _c.mutation.AuthSecret(); !ok {
+		return &ValidationError{Name: "auth_secret", err: errors.New(`ent: missing required field "Plugin.auth_secret"`)}
+	}
 	if _, ok := _c.mutation.AddedBy(); !ok {
 		return &ValidationError{Name: "added_by", err: errors.New(`ent: missing required field "Plugin.added_by"`)}
 	}
@@ -289,6 +298,10 @@ func (_c *PluginCreate) createSpec() (*Plugin, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.StatusDetails(); ok {
 		_spec.SetField(entplugin.FieldStatusDetails, field.TypeJSON, value)
 		_node.StatusDetails = value
+	}
+	if value, ok := _c.mutation.AuthSecret(); ok {
+		_spec.SetField(entplugin.FieldAuthSecret, field.TypeString, value)
+		_node.AuthSecret = value
 	}
 	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -464,6 +477,18 @@ func (u *PluginUpsert) UpdateStatusDetails() *PluginUpsert {
 // ClearStatusDetails clears the value of the "status_details" field.
 func (u *PluginUpsert) ClearStatusDetails() *PluginUpsert {
 	u.SetNull(entplugin.FieldStatusDetails)
+	return u
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsert) SetAuthSecret(v string) *PluginUpsert {
+	u.Set(entplugin.FieldAuthSecret, v)
+	return u
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsert) UpdateAuthSecret() *PluginUpsert {
+	u.SetExcluded(entplugin.FieldAuthSecret)
 	return u
 }
 
@@ -653,6 +678,20 @@ func (u *PluginUpsertOne) UpdateStatusDetails() *PluginUpsertOne {
 func (u *PluginUpsertOne) ClearStatusDetails() *PluginUpsertOne {
 	return u.Update(func(s *PluginUpsert) {
 		s.ClearStatusDetails()
+	})
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsertOne) SetAuthSecret(v string) *PluginUpsertOne {
+	return u.Update(func(s *PluginUpsert) {
+		s.SetAuthSecret(v)
+	})
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsertOne) UpdateAuthSecret() *PluginUpsertOne {
+	return u.Update(func(s *PluginUpsert) {
+		s.UpdateAuthSecret()
 	})
 }
 
@@ -1011,6 +1050,20 @@ func (u *PluginUpsertBulk) UpdateStatusDetails() *PluginUpsertBulk {
 func (u *PluginUpsertBulk) ClearStatusDetails() *PluginUpsertBulk {
 	return u.Update(func(s *PluginUpsert) {
 		s.ClearStatusDetails()
+	})
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsertBulk) SetAuthSecret(v string) *PluginUpsertBulk {
+	return u.Update(func(s *PluginUpsert) {
+		s.SetAuthSecret(v)
+	})
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsertBulk) UpdateAuthSecret() *PluginUpsertBulk {
+	return u.Update(func(s *PluginUpsert) {
+		s.UpdateAuthSecret()
 	})
 }
 
