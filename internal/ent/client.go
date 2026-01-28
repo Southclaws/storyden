@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -94,6 +95,8 @@ type Client struct {
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// Plugin is the client for interacting with the Plugin builders.
+	Plugin *PluginClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
 	// PostRead is the client for interacting with the PostRead builders.
@@ -148,6 +151,7 @@ func (c *Client) init() {
 	c.MentionProfile = NewMentionProfileClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
+	c.Plugin = NewPluginClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.PostRead = NewPostReadClient(c.config)
 	c.Property = NewPropertyClient(c.config)
@@ -271,6 +275,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MentionProfile:      NewMentionProfileClient(cfg),
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
+		Plugin:              NewPluginClient(cfg),
 		Post:                NewPostClient(cfg),
 		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
@@ -321,6 +326,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MentionProfile:      NewMentionProfileClient(cfg),
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
+		Plugin:              NewPluginClient(cfg),
 		Post:                NewPostClient(cfg),
 		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
@@ -365,9 +371,9 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.Question, c.React, c.Report, c.Role,
-		c.Session, c.Setting, c.Tag,
+		c.MentionProfile, c.Node, c.Notification, c.Plugin, c.Post, c.PostRead,
+		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
+		c.Report, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -380,9 +386,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Post, c.PostRead, c.Property,
-		c.PropertySchema, c.PropertySchemaField, c.Question, c.React, c.Report, c.Role,
-		c.Session, c.Setting, c.Tag,
+		c.MentionProfile, c.Node, c.Notification, c.Plugin, c.Post, c.PostRead,
+		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
+		c.Report, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -429,6 +435,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Node.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
+	case *PluginMutation:
+		return c.Plugin.mutate(ctx, m)
 	case *PostMutation:
 		return c.Post.mutate(ctx, m)
 	case *PostReadMutation:
@@ -575,6 +583,22 @@ func (c *AccountClient) QuerySessions(_m *Account) *SessionQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(session.Table, session.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.SessionsTable, account.SessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPlugins queries the plugins edge of a Account.
+func (c *AccountClient) QueryPlugins(_m *Account) *PluginQuery {
+	query := (&PluginClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(entplugin.Table, entplugin.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PluginsTable, account.PluginsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4247,6 +4271,155 @@ func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation
 	}
 }
 
+// PluginClient is a client for the Plugin schema.
+type PluginClient struct {
+	config
+}
+
+// NewPluginClient returns a client for the Plugin from the given config.
+func NewPluginClient(c config) *PluginClient {
+	return &PluginClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `entplugin.Hooks(f(g(h())))`.
+func (c *PluginClient) Use(hooks ...Hook) {
+	c.hooks.Plugin = append(c.hooks.Plugin, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `entplugin.Intercept(f(g(h())))`.
+func (c *PluginClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Plugin = append(c.inters.Plugin, interceptors...)
+}
+
+// Create returns a builder for creating a Plugin entity.
+func (c *PluginClient) Create() *PluginCreate {
+	mutation := newPluginMutation(c.config, OpCreate)
+	return &PluginCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Plugin entities.
+func (c *PluginClient) CreateBulk(builders ...*PluginCreate) *PluginCreateBulk {
+	return &PluginCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PluginClient) MapCreateBulk(slice any, setFunc func(*PluginCreate, int)) *PluginCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PluginCreateBulk{err: fmt.Errorf("calling to PluginClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PluginCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PluginCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Plugin.
+func (c *PluginClient) Update() *PluginUpdate {
+	mutation := newPluginMutation(c.config, OpUpdate)
+	return &PluginUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PluginClient) UpdateOne(_m *Plugin) *PluginUpdateOne {
+	mutation := newPluginMutation(c.config, OpUpdateOne, withPlugin(_m))
+	return &PluginUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PluginClient) UpdateOneID(id xid.ID) *PluginUpdateOne {
+	mutation := newPluginMutation(c.config, OpUpdateOne, withPluginID(id))
+	return &PluginUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Plugin.
+func (c *PluginClient) Delete() *PluginDelete {
+	mutation := newPluginMutation(c.config, OpDelete)
+	return &PluginDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PluginClient) DeleteOne(_m *Plugin) *PluginDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PluginClient) DeleteOneID(id xid.ID) *PluginDeleteOne {
+	builder := c.Delete().Where(entplugin.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PluginDeleteOne{builder}
+}
+
+// Query returns a query builder for Plugin.
+func (c *PluginClient) Query() *PluginQuery {
+	return &PluginQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePlugin},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Plugin entity by its id.
+func (c *PluginClient) Get(ctx context.Context, id xid.ID) (*Plugin, error) {
+	return c.Query().Where(entplugin.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PluginClient) GetX(ctx context.Context, id xid.ID) *Plugin {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a Plugin.
+func (c *PluginClient) QueryAccount(_m *Plugin) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(entplugin.Table, entplugin.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, entplugin.AccountTable, entplugin.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PluginClient) Hooks() []Hook {
+	return c.hooks.Plugin
+}
+
+// Interceptors returns the client interceptors.
+func (c *PluginClient) Interceptors() []Interceptor {
+	return c.inters.Plugin
+}
+
+func (c *PluginClient) mutate(ctx context.Context, m *PluginMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PluginCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PluginUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PluginUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PluginDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Plugin mutation op: %q", m.Op())
+	}
+}
+
 // PostClient is a client for the Post schema.
 type PostClient struct {
 	config
@@ -6440,16 +6613,16 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
-		Property, PropertySchema, PropertySchemaField, Question, React, Report, Role,
-		Session, Setting, Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Plugin, Post,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
-		Property, PropertySchema, PropertySchemaField, Question, React, Report, Role,
-		Session, Setting, Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Plugin, Post,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag []ent.Interceptor
 	}
 )
 

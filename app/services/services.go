@@ -29,6 +29,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
 	"github.com/Southclaws/storyden/app/services/notification/notify_job"
 	"github.com/Southclaws/storyden/app/services/onboarding"
+	"github.com/Southclaws/storyden/app/services/plugin"
 	"github.com/Southclaws/storyden/app/services/profile/following"
 	"github.com/Southclaws/storyden/app/services/react_manager"
 	"github.com/Southclaws/storyden/app/services/reply"
@@ -78,6 +79,7 @@ func Build() fx.Option {
 		moderation.Build(),
 		action_dispatcher.Build(),
 		audit_logger.Build(),
+		plugin.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(following.New),
 		fx.Provide(autotagger.New),

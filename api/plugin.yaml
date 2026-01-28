@@ -1,0 +1,33 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+definitions:
+  RPCRequest:
+    type: object
+    properties:
+      jsonrpc:
+        type: string
+        enum: ["2.0"]
+      method:
+        type: string
+      params:
+        type: object
+      id:
+        type: integer
+    required: ["jsonrpc", "method", "id"]
+  RPCResponse:
+    type: object
+    properties:
+      jsonrpc:
+        type: string
+        enum: ["2.0"]
+      result:
+        type: object
+      error:
+        type: object
+        properties:
+          code:
+            type: integer
+          message:
+            type: string
+      id:
+        type: integer
+    required: ["jsonrpc", "id"]
