@@ -4,20 +4,23 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/Southclaws/enumerator/generate"
 	"github.com/dave/jennifer/jen"
 	"github.com/iancoleman/strcase"
 	"github.com/pb33f/libopenapi"
+	"github.com/pb33f/libopenapi/datamodel"
 )
 
 func main() {
-	schemaFlag := flag.String("schema", "api/openapi.yaml", "path to openapi schema")
-	outputFlag := flag.String("output", "app/transports/http/bindings/openapi_rbac/openapi_rbac_gen.go", "path to output file")
-	enumFlag := flag.String("enum", "app/resources/rbac/rbac_enum_gen.go", "path to enum output file")
-	operationEnumFlag := flag.String("operation-enum", "app/transports/http/openapi/operation/operation_enum_gen.go", "path to operation enum output file")
-	operationCostFlag := flag.String("operation-cost", "app/transports/http/openapi/operation/operation_cost_gen.go", "path to operation cost map output file")
+	// meant to be run from ./api
+	schemaFlag := flag.String("schema", "openapi.yaml", "path to openapi schema")
+	outputFlag := flag.String("output", "../app/transports/http/bindings/openapi_rbac/openapi_rbac_gen.go", "path to output file")
+	enumFlag := flag.String("enum", "../app/resources/rbac/rbac_enum_gen.go", "path to enum output file")
+	operationEnumFlag := flag.String("operation-enum", "../app/transports/http/openapi/operation/operation_enum_gen.go", "path to operation enum output file")
+	operationCostFlag := flag.String("operation-cost", "../app/transports/http/openapi/operation/operation_cost_gen.go", "path to operation cost map output file")
 
 	flag.Parse()
 
@@ -34,7 +37,7 @@ func main() {
 }
 
 type Operation struct {
-	Name         string
+	Name          string
 	RateLimitCost int
 }
 
@@ -44,7 +47,11 @@ func run(filename, outfile, enumOutfilePath, operationEnumOutfile, operationCost
 		return err
 	}
 
-	document, err := libopenapi.NewDocument(spec)
+	config := datamodel.NewDocumentConfiguration()
+	config.AllowFileReferences = true
+	config.BasePath = filepath.Dir(filename)
+
+	document, err := libopenapi.NewDocumentWithConfiguration(spec, config)
 	if err != nil {
 		return fmt.Errorf("cannot create new document: %w", err)
 	}
@@ -78,7 +85,7 @@ func run(filename, outfile, enumOutfilePath, operationEnumOutfile, operationCost
 			}
 
 			ops = append(ops, Operation{
-				Name:         op.OperationId,
+				Name:          op.OperationId,
 				RateLimitCost: rateLimitCost,
 			})
 		}

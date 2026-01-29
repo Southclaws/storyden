@@ -1,0 +1,49 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolTagList
+x-storyden-role: READ_PUBLISHED_THREADS
+title: tag_list
+description: Get a list of all tags on the site or search for tags by name. Tags
+  are labels used to categorize and organize content. Each tag includes its name
+  and the number of items tagged with it.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolTagListInput"
+  output:
+    $ref: "#/definitions/ToolTagListOutput"
+definitions:
+  ToolTagListInput:
+    type: object
+    properties:
+      query:
+        type: string
+        description: Optional search query to filter tags by name. If not provided,
+          returns all tags.
+    additionalProperties: false
+  ToolTagListOutput:
+    type: object
+    required:
+      - tags
+    properties:
+      tags:
+        type: array
+        description: List of tags
+        items:
+          $ref: "#/definitions/TagItem"
+    additionalProperties: false
+  TagItem:
+    type: object
+    required:
+      - name
+      - item_count
+    properties:
+      name:
+        type: string
+        description: The tag name
+      item_count:
+        type: integer
+        description: Number of items tagged with this tag
+    additionalProperties: false

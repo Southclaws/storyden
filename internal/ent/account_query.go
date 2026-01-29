@@ -32,6 +32,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -69,6 +72,9 @@ type AccountQuery struct {
 	withReports                *ReportQuery
 	withHandledReports         *ReportQuery
 	withAuditLogs              *AuditLogQuery
+	withRobots                 *RobotQuery
+	withRobotSessions          *RobotSessionQuery
+	withRobotMessages          *RobotSessionMessageQuery
 	withAccountRoles           *AccountRolesQuery
 	modifiers                  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -635,6 +641,72 @@ func (_q *AccountQuery) QueryAuditLogs() *AuditLogQuery {
 	return query
 }
 
+// QueryRobots chains the current query on the "robots" edge.
+func (_q *AccountQuery) QueryRobots() *RobotQuery {
+	query := (&RobotClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(robot.Table, robot.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotsTable, account.RobotsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRobotSessions chains the current query on the "robot_sessions" edge.
+func (_q *AccountQuery) QueryRobotSessions() *RobotSessionQuery {
+	query := (&RobotSessionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(robotsession.Table, robotsession.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotSessionsTable, account.RobotSessionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRobotMessages chains the current query on the "robot_messages" edge.
+func (_q *AccountQuery) QueryRobotMessages() *RobotSessionMessageQuery {
+	query := (&RobotSessionMessageClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotMessagesTable, account.RobotMessagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAccountRoles chains the current query on the "account_roles" edge.
 func (_q *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 	query := (&AccountRolesClient{config: _q.config}).Query()
@@ -873,6 +945,9 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withReports:                _q.withReports.Clone(),
 		withHandledReports:         _q.withHandledReports.Clone(),
 		withAuditLogs:              _q.withAuditLogs.Clone(),
+		withRobots:                 _q.withRobots.Clone(),
+		withRobotSessions:          _q.withRobotSessions.Clone(),
+		withRobotMessages:          _q.withRobotMessages.Clone(),
 		withAccountRoles:           _q.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -1145,6 +1220,39 @@ func (_q *AccountQuery) WithAuditLogs(opts ...func(*AuditLogQuery)) *AccountQuer
 	return _q
 }
 
+// WithRobots tells the query-builder to eager-load the nodes that are connected to
+// the "robots" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithRobots(opts ...func(*RobotQuery)) *AccountQuery {
+	query := (&RobotClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRobots = query
+	return _q
+}
+
+// WithRobotSessions tells the query-builder to eager-load the nodes that are connected to
+// the "robot_sessions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithRobotSessions(opts ...func(*RobotSessionQuery)) *AccountQuery {
+	query := (&RobotSessionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRobotSessions = query
+	return _q
+}
+
+// WithRobotMessages tells the query-builder to eager-load the nodes that are connected to
+// the "robot_messages" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithRobotMessages(opts ...func(*RobotSessionMessageQuery)) *AccountQuery {
+	query := (&RobotSessionMessageClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRobotMessages = query
+	return _q
+}
+
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
@@ -1234,7 +1342,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [25]bool{
+		loadedTypes = [28]bool{
 			_q.withSessions != nil,
 			_q.withEmails != nil,
 			_q.withNotifications != nil,
@@ -1259,6 +1367,9 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withReports != nil,
 			_q.withHandledReports != nil,
 			_q.withAuditLogs != nil,
+			_q.withRobots != nil,
+			_q.withRobotSessions != nil,
+			_q.withRobotMessages != nil,
 			_q.withAccountRoles != nil,
 		}
 	)
@@ -1449,6 +1560,27 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadAuditLogs(ctx, query, nodes,
 			func(n *Account) { n.Edges.AuditLogs = []*AuditLog{} },
 			func(n *Account, e *AuditLog) { n.Edges.AuditLogs = append(n.Edges.AuditLogs, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRobots; query != nil {
+		if err := _q.loadRobots(ctx, query, nodes,
+			func(n *Account) { n.Edges.Robots = []*Robot{} },
+			func(n *Account, e *Robot) { n.Edges.Robots = append(n.Edges.Robots, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRobotSessions; query != nil {
+		if err := _q.loadRobotSessions(ctx, query, nodes,
+			func(n *Account) { n.Edges.RobotSessions = []*RobotSession{} },
+			func(n *Account, e *RobotSession) { n.Edges.RobotSessions = append(n.Edges.RobotSessions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRobotMessages; query != nil {
+		if err := _q.loadRobotMessages(ctx, query, nodes,
+			func(n *Account) { n.Edges.RobotMessages = []*RobotSessionMessage{} },
+			func(n *Account, e *RobotSessionMessage) { n.Edges.RobotMessages = append(n.Edges.RobotMessages, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2257,6 +2389,99 @@ func (_q *AccountQuery) loadAuditLogs(ctx context.Context, query *AuditLogQuery,
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "enacted_by_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadRobots(ctx context.Context, query *RobotQuery, nodes []*Account, init func(*Account), assign func(*Account, *Robot)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robot.FieldAuthorID)
+	}
+	query.Where(predicate.Robot(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.RobotsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AuthorID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "author_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadRobotSessions(ctx context.Context, query *RobotSessionQuery, nodes []*Account, init func(*Account), assign func(*Account, *RobotSession)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robotsession.FieldAccountID)
+	}
+	query.Where(predicate.RobotSession(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.RobotSessionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadRobotMessages(ctx context.Context, query *RobotSessionMessageQuery, nodes []*Account, init func(*Account), assign func(*Account, *RobotSessionMessage)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robotsessionmessage.FieldAccountID)
+	}
+	query.Where(predicate.RobotSessionMessage(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.RobotMessagesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

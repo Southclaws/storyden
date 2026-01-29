@@ -152,6 +152,13 @@ var (
 	OperationIDEventDelete                      = OperationID{`EventDelete`}
 	OperationIDEventParticipantUpdate           = OperationID{`EventParticipantUpdate`}
 	OperationIDEventParticipantRemove           = OperationID{`EventParticipantRemove`}
+	OperationIDRobotsList                       = OperationID{`RobotsList`}
+	OperationIDRobotCreate                      = OperationID{`RobotCreate`}
+	OperationIDRobotChatSSE                     = OperationID{`RobotChatSSE`}
+	OperationIDRobotGet                         = OperationID{`RobotGet`}
+	OperationIDRobotUpdate                      = OperationID{`RobotUpdate`}
+	OperationIDRobotSessionsList                = OperationID{`RobotSessionsList`}
+	OperationIDRobotSessionGet                  = OperationID{`RobotSessionGet`}
 )
 
 func (r OperationID) Format(f fmt.State, verb rune) {
@@ -471,6 +478,20 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDEventParticipantUpdate, nil
 	case string(`EventParticipantRemove`):
 		return OperationIDEventParticipantRemove, nil
+	case string(`RobotsList`):
+		return OperationIDRobotsList, nil
+	case string(`RobotCreate`):
+		return OperationIDRobotCreate, nil
+	case string(`RobotChatSSE`):
+		return OperationIDRobotChatSSE, nil
+	case string(`RobotGet`):
+		return OperationIDRobotGet, nil
+	case string(`RobotUpdate`):
+		return OperationIDRobotUpdate, nil
+	case string(`RobotSessionsList`):
+		return OperationIDRobotSessionsList, nil
+	case string(`RobotSessionGet`):
+		return OperationIDRobotSessionGet, nil
 	default:
 		return OperationID{}, fmt.Errorf("invalid value for type 'OperationID': '%s'", __iNpUt__)
 	}

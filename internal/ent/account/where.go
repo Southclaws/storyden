@@ -1168,6 +1168,75 @@ func HasAuditLogsWith(preds ...predicate.AuditLog) predicate.Account {
 	})
 }
 
+// HasRobots applies the HasEdge predicate on the "robots" edge.
+func HasRobots() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RobotsTable, RobotsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotsWith applies the HasEdge predicate on the "robots" edge with a given conditions (other predicates).
+func HasRobotsWith(preds ...predicate.Robot) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newRobotsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRobotSessions applies the HasEdge predicate on the "robot_sessions" edge.
+func HasRobotSessions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RobotSessionsTable, RobotSessionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotSessionsWith applies the HasEdge predicate on the "robot_sessions" edge with a given conditions (other predicates).
+func HasRobotSessionsWith(preds ...predicate.RobotSession) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newRobotSessionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRobotMessages applies the HasEdge predicate on the "robot_messages" edge.
+func HasRobotMessages() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RobotMessagesTable, RobotMessagesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotMessagesWith applies the HasEdge predicate on the "robot_messages" edge with a given conditions (other predicates).
+func HasRobotMessagesWith(preds ...predicate.RobotSessionMessage) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newRobotMessagesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

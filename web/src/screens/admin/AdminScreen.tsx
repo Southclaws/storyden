@@ -12,6 +12,7 @@ import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
 import { BrandSettingsScreen } from "./BrandSettingsScreen";
 import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
+import { RobotsSettingsScreen } from "./RobotsSettingsScreen/RobotsSettingsScreen";
 import { SystemSettingsScreen } from "./SystemSettingsScreen";
 
 const DEFAULT_TAB = "brand";
@@ -53,6 +54,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
+        <Tabs.Trigger value="robots">Robots</Tabs.Trigger>
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -82,6 +84,10 @@ export function AdminScreen() {
 
       <Tabs.Content value="access_keys">
         <AccessKeySettingsScreen />
+      </Tabs.Content>
+
+      <Tabs.Content value="robots">
+        <RobotsSettingsScreen />
       </Tabs.Content>
     </Tabs.Root>
   );

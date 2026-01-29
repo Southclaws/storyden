@@ -36,4 +36,12 @@ export const colours = defineSemanticTokens.colors({
         "linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 1) 80%)",
     },
   },
+  "scroll-fade-top": {
+    value: {
+      _osLight:
+        "linear-gradient(to bottom, {colors.bg.site} 0%, transparent 100%)",
+      _osDark:
+        "linear-gradient(to bottom, {colors.bg.site} 0%, transparent 100%)",
+    },
+  },
 });

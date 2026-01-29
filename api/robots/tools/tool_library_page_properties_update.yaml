@@ -1,0 +1,80 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPagePropertiesUpdate
+x-storyden-role: MANAGE_LIBRARY
+title: library_page_properties_update
+description: Update property values on a library page. The page must have a property schema defined by its parent. Each property value corresponds to a field in the schema.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPagePropertiesUpdateInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPagePropertiesUpdateOutput"
+definitions:
+  ToolLibraryPagePropertiesUpdateInput:
+    type: object
+    required:
+      - id
+      - properties
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The slug or ID of the library page to update properties on
+      properties:
+        type: array
+        description: The property values to set
+        items:
+          $ref: "#/definitions/PropertyValueMutation"
+    additionalProperties: false
+  ToolLibraryPagePropertiesUpdateOutput:
+    type: object
+    required:
+      - properties
+    properties:
+      properties:
+        type: array
+        description: The updated property values
+        items:
+          $ref: "#/definitions/PropertyValueResult"
+    additionalProperties: false
+  PropertyValueMutation:
+    type: object
+    required:
+      - field_id
+      - value
+    properties:
+      field_id:
+        type: string
+        description: The ID of the schema field this property value is for
+      value:
+        type: string
+        description: The value to set for this property
+    additionalProperties: false
+  PropertyValueResult:
+    type: object
+    required:
+      - field_id
+      - name
+      - value
+    properties:
+      field_id:
+        type: string
+        description: The ID of the schema field
+      name:
+        type: string
+        description: The name of the field
+      type:
+        type: string
+        enum:
+          - text
+          - number
+          - timestamp
+          - boolean
+        description: Data type of the field
+      value:
+        type: string
+        description: The current value of this property
+    additionalProperties: false

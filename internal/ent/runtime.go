@@ -33,6 +33,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
@@ -1047,6 +1050,123 @@ func init() {
 	// report.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	report.IDValidator = func() func(string) error {
 		validators := reportDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robotMixin := schema.Robot{}.Mixin()
+	robotMixinFields0 := robotMixin[0].Fields()
+	_ = robotMixinFields0
+	robotMixinFields1 := robotMixin[1].Fields()
+	_ = robotMixinFields1
+	robotMixinFields2 := robotMixin[2].Fields()
+	_ = robotMixinFields2
+	robotFields := schema.Robot{}.Fields()
+	_ = robotFields
+	// robotDescCreatedAt is the schema descriptor for created_at field.
+	robotDescCreatedAt := robotMixinFields1[0].Descriptor()
+	// robot.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robot.DefaultCreatedAt = robotDescCreatedAt.Default.(func() time.Time)
+	// robotDescUpdatedAt is the schema descriptor for updated_at field.
+	robotDescUpdatedAt := robotMixinFields2[0].Descriptor()
+	// robot.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robot.DefaultUpdatedAt = robotDescUpdatedAt.Default.(func() time.Time)
+	// robot.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robot.UpdateDefaultUpdatedAt = robotDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robotDescName is the schema descriptor for name field.
+	robotDescName := robotFields[0].Descriptor()
+	// robot.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	robot.NameValidator = robotDescName.Validators[0].(func(string) error)
+	// robotDescID is the schema descriptor for id field.
+	robotDescID := robotMixinFields0[0].Descriptor()
+	// robot.DefaultID holds the default value on creation for the id field.
+	robot.DefaultID = robotDescID.Default.(func() xid.ID)
+	// robot.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robot.IDValidator = func() func(string) error {
+		validators := robotDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robotsessionMixin := schema.RobotSession{}.Mixin()
+	robotsessionMixinFields0 := robotsessionMixin[0].Fields()
+	_ = robotsessionMixinFields0
+	robotsessionMixinFields1 := robotsessionMixin[1].Fields()
+	_ = robotsessionMixinFields1
+	robotsessionMixinFields2 := robotsessionMixin[2].Fields()
+	_ = robotsessionMixinFields2
+	robotsessionFields := schema.RobotSession{}.Fields()
+	_ = robotsessionFields
+	// robotsessionDescCreatedAt is the schema descriptor for created_at field.
+	robotsessionDescCreatedAt := robotsessionMixinFields1[0].Descriptor()
+	// robotsession.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robotsession.DefaultCreatedAt = robotsessionDescCreatedAt.Default.(func() time.Time)
+	// robotsessionDescUpdatedAt is the schema descriptor for updated_at field.
+	robotsessionDescUpdatedAt := robotsessionMixinFields2[0].Descriptor()
+	// robotsession.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robotsession.DefaultUpdatedAt = robotsessionDescUpdatedAt.Default.(func() time.Time)
+	// robotsession.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robotsession.UpdateDefaultUpdatedAt = robotsessionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robotsessionDescName is the schema descriptor for name field.
+	robotsessionDescName := robotsessionFields[0].Descriptor()
+	// robotsession.DefaultName holds the default value on creation for the name field.
+	robotsession.DefaultName = robotsessionDescName.Default.(func() string)
+	// robotsessionDescID is the schema descriptor for id field.
+	robotsessionDescID := robotsessionMixinFields0[0].Descriptor()
+	// robotsession.DefaultID holds the default value on creation for the id field.
+	robotsession.DefaultID = robotsessionDescID.Default.(func() xid.ID)
+	// robotsession.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robotsession.IDValidator = func() func(string) error {
+		validators := robotsessionDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robotsessionmessageMixin := schema.RobotSessionMessage{}.Mixin()
+	robotsessionmessageMixinFields0 := robotsessionmessageMixin[0].Fields()
+	_ = robotsessionmessageMixinFields0
+	robotsessionmessageMixinFields1 := robotsessionmessageMixin[1].Fields()
+	_ = robotsessionmessageMixinFields1
+	robotsessionmessageFields := schema.RobotSessionMessage{}.Fields()
+	_ = robotsessionmessageFields
+	// robotsessionmessageDescCreatedAt is the schema descriptor for created_at field.
+	robotsessionmessageDescCreatedAt := robotsessionmessageMixinFields1[0].Descriptor()
+	// robotsessionmessage.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robotsessionmessage.DefaultCreatedAt = robotsessionmessageDescCreatedAt.Default.(func() time.Time)
+	// robotsessionmessageDescID is the schema descriptor for id field.
+	robotsessionmessageDescID := robotsessionmessageMixinFields0[0].Descriptor()
+	// robotsessionmessage.DefaultID holds the default value on creation for the id field.
+	robotsessionmessage.DefaultID = robotsessionmessageDescID.Default.(func() xid.ID)
+	// robotsessionmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robotsessionmessage.IDValidator = func() func(string) error {
+		validators := robotsessionmessageDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

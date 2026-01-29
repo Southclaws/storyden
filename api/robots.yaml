@@ -1,0 +1,102 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+definitions:
+  ToolSearch:
+    $ref: "./robots/tools/tool_search.yaml"
+
+  ToolRobotSwitch:
+    $ref: "./robots/tools/tool_robot_switch.yaml"
+
+  ToolRobotGetAllToolNames:
+    $ref: "./robots/tools/tool_system_all_tool_names.yaml"
+
+  ToolRobotCreate:
+    $ref: "./robots/tools/tool_robot_create.yaml"
+
+  ToolRobotList:
+    $ref: "./robots/tools/tool_robot_list.yaml"
+
+  ToolRobotGet:
+    $ref: "./robots/tools/tool_robot_get.yaml"
+
+  ToolRobotUpdate:
+    $ref: "./robots/tools/tool_robot_update.yaml"
+
+  ToolRobotDelete:
+    $ref: "./robots/tools/tool_robot_delete.yaml"
+
+  ToolLibraryPageTree:
+    $ref: "./robots/tools/tool_library_page_list.yaml"
+
+  ToolLibraryPageGet:
+    $ref: "./robots/tools/tool_library_page_get.yaml"
+
+  ToolLibraryPageCreate:
+    $ref: "./robots/tools/tool_library_page_create.yaml"
+
+  ToolLibraryPageUpdate:
+    $ref: "./robots/tools/tool_library_page_update.yaml"
+
+  ToolLibraryPageSearch:
+    $ref: "./robots/tools/tool_search_library_pages.yaml"
+
+  ToolLibraryPagePropertySchemaGet:
+    $ref: "./robots/tools/tool_library_page_property_schema_get.yaml"
+
+  ToolLibraryPagePropertySchemaUpdate:
+    $ref: "./robots/tools/tool_library_page_property_schema_update.yaml"
+
+  ToolLibraryPagePropertiesUpdate:
+    $ref: "./robots/tools/tool_library_page_properties_update.yaml"
+
+  ToolTagList:
+    $ref: "./robots/tools/tool_tag_list.yaml"
+
+  ToolLinkCreate:
+    $ref: "./robots/tools/tool_link_create.yaml"
+
+  ToolThreadCreate:
+    $ref: "./robots/tools/tool_thread_create.yaml"
+
+  ToolThreadList:
+    $ref: "./robots/tools/tool_thread_list.yaml"
+
+  ToolThreadGet:
+    $ref: "./robots/tools/tool_thread_get.yaml"
+
+  ToolThreadUpdate:
+    $ref: "./robots/tools/tool_thread_update.yaml"
+
+  ToolThreadReply:
+    $ref: "./robots/tools/tool_thread_reply.yaml"
+
+  ToolCategoryList:
+    $ref: "./robots/tools/tool_category_list.yaml"
+
+  DatagraphItemRef:
+    type: object
+    required:
+      - id
+      - slug
+      - kind
+    properties:
+      id:
+        type: string
+        description: "Unique identifier of the datagraph item"
+      slug:
+        type: string
+        description: "URL-friendly slug of the datagraph item"
+      kind:
+        $ref: "./common/DatagraphItemKind.yaml"
+        description: "Type of datagraph item (thread, node, profile, collection, etc.)"
+    additionalProperties: false
+
+  RobotChatContext:
+    type: object
+    properties:
+      datagraph_item:
+        $ref: "#/definitions/DatagraphItemRef"
+        description: "Optional reference to a datagraph item if the user is viewing one (e.g., a thread, library page, profile)"
+      page_type:
+        type: string
+        description: "Human-readable page type if not viewing a specific datagraph item. Examples: 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form text since the backend doesn't know about frontend routes."
+    additionalProperties: false

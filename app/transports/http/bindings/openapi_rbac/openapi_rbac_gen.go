@@ -143,6 +143,13 @@ type OperationPermissions interface {
 	EventDelete() (bool, *rbac.Permission)
 	EventParticipantUpdate() (bool, *rbac.Permission)
 	EventParticipantRemove() (bool, *rbac.Permission)
+	RobotsList() (bool, *rbac.Permission)
+	RobotCreate() (bool, *rbac.Permission)
+	RobotChatSSE() (bool, *rbac.Permission)
+	RobotGet() (bool, *rbac.Permission)
+	RobotUpdate() (bool, *rbac.Permission)
+	RobotSessionsList() (bool, *rbac.Permission)
+	RobotSessionGet() (bool, *rbac.Permission)
 }
 
 func GetOperationPermission(optable OperationPermissions, op string) (bool, *rbac.Permission) {
@@ -427,6 +434,20 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.EventParticipantUpdate()
 	case "EventParticipantRemove":
 		return optable.EventParticipantRemove()
+	case "RobotsList":
+		return optable.RobotsList()
+	case "RobotCreate":
+		return optable.RobotCreate()
+	case "RobotChatSSE":
+		return optable.RobotChatSSE()
+	case "RobotGet":
+		return optable.RobotGet()
+	case "RobotUpdate":
+		return optable.RobotUpdate()
+	case "RobotSessionsList":
+		return optable.RobotSessionsList()
+	case "RobotSessionGet":
+		return optable.RobotSessionGet()
 	default:
 		panic("unknown operation, must re-run rbacgen")
 	}

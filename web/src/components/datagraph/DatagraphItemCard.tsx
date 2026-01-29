@@ -199,7 +199,7 @@ export function badgeColours(c: string) {
   return { bg, bo, fg };
 }
 
-function getDatagraphKindLabel(kind: DatagraphItemKind): string {
+export function getDatagraphKindLabel(kind: DatagraphItemKind): string {
   switch (kind) {
     case DatagraphItemKind.post:
       return "Post";
@@ -218,7 +218,7 @@ function getDatagraphKindLabel(kind: DatagraphItemKind): string {
   }
 }
 
-function getDatagraphKindColour(kind: DatagraphItemKind): ColorPalette {
+export function getDatagraphKindColour(kind: DatagraphItemKind): ColorPalette {
   switch (kind) {
     case DatagraphItemKind.post:
       return "pink";

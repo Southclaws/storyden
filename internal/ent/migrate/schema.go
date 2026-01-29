@@ -983,6 +983,98 @@ var (
 			},
 		},
 	}
+	// RobotsColumns holds the columns for the "robots" table.
+	RobotsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "playbook", Type: field.TypeString},
+		{Name: "tools", Type: field.TypeJSON, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "author_id", Type: field.TypeString, Size: 20},
+	}
+	// RobotsTable holds the schema information for the "robots" table.
+	RobotsTable = &schema.Table{
+		Name:       "robots",
+		Columns:    RobotsColumns,
+		PrimaryKey: []*schema.Column{RobotsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robots_accounts_robots",
+				Columns:    []*schema.Column{RobotsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// RobotSessionsColumns holds the columns for the "robot_sessions" table.
+	RobotSessionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "state", Type: field.TypeJSON, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// RobotSessionsTable holds the schema information for the "robot_sessions" table.
+	RobotSessionsTable = &schema.Table{
+		Name:       "robot_sessions",
+		Columns:    RobotSessionsColumns,
+		PrimaryKey: []*schema.Column{RobotSessionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robot_sessions_accounts_robot_sessions",
+				Columns:    []*schema.Column{RobotSessionsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// RobotSessionMessagesColumns holds the columns for the "robot_session_messages" table.
+	RobotSessionMessagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "invocation_id", Type: field.TypeString},
+		{Name: "event_data", Type: field.TypeJSON},
+		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "robot_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "session_id", Type: field.TypeString, Size: 20},
+	}
+	// RobotSessionMessagesTable holds the schema information for the "robot_session_messages" table.
+	RobotSessionMessagesTable = &schema.Table{
+		Name:       "robot_session_messages",
+		Columns:    RobotSessionMessagesColumns,
+		PrimaryKey: []*schema.Column{RobotSessionMessagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robot_session_messages_accounts_robot_messages",
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "robot_session_messages_robots_messages",
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[5]},
+				RefColumns: []*schema.Column{RobotsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "robot_session_messages_robot_sessions_messages",
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[6]},
+				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "robotsessionmessage_session_id_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{RobotSessionMessagesColumns[6], RobotSessionMessagesColumns[1]},
+			},
+		},
+	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1274,6 +1366,9 @@ var (
 		QuestionsTable,
 		ReactsTable,
 		ReportsTable,
+		RobotsTable,
+		RobotSessionsTable,
+		RobotSessionMessagesTable,
 		RolesTable,
 		SessionsTable,
 		SettingsTable,
@@ -1342,6 +1437,11 @@ func init() {
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	ReportsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReportsTable.ForeignKeys[1].RefTable = AccountsTable
+	RobotsTable.ForeignKeys[0].RefTable = AccountsTable
+	RobotSessionsTable.ForeignKeys[0].RefTable = AccountsTable
+	RobotSessionMessagesTable.ForeignKeys[0].RefTable = AccountsTable
+	RobotSessionMessagesTable.ForeignKeys[1].RefTable = RobotsTable
+	RobotSessionMessagesTable.ForeignKeys[2].RefTable = RobotSessionsTable
 	SessionsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable

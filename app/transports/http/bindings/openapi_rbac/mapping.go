@@ -571,3 +571,31 @@ func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	// Requires PermissionManageEvents unless deleting self
 	return true, nil
 }
+
+func (m *Mapping) RobotsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotChatSSE() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotSessionsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotSessionGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}

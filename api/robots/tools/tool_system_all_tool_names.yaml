@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotGetAllToolNames
+x-storyden-role: USE_ROBOTS
+title: system_all_tool_names
+description: Get a list of all available tool names and their descriptions. This
+  is useful when creating or updating a Robot to know what tools are available
+  without loading full schemas. Returns a lightweight list of tool names and
+  brief descriptions.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotGetAllToolNamesInput"
+  output:
+    $ref: "#/definitions/ToolRobotGetAllToolNamesOutput"
+definitions:
+  ToolRobotGetAllToolNamesInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+  ToolRobotGetAllToolNamesOutput:
+    type: object
+    description: List of all available tools with their names and descriptions
+    properties:
+      tools:
+        type: array
+        items:
+          $ref: "#/definitions/ToolInfo"
+  ToolInfo:
+    type: object
+    required:
+      - name
+      - description
+    properties:
+      name:
+        type: string
+        description: The tool name identifier
+      description:
+        type: string
+        description: Brief description of what the tool does
+    additionalProperties: false

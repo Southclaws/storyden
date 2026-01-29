@@ -140,6 +140,18 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "View detailed account information including email addresses and verification status for non-administrator accounts.",
   },
+  [Permission.USE_ROBOTS]: {
+    value: Permission.USE_ROBOTS,
+    name: "Use robots",
+    description:
+      "Use Robots to build automations for managing content, moderation and more.",
+  },
+  [Permission.MANAGE_ROBOTS]: {
+    value: Permission.MANAGE_ROBOTS,
+    name: "Manage robots",
+    description:
+      "Create, edit, and delete Robots and manage Robot configurations.",
+  },
   [Permission.ADMINISTRATOR]: {
     value: Permission.ADMINISTRATOR,
     name: "Administrator",

@@ -101,11 +101,17 @@ type AccountEdges struct {
 	HandledReports []*Report `json:"handled_reports,omitempty"`
 	// AuditLogs holds the value of the audit_logs edge.
 	AuditLogs []*AuditLog `json:"audit_logs,omitempty"`
+	// Robots holds the value of the robots edge.
+	Robots []*Robot `json:"robots,omitempty"`
+	// RobotSessions holds the value of the robot_sessions edge.
+	RobotSessions []*RobotSession `json:"robot_sessions,omitempty"`
+	// RobotMessages holds the value of the robot_messages edge.
+	RobotMessages []*RobotSessionMessage `json:"robot_messages,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [25]bool
+	loadedTypes [28]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -326,10 +332,37 @@ func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
 	return nil, &NotLoadedError{edge: "audit_logs"}
 }
 
+// RobotsOrErr returns the Robots value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RobotsOrErr() ([]*Robot, error) {
+	if e.loadedTypes[24] {
+		return e.Robots, nil
+	}
+	return nil, &NotLoadedError{edge: "robots"}
+}
+
+// RobotSessionsOrErr returns the RobotSessions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RobotSessionsOrErr() ([]*RobotSession, error) {
+	if e.loadedTypes[25] {
+		return e.RobotSessions, nil
+	}
+	return nil, &NotLoadedError{edge: "robot_sessions"}
+}
+
+// RobotMessagesOrErr returns the RobotMessages value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
+	if e.loadedTypes[26] {
+		return e.RobotMessages, nil
+	}
+	return nil, &NotLoadedError{edge: "robot_messages"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[27] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -583,6 +616,21 @@ func (_m *Account) QueryHandledReports() *ReportQuery {
 // QueryAuditLogs queries the "audit_logs" edge of the Account entity.
 func (_m *Account) QueryAuditLogs() *AuditLogQuery {
 	return NewAccountClient(_m.config).QueryAuditLogs(_m)
+}
+
+// QueryRobots queries the "robots" edge of the Account entity.
+func (_m *Account) QueryRobots() *RobotQuery {
+	return NewAccountClient(_m.config).QueryRobots(_m)
+}
+
+// QueryRobotSessions queries the "robot_sessions" edge of the Account entity.
+func (_m *Account) QueryRobotSessions() *RobotSessionQuery {
+	return NewAccountClient(_m.config).QueryRobotSessions(_m)
+}
+
+// QueryRobotMessages queries the "robot_messages" edge of the Account entity.
+func (_m *Account) QueryRobotMessages() *RobotSessionMessageQuery {
+	return NewAccountClient(_m.config).QueryRobotMessages(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

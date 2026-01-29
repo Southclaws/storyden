@@ -91,6 +91,8 @@ tags:
     description: Content graph (posts, nodes, links) APIs.
   - name: events
     description: Event scheduling, invites and management.
+  - name: robots
+    description: Robots (AI Agents)
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -2404,6 +2406,155 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
+  #
+  #                 888               888
+  #                 888               888
+  #                 888               888
+  # 888d888 .d88b.  88888b.   .d88b.  888888 .d8888b
+  # 888P"  d88""88b 888 "88b d88""88b 888    88K
+  # 888    888  888 888  888 888  888 888    "Y8888b.
+  # 888    Y88..88P 888 d88P Y88..88P Y88b.       X88
+  # 888     "Y88P"  88888P"   "Y88P"   "Y888  88888P'
+  #
+
+  /robots:
+    get:
+      operationId: RobotsList
+      summary: List robots
+      description: Get a paginated list of all available robots.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotsListOK" }
+    post:
+      operationId: RobotCreate
+      summary: Create a robot
+      description: |
+        Create a new Robot with the specified configuration. A Robot in Storyden
+        consists of a name and description (for humans) as well as a playbook,
+        and a set of available tools to interact with Storyden or plugins. The
+        playbook is a detailed set of instructions that guides behaviour of the
+        Robot to help it assist members in achieving a specific automation goal.
+        Tools are available from either Storyden or plugins that allow it to
+        perform actions or query data. Robots never need all tools and it's best
+        to build goal-specific Robots with minimal sets of tools.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotCreateOK" }
+
+  /robots/chat/sse:
+    post:
+      operationId: RobotChatSSE
+      description: |
+        Send a message to a Robot and receive its response. This endpoint
+        manages sessions automatically, creating new sessions as needed or
+        continuing existing sessions based on the provided session ID.
+
+        Each message sent to the Robot is processed according to its playbook
+        and available tools, allowing it to perform actions or retrieve data
+        as part of the conversation. The response from the Robot includes its
+        reply message along with any actions taken during the interaction.
+
+        This endpoint is a Server Sent Events (SSE) stream, meaning that the
+        response is streamed back to the client in real-time as the Robot
+        generates its reply.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotChatStart" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotChatStream" }
+
+  /robots/{robot_id}:
+    get:
+      operationId: RobotGet
+      summary: Get a robot
+      description: |
+        Retrieve a specific Robot by its ID. Does not include any messages or
+        sessions associated with the Robot, just provides metadata about it.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotGetOK" }
+    patch:
+      operationId: RobotUpdate
+      summary: Update a robot
+      description: |
+        Update a Robot's name, description, playbook or available tools.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotIDParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotGetOK" }
+
+  /robots/sessions:
+    get:
+      operationId: RobotSessionsList
+      summary: List robot sessions
+      description: |
+        Get a paginated list of Robot sessions. These are chat sessions with the
+        Robot system. One session may span multiple Robots as members can switch
+        which Robot they are talking to mid conversation, or the Robot itself
+        may choose to switch to another Robot to achieve a goal. A session is a
+        representation of an entire conversation thread with the Robot system.
+
+        You may include an account ID to filter sessions by account. Only those
+        with "USE_ROBOTS" permission can use Robots, however sessions, messages
+        and usage is not considered hidden to other accounts with the usage
+        permission. Robots are intended as administrative or moderation tools
+        to be shared among the team rather than private assistants.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/AccountIDQueryParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotSessionsListOK" }
+
+  /robots/sessions/{session_id}:
+    get:
+      operationId: RobotSessionGet
+      summary: Get a robot session
+      description: |
+        Retrieve a specific robot session with all of its messages. Sessions can
+        involve interactions with multiple Robots so the Robot is specified on
+        each message. Messages may not be representative of exactly what is sent
+        into a language model, as certain optimisations may be performed before
+        this such as compaction, summarisation or removal of irrelevant context.
+
+        Any member with "USE_ROBOTS" can see any other members' sessions and
+        messages with a Robot. Robots are not considered private assistants, but
+        rather shared tools for the team to use for managing their community.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotSessionGetOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -2933,6 +3084,22 @@ components:
       schema:
         $ref: "#/components/schemas/Mark"
 
+    RobotIDParam:
+      description: Robot ID
+      in: path
+      name: robot_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotSessionIDParam:
+      description: Robot session ID
+      in: path
+      name: session_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
   # 888   Y88b 888       d88P" "Y88b 888     888 888       d88P  Y88b    888    d88P  Y88b
@@ -3215,6 +3382,21 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/EventParticipantMutableProps" }
+
+    RobotCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotInitialProps" }
+
+    RobotUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMutableProps" }
+
+    RobotChatStart:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotChatRequest" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -3861,6 +4043,46 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Event" }
+
+    RobotsListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotsListResult"
+
+    RobotCreateOK:
+      description: Robot created.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Robot" }
+
+    RobotGetOK:
+      description: Robot retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Robot" }
+
+    RobotSessionsListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotSessionsListResult"
+
+    RobotSessionGetOK:
+      description: Robot session with messages.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotSession"
+
+    RobotChatStream:
+      description: Server-sent events stream of robot chat responses.
+      content:
+        text/event-stream:
+          schema:
+            $ref: "#/components/schemas/StreamPart"
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -4568,6 +4790,9 @@ components:
         - "MANAGE_ROLES"
         - "MANAGE_REPORTS"
         - "VIEW_ACCOUNTS"
+        # Robots
+        - "USE_ROBOTS"
+        - "MANAGE_ROBOTS"
         # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
 
@@ -7081,6 +7306,760 @@ components:
     EventCapacity:
       description: The maximum number of attendees that can attend the event.
       type: integer
+
+    #
+    # 8888888b.          888               888
+    # 888   Y88b         888               888
+    # 888    888         888               888
+    # 888   d88P .d88b.  88888b.   .d88b.  888888
+    # 8888888P" d88""88b 888 "88b d88""88b 888
+    # 888 T88b  888  888 888  888 888  888 888
+    # 888  T88b Y88..88P 888 d88P Y88..88P Y88b.
+    # 888   T88b "Y88P"  88888P"   "Y88P"   "Y888
+    #
+
+    Robot:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotProps"
+
+    RobotProps:
+      type: object
+      required: [name, description, playbook, author, tools]
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        tools: { $ref: "#/components/schemas/RobotToolNameList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotSession:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotSessionRefProps"
+        - $ref: "#/components/schemas/RobotSessionProps"
+
+    RobotSessionProps:
+      type: object
+      required: [message_list]
+      properties:
+        message_list: { $ref: "#/components/schemas/PaginatedRobotMessageList" }
+
+    RobotSessionRef:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotSessionRefProps"
+
+    RobotSessionRefProps:
+      type: object
+      required: [name, created_by]
+      properties:
+        name: { type: string }
+        created_by: { $ref: "#/components/schemas/ProfileReference" }
+
+    # -
+    # Vercel AI SDK UIMessage format
+    # These schemas match the structure from @ai-sdk/react for compatibility
+    # -
+
+    UIMessage:
+      type: object
+      required: [id, role, parts]
+      description: |
+        A message in the Vercel AI SDK format. This is compatible with the
+        UIMessage interface from @ai-sdk/react and can be used directly with
+        the useChat hook.
+      properties:
+        id:
+          type: string
+          description: Unique message identifier
+        role:
+          type: string
+          enum: [system, user, assistant]
+          description: The role of the message sender
+        parts:
+          type: array
+          items: { $ref: "#/components/schemas/UIMessagePart" }
+          description: The parts that make up the message content
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional metadata associated with the message
+
+    UIMessagePart:
+      oneOf:
+        - $ref: "#/components/schemas/TextUIPart"
+        - $ref: "#/components/schemas/ReasoningUIPart"
+        - $ref: "#/components/schemas/ToolUIPart"
+        - $ref: "#/components/schemas/FileUIPart"
+      discriminator:
+        propertyName: type
+        mapping:
+          text: "#/components/schemas/TextUIPart"
+          reasoning: "#/components/schemas/ReasoningUIPart"
+          "dynamic-tool": "#/components/schemas/ToolUIPart"
+          file: "#/components/schemas/FileUIPart"
+      description: |
+        A part of a UIMessage. Can be text, reasoning, tool invocation, or file.
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: The type of the message part
+          enum: [text, reasoning, dynamic-tool, file]
+
+    TextUIPart:
+      type: object
+      required: [type, text]
+      description: A text part of a message
+      properties:
+        type:
+          type: string
+          enum: [text]
+        text:
+          type: string
+          description: The text content
+        state:
+          type: string
+          enum: [streaming, done]
+          description: The state of the text part
+
+    ReasoningUIPart:
+      type: object
+      required: [type, text]
+      description: A reasoning part of a message (extended thinking/reasoning)
+      properties:
+        type:
+          type: string
+          enum: [reasoning]
+        text:
+          type: string
+          description: The reasoning text
+        state:
+          type: string
+          enum: [streaming, done]
+          description: The state of the reasoning part
+
+    ToolUIPart:
+      oneOf:
+        - $ref: "#/components/schemas/ToolUIPartInputStreaming"
+        - $ref: "#/components/schemas/ToolUIPartInputAvailable"
+        - $ref: "#/components/schemas/ToolUIPartOutputAvailable"
+        - $ref: "#/components/schemas/ToolUIPartOutputError"
+      discriminator:
+        propertyName: state
+        mapping:
+          input-streaming: "#/components/schemas/ToolUIPartInputStreaming"
+          input-available: "#/components/schemas/ToolUIPartInputAvailable"
+          output-available: "#/components/schemas/ToolUIPartOutputAvailable"
+          output-error: "#/components/schemas/ToolUIPartOutputError"
+      description: A tool invocation part (dynamic-tool format matching Vercel AI SDK)
+
+    ToolUIPartBase:
+      type: object
+      required: [type, toolCallId, toolName]
+      properties:
+        type:
+          type: string
+          enum: [dynamic-tool]
+          description: Type identifier for dynamic tool calls
+        toolCallId:
+          type: string
+          description: Unique ID for this tool call
+        toolName:
+          type: string
+          description: Name of the tool being called
+        title:
+          type: string
+          description: Optional title for the tool call
+        providerExecuted:
+          type: boolean
+          description: Whether the tool was executed by the provider
+
+    ToolUIPartInputStreaming:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input]
+          properties:
+            state:
+              type: string
+              enum: [input-streaming]
+            input:
+              type: object
+              additionalProperties: true
+              description: Partial input (streaming)
+
+    ToolUIPartInputAvailable:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input]
+          properties:
+            state:
+              type: string
+              enum: [input-available]
+            input:
+              type: object
+              additionalProperties: true
+              description: Complete input arguments
+
+    ToolUIPartOutputAvailable:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, output]
+          properties:
+            state:
+              type: string
+              enum: [output-available]
+            input:
+              type: object
+              additionalProperties: true
+              description: Input arguments used
+            output:
+              type: object
+              additionalProperties: true
+              description: Output result from the tool
+            preliminary:
+              type: boolean
+              description: Whether this is a preliminary result
+
+    ToolUIPartOutputError:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, errorText]
+          properties:
+            state:
+              type: string
+              enum: [output-error]
+            input:
+              type: object
+              additionalProperties: true
+              description: Input that caused the error
+            errorText:
+              type: string
+              description: Error message
+
+    FileUIPart:
+      type: object
+      required: [type, mediaType, url]
+      description: A file part of a message
+      properties:
+        type:
+          type: string
+          enum: [file]
+        mediaType:
+          type: string
+          description: IANA media type of the file
+        filename:
+          type: string
+          description: Optional filename
+        url:
+          type: string
+          description: URL to the file (can be a data URL or hosted URL)
+
+    # -
+    # Robot session messages - extends UIMessage with our metadata
+    # -
+
+    RobotSessionMessage:
+      allOf:
+        - $ref: "#/components/schemas/UIMessage"
+        - type: object
+          required: [created_at]
+          properties:
+            created_at:
+              type: string
+              format: date-time
+              description: When the message was sent
+            robot:
+              $ref: "#/components/schemas/Robot"
+              description: Robot that generated this message
+            author:
+              $ref: "#/components/schemas/ProfileReference"
+              description: Human author of the message
+
+    RobotSessionMessageList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotSessionMessage" }
+
+    PaginatedRobotMessageList:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [messages]
+          properties:
+            messages: { $ref: "#/components/schemas/RobotSessionMessageList" }
+
+    RobotToolNameList:
+      description: A list of tool names that the robot can use.
+      type: array
+      items:
+        type: string
+
+    # -
+    # Robot mutation types
+    # -
+
+    RobotInitialProps:
+      type: object
+      required: [name, description, playbook]
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotChatRequest:
+      type: object
+      required: [id, messages]
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this chat request
+        threadId:
+          type: string
+          description: Optional thread ID if this chat is part of a thread context
+        sessionId:
+          type: string
+          description: Session ID to continue an existing conversation
+        robotId:
+          type: string
+          description: Specific robot ID to use for this message
+        messages:
+          type: array
+          description: Array of chat messages in the conversation
+          items:
+            $ref: "#/components/schemas/UIMessage"
+        data:
+          type: object
+          description: Additional data for the chat request
+          additionalProperties: true
+        context:
+          $ref: "#/components/schemas/RobotChatContext"
+          description: Context about the page/item the user is viewing
+
+    RobotChatContext:
+      type: object
+      properties:
+        datagraph_item:
+          $ref: "#/components/schemas/DatagraphItemRef"
+          description: Optional reference to a datagraph item if the user is viewing one
+        page_type:
+          type: string
+          description: Human-readable page type if not viewing a specific datagraph item
+
+    DatagraphItemRef:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+          description: The unique identifier of the datagraph item
+        kind:
+          type: string
+          enum: [thread, node, profile, link, collection]
+          description: The type of datagraph item
+        slug:
+          type: string
+          description: Human-readable URL slug for the item
+        name:
+          type: string
+          description: Display name of the item
+
+    # -
+    # Robot listing types
+    # -
+
+    RobotList:
+      type: array
+      items: { $ref: "#/components/schemas/Robot" }
+
+    RobotsListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [robots]
+          properties:
+            robots: { $ref: "#/components/schemas/RobotList" }
+
+    RobotSessionList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotSessionRef" }
+
+    RobotSessionsListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [sessions]
+          properties:
+            sessions: { $ref: "#/components/schemas/RobotSessionList" }
+
+    # -
+    # Vercel Streaming Protocol
+    # -
+
+    NonEmptyString:
+      type: string
+      minLength: 1
+
+    Id:
+      type: string
+      minLength: 1
+
+    MediaType:
+      type: string
+      minLength: 1
+      description: IANA media type (MIME type) such as image/png, application/pdf, text/plain.
+      pattern: "^[\\w!#$&^_.+-]+\\/[\\w!#$&^_.+-]+$"
+
+    ArbitraryData: {}
+    #   description: Arbitrary structured data for the custom data part.
+    #   oneOf:
+    #     - type: object
+    #       additionalProperties: true
+    #     - type: array
+    #       items:
+    #         $ref: "#/components/schemas/ArbitraryData"
+    #     - type: string
+    #     - type: number
+    #     - type: integer
+    #     - type: boolean
+
+    StreamPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          "$ref": "#/components/schemas/NonEmptyString"
+      oneOf:
+        - "$ref": "#/components/schemas/StartPart"
+        - "$ref": "#/components/schemas/TextStartPart"
+        - "$ref": "#/components/schemas/TextDeltaPart"
+        - "$ref": "#/components/schemas/TextEndPart"
+        - "$ref": "#/components/schemas/ReasoningStartPart"
+        - "$ref": "#/components/schemas/ReasoningDeltaPart"
+        - "$ref": "#/components/schemas/ReasoningEndPart"
+        - "$ref": "#/components/schemas/SourceUrlPart"
+        - "$ref": "#/components/schemas/SourceDocumentPart"
+        - "$ref": "#/components/schemas/FilePart"
+        - "$ref": "#/components/schemas/DataPart"
+        - "$ref": "#/components/schemas/ErrorPart"
+        - "$ref": "#/components/schemas/ToolInputStartPart"
+        - "$ref": "#/components/schemas/ToolInputDeltaPart"
+        - "$ref": "#/components/schemas/ToolInputAvailablePart"
+        - "$ref": "#/components/schemas/ToolOutputAvailablePart"
+        - "$ref": "#/components/schemas/StartStepPart"
+        - "$ref": "#/components/schemas/FinishStepPart"
+        - "$ref": "#/components/schemas/FinishMessagePart"
+        - "$ref": "#/components/schemas/AbortPart"
+      discriminator:
+        propertyName: type
+        mapping:
+          start: "#/components/schemas/StartPart"
+          text-start: "#/components/schemas/TextStartPart"
+          text-delta: "#/components/schemas/TextDeltaPart"
+          text-end: "#/components/schemas/TextEndPart"
+          reasoning-start: "#/components/schemas/ReasoningStartPart"
+          reasoning-delta: "#/components/schemas/ReasoningDeltaPart"
+          reasoning-end: "#/components/schemas/ReasoningEndPart"
+          source-url: "#/components/schemas/SourceUrlPart"
+          source-document: "#/components/schemas/SourceDocumentPart"
+          file: "#/components/schemas/FilePart"
+          error: "#/components/schemas/ErrorPart"
+          tool-input-start: "#/components/schemas/ToolInputStartPart"
+          tool-input-delta: "#/components/schemas/ToolInputDeltaPart"
+          tool-input-available: "#/components/schemas/ToolInputAvailablePart"
+          tool-output-available: "#/components/schemas/ToolOutputAvailablePart"
+          start-step: "#/components/schemas/StartStepPart"
+          finish-step: "#/components/schemas/FinishStepPart"
+          finish: "#/components/schemas/FinishMessagePart"
+          abort: "#/components/schemas/AbortPart"
+
+    StartPart:
+      type: object
+      required:
+        - type
+        - messageId
+      properties:
+        type:
+          const: start
+        messageId:
+          "$ref": "#/components/schemas/Id"
+
+    TextStartPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: text-start
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    TextDeltaPart:
+      type: object
+      required:
+        - type
+        - id
+        - delta
+      properties:
+        type:
+          const: text-delta
+        id:
+          "$ref": "#/components/schemas/Id"
+        delta:
+          type: string
+
+    TextEndPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: text-end
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    ReasoningStartPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: reasoning-start
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    ReasoningDeltaPart:
+      type: object
+      required:
+        - type
+        - id
+        - delta
+      properties:
+        type:
+          const: reasoning-delta
+        id:
+          "$ref": "#/components/schemas/Id"
+        delta:
+          type: string
+
+    ReasoningEndPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: reasoning-end
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    SourceUrlPart:
+      type: object
+      required:
+        - type
+        - sourceId
+        - url
+      properties:
+        type:
+          const: source-url
+        sourceId:
+          "$ref": "#/components/schemas/NonEmptyString"
+        url:
+          "$ref": "#/components/schemas/URL"
+
+    SourceDocumentPart:
+      type: object
+      required:
+        - type
+        - sourceId
+        - mediaType
+        - title
+      properties:
+        type:
+          const: source-document
+        sourceId:
+          "$ref": "#/components/schemas/NonEmptyString"
+        mediaType:
+          type: string
+          minLength: 1
+          description:
+            Protocol doc example uses "file" here. Kept as a non-empty string
+            to avoid over-constraining.
+        title:
+          "$ref": "#/components/schemas/NonEmptyString"
+        url:
+          "$ref": "#/components/schemas/URL"
+          description:
+            Not shown in the provided example, but some implementations may
+            include a URL for the document.
+
+    FilePart:
+      type: object
+      required:
+        - type
+        - url
+        - mediaType
+      properties:
+        type:
+          const: file
+        url:
+          "$ref": "#/components/schemas/URL"
+        mediaType:
+          "$ref": "#/components/schemas/MediaType"
+
+    DataPart:
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+          pattern: "^data-[A-Za-z0-9][A-Za-z0-9._-]*$"
+          description: Custom data part types, e.g. "data-weather".
+        data:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    ErrorPart:
+      type: object
+      required:
+        - type
+        - errorText
+      properties:
+        type:
+          const: error
+        errorText:
+          type: string
+
+    ToolInputStartPart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - toolName
+      properties:
+        type:
+          const: tool-input-start
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        toolName:
+          "$ref": "#/components/schemas/NonEmptyString"
+
+    ToolInputDeltaPart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - inputTextDelta
+      properties:
+        type:
+          const: tool-input-delta
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        inputTextDelta:
+          type: string
+
+    ToolInputAvailablePart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - toolName
+        - input
+      properties:
+        type:
+          const: tool-input-available
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        toolName:
+          "$ref": "#/components/schemas/NonEmptyString"
+        input:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    ToolOutputAvailablePart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - output
+      properties:
+        type:
+          const: tool-output-available
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        output:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    StartStepPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: start-step
+
+    FinishStepPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: finish-step
+
+    FinishMessagePart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: finish
+
+    AbortPart:
+      type: object
+      required:
+        - type
+        - reason
+      properties:
+        type:
+          const: abort
+        reason:
+          type: string
 
   securitySchemes:
     browser:

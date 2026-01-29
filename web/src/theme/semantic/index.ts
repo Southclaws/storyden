@@ -38,6 +38,17 @@ export const semanticTokens = defineSemanticTokens({
   },
   sizes: {
     prose: { value: "65ch" },
+    viewportHeight: {
+      value: `
+        calc(
+          100dvh
+          - var(--app-nav-h, 72px)
+          - env(safe-area-inset-top)
+          - env(safe-area-inset-bottom)
+          - env(keyboard-inset-height, 0px)
+        )
+      `,
+    },
   },
   spacing: {
     safeBottom: { value: "env(safe-area-inset-bottom)" },

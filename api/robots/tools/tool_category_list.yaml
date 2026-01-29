@@ -1,0 +1,45 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolCategoryList
+x-storyden-role: READ_PUBLISHED_THREADS
+title: category_list
+description: List all thread categories with their names and descriptions
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolCategoryListInput"
+  output:
+    $ref: "#/definitions/ToolCategoryListOutput"
+definitions:
+  ToolCategoryListInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+  ToolCategoryListOutput:
+    type: object
+    required:
+      - categories
+    properties:
+      categories:
+        type: array
+        items:
+          $ref: "#/definitions/CategoryItem"
+    additionalProperties: false
+  CategoryItem:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: Category slug
+      name:
+        type: string
+        description: Category name
+      description:
+        type: string
+        description: Category description
+    additionalProperties: false
