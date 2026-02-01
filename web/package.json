@@ -85,7 +85,7 @@
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.38.0",
     "eslint-config-next": "16.0.1",
-    "orval": "7.2.0",
+    "orval": "7.21.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
