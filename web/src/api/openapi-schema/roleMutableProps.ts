@@ -7,10 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.3-canary
  */
+import type { Metadata } from "./metadata";
 import type { PermissionList } from "./permissionList";
 
 export interface RoleMutableProps {
   colour?: string;
+  meta?: Metadata;
   name?: string;
   permissions?: PermissionList;
 }

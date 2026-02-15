@@ -13,6 +13,7 @@ import type {
   RoleGetOKResponse,
   RoleListOKResponse,
   RoleUpdateBody,
+  RoleUpdateOrderBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -58,6 +59,33 @@ export const roleList = async (
   return fetcher<Promise<roleListResponse>>(getRoleListUrl(), {
     ...options,
     method: "GET",
+  });
+};
+
+/**
+ * Update the global ordering of custom roles. The request body must
+include every non-default role identifier exactly once in the desired
+order of precedence.
+
+ */
+export type roleUpdateOrderResponse = {
+  data: RoleListOKResponse;
+  status: number;
+};
+
+export const getRoleUpdateOrderUrl = () => {
+  return `/roles/order`;
+};
+
+export const roleUpdateOrder = async (
+  roleUpdateOrderBody: RoleUpdateOrderBody,
+  options?: RequestInit,
+): Promise<roleUpdateOrderResponse> => {
+  return fetcher<Promise<roleUpdateOrderResponse>>(getRoleUpdateOrderUrl(), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(roleUpdateOrderBody),
   });
 };
 

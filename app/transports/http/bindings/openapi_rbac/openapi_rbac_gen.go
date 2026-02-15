@@ -23,6 +23,7 @@ type OperationPermissions interface {
 	AdminAccessKeyDelete() (bool, *rbac.Permission)
 	RoleCreate() (bool, *rbac.Permission)
 	RoleList() (bool, *rbac.Permission)
+	RoleUpdateOrder() (bool, *rbac.Permission)
 	RoleGet() (bool, *rbac.Permission)
 	RoleUpdate() (bool, *rbac.Permission)
 	RoleDelete() (bool, *rbac.Permission)
@@ -187,6 +188,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.RoleCreate()
 	case "RoleList":
 		return optable.RoleList()
+	case "RoleUpdateOrder":
+		return optable.RoleUpdateOrder()
 	case "RoleGet":
 		return optable.RoleGet()
 	case "RoleUpdate":

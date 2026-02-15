@@ -14,6 +14,7 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  BadRequestResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   RoleCreateBody,
@@ -21,6 +22,7 @@ import type {
   RoleGetOKResponse,
   RoleListOKResponse,
   RoleUpdateBody,
+  RoleUpdateOrderBody,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -112,6 +114,65 @@ export const useRoleList = <TError = InternalServerErrorResponse>(options?: {
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the global ordering of custom roles. The request body must
+include every non-default role identifier exactly once in the desired
+order of precedence.
+
+ */
+export const roleUpdateOrder = (roleUpdateOrderBody: RoleUpdateOrderBody) => {
+  return fetcher<RoleListOKResponse>({
+    url: `/roles/order`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: roleUpdateOrderBody,
+  });
+};
+
+export const getRoleUpdateOrderMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: RoleUpdateOrderBody },
+  ): Promise<RoleListOKResponse> => {
+    return roleUpdateOrder(arg);
+  };
+};
+export const getRoleUpdateOrderMutationKey = () => [`/roles/order`] as const;
+
+export type RoleUpdateOrderMutationResult = NonNullable<
+  Awaited<ReturnType<typeof roleUpdateOrder>>
+>;
+export type RoleUpdateOrderMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useRoleUpdateOrder = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof roleUpdateOrder>>,
+    TError,
+    Key,
+    RoleUpdateOrderBody,
+    Awaited<ReturnType<typeof roleUpdateOrder>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getRoleUpdateOrderMutationKey();
+  const swrFn = getRoleUpdateOrderMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

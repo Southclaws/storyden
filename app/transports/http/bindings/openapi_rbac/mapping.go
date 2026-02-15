@@ -94,6 +94,10 @@ func (m *Mapping) RoleUpdate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }
 
+func (m *Mapping) RoleUpdateOrder() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRoles
+}
+
 func (m *Mapping) RoleDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }

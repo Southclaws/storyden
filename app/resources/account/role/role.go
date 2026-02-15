@@ -23,6 +23,7 @@ type Role struct {
 	Colour      string
 	Permissions rbac.Permissions
 	SortKey     float64
+	Metadata    map[string]any
 	CreatedAt   time.Time
 }
 
@@ -57,6 +58,8 @@ func Map(r *ent.Role) (*Role, error) {
 		Name:        r.Name,
 		Colour:      r.Colour,
 		Permissions: *perms,
+		SortKey:     defaultSortKey(RoleID(r.ID), r.SortKey),
+		Metadata:    r.Metadata,
 		CreatedAt:   r.CreatedAt,
 	}, nil
 }
@@ -70,4 +73,17 @@ func MapList(in []*ent.Role) (Roles, error) {
 	sort.Sort(Roles(mapped))
 
 	return mapped, nil
+}
+
+func defaultSortKey(id RoleID, current float64) float64 {
+	switch id {
+	case DefaultRoleGuestID:
+		return DefaultRoleGuest.SortKey
+	case DefaultRoleMemberID:
+		return DefaultRoleMember.SortKey
+	case DefaultRoleAdminID:
+		return DefaultRoleAdmin.SortKey
+	default:
+		return current
+	}
 }

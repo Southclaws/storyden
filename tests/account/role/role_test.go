@@ -137,6 +137,118 @@ func TestRoles(t *testing.T) {
 				page2, err := cl.NodeCreateWithResponse(guestCtx, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Visibility: &vis}, guest1Session)
 				tests.Ok(t, err, page2)
 			})
+
+			t.Run("role_metadata_roundtrip", func(t *testing.T) {
+				name := "meta-role-" + xid.New().String()
+				meta := openapi.Metadata{
+					"display": map[string]any{
+						"style": "bold",
+						"glow":  true,
+					},
+				}
+
+				create, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{
+					Name:        name,
+					Colour:      "purple",
+					Permissions: openapi.PermissionList{},
+					Meta:        &meta,
+				}, adminSession)
+				tests.Ok(t, err, create)
+
+				get, err := cl.RoleGetWithResponse(adminCtx, create.JSON200.Id, adminSession)
+				tests.Ok(t, err, get)
+
+				r.NotNil(get.JSON200.Meta)
+				a.Equal(meta, *get.JSON200.Meta)
+			})
+
+			t.Run("role_reorder_custom_roles", func(t *testing.T) {
+				defaultGuestID := openapi.Identifier("0000000000000000000g")
+				defaultMemberID := openapi.Identifier("000000000000000000m0")
+				defaultAdminID := openapi.Identifier("00000000000000000a00")
+
+				createRole := func(name string) openapi.Role {
+					resp := tests.AssertRequest(cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{
+						Name:        name,
+						Colour:      "orange",
+						Permissions: openapi.PermissionList{},
+					}, adminSession))(t, http.StatusOK)
+					r.NotNil(resp.JSON200)
+					return *resp.JSON200
+				}
+
+				role1 := createRole("order-role-" + xid.New().String())
+				role2 := createRole("order-role-" + xid.New().String())
+				role3 := createRole("order-role-" + xid.New().String())
+
+				getCustomIDs := func(roles []openapi.Role) []openapi.Identifier {
+					return lo.FilterMap(roles, func(v openapi.Role, _ int) (openapi.Identifier, bool) {
+						if v.Id == defaultGuestID || v.Id == defaultMemberID || v.Id == defaultAdminID {
+							return "", false
+						}
+						return openapi.Identifier(v.Id), true
+					})
+				}
+				targetIDs := []openapi.Identifier{role3.Id, role1.Id, role2.Id}
+
+				var reorderResp *openapi.RoleUpdateOrderResponse
+				var reorderedIDs []openapi.Identifier
+				for attempt := 0; attempt < 5; attempt++ {
+					beforeListResp := tests.AssertRequest(cl.RoleListWithResponse(adminCtx, adminSession))(t, http.StatusOK)
+					r.NotNil(beforeListResp.JSON200)
+
+					customIDs := getCustomIDs(beforeListResp.JSON200.Roles)
+					r.Contains(customIDs, role1.Id)
+					r.Contains(customIDs, role2.Id)
+					r.Contains(customIDs, role3.Id)
+
+					remainingIDs := lo.Filter(customIDs, func(id openapi.Identifier, _ int) bool {
+						return id != role1.Id && id != role2.Id && id != role3.Id
+					})
+
+					reorderedIDs = append([]openapi.Identifier{}, targetIDs...)
+					reorderedIDs = append(reorderedIDs, remainingIDs...)
+
+					resp, err := cl.RoleUpdateOrderWithResponse(adminCtx, openapi.RoleUpdateOrderJSONRequestBody{
+						RoleIds: reorderedIDs,
+					}, adminSession)
+					r.NoError(err)
+					r.NotNil(resp)
+
+					if resp.StatusCode() == http.StatusOK {
+						reorderResp = resp
+						break
+					}
+					if resp.StatusCode() != http.StatusBadRequest {
+						t.Fatalf("unexpected role reorder status %d", resp.StatusCode())
+					}
+				}
+
+				r.NotNil(reorderResp, "failed to reorder roles after retries due concurrent role mutations")
+				r.NotNil(reorderResp.JSON200)
+
+				roles := reorderResp.JSON200.Roles
+				ids := lo.Map(roles, func(r openapi.Role, _ int) openapi.Identifier { return r.Id })
+				idxGuest := lo.IndexOf(ids, defaultGuestID)
+				idxMember := lo.IndexOf(ids, defaultMemberID)
+				idx1 := lo.IndexOf(ids, role1.Id)
+				idx2 := lo.IndexOf(ids, role2.Id)
+				idx3 := lo.IndexOf(ids, role3.Id)
+
+				r.NotEqual(-1, idxGuest)
+				r.NotEqual(-1, idxMember)
+				r.NotEqual(-1, idx1)
+				r.NotEqual(-1, idx2)
+				r.NotEqual(-1, idx3)
+				a.True(idxGuest < idxMember, "default guest role should sort before member role")
+				a.True(idx3 < idx1 && idx1 < idx2, "custom roles should match reordered precedence")
+
+				tests.AssertRequest(cl.RoleUpdateOrderWithResponse(adminCtx, openapi.RoleUpdateOrderJSONRequestBody{
+					RoleIds: append([]openapi.Identifier{
+						defaultMemberID,
+					}, reorderedIDs...),
+				}, adminSession))(t, http.StatusBadRequest)
+			})
 		}))
 	}))
 }

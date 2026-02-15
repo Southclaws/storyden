@@ -6,10 +6,10 @@ import { useSWRConfig } from "swr";
 import { handle } from "@/api/client";
 import { getRoleListKey, roleCreate } from "@/api/openapi-client/roles";
 import { Role } from "@/api/openapi-schema";
-import { EditAction } from "@/components/site/Action/Edit";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
+import { EditIcon } from "@/components/ui/icons/Edit";
 import { isDefaultRole, isEditableDefaultRole } from "@/lib/role/defaults";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
 
@@ -45,12 +45,20 @@ export function RoleEditModalTrigger({ role }: Props) {
 
   return (
     <>
-      <EditAction
+      <IconButton
+        variant="ghost"
         size="xs"
+        minWidth="5"
+        width="5"
+        height="5"
+        padding="0"
+        color="fg.muted"
         disabled={cannotEdit}
         title={titleLabel}
         onClick={disclosure.onOpen}
-      />
+      >
+        <EditIcon width="4" />
+      </IconButton>
 
       <RoleEditModal {...disclosure} role={role} />
     </>

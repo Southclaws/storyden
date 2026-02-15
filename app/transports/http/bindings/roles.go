@@ -43,7 +43,12 @@ func (h *Roles) RoleCreate(ctx context.Context, request openapi.RoleCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	role, err := h.roleWriter.Create(ctx, request.Body.Name, request.Body.Colour, perms)
+	opts := []role_writer.Mutation{}
+	if request.Body.Meta != nil {
+		opts = append(opts, role_writer.WithMeta(map[string]any(*request.Body.Meta)))
+	}
+
+	role, err := h.roleWriter.Create(ctx, request.Body.Name, request.Body.Colour, perms, opts...)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			err = fault.Wrap(err, fmsg.WithDesc("unique", "A role with that name already exists"), ftag.With(ftag.AlreadyExists))
@@ -104,6 +109,10 @@ func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateReques
 		opts = append(opts, role_writer.WithPermissions(perms))
 	}
 
+	if request.Body.Meta != nil {
+		opts = append(opts, role_writer.WithMeta(map[string]any(*request.Body.Meta)))
+	}
+
 	role, err := h.roleWriter.Update(ctx, id, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -111,6 +120,34 @@ func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateReques
 
 	return openapi.RoleUpdate200JSONResponse{
 		RoleGetOKJSONResponse: openapi.RoleGetOKJSONResponse(serialiseRolePtr(role)),
+	}, nil
+}
+
+func (h *Roles) RoleUpdateOrder(ctx context.Context, request openapi.RoleUpdateOrderRequestObject) (openapi.RoleUpdateOrderResponseObject, error) {
+	if request.Body == nil {
+		return nil, fault.Wrap(
+			fault.New("missing role reorder body", ftag.With(ftag.InvalidArgument), fmsg.With("request body is required")),
+			fctx.With(ctx),
+		)
+	}
+
+	ids := dt.Map(request.Body.RoleIds, func(id openapi.Identifier) role.RoleID {
+		return role.RoleID(openapi.ParseID(id))
+	})
+
+	if err := h.roleWriter.UpdateSortOrder(ctx, ids); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roles, err := h.roleQuerier.List(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.RoleUpdateOrder200JSONResponse{
+		RoleListOKJSONResponse: openapi.RoleListOKJSONResponse{
+			Roles: serialiseRoleList(roles),
+		},
 	}, nil
 }
 
@@ -129,6 +166,7 @@ func serialiseRole(in role.Role) openapi.Role {
 		Name:        in.Name,
 		Colour:      in.Colour,
 		Permissions: serialisePermissionList(in.Permissions),
+		Meta:        serialiseMetadata(in.Metadata),
 		CreatedAt:   in.CreatedAt,
 	}
 }
@@ -150,10 +188,19 @@ func serialiseHeldRole(in held.Role) openapi.AccountRole {
 		Name:        in.Name,
 		Colour:      in.Colour,
 		Permissions: serialisePermissionList(in.Permissions),
+		Meta:        serialiseMetadata(in.Metadata),
 		Badge:       in.Badge,
 		Default:     in.Default,
 		CreatedAt:   in.CreatedAt,
 	}
+}
+
+func serialiseMetadata(meta map[string]any) *openapi.Metadata {
+	if meta == nil {
+		return nil
+	}
+	v := openapi.Metadata(meta)
+	return &v
 }
 
 func serialiseHeldRolePtr(in *held.Role) openapi.AccountRole {

@@ -100,6 +100,18 @@ func (_u *RoleUpdate) AddSortKey(v float64) *RoleUpdate {
 	return _u
 }
 
+// SetMetadata sets the "metadata" field.
+func (_u *RoleUpdate) SetMetadata(v map[string]interface{}) *RoleUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (_u *RoleUpdate) ClearMetadata() *RoleUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
 func (_u *RoleUpdate) AddAccountIDs(ids ...xid.ID) *RoleUpdate {
 	_u.mutation.AddAccountIDs(ids...)
@@ -250,6 +262,12 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedSortKey(); ok {
 		_spec.AddField(role.FieldSortKey, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.Metadata(); ok {
+		_spec.SetField(role.FieldMetadata, field.TypeJSON, value)
+	}
+	if _u.mutation.MetadataCleared() {
+		_spec.ClearField(role.FieldMetadata, field.TypeJSON)
 	}
 	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -451,6 +469,18 @@ func (_u *RoleUpdateOne) AddSortKey(v float64) *RoleUpdateOne {
 	return _u
 }
 
+// SetMetadata sets the "metadata" field.
+func (_u *RoleUpdateOne) SetMetadata(v map[string]interface{}) *RoleUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (_u *RoleUpdateOne) ClearMetadata() *RoleUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
 func (_u *RoleUpdateOne) AddAccountIDs(ids ...xid.ID) *RoleUpdateOne {
 	_u.mutation.AddAccountIDs(ids...)
@@ -631,6 +661,12 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	}
 	if value, ok := _u.mutation.AddedSortKey(); ok {
 		_spec.AddField(role.FieldSortKey, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.Metadata(); ok {
+		_spec.SetField(role.FieldMetadata, field.TypeJSON, value)
+	}
+	if _u.mutation.MetadataCleared() {
+		_spec.ClearField(role.FieldMetadata, field.TypeJSON)
 	}
 	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
