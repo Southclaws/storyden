@@ -56,8 +56,20 @@ export function LogoutAnchor({ hideLabel, ...props }: Props) {
 
 export function LogoutMenuItem({ hideLabel }: AnchorProps) {
   return (
-    <form action={LogoutAction} method="POST">
-      <button type="submit" style={{ all: "unset", cursor: "pointer", width: "100%" }}>
+    <form action={LogoutAction} method="POST" style={{ display: "contents" }}>
+      <button
+        type="submit"
+        style={{
+          background: "none",
+          border: "none",
+          padding: 0,
+          font: "inherit",
+          cursor: "pointer",
+          outline: "inherit",
+          width: "100%",
+          textAlign: "left",
+        }}
+      >
         <Item value={LogoutID}>
           {<LogoutIcon />}
           {!hideLabel && (
