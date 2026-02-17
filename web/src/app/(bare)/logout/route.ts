@@ -6,7 +6,7 @@ import { WEB_ADDRESS } from "src/config";
 
 const cookieName = "storyden-session";
 
-export async function GET() {
+export async function POST() {
   (await cookies()).delete(cookieName);
 
   revalidateTag("accounts", { expire: 0 });

@@ -759,7 +759,7 @@ export const authProviderLogout = async (
     getAuthProviderLogoutUrl(params),
     {
       ...options,
-      method: "GET",
+      method: "POST",
     },
   );
 };

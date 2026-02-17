@@ -1383,39 +1383,43 @@ headers are same-origin compliant and won't work cross-origin.
 
  */
 export const authProviderLogout = (params?: AuthProviderLogoutParams) => {
-  return fetcher<unknown>({ url: `/auth/logout`, method: "GET", params });
+  return fetcher<unknown>({ url: `/auth/logout`, method: "POST", params });
 };
 
-export const getAuthProviderLogoutKey = (params?: AuthProviderLogoutParams) =>
-  [`/auth/logout`, ...(params ? [params] : [])] as const;
+export const getAuthProviderLogoutMutationFetcher = (
+  params?: AuthProviderLogoutParams,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<unknown> => {
+    return authProviderLogout(params);
+  };
+};
+export const getAuthProviderLogoutMutationKey = (
+  params?: AuthProviderLogoutParams,
+) => [`/auth/logout`, ...(params ? [params] : [])] as const;
 
-export type AuthProviderLogoutQueryResult = NonNullable<
+export type AuthProviderLogoutMutationResult = NonNullable<
   Awaited<ReturnType<typeof authProviderLogout>>
 >;
-export type AuthProviderLogoutQueryError = void;
+export type AuthProviderLogoutMutationError = void;
 
 export const useAuthProviderLogout = <TError = void>(
   params?: AuthProviderLogoutParams,
   options?: {
-    swr?: SWRConfiguration<
+    swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof authProviderLogout>>,
-      TError
-    > & { swrKey?: Key; enabled?: boolean };
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof authProviderLogout>>
+    > & { swrKey?: string };
   },
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAuthProviderLogoutKey(params) : null));
-  const swrFn = () => authProviderLogout(params);
+  const swrKey = swrOptions?.swrKey ?? getAuthProviderLogoutMutationKey(params);
+  const swrFn = getAuthProviderLogoutMutationFetcher(params);
 
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
-    swrKey,
-    swrFn,
-    swrOptions,
-  );
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

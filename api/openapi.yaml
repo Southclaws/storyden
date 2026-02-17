@@ -777,7 +777,7 @@ paths:
         "204": { $ref: "#/components/responses/NoContent" }
 
   /auth/logout:
-    get:
+    post:
       operationId: AuthProviderLogout
       description: |
         Performs a HTTP logout by clearing the session cookie and redirecting to
