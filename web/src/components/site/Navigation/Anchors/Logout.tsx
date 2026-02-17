@@ -14,7 +14,7 @@ import { AnchorProps } from "./Anchor";
 // may run on a separate subdomain, the Clear-Site-Data header will not apply to
 // requests made to a different origin. So if the Next.js app sets this header
 // it will only apply to the Next.js origin, not the API origin. To solve this,
-// logging out is handled by a browser navigation to the actual API itself, to
+// logging out is handled by a form submission to the actual API itself, to
 // the /auth/logout endpoint. This endpoint clears the site data such as cache
 // and cookies for the API origin which resolves the caching for API calls such
 // as the main endpoint used to check if the user is authenticated: /accounts
@@ -30,39 +30,43 @@ import { AnchorProps } from "./Anchor";
 //
 
 export const LogoutID = "logout";
-export const LogoutRoute = `${API_ADDRESS}/api/auth/logout?redirect=${encodeURIComponent(`/logout`)}`;
+export const LogoutAction = `${API_ADDRESS}/api/auth/logout?redirect=${encodeURIComponent(`/logout`)}`;
 export const LogoutLabel = "Logout";
 
 type Props = AnchorProps & LinkButtonStyleProps;
 
 export function LogoutAnchor({ hideLabel, ...props }: Props) {
   return (
-    <a
-      className={button({ variant: "ghost", ...props })}
-      href={LogoutRoute}
-      title={LogoutLabel}
-    >
-      {<LogoutIcon />}
-      {!hideLabel && (
-        <>
-          &nbsp;<span>{LogoutLabel}</span>
-        </>
-      )}
-    </a>
-  );
-}
-
-export function LogoutMenuItem({ hideLabel }: AnchorProps) {
-  return (
-    <a href={LogoutRoute}>
-      <Item value={LogoutID}>
+    <form action={LogoutAction} method="POST">
+      <button
+        type="submit"
+        className={button({ variant: "ghost", ...props })}
+        title={LogoutLabel}
+      >
         {<LogoutIcon />}
         {!hideLabel && (
           <>
             &nbsp;<span>{LogoutLabel}</span>
           </>
         )}
-      </Item>
-    </a>
+      </button>
+    </form>
+  );
+}
+
+export function LogoutMenuItem({ hideLabel }: AnchorProps) {
+  return (
+    <form action={LogoutAction} method="POST">
+      <button type="submit" style={{ all: "unset", cursor: "pointer", width: "100%" }}>
+        <Item value={LogoutID}>
+          {<LogoutIcon />}
+          {!hideLabel && (
+            <>
+              &nbsp;<span>{LogoutLabel}</span>
+            </>
+          )}
+        </Item>
+      </button>
+    </form>
   );
 }
