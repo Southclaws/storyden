@@ -10,7 +10,7 @@ type LikeButtonProps = Props & {
 };
 
 export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
-  const { handleClick } = useLikeButton({ thread: props.thread });
+  const { enabled, handleClick } = useLikeButton({ thread: props.thread });
   const likeCount = props.thread.likes.likes;
 
   if (showCount) {
@@ -25,6 +25,7 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
         aria-label={props.thread.likes.liked ? "Unlike" : "Like"}
         title={props.thread.likes.liked ? "Unlike" : "Like"}
         onClick={handleClick}
+        disabled={!enabled}
       >
         <span>
           {props.thread.likes.liked ? (
@@ -51,6 +52,7 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
       size="xs"
       liked={props.thread.likes.liked}
       onClick={handleClick}
+      disabled={!enabled}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { PostReference } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
+import { useSession } from "@/auth";
 import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
@@ -8,7 +9,10 @@ export type Props = {
 };
 
 export function useLikeButton({ thread }: Props) {
+  const session = useSession();
   const { likePost, unlikePost, revalidate } = useFeedMutations();
+
+  const enabled = Boolean(session);
 
   const handleClick = async () => {
     await handle(
@@ -29,7 +33,7 @@ export function useLikeButton({ thread }: Props) {
   };
 
   return {
-    ready: true as const,
     handleClick,
+    enabled,
   };
 }
