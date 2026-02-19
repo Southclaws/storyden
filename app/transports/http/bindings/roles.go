@@ -12,8 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -21,14 +20,14 @@ import (
 
 type Roles struct {
 	accountQuerier *account_querier.Querier
-	roleQuerier    *role_querier.Querier
-	roleWriter     *role_writer.Writer
+	roleQuerier    *role_repo.Repository
+	roleWriter     role_repo.Writer
 }
 
 func NewRoles(
 	accountQuerier *account_querier.Querier,
-	roleQuerier *role_querier.Querier,
-	roleWriter *role_writer.Writer,
+	roleQuerier *role_repo.Repository,
+	roleWriter role_repo.Writer,
 ) Roles {
 	return Roles{
 		accountQuerier: accountQuerier,
@@ -43,9 +42,9 @@ func (h *Roles) RoleCreate(ctx context.Context, request openapi.RoleCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	opts := []role_writer.Mutation{}
+	opts := []role_repo.Mutation{}
 	if request.Body.Meta != nil {
-		opts = append(opts, role_writer.WithMeta(map[string]any(*request.Body.Meta)))
+		opts = append(opts, role_repo.WithMeta(map[string]any(*request.Body.Meta)))
 	}
 
 	role, err := h.roleWriter.Create(ctx, request.Body.Name, request.Body.Colour, perms, opts...)
@@ -90,14 +89,14 @@ func (h *Roles) RoleGet(ctx context.Context, request openapi.RoleGetRequestObjec
 func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateRequestObject) (openapi.RoleUpdateResponseObject, error) {
 	id := role.RoleID(openapi.ParseID(request.RoleId))
 
-	opts := []role_writer.Mutation{}
+	opts := []role_repo.Mutation{}
 
 	if request.Body.Name != nil {
-		opts = append(opts, role_writer.WithName(*request.Body.Name))
+		opts = append(opts, role_repo.WithName(*request.Body.Name))
 	}
 
 	if request.Body.Colour != nil {
-		opts = append(opts, role_writer.WithColour(*request.Body.Colour))
+		opts = append(opts, role_repo.WithColour(*request.Body.Colour))
 	}
 
 	if request.Body.Permissions != nil {
@@ -106,11 +105,11 @@ func (h *Roles) RoleUpdate(ctx context.Context, request openapi.RoleUpdateReques
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		opts = append(opts, role_writer.WithPermissions(perms))
+		opts = append(opts, role_repo.WithPermissions(perms))
 	}
 
 	if request.Body.Meta != nil {
-		opts = append(opts, role_writer.WithMeta(map[string]any(*request.Body.Meta)))
+		opts = append(opts, role_repo.WithMeta(map[string]any(*request.Body.Meta)))
 	}
 
 	role, err := h.roleWriter.Update(ctx, id, opts...)
@@ -212,6 +211,25 @@ func serialiseHeldRolePtr(in *held.Role) openapi.AccountRole {
 
 func serialiseHeldRoleList(in held.Roles) openapi.AccountRoleList {
 	return dt.Map(in, serialiseHeldRolePtr)
+}
+
+func serialiseHeldRoleRef(in held.Role) openapi.AccountRoleRef {
+	return openapi.AccountRoleRef{
+		Id:      in.ID.String(),
+		Name:    in.Name,
+		Colour:  in.Colour,
+		Meta:    serialiseMetadata(in.Metadata),
+		Badge:   in.Badge,
+		Default: in.Default,
+	}
+}
+
+func serialiseHeldRoleRefPtr(in *held.Role) openapi.AccountRoleRef {
+	return serialiseHeldRoleRef(*in)
+}
+
+func serialiseHeldRoleRefList(in held.Roles) openapi.AccountRoleRefList {
+	return dt.Map(in, serialiseHeldRoleRefPtr)
 }
 
 func serialisePermission(in rbac.Permission) openapi.Permission {

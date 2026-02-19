@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/like/item_like"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -30,11 +31,12 @@ type Result struct {
 }
 
 type LikeQuerier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *LikeQuerier {
-	return &LikeQuerier{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *LikeQuerier {
+	return &LikeQuerier{db: db, roleQuerier: roleQuerier}
 }
 
 func (l *LikeQuerier) GetPostLikes(ctx context.Context, postID post.ID) ([]*item_like.Like, error) {
@@ -47,7 +49,15 @@ func (l *LikeQuerier) GetPostLikes(ctx context.Context, postID post.ID) ([]*item
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	likes, err := dt.MapErr(r, item_like.Map)
+	accountEdges := dt.Map(r, func(l *ent.LikePost) *ent.Account { return l.Edges.Account })
+	roleHydrator, err := l.roleQuerier.BuildMultiHydrator(ctx, accountEdges)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	likes, err := dt.MapErr(r, func(in *ent.LikePost) (*item_like.Like, error) {
+		return item_like.Map(in, roleHydrator.Hydrate)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -83,7 +93,20 @@ func (l *LikeQuerier) GetProfileLikes(ctx context.Context, accountID account.Acc
 		r = r[:len(r)-1]
 	}
 
-	likes, err := dt.MapErr(r, profile_like.Map)
+	postAuthorEdges := dt.Map(r, func(l *ent.LikePost) *ent.Account {
+		if l.Edges.Post == nil {
+			return nil
+		}
+		return l.Edges.Post.Edges.Author
+	})
+	roleHydrator, err := l.roleQuerier.BuildMultiHydrator(ctx, postAuthorEdges)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	likes, err := dt.MapErr(r, func(in *ent.LikePost) (*profile_like.Like, error) {
+		return profile_like.Map(in, roleHydrator.Hydrate)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

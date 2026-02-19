@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -74,7 +75,9 @@ func (t *Thread) GetTags() []string {
 	return tags
 }
 
-func Map(m *ent.Post) (*Thread, error) {
+func Map(m *ent.Post, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Thread, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	category := opt.Map(opt.NewPtr(m.Edges.Category), func(in ent.Category) category.Category {
 		return *category.FromModel(&in)
 	})
@@ -88,7 +91,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.MapRef(m.Edges.Author)
+	pro, err := profileMapper(m.Edges.Author)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -124,12 +127,15 @@ func Map(m *ent.Post) (*Thread, error) {
 
 func Mapper(
 	am account.Lookup,
+	roleHydratorFn func(accID xid.ID) (held.Roles, error),
 	rr post.ReadStateMap,
 	ls post.PostLikesMap,
 	cs collection_item_status.CollectionStatusMap,
 	rs post.PostRepliesMap,
 	rl reaction.Lookup,
 ) func(m *ent.Post) (*Thread, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	return func(m *ent.Post) (*Thread, error) {
 		category := opt.Map(opt.NewPtr(m.Edges.Category), func(in ent.Category) category.Category {
 			return *category.FromModel(&in)
@@ -147,12 +153,12 @@ func Mapper(
 		var pro *profile.Ref
 		authorEdge := am[m.AccountPosts]
 		if authorEdge != nil {
-			pro, err = profile.MapRef(authorEdge)
+			pro, err = profileMapper(authorEdge)
 			if err != nil {
 				return nil, fault.Wrap(err)
 			}
 		} else {
-			pro, err = profile.MapRef(m.Edges.Author)
+			pro, err = profileMapper(m.Edges.Author)
 			if err != nil {
 				return nil, fault.Wrap(err)
 			}

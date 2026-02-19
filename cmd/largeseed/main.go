@@ -18,10 +18,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache/local"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -179,10 +180,16 @@ type seeder struct {
 }
 
 func newSeeder(db *ent.Client) *seeder {
-	accountQuerier := account_querier.New(db, role_querier.New(db))
+	store, err := local.New()
+	if err != nil {
+		panic(err)
+	}
+
+	roleHydrator := role_repo.New(db, store)
+	accountQuerier := account_querier.New(db, roleHydrator)
 	return &seeder{
 		db:            db,
-		accountWriter: account_writer.New(db, accountQuerier),
+		accountWriter: account_writer.New(db, accountQuerier, roleHydrator),
 	}
 }
 

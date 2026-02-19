@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -21,11 +22,15 @@ import (
 )
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Querier {
+	return &Querier{
+		db:          db,
+		roleQuerier: roleQuerier,
+	}
 }
 
 type listOption struct {
@@ -89,7 +94,16 @@ func (d *Querier) List(ctx context.Context, filters ...Option) ([]*collection.Co
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	all, err := collection.MapList(opts.queryForIncludedItems.OrZero(), cols)
+	accs := dt.Map(cols, func(col *ent.Collection) *ent.Account {
+		return col.Edges.Owner
+	})
+
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	all, err := collection.MapList(opts.queryForIncludedItems.OrZero(), cols, roleHydrator.Hydrate)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -136,7 +150,13 @@ func (d *Querier) Get(ctx context.Context, qk collection.QueryKey, filters ...It
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return collection.MapWithItems(col)
+	accs := roleHydrationTargetsFromCollection(col)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return collection.MapWithItems(col, roleHydrator.Hydrate)
 }
 
 func (d *Querier) Probe(ctx context.Context, qk collection.QueryKey) (*collection.Collection, error) {
@@ -149,5 +169,43 @@ func (d *Querier) Probe(ctx context.Context, qk collection.QueryKey) (*collectio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return collection.Map(nil)(col)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, []*ent.Account{col.Edges.Owner})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return collection.Map(nil, roleHydrator.Hydrate)(col)
+}
+
+func roleHydrationTargetsFromCollection(col *ent.Collection) []*ent.Account {
+	targets := map[xid.ID]*ent.Account{}
+
+	if owner := col.Edges.Owner; owner != nil {
+		targets[owner.ID] = owner
+	}
+
+	for _, cp := range col.Edges.CollectionPosts {
+		if cp == nil || cp.Edges.Post == nil || cp.Edges.Post.Edges.Author == nil {
+			continue
+		}
+
+		author := cp.Edges.Post.Edges.Author
+		targets[author.ID] = author
+	}
+
+	for _, cn := range col.Edges.CollectionNodes {
+		if cn == nil || cn.Edges.Node == nil || cn.Edges.Node.Edges.Owner == nil {
+			continue
+		}
+
+		owner := cn.Edges.Node.Edges.Owner
+		targets[owner.ID] = owner
+	}
+
+	out := make([]*ent.Account, 0, len(targets))
+	for _, acc := range targets {
+		out = append(out, acc)
+	}
+
+	return out
 }

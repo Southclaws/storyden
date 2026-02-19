@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -15,11 +16,12 @@ import (
 )
 
 type Repository struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *Repository {
-	return &Repository{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Repository {
+	return &Repository{db: db, roleQuerier: roleQuerier}
 }
 
 func (r *Repository) Store(ctx context.Context,
@@ -60,7 +62,12 @@ func (r *Repository) Store(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(q)
+	roleHydrator, err := r.roleQuerier.BuildMultiHydrator(ctx, []*ent.Account{q.Edges.Author})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return Map(q, roleHydrator.Hydrate)
 }
 
 func (r *Repository) Get(ctx context.Context, id xid.ID) (*Question, error) {
@@ -72,7 +79,12 @@ func (r *Repository) Get(ctx context.Context, id xid.ID) (*Question, error) {
 		return nil, err
 	}
 
-	return Map(q)
+	roleHydrator, err := r.roleQuerier.BuildMultiHydrator(ctx, []*ent.Account{q.Edges.Author})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return Map(q, roleHydrator.Hydrate)
 }
 
 func (r *Repository) GetByQuerySlug(ctx context.Context, query string) (*Question, error) {
@@ -86,5 +98,10 @@ func (r *Repository) GetByQuerySlug(ctx context.Context, query string) (*Questio
 		return nil, err
 	}
 
-	return Map(q)
+	roleHydrator, err := r.roleQuerier.BuildMultiHydrator(ctx, []*ent.Account{q.Edges.Author})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return Map(q, roleHydrator.Hydrate)
 }

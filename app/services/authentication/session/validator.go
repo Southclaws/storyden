@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/role"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/settings"
 )
@@ -19,13 +19,13 @@ import (
 type Validator struct {
 	tokenRepo      token.Repository
 	accountQuerier *account_querier.Querier
-	roleQuerier    *role_querier.Querier
+	roleQuerier    *role_repo.Repository
 	akRepo         *access_key.Repository
 	settings       *settings.SettingsRepository
 }
 
 // NewValidator creates a new session validator with the required dependencies.
-func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository, settings *settings.SettingsRepository) *Validator {
+func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_repo.Repository, akRepo *access_key.Repository, settings *settings.SettingsRepository) *Validator {
 	return &Validator{
 		tokenRepo:      tokenRepo,
 		accountQuerier: accountQuerier,

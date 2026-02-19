@@ -6,6 +6,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -37,41 +38,43 @@ type NotificationRef struct {
 
 type NotificationRefs []*NotificationRef
 
-func Map(r *ent.Notification) (*NotificationRef, error) {
-	sourceEdge := opt.NewPtr(r.Edges.Source)
+func Map(roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(r *ent.Notification) (*NotificationRef, error) {
+	return func(r *ent.Notification) (*NotificationRef, error) {
+		sourceEdge := opt.NewPtr(r.Edges.Source)
 
-	source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Ref, error) {
-		p, err := profile.MapRef(&a)
-		if err != nil {
-			return profile.Ref{}, err
-		}
-		return *p, err
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	et, err := NewEvent(r.EventType)
-	if err != nil {
-		return nil, err
-	}
-
-	var itemRef opt.Optional[datagraph.Ref]
-	if r.DatagraphKind != nil && r.DatagraphID != nil {
-		k, err := datagraph.NewKind(*r.DatagraphKind)
+		source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Ref, error) {
+			p, err := profile.RefMapper(roleHydratorFn)(&a)
+			if err != nil {
+				return profile.Ref{}, err
+			}
+			return *p, err
+		})
 		if err != nil {
 			return nil, err
 		}
 
-		itemRef = opt.New(datagraph.Ref{ID: *r.DatagraphID, Kind: k})
-	}
+		et, err := NewEvent(r.EventType)
+		if err != nil {
+			return nil, err
+		}
 
-	return &NotificationRef{
-		ID:      r.ID,
-		Event:   et,
-		ItemRef: itemRef,
-		Source:  source,
-		Time:    r.CreatedAt,
-		Read:    r.Read,
-	}, nil
+		var itemRef opt.Optional[datagraph.Ref]
+		if r.DatagraphKind != nil && r.DatagraphID != nil {
+			k, err := datagraph.NewKind(*r.DatagraphKind)
+			if err != nil {
+				return nil, err
+			}
+
+			itemRef = opt.New(datagraph.Ref{ID: *r.DatagraphID, Kind: k})
+		}
+
+		return &NotificationRef{
+			ID:      r.ID,
+			Event:   et,
+			ItemRef: itemRef,
+			Source:  source,
+			Time:    r.CreatedAt,
+			Read:    r.Read,
+		}, nil
+	}
 }

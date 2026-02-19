@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -19,13 +20,13 @@ type Like struct {
 	Item    datagraph.Item
 }
 
-func Map(in *ent.LikePost) (*Like, error) {
+func Map(in *ent.LikePost, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Like, error) {
 	postEdge, err := in.Edges.PostOrErr()
 	if err != nil {
 		return nil, err
 	}
 
-	item, err := post.Map(postEdge)
+	item, err := post.Map(postEdge, roleHydratorFn)
 	if err != nil {
 		return nil, err
 	}

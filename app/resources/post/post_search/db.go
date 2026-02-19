@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -21,11 +22,33 @@ import (
 )
 
 type database struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) Repository {
-	return &database{db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) Repository {
+	return &database{db: db, roleQuerier: roleQuerier}
+}
+
+func roleHydrationTargets(posts []*ent.Post) []*ent.Account {
+	targets := make([]*ent.Account, 0, len(posts))
+	for _, p := range posts {
+		if p == nil {
+			continue
+		}
+
+		if p.Edges.Author != nil {
+			targets = append(targets, p.Edges.Author)
+		}
+
+		for _, react := range p.Edges.Reacts {
+			if react != nil && react.Edges.Account != nil {
+				targets = append(targets, react.Edges.Account)
+			}
+		}
+	}
+
+	return targets
 }
 
 func (d *database) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*post.Post], error) {
@@ -64,7 +87,14 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	posts, err := dt.MapErr(r, post.Map)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(r))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	posts, err := dt.MapErr(r, func(in *ent.Post) (*post.Post, error) {
+		return post.Map(in, roleHydrator.Hydrate)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -101,7 +131,14 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	posts, err := dt.MapErr(result, post.Map)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(result))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	posts, err := dt.MapErr(result, func(in *ent.Post) (*post.Post, error) {
+		return post.Map(in, roleHydrator.Hydrate)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

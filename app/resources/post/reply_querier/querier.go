@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -17,11 +18,35 @@ import (
 )
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Querier {
+	return &Querier{db: db, roleQuerier: roleQuerier}
+}
+
+func roleHydrationTargets(posts ...*ent.Post) []*ent.Account {
+	targets := make([]*ent.Account, 0)
+	for _, p := range posts {
+		if p == nil {
+			continue
+		}
+
+		if p.Edges.Author != nil {
+			targets = append(targets, p.Edges.Author)
+		}
+
+		if p.Edges.Root != nil && p.Edges.Root.Edges.Author != nil {
+			targets = append(targets, p.Edges.Root.Edges.Author)
+		}
+
+		if p.Edges.ReplyTo != nil && p.Edges.ReplyTo.Edges.Author != nil {
+			targets = append(targets, p.Edges.ReplyTo.Edges.Author)
+		}
+	}
+
+	return targets
 }
 
 func (d *Querier) Get(ctx context.Context, id post.ID) (*reply.Reply, error) {
@@ -44,7 +69,12 @@ func (d *Querier) Get(ctx context.Context, id post.ID) (*reply.Reply, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return reply.Map(p)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(p))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return reply.Map(p, roleHydrator.Hydrate)
 }
 
 func (d *Querier) GetMany(ctx context.Context, ids ...post.ID) ([]*reply.Reply, error) {
@@ -70,8 +100,13 @@ func (d *Querier) GetMany(ctx context.Context, ids ...post.ID) ([]*reply.Reply, 
 	}
 
 	replies := make([]*reply.Reply, 0, len(posts))
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(posts...))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	for _, p := range posts {
-		r, err := reply.Map(p)
+		r, err := reply.Map(p, roleHydrator.Hydrate)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

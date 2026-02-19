@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mark"
@@ -26,11 +27,12 @@ import (
 )
 
 type Writer struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *Writer {
-	return &Writer{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Writer {
+	return &Writer{db: db, roleQuerier: roleQuerier}
 }
 
 type Option func(*ent.PostMutation)
@@ -148,7 +150,6 @@ func (d *Writer) Create(
 	mutate.SetTitle(title)
 	mutate.SetLastReplyAt(time.Now())
 	mutate.SetAuthorID(xid.ID(authorID))
-	mutate.SetTitle(title)
 
 	p, err := create.Save(ctx)
 	if err != nil {
@@ -186,7 +187,12 @@ func (d *Writer) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return thread.Map(p)
+	roleHydrator, err := d.roleQuerier.BuildSingleHydrator(ctx, p.Edges.Author)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return thread.Map(p, roleHydrator.Hydrate)
 }
 
 func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*thread.Thread, error) {
@@ -222,7 +228,12 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*threa
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return thread.Map(p)
+	roleHydrator, err := d.roleQuerier.BuildSingleHydrator(ctx, p.Edges.Author)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return thread.Map(p, roleHydrator.Hydrate)
 }
 
 func (d *Writer) Delete(ctx context.Context, id post.ID) error {

@@ -6,43 +6,62 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-func MapRef(a *ent.Account) (*Account, error) {
-	bio, err := datagraph.NewRichText(a.Bio)
-	if err != nil {
-		return nil, err
-	}
-
-	kind, err := NewAccountKind(string(a.Kind))
-	if err != nil {
-		return nil, err
-	}
-
-	return &Account{
-		ID:        AccountID(a.ID),
-		CreatedAt: a.CreatedAt,
-		UpdatedAt: a.UpdatedAt,
-
-		Handle:   a.Handle,
-		Name:     a.Name,
-		Bio:      bio,
-		Kind:     kind,
-		Admin:    a.Admin, // TODO: should this be derived from roles?
-		Metadata: a.Metadata,
-
-		DeletedAt: opt.NewPtr(a.DeletedAt),
-		IndexedAt: opt.NewPtr(a.IndexedAt),
-	}, nil
+func mapRefWithoutRoles(accID xid.ID) (held.Roles, error) {
+	return held.Roles{}, nil
 }
 
-func MapAccount(roles held.Roles) func(a *ent.Account) (*AccountWithEdges, error) {
+func MapRef(a *ent.Account) (*Account, error) {
+	return RefMapper(mapRefWithoutRoles)(a)
+}
+
+func RefMapper(roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(a *ent.Account) (*Account, error) {
+	return func(a *ent.Account) (*Account, error) {
+		bio, err := datagraph.NewRichText(a.Bio)
+		if err != nil {
+			return nil, err
+		}
+
+		kind, err := NewAccountKind(string(a.Kind))
+		if err != nil {
+			return nil, err
+		}
+
+		roles, err := roleHydratorFn(a.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &Account{
+			ID:        AccountID(a.ID),
+			CreatedAt: a.CreatedAt,
+			UpdatedAt: a.UpdatedAt,
+
+			Handle:   a.Handle,
+			Name:     a.Name,
+			Bio:      bio,
+			Kind:     kind,
+			Roles:    roles,
+			Admin:    a.Admin, // TODO: should this be derived from roles?
+			Metadata: a.Metadata,
+
+			DeletedAt: opt.NewPtr(a.DeletedAt),
+			IndexedAt: opt.NewPtr(a.IndexedAt),
+		}, nil
+	}
+}
+
+func MapAccount(roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(a *ent.Account) (*AccountWithEdges, error) {
+	refMapper := RefMapper(roleHydratorFn)
+
 	return func(a *ent.Account) (*AccountWithEdges, error) {
-		ref, err := MapRef(a)
+		ref, err := refMapper(a)
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +95,7 @@ func MapAccount(roles held.Roles) func(a *ent.Account) (*AccountWithEdges, error
 				return Account{}, err
 			}
 
-			ib, err := MapRef(c)
+			ib, err := refMapper(c)
 			if err != nil {
 				return Account{}, err
 			}
@@ -94,7 +113,7 @@ func MapAccount(roles held.Roles) func(a *ent.Account) (*AccountWithEdges, error
 
 		return &AccountWithEdges{
 			Account:        *ref,
-			Roles:          roles,
+			Roles:          ref.Roles,
 			Auths:          auths,
 			EmailAddresses: emails,
 			VerifiedStatus: verifiedStatus,

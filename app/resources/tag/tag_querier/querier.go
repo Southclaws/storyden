@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -18,12 +19,17 @@ import (
 )
 
 type Querier struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client, raw *sqlx.DB) *Querier {
-	return &Querier{db, raw}
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_repo.Repository) *Querier {
+	return &Querier{
+		db:          db,
+		raw:         raw,
+		roleQuerier: roleQuerier,
+	}
 }
 
 const tagItemsCountManyQuery = `select
@@ -104,7 +110,20 @@ func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tag, err := tag.Map(r)
+	accs := make([]*ent.Account, 0, len(r.Edges.Posts)+len(r.Edges.Nodes))
+	for _, post := range r.Edges.Posts {
+		accs = append(accs, post.Edges.Author)
+	}
+	for _, node := range r.Edges.Nodes {
+		accs = append(accs, node.Edges.Owner)
+	}
+
+	roleHydrator, err := q.roleQuerier.BuildMultiHydrator(ctx, accs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tag, err := tag.Map(r, roleHydrator.Hydrate)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

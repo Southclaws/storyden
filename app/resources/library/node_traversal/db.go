@@ -17,6 +17,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -26,12 +27,17 @@ import (
 )
 
 type database struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client, raw *sqlx.DB) Repository {
-	return &database{db, raw}
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_repo.Repository) Repository {
+	return &database{
+		db:          db,
+		raw:         raw,
+		roleQuerier: roleQuerier,
+	}
 }
 
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, error) {
@@ -65,7 +71,12 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(cs, library.MapNode(true, nil))
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNodes(cs))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nodes, err := dt.MapErr(cs, library.MapNode(true, nil, roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -208,13 +219,17 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 	}
 
 	hydratedNodeMap := lo.KeyBy(nodeRecords, func(n *ent.Node) xid.ID { return n.ID })
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNodes(nodeRecords))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	flat, err := dt.MapErr(filtered, func(n subtreeRow) (*library.Node, error) {
 		hydratedNode, exists := hydratedNodeMap[n.NodeId]
 		if !exists {
 			panic("recursive query result was not present in hydrated node map")
 		}
 
-		return library.MapNode(true, nil)(hydratedNode)
+		return library.MapNode(true, nil, roleHydrator.Hydrate)(hydratedNode)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to hydrate nodes"))
@@ -229,6 +244,31 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 	tree := buildTree(flat, id)
 
 	return tree, nil
+}
+
+func roleHydrationTargetsFromNodes(nodes []*ent.Node) []*ent.Account {
+	targets := map[xid.ID]*ent.Account{}
+
+	for _, node := range nodes {
+		if node == nil {
+			continue
+		}
+
+		if owner := node.Edges.Owner; owner != nil {
+			targets[owner.ID] = owner
+		}
+
+		if parent := node.Edges.Parent; parent != nil && parent.Edges.Owner != nil {
+			targets[parent.Edges.Owner.ID] = parent.Edges.Owner
+		}
+	}
+
+	out := make([]*ent.Account, 0, len(targets))
+	for _, account := range targets {
+		out = append(out, account)
+	}
+
+	return out
 }
 
 func buildTree(hydrated []*library.Node, id opt.Optional[library.NodeID]) []*library.Node {

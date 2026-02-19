@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -49,7 +50,7 @@ func NewLinkOpt(purl, ptitle, pdescription *string) opt.Optional[link_ref.LinkRe
 	})
 }
 
-func Map(in *ent.Link) (*Link, error) {
+func Map(in *ent.Link, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Link, error) {
 	postEdge, err := in.Edges.PostsOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -60,14 +61,14 @@ func Map(in *ent.Link) (*Link, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	// Mapping
-
-	posts, err := dt.MapErr(postEdge, post.Map)
+	posts, err := dt.MapErr(postEdge, func(in *ent.Post) (*post.Post, error) {
+		return post.Map(in, roleHydratorFn)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	nodes, err := dt.MapErr(nodeEdge, library.MapNode(true, nil))
+	nodes, err := dt.MapErr(nodeEdge, library.MapNode(true, nil, roleHydratorFn))
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

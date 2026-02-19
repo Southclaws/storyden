@@ -1,9 +1,11 @@
 package participation
 
 import (
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -23,7 +25,9 @@ func (p EventParticipants) IsHost(id account.AccountID) bool {
 	return isHost
 }
 
-func Map(in *ent.EventParticipant) (*EventParticipant, error) {
+func Map(in *ent.EventParticipant, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*EventParticipant, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	accountEdge, err := in.Edges.AccountOrErr()
 	if err != nil {
 		return nil, err
@@ -39,7 +43,7 @@ func Map(in *ent.EventParticipant) (*EventParticipant, error) {
 		return nil, err
 	}
 
-	acc, err := profile.MapRef(accountEdge)
+	acc, err := profileMapper(accountEdge)
 	if err != nil {
 		return nil, err
 	}

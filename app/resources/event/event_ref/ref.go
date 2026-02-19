@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/event/location"
 	"github.com/Southclaws/storyden/app/resources/event/participation"
@@ -45,7 +46,7 @@ type TimeRange struct {
 	Duration time.Duration
 }
 
-func Map(in *ent.Event) (*Event, error) {
+func Map(in *ent.Event, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Event, error) {
 	assetEdge := opt.NewPtr(in.Edges.PrimaryImage)
 
 	image := opt.Map(assetEdge, func(a ent.Asset) asset.Asset {
@@ -67,7 +68,9 @@ func Map(in *ent.Event) (*Event, error) {
 		return nil, err
 	}
 
-	participants, err := dt.MapErr(in.Edges.Participants, participation.Map)
+	participants, err := dt.MapErr(in.Edges.Participants, func(in *ent.EventParticipant) (*participation.EventParticipant, error) {
+		return participation.Map(in, roleHydratorFn)
+	})
 	if err != nil {
 		return nil, err
 	}

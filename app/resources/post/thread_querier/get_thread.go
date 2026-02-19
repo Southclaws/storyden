@@ -211,17 +211,21 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 	}
 
 	accountLookup = account.NewAccountLookup(accountEdges)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accountEdges)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	// Join all data together
 
-	reacts, err := dt.MapErr(reactResult, reaction.Mapper(accountLookup))
+	reacts, err := dt.MapErr(reactResult, reaction.Mapper(accountLookup, roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	reactLookup := reaction.Reacts(reacts).Map()
 
-	replyMapper := reply.Mapper(accountLookup, likesMap, reactLookup)
-	threadMapper := thread.Mapper(accountLookup, readStateMap, likesMap, collectionsMap, replyStatsMap, reactLookup)
+	replyMapper := reply.Mapper(accountLookup, roleHydrator.Hydrate, likesMap, reactLookup)
+	threadMapper := thread.Mapper(accountLookup, roleHydrator.Hydrate, readStateMap, likesMap, collectionsMap, replyStatsMap, reactLookup)
 
 	replies, err := dt.MapErr(repliesResult, replyMapper)
 	if err != nil {

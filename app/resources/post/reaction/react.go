@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -30,13 +31,14 @@ func (r Reacts) Map() Lookup {
 
 type Lookup map[xid.ID]Reacts
 
-func Map(in *ent.React) (*React, error) {
+func Map(in *ent.React, roleLookup func(accID xid.ID) (held.Roles, error)) (*React, error) {
 	accountEdge, err := in.Edges.AccountOrErr()
 	if err != nil {
 		return nil, err
 	}
 
-	acc, err := profile.MapRef(accountEdge)
+	profileMapper := profile.RefMapper(roleLookup)
+	acc, err := profileMapper(accountEdge)
 	if err != nil {
 		return nil, err
 	}
@@ -49,15 +51,18 @@ func Map(in *ent.React) (*React, error) {
 	}, nil
 }
 
-func MapList(in []*ent.React) ([]*React, error) {
-	return dt.MapErr(in, Map)
+func MapList(in []*ent.React, roleLookup func(accID xid.ID) (held.Roles, error)) ([]*React, error) {
+	return dt.MapErr(in, func(in *ent.React) (*React, error) {
+		return Map(in, roleLookup)
+	})
 }
 
-func Mapper(am account.Lookup) func(in *ent.React) (*React, error) {
+func Mapper(am account.Lookup, roleLookup func(accID xid.ID) (held.Roles, error)) func(in *ent.React) (*React, error) {
+	profileMapper := profile.RefMapper(roleLookup)
 	return func(in *ent.React) (*React, error) {
 		acc := am[xid.ID(in.AccountID)]
 
-		pro, err := profile.MapRef(acc)
+		pro, err := profileMapper(acc)
 		if err != nil {
 			return nil, err
 		}

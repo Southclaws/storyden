@@ -4147,6 +4147,7 @@ components:
         suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
+        roles: { $ref: "#/components/schemas/AccountRoleRefList" }
 
     ThreadTitle:
       type: string
@@ -4533,6 +4534,28 @@ components:
           $ref: "#/components/schemas/PermissionList"
         meta:
           $ref: "#/components/schemas/Metadata"
+
+    AccountRoleRef:
+      description: |
+        A lightweight reference to a held role, without the list of permissions
+        within the role itself. This is for profile references where permissions
+        are not necessary, it's primarily useful for aesthetic display features.
+      allOf:
+        - $ref: "#/components/schemas/AccountRoleProps"
+        - $ref: "#/components/schemas/AccountRoleRefProps"
+
+    AccountRoleRefProps:
+      type: object
+      required: [id, name, colour]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name: { type: string }
+        colour: { type: string }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    AccountRoleRefList:
+      type: array
+      items: { $ref: "#/components/schemas/AccountRoleRef" }
 
     RoleInitialProps:
       type: object

@@ -10,6 +10,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
@@ -17,11 +19,15 @@ import (
 )
 
 type Writer struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *Writer {
-	return &Writer{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Writer {
+	return &Writer{
+		db:          db,
+		roleQuerier: roleQuerier,
+	}
 }
 
 func (n *Writer) Notification(ctx context.Context,
@@ -49,7 +55,15 @@ func (n *Writer) Notification(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nr, err := notification.Map(r)
+	r, err = n.db.Notification.Query().
+		Where(entnotification.ID(r.ID)).
+		WithSource().
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nr, err := n.mapRef(ctx, r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -65,7 +79,15 @@ func (n *Writer) SetRead(ctx context.Context, id xid.ID, read bool) (*notificati
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nr, err := notification.Map(r)
+	r, err = n.db.Notification.Query().
+		Where(entnotification.ID(r.ID)).
+		WithSource().
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nr, err := n.mapRef(ctx, r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -94,7 +116,15 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		nr, err := notification.Map(r)
+		r, err = tx.Notification.Query().
+			Where(entnotification.ID(r.ID)).
+			WithSource().
+			Only(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		nr, err := n.mapRef(ctx, r)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -107,4 +137,27 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 	}
 
 	return updated, nil
+}
+
+func (n *Writer) mapRef(ctx context.Context, in *ent.Notification) (*notification.NotificationRef, error) {
+	roleHydratorFn := func(accID xid.ID) (held.Roles, error) {
+		return held.Roles{}, nil
+	}
+
+	source := in.Edges.Source
+	if source != nil {
+		roleHydrator, err := n.roleQuerier.BuildSingleHydrator(ctx, source)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		roleHydratorFn = roleHydrator.Hydrate
+	}
+
+	ref, err := notification.Map(roleHydratorFn)(in)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return ref, nil
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -33,7 +34,9 @@ type CollectionWithItems struct {
 	Items CollectionItems
 }
 
-func Map(queriedItems []xid.ID) func(c *ent.Collection) (*Collection, error) {
+func Map(queriedItems []xid.ID, roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(c *ent.Collection) (*Collection, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	return func(c *ent.Collection) (*Collection, error) {
 		accEdge, err := c.Edges.OwnerOrErr()
 		if err != nil {
@@ -44,7 +47,7 @@ func Map(queriedItems []xid.ID) func(c *ent.Collection) (*Collection, error) {
 
 		nodesEdge := c.Edges.CollectionNodes
 
-		pro, err := profile.MapRef(accEdge)
+		pro, err := profileMapper(accEdge)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -79,6 +82,6 @@ func Map(queriedItems []xid.ID) func(c *ent.Collection) (*Collection, error) {
 	}
 }
 
-func MapList(queriedItems []xid.ID, c []*ent.Collection) ([]*Collection, error) {
-	return dt.MapErr(c, Map(queriedItems))
+func MapList(queriedItems []xid.ID, c []*ent.Collection, roleHydratorFn func(accID xid.ID) (held.Roles, error)) ([]*Collection, error) {
+	return dt.MapErr(c, Map(queriedItems, roleHydratorFn))
 }

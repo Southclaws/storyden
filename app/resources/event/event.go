@@ -3,6 +3,7 @@ package event
 import (
 	"time"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
@@ -35,18 +36,18 @@ func (e *Event) GetAssets() []*asset.Asset {
 func (e *Event) GetCreated() time.Time { return e.CreatedAt }
 func (e *Event) GetUpdated() time.Time { return e.UpdatedAt }
 
-func Map(in *ent.Event) (*Event, error) {
+func Map(in *ent.Event, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Event, error) {
 	threadEdge, err := in.Edges.ThreadOrErr()
 	if err != nil {
 		return nil, err
 	}
 
-	thr, err := thread.Map(threadEdge)
+	thr, err := thread.Map(threadEdge, roleHydratorFn)
 	if err != nil {
 		return nil, err
 	}
 
-	evt, err := event_ref.Map(in)
+	evt, err := event_ref.Map(in, roleHydratorFn)
 	if err != nil {
 		return nil, err
 	}

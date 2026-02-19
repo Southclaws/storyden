@@ -1,4 +1,4 @@
-package role_writer
+package role_repo
 
 import (
 	"context"
@@ -19,12 +19,11 @@ import (
 
 var ErrWritePermissionsNotAllowed = fault.New("write permissions not allowed on guest role")
 
-type Writer struct {
-	db *ent.Client
-}
-
-func New(db *ent.Client) *Writer {
-	return &Writer{db: db}
+type Writer interface {
+	Create(ctx context.Context, name string, colour string, perms rbac.PermissionList, opts ...Mutation) (*role.Role, error)
+	Update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error)
+	Delete(ctx context.Context, id role.RoleID) error
+	UpdateSortOrder(ctx context.Context, ids []role.RoleID) error
 }
 
 type Mutation func(*ent.RoleMutation)
@@ -54,7 +53,7 @@ func WithMeta(meta map[string]any) Mutation {
 	}
 }
 
-func (w *Writer) Create(ctx context.Context, name string, colour string, perms rbac.PermissionList, opts ...Mutation) (*role.Role, error) {
+func (w *Repository) Create(ctx context.Context, name string, colour string, perms rbac.PermissionList, opts ...Mutation) (*role.Role, error) {
 	ps := dt.Map(perms, func(p rbac.Permission) string { return p.String() })
 	nextSortKey, err := w.nextCustomSortKey(ctx)
 	if err != nil {
@@ -82,16 +81,50 @@ func (w *Writer) Create(ctx context.Context, name string, colour string, perms r
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := w.storeRole(ctx, rl, true); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.create.store_role", err); recoveryErr != nil {
+			return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
+	if err := w.syncCustomRoles(ctx); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.create.sync_custom_roles", err); recoveryErr != nil {
+			return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
 	return rl, nil
 }
 
-func (w *Writer) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error) {
+func (w *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error) {
 	if id == role.DefaultRoleMemberID {
-		return w.updateDefaultRole(ctx, opts...)
+		rl, err := w.updateDefaultRole(ctx, opts...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := w.storeRole(ctx, rl, true); err != nil {
+			if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.update_default_member.store_role", err); recoveryErr != nil {
+				return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+			}
+		}
+
+		return rl, nil
 	}
 
 	if id == role.DefaultRoleGuestID {
-		return w.updateGuestRole(ctx, opts...)
+		rl, err := w.updateGuestRole(ctx, opts...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := w.storeRole(ctx, rl, true); err != nil {
+			if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.update_default_guest.store_role", err); recoveryErr != nil {
+				return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+			}
+		}
+
+		return rl, nil
 	}
 
 	update := w.db.Role.UpdateOneID(xid.ID(id))
@@ -111,10 +144,22 @@ func (w *Writer) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := w.storeRole(ctx, rl, true); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.update.store_role", err); recoveryErr != nil {
+			return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
+	if err := w.syncCustomRoles(ctx); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.update.sync_custom_roles", err); recoveryErr != nil {
+			return nil, fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
 	return rl, nil
 }
 
-func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+func (w *Repository) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
 	rl, found, err := w.lookupRole(ctx, role.DefaultRoleMemberID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -156,7 +201,7 @@ func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role
 	return role.Map(r)
 }
 
-func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+func (w *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
 	rl, found, err := w.lookupRole(ctx, role.DefaultRoleGuestID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -177,7 +222,11 @@ func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.R
 
 		if perms, ok := mutate.Permissions(); ok {
 			// Do not allow write permissions to be added.
-			list, _ := rbac.NewPermissions(perms)
+			list, err := rbac.NewPermissions(perms)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
 			if list.HasAnyWrite() {
 				return nil, fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 			}
@@ -206,7 +255,7 @@ func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.R
 	return role.Map(r)
 }
 
-func (w *Writer) lookupRole(ctx context.Context, id role.RoleID) (*ent.Role, bool, error) {
+func (w *Repository) lookupRole(ctx context.Context, id role.RoleID) (*ent.Role, bool, error) {
 	r, err := w.db.Role.Query().Where(ent_role.ID(xid.ID(id))).Only(ctx)
 	if ent.IsNotFound(err) {
 		return nil, false, nil
@@ -217,23 +266,44 @@ func (w *Writer) lookupRole(ctx context.Context, id role.RoleID) (*ent.Role, boo
 	return r, true, nil
 }
 
-func (w *Writer) Delete(ctx context.Context, id role.RoleID) error {
+func (w *Repository) Delete(ctx context.Context, id role.RoleID) error {
 	err := w.db.Role.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := w.deleteRole(ctx, id); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.delete.delete_role", err); recoveryErr != nil {
+			return fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
+	if err := w.syncCustomRoles(ctx); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.delete.sync_custom_roles", err); recoveryErr != nil {
+			return fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
 	return nil
 }
 
-func (w *Writer) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
+func (w *Repository) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
 	for _, id := range ids {
 		if id == role.DefaultRoleGuestID || id == role.DefaultRoleMemberID || id == role.DefaultRoleAdminID {
 			return fault.New("default roles cannot be reordered", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 	}
 
-	customRoles, err := w.db.Role.Query().Where(ent_role.IDNotIn(
+	tx, err := w.db.Tx(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	customRoles, err := tx.Role.Query().Where(ent_role.IDNotIn(
 		xid.ID(role.DefaultRoleGuestID),
 		xid.ID(role.DefaultRoleMemberID),
 		xid.ID(role.DefaultRoleAdminID),
@@ -267,15 +337,6 @@ func (w *Writer) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
 		seen[id] = struct{}{}
 	}
 
-	tx, err := w.db.Tx(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
 	for i, id := range ids {
 		_, err := tx.Role.UpdateOneID(xid.ID(id)).SetSortKey(float64(i)).Save(ctx)
 		if err != nil {
@@ -287,10 +348,16 @@ func (w *Writer) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := w.syncCustomRoles(ctx); err != nil {
+		if recoveryErr := w.recoverFromCacheWriteFailure(ctx, "writer.update_sort_order.sync_custom_roles", err); recoveryErr != nil {
+			return fault.Wrap(recoveryErr, fctx.With(ctx))
+		}
+	}
+
 	return nil
 }
 
-func (w *Writer) nextCustomSortKey(ctx context.Context) (float64, error) {
+func (w *Repository) nextCustomSortKey(ctx context.Context) (float64, error) {
 	customRoles, err := w.db.Role.Query().Where(ent_role.IDNotIn(
 		xid.ID(role.DefaultRoleGuestID),
 		xid.ID(role.DefaultRoleMemberID),
@@ -309,4 +376,13 @@ func (w *Writer) nextCustomSortKey(ctx context.Context) (float64, error) {
 	})
 
 	return customRoles[len(customRoles)-1].SortKey + 1, nil
+}
+
+func (w *Repository) syncCustomRoles(ctx context.Context) error {
+	_, err := w.listFromDB(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }

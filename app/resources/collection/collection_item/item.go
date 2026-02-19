@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -21,10 +22,11 @@ import (
 type Repository struct {
 	db      *ent.Client
 	querier *collection_querier.Querier
+	roles   *role_repo.Repository
 }
 
-func New(db *ent.Client, querier *collection_querier.Querier) *Repository {
-	return &Repository{db: db, querier: querier}
+func New(db *ent.Client, querier *collection_querier.Querier, roles *role_repo.Repository) *Repository {
+	return &Repository{db: db, querier: querier, roles: roles}
 }
 
 type itemChange struct {
@@ -183,13 +185,39 @@ func (d *Repository) ProbeItem(ctx context.Context, qk collection.QueryKey, item
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	accs := []*ent.Account{r.Edges.Owner}
+	if len(r.Edges.CollectionNodes) > 0 {
+		if cn := r.Edges.CollectionNodes[0]; cn != nil && cn.Edges.Node != nil && cn.Edges.Node.Edges.Owner != nil {
+			accs = append(accs, cn.Edges.Node.Edges.Owner)
+		}
+	}
+	if len(r.Edges.CollectionPosts) > 0 {
+		if cp := r.Edges.CollectionPosts[0]; cp != nil && cp.Edges.Post != nil && cp.Edges.Post.Edges.Author != nil {
+			accs = append(accs, cp.Edges.Post.Edges.Author)
+		}
+	}
+
+	filteredAccs := make([]*ent.Account, 0, len(accs))
+	for _, acc := range accs {
+		if acc == nil {
+			continue
+		}
+
+		filteredAccs = append(filteredAccs, acc)
+	}
+
+	roleHydrator, err := d.roles.BuildMultiHydrator(ctx, filteredAccs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	item, err := func() (_ opt.Optional[collection.CollectionItem], err error) {
 		var i *collection.CollectionItem
 		if len(r.Edges.CollectionNodes) > 0 {
-			i, err = collection.MapNode(r.Edges.CollectionNodes[0])
+			i, err = collection.MapNode(r.Edges.CollectionNodes[0], roleHydrator.Hydrate)
 		}
 		if len(r.Edges.CollectionPosts) > 0 {
-			i, err = collection.MapPost(r.Edges.CollectionPosts[0])
+			i, err = collection.MapPost(r.Edges.CollectionPosts[0], roleHydrator.Hydrate)
 		}
 		return opt.NewPtr(i), err
 	}()
@@ -197,9 +225,9 @@ func (d *Repository) ProbeItem(ctx context.Context, qk collection.QueryKey, item
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	col, err := collection.Map(nil)(r)
+	col, err := collection.Map(nil, roleHydrator.Hydrate)(r)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return &collection.CollectionItemStatus{

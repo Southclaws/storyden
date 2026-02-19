@@ -15,6 +15,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -26,13 +27,19 @@ import (
 )
 
 type Querier struct {
-	db  *ent.Client
-	raw *sqlx.DB
-	aq  *account_querier.Querier
+	db          *ent.Client
+	raw         *sqlx.DB
+	aq          *account_querier.Querier
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
-	return &Querier{db, raw, aq}
+func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier, roleQuerier *role_repo.Repository) *Querier {
+	return &Querier{
+		db:          db,
+		raw:         raw,
+		aq:          aq,
+		roleQuerier: roleQuerier,
+	}
 }
 
 type options struct {
@@ -232,7 +239,12 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		})
 	}
 
-	r, err := library.MapNode(true, propSchema.Map())(col)
+	roleHydrator, err := q.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNode(col))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err := library.MapNode(true, propSchema.Map(), roleHydrator.Hydrate)(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -374,7 +386,12 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		})
 	}
 
-	rs, err := dt.MapErr(nodes, library.MapNode(false, propSchema.Map()))
+	roleHydrator, err := q.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNodes(nodes))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rs, err := dt.MapErr(nodes, library.MapNode(false, propSchema.Map(), roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -397,7 +414,12 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := library.MapNode(true, nil)(col)
+	roleHydrator, err := q.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNode(col))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err := library.MapNode(true, nil, roleHydrator.Hydrate)(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -425,7 +447,12 @@ func (q *Querier) ProbeMany(ctx context.Context, ids ...library.NodeID) ([]*libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	result, err := dt.MapErr(nodes, library.MapNode(false, nil))
+	roleHydrator, err := q.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargetsFromNodes(nodes))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	result, err := dt.MapErr(nodes, library.MapNode(false, nil, roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -447,4 +474,47 @@ func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Opt
 	}
 
 	return opt.New(*acc), nil
+}
+
+func roleHydrationTargetsFromNode(n *ent.Node) []*ent.Account {
+	return roleHydrationTargetsFromNodes([]*ent.Node{n})
+}
+
+func roleHydrationTargetsFromNodes(nodes []*ent.Node) []*ent.Account {
+	targets := map[xid.ID]*ent.Account{}
+	seenNodes := map[xid.ID]struct{}{}
+	stack := append([]*ent.Node{}, nodes...)
+
+	for len(stack) > 0 {
+		last := len(stack) - 1
+		current := stack[last]
+		stack = stack[:last]
+		if current == nil {
+			continue
+		}
+
+		if _, seen := seenNodes[current.ID]; seen {
+			continue
+		}
+		seenNodes[current.ID] = struct{}{}
+
+		if owner := current.Edges.Owner; owner != nil {
+			targets[owner.ID] = owner
+		}
+
+		if parent := current.Edges.Parent; parent != nil {
+			stack = append(stack, parent)
+		}
+
+		for _, child := range current.Edges.Nodes {
+			stack = append(stack, child)
+		}
+	}
+
+	out := make([]*ent.Account, 0, len(targets))
+	for _, account := range targets {
+		out = append(out, account)
+	}
+
+	return out
 }

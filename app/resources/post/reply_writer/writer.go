@@ -178,24 +178,7 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply
 		return nil, fault.Wrap(err, fmsg.With("failed to update reply"), fctx.With(ctx))
 	}
 
-	p, err := d.db.Post.
-		Query().
-		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor().
-		WithRoot(func(pq *ent.PostQuery) {
-			pq.WithAuthor()
-		}).
-		WithAssets().
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			err = fault.Wrap(err, ftag.With(ftag.NotFound), fmsg.WithDesc("not found", "Reply not found after update."))
-		}
-
-		return nil, fault.Wrap(err, fmsg.With("failed to query updated reply"), fctx.With(ctx))
-	}
-
-	return reply.Map(p)
+	return d.querier.Get(ctx, id)
 }
 
 func (d *Writer) Delete(ctx context.Context, id post.ID) error {

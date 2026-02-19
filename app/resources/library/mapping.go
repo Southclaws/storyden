@@ -4,7 +4,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -15,20 +17,22 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, error) {
+func MapNode(isRoot bool, ps *PropertySchemaTable, roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(c *ent.Node) (*Node, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	return func(c *ent.Node) (*Node, error) {
 		accEdge, err := c.Edges.OwnerOrErr()
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
 
-		pro, err := profile.MapRef(accEdge)
+		pro, err := profileMapper(accEdge)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
 
 		parent, err := opt.MapErr(opt.NewPtr(c.Edges.Parent), func(c ent.Node) (Node, error) {
-			p, err := MapNode(false, ps)(&c)
+			p, err := MapNode(false, ps, roleHydratorFn)(&c)
 			if err != nil {
 				return Node{}, err
 			}
@@ -41,7 +45,7 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 		tagsEdge := c.Edges.Tags
 		tags := dt.Map(tagsEdge, tag_ref.Map(nil))
 
-		nodes, err := dt.MapErr(c.Edges.Nodes, MapNode(false, ps))
+		nodes, err := dt.MapErr(c.Edges.Nodes, MapNode(false, ps, roleHydratorFn))
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}

@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -66,14 +67,16 @@ func WithTags(names ...tag_ref.Name) Option {
 }
 
 type service struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client, raw *sqlx.DB) Search {
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_repo.Repository) Search {
 	return &service{
-		db:  db,
-		raw: raw,
+		db:          db,
+		raw:         raw,
+		roleQuerier: roleQuerier,
 	}
 }
 
@@ -126,7 +129,12 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(r, library.MapNode(true, nil))
+	roleLookup, err := s.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(r))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nodes, err := dt.MapErr(r, library.MapNode(true, nil, roleLookup.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -134,4 +142,36 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 	result := pagination.NewPageResult(params, total, nodes)
 
 	return &result, nil
+}
+
+func roleHydrationTargets(nodes []*ent.Node) []*ent.Account {
+	targets := map[xid.ID]*ent.Account{}
+	visited := map[xid.ID]struct{}{}
+	queue := append([]*ent.Node{}, nodes...)
+
+	for len(queue) > 0 {
+		n := queue[0]
+		queue = queue[1:]
+
+		if n == nil {
+			continue
+		}
+		if _, ok := visited[n.ID]; ok {
+			continue
+		}
+		visited[n.ID] = struct{}{}
+
+		if owner := n.Edges.Owner; owner != nil {
+			targets[owner.ID] = owner
+		}
+
+		queue = append(queue, n.Edges.Nodes...)
+	}
+
+	out := make([]*ent.Account, 0, len(targets))
+	for _, acc := range targets {
+		out = append(out, acc)
+	}
+
+	return out
 }

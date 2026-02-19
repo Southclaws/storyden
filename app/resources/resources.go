@@ -12,10 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/invitation/invitation_writer"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
@@ -73,10 +70,6 @@ func Build() fx.Option {
 			account_writer.New,
 			access_key.New,
 			email.New,
-			role_assign.New,
-			role_querier.New,
-			role_writer.New,
-			role_badge.New,
 			invitation_querier.New,
 			invitation_writer.New,
 			asset_querier.New,
@@ -129,5 +122,6 @@ func Build() fx.Option {
 			report_writer.New,
 		),
 		token.Build(),
+		role_repo.Build(),
 	)
 }

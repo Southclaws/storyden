@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
@@ -22,10 +23,11 @@ import (
 type Writer struct {
 	db             *ent.Client
 	accountQuerier *account_querier.Querier
+	roleRepo       *role_repo.Repository
 }
 
-func New(db *ent.Client, accountQuerier *account_querier.Querier) *Writer {
-	return &Writer{db: db, accountQuerier: accountQuerier}
+func New(db *ent.Client, accountQuerier *account_querier.Querier, roleRepo *role_repo.Repository) *Writer {
+	return &Writer{db: db, accountQuerier: accountQuerier, roleRepo: roleRepo}
 }
 
 type (
@@ -138,6 +140,10 @@ func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*ac
 		}
 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	if err := d.roleRepo.PrimeAssignmentsForAccount(ctx, a.ID); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return d.accountQuerier.GetByID(ctx, account.AccountID(a.ID))

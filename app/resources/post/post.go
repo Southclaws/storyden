@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 
@@ -67,7 +68,9 @@ func (p *Post) GetAssets() []*asset.Asset     { return p.Assets }
 func (p *Post) GetCreated() time.Time         { return p.CreatedAt }
 func (p *Post) GetUpdated() time.Time         { return p.UpdatedAt }
 
-func Map(in *ent.Post) (*Post, error) {
+func Map(in *ent.Post, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Post, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	rootID, title, slug := func() (ID, string, string) {
 		if in.RootPostID == nil {
 			return ID(in.ID), in.Title, in.Slug
@@ -81,7 +84,7 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.MapRef(authorEdge)
+	pro, err := profileMapper(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -97,7 +100,7 @@ func Map(in *ent.Post) (*Post, error) {
 	})
 
 	// These edges are arrays so if not loaded, nothing bad happens.
-	reacts, err := reaction.MapList(in.Edges.Reacts)
+	reacts, err := reaction.MapList(in.Edges.Reacts, roleHydratorFn)
 	if err != nil {
 		return nil, err
 	}

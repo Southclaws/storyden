@@ -4,6 +4,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -17,7 +18,9 @@ type Question struct {
 	Author opt.Optional[profile.Ref]
 }
 
-func Map(in *ent.Question) (*Question, error) {
+func Map(in *ent.Question, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Question, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	authorEdge := opt.NewPtr(in.Edges.Author)
 
 	result, err := datagraph.NewRichText(in.Result)
@@ -26,7 +29,7 @@ func Map(in *ent.Question) (*Question, error) {
 	}
 
 	author, err := opt.MapErr(authorEdge, func(a ent.Account) (profile.Ref, error) {
-		acc, err := profile.MapRef(&a)
+		acc, err := profileMapper(&a)
 		if err != nil {
 			return profile.Ref{}, err
 		}

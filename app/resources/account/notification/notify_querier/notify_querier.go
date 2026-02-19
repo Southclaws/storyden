@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -21,11 +22,16 @@ import (
 
 type Querier struct {
 	db           *ent.Client
+	roleQuerier  *role_repo.Repository
 	postSearcher post_search.Repository
 }
 
-func New(db *ent.Client, postSearcher post_search.Repository) *Querier {
-	return &Querier{db: db, postSearcher: postSearcher}
+func New(db *ent.Client, roleQuerier *role_repo.Repository, postSearcher post_search.Repository) *Querier {
+	return &Querier{
+		db:           db,
+		roleQuerier:  roleQuerier,
+		postSearcher: postSearcher,
+	}
 }
 
 func (n *Querier) ListNotifications(ctx context.Context, accountID account.AccountID) (notification.Notifications, error) {
@@ -38,7 +44,22 @@ func (n *Querier) ListNotifications(ctx context.Context, accountID account.Accou
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	refs, err := dt.MapErr(r, notification.Map)
+	sourceAccounts := make([]*ent.Account, 0, len(r))
+	for _, item := range r {
+		source := item.Edges.Source
+		if source == nil {
+			continue
+		}
+
+		sourceAccounts = append(sourceAccounts, source)
+	}
+
+	roleHydrator, err := n.roleQuerier.BuildMultiHydrator(ctx, sourceAccounts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	refs, err := dt.MapErr(r, notification.Map(roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

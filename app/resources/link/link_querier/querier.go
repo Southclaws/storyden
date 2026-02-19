@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -17,11 +18,15 @@ import (
 )
 
 type LinkQuerier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client) *LinkQuerier {
-	return &LinkQuerier{db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *LinkQuerier {
+	return &LinkQuerier{
+		db:          db,
+		roleQuerier: roleQuerier,
+	}
 }
 
 type Result struct {
@@ -71,7 +76,12 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	link, err := link.Map(r)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleHydrationTargets(r))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	link, err := link.Map(r, roleHydrator.Hydrate)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -134,4 +144,31 @@ func (d *LinkQuerier) Search(ctx context.Context, page int, size int, filters ..
 		NextPage:    nextPage,
 		Links:       links,
 	}, nil
+}
+
+func roleHydrationTargets(in *ent.Link) []*ent.Account {
+	targets := map[xid.ID]*ent.Account{}
+
+	for _, node := range in.Edges.Nodes {
+		if node == nil || node.Edges.Owner == nil {
+			continue
+		}
+
+		targets[node.Edges.Owner.ID] = node.Edges.Owner
+	}
+
+	for _, p := range in.Edges.Posts {
+		if p == nil || p.Edges.Author == nil {
+			continue
+		}
+
+		targets[p.Edges.Author.ID] = p.Edges.Author
+	}
+
+	out := make([]*ent.Account, 0, len(targets))
+	for _, acc := range targets {
+		out = append(out, acc)
+	}
+
+	return out
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 	email_ent "github.com/Southclaws/storyden/internal/ent/email"
@@ -163,10 +164,9 @@ func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Addres
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(
-		// NOTE: Roles lookup not currently required by callers of this API.
-		nil,
-	)(result)
+	acc, err := account.MapAccount(func(accID xid.ID) (held.Roles, error) {
+		return held.Roles{}, nil
+	})(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}

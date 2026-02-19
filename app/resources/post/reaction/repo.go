@@ -12,20 +12,22 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/react"
 )
 
 var ErrInvalidEmoji = errors.New("invalid emoji codepoint")
 
-func New(db *ent.Client) (*Querier, *Writer) {
-	q := &Querier{db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) (*Querier, *Writer) {
+	q := &Querier{db: db, roleQuerier: roleQuerier}
 	w := &Writer{db, q}
 	return q, w
 }
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
 func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
@@ -40,7 +42,7 @@ func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(r)
+	return q.mapSingle(ctx, r)
 }
 
 func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*React, error) {
@@ -59,7 +61,26 @@ func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postI
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(r)
+	return q.mapSingle(ctx, r)
+}
+
+func (q *Querier) mapSingle(ctx context.Context, in *ent.React) (*React, error) {
+	accountEdge, err := in.Edges.AccountOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleHydrator, err := q.roleQuerier.BuildSingleHydrator(ctx, accountEdge)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	out, err := Map(in, roleHydrator.Hydrate)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return out, nil
 }
 
 type Writer struct {

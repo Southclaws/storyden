@@ -7,7 +7,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -34,18 +36,22 @@ func (a CollectionItems) Len() int           { return len(a) }
 func (a CollectionItems) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a CollectionItems) Less(i, j int) bool { return a[i].Added.After(a[j].Added) }
 
-func MapWithItems(c *ent.Collection) (*CollectionWithItems, error) {
-	col, err := Map(nil)(c)
+func MapWithItems(c *ent.Collection, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*CollectionWithItems, error) {
+	col, err := Map(nil, roleHydratorFn)(c)
 	if err != nil {
 		return nil, err
 	}
 
-	posts, err := dt.MapErr(c.Edges.CollectionPosts, MapPost)
+	posts, err := dt.MapErr(c.Edges.CollectionPosts, func(in *ent.CollectionPost) (*CollectionItem, error) {
+		return MapPost(in, roleHydratorFn)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	nodes, err := dt.MapErr(c.Edges.CollectionNodes, MapNode)
+	nodes, err := dt.MapErr(c.Edges.CollectionNodes, func(in *ent.CollectionNode) (*CollectionItem, error) {
+		return MapNode(in, roleHydratorFn)
+	})
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -62,7 +68,9 @@ func MapWithItems(c *ent.Collection) (*CollectionWithItems, error) {
 	return colWithItems, nil
 }
 
-func MapPost(n *ent.CollectionPost) (*CollectionItem, error) {
+func MapPost(n *ent.CollectionPost, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*CollectionItem, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	p := n.Edges.Post
 
 	accEdge, err := p.Edges.AuthorOrErr()
@@ -75,12 +83,12 @@ func MapPost(n *ent.CollectionPost) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := profile.MapRef(accEdge)
+	pro, err := profileMapper(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := post.Map(p)
+	item, err := post.Map(p, roleHydratorFn)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +101,9 @@ func MapPost(n *ent.CollectionPost) (*CollectionItem, error) {
 	}, nil
 }
 
-func MapNode(n *ent.CollectionNode) (*CollectionItem, error) {
+func MapNode(n *ent.CollectionNode, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*CollectionItem, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	p := n.Edges.Node
 
 	accEdge, err := p.Edges.OwnerOrErr()
@@ -106,12 +116,12 @@ func MapNode(n *ent.CollectionNode) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := profile.MapRef(accEdge)
+	pro, err := profileMapper(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := library.MapNode(true, nil)(p)
+	item, err := library.MapNode(true, nil, roleHydratorFn)(p)
 	if err != nil {
 		return nil, err
 	}

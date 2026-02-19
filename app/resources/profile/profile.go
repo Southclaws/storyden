@@ -24,27 +24,36 @@ type Ref struct {
 	Handle   string
 	Name     string
 	Bio      datagraph.Content
+	Roles    held.Roles
 	Admin    bool
 	Metadata map[string]any
 }
 
-func MapRef(a *ent.Account) (*Ref, error) {
-	bio, err := datagraph.NewRichText(a.Bio)
-	if err != nil {
-		return nil, err
-	}
+func RefMapper(roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(a *ent.Account) (*Ref, error) {
+	return func(a *ent.Account) (*Ref, error) {
+		bio, err := datagraph.NewRichText(a.Bio)
+		if err != nil {
+			return nil, err
+		}
 
-	return &Ref{
-		ID:       account.AccountID(a.ID),
-		Created:  a.CreatedAt,
-		Updated:  a.UpdatedAt,
-		Deleted:  opt.NewPtr(a.DeletedAt),
-		Handle:   a.Handle,
-		Name:     a.Name,
-		Bio:      bio,
-		Admin:    a.Admin,
-		Metadata: a.Metadata,
-	}, nil
+		roles, err := roleHydratorFn(a.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		return &Ref{
+			ID:       account.AccountID(a.ID),
+			Created:  a.CreatedAt,
+			Updated:  a.UpdatedAt,
+			Deleted:  opt.NewPtr(a.DeletedAt),
+			Handle:   a.Handle,
+			Name:     a.Name,
+			Bio:      bio,
+			Roles:    roles,
+			Admin:    a.Admin,
+			Metadata: a.Metadata,
+		}, nil
+	}
 }
 
 type Public struct {
@@ -70,9 +79,11 @@ func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
 func (p *Public) GetCreated() time.Time         { return p.Created }
 func (p *Public) GetUpdated() time.Time         { return p.Updated }
 
-func Map(roles held.Roles) func(a *ent.Account) (*Public, error) {
+func Map(roleHydratorFn func(accID xid.ID) (held.Roles, error)) func(a *ent.Account) (*Public, error) {
+	mapper := RefMapper(roleHydratorFn)
+
 	return func(a *ent.Account) (*Public, error) {
-		ref, err := MapRef(a)
+		ref, err := mapper(a)
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +103,7 @@ func Map(roles held.Roles) func(a *ent.Account) (*Public, error) {
 				return Ref{}, err
 			}
 
-			p, err := MapRef(c)
+			p, err := mapper(c)
 			if err != nil {
 				return Ref{}, err
 			}
@@ -114,7 +125,7 @@ func Map(roles held.Roles) func(a *ent.Account) (*Public, error) {
 			Following: 0, // TODO: Hydrate here
 			LikeScore: 0, // TODO: Hydrate here
 
-			Roles:         roles,
+			Roles:         ref.Roles,
 			Interests:     interests,
 			InvitedBy:     invitedBy,
 			ExternalLinks: links,

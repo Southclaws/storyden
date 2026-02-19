@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -70,13 +71,15 @@ func (r *Reply) GetCreated() time.Time { return r.CreatedAt }
 func (r *Reply) GetUpdated() time.Time { return r.UpdatedAt }
 func (r *Reply) GetAuthor() xid.ID     { return xid.ID(r.Author.ID) }
 
-func Map(m *ent.Post) (*Reply, error) {
+func Map(m *ent.Post, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Reply, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	authorEdge, err := m.Edges.AuthorOrErr()
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.MapRef(authorEdge)
+	pro, err := profileMapper(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -91,7 +94,7 @@ func Map(m *ent.Post) (*Reply, error) {
 			return opt.NewEmpty[Reply](), nil
 		}
 
-		r, err := Map(m.Edges.ReplyTo)
+		r, err := Map(m.Edges.ReplyTo, roleHydratorFn)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +139,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		reply.Slug = slug
 
 		if m.Edges.Root.Edges.Author != nil {
-			p, err := profile.MapRef(m.Edges.Root.Edges.Author)
+			p, err := profileMapper(m.Edges.Root.Edges.Author)
 			if err != nil {
 				return nil, err
 			}
@@ -149,15 +152,18 @@ func Map(m *ent.Post) (*Reply, error) {
 
 func Mapper(
 	am account.Lookup,
+	roleHydratorFn func(accID xid.ID) (held.Roles, error),
 	ls post.PostLikesMap,
 	rl reaction.Lookup,
 ) func(m *ent.Post) (*Reply, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
 	mapReplyTo := func(m *ent.Post) (opt.Optional[Reply], error) {
 		if m.Edges.ReplyTo == nil {
 			return opt.NewEmpty[Reply](), nil
 		}
 
-		r, err := Mapper(am, ls, rl)(m.Edges.ReplyTo)
+		r, err := Mapper(am, roleHydratorFn, ls, rl)(m.Edges.ReplyTo)
 		if err != nil {
 			return nil, err
 		}
@@ -167,7 +173,7 @@ func Mapper(
 
 	return func(m *ent.Post) (*Reply, error) {
 		authorEdge := am[m.AccountPosts]
-		pro, err := profile.MapRef(authorEdge)
+		pro, err := profileMapper(authorEdge)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -216,7 +222,7 @@ func Mapper(
 
 			slug := fmt.Sprintf("%s#%s", rootThreadMark, m.ID)
 
-			rootAuthor, err := profile.MapRef(m.Edges.Root.Edges.Author)
+			rootAuthor, err := profileMapper(m.Edges.Root.Edges.Author)
 			if err != nil {
 				return nil, fault.Wrap(err)
 			}

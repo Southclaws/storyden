@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
@@ -25,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_manage"
+	"github.com/Southclaws/storyden/app/services/account/account_role"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -44,8 +44,7 @@ type Accounts struct {
 	accountAuth   *account_auth.Manager
 	accountEmail  *account_email.Manager
 	accountManage *account_manage.Manager
-	roleAssign    *role_assign.Assignment
-	roleBadge     *role_badge.Writer
+	roleAssign    *account_role.Manager
 	webAddress    url.URL
 }
 
@@ -60,8 +59,7 @@ func NewAccounts(
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
 	accountManage *account_manage.Manager,
-	roleAssign *role_assign.Assignment,
-	roleBadge *role_badge.Writer,
+	roleAssign *account_role.Manager,
 ) Accounts {
 	return Accounts{
 		profile_cache: profile_cache,
@@ -74,7 +72,6 @@ func NewAccounts(
 		accountEmail:  accountEmail,
 		accountManage: accountManage,
 		roleAssign:    roleAssign,
-		roleBadge:     roleBadge,
 		webAddress:    cfg.PublicWebAddress,
 	}
 }
@@ -331,7 +328,12 @@ func (h *Accounts) AccountRemoveRole(ctx context.Context, request openapi.Accoun
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
 	}
 
-	acc, err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Remove(roleID))
+	err = h.roleAssign.UpdateRoles(ctx, xid.ID(acc.ID), role_assign.Remove(roleID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = h.accountQuery.GetByID(ctx, acc.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -368,7 +370,12 @@ func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAd
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
 	}
 
-	acc, err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Add(roleID))
+	err = h.roleAssign.UpdateRoles(ctx, xid.ID(acc.ID), role_assign.Add(roleID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = h.accountQuery.GetByID(ctx, acc.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -391,7 +398,15 @@ func (h *Accounts) AccountRoleSetBadge(ctx context.Context, request openapi.Acco
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	updatingSelf := acc.Handle == request.AccountHandle
+	target, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	updatingSelf := accountID == target.ID
 
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		if updatingSelf {
@@ -402,13 +417,18 @@ func (h *Accounts) AccountRoleSetBadge(ctx context.Context, request openapi.Acco
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err = h.roleBadge.Update(ctx, accountID, roleID, true)
+	err = h.roleAssign.UpdateBadge(ctx, xid.ID(target.ID), roleID, true)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	target, err = h.accountQuery.GetByID(ctx, target.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AccountRoleSetBadge200JSONResponse{
-		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(target)),
 	}, nil
 }
 
@@ -425,7 +445,15 @@ func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	updatingSelf := acc.Handle == request.AccountHandle
+	target, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	updatingSelf := accountID == target.ID
 
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		if updatingSelf {
@@ -436,13 +464,18 @@ func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err = h.roleBadge.Update(ctx, accountID, roleID, false)
+	err = h.roleAssign.UpdateBadge(ctx, xid.ID(target.ID), roleID, false)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	target, err = h.accountQuery.GetByID(ctx, target.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AccountRoleRemoveBadge200JSONResponse{
-		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(target)),
 	}, nil
 }
 

@@ -2,6 +2,9 @@ package tag
 
 import (
 	"github.com/Southclaws/dt"
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -17,7 +20,7 @@ type Tag struct {
 
 type Tags []*Tag
 
-func Map(in *ent.Tag) (*Tag, error) {
+func Map(in *ent.Tag, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Tag, error) {
 	postsEdge, err := in.Edges.PostsOrErr()
 	if err != nil {
 		return nil, err
@@ -32,12 +35,14 @@ func Map(in *ent.Tag) (*Tag, error) {
 
 	tag.ItemCount = len(postsEdge) + len(nodesEdge)
 
-	posts, err := dt.MapErr(postsEdge, thread.Map)
+	posts, err := dt.MapErr(postsEdge, func(in *ent.Post) (*thread.Thread, error) {
+		return thread.Map(in, roleHydratorFn)
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	nodes, err := dt.MapErr(nodesEdge, library.MapNode(true, nil))
+	nodes, err := dt.MapErr(nodesEdge, library.MapNode(true, nil, roleHydratorFn))
 	if err != nil {
 		return nil, err
 	}

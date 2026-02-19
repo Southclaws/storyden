@@ -165,7 +165,13 @@ func (d *Querier) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapper := thread.Mapper(nil, readStates, likesMap, collectionsMap, repliesMap, nil)
+	authorEdges := dt.Map(result, func(p *ent.Post) *ent.Account { return p.Edges.Author })
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, authorEdges)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mapper := thread.Mapper(nil, roleHydrator.Hydrate, readStates, likesMap, collectionsMap, repliesMap, nil)
 	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -343,14 +349,18 @@ func (d *Querier) GetMany(ctx context.Context, threadIDs []post.ID, accountID op
 	}
 
 	accountLookup = account.NewAccountLookup(accountEdges)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accountEdges)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-	reacts, err := dt.MapErr(reactResult, reaction.Mapper(accountLookup))
+	reacts, err := dt.MapErr(reactResult, reaction.Mapper(accountLookup, roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	reactLookup := reaction.Reacts(reacts).Map()
 
-	threadMapper := thread.Mapper(accountLookup, readStateMap, likesMap, collectionsMap, replyStatsMap, reactLookup)
+	threadMapper := thread.Mapper(accountLookup, roleHydrator.Hydrate, readStateMap, likesMap, collectionsMap, replyStatsMap, reactLookup)
 
 	threads := make([]*thread.Thread, 0, len(threadResults))
 	for _, threadResult := range threadResults {

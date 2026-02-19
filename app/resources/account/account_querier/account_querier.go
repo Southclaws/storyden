@@ -12,7 +12,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
@@ -22,10 +22,10 @@ import (
 
 type Querier struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_repo.Repository
 }
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Querier {
 	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
@@ -36,9 +36,7 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		WithTags().
 		WithEmails().
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		WithAuthentication()
 
@@ -51,12 +49,12 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
+	roleHydrator, err := d.roleQuerier.BuildSingleHydrator(ctx, result)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := account.MapAccount(hr)(result)
+	acc, err := account.MapAccount(roleHydrator.Hydrate)(result)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -71,9 +69,7 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		WithTags().
 		WithEmails().
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		WithAuthentication()
 
@@ -86,12 +82,12 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
+	roleHydrator, err := d.roleQuerier.BuildSingleHydrator(ctx, result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := account.MapAccount(hr)(result)
+	acc, err := account.MapAccount(roleHydrator.Hydrate)(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -115,7 +111,12 @@ func (d *Querier) ProbeMany(ctx context.Context, handles ...string) ([]*account.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return dt.MapErr(accounts, account.MapRef)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accounts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return dt.MapErr(accounts, account.RefMapper(roleHydrator.Hydrate))
 }
 
 func (d *Querier) ListByHeldPermission(ctx context.Context, perms ...rbac.Permission) ([]*account.Account, error) {
@@ -143,5 +144,10 @@ func (d *Querier) ListByHeldPermission(ctx context.Context, perms ...rbac.Permis
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return dt.MapErr(accounts, account.MapRef)
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, accounts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return dt.MapErr(accounts, account.RefMapper(roleHydrator.Hydrate))
 }

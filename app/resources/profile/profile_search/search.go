@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/sortrule"
@@ -22,7 +23,8 @@ import (
 type Filter func(*ent.AccountQuery)
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_repo.Repository
 }
 
 func WithDisplayNameContains(q string) Filter {
@@ -127,8 +129,11 @@ func WithInvitedByHandles(handles []string) Filter {
 	}
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db: db}
+func New(db *ent.Client, roleQuerier *role_repo.Repository) *Querier {
+	return &Querier{
+		db:          db,
+		roleQuerier: roleQuerier,
+	}
 }
 
 func (d *Querier) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*profile.Public], error) {
@@ -156,7 +161,23 @@ func (d *Querier) Search(ctx context.Context, params pagination.Parameters, filt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	profiles, err := dt.MapErr(r, profile.Map(nil))
+	roleTargets := make([]*ent.Account, 0, len(r)*2)
+	for _, acc := range r {
+		roleTargets = append(roleTargets, acc)
+		if invitedBy := acc.Edges.InvitedBy; invitedBy != nil {
+			creator, err := invitedBy.Edges.CreatorOrErr()
+			if err == nil {
+				roleTargets = append(roleTargets, creator)
+			}
+		}
+	}
+
+	roleHydrator, err := d.roleQuerier.BuildMultiHydrator(ctx, roleTargets)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	profiles, err := dt.MapErr(r, profile.Map(roleHydrator.Hydrate))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

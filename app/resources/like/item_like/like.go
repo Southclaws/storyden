@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -18,8 +19,10 @@ type Like struct {
 	Owner   profile.Ref
 }
 
-func Map(in *ent.LikePost) (*Like, error) {
-	owner, err := profile.MapRef(in.Edges.Account)
+func Map(in *ent.LikePost, roleHydratorFn func(accID xid.ID) (held.Roles, error)) (*Like, error) {
+	profileMapper := profile.RefMapper(roleHydratorFn)
+
+	owner, err := profileMapper(in.Edges.Account)
 	if err != nil {
 		return nil, err
 	}

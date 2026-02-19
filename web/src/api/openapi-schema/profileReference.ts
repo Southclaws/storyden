@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { AccountRoleRefList } from "./accountRoleRefList";
 import type { Identifier } from "./identifier";
 import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
@@ -21,5 +22,6 @@ export interface ProfileReference {
   id: Identifier;
   joined: MemberJoinedDate;
   name: AccountName;
+  roles: AccountRoleRefList;
   suspended?: MemberSuspendedDate;
 }
