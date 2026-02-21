@@ -80,7 +80,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.9
-	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
+	github.com/tursodatabase/libsql-client-go v0.0.0-20251219100830-236aa1ff8acc
 	github.com/twilio/twilio-go v1.28.3
 	github.com/weaviate/weaviate v1.33.0
 	github.com/weaviate/weaviate-go-client/v5 v5.5.0
