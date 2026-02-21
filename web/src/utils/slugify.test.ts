@@ -28,7 +28,7 @@ test("hebrew with hyphen", () => {
 });
 
 test("persian with hyphen", () => {
-  assert.is(slugify("مثालِ-سادِه"), "مثالِ-سادِه");
+  assert.is(slugify("مثالِ-سادِه"), "مثالِ-سادِه");
 });
 
 test("basic english", () => {
