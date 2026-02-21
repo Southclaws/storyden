@@ -320,134 +320,292 @@ func (c Content) Split() []string {
 		return []string{}
 	}
 
-	r := []html.Node{}
+	state := chunkState{max: roughMaxSentenceSize}
+	walkChunks(c.html, &state)
 
-	// first, walk the tree for the top-most block-content nodes.
-	var walk func(n *html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode {
-			switch n.DataAtom {
-			case
-				atom.H1,
-				atom.H2,
-				atom.H3,
-				atom.H4,
-				atom.H5,
-				atom.H6,
-				atom.Blockquote,
-				atom.Pre,
-				atom.P:
-				r = append(r, *n)
-				// once split, exit out of this branch
-				return
-			}
-		}
-
-		if n.Type == html.TextNode {
-			// if the text node is empty, skip it.
-			if strings.TrimSpace(n.Data) == "" {
-				return
-			}
-
-			r = append(r, *n)
-		}
-
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
-		}
-	}
-	walk(c.html)
-
-	// now, iterate these top level nodes and split any that are "too big"
-	chunks := chunksFromNodes(r, roughMaxSentenceSize)
-
-	return chunks
+	return state.chunks
 }
 
-func chunksFromNodes(ns []html.Node, max int) []string {
-	chunks := []string{}
+type chunkState struct {
+	chunks         []string
+	max            int
+	heading        string
+	pendingHeading bool
+}
 
-	for _, n := range ns {
-		t := textfromnode(&n)
-		if len(t) > max {
-			// TODO: Split logic
-			chunks = append(chunks, splitearly(t, max)...)
-		} else {
-			chunks = append(chunks, t)
+func (s *chunkState) addChunk(text string, preserveNewlines bool) {
+	normalized := normalizeChunkText(text, preserveNewlines)
+	if normalized == "" {
+		return
+	}
+	if isNoiseChunk(normalized) {
+		return
+	}
+
+	if s.pendingHeading && s.heading != "" {
+		normalized = s.heading + "\n" + normalized
+		s.pendingHeading = false
+	}
+
+	s.chunks = append(s.chunks, splitChunk(normalized, s.max, preserveNewlines)...)
+}
+
+func isNoiseChunk(s string) bool {
+	runes := []rune(strings.TrimSpace(s))
+	if len(runes) == 0 {
+		return true
+	}
+	if len(runes) <= 24 && strings.ContainsRune(s, '©') {
+		return true
+	}
+	return false
+}
+
+func walkChunks(n *html.Node, state *chunkState) {
+	if n == nil || shouldIgnoreSubtree(n) {
+		return
+	}
+
+	if n.Type == html.TextNode {
+		// keep raw text that appears in block/container elements even without
+		// paragraph tags.
+		if hasIgnoredAncestor(n) {
+			return
+		}
+		if isRawTextContainer(n.Parent) {
+			state.addChunk(n.Data, true)
+		}
+		return
+	}
+
+	if n.Type == html.ElementNode {
+		switch n.DataAtom {
+		case atom.H1, atom.H2, atom.H3, atom.H4, atom.H5, atom.H6:
+			heading := normalizeChunkText(textFromNode(n, false), false)
+			if heading != "" {
+				state.heading = heading
+				state.pendingHeading = true
+			}
+			return
+		case atom.P, atom.Blockquote, atom.Li:
+			state.addChunk(textFromNode(n, false), false)
+			return
+		case atom.Pre:
+			state.addChunk(textFromNode(n, true), true)
+			return
+		case atom.Tr:
+			state.addChunk(tableRowToText(n), false)
+			return
 		}
 	}
 
-	return chunks
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		walkChunks(c, state)
+	}
 }
 
-func splitearly(in string, max int) []string {
+func shouldIgnoreSubtree(n *html.Node) bool {
+	if n == nil || n.Type != html.ElementNode {
+		return false
+	}
+
+	return isIgnoredTag(n)
+}
+
+func isRawTextContainer(n *html.Node) bool {
+	if n == nil || n.Type != html.ElementNode {
+		return false
+	}
+
+	switch n.DataAtom {
+	case atom.Body, atom.Main, atom.Article, atom.Section, atom.Div:
+		return true
+	default:
+		return false
+	}
+}
+
+func hasIgnoredAncestor(n *html.Node) bool {
+	for curr := n.Parent; curr != nil; curr = curr.Parent {
+		if curr.Type == html.ElementNode && isIgnoredTag(curr) {
+			return true
+		}
+	}
+	return false
+}
+
+func isIgnoredTag(n *html.Node) bool {
+	if n == nil || n.Type != html.ElementNode {
+		return false
+	}
+
+	switch n.DataAtom {
+	case atom.Nav, atom.Footer, atom.Script, atom.Style, atom.Noscript:
+		return true
+	}
+
+	switch strings.ToLower(n.Data) {
+	case "nav", "footer", "script", "style", "noscript":
+		return true
+	default:
+		return false
+	}
+}
+
+func tableRowToText(n *html.Node) string {
+	cells := []string{}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.ElementNode && (c.DataAtom == atom.Th || c.DataAtom == atom.Td) {
+			cell := normalizeChunkText(textFromNode(c, false), false)
+			if cell != "" {
+				cells = append(cells, cell)
+			}
+		}
+	}
+
+	return strings.Join(cells, " | ")
+}
+
+func normalizeChunkText(s string, preserveNewlines bool) string {
+	if preserveNewlines {
+		s = strings.ReplaceAll(s, "\r\n", "\n")
+		s = strings.ReplaceAll(s, "\r", "\n")
+		return strings.TrimSpace(s)
+	}
+
+	return strings.TrimSpace(spaces.ReplaceAllString(s, " "))
+}
+
+func splitChunk(in string, max int, preserveNewlines bool) []string {
+	if in == "" {
+		return nil
+	}
+
+	runes := []rune(in)
+	if len(runes) <= max {
+		return []string{in}
+	}
+
 	var chunks []string
-	var split func(s string)
-	split = func(s string) {
-		if len(s) <= max {
-			chunks = append(chunks, strings.TrimSpace(s))
-			return
+	for len(runes) > 0 {
+		if len(runes) <= max {
+			chunk := strings.TrimSpace(string(runes))
+			if chunk != "" {
+				chunks = append(chunks, chunk)
+			}
+			break
 		}
 
-		upper := min(len(s), max) - 1
-		if upper == -1 {
-			// reached end of input stream
-			return
-		}
-
+		upper := max - 1
 		lower := upper / 2
-		boundary := upper
-		fallback := -1
-	outer:
-		for ; boundary > lower; boundary-- {
-			c := s[boundary]
-			switch c {
-			// very rudimentary sentence boundaries (latin only at the moment)
-			case '.', ';', '!', '?':
-				break outer
-			// worst case: no boundaries found, use the closest space
+		boundary := -1
+		spaceFallback := -1
+
+		for i := upper; i > lower; i-- {
+			switch runes[i] {
+			case '.', ';', '!', '?', '\n':
+				boundary = i
+				i = -1
 			case ' ':
-				if fallback == -1 {
-					fallback = boundary
+				if spaceFallback == -1 {
+					spaceFallback = i
 				}
 			}
 		}
 
-		if boundary <= lower {
-			if fallback > -1 {
-				// worst case: no sent boundaries, split at fallback position.
-				boundary = fallback
+		if boundary == -1 {
+			if spaceFallback != -1 {
+				boundary = spaceFallback
 			} else {
-				// worst case: no fallback either (the input string was a solid
-				// block of text with no spaces or sentence boundaries.)
 				boundary = upper
 			}
 		}
 
-		left := strings.TrimSpace(s[:boundary])
-		right := strings.TrimSpace(s[boundary+1:])
-		chunks = append(chunks, left)
+		left := strings.TrimSpace(string(runes[:boundary+1]))
+		if left != "" {
+			chunks = append(chunks, left)
+		}
+		runes = []rune(strings.TrimSpace(string(runes[boundary+1:])))
+	}
 
-		if len(right) > 0 {
-			split(right)
+	if !preserveNewlines {
+		for i := range chunks {
+			chunks[i] = normalizeChunkText(chunks[i], false)
 		}
 	}
-	split(in)
 
 	return chunks
 }
 
-func textfromnode(n *html.Node) string {
-	var collect func(*html.Node, *strings.Builder)
-	collect = func(cc *html.Node, buf *strings.Builder) {
-		if cc.Type == html.TextNode {
-			buf.WriteString(cc.Data)
-		}
-		for c := cc.FirstChild; c != nil; c = c.NextSibling {
-			collect(c, buf)
+func textFromNode(n *html.Node, preserveNewlines bool) string {
+	var buf strings.Builder
+	var last rune
+	var collect func(*html.Node)
+	collect = func(curr *html.Node) {
+		switch curr.Type {
+		case html.TextNode:
+			data := curr.Data
+			if data == "" {
+				return
+			}
+			if preserveNewlines {
+				buf.WriteString(data)
+				return
+			}
+
+			normalized := spaces.ReplaceAllString(data, " ")
+			normalized = strings.TrimSpace(normalized)
+			if normalized == "" {
+				return
+			}
+
+			first := []rune(normalized)[0]
+			if buf.Len() > 0 && needsSpace(last, first) {
+				buf.WriteByte(' ')
+			}
+			buf.WriteString(normalized)
+			last = []rune(normalized)[len([]rune(normalized))-1]
+		case html.ElementNode:
+			if curr.DataAtom == atom.Br && preserveNewlines {
+				buf.WriteByte('\n')
+			}
+			for c := curr.FirstChild; c != nil; c = c.NextSibling {
+				collect(c)
+			}
+		default:
+			for c := curr.FirstChild; c != nil; c = c.NextSibling {
+				collect(c)
+			}
 		}
 	}
-	buf := &strings.Builder{}
-	collect(n, buf)
+
+	collect(n)
+
 	return buf.String()
+}
+
+func needsSpace(left rune, right rune) bool {
+	if left == 0 || right == 0 {
+		return false
+	}
+	if unicode.IsSpace(left) || unicode.IsSpace(right) {
+		return false
+	}
+	if isNoSpaceScript(left) && isNoSpaceScript(right) {
+		return false
+	}
+	if strings.ContainsRune("([{\"'`", right) {
+		return true
+	}
+	if strings.ContainsRune(")]},.!?:;\"'`", right) {
+		return false
+	}
+	if strings.ContainsRune("([{\"'`", left) {
+		return false
+	}
+	return true
+}
+
+func isNoSpaceScript(r rune) bool {
+	return unicode.In(r, unicode.Han, unicode.Hiragana, unicode.Katakana, unicode.Hangul)
 }
