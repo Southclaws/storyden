@@ -8,10 +8,10 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *Mutator) Delete(ctx context.Context, postID post.ID) error {
@@ -55,7 +55,7 @@ func (s *Mutator) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventThreadReplyDeleted{
+	s.bus.Publish(ctx, &rpc.EventThreadReplyDeleted{
 		ThreadID: p.RootPostID,
 		ReplyID:  p.ID,
 	})

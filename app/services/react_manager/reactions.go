@@ -9,13 +9,13 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_querier"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Reactor struct {
@@ -65,7 +65,7 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventPostReacted{
+	s.bus.Publish(ctx, &rpc.EventPostReacted{
 		PostID:     postID,
 		RootPostID: pref.Root,
 	})
@@ -117,7 +117,7 @@ func (s *Reactor) Remove(ctx context.Context, reactID reaction.ReactID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventPostUnreacted{
+	s.bus.Publish(ctx, &rpc.EventPostUnreacted{
 		PostID:     targetID,
 		RootPostID: pref.Root,
 	})

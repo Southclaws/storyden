@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -21,7 +21,7 @@ import (
 type PluginQuery struct {
 	config
 	ctx         *QueryContext
-	order       []entplugin.OrderOption
+	order       []plugin.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Plugin
 	withAccount *AccountQuery
@@ -57,7 +57,7 @@ func (_q *PluginQuery) Unique(unique bool) *PluginQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (_q *PluginQuery) Order(o ...entplugin.OrderOption) *PluginQuery {
+func (_q *PluginQuery) Order(o ...plugin.OrderOption) *PluginQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
@@ -74,9 +74,9 @@ func (_q *PluginQuery) QueryAccount() *AccountQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(entplugin.Table, entplugin.FieldID, selector),
+			sqlgraph.From(plugin.Table, plugin.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, entplugin.AccountTable, entplugin.AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, plugin.AccountTable, plugin.AccountColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -92,7 +92,7 @@ func (_q *PluginQuery) First(ctx context.Context) (*Plugin, error) {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{entplugin.Label}
+		return nil, &NotFoundError{plugin.Label}
 	}
 	return nodes[0], nil
 }
@@ -114,7 +114,7 @@ func (_q *PluginQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{entplugin.Label}
+		err = &NotFoundError{plugin.Label}
 		return
 	}
 	return ids[0], nil
@@ -141,9 +141,9 @@ func (_q *PluginQuery) Only(ctx context.Context) (*Plugin, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{entplugin.Label}
+		return nil, &NotFoundError{plugin.Label}
 	default:
-		return nil, &NotSingularError{entplugin.Label}
+		return nil, &NotSingularError{plugin.Label}
 	}
 }
 
@@ -168,9 +168,9 @@ func (_q *PluginQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{entplugin.Label}
+		err = &NotFoundError{plugin.Label}
 	default:
-		err = &NotSingularError{entplugin.Label}
+		err = &NotSingularError{plugin.Label}
 	}
 	return
 }
@@ -209,7 +209,7 @@ func (_q *PluginQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(entplugin.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(plugin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -273,7 +273,7 @@ func (_q *PluginQuery) Clone() *PluginQuery {
 	return &PluginQuery{
 		config:      _q.config,
 		ctx:         _q.ctx.Clone(),
-		order:       append([]entplugin.OrderOption{}, _q.order...),
+		order:       append([]plugin.OrderOption{}, _q.order...),
 		inters:      append([]Interceptor{}, _q.inters...),
 		predicates:  append([]predicate.Plugin{}, _q.predicates...),
 		withAccount: _q.withAccount.Clone(),
@@ -306,14 +306,14 @@ func (_q *PluginQuery) WithAccount(opts ...func(*AccountQuery)) *PluginQuery {
 //	}
 //
 //	client.Plugin.Query().
-//		GroupBy(entplugin.FieldCreatedAt).
+//		GroupBy(plugin.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *PluginQuery) GroupBy(field string, fields ...string) *PluginGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &PluginGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = entplugin.Label
+	grbuild.label = plugin.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -328,12 +328,12 @@ func (_q *PluginQuery) GroupBy(field string, fields ...string) *PluginGroupBy {
 //	}
 //
 //	client.Plugin.Query().
-//		Select(entplugin.FieldCreatedAt).
+//		Select(plugin.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (_q *PluginQuery) Select(fields ...string) *PluginSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
 	sbuild := &PluginSelect{PluginQuery: _q}
-	sbuild.label = entplugin.Label
+	sbuild.label = plugin.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
@@ -355,7 +355,7 @@ func (_q *PluginQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !entplugin.ValidColumn(f) {
+		if !plugin.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -450,7 +450,7 @@ func (_q *PluginQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *PluginQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(entplugin.Table, entplugin.Columns, sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(plugin.Table, plugin.Columns, sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -459,14 +459,14 @@ func (_q *PluginQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, entplugin.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, plugin.FieldID)
 		for i := range fields {
-			if fields[i] != entplugin.FieldID {
+			if fields[i] != plugin.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
 		if _q.withAccount != nil {
-			_spec.Node.AddColumnOnce(entplugin.FieldAddedBy)
+			_spec.Node.AddColumnOnce(plugin.FieldAddedBy)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {
@@ -494,10 +494,10 @@ func (_q *PluginQuery) querySpec() *sqlgraph.QuerySpec {
 
 func (_q *PluginQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(entplugin.Table)
+	t1 := builder.Table(plugin.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = entplugin.Columns
+		columns = plugin.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {

@@ -11,7 +11,6 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -19,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 	RateLimitRemaining  = "X-RateLimit-Remaining"
 	RateLimitReset      = "X-RateLimit-Reset"
 	RetryAfter          = "Retry-After"
-	MaxRequestSizeBytes = 10 * 1024 * 1024
+	MaxRequestSizeBytes = 50 * 1024 * 1024
 )
 
 type Middleware struct {
@@ -70,7 +70,7 @@ func New(
 	m.reconfigureLimiter(ctx)
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(ctx, bus, "limiter.settings_updated", func(ctx context.Context, evt *message.EventSettingsUpdated) error {
+		_, err := pubsub.Subscribe(ctx, bus, "limiter.settings_updated", func(ctx context.Context, evt *rpc.EventSettingsUpdated) error {
 			m.reconfigureLimiter(ctx)
 			return nil
 		})

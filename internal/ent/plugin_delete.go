@@ -8,9 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 )
 
 // PluginDelete is the builder for deleting a Plugin entity.
@@ -41,7 +40,7 @@ func (_d *PluginDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *PluginDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(entplugin.Table, sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString))
+	_spec := sqlgraph.NewDeleteSpec(plugin.Table, sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -75,7 +74,7 @@ func (_d *PluginDeleteOne) Exec(ctx context.Context) error {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{entplugin.Label}
+		return &NotFoundError{plugin.Label}
 	default:
 		return nil
 	}

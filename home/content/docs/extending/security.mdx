@@ -1,0 +1,85 @@
+---
+title: Security
+description: Token, transport, identity, and permission boundaries for plugins.
+---
+
+Storyden plugins run with explicit boundaries by design. This page covers the important ones.
+
+## RPC authentication model
+
+Plugin RPC sessions authenticate with a token in the RPC URL which is passed to Supervised plugins as an environment variable, external plugins may do the same but its up to them how they fetch secrets. It looks like this:
+
+```
+STORYDEN_RPC_URL=ws://localhost:8000/rpc?plugin_id=abc&token=abc123
+```
+
+Only one RPC session can exist per plugin. The token is a secret that grants authenticated access to the Storyden RPC API, so it must be protected like any other credential. The token handling and semantics differ between Supervised and External plugins:
+
+### Supervised
+
+- Supervised plugin tokens are use-once.
+- This is why Supervised plugins cannot restart themselves.
+- Storyden issues a new token via environment variable when it boots the process.
+- When the process connects, the token is validated then immediately discarded.
+- The RPC URL contains the plugin's installation ID.
+
+### External
+
+- Token handling differs from the use-once semantics of Supervised plugins.
+- External plugin tokens are static bearer tokens with no expiry.
+- When the process connects, the token is used to identify the plugin.
+- The RPC URL does not contain the plugin's installation ID.
+
+If the connection token is regenerated, the plugin using it will be disconnected and will need to be restarted with the new token.
+
+You can get the token and an environment variable copy-paste helper from the Connection tab of the plugin:
+
+![2026-02-19-19-47-09.png](2026-02-19-19-47-09.png)
+
+## API access identity model
+
+Plugin API access is opt-in via manifest `access`.
+
+See [Manifest -> `access`](/docs/extending/manifest#access).
+
+When granted, Storyden provisions an account identity with the requested permissions and an access key for API usage.
+
+Key points:
+
+- Access is explicit, not implicit.
+- Permissions are declared, inspectable, and enforceable.
+- You can revoke the key at any time, ban the account, or uninstall the plugin.
+- Uninstalling a plugin revokes all keys automatically.
+- The account will not be deleted however.
+
+## Runtime boundaries
+
+### Supervised
+
+Supervised plugins run as host-managed child processes with lifecycle controls and host-side logging surfaces.
+
+It's safe to assume they have access to anything Storyden has access to, but they do not have any implicit permissions or API access. Supervised processes are not containerised or sandboxed, so they have the same filesystem and network access as Storyden itself. This is a powerful capability to be used with care. Do not install third party plugins without vetting the source code. If there is no source code, bin it immediately!
+
+### External
+
+External plugins are managed by you on your infrastructure. This does not come without risks however. The same dilligence applies for plugins from third parties.
+
+RPC tokens are sensitive secrets that grant authenticated access to your Storyden instance.
+
+## Token handling guidance
+
+- Treat RPC tokens and API access keys as secrets.
+- Store them in environment variables or secret managers.
+- Do not commit them to source control.
+- Rotate credentials when compromised or no longer needed.
+
+## Operational hardening
+
+- Keep plugin permissions minimal.
+- Prefer narrow, purpose-built plugin accounts.
+- Monitor plugin-originated API activity like any other automated actor.
+- Revoke or cycle credentials as part of incident response.
+
+## Security posture summary
+
+Security is based on explicit manifests, explicit permissions, authenticated transport, and normal API authorization semantics.

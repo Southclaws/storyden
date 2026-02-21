@@ -12,9 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/lib/plugin"
 	"github.com/rs/xid"
 )
 
@@ -38,31 +37,23 @@ func (_u *PluginUpdate) SetUpdatedAt(v time.Time) *PluginUpdate {
 	return _u
 }
 
-// SetPath sets the "path" field.
-func (_u *PluginUpdate) SetPath(v string) *PluginUpdate {
-	_u.mutation.SetPath(v)
+// SetSupervised sets the "supervised" field.
+func (_u *PluginUpdate) SetSupervised(v bool) *PluginUpdate {
+	_u.mutation.SetSupervised(v)
 	return _u
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (_u *PluginUpdate) SetNillablePath(v *string) *PluginUpdate {
+// SetNillableSupervised sets the "supervised" field if the given value is not nil.
+func (_u *PluginUpdate) SetNillableSupervised(v *bool) *PluginUpdate {
 	if v != nil {
-		_u.SetPath(*v)
+		_u.SetSupervised(*v)
 	}
 	return _u
 }
 
 // SetManifest sets the "manifest" field.
-func (_u *PluginUpdate) SetManifest(v plugin.Manifest) *PluginUpdate {
+func (_u *PluginUpdate) SetManifest(v map[string]interface{}) *PluginUpdate {
 	_u.mutation.SetManifest(v)
-	return _u
-}
-
-// SetNillableManifest sets the "manifest" field if the given value is not nil.
-func (_u *PluginUpdate) SetNillableManifest(v *plugin.Manifest) *PluginUpdate {
-	if v != nil {
-		_u.SetManifest(*v)
-	}
 	return _u
 }
 
@@ -129,6 +120,20 @@ func (_u *PluginUpdate) SetStatusDetails(v map[string]interface{}) *PluginUpdate
 // ClearStatusDetails clears the value of the "status_details" field.
 func (_u *PluginUpdate) ClearStatusDetails() *PluginUpdate {
 	_u.mutation.ClearStatusDetails()
+	return _u
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (_u *PluginUpdate) SetAuthSecret(v string) *PluginUpdate {
+	_u.mutation.SetAuthSecret(v)
+	return _u
+}
+
+// SetNillableAuthSecret sets the "auth_secret" field if the given value is not nil.
+func (_u *PluginUpdate) SetNillableAuthSecret(v *string) *PluginUpdate {
+	if v != nil {
+		_u.SetAuthSecret(*v)
+	}
 	return _u
 }
 
@@ -199,7 +204,7 @@ func (_u *PluginUpdate) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (_u *PluginUpdate) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := entplugin.UpdateDefaultUpdatedAt()
+		v := plugin.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
 }
@@ -222,7 +227,7 @@ func (_u *PluginUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(entplugin.Table, entplugin.Columns, sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(plugin.Table, plugin.Columns, sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -231,41 +236,44 @@ func (_u *PluginUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(entplugin.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.Path(); ok {
-		_spec.SetField(entplugin.FieldPath, field.TypeString, value)
+	if value, ok := _u.mutation.Supervised(); ok {
+		_spec.SetField(plugin.FieldSupervised, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Manifest(); ok {
-		_spec.SetField(entplugin.FieldManifest, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldManifest, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.Config(); ok {
-		_spec.SetField(entplugin.FieldConfig, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldConfig, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.ActiveState(); ok {
-		_spec.SetField(entplugin.FieldActiveState, field.TypeString, value)
+		_spec.SetField(plugin.FieldActiveState, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ActiveStateChangedAt(); ok {
-		_spec.SetField(entplugin.FieldActiveStateChangedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldActiveStateChangedAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.StatusMessage(); ok {
-		_spec.SetField(entplugin.FieldStatusMessage, field.TypeString, value)
+		_spec.SetField(plugin.FieldStatusMessage, field.TypeString, value)
 	}
 	if _u.mutation.StatusMessageCleared() {
-		_spec.ClearField(entplugin.FieldStatusMessage, field.TypeString)
+		_spec.ClearField(plugin.FieldStatusMessage, field.TypeString)
 	}
 	if value, ok := _u.mutation.StatusDetails(); ok {
-		_spec.SetField(entplugin.FieldStatusDetails, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldStatusDetails, field.TypeJSON, value)
 	}
 	if _u.mutation.StatusDetailsCleared() {
-		_spec.ClearField(entplugin.FieldStatusDetails, field.TypeJSON)
+		_spec.ClearField(plugin.FieldStatusDetails, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.AuthSecret(); ok {
+		_spec.SetField(plugin.FieldAuthSecret, field.TypeString, value)
 	}
 	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   entplugin.AccountTable,
-			Columns: []string{entplugin.AccountColumn},
+			Table:   plugin.AccountTable,
+			Columns: []string{plugin.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -277,8 +285,8 @@ func (_u *PluginUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   entplugin.AccountTable,
-			Columns: []string{entplugin.AccountColumn},
+			Table:   plugin.AccountTable,
+			Columns: []string{plugin.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -292,7 +300,7 @@ func (_u *PluginUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{entplugin.Label}
+			err = &NotFoundError{plugin.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -317,31 +325,23 @@ func (_u *PluginUpdateOne) SetUpdatedAt(v time.Time) *PluginUpdateOne {
 	return _u
 }
 
-// SetPath sets the "path" field.
-func (_u *PluginUpdateOne) SetPath(v string) *PluginUpdateOne {
-	_u.mutation.SetPath(v)
+// SetSupervised sets the "supervised" field.
+func (_u *PluginUpdateOne) SetSupervised(v bool) *PluginUpdateOne {
+	_u.mutation.SetSupervised(v)
 	return _u
 }
 
-// SetNillablePath sets the "path" field if the given value is not nil.
-func (_u *PluginUpdateOne) SetNillablePath(v *string) *PluginUpdateOne {
+// SetNillableSupervised sets the "supervised" field if the given value is not nil.
+func (_u *PluginUpdateOne) SetNillableSupervised(v *bool) *PluginUpdateOne {
 	if v != nil {
-		_u.SetPath(*v)
+		_u.SetSupervised(*v)
 	}
 	return _u
 }
 
 // SetManifest sets the "manifest" field.
-func (_u *PluginUpdateOne) SetManifest(v plugin.Manifest) *PluginUpdateOne {
+func (_u *PluginUpdateOne) SetManifest(v map[string]interface{}) *PluginUpdateOne {
 	_u.mutation.SetManifest(v)
-	return _u
-}
-
-// SetNillableManifest sets the "manifest" field if the given value is not nil.
-func (_u *PluginUpdateOne) SetNillableManifest(v *plugin.Manifest) *PluginUpdateOne {
-	if v != nil {
-		_u.SetManifest(*v)
-	}
 	return _u
 }
 
@@ -408,6 +408,20 @@ func (_u *PluginUpdateOne) SetStatusDetails(v map[string]interface{}) *PluginUpd
 // ClearStatusDetails clears the value of the "status_details" field.
 func (_u *PluginUpdateOne) ClearStatusDetails() *PluginUpdateOne {
 	_u.mutation.ClearStatusDetails()
+	return _u
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (_u *PluginUpdateOne) SetAuthSecret(v string) *PluginUpdateOne {
+	_u.mutation.SetAuthSecret(v)
+	return _u
+}
+
+// SetNillableAuthSecret sets the "auth_secret" field if the given value is not nil.
+func (_u *PluginUpdateOne) SetNillableAuthSecret(v *string) *PluginUpdateOne {
+	if v != nil {
+		_u.SetAuthSecret(*v)
+	}
 	return _u
 }
 
@@ -491,7 +505,7 @@ func (_u *PluginUpdateOne) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (_u *PluginUpdateOne) defaults() {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := entplugin.UpdateDefaultUpdatedAt()
+		v := plugin.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
 }
@@ -514,7 +528,7 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(entplugin.Table, entplugin.Columns, sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString))
+	_spec := sqlgraph.NewUpdateSpec(plugin.Table, plugin.Columns, sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Plugin.id" for update`)}
@@ -522,12 +536,12 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 	_spec.Node.ID.Value = id
 	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, entplugin.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, plugin.FieldID)
 		for _, f := range fields {
-			if !entplugin.ValidColumn(f) {
+			if !plugin.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != entplugin.FieldID {
+			if f != plugin.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, f)
 			}
 		}
@@ -540,41 +554,44 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 		}
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(entplugin.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.Path(); ok {
-		_spec.SetField(entplugin.FieldPath, field.TypeString, value)
+	if value, ok := _u.mutation.Supervised(); ok {
+		_spec.SetField(plugin.FieldSupervised, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Manifest(); ok {
-		_spec.SetField(entplugin.FieldManifest, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldManifest, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.Config(); ok {
-		_spec.SetField(entplugin.FieldConfig, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldConfig, field.TypeJSON, value)
 	}
 	if value, ok := _u.mutation.ActiveState(); ok {
-		_spec.SetField(entplugin.FieldActiveState, field.TypeString, value)
+		_spec.SetField(plugin.FieldActiveState, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ActiveStateChangedAt(); ok {
-		_spec.SetField(entplugin.FieldActiveStateChangedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldActiveStateChangedAt, field.TypeTime, value)
 	}
 	if value, ok := _u.mutation.StatusMessage(); ok {
-		_spec.SetField(entplugin.FieldStatusMessage, field.TypeString, value)
+		_spec.SetField(plugin.FieldStatusMessage, field.TypeString, value)
 	}
 	if _u.mutation.StatusMessageCleared() {
-		_spec.ClearField(entplugin.FieldStatusMessage, field.TypeString)
+		_spec.ClearField(plugin.FieldStatusMessage, field.TypeString)
 	}
 	if value, ok := _u.mutation.StatusDetails(); ok {
-		_spec.SetField(entplugin.FieldStatusDetails, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldStatusDetails, field.TypeJSON, value)
 	}
 	if _u.mutation.StatusDetailsCleared() {
-		_spec.ClearField(entplugin.FieldStatusDetails, field.TypeJSON)
+		_spec.ClearField(plugin.FieldStatusDetails, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.AuthSecret(); ok {
+		_spec.SetField(plugin.FieldAuthSecret, field.TypeString, value)
 	}
 	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   entplugin.AccountTable,
-			Columns: []string{entplugin.AccountColumn},
+			Table:   plugin.AccountTable,
+			Columns: []string{plugin.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -586,8 +603,8 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   entplugin.AccountTable,
-			Columns: []string{entplugin.AccountColumn},
+			Table:   plugin.AccountTable,
+			Columns: []string{plugin.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -604,7 +621,7 @@ func (_u *PluginUpdateOne) sqlSave(ctx context.Context) (_node *Plugin, err erro
 	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
-			err = &NotFoundError{entplugin.Label}
+			err = &NotFoundError{plugin.Label}
 		} else if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}

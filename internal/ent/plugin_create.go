@@ -13,8 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
-	"github.com/Southclaws/storyden/lib/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/rs/xid"
 )
 
@@ -54,14 +53,14 @@ func (_c *PluginCreate) SetNillableUpdatedAt(v *time.Time) *PluginCreate {
 	return _c
 }
 
-// SetPath sets the "path" field.
-func (_c *PluginCreate) SetPath(v string) *PluginCreate {
-	_c.mutation.SetPath(v)
+// SetSupervised sets the "supervised" field.
+func (_c *PluginCreate) SetSupervised(v bool) *PluginCreate {
+	_c.mutation.SetSupervised(v)
 	return _c
 }
 
 // SetManifest sets the "manifest" field.
-func (_c *PluginCreate) SetManifest(v plugin.Manifest) *PluginCreate {
+func (_c *PluginCreate) SetManifest(v map[string]interface{}) *PluginCreate {
 	_c.mutation.SetManifest(v)
 	return _c
 }
@@ -101,6 +100,12 @@ func (_c *PluginCreate) SetNillableStatusMessage(v *string) *PluginCreate {
 // SetStatusDetails sets the "status_details" field.
 func (_c *PluginCreate) SetStatusDetails(v map[string]interface{}) *PluginCreate {
 	_c.mutation.SetStatusDetails(v)
+	return _c
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (_c *PluginCreate) SetAuthSecret(v string) *PluginCreate {
+	_c.mutation.SetAuthSecret(v)
 	return _c
 }
 
@@ -171,15 +176,15 @@ func (_c *PluginCreate) ExecX(ctx context.Context) {
 // defaults sets the default values of the builder before save.
 func (_c *PluginCreate) defaults() {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := entplugin.DefaultCreatedAt()
+		v := plugin.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := entplugin.DefaultUpdatedAt()
+		v := plugin.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := _c.mutation.ID(); !ok {
-		v := entplugin.DefaultID()
+		v := plugin.DefaultID()
 		_c.mutation.SetID(v)
 	}
 }
@@ -192,8 +197,8 @@ func (_c *PluginCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Plugin.updated_at"`)}
 	}
-	if _, ok := _c.mutation.Path(); !ok {
-		return &ValidationError{Name: "path", err: errors.New(`ent: missing required field "Plugin.path"`)}
+	if _, ok := _c.mutation.Supervised(); !ok {
+		return &ValidationError{Name: "supervised", err: errors.New(`ent: missing required field "Plugin.supervised"`)}
 	}
 	if _, ok := _c.mutation.Manifest(); !ok {
 		return &ValidationError{Name: "manifest", err: errors.New(`ent: missing required field "Plugin.manifest"`)}
@@ -207,11 +212,14 @@ func (_c *PluginCreate) check() error {
 	if _, ok := _c.mutation.ActiveStateChangedAt(); !ok {
 		return &ValidationError{Name: "active_state_changed_at", err: errors.New(`ent: missing required field "Plugin.active_state_changed_at"`)}
 	}
+	if _, ok := _c.mutation.AuthSecret(); !ok {
+		return &ValidationError{Name: "auth_secret", err: errors.New(`ent: missing required field "Plugin.auth_secret"`)}
+	}
 	if _, ok := _c.mutation.AddedBy(); !ok {
 		return &ValidationError{Name: "added_by", err: errors.New(`ent: missing required field "Plugin.added_by"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
-		if err := entplugin.IDValidator(v.String()); err != nil {
+		if err := plugin.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Plugin.id": %w`, err)}
 		}
 	}
@@ -247,7 +255,7 @@ func (_c *PluginCreate) sqlSave(ctx context.Context) (*Plugin, error) {
 func (_c *PluginCreate) createSpec() (*Plugin, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Plugin{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(entplugin.Table, sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(plugin.Table, sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString))
 	)
 	_spec.OnConflict = _c.conflict
 	if id, ok := _c.mutation.ID(); ok {
@@ -255,47 +263,51 @@ func (_c *PluginCreate) createSpec() (*Plugin, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = &id
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(entplugin.FieldCreatedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
 	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(entplugin.FieldUpdatedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.Path(); ok {
-		_spec.SetField(entplugin.FieldPath, field.TypeString, value)
-		_node.Path = value
+	if value, ok := _c.mutation.Supervised(); ok {
+		_spec.SetField(plugin.FieldSupervised, field.TypeBool, value)
+		_node.Supervised = value
 	}
 	if value, ok := _c.mutation.Manifest(); ok {
-		_spec.SetField(entplugin.FieldManifest, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldManifest, field.TypeJSON, value)
 		_node.Manifest = value
 	}
 	if value, ok := _c.mutation.Config(); ok {
-		_spec.SetField(entplugin.FieldConfig, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldConfig, field.TypeJSON, value)
 		_node.Config = value
 	}
 	if value, ok := _c.mutation.ActiveState(); ok {
-		_spec.SetField(entplugin.FieldActiveState, field.TypeString, value)
+		_spec.SetField(plugin.FieldActiveState, field.TypeString, value)
 		_node.ActiveState = value
 	}
 	if value, ok := _c.mutation.ActiveStateChangedAt(); ok {
-		_spec.SetField(entplugin.FieldActiveStateChangedAt, field.TypeTime, value)
+		_spec.SetField(plugin.FieldActiveStateChangedAt, field.TypeTime, value)
 		_node.ActiveStateChangedAt = value
 	}
 	if value, ok := _c.mutation.StatusMessage(); ok {
-		_spec.SetField(entplugin.FieldStatusMessage, field.TypeString, value)
+		_spec.SetField(plugin.FieldStatusMessage, field.TypeString, value)
 		_node.StatusMessage = &value
 	}
 	if value, ok := _c.mutation.StatusDetails(); ok {
-		_spec.SetField(entplugin.FieldStatusDetails, field.TypeJSON, value)
+		_spec.SetField(plugin.FieldStatusDetails, field.TypeJSON, value)
 		_node.StatusDetails = value
+	}
+	if value, ok := _c.mutation.AuthSecret(); ok {
+		_spec.SetField(plugin.FieldAuthSecret, field.TypeString, value)
+		_node.AuthSecret = value
 	}
 	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   entplugin.AccountTable,
-			Columns: []string{entplugin.AccountColumn},
+			Table:   plugin.AccountTable,
+			Columns: []string{plugin.AccountColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -361,121 +373,133 @@ type (
 
 // SetUpdatedAt sets the "updated_at" field.
 func (u *PluginUpsert) SetUpdatedAt(v time.Time) *PluginUpsert {
-	u.Set(entplugin.FieldUpdatedAt, v)
+	u.Set(plugin.FieldUpdatedAt, v)
 	return u
 }
 
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateUpdatedAt() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldUpdatedAt)
+	u.SetExcluded(plugin.FieldUpdatedAt)
 	return u
 }
 
-// SetPath sets the "path" field.
-func (u *PluginUpsert) SetPath(v string) *PluginUpsert {
-	u.Set(entplugin.FieldPath, v)
+// SetSupervised sets the "supervised" field.
+func (u *PluginUpsert) SetSupervised(v bool) *PluginUpsert {
+	u.Set(plugin.FieldSupervised, v)
 	return u
 }
 
-// UpdatePath sets the "path" field to the value that was provided on create.
-func (u *PluginUpsert) UpdatePath() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldPath)
+// UpdateSupervised sets the "supervised" field to the value that was provided on create.
+func (u *PluginUpsert) UpdateSupervised() *PluginUpsert {
+	u.SetExcluded(plugin.FieldSupervised)
 	return u
 }
 
 // SetManifest sets the "manifest" field.
-func (u *PluginUpsert) SetManifest(v plugin.Manifest) *PluginUpsert {
-	u.Set(entplugin.FieldManifest, v)
+func (u *PluginUpsert) SetManifest(v map[string]interface{}) *PluginUpsert {
+	u.Set(plugin.FieldManifest, v)
 	return u
 }
 
 // UpdateManifest sets the "manifest" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateManifest() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldManifest)
+	u.SetExcluded(plugin.FieldManifest)
 	return u
 }
 
 // SetConfig sets the "config" field.
 func (u *PluginUpsert) SetConfig(v map[string]interface{}) *PluginUpsert {
-	u.Set(entplugin.FieldConfig, v)
+	u.Set(plugin.FieldConfig, v)
 	return u
 }
 
 // UpdateConfig sets the "config" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateConfig() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldConfig)
+	u.SetExcluded(plugin.FieldConfig)
 	return u
 }
 
 // SetActiveState sets the "active_state" field.
 func (u *PluginUpsert) SetActiveState(v string) *PluginUpsert {
-	u.Set(entplugin.FieldActiveState, v)
+	u.Set(plugin.FieldActiveState, v)
 	return u
 }
 
 // UpdateActiveState sets the "active_state" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateActiveState() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldActiveState)
+	u.SetExcluded(plugin.FieldActiveState)
 	return u
 }
 
 // SetActiveStateChangedAt sets the "active_state_changed_at" field.
 func (u *PluginUpsert) SetActiveStateChangedAt(v time.Time) *PluginUpsert {
-	u.Set(entplugin.FieldActiveStateChangedAt, v)
+	u.Set(plugin.FieldActiveStateChangedAt, v)
 	return u
 }
 
 // UpdateActiveStateChangedAt sets the "active_state_changed_at" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateActiveStateChangedAt() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldActiveStateChangedAt)
+	u.SetExcluded(plugin.FieldActiveStateChangedAt)
 	return u
 }
 
 // SetStatusMessage sets the "status_message" field.
 func (u *PluginUpsert) SetStatusMessage(v string) *PluginUpsert {
-	u.Set(entplugin.FieldStatusMessage, v)
+	u.Set(plugin.FieldStatusMessage, v)
 	return u
 }
 
 // UpdateStatusMessage sets the "status_message" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateStatusMessage() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldStatusMessage)
+	u.SetExcluded(plugin.FieldStatusMessage)
 	return u
 }
 
 // ClearStatusMessage clears the value of the "status_message" field.
 func (u *PluginUpsert) ClearStatusMessage() *PluginUpsert {
-	u.SetNull(entplugin.FieldStatusMessage)
+	u.SetNull(plugin.FieldStatusMessage)
 	return u
 }
 
 // SetStatusDetails sets the "status_details" field.
 func (u *PluginUpsert) SetStatusDetails(v map[string]interface{}) *PluginUpsert {
-	u.Set(entplugin.FieldStatusDetails, v)
+	u.Set(plugin.FieldStatusDetails, v)
 	return u
 }
 
 // UpdateStatusDetails sets the "status_details" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateStatusDetails() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldStatusDetails)
+	u.SetExcluded(plugin.FieldStatusDetails)
 	return u
 }
 
 // ClearStatusDetails clears the value of the "status_details" field.
 func (u *PluginUpsert) ClearStatusDetails() *PluginUpsert {
-	u.SetNull(entplugin.FieldStatusDetails)
+	u.SetNull(plugin.FieldStatusDetails)
+	return u
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsert) SetAuthSecret(v string) *PluginUpsert {
+	u.Set(plugin.FieldAuthSecret, v)
+	return u
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsert) UpdateAuthSecret() *PluginUpsert {
+	u.SetExcluded(plugin.FieldAuthSecret)
 	return u
 }
 
 // SetAddedBy sets the "added_by" field.
 func (u *PluginUpsert) SetAddedBy(v xid.ID) *PluginUpsert {
-	u.Set(entplugin.FieldAddedBy, v)
+	u.Set(plugin.FieldAddedBy, v)
 	return u
 }
 
 // UpdateAddedBy sets the "added_by" field to the value that was provided on create.
 func (u *PluginUpsert) UpdateAddedBy() *PluginUpsert {
-	u.SetExcluded(entplugin.FieldAddedBy)
+	u.SetExcluded(plugin.FieldAddedBy)
 	return u
 }
 
@@ -486,7 +510,7 @@ func (u *PluginUpsert) UpdateAddedBy() *PluginUpsert {
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(entplugin.FieldID)
+//				u.SetIgnore(plugin.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
@@ -494,10 +518,10 @@ func (u *PluginUpsertOne) UpdateNewValues() *PluginUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.ID(); exists {
-			s.SetIgnore(entplugin.FieldID)
+			s.SetIgnore(plugin.FieldID)
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
-			s.SetIgnore(entplugin.FieldCreatedAt)
+			s.SetIgnore(plugin.FieldCreatedAt)
 		}
 	}))
 	return u
@@ -544,22 +568,22 @@ func (u *PluginUpsertOne) UpdateUpdatedAt() *PluginUpsertOne {
 	})
 }
 
-// SetPath sets the "path" field.
-func (u *PluginUpsertOne) SetPath(v string) *PluginUpsertOne {
+// SetSupervised sets the "supervised" field.
+func (u *PluginUpsertOne) SetSupervised(v bool) *PluginUpsertOne {
 	return u.Update(func(s *PluginUpsert) {
-		s.SetPath(v)
+		s.SetSupervised(v)
 	})
 }
 
-// UpdatePath sets the "path" field to the value that was provided on create.
-func (u *PluginUpsertOne) UpdatePath() *PluginUpsertOne {
+// UpdateSupervised sets the "supervised" field to the value that was provided on create.
+func (u *PluginUpsertOne) UpdateSupervised() *PluginUpsertOne {
 	return u.Update(func(s *PluginUpsert) {
-		s.UpdatePath()
+		s.UpdateSupervised()
 	})
 }
 
 // SetManifest sets the "manifest" field.
-func (u *PluginUpsertOne) SetManifest(v plugin.Manifest) *PluginUpsertOne {
+func (u *PluginUpsertOne) SetManifest(v map[string]interface{}) *PluginUpsertOne {
 	return u.Update(func(s *PluginUpsert) {
 		s.SetManifest(v)
 	})
@@ -653,6 +677,20 @@ func (u *PluginUpsertOne) UpdateStatusDetails() *PluginUpsertOne {
 func (u *PluginUpsertOne) ClearStatusDetails() *PluginUpsertOne {
 	return u.Update(func(s *PluginUpsert) {
 		s.ClearStatusDetails()
+	})
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsertOne) SetAuthSecret(v string) *PluginUpsertOne {
+	return u.Update(func(s *PluginUpsert) {
+		s.SetAuthSecret(v)
+	})
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsertOne) UpdateAuthSecret() *PluginUpsertOne {
+	return u.Update(func(s *PluginUpsert) {
+		s.UpdateAuthSecret()
 	})
 }
 
@@ -842,7 +880,7 @@ type PluginUpsertBulk struct {
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
 //			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(entplugin.FieldID)
+//				u.SetIgnore(plugin.FieldID)
 //			}),
 //		).
 //		Exec(ctx)
@@ -851,10 +889,10 @@ func (u *PluginUpsertBulk) UpdateNewValues() *PluginUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.ID(); exists {
-				s.SetIgnore(entplugin.FieldID)
+				s.SetIgnore(plugin.FieldID)
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
-				s.SetIgnore(entplugin.FieldCreatedAt)
+				s.SetIgnore(plugin.FieldCreatedAt)
 			}
 		}
 	}))
@@ -902,22 +940,22 @@ func (u *PluginUpsertBulk) UpdateUpdatedAt() *PluginUpsertBulk {
 	})
 }
 
-// SetPath sets the "path" field.
-func (u *PluginUpsertBulk) SetPath(v string) *PluginUpsertBulk {
+// SetSupervised sets the "supervised" field.
+func (u *PluginUpsertBulk) SetSupervised(v bool) *PluginUpsertBulk {
 	return u.Update(func(s *PluginUpsert) {
-		s.SetPath(v)
+		s.SetSupervised(v)
 	})
 }
 
-// UpdatePath sets the "path" field to the value that was provided on create.
-func (u *PluginUpsertBulk) UpdatePath() *PluginUpsertBulk {
+// UpdateSupervised sets the "supervised" field to the value that was provided on create.
+func (u *PluginUpsertBulk) UpdateSupervised() *PluginUpsertBulk {
 	return u.Update(func(s *PluginUpsert) {
-		s.UpdatePath()
+		s.UpdateSupervised()
 	})
 }
 
 // SetManifest sets the "manifest" field.
-func (u *PluginUpsertBulk) SetManifest(v plugin.Manifest) *PluginUpsertBulk {
+func (u *PluginUpsertBulk) SetManifest(v map[string]interface{}) *PluginUpsertBulk {
 	return u.Update(func(s *PluginUpsert) {
 		s.SetManifest(v)
 	})
@@ -1011,6 +1049,20 @@ func (u *PluginUpsertBulk) UpdateStatusDetails() *PluginUpsertBulk {
 func (u *PluginUpsertBulk) ClearStatusDetails() *PluginUpsertBulk {
 	return u.Update(func(s *PluginUpsert) {
 		s.ClearStatusDetails()
+	})
+}
+
+// SetAuthSecret sets the "auth_secret" field.
+func (u *PluginUpsertBulk) SetAuthSecret(v string) *PluginUpsertBulk {
+	return u.Update(func(s *PluginUpsert) {
+		s.SetAuthSecret(v)
+	})
+}
+
+// UpdateAuthSecret sets the "auth_secret" field to the value that was provided on create.
+func (u *PluginUpsertBulk) UpdateAuthSecret() *PluginUpsertBulk {
+	return u.Update(func(s *PluginUpsert) {
+		s.UpdateAuthSecret()
 	})
 }
 

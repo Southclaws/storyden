@@ -1,0 +1,228 @@
+# This is a JSON-RPC 2.0 conformant RPC spec for Storyden plugin integrations.
+
+$schema: "http://json-schema.org/draft-07/schema#"
+
+title: Manifest
+type: object
+required:
+  - id
+  - name
+  - author
+  - description
+  - version
+  - command
+properties:
+  id:
+    type: string
+    example: "my-external-plugin"
+    description: >
+      The unique identifier of the plugin. Must match the pattern
+      `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.
+
+      (NOTE: May change in future.)
+
+  name:
+    type: string
+    example: "My Cool Plugin"
+    description: >
+      The name of the plugin. This is not a unique identifier and is only used
+      for display purposes within the Plugin Registry and Storyden installation.
+
+  author:
+    type: string
+    example: "you"
+    description: >
+      The author of the plugin. Must match the pattern
+      `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.
+
+      (NOTE: May change in future.)
+
+  description:
+    type: string
+    example: "Reacts with a 🔥 to every reply posted."
+    description: >
+      The description of the plugin. Displayed in Plugin Registries as well as
+      in UI of Storyden installations when installed.
+
+  version:
+    type: string
+    example: "1.0.0"
+    description: >
+      The version of the plugin. This
+      is not used for any versioning or compatibility purposes by the
+      runtime and is only used for display purposes currently.
+
+  command:
+    type: string
+    example: "./myplugin.exe"
+    description: >
+      The executable or script used to launch your plugin. If your plugin is a
+      binary (Go, Rust, C, etc) then this should be a path to that binary, it's
+      best to put it in the root of your plugin archive like `./myplugin.exe` or
+      `./myplugin`. If your plugin is a script (Python, Node, etc) then this
+      should be the interpreter's `$PATH` executable (e.g. `python` or `node`) 
+      and you should include the script in the `args` field.
+
+      Note that Storyden cannot guarantee that the runtime environment defined
+      by the person hosting Storyden will have any language's interpreter on
+      the `$PATH`. If you are running your own instance and building a custom
+      plugin, you should `FROM` the Storyden base image for your deployment so
+      that you know what runtimes are available.
+
+      If you are distributing a plugin for others to use, we highly recommend
+      that you use a statically compiled language such as Go, Rust or Zig for
+      your plugin so that it's guaranteed to be compatible with any runtime.
+
+  args:
+    type: array
+    example:
+      - "--enable-coolness"
+    description: Arguments passed to the "command" invocation.
+    items:
+      type: string
+
+  events_consumed:
+    type: array
+    example:
+      - "EventThreadReplyCreated"
+    description: >
+      The list of events the plugin subscribes to and will receive from the host
+      via RPC. Events allow your plugins to react to things that that humans or
+      robots do on Storyden.
+    items:
+      $ref: "common/events.yaml#/$defs/Event"
+
+  access:
+    $ref: "#/$defs/ManifestAccess"
+    example:
+      handle: example-plugin
+      name: Example Plugin
+      permissions:
+        - "CREATE_REACTION"
+    description: >
+      Optional API access configuration for this plugin. When provided, the
+      host can provision a bot account and access key for API calls via RPC.
+
+  configuration_schema:
+    $ref: "common/plugin-configuration.yaml"
+    example:
+      fields:
+        - id: webhook_url
+          label: Webhook URL
+          description: Where to send event notifications.
+          type: string
+
+$defs:
+  ManifestAccess:
+    type: object
+    example:
+      handle: example-plugin
+      name: Example Plugin
+      permissions:
+        - "CREATE_REACTION"
+    required:
+      - handle
+      - name
+      - permissions
+    properties:
+      handle:
+        type: string
+        example: example-plugin
+        description: >
+          The account handle to provision for this plugin's API identity.
+      name:
+        type: string
+        example: Example Plugin
+        description: >
+          The account display name to provision for this plugin's API identity.
+      bio:
+        type: string
+        example: This account is managed by a Storyden plugin.
+        description: Optional profile bio for the provisioned account.
+      links:
+        type: array
+        example:
+          - text: Website
+            url: https://example.com
+        description: Optional profile links for the provisioned account.
+        items:
+          $ref: "#/$defs/ManifestAccessExternalLink"
+      metadata:
+        type: object
+        example:
+          source: plugin
+        description: Optional profile metadata for the provisioned account.
+        additionalProperties: true
+      permissions:
+        type: array
+        example:
+          - "CREATE_REACTION"
+          - "CREATE_POST"
+        description: >
+          The list of permission names requested for API access.
+        items:
+          type: string
+
+  ManifestAccessExternalLink:
+    type: object
+    example:
+      text: Website
+      url: https://example.com
+    required:
+      - text
+      - url
+    properties:
+      text:
+        type: string
+        example: Website
+      url:
+        type: string
+        format: uri
+        example: https://example.com
+
+  # -
+  # Host-to-Plugin RPC methods
+  # -
+
+  HostToPluginRequest:
+    oneOf:
+      - $ref: "rpc/host-to-plugin/configure.yaml#/$defs/RPCRequestConfigure"
+      - $ref: "rpc/host-to-plugin/event.yaml#/$defs/RPCRequestEvent"
+      - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCRequestPing"
+
+  HostToPluginResponse:
+    type: object
+    allOf:
+      - $ref: "rpc/rpc.yaml#/$defs/JsonRpcResponse"
+      - required: [result]
+        properties:
+          result:
+            $ref: "#/$defs/HostToPluginResponseUnion"
+
+  HostToPluginResponseUnion:
+    oneOf:
+      - $ref: "rpc/host-to-plugin/configure.yaml#/$defs/RPCResponseConfigure"
+      - $ref: "rpc/host-to-plugin/event.yaml#/$defs/RPCResponseEvent"
+      - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCResponsePing"
+
+  # -
+  # Plugin-to-Host RPC methods
+  # -
+
+  PluginToHostRequest:
+    oneOf:
+      - $ref: "rpc/plugin-to-host/access_get.yaml#/$defs/RPCRequestAccessGet"
+      - $ref: "rpc/plugin-to-host/get_config.yaml#/$defs/RPCRequestGetConfig"
+
+  PluginToHostResponse:
+    allOf:
+      - $ref: "rpc/rpc.yaml#/$defs/JsonRpcResponse"
+      - required: [result]
+        properties:
+          result:
+            $ref: "#/$defs/PluginToHostResponseUnion"
+
+  PluginToHostResponseUnion:
+    oneOf:
+      - $ref: "rpc/plugin-to-host/access_get.yaml#/$defs/RPCResponseAccessGet"
+      - $ref: "rpc/plugin-to-host/get_config.yaml#/$defs/RPCResponseGetConfig"

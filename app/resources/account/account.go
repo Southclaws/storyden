@@ -22,6 +22,19 @@ type AccountID xid.ID
 
 func (u AccountID) String() string { return xid.ID(u).String() }
 
+func (u AccountID) MarshalJSON() ([]byte, error) {
+	return xid.ID(u).MarshalJSON()
+}
+
+func (u *AccountID) UnmarshalJSON(data []byte) error {
+	var id xid.ID
+	if err := id.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*u = AccountID(id)
+	return nil
+}
+
 type Account struct {
 	ID        AccountID
 	CreatedAt time.Time

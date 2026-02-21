@@ -6,11 +6,11 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
@@ -44,8 +44,8 @@ func (m *Manager) Set(ctx context.Context, s settings.Settings) (*settings.Setti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventSettingsUpdated{
-		Settings: updated,
+	m.bus.Publish(ctx, &rpc.EventSettingsUpdated{
+		Settings: rpc.SerialiseSettings(*updated),
 	})
 
 	return updated, nil

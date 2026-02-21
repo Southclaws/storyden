@@ -1,0 +1,23 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestEvent:
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "event"
+          params:
+            $ref: "../../common/events.yaml#/$defs/EventPayload"
+
+  RPCResponseEvent:
+    type: object
+    required: ["ok"]
+    properties:
+      method:
+        type: string
+        const: "event"
+      ok:
+        type: boolean

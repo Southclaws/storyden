@@ -9,13 +9,13 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/report"
 	"github.com/Southclaws/storyden/app/resources/report/report_querier"
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
@@ -107,9 +107,9 @@ func (m *Manager) Update(
 		targetRef = datagraph.NewRef(rep.TargetItem)
 	}
 
-	m.bus.Publish(ctx, &message.EventReportUpdated{
+	m.bus.Publish(ctx, &rpc.EventReportUpdated{
 		ID:     rep.ID,
-		Target: targetRef,
+		Target: opt.Map(opt.NewPtr(targetRef), rpc.DatagraphRefToRPC),
 		ReportedBy: opt.Map(rep.ReportedBy, func(a account.Account) account.AccountID {
 			return a.ID
 		}),

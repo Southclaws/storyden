@@ -14,7 +14,6 @@ type ActiveState struct {
 var (
 	ActiveStateActive   = ActiveState{activeStateActive}
 	ActiveStateInactive = ActiveState{activeStateInactive}
-	ActiveStateError    = ActiveState{activeStateError}
 )
 
 func (r ActiveState) Format(f fmt.State, verb rune) {
@@ -58,9 +57,132 @@ func NewActiveState(__iNpUt__ string) (ActiveState, error) {
 		return ActiveStateActive, nil
 	case string(activeStateInactive):
 		return ActiveStateInactive, nil
-	case string(activeStateError):
-		return ActiveStateError, nil
 	default:
 		return ActiveState{}, fmt.Errorf("invalid value for type 'ActiveState': '%s'", __iNpUt__)
+	}
+}
+
+type PluginMode struct {
+	v pluginModeEnum
+}
+
+var (
+	PluginModeSupervised = PluginMode{pluginModeSupervised}
+	PluginModeExternal   = PluginMode{pluginModeExternal}
+)
+
+func (r PluginMode) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r PluginMode) String() string {
+	return string(r.v)
+}
+func (r PluginMode) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *PluginMode) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewPluginMode(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r PluginMode) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *PluginMode) Scan(__iNpUt__ any) error {
+	s, err := NewPluginMode(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewPluginMode(__iNpUt__ string) (PluginMode, error) {
+	switch __iNpUt__ {
+	case string(pluginModeSupervised):
+		return PluginModeSupervised, nil
+	case string(pluginModeExternal):
+		return PluginModeExternal, nil
+	default:
+		return PluginMode{}, fmt.Errorf("invalid value for type 'PluginMode': '%s'", __iNpUt__)
+	}
+}
+
+type ReportedState struct {
+	v reportedStateEnum
+}
+
+var (
+	ReportedStateInactive   = ReportedState{reportedStateInactive}
+	ReportedStateStarting   = ReportedState{reportedStateStarting}
+	ReportedStateConnecting = ReportedState{reportedStateConnecting}
+	ReportedStateActive     = ReportedState{reportedStateActive}
+	ReportedStateStopping   = ReportedState{reportedStateStopping}
+	ReportedStateError      = ReportedState{reportedStateError}
+	ReportedStateRestarting = ReportedState{reportedStateRestarting}
+)
+
+func (r ReportedState) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r ReportedState) String() string {
+	return string(r.v)
+}
+func (r ReportedState) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *ReportedState) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewReportedState(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r ReportedState) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *ReportedState) Scan(__iNpUt__ any) error {
+	s, err := NewReportedState(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewReportedState(__iNpUt__ string) (ReportedState, error) {
+	switch __iNpUt__ {
+	case string(reportedStateInactive):
+		return ReportedStateInactive, nil
+	case string(reportedStateStarting):
+		return ReportedStateStarting, nil
+	case string(reportedStateConnecting):
+		return ReportedStateConnecting, nil
+	case string(reportedStateActive):
+		return ReportedStateActive, nil
+	case string(reportedStateStopping):
+		return ReportedStateStopping, nil
+	case string(reportedStateError):
+		return ReportedStateError, nil
+	case string(reportedStateRestarting):
+		return ReportedStateRestarting, nil
+	default:
+		return ReportedState{}, fmt.Errorf("invalid value for type 'ReportedState': '%s'", __iNpUt__)
 	}
 }

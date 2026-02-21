@@ -26,7 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -1319,7 +1319,7 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1332,7 +1332,7 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1348,7 +1348,7 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -3758,7 +3758,7 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -3771,7 +3771,7 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -3787,7 +3787,7 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Columns: []string{account.PluginsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(plugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

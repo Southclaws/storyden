@@ -4,7 +4,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"github.com/Southclaws/storyden/lib/plugin"
 	"github.com/rs/xid"
 )
 
@@ -18,9 +17,8 @@ func (Plugin) Mixin() []ent.Mixin {
 
 func (Plugin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("path").
-			Unique(),
-		field.JSON("manifest", plugin.Manifest{}),
+		field.Bool("supervised"),
+		field.JSON("manifest", map[string]any{}),
 		field.JSON("config", map[string]any{}),
 
 		field.String("active_state"),
@@ -30,6 +28,8 @@ func (Plugin) Fields() []ent.Field {
 			Nillable(),
 		field.JSON("status_details", map[string]any{}).
 			Optional(),
+
+		field.String("auth_secret"),
 
 		field.String("added_by").
 			GoType(xid.ID{}),

@@ -14,11 +14,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type SchemaWriter struct {
@@ -65,7 +65,7 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	w.bus.Publish(ctx, message.EventNodeUpdated{
+	w.bus.Publish(ctx, rpc.EventNodeUpdated{
 		ID:   library.NodeID(node.ID),
 		Slug: node.Slug,
 	})
@@ -89,7 +89,7 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		return &library.PropertySchema{}, nil
 	}
 
-	events := []message.EventNodeUpdated{
+	events := []rpc.EventNodeUpdated{
 		{
 			ID:   library.NodeID(parent.ID),
 			Slug: parent.Slug,
@@ -105,7 +105,7 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		events = append(events, message.EventNodeUpdated{
+		events = append(events, rpc.EventNodeUpdated{
 			ID:   library.NodeID(node.ID),
 			Slug: node.Slug,
 		})
@@ -142,7 +142,7 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	events := []message.EventNodeUpdated{
+	events := []rpc.EventNodeUpdated{
 		{
 			ID:   library.NodeID(current.ID),
 			Slug: current.Slug,
@@ -157,7 +157,7 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 		if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-		events = append(events, message.EventNodeUpdated{
+		events = append(events, rpc.EventNodeUpdated{
 			ID:   library.NodeID(node.ID),
 			Slug: node.Slug,
 		})

@@ -9,7 +9,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
@@ -17,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) (*reply.Reply, error) {
@@ -82,7 +82,7 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventThreadReplyUpdated{
+	s.bus.Publish(ctx, &rpc.EventThreadReplyUpdated{
 		ThreadID: p.RootPostID,
 		ReplyID:  p.ID,
 	})
@@ -90,12 +90,12 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 	// Emit visibility-specific events when visibility changes
 	if oldVisibility != p.Visibility {
 		if p.Visibility == visibility.VisibilityPublished {
-			s.bus.Publish(ctx, &message.EventThreadReplyPublished{
+			s.bus.Publish(ctx, &rpc.EventThreadReplyPublished{
 				ThreadID: p.RootPostID,
 				ReplyID:  p.ID,
 			})
 		} else if oldVisibility == visibility.VisibilityPublished {
-			s.bus.Publish(ctx, &message.EventThreadReplyUnpublished{
+			s.bus.Publish(ctx, &rpc.EventThreadReplyUnpublished{
 				ThreadID: p.RootPostID,
 				ReplyID:  p.ID,
 			})

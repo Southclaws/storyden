@@ -1,0 +1,72 @@
+---
+title: Extending Storyden
+description: Add custom behaviour to your Storyden site with plugins.
+---
+
+Storyden plugins let you add custom behaviour to your community site without editing Storyden itself.
+
+If you want Storyden to better match how your community works, this is where that starts.
+
+## What is a Plugin?
+
+Plugins in Storyden are just regular programs. Any program can be a plugin if it speaks Storyden RPC. There are two modalities of a plugin:
+
+- Supervised
+- External
+
+You can learn more about the architecture of plugins in the [Plugin Model](/docs/extending/model) section.
+
+### Supervised plugins
+
+Supervised plugins are much like browser extensions. You give Storyden a .zip file containing the plugin code and some metadata, Storyden unpacks this and runs the program. It then supervises the process, recording logs and restarting it if it crashes. Supervised plugins can be written in any language, but must run on the same machine as Storyden.
+
+This comes with some security concerns you should be aware of. Much like plugins in other forum software, supervised plugins do not have any sandboxing and can access anything Storyden can access.
+
+Read [Security -> Runtime boundaries](/docs/extending/security#runtime-boundaries) before installing third-party plugins.
+
+### External plugins
+
+External plugins run elsewhere, not supervised by Storyden itself. These plugins have two primary use cases:
+
+- Development: when you're developing a plugin, you will run it as an external plugin to make the edit-run-debug cycle faster.
+- Advanced and custom use-cases: if your plugin needs its own software development life cycle and deployment process, external plugins are effectively just normal software that you are responsible for managing.
+
+External plugins can also just be other apps, you can import the Storyden SDK libraries or generate your own and embed into your app so it can communicate and behave as if it were a plugin.
+
+However, Storyden will not handle log collection or restarting of external plugins. That's up to you.
+
+For token handling and connection semantics, see [Security -> RPC authentication model](/docs/extending/security#rpc-authentication-model).
+
+## Manifest
+
+Every plugin, supervised or external, has a manifest. If you distribute a plugin on the web, whether it's intended to be supervised or external, it must have a manifest describing its capabilities and requests. See [Manifest](/docs/extending/manifest) for more information.
+
+## In this section
+
+<Cards>
+
+<Card href="/docs/extending/model" title="Plugin Model">
+  How plugins fit into Storyden, what modes exist, and how sessions behave.
+</Card>
+
+<Card href="/docs/extending/manifest" title="Manifest File">
+  How to describe a plugin, what it needs and how to look after it.
+</Card>
+
+<Card href="/docs/extending/capabilities" title="Capabilities and Limits">
+  What plugins can do today, and what they cannot do.
+</Card>
+
+<Card href="/docs/extending/security" title="Security">
+  Auth model, token handling, runtime boundaries, and operational safety notes.
+</Card>
+
+<Card href="/docs/extending/api-overview" title="API Overview">
+  How the Storyden RPC communication channel works.
+</Card>
+
+<Card href="/docs/extending/rpc" title="RPC Reference">
+  Generated reference pages for every plugin RPC method, grouped by direction.
+</Card>
+
+</Cards>

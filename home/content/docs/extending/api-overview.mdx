@@ -1,0 +1,63 @@
+---
+title: API Overview
+description: How plugin HTTP endpoints and RPC methods work together.
+---
+
+Storyden plugin integration has two API surfaces:
+
+- HTTP API for installation, lifecycle, metadata, configuration and management
+- JSON-RPC over WebSocket for host-plugin runtime communication
+
+If you're looking for the shape of plugin metadata first, read [Manifest](/docs/extending/manifest).
+
+## HTTP API responsibilities
+
+The HTTP API handles instance-side management and can not be interacted with via an [Access Key](/docs/reference/access-keys), only via a web based session:
+
+- Add/list/get/delete plugin installations
+- Enable and disable (for supervised plugins)
+- Regenerate token (for external plugins)
+- Manifest updates (for external plugins)
+- Configuration schema and values
+- Supervised plugin logs
+
+For endpoint-level details, check out the [API documentation](/docs/api/plugins/PluginList).
+
+## RPC responsibilities
+
+RPC handles runtime messaging after authentication:
+
+- Host to plugin: events, configuration updates, health checks
+- Plugin to host: config fetch, access key fetch
+
+RPC method docs are generated from schema and live under [RPC Reference](/docs/extending/rpc).
+
+Related pages:
+
+- [Host to Plugin methods](/docs/extending/rpc/host-to-plugin)
+- [Plugin to Host methods](/docs/extending/rpc/plugin-to-host)
+
+## How the two layers fit
+
+The common flow looks like this:
+
+1. Install plugin via HTTP API
+2. Plugin connects over RPC using authenticated URL
+3. Runtime data moves over RPC
+4. Plugins can talk to the HTTP API to do stuff if they get an access key
+
+Connection model and token behaviour are covered in [Security -> RPC authentication model](/docs/extending/security#rpc-authentication-model).
+
+Plugins with API access can be powerful, this allows plugins to do things like:
+
+- Create threads and replies
+- Manage Library pages
+- Moderate content and manage reports
+- React to content events automatically
+
+## Contract source of truth
+
+- Plugin manifest schema: [`/api/plugin.yaml`](https://github.com/Southclaws/storyden/blob/main/api/plugin.yaml)
+- RPC method schemas: [`/api/rpc`](https://github.com/Southclaws/storyden/tree/main/api/rpc)
+
+The RPC docs in this section are generated directly from those schema files to reduce drift.

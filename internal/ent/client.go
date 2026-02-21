@@ -35,7 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -597,7 +597,7 @@ func (c *AccountClient) QueryPlugins(_m *Account) *PluginQuery {
 		id := _m.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, id),
-			sqlgraph.To(entplugin.Table, entplugin.FieldID),
+			sqlgraph.To(plugin.Table, plugin.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PluginsTable, account.PluginsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
@@ -4282,13 +4282,13 @@ func NewPluginClient(c config) *PluginClient {
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `entplugin.Hooks(f(g(h())))`.
+// A call to `Use(f, g, h)` equals to `plugin.Hooks(f(g(h())))`.
 func (c *PluginClient) Use(hooks ...Hook) {
 	c.hooks.Plugin = append(c.hooks.Plugin, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `entplugin.Intercept(f(g(h())))`.
+// A call to `Intercept(f, g, h)` equals to `plugin.Intercept(f(g(h())))`.
 func (c *PluginClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Plugin = append(c.inters.Plugin, interceptors...)
 }
@@ -4350,7 +4350,7 @@ func (c *PluginClient) DeleteOne(_m *Plugin) *PluginDeleteOne {
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
 func (c *PluginClient) DeleteOneID(id xid.ID) *PluginDeleteOne {
-	builder := c.Delete().Where(entplugin.ID(id))
+	builder := c.Delete().Where(plugin.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
 	return &PluginDeleteOne{builder}
@@ -4367,7 +4367,7 @@ func (c *PluginClient) Query() *PluginQuery {
 
 // Get returns a Plugin entity by its id.
 func (c *PluginClient) Get(ctx context.Context, id xid.ID) (*Plugin, error) {
-	return c.Query().Where(entplugin.ID(id)).Only(ctx)
+	return c.Query().Where(plugin.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
@@ -4385,9 +4385,9 @@ func (c *PluginClient) QueryAccount(_m *Plugin) *AccountQuery {
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := _m.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(entplugin.Table, entplugin.FieldID, id),
+			sqlgraph.From(plugin.Table, plugin.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, entplugin.AccountTable, entplugin.AccountColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, plugin.AccountTable, plugin.AccountColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil

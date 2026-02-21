@@ -11,8 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
-	"github.com/Southclaws/storyden/lib/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/rs/xid"
 )
 
@@ -25,10 +24,10 @@ type Plugin struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Path holds the value of the "path" field.
-	Path string `json:"path,omitempty"`
+	// Supervised holds the value of the "supervised" field.
+	Supervised bool `json:"supervised,omitempty"`
 	// Manifest holds the value of the "manifest" field.
-	Manifest plugin.Manifest `json:"manifest,omitempty"`
+	Manifest map[string]interface{} `json:"manifest,omitempty"`
 	// Config holds the value of the "config" field.
 	Config map[string]interface{} `json:"config,omitempty"`
 	// ActiveState holds the value of the "active_state" field.
@@ -39,6 +38,8 @@ type Plugin struct {
 	StatusMessage *string `json:"status_message,omitempty"`
 	// StatusDetails holds the value of the "status_details" field.
 	StatusDetails map[string]interface{} `json:"status_details,omitempty"`
+	// AuthSecret holds the value of the "auth_secret" field.
+	AuthSecret string `json:"auth_secret,omitempty"`
 	// AddedBy holds the value of the "added_by" field.
 	AddedBy xid.ID `json:"added_by,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -72,13 +73,15 @@ func (*Plugin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case entplugin.FieldManifest, entplugin.FieldConfig, entplugin.FieldStatusDetails:
+		case plugin.FieldManifest, plugin.FieldConfig, plugin.FieldStatusDetails:
 			values[i] = new([]byte)
-		case entplugin.FieldPath, entplugin.FieldActiveState, entplugin.FieldStatusMessage:
+		case plugin.FieldSupervised:
+			values[i] = new(sql.NullBool)
+		case plugin.FieldActiveState, plugin.FieldStatusMessage, plugin.FieldAuthSecret:
 			values[i] = new(sql.NullString)
-		case entplugin.FieldCreatedAt, entplugin.FieldUpdatedAt, entplugin.FieldActiveStateChangedAt:
+		case plugin.FieldCreatedAt, plugin.FieldUpdatedAt, plugin.FieldActiveStateChangedAt:
 			values[i] = new(sql.NullTime)
-		case entplugin.FieldID, entplugin.FieldAddedBy:
+		case plugin.FieldID, plugin.FieldAddedBy:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -95,31 +98,31 @@ func (_m *Plugin) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
-		case entplugin.FieldID:
+		case plugin.FieldID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
 				_m.ID = *value
 			}
-		case entplugin.FieldCreatedAt:
+		case plugin.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
 			}
-		case entplugin.FieldUpdatedAt:
+		case plugin.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case entplugin.FieldPath:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field path", values[i])
+		case plugin.FieldSupervised:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field supervised", values[i])
 			} else if value.Valid {
-				_m.Path = value.String
+				_m.Supervised = value.Bool
 			}
-		case entplugin.FieldManifest:
+		case plugin.FieldManifest:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field manifest", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -127,7 +130,7 @@ func (_m *Plugin) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field manifest: %w", err)
 				}
 			}
-		case entplugin.FieldConfig:
+		case plugin.FieldConfig:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field config", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -135,26 +138,26 @@ func (_m *Plugin) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field config: %w", err)
 				}
 			}
-		case entplugin.FieldActiveState:
+		case plugin.FieldActiveState:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field active_state", values[i])
 			} else if value.Valid {
 				_m.ActiveState = value.String
 			}
-		case entplugin.FieldActiveStateChangedAt:
+		case plugin.FieldActiveStateChangedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field active_state_changed_at", values[i])
 			} else if value.Valid {
 				_m.ActiveStateChangedAt = value.Time
 			}
-		case entplugin.FieldStatusMessage:
+		case plugin.FieldStatusMessage:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field status_message", values[i])
 			} else if value.Valid {
 				_m.StatusMessage = new(string)
 				*_m.StatusMessage = value.String
 			}
-		case entplugin.FieldStatusDetails:
+		case plugin.FieldStatusDetails:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field status_details", values[i])
 			} else if value != nil && len(*value) > 0 {
@@ -162,7 +165,13 @@ func (_m *Plugin) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field status_details: %w", err)
 				}
 			}
-		case entplugin.FieldAddedBy:
+		case plugin.FieldAuthSecret:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field auth_secret", values[i])
+			} else if value.Valid {
+				_m.AuthSecret = value.String
+			}
+		case plugin.FieldAddedBy:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field added_by", values[i])
 			} else if value != nil {
@@ -215,8 +224,8 @@ func (_m *Plugin) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("path=")
-	builder.WriteString(_m.Path)
+	builder.WriteString("supervised=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Supervised))
 	builder.WriteString(", ")
 	builder.WriteString("manifest=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Manifest))
@@ -237,6 +246,9 @@ func (_m *Plugin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("status_details=")
 	builder.WriteString(fmt.Sprintf("%v", _m.StatusDetails))
+	builder.WriteString(", ")
+	builder.WriteString("auth_secret=")
+	builder.WriteString(_m.AuthSecret)
 	builder.WriteString(", ")
 	builder.WriteString("added_by=")
 	builder.WriteString(fmt.Sprintf("%v", _m.AddedBy))

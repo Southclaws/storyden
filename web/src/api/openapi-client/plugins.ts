@@ -19,9 +19,15 @@ import type {
   NoContentResponse,
   NotFoundResponse,
   PluginAddBody,
+  PluginCycleTokenOKResponse,
+  PluginGetConfigurationOKResponse,
+  PluginGetConfigurationSchemaOKResponse,
+  PluginGetLogsOKResponse,
   PluginGetOKResponse,
   PluginListOKResponse,
   PluginSetActiveStateBody,
+  PluginUpdateConfigurationBody,
+  PluginUpdateManifestBody,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -74,7 +80,7 @@ export const pluginAdd = (pluginAddBody: PluginAddBody) => {
   return fetcher<PluginGetOKResponse>({
     url: `/plugins`,
     method: "POST",
-    headers: { "Content-Type": "application/octet-stream" },
+    headers: { "Content-Type": "application/zip" },
     data: pluginAddBody,
   });
 };
@@ -295,6 +301,393 @@ export const usePluginSetActiveState = <
   const swrKey =
     swrOptions?.swrKey ?? getPluginSetActiveStateMutationKey(pluginInstanceId);
   const swrFn = getPluginSetActiveStateMutationFetcher(pluginInstanceId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Stream the logs for the specified plugin. If the plugin is running, this
+endpoint will stream live logs after the existing logs have been sent.
+
+ */
+export const pluginGetLogs = (pluginInstanceId: string) => {
+  return fetcher<PluginGetLogsOKResponse>({
+    url: `/plugins/${pluginInstanceId}/logs`,
+    method: "GET",
+  });
+};
+
+export const getPluginGetLogsKey = (pluginInstanceId: string) =>
+  [`/plugins/${pluginInstanceId}/logs`] as const;
+
+export type PluginGetLogsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof pluginGetLogs>>
+>;
+export type PluginGetLogsQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginGetLogs = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof pluginGetLogs>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!pluginInstanceId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getPluginGetLogsKey(pluginInstanceId) : null));
+  const swrFn = () => pluginGetLogs(pluginInstanceId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Cycles the static bearer token for an external plugin and returns the
+newly generated token. This operation is only valid for external
+plugins. Supervised plugins cycle their connection token automatically.
+
+ */
+export const pluginCycleToken = (pluginInstanceId: string) => {
+  return fetcher<PluginCycleTokenOKResponse>({
+    url: `/plugins/${pluginInstanceId}/token`,
+    method: "POST",
+  });
+};
+
+export const getPluginCycleTokenMutationFetcher = (
+  pluginInstanceId: string,
+) => {
+  return (
+    _: Key,
+    __: { arg: Arguments },
+  ): Promise<PluginCycleTokenOKResponse> => {
+    return pluginCycleToken(pluginInstanceId);
+  };
+};
+export const getPluginCycleTokenMutationKey = (pluginInstanceId: string) =>
+  [`/plugins/${pluginInstanceId}/token`] as const;
+
+export type PluginCycleTokenMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pluginCycleToken>>
+>;
+export type PluginCycleTokenMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginCycleToken = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof pluginCycleToken>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof pluginCycleToken>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getPluginCycleTokenMutationKey(pluginInstanceId);
+  const swrFn = getPluginCycleTokenMutationFetcher(pluginInstanceId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the manifest for a plugin. This is used for development of plugins
+where the manifest may change frequently and it's useful to be able to
+update it without re-uploading the entire plugin bundle.
+
+This only works for External plugins that were created by uploading a 
+manifest directly. It does not work for Supervised plugins.
+
+ */
+export const pluginUpdateManifest = (
+  pluginInstanceId: string,
+  pluginUpdateManifestBody: PluginUpdateManifestBody,
+) => {
+  return fetcher<PluginGetOKResponse>({
+    url: `/plugins/${pluginInstanceId}/manifest`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: pluginUpdateManifestBody,
+  });
+};
+
+export const getPluginUpdateManifestMutationFetcher = (
+  pluginInstanceId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: PluginUpdateManifestBody },
+  ): Promise<PluginGetOKResponse> => {
+    return pluginUpdateManifest(pluginInstanceId, arg);
+  };
+};
+export const getPluginUpdateManifestMutationKey = (pluginInstanceId: string) =>
+  [`/plugins/${pluginInstanceId}/manifest`] as const;
+
+export type PluginUpdateManifestMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pluginUpdateManifest>>
+>;
+export type PluginUpdateManifestMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginUpdateManifest = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof pluginUpdateManifest>>,
+      TError,
+      Key,
+      PluginUpdateManifestBody,
+      Awaited<ReturnType<typeof pluginUpdateManifest>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getPluginUpdateManifestMutationKey(pluginInstanceId);
+  const swrFn = getPluginUpdateManifestMutationFetcher(pluginInstanceId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Returns the configuration schema for a plugin as defined in its manifest
+file. The schema should be used to render a configuration form for the
+plugin in the client so that administrators can configure the plugin.
+
+ */
+export const pluginGetConfigurationSchema = (pluginInstanceId: string) => {
+  return fetcher<PluginGetConfigurationSchemaOKResponse>({
+    url: `/plugins/${pluginInstanceId}/configuration-schema`,
+    method: "GET",
+  });
+};
+
+export const getPluginGetConfigurationSchemaKey = (pluginInstanceId: string) =>
+  [`/plugins/${pluginInstanceId}/configuration-schema`] as const;
+
+export type PluginGetConfigurationSchemaQueryResult = NonNullable<
+  Awaited<ReturnType<typeof pluginGetConfigurationSchema>>
+>;
+export type PluginGetConfigurationSchemaQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginGetConfigurationSchema = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof pluginGetConfigurationSchema>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!pluginInstanceId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getPluginGetConfigurationSchemaKey(pluginInstanceId) : null);
+  const swrFn = () => pluginGetConfigurationSchema(pluginInstanceId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get the current configuration values for a plugin. The shape of the
+object is defined by the plugin's manifest and should be used to render
+the current configuration state in the client, using the layout driven
+by the result of `PluginGetConfigurationSchema` to build a form-like UI.
+
+ */
+export const pluginGetConfiguration = (pluginInstanceId: string) => {
+  return fetcher<PluginGetConfigurationOKResponse>({
+    url: `/plugins/${pluginInstanceId}/configuration`,
+    method: "GET",
+  });
+};
+
+export const getPluginGetConfigurationKey = (pluginInstanceId: string) =>
+  [`/plugins/${pluginInstanceId}/configuration`] as const;
+
+export type PluginGetConfigurationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof pluginGetConfiguration>>
+>;
+export type PluginGetConfigurationQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginGetConfiguration = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof pluginGetConfiguration>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!pluginInstanceId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getPluginGetConfigurationKey(pluginInstanceId) : null));
+  const swrFn = () => pluginGetConfiguration(pluginInstanceId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the configuration for a plugin. Each plugin defines its own set
+of configuration parameters in its manifest and this endpoint accepts
+any object validated against that schema. When a valid configuration is
+received, it is sent to the plugin via RPC and the plugin is expected to
+apply the new configuration to itself internally.
+
+ */
+export const pluginUpdateConfiguration = (
+  pluginInstanceId: string,
+  pluginUpdateConfigurationBody: PluginUpdateConfigurationBody,
+) => {
+  return fetcher<PluginGetConfigurationOKResponse>({
+    url: `/plugins/${pluginInstanceId}/configuration`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: pluginUpdateConfigurationBody,
+  });
+};
+
+export const getPluginUpdateConfigurationMutationFetcher = (
+  pluginInstanceId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: PluginUpdateConfigurationBody },
+  ): Promise<PluginGetConfigurationOKResponse> => {
+    return pluginUpdateConfiguration(pluginInstanceId, arg);
+  };
+};
+export const getPluginUpdateConfigurationMutationKey = (
+  pluginInstanceId: string,
+) => [`/plugins/${pluginInstanceId}/configuration`] as const;
+
+export type PluginUpdateConfigurationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof pluginUpdateConfiguration>>
+>;
+export type PluginUpdateConfigurationMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePluginUpdateConfiguration = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  pluginInstanceId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof pluginUpdateConfiguration>>,
+      TError,
+      Key,
+      PluginUpdateConfigurationBody,
+      Awaited<ReturnType<typeof pluginUpdateConfiguration>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getPluginUpdateConfigurationMutationKey(pluginInstanceId);
+  const swrFn = getPluginUpdateConfigurationMutationFetcher(pluginInstanceId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

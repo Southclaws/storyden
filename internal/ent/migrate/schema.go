@@ -689,13 +689,14 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "path", Type: field.TypeString, Unique: true},
+		{Name: "supervised", Type: field.TypeBool},
 		{Name: "manifest", Type: field.TypeJSON},
 		{Name: "config", Type: field.TypeJSON},
 		{Name: "active_state", Type: field.TypeString},
 		{Name: "active_state_changed_at", Type: field.TypeTime},
 		{Name: "status_message", Type: field.TypeString, Nullable: true},
 		{Name: "status_details", Type: field.TypeJSON, Nullable: true},
+		{Name: "auth_secret", Type: field.TypeString},
 		{Name: "added_by", Type: field.TypeString, Size: 20},
 	}
 	// PluginsTable holds the schema information for the "plugins" table.
@@ -706,7 +707,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "plugins_accounts_plugins",
-				Columns:    []*schema.Column{PluginsColumns[10]},
+				Columns:    []*schema.Column{PluginsColumns[11]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Restrict,
 			},

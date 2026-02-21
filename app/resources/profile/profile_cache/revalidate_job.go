@@ -5,8 +5,8 @@ import (
 
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
@@ -14,7 +14,7 @@ func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
 		return nil
 	}
 
-	if _, err := pubsub.Subscribe(ctx, bus, "profile_cache.touch_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
+	if _, err := pubsub.Subscribe(ctx, bus, "profile_cache.touch_updated", func(ctx context.Context, evt *rpc.EventAccountUpdated) error {
 		return c.Invalidate(ctx, xid.ID(evt.ID))
 	}); err != nil {
 		return err

@@ -11,13 +11,13 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	"github.com/Southclaws/storyden/tests"
 )
 
@@ -146,8 +146,8 @@ func updateModerationSettings(
 	})
 	require.NoError(t, err, "should be able to update settings")
 
-	bus.Publish(ctx, &message.EventSettingsUpdated{
-		Settings: updatedSettings,
+	bus.Publish(ctx, &rpc.EventSettingsUpdated{
+		Settings: rpc.SerialiseSettings(*updatedSettings),
 	})
 
 	time.Sleep(100 * time.Millisecond)

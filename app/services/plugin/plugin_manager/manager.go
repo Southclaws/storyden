@@ -3,6 +3,7 @@ package plugin_manager
 import (
 	"context"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/samber/lo"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
@@ -20,25 +22,39 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
-	lib_plugin "github.com/Southclaws/storyden/lib/plugin"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
 	pluginWriter  *plugin_writer.Writer
 	pluginQuerier *plugin_reader.Reader
-	runner        plugin_runner.Runner
+	runner        plugin_runner.Host
+	bus           *pubsub.Bus
+	logger        *slog.Logger
 }
 
 func New(
+	lc fx.Lifecycle,
 	pluginWriter *plugin_writer.Writer,
 	pluginQuerier *plugin_reader.Reader,
-	runner plugin_runner.Runner,
+	runner plugin_runner.Host,
+	bus *pubsub.Bus,
+	logger *slog.Logger,
 ) *Manager {
-	return &Manager{
+	m := &Manager{
 		pluginWriter:  pluginWriter,
 		pluginQuerier: pluginQuerier,
 		runner:        runner,
+		bus:           bus,
+		logger:        logger,
 	}
+
+	lc.Append(fx.Hook{
+		OnStart: m.onStart,
+	})
+
+	return m
 }
 
 func (m *Manager) AddFromFile(ctx context.Context, r io.Reader) (*plugin.Available, error) {
@@ -78,21 +94,44 @@ func (m *Manager) AddFromURL(ctx context.Context, u url.URL) (*plugin.Available,
 	return m.addFromBuffer(ctx, b)
 }
 
+func (m *Manager) AddExternal(ctx context.Context, manifest rpc.Manifest) (*plugin.Record, string, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := session.GetAccount(ctx)
+	if err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rec, token, err := m.pluginWriter.AddExternal(ctx, acc.ID, manifest)
+	if err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := m.runner.Load(ctx, *rec); err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	sess, err := m.runner.GetSession(ctx, rec.InstallationID)
+	if err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := sess.SetActiveState(ctx, plugin.ActiveStateActive); err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return rec, token, nil
+}
+
 func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Available, error) {
 	acc, err := session.GetAccount(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Validating here is probably not necessary any more, Load can return
-	// the session + manifest and perform validation.
-	pl, err := plugin.Binary(b).Validate(ctx, func(b []byte) (*lib_plugin.Manifest, error) {
-		mb, err := m.runner.Validate(ctx, b)
-		if err != nil {
-			return nil, err
-		}
-		return mb, nil
-	})
+	pl, err := plugin.Binary(b).Validate(ctx)
 	if err != nil {
 		details := getValidationDetails(err)
 
@@ -101,11 +140,6 @@ func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Availabl
 			ftag.With(ftag.InvalidArgument),
 			fmsg.WithDesc("invalid", "The provided plugin file is invalid: "+details),
 		)
-	}
-
-	_, err = m.runner.Load(ctx, pl.Binary)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	pa, err := m.pluginWriter.Add(ctx, acc.ID, pl)
@@ -119,7 +153,7 @@ func (m *Manager) addFromBuffer(ctx context.Context, b []byte) (*plugin.Availabl
 	return pa, nil
 }
 
-func (m *Manager) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error) {
+func (m *Manager) Get(ctx context.Context, id plugin.InstallationID) (*plugin.Record, error) {
 	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -129,17 +163,23 @@ func (m *Manager) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	sess, err := m.runner.GetSession(ctx, record.Manifest.ID)
+	sess, err := m.runner.GetSession(ctx, record.InstallationID)
 	if err != nil {
-		// TODO: Better distinguish between error paths.
-		// particularly around the state on the record (desired?) and runtime.
-		record.State = plugin.ActiveStateError
-		record.StatusMessage = "Plugin is not running"
+		record.StatusMessage = "Session not found"
+		record.State = plugin.ActiveStateInactive
 	} else {
-		hydrateSession(record, *sess)
+		hydrateSession(record, sess)
 	}
 
 	return record, nil
+}
+
+func (m *Manager) GetSession(ctx context.Context, id plugin.InstallationID) (plugin_runner.Session, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return m.runner.GetSession(ctx, id)
 }
 
 func (m *Manager) List(ctx context.Context) ([]*plugin.Record, error) {
@@ -156,28 +196,30 @@ func (m *Manager) List(ctx context.Context) ([]*plugin.Record, error) {
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	sessionMap := lo.KeyBy(sessions, func(s *plugin_runner.PluginSession) lib_plugin.ID {
+	sessionMap := lo.KeyBy(sessions, func(s plugin_runner.Session) plugin.InstallationID {
 		return s.ID()
 	})
 
 	// match up sessions to records
 	for _, record := range records {
-		if sess, ok := sessionMap[record.Manifest.ID]; ok {
-			hydrateSession(record, *sess)
+		if sess, ok := sessionMap[record.InstallationID]; ok {
+			hydrateSession(record, sess)
 		} else {
-			// TODO: If desired state is running, but session not here, mark as error?
-			record.StatusMessage = "Plugin is not running"
+			record.StatusMessage = "Session not found"
+			record.State = plugin.ActiveStateInactive
 		}
 	}
 
 	return records, nil
 }
 
-func hydrateSession(record *plugin.Record, sess plugin_runner.PluginSession) {
+func hydrateSession(record *plugin.Record, sess plugin_runner.Session) {
+	record.ReportedState = sess.GetReportedState()
 	record.StartedAt = sess.GetStartedAt().OrZero()
+	record.StatusMessage = sess.GetErrorMessage()
 }
 
-func (m *Manager) Delete(ctx context.Context, id plugin.ID) error {
+func (m *Manager) Delete(ctx context.Context, id plugin.InstallationID) error {
 	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -187,12 +229,44 @@ func (m *Manager) Delete(ctx context.Context, id plugin.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err = m.runner.Unload(ctx, rec.Manifest.ID); err != nil {
+	if err = m.runner.Unload(ctx, rec.InstallationID); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if err := m.pluginWriter.Remove(ctx, id); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (m *Manager) onStart(ctx context.Context) error {
+	plugins, err := m.pluginQuerier.List(ctx)
+	if err != nil {
+		m.logger.Error("failed to list plugins on startup", slog.Any("error", err))
+		return nil
+	}
+
+	for _, rec := range plugins {
+		if rec.State != plugin.ActiveStateActive {
+			continue
+		}
+
+		m.logger.Info("starting active plugin",
+			slog.String("plugin_id", rec.InstallationID.String()),
+			slog.String("plugin_name", rec.Manifest.Name))
+
+		if err := m.activatePlugin(ctx, rec); err != nil {
+			m.logger.Warn("failed to start plugin on startup",
+				slog.String("plugin_id", rec.InstallationID.String()),
+				slog.String("plugin_name", rec.Manifest.Name),
+				slog.Any("error", err))
+			continue
+		}
+
+		m.logger.Info("successfully started plugin",
+			slog.String("plugin_id", rec.InstallationID.String()),
+			slog.String("plugin_name", rec.Manifest.Name))
 	}
 
 	return nil

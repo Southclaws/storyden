@@ -1,0 +1,36 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestConfigure:
+    description: >
+      Request sent by the host to the plugin to provide configuration settings.
+      The params object can contain any key-value pairs defined by the plugin in
+      its manifest "configuration_schema" field and the plugin should validate
+      and apply these settings to its internal state.
+
+      If configuration changes require a plugin to restart, the plugin should
+      cleanly shut down with a zero exit code so that the Host can restart if it
+      is a Supervised plugin. If it's an external plugin, the plugin itself is
+      responsible for this behavior based on the plugin's lifecycle design.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "configure"
+          params:
+            type: object
+            additionalProperties: true
+
+  RPCResponseConfigure:
+    description: >
+      Confirm that the configuration was received and applied correctly.
+    type: object
+    required: ["ok"]
+    properties:
+      method:
+        type: string
+        const: "configure"
+      ok:
+        type: boolean

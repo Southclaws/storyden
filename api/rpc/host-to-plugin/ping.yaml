@@ -1,0 +1,30 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestPing:
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method"]
+        properties:
+          method:
+            type: string
+            const: "ping"
+          params:
+            type: object
+            properties: {}
+
+  RPCResponsePing:
+    type: object
+    required: ["pong"]
+    properties:
+      method:
+        type: string
+        const: "ping"
+      pong:
+        type: boolean
+      uptime_seconds:
+        type: number
+        description: "How long the plugin has been running"
+      status:
+        type: string
+        description: "Optional status message"

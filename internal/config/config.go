@@ -367,6 +367,47 @@ type Config struct {
 	QueueRetryMaxInterval time.Duration `default:"1m" envconfig:"QUEUE_RETRY_MAX_INTERVAL"`
 
 	// -
+	// Plugins
+	// -
+
+	/*
+	   The directory where plugin files will be extracted and stored. Each plugin gets its own subdirectory keyed by the plugin installation ID.
+
+	   This directory should be persistent and writable by the Storyden process.
+	*/
+	PluginDataPath string `default:"./data/plugins" envconfig:"PLUGIN_DATA_PATH"`
+	/*
+	   The plugin runtime provider. Different runtime providers offer different security guarantees. The simplest is `local` which just runs the plugin as a child process on the same machine as Storyden.
+
+	   - `local`: runs supervised plugins as local child processes on the same machine as Storyden.
+	*/
+	PluginRuntimeProvider string `default:"local" envconfig:"PLUGIN_RUNTIME_PROVIDER"`
+	/*
+	   Maximum number of consecutive restart attempts for a supervised plugin before marking it as errored.
+
+	   When a plugin crashes during startup (before the runtime crash threshold), the restart counter increments. After exceeding this limit, the plugin transitions to an error state and stops attempting restarts.
+	*/
+	PluginMaxRestartAttempts int `default:"3" envconfig:"PLUGIN_MAX_RESTART_ATTEMPTS"`
+	/*
+	   Maximum backoff duration between plugin restart attempts.
+
+	   Restart delays use exponential backoff (1s, 2s, 4s, 8s, ...) capped at this maximum value.
+	*/
+	PluginMaxBackoffDuration time.Duration `default:"60s" envconfig:"PLUGIN_MAX_BACKOFF_DURATION"`
+	/*
+	   Time threshold to distinguish between startup crashes and runtime crashes.
+
+	   If a plugin runs successfully for longer than this duration before crashing, it's considered a "runtime crash" and the restart counter is reset. This allows plugins that crash after running for a while (hours/days) to restart without being penalized by the startup crash limit.
+	*/
+	PluginRuntimeCrashThreshold time.Duration `default:"30s" envconfig:"PLUGIN_RUNTIME_CRASH_THRESHOLD"`
+	/*
+	   Backoff duration used specifically for runtime crashes (crashes that occur after the plugin has been running for longer than the runtime crash threshold).
+
+	   This is typically shorter than the exponential backoff used for startup crashes, as runtime crashes are less likely to be configuration issues.
+	*/
+	PluginRuntimeCrashBackoff time.Duration `default:"5s" envconfig:"PLUGIN_RUNTIME_CRASH_BACKOFF"`
+
+	// -
 	// Artificial intelligence/language models
 	// -
 

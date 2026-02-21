@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -20,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *service) Create(ctx context.Context,
@@ -90,7 +90,7 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	if thr.Visibility == visibility.VisibilityPublished {
-		s.bus.Publish(ctx, &message.EventThreadPublished{
+		s.bus.Publish(ctx, &rpc.EventThreadPublished{
 			ID: thr.ID,
 		})
 	}

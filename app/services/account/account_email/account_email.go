@@ -10,11 +10,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/otp"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
@@ -44,7 +44,7 @@ func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventAccountUpdated{
+	m.bus.Publish(ctx, &rpc.EventAccountUpdated{
 		ID: accountID,
 	})
 
@@ -62,7 +62,7 @@ func (m *Manager) Remove(ctx context.Context, accountID account.AccountID, id xi
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventAccountUpdated{
+	m.bus.Publish(ctx, &rpc.EventAccountUpdated{
 		ID: accountID,
 	})
 

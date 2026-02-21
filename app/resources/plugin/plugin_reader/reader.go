@@ -2,6 +2,7 @@ package plugin_reader
 
 import (
 	"context"
+	"io"
 	"path/filepath"
 
 	"github.com/Southclaws/dt"
@@ -12,26 +13,35 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/plugin"
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_plugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
 
 type Reader struct {
-	db    *ent.Client
-	store object.Storer
+	db             *ent.Client
+	store          object.Storer
+	pluginDataPath string
 }
 
 func New(
+	cfg config.Config,
 	db *ent.Client,
 	store object.Storer,
 ) *Reader {
 	return &Reader{
-		db:    db,
-		store: store,
+		db:             db,
+		store:          store,
+		pluginDataPath: cfg.PluginDataPath,
 	}
 }
 
-func (r *Reader) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error) {
+func (r *Reader) FilePath(id plugin.InstallationID) string {
+	return filepath.Join(plugin.PluginDirectory, id.String()+".zip")
+}
+
+func (r *Reader) Get(ctx context.Context, id plugin.InstallationID) (*plugin.Record, error) {
 	record, err := r.db.Plugin.Get(ctx, xid.ID(id))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -45,15 +55,17 @@ func (r *Reader) Get(ctx context.Context, id plugin.ID) (*plugin.Record, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	exists, err := r.store.Exists(ctx, rec.FilePath)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if !exists {
-		rec.State = plugin.ActiveStateError
-		rec.StatusMessage = "Plugin file not found in storage"
-		rec.Details = map[string]any{
-			"expected_file_path": rec.FilePath,
+	if rec.Mode.Supervised() {
+		filePath := r.FilePath(rec.InstallationID)
+		exists, err := r.store.Exists(ctx, filePath)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		if !exists {
+			rec.StatusMessage = "Plugin file not found in storage"
+			rec.Details = map[string]any{
+				"expected_file_path": filePath,
+			}
 		}
 	}
 
@@ -78,24 +90,92 @@ func (r *Reader) List(ctx context.Context) ([]*plugin.Record, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	validated := dt.Map(records, func(r *plugin.Record) *plugin.Record {
+	validated := dt.Map(records, func(rec *plugin.Record) *plugin.Record {
+		if !rec.Mode.Supervised() {
+			return rec
+		}
+
+		filePath := r.FilePath(rec.InstallationID)
 		_, exists := lo.Find(files, func(f string) bool {
 			path := filepath.Join(plugin.PluginDirectory, f)
-			return path == r.FilePath
+			return path == filePath
 		})
 		if !exists {
-			// NOTE: A bit of a mutative hack, these kinds of edge case error
-			// states are not currently easier to represent in the data model.
-			r.State = plugin.ActiveStateError
-			r.StatusMessage = "Plugin file not found in storage"
-			r.Details = map[string]any{
-				"expected_file_path": r.FilePath,
+			rec.StatusMessage = "Plugin file not found in storage"
+			rec.Details = map[string]any{
+				"expected_file_path": filePath,
 				"current_file_paths": files,
 			}
 		}
 
-		return r
+		return rec
 	})
 
 	return validated, nil
+}
+
+func (r *Reader) LoadBinary(ctx context.Context, id plugin.InstallationID) ([]byte, error) {
+	filePath := r.FilePath(id)
+
+	reader, _, err := r.store.Read(ctx, filePath)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	bin, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return bin, nil
+}
+
+func (r *Reader) GetAuthSecret(ctx context.Context, id plugin.InstallationID) (string, error) {
+	record, err := r.db.Plugin.Get(ctx, xid.ID(id))
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return "", fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return record.AuthSecret, nil
+}
+
+func (r *Reader) GetByExternalToken(ctx context.Context, token string) (*plugin.Record, error) {
+	record, err := r.db.Plugin.Query().
+		Where(
+			ent_plugin.SupervisedEQ(false),
+			ent_plugin.AuthSecretEQ(token),
+		).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rec, err := plugin.MapRecord(record)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return rec, nil
+}
+
+func (r *Reader) GetConfig(ctx context.Context, id plugin.InstallationID) (map[string]any, error) {
+	record, err := r.db.Plugin.Get(ctx, xid.ID(id))
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if record.Config == nil {
+		return map[string]any{}, nil
+	}
+
+	return record.Config, nil
 }

@@ -1,0 +1,526 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+
+# Event payload discriminated union
+# All events from app/resources/message/message_types.go
+
+$defs:
+  Event:
+    type: string
+    enum:
+      - EventThreadPublished
+      - EventThreadUnpublished
+      - EventThreadUpdated
+      - EventThreadDeleted
+      - EventThreadReplyCreated
+      - EventThreadReplyDeleted
+      - EventThreadReplyUpdated
+      - EventThreadReplyPublished
+      - EventThreadReplyUnpublished
+      - EventPostLiked
+      - EventPostUnliked
+      - EventPostReacted
+      - EventPostUnreacted
+      - EventCategoryUpdated
+      - EventCategoryDeleted
+      - EventMemberMentioned
+      - EventNodeCreated
+      - EventNodeUpdated
+      - EventNodeDeleted
+      - EventNodePublished
+      - EventNodeSubmittedForReview
+      - EventNodeUnpublished
+      - EventAccountCreated
+      - EventAccountUpdated
+      - EventAccountSuspended
+      - EventAccountUnsuspended
+      - EventReportCreated
+      - EventReportUpdated
+      - EventActivityCreated
+      - EventActivityUpdated
+      - EventActivityDeleted
+      - EventActivityPublished
+      - EventSettingsUpdated
+
+  EventPayload:
+    type: object
+    oneOf:
+      - $ref: "#/$defs/EventThreadPublished"
+      - $ref: "#/$defs/EventThreadUnpublished"
+      - $ref: "#/$defs/EventThreadUpdated"
+      - $ref: "#/$defs/EventThreadDeleted"
+      - $ref: "#/$defs/EventThreadReplyCreated"
+      - $ref: "#/$defs/EventThreadReplyDeleted"
+      - $ref: "#/$defs/EventThreadReplyUpdated"
+      - $ref: "#/$defs/EventThreadReplyPublished"
+      - $ref: "#/$defs/EventThreadReplyUnpublished"
+      - $ref: "#/$defs/EventPostLiked"
+      - $ref: "#/$defs/EventPostUnliked"
+      - $ref: "#/$defs/EventPostReacted"
+      - $ref: "#/$defs/EventPostUnreacted"
+      - $ref: "#/$defs/EventCategoryUpdated"
+      - $ref: "#/$defs/EventCategoryDeleted"
+      - $ref: "#/$defs/EventMemberMentioned"
+      - $ref: "#/$defs/EventNodeCreated"
+      - $ref: "#/$defs/EventNodeUpdated"
+      - $ref: "#/$defs/EventNodeDeleted"
+      - $ref: "#/$defs/EventNodePublished"
+      - $ref: "#/$defs/EventNodeSubmittedForReview"
+      - $ref: "#/$defs/EventNodeUnpublished"
+      - $ref: "#/$defs/EventAccountCreated"
+      - $ref: "#/$defs/EventAccountUpdated"
+      - $ref: "#/$defs/EventAccountSuspended"
+      - $ref: "#/$defs/EventAccountUnsuspended"
+      - $ref: "#/$defs/EventReportCreated"
+      - $ref: "#/$defs/EventReportUpdated"
+      - $ref: "#/$defs/EventActivityCreated"
+      - $ref: "#/$defs/EventActivityUpdated"
+      - $ref: "#/$defs/EventActivityDeleted"
+      - $ref: "#/$defs/EventActivityPublished"
+      - $ref: "#/$defs/EventSettingsUpdated"
+
+  # Thread events
+
+  EventThreadPublished:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventThreadPublished" }
+      id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+
+  EventThreadUnpublished:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventThreadUnpublished" }
+      id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+
+  EventThreadUpdated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventThreadUpdated" }
+      id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+
+  EventThreadDeleted:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventThreadDeleted" }
+      id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+
+  EventThreadReplyCreated:
+    type: object
+    required:
+      ["event", "thread_id", "reply_id", "thread_author_id", "reply_author_id"]
+    properties:
+      event: { type: string, const: "EventThreadReplyCreated" }
+      thread_id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+      reply_id:
+        type: string
+        format: postID
+        description: "Reply post ID"
+      thread_author_id:
+        type: string
+        format: accountID
+        description: "Thread author account ID"
+      reply_author_id:
+        type: string
+        format: accountID
+        description: "Reply author account ID"
+      reply_to_author_id:
+        type: string
+        format: accountID
+        description: "Optional ID of the author being replied to"
+      reply_to_target_id:
+        type: string
+        format: postID
+        description: "Optional ID of the post being replied to"
+
+  EventThreadReplyDeleted:
+    type: object
+    required: ["event", "thread_id", "reply_id"]
+    properties:
+      event: { type: string, const: "EventThreadReplyDeleted" }
+      thread_id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+      reply_id:
+        type: string
+        format: postID
+        description: "Reply post ID"
+
+  EventThreadReplyUpdated:
+    type: object
+    required: ["event", "thread_id", "reply_id"]
+    properties:
+      event: { type: string, const: "EventThreadReplyUpdated" }
+      thread_id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+      reply_id:
+        type: string
+        format: postID
+        description: "Reply post ID"
+
+  EventThreadReplyPublished:
+    type: object
+    required: ["event", "thread_id", "reply_id"]
+    properties:
+      event: { type: string, const: "EventThreadReplyPublished" }
+      thread_id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+      reply_id:
+        type: string
+        format: postID
+        description: "Reply post ID"
+
+  EventThreadReplyUnpublished:
+    type: object
+    required: ["event", "thread_id", "reply_id"]
+    properties:
+      event: { type: string, const: "EventThreadReplyUnpublished" }
+      thread_id:
+        type: string
+        format: postID
+        description: "Thread post ID"
+      reply_id:
+        type: string
+        format: postID
+        description: "Reply post ID"
+
+  EventPostLiked:
+    type: object
+    required: ["event", "post_id", "root_post_id"]
+    properties:
+      event: { type: string, const: "EventPostLiked" }
+      post_id:
+        type: string
+        format: postID
+        description: "Post ID that was liked"
+      root_post_id:
+        type: string
+        format: postID
+        description: "Root thread post ID"
+
+  EventPostUnliked:
+    type: object
+    required: ["event", "post_id", "root_post_id"]
+    properties:
+      event: { type: string, const: "EventPostUnliked" }
+      post_id:
+        type: string
+        format: postID
+        description: "Post ID that was unliked"
+      root_post_id:
+        type: string
+        format: postID
+        description: "Root thread post ID"
+
+  EventPostReacted:
+    type: object
+    required: ["event", "post_id", "root_post_id"]
+    properties:
+      event: { type: string, const: "EventPostReacted" }
+      post_id:
+        type: string
+        format: postID
+        description: "Post ID that was reacted to"
+      root_post_id:
+        type: string
+        format: postID
+        description: "Root thread post ID"
+
+  EventPostUnreacted:
+    type: object
+    required: ["event", "post_id", "root_post_id"]
+    properties:
+      event: { type: string, const: "EventPostUnreacted" }
+      post_id:
+        type: string
+        format: postID
+        description: "Post ID that was unreacted"
+      root_post_id:
+        type: string
+        format: postID
+        description: "Root thread post ID"
+
+  # Category events
+
+  EventCategoryUpdated:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventCategoryUpdated" }
+      id:
+        type: string
+        format: xid
+        description: "Category ID"
+      slug:
+        type: string
+        description: "Category slug"
+
+  EventCategoryDeleted:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventCategoryDeleted" }
+      id:
+        type: string
+        format: xid
+        description: "Category ID"
+      slug:
+        type: string
+        description: "Category slug"
+
+  # Member mention event
+
+  EventMemberMentioned:
+    type: object
+    required: ["event", "by", "source", "item"]
+    properties:
+      event: { type: string, const: "EventMemberMentioned" }
+      by:
+        type: string
+        format: accountID
+        description: "Account ID of the member who mentioned"
+      source:
+        $ref: "datagraph-ref.yaml#/$defs/DatagraphRef"
+      item:
+        $ref: "datagraph-ref.yaml#/$defs/DatagraphRef"
+
+  # Library node events
+
+  EventNodeCreated:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodeCreated" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  EventNodeUpdated:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodeUpdated" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  EventNodeDeleted:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodeDeleted" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  EventNodePublished:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodePublished" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  EventNodeSubmittedForReview:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodeSubmittedForReview" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  EventNodeUnpublished:
+    type: object
+    required: ["event", "id", "slug"]
+    properties:
+      event: { type: string, const: "EventNodeUnpublished" }
+      id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      slug:
+        type: string
+        description: "Node slug"
+
+  # Account events
+
+  EventAccountCreated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventAccountCreated" }
+      id:
+        type: string
+        format: accountID
+        description: "Account ID"
+
+  EventAccountUpdated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventAccountUpdated" }
+      id:
+        type: string
+        format: accountID
+        description: "Account ID"
+
+  EventAccountSuspended:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventAccountSuspended" }
+      id:
+        type: string
+        format: accountID
+        description: "Account ID"
+
+  EventAccountUnsuspended:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventAccountUnsuspended" }
+      id:
+        type: string
+        format: accountID
+        description: "Account ID"
+
+  # Report events
+
+  EventReportCreated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventReportCreated" }
+      id:
+        type: string
+        format: reportID
+        description: "Report ID"
+      target:
+        $ref: "datagraph-ref.yaml#/$defs/DatagraphRef"
+      reported_by:
+        type: string
+        format: accountID
+        description: "Optional account ID of reporter"
+
+  EventReportUpdated:
+    type: object
+    required: ["event", "id", "status"]
+    properties:
+      event: { type: string, const: "EventReportUpdated" }
+      id:
+        type: string
+        format: reportID
+        description: "Report ID"
+      target:
+        $ref: "datagraph-ref.yaml#/$defs/DatagraphRef"
+      reported_by:
+        type: string
+        format: accountID
+        description: "Optional account ID of reporter"
+      handled_by:
+        type: string
+        format: accountID
+        description: "Optional account ID of handler"
+      status:
+        type: string
+        format: reportStatus
+        description: "Report status"
+
+  # Activity (scheduled event) events
+
+  EventActivityCreated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventActivityCreated" }
+      id:
+        type: string
+        format: eventID
+        description: "Activity/Event ID"
+
+  EventActivityUpdated:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventActivityUpdated" }
+      id:
+        type: string
+        format: eventID
+        description: "Activity/Event ID"
+
+  EventActivityDeleted:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventActivityDeleted" }
+      id:
+        type: string
+        format: eventID
+        description: "Activity/Event ID"
+
+  EventActivityPublished:
+    type: object
+    required: ["event", "id"]
+    properties:
+      event: { type: string, const: "EventActivityPublished" }
+      id:
+        type: string
+        format: eventID
+        description: "Activity/Event ID"
+
+  # Settings events
+
+  EventSettingsUpdated:
+    type: object
+    required: ["event", "settings"]
+    properties:
+      event: { type: string, const: "EventSettingsUpdated" }
+      settings:
+        type: object
+        description: "Settings object"
+        additionalProperties: true

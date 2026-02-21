@@ -8,10 +8,16 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.26.3-canary
  */
 import type { PluginStatusActive } from "./pluginStatusActive";
+import type { PluginStatusConnecting } from "./pluginStatusConnecting";
 import type { PluginStatusError } from "./pluginStatusError";
 import type { PluginStatusInactive } from "./pluginStatusInactive";
+import type { PluginStatusRestarting } from "./pluginStatusRestarting";
+import type { PluginStatusStarting } from "./pluginStatusStarting";
 
 export type PluginStatus =
-  | PluginStatusActive
   | PluginStatusInactive
-  | PluginStatusError;
+  | PluginStatusStarting
+  | PluginStatusConnecting
+  | PluginStatusActive
+  | PluginStatusError
+  | PluginStatusRestarting;
