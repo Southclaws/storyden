@@ -10,7 +10,7 @@ function Permanence() {
       maxW="breakpoint-sm"
       h="full"
       py="48"
-      px="8"
+      px="4"
       textAlign="center"
     >
       <styled.h2 color="Mono.ink/60">Communities deserve permanence.</styled.h2>
@@ -44,20 +44,20 @@ function Organise() {
           Allow your collective knowledge to flourish without losing great ideas
           to the void of time, banished to the archive.
         </styled.p>
-      </VStack>
 
-      <Box maxW="sm">
-        <Image
-          className={css({
-            borderRadius: "sm",
-            boxShadow: "sm",
-          })}
-          src="/organise.png"
-          alt="A diagram of the link fetching flow going from fetching, assigning tags and creating a page to demonstrate the AI assisted curation capabilities."
-          width={1320 / 2}
-          height={864 / 2}
-        />
-      </Box>
+        <Box maxW="sm">
+          <Image
+            className={css({
+              borderRadius: "sm",
+              boxShadow: "sm",
+            })}
+            src="/organise.png"
+            alt="A diagram of the link fetching flow going from fetching, assigning tags and creating a page to demonstrate the AI assisted curation capabilities."
+            width={1320 / 2}
+            height={864 / 2}
+          />
+        </Box>
+      </VStack>
     </VStack>
   );
 }
@@ -65,44 +65,47 @@ function Organise() {
 function Gardens() {
   return (
     <VStack w="full" gap="8" py="48" bgColor="Mono.ink">
-      <Box p="4">
-        <styled.h2 color="Mono.slush/80">
-          Knowledge gardens, not content farms.
-        </styled.h2>
-      </Box>
+      <VStack p="4">
+        <Box p="4">
+          <styled.h2 color="Mono.slush/80">
+            Knowledge&nbsp;gardens,
+            <wbr /> not&nbsp;content&nbsp;farms.
+          </styled.h2>
+        </Box>
 
-      <Box
-        aspectRatio="1"
-        maxW="sm"
-        position="relative"
-        bgColor="#F6F6F6"
-        borderRadius="xl"
-        boxShadow="xs"
-        backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
-        backgroundSize="cover"
-        backgroundPosition="top"
-        overflowClipMargin="unset"
-        display="flex"
-        flexDir="column"
-        justifyContent="space-between"
-        overflow="hidden"
-      >
-        <Box height={{ base: "12" }} />
-
-        <styled.p
-          backgroundColor="white/20"
-          backdropBlur="sm"
-          backdropFilter="auto"
-          // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
-          borderBottomRadius="md"
-          p="6"
-          textWrap="pretty"
+        <Box
+          aspectRatio="1"
+          maxW="sm"
+          position="relative"
+          bgColor="#F6F6F6"
+          borderRadius="xl"
+          boxShadow="xs"
+          backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
+          backgroundSize="cover"
+          backgroundPosition="top"
+          overflowClipMargin="unset"
+          display="flex"
+          flexDir="column"
+          justifyContent="space-between"
+          overflow="hidden"
         >
-          From fan <strong>clubs</strong> to research groups, digital zines to
-          esports <strong>teams</strong>. For anyone who cares about ideas and
-          the <strong>people</strong> behind them.
-        </styled.p>
-      </Box>
+          <Box height={{ base: "12" }} />
+
+          <styled.p
+            backgroundColor="white/20"
+            backdropBlur="sm"
+            backdropFilter="auto"
+            // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
+            borderBottomRadius="md"
+            p="6"
+            textWrap="pretty"
+          >
+            From fan <strong>clubs</strong> to research groups, digital zines to
+            esports <strong>teams</strong>. For anyone who cares about ideas and
+            the <strong>people</strong> behind them.
+          </styled.p>
+        </Box>
+      </VStack>
     </VStack>
   );
 }
