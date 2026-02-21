@@ -13,22 +13,25 @@ export function Footer() {
     >
       <HStack gap={[2, 3, 4]}>
         <VStack alignItems="end" fontSize="sm" color="Primary.moonlit">
-          <styled.a href="https://discord.gg/XF6ZBGF9XF">
-            <HStack>
+          <styled.a href="https://discord.gg/XF6ZBGF9XF" className="link">
+            <HStack gap="2">
               <styled.p>Discord</styled.p>
               <Discord width="1.2em" />
             </HStack>
           </styled.a>
 
-          <styled.a href="https://github.com/Southclaws/storyden">
-            <HStack>
+          <styled.a
+            href="https://github.com/Southclaws/storyden"
+            className="link"
+          >
+            <HStack gap="2">
               <styled.p>GitHub</styled.p>
               <GitHub width="1.2em" />
             </HStack>
           </styled.a>
 
-          <styled.a href="https://twitter.com/Southclaws">
-            <HStack>
+          <styled.a href="https://twitter.com/Southclaws" className="link">
+            <HStack gap="2">
               <styled.p>X</styled.p>
               <Twitter width="1.2em" />
             </HStack>
@@ -59,7 +62,8 @@ function Discord(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 127.14 96.36"
-      fill={token("colors.Primary.moonlit")}
+      // fill={token("colors.Primary.moonlit")}
+      fill="currentcolor"
       {...props}
     >
       <g data-name="\u56FE\u5C42 2">
@@ -79,7 +83,8 @@ function Twitter(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 248 204"
-      fill={token("colors.Primary.moonlit")}
+      // fill={token("colors.Primary.moonlit")}
+      fill="currentcolor"
       style={{
         enableBackground: "new 0 0 248 204",
       }}
@@ -95,7 +100,8 @@ function GitHub(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 98 96"
-      fill={token("colors.Primary.moonlit")}
+      // fill={token("colors.Primary.moonlit")}
+      fill="currentcolor"
       {...props}
     >
       <path

@@ -125,3 +125,12 @@ summary::before {
 details[open] summary::before {
   transform: rotate(90deg);
 }
+
+.link {
+  color: var(--colors--primary-moonlit);
+}
+
+.link:hover {
+  color: var(--colors--primary-saddle);
+  text-decoration: underline;
+}
