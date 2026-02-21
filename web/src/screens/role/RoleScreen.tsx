@@ -95,6 +95,7 @@ function SortableRoleGrid({ roles, canEdit }: SortableRoleGridProps) {
     }),
   );
 
+  const allRoleIDs = roles.map((r) => r.id);
   const customRoleIDs = roles.filter((r) => !isDefaultRole(r)).map((r) => r.id);
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -167,7 +168,7 @@ function SortableRoleGrid({ roles, canEdit }: SortableRoleGridProps) {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <SortableContext items={customRoleIDs} strategy={rectSortingStrategy}>
+      <SortableContext items={allRoleIDs} strategy={rectSortingStrategy}>
         <CardGrid>
           {roles.map((r) => (
             <SortableRoleCard
