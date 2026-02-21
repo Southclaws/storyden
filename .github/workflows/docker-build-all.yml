@@ -10,7 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   DOCKERFILE: ./docker/all/Dockerfile
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: southclaws/storyden
   IMAGE_KIND: fullstack
 
 permissions:
