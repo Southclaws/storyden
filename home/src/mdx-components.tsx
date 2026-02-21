@@ -18,6 +18,15 @@ const mediaAdapters: Record<string, MediaAdapter> = {
       return bodyStr;
     },
   },
+  "application/zip": {
+    encode(data) {
+      return data.body as BodyInit;
+    },
+    generateExample() {
+      // not supported
+      return undefined;
+    },
+  },
 };
 
 const APIPage = createAPIPage(openapi, {
