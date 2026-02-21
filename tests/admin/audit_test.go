@@ -208,17 +208,21 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				var found bool
-				for _, event := range *list.JSON200.Events {
-					if event.Type == openapi.ThreadDeleted {
-						deletedEvent, err := event.AsAuditEventThreadDeleted()
-						r.NoError(err)
-						a.Equal(createThread.JSON200.Id, deletedEvent.ThreadId)
-						found = true
-						break
+				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.ThreadDeleted {
+						return false
 					}
-				}
-				a.True(found, "Should find thread_deleted event in audit log")
+					deletedEvent, err := e.AsAuditEventThreadDeleted()
+					if err != nil {
+						return false
+					}
+					return deletedEvent.ThreadId == createThread.JSON200.Id
+				})
+				r.True(found, "Should find thread_deleted event in audit log")
+
+				deletedEvent, err := event.AsAuditEventThreadDeleted()
+				r.NoError(err)
+				a.Equal(createThread.JSON200.Id, deletedEvent.ThreadId)
 			})
 
 			t.Run("logs_reply_deletion", func(t *testing.T) {
@@ -253,17 +257,21 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				var found bool
-				for _, event := range *list.JSON200.Events {
-					if event.Type == openapi.ThreadReplyDeleted {
-						deletedEvent, err := event.AsAuditEventThreadReplyDeleted()
-						r.NoError(err)
-						a.Equal(replyResp.JSON200.Id, deletedEvent.ReplyId)
-						found = true
-						break
+				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.ThreadReplyDeleted {
+						return false
 					}
-				}
-				a.True(found, "Should find thread_reply_deleted event in audit log")
+					deletedEvent, err := e.AsAuditEventThreadReplyDeleted()
+					if err != nil {
+						return false
+					}
+					return deletedEvent.ReplyId == replyResp.JSON200.Id
+				})
+				r.True(found, "Should find thread_reply_deleted event in audit log")
+
+				deletedEvent, err := event.AsAuditEventThreadReplyDeleted()
+				r.NoError(err)
+				a.Equal(replyResp.JSON200.Id, deletedEvent.ReplyId)
 			})
 
 			t.Run("logs_account_suspension", func(t *testing.T) {
@@ -284,17 +292,21 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				var found bool
-				for _, event := range *list.JSON200.Events {
-					if event.Type == openapi.AccountSuspended {
-						suspendedEvent, err := event.AsAuditEventAccountSuspended()
-						r.NoError(err)
-						a.Equal(openapi.Identifier(member.ID.String()), suspendedEvent.AccountId)
-						found = true
-						break
+				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.AccountSuspended {
+						return false
 					}
-				}
-				a.True(found, "Should find account_suspended event in audit log")
+					suspendedEvent, err := e.AsAuditEventAccountSuspended()
+					if err != nil {
+						return false
+					}
+					return suspendedEvent.AccountId == openapi.Identifier(member.ID.String())
+				})
+				r.True(found, "Should find account_suspended event in audit log")
+
+				suspendedEvent, err := event.AsAuditEventAccountSuspended()
+				r.NoError(err)
+				a.Equal(openapi.Identifier(member.ID.String()), suspendedEvent.AccountId)
 			})
 
 			t.Run("logs_account_unsuspension", func(t *testing.T) {
@@ -318,17 +330,21 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				var found bool
-				for _, event := range *list.JSON200.Events {
-					if event.Type == openapi.AccountUnsuspended {
-						unsuspendedEvent, err := event.AsAuditEventAccountUnsuspended()
-						r.NoError(err)
-						a.Equal(openapi.Identifier(member.ID.String()), unsuspendedEvent.AccountId)
-						found = true
-						break
+				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.AccountUnsuspended {
+						return false
 					}
-				}
-				a.True(found, "Should find account_unsuspended event in audit log")
+					unsuspendedEvent, err := e.AsAuditEventAccountUnsuspended()
+					if err != nil {
+						return false
+					}
+					return unsuspendedEvent.AccountId == openapi.Identifier(member.ID.String())
+				})
+				r.True(found, "Should find account_unsuspended event in audit log")
+
+				unsuspendedEvent, err := event.AsAuditEventAccountUnsuspended()
+				r.NoError(err)
+				a.Equal(openapi.Identifier(member.ID.String()), unsuspendedEvent.AccountId)
 			})
 		}))
 	}))
