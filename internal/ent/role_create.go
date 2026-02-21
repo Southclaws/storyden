@@ -86,6 +86,12 @@ func (_c *RoleCreate) SetSortKey(v float64) *RoleCreate {
 	return _c
 }
 
+// SetMetadata sets the "metadata" field.
+func (_c *RoleCreate) SetMetadata(v map[string]interface{}) *RoleCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *RoleCreate) SetID(v xid.ID) *RoleCreate {
 	_c.mutation.SetID(v)
@@ -268,6 +274,10 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldSortKey, field.TypeFloat64, value)
 		_node.SortKey = value
 	}
+	if value, ok := _c.mutation.Metadata(); ok {
+		_spec.SetField(role.FieldMetadata, field.TypeJSON, value)
+		_node.Metadata = value
+	}
 	if nodes := _c.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -425,6 +435,24 @@ func (u *RoleUpsert) AddSortKey(v float64) *RoleUpsert {
 	return u
 }
 
+// SetMetadata sets the "metadata" field.
+func (u *RoleUpsert) SetMetadata(v map[string]interface{}) *RoleUpsert {
+	u.Set(role.FieldMetadata, v)
+	return u
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateMetadata() *RoleUpsert {
+	u.SetExcluded(role.FieldMetadata)
+	return u
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *RoleUpsert) ClearMetadata() *RoleUpsert {
+	u.SetNull(role.FieldMetadata)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -550,6 +578,27 @@ func (u *RoleUpsertOne) AddSortKey(v float64) *RoleUpsertOne {
 func (u *RoleUpsertOne) UpdateSortKey() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateSortKey()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *RoleUpsertOne) SetMetadata(v map[string]interface{}) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateMetadata() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *RoleUpsertOne) ClearMetadata() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.ClearMetadata()
 	})
 }
 
@@ -845,6 +894,27 @@ func (u *RoleUpsertBulk) AddSortKey(v float64) *RoleUpsertBulk {
 func (u *RoleUpsertBulk) UpdateSortKey() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateSortKey()
+	})
+}
+
+// SetMetadata sets the "metadata" field.
+func (u *RoleUpsertBulk) SetMetadata(v map[string]interface{}) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetMetadata(v)
+	})
+}
+
+// UpdateMetadata sets the "metadata" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateMetadata() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateMetadata()
+	})
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (u *RoleUpsertBulk) ClearMetadata() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.ClearMetadata()
 	})
 }
 

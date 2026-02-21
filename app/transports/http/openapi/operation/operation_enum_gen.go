@@ -32,6 +32,7 @@ var (
 	OperationIDAdminAccessKeyDelete             = OperationID{`AdminAccessKeyDelete`}
 	OperationIDRoleCreate                       = OperationID{`RoleCreate`}
 	OperationIDRoleList                         = OperationID{`RoleList`}
+	OperationIDRoleUpdateOrder                  = OperationID{`RoleUpdateOrder`}
 	OperationIDRoleGet                          = OperationID{`RoleGet`}
 	OperationIDRoleUpdate                       = OperationID{`RoleUpdate`}
 	OperationIDRoleDelete                       = OperationID{`RoleDelete`}
@@ -231,6 +232,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRoleCreate, nil
 	case string(`RoleList`):
 		return OperationIDRoleList, nil
+	case string(`RoleUpdateOrder`):
+		return OperationIDRoleUpdateOrder, nil
 	case string(`RoleGet`):
 		return OperationIDRoleGet, nil
 	case string(`RoleUpdate`):

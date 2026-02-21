@@ -27343,6 +27343,7 @@ type RoleMutation struct {
 	appendpermissions    []string
 	sort_key             *float64
 	addsort_key          *float64
+	metadata             *map[string]interface{}
 	clearedFields        map[string]struct{}
 	accounts             map[xid.ID]struct{}
 	removedaccounts      map[xid.ID]struct{}
@@ -27710,6 +27711,55 @@ func (m *RoleMutation) ResetSortKey() {
 	m.addsort_key = nil
 }
 
+// SetMetadata sets the "metadata" field.
+func (m *RoleMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *RoleMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *RoleMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[role.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *RoleMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[role.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *RoleMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, role.FieldMetadata)
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by ids.
 func (m *RoleMutation) AddAccountIDs(ids ...xid.ID) {
 	if m.accounts == nil {
@@ -27852,7 +27902,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, role.FieldCreatedAt)
 	}
@@ -27870,6 +27920,9 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.sort_key != nil {
 		fields = append(fields, role.FieldSortKey)
+	}
+	if m.metadata != nil {
+		fields = append(fields, role.FieldMetadata)
 	}
 	return fields
 }
@@ -27891,6 +27944,8 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.Permissions()
 	case role.FieldSortKey:
 		return m.SortKey()
+	case role.FieldMetadata:
+		return m.Metadata()
 	}
 	return nil, false
 }
@@ -27912,6 +27967,8 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPermissions(ctx)
 	case role.FieldSortKey:
 		return m.OldSortKey(ctx)
+	case role.FieldMetadata:
+		return m.OldMetadata(ctx)
 	}
 	return nil, fmt.Errorf("unknown Role field %s", name)
 }
@@ -27963,6 +28020,13 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSortKey(v)
 		return nil
+	case role.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)
 }
@@ -28007,7 +28071,11 @@ func (m *RoleMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *RoleMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(role.FieldMetadata) {
+		fields = append(fields, role.FieldMetadata)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -28020,6 +28088,11 @@ func (m *RoleMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *RoleMutation) ClearField(name string) error {
+	switch name {
+	case role.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
 	return fmt.Errorf("unknown Role nullable field %s", name)
 }
 
@@ -28044,6 +28117,9 @@ func (m *RoleMutation) ResetField(name string) error {
 		return nil
 	case role.FieldSortKey:
 		m.ResetSortKey()
+		return nil
+	case role.FieldMetadata:
+		m.ResetMetadata()
 		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)

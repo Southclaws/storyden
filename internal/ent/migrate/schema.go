@@ -992,6 +992,7 @@ var (
 		{Name: "colour", Type: field.TypeString, Default: "hsl(157, 65%, 44%)"},
 		{Name: "permissions", Type: field.TypeJSON},
 		{Name: "sort_key", Type: field.TypeFloat64, Default: "0.0"},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{

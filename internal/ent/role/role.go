@@ -27,6 +27,8 @@ const (
 	FieldPermissions = "permissions"
 	// FieldSortKey holds the string denoting the sort_key field in the database.
 	FieldSortKey = "sort_key"
+	// FieldMetadata holds the string denoting the metadata field in the database.
+	FieldMetadata = "metadata"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
 	EdgeAccounts = "accounts"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
@@ -56,6 +58,7 @@ var Columns = []string{
 	FieldColour,
 	FieldPermissions,
 	FieldSortKey,
+	FieldMetadata,
 }
 
 var (

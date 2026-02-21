@@ -41,6 +41,7 @@ func (q *Querier) List(ctx context.Context) (role.Roles, error) {
 	roles, err := q.db.Role.Query().Where(ent_role.IDNotIn(
 		xid.ID(role.DefaultRoleGuestID),
 		xid.ID(role.DefaultRoleMemberID),
+		xid.ID(role.DefaultRoleAdminID),
 	)).All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -61,7 +62,12 @@ func (q *Querier) List(ctx context.Context) (role.Roles, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapped = append(mapped, defaultRole, guestRole)
+	adminRole, err := q.GetAdminRole(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mapped = append(mapped, defaultRole, guestRole, adminRole)
 
 	sort.Sort(mapped)
 
@@ -76,6 +82,7 @@ func (q *Querier) ListFor(ctx context.Context, account *ent.Account) (held.Roles
 			ent_account_role.HasRoleWith(ent_role.IDNotIn(
 				xid.ID(role.DefaultRoleGuestID),
 				xid.ID(role.DefaultRoleMemberID),
+				xid.ID(role.DefaultRoleAdminID),
 			)),
 		).
 		WithRole(func(rq *ent.RoleQuery) {
@@ -92,12 +99,10 @@ func (q *Querier) ListFor(ctx context.Context, account *ent.Account) (held.Roles
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, memberRole, err := q.lookupDefaultRoles(ctx)
+	_, memberRole, _, err := q.lookupDefaultRoles(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	var list held.Roles
 
 	// If the default member role has not been modified (aka not added to the DB
 	// with custom permissions) we add the default manually.
@@ -119,16 +124,13 @@ func (q *Querier) ListFor(ctx context.Context, account *ent.Account) (held.Roles
 		})
 	}
 
-	// TODO: Implement sorting on API - currently it's pointless.
-	// sort.Sort(mapped)
-	// Add custom roles after defaults. Because of sorting not done yet.
-	list = append(list, mapped...)
+	sort.Sort(mapped)
 
-	return list, nil
+	return mapped, nil
 }
 
 func (q *Querier) GetMemberRole(ctx context.Context) (*role.Role, error) {
-	_, memberRole, err := q.lookupDefaultRoles(ctx)
+	_, memberRole, _, err := q.lookupDefaultRoles(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -141,7 +143,7 @@ func (q *Querier) GetMemberRole(ctx context.Context) (*role.Role, error) {
 }
 
 func (q *Querier) GetGuestRole(ctx context.Context) (*role.Role, error) {
-	guestRole, _, err := q.lookupDefaultRoles(ctx)
+	guestRole, _, _, err := q.lookupDefaultRoles(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -153,25 +155,42 @@ func (q *Querier) GetGuestRole(ctx context.Context) (*role.Role, error) {
 	return role.Map(guestRole)
 }
 
-func (q *Querier) lookupDefaultRoles(ctx context.Context) (*ent.Role, *ent.Role, error) {
+func (q *Querier) GetAdminRole(ctx context.Context) (*role.Role, error) {
+	_, _, adminRole, err := q.lookupDefaultRoles(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if adminRole == nil {
+		return &role.DefaultRoleAdmin, nil
+	}
+
+	return role.Map(adminRole)
+}
+
+func (q *Querier) lookupDefaultRoles(ctx context.Context) (*ent.Role, *ent.Role, *ent.Role, error) {
 	roles, err := q.db.Role.Query().Where(ent_role.IDIn(
 		xid.ID(role.DefaultRoleGuestID),
 		xid.ID(role.DefaultRoleMemberID),
+		xid.ID(role.DefaultRoleAdminID),
 	)).All(ctx)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	var guestRole *ent.Role
 	var memberRole *ent.Role
+	var adminRole *ent.Role
 
 	for _, r := range roles {
 		if r.ID == xid.ID(role.DefaultRoleGuestID) {
 			guestRole = r
 		} else if r.ID == xid.ID(role.DefaultRoleMemberID) {
 			memberRole = r
+		} else if r.ID == xid.ID(role.DefaultRoleAdminID) {
+			adminRole = r
 		}
 	}
 
-	return guestRole, memberRole, nil
+	return guestRole, memberRole, adminRole, nil
 }

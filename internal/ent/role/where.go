@@ -331,6 +331,16 @@ func SortKeyLTE(v float64) predicate.Role {
 	return predicate.Role(sql.FieldLTE(FieldSortKey, v))
 }
 
+// MetadataIsNil applies the IsNil predicate on the "metadata" field.
+func MetadataIsNil() predicate.Role {
+	return predicate.Role(sql.FieldIsNull(FieldMetadata))
+}
+
+// MetadataNotNil applies the NotNil predicate on the "metadata" field.
+func MetadataNotNil() predicate.Role {
+	return predicate.Role(sql.FieldNotNull(FieldMetadata))
+}
+
 // HasAccounts applies the HasEdge predicate on the "accounts" edge.
 func HasAccounts() predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {

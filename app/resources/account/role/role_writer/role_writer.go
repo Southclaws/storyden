@@ -2,10 +2,12 @@ package role_writer
 
 import (
 	"context"
+	"sort"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
@@ -46,15 +48,31 @@ func WithPermissions(perms rbac.PermissionList) Mutation {
 	}
 }
 
-func (w *Writer) Create(ctx context.Context, name string, colour string, perms rbac.PermissionList) (*role.Role, error) {
-	ps := dt.Map(perms, func(p rbac.Permission) string { return p.String() })
+func WithMeta(meta map[string]any) Mutation {
+	return func(m *ent.RoleMutation) {
+		m.SetMetadata(meta)
+	}
+}
 
-	r, err := w.db.Role.Create().
+func (w *Writer) Create(ctx context.Context, name string, colour string, perms rbac.PermissionList, opts ...Mutation) (*role.Role, error) {
+	ps := dt.Map(perms, func(p rbac.Permission) string { return p.String() })
+	nextSortKey, err := w.nextCustomSortKey(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	create := w.db.Role.Create().
 		SetName(name).
 		SetColour(colour).
 		SetPermissions(ps).
-		SetSortKey(0.0).
-		Save(ctx)
+		SetSortKey(nextSortKey)
+
+	mutation := create.Mutation()
+	for _, opt := range opts {
+		opt(mutation)
+	}
+
+	r, err := create.Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -125,6 +143,7 @@ func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role
 
 	update := rl.Update()
 	mutate := update.Mutation()
+	mutate.SetSortKey(role.DefaultRoleMember.SortKey)
 	for _, opt := range opts {
 		opt(mutate)
 	}
@@ -174,6 +193,7 @@ func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.R
 
 	update := rl.Update()
 	mutate := update.Mutation()
+	mutate.SetSortKey(role.DefaultRoleGuest.SortKey)
 	for _, opt := range opts {
 		opt(mutate)
 	}
@@ -204,4 +224,89 @@ func (w *Writer) Delete(ctx context.Context, id role.RoleID) error {
 	}
 
 	return nil
+}
+
+func (w *Writer) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
+	for _, id := range ids {
+		if id == role.DefaultRoleGuestID || id == role.DefaultRoleMemberID || id == role.DefaultRoleAdminID {
+			return fault.New("default roles cannot be reordered", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+
+	customRoles, err := w.db.Role.Query().Where(ent_role.IDNotIn(
+		xid.ID(role.DefaultRoleGuestID),
+		xid.ID(role.DefaultRoleMemberID),
+		xid.ID(role.DefaultRoleAdminID),
+	)).All(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(customRoles) != len(ids) {
+		return fault.New(
+			"role reorder list must include all custom roles exactly once",
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.With("role_ids must contain every custom role ID once"),
+		)
+	}
+
+	existing := make(map[role.RoleID]struct{}, len(customRoles))
+	for _, r := range customRoles {
+		existing[role.RoleID(r.ID)] = struct{}{}
+	}
+
+	seen := make(map[role.RoleID]struct{}, len(ids))
+	for _, id := range ids {
+		if _, ok := existing[id]; !ok {
+			return fault.New("unknown custom role ID in role reorder list", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		if _, ok := seen[id]; ok {
+			return fault.New("duplicate custom role ID in role reorder list", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		seen[id] = struct{}{}
+	}
+
+	tx, err := w.db.Tx(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	for i, id := range ids {
+		_, err := tx.Role.UpdateOneID(xid.ID(id)).SetSortKey(float64(i)).Save(ctx)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (w *Writer) nextCustomSortKey(ctx context.Context) (float64, error) {
+	customRoles, err := w.db.Role.Query().Where(ent_role.IDNotIn(
+		xid.ID(role.DefaultRoleGuestID),
+		xid.ID(role.DefaultRoleMemberID),
+		xid.ID(role.DefaultRoleAdminID),
+	)).All(ctx)
+	if err != nil {
+		return 0, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(customRoles) == 0 {
+		return 0, nil
+	}
+
+	sort.Slice(customRoles, func(i, j int) bool {
+		return customRoles[i].SortKey < customRoles[j].SortKey
+	})
+
+	return customRoles[len(customRoles)-1].SortKey + 1, nil
 }

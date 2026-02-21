@@ -22,6 +22,7 @@ func (Role) Fields() []ent.Field {
 		field.String("colour").Default("hsl(157, 65%, 44%)"),
 		field.Strings("permissions"),
 		field.Float("sort_key").Annotations(entsql.Default("0.0")),
+		field.JSON("metadata", map[string]any{}).Optional(),
 	}
 }
 

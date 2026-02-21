@@ -31,6 +31,8 @@ type Role struct {
 	Permissions []string `json:"permissions,omitempty"`
 	// SortKey holds the value of the "sort_key" field.
 	SortKey float64 `json:"sort_key,omitempty"`
+	// Metadata holds the value of the "metadata" field.
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RoleQuery when eager-loading is set.
 	Edges        RoleEdges `json:"edges"`
@@ -71,7 +73,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case role.FieldPermissions:
+		case role.FieldPermissions, role.FieldMetadata:
 			values[i] = new([]byte)
 		case role.FieldSortKey:
 			values[i] = new(sql.NullFloat64)
@@ -140,6 +142,14 @@ func (_m *Role) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.SortKey = value.Float64
 			}
+		case role.FieldMetadata:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field metadata", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
+					return fmt.Errorf("unmarshal field metadata: %w", err)
+				}
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -203,6 +213,9 @@ func (_m *Role) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sort_key=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SortKey))
+	builder.WriteString(", ")
+	builder.WriteString("metadata=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -1,8 +1,10 @@
+import { ReactNode } from "react";
+
 import { Role } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
 import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
-import { CardBox, WStack } from "@/styled-system/jsx";
+import { CardBox, HStack, WStack } from "@/styled-system/jsx";
 
 import { Badge } from "../ui/badge";
 
@@ -13,9 +15,10 @@ import { badgeColourCSS } from "./colours";
 type Props = {
   role: Role;
   editable?: boolean;
+  dragHandle?: ReactNode;
 };
 
-export function RoleCard({ role, editable }: Props) {
+export function RoleCard({ role, editable, dragHandle }: Props) {
   const cssVars = badgeColourCSS(role.colour);
 
   const isDefault = isDefaultRole(role);
@@ -25,6 +28,8 @@ export function RoleCard({ role, editable }: Props) {
     <CardBox
       className={css({
         borderColor: "colorPalette.fg",
+        display: "flex",
+        gap: "2",
       })}
       style={{
         ...cssVars,
@@ -32,23 +37,28 @@ export function RoleCard({ role, editable }: Props) {
         borderLeftStyle: "solid",
       }}
     >
-      <WStack>
+      <WStack alignItems="flex-start">
         <Heading>{role.name}</Heading>
 
-        {editable && <RoleEditModalTrigger role={role} />}
+        <HStack>
+          {isDefault && (
+            <>
+              {isCustomDefault ? (
+                <Badge size="sm">Default + Custom</Badge>
+              ) : (
+                <Badge size="sm">Default</Badge>
+              )}
+            </>
+          )}
+
+          {dragHandle}
+        </HStack>
       </WStack>
 
-      <WStack>
+      <WStack alignItems="flex-end">
         <PermissionSummary permissions={role.permissions} />
-        {isDefault && (
-          <>
-            {isCustomDefault ? (
-              <Badge size="sm">Default + Custom</Badge>
-            ) : (
-              <Badge size="sm">Default</Badge>
-            )}
-          </>
-        )}
+
+        {editable && <RoleEditModalTrigger role={role} />}
       </WStack>
     </CardBox>
   );

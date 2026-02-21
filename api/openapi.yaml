@@ -408,6 +408,21 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/RoleListOK" }
 
+  /roles/order:
+    patch:
+      operationId: RoleUpdateOrder
+      description: |
+        Update the global ordering of custom roles. The request body must
+        include every non-default role identifier exactly once in the desired
+        order of precedence.
+      tags: [roles]
+      requestBody: { $ref: "#/components/requestBodies/RoleUpdateOrder" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RoleListOK" }
+
   /roles/{role_id}:
     get:
       operationId: RoleGet
@@ -2971,6 +2986,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/RoleMutableProps" }
 
+    RoleUpdateOrder:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RoleOrderMutableProps" }
+
     AuthPassword:
       content:
         application/json:
@@ -4511,6 +4531,8 @@ components:
           type: string
         permissions:
           $ref: "#/components/schemas/PermissionList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
 
     RoleInitialProps:
       type: object
@@ -4522,6 +4544,8 @@ components:
           type: string
         permissions:
           $ref: "#/components/schemas/PermissionList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
 
     RoleMutableProps:
       type: object
@@ -4532,6 +4556,20 @@ components:
           type: string
         permissions:
           $ref: "#/components/schemas/PermissionList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
+
+    RoleOrderMutableProps:
+      type: object
+      required: [role_ids]
+      properties:
+        role_ids:
+          description: |
+            Ordered list of custom role identifiers in the desired sort order.
+            Must include all custom roles exactly once without default roles.
+          type: array
+          items:
+            $ref: "#/components/schemas/Identifier"
 
     Permission:
       type: string
