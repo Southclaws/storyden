@@ -17,7 +17,7 @@ function Permanence() {
       <styled.p textWrap="balance">
         In a tangled web of fleeting <strong>feeds</strong> and forgotten
         threads, Storyden makes <strong>what matters</strong> stay discoverable,
-        readable, and shareable. <strong>Forever</strong>.
+        readable, and shareable. <strong>On your terms</strong>.
       </styled.p>
       <styled.p textWrap="balance">
         Own your <strong>data</strong>. Run your own Reddit, your own Pinterest,
@@ -45,7 +45,7 @@ function Organise() {
           to the void of time, banished to the archive.
         </styled.p>
 
-        <Box maxW="sm">
+        <Box maxW="lg">
           <Image
             className={css({
               borderRadius: "sm",
