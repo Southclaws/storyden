@@ -1,6 +1,6 @@
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Extension } from "@tiptap/react";
-import { find } from "linkifyjs";
+import { normalizeLink } from "@/lib/link/validation";
 
 export type LinkPasteMenuState = {
   isVisible: boolean;
@@ -81,20 +81,10 @@ export const LinkPasteMenuPlugin = Extension.create({
               return false;
             }
 
-            const links = find(pastedText);
-            if (links.length === 0 || links[0] === undefined) {
+            const url = getSinglePastedUrl(pastedText);
+            if (!url) {
               return false;
             }
-
-            const link = links[0];
-
-            const isSingleURL = links.length === 1 && link.value === pastedText;
-
-            if (!isSingleURL) {
-              return false;
-            }
-
-            const url = link.href;
 
             event.preventDefault();
 
@@ -119,3 +109,11 @@ export const LinkPasteMenuPlugin = Extension.create({
     ];
   },
 });
+
+function getSinglePastedUrl(text: string): string | null {
+  if (/\s/.test(text)) {
+    return null;
+  }
+
+  return normalizeLink(text) ?? null;
+}
