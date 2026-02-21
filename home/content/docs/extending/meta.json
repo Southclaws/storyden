@@ -1,0 +1,17 @@
+{
+    "root": true,
+    "title": "Extending",
+    "description": "Learn how to extend Storyden with custom plugins.",
+    "defaultOpen": false,
+    "pages": [
+        "index",
+        "---Reference---",
+        "model",
+        "supervised-runtimes",
+        "manifest",
+        "capabilities",
+        "security",
+        "api-overview",
+        "rpc"
+    ]
+}

@@ -104,7 +104,7 @@ const (
 	// PluginsTable is the table that holds the plugins relation/edge.
 	PluginsTable = "plugins"
 	// PluginsInverseTable is the table name for the Plugin entity.
-	// It exists in this package in order to avoid circular dependency with the "entplugin" package.
+	// It exists in this package in order to avoid circular dependency with the "plugin" package.
 	PluginsInverseTable = "plugins"
 	// PluginsColumn is the table column denoting the plugins relation/edge.
 	PluginsColumn = "added_by"

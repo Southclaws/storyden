@@ -1,0 +1,8 @@
+id: simple-python-plugin
+name: Simple Python Plugin
+author: storyden
+description: Minimal Python plugin example that logs thread published events.
+version: 0.1.0
+command: "uv"
+args: ["run", "python", "main.py"]
+events_consumed: ["EventThreadPublished"]

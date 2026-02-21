@@ -9,10 +9,14 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 
 /**
- * The state of the plugin, whether it is active, inactive or in an error
-state. When plugins are added, they are initially inactive and must be
-activated before being used. An active plugin can be deactivated or if
-it crashes or encounters an error, it will be set to the "error" state.
+ * The state of the plugin, whether it is active, inactive, starting or in
+an error state. When plugins are added, they are initially inactive and
+must be activated before being used. When activating, the plugin
+transitions through the "starting" state while the process starts and
+connects. An active plugin can be deactivated or if it crashes or
+encounters an error, it will be set to the "restarting" state and a
+restart will be attempted. If this succeeds, it will transition back to
+"active", but if it fails again it will transition to the "error" state.
 
  */
 export type PluginActiveState =
@@ -20,7 +24,10 @@ export type PluginActiveState =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PluginActiveState = {
-  active: "active",
   inactive: "inactive",
+  starting: "starting",
+  connecting: "connecting",
+  active: "active",
   error: "error",
+  restarting: "restarting",
 } as const;

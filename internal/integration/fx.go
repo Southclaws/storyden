@@ -39,6 +39,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		RateLimitPeriod:  time.Hour,
 		RateLimitBucket:  time.Minute,
 		EmailProvider:    "mock",
+		PluginDataPath:   "data/plugins",
 	}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {

@@ -10,9 +10,9 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 // TODO: Should be named profile updater tbh, is not account-specific.
@@ -79,7 +79,7 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u.bus.Publish(ctx, &message.EventAccountUpdated{
+	u.bus.Publish(ctx, &rpc.EventAccountUpdated{
 		ID: id,
 	})
 

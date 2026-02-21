@@ -14,12 +14,16 @@ describes the version information, the author, its requested access and
 other information that the plugin has provided.
 
 This data structure is direct from the plugin itself and is not modified
-by the runtime. This same schema is provided to plugin authors.
+by the runtime. As such, it's not part of the Storyden HTTP API contract
+so it's left as a free-form object here so that HTTP clients don't rely
+on its structure here. That being said, the manifest format is defined
+in a contract as part of the Plugin RPC spec which is a separate spec.
+
+As a HTTP API consumer, you probably won't need to interact with this in
+such a way that requires validation, however if you do need the schema,
+it is located in `plugin.yaml` in the same folder as this specification.
 
  */
 export interface PluginManifest {
-  /** The name of the plugin. */
-  name: string;
-  /** The version of the plugin. */
-  version: string;
+  [key: string]: unknown;
 }

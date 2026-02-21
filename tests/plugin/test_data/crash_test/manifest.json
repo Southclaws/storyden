@@ -1,0 +1,11 @@
+{
+  "id": "crash-test",
+  "author": "storyden",
+  "name": "Crash Test Plugin",
+  "description": "Test plugin that crashes when it receives a ThreadPublished event",
+  "version": "1.0.0",
+  "command": "./crash_test",
+  "events_consumed": [
+    "EventThreadPublished"
+  ]
+}

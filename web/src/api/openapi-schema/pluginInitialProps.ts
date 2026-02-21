@@ -7,8 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.3-canary
  */
+import type { PluginInitialExternal } from "./pluginInitialExternal";
+import type { PluginInitialSupervised } from "./pluginInitialSupervised";
 
-export interface PluginInitialProps {
-  /** A remote URL pointing to a `.wasm` Storyden plugin file. */
-  url: string;
-}
+export type PluginInitialProps =
+  | PluginInitialSupervised
+  | PluginInitialExternal;

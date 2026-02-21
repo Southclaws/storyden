@@ -1,7 +1,8 @@
 {
     "pages": [
         "introduction",
-        "operation",
+        "extending",
+        "cookbook",
         "reference",
         "api"
     ]

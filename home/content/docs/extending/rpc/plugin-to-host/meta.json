@@ -1,0 +1,7 @@
+{
+    "pages": [
+        "index",
+        "access_get",
+        "get_config"
+    ]
+}

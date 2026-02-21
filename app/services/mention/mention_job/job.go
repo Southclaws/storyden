@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func runMentionConsumer(
@@ -18,8 +18,8 @@ func runMentionConsumer(
 	ic *mentionConsumer,
 ) {
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(ctx, bus, "mention_job.notify_mentions", func(ctx context.Context, evt *message.EventMemberMentioned) error {
-			if err := ic.mention(ctx, evt.By, evt.Source, evt.Item); err != nil {
+		_, err := pubsub.Subscribe(ctx, bus, "mention_job.notify_mentions", func(ctx context.Context, evt *rpc.EventMemberMentioned) error {
+			if err := ic.mention(ctx, evt.By, evt.Source.ToDomain(), evt.Item.ToDomain()); err != nil {
 				logger.Error("failed to record mention", slog.String("error", err.Error()))
 				return err
 			}

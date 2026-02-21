@@ -12,10 +12,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Assignment struct {
@@ -90,7 +90,7 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	w.bus.Publish(ctx, &message.EventAccountUpdated{
+	w.bus.Publish(ctx, &rpc.EventAccountUpdated{
 		ID: accountID,
 	})
 

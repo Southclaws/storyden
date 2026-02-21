@@ -26,7 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
-	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -144,7 +144,7 @@ func (_q *AccountQuery) QueryPlugins() *PluginQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(account.Table, account.FieldID, selector),
-			sqlgraph.To(entplugin.Table, entplugin.FieldID),
+			sqlgraph.To(plugin.Table, plugin.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PluginsTable, account.PluginsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
@@ -1547,7 +1547,7 @@ func (_q *AccountQuery) loadPlugins(ctx context.Context, query *PluginQuery, nod
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(entplugin.FieldAddedBy)
+		query.ctx.AppendFieldOnce(plugin.FieldAddedBy)
 	}
 	query.Where(predicate.Plugin(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.PluginsColumn), fks...))

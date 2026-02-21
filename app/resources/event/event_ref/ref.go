@@ -20,6 +20,19 @@ type EventID xid.ID
 
 func (e EventID) String() string { return xid.ID(e).String() }
 
+func (e EventID) MarshalJSON() ([]byte, error) {
+	return xid.ID(e).MarshalJSON()
+}
+
+func (e *EventID) UnmarshalJSON(data []byte) error {
+	var id xid.ID
+	if err := id.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*e = EventID(id)
+	return nil
+}
+
 type Event struct {
 	ID           EventID
 	CreatedAt    time.Time

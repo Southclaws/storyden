@@ -18,12 +18,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/otp"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var (
@@ -93,7 +93,7 @@ func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opt
 			fmsg.WithDesc("failed to create account", "Unable to create your account."))
 	}
 
-	s.bus.Publish(ctx, &message.EventAccountCreated{
+	s.bus.Publish(ctx, &rpc.EventAccountCreated{
 		ID: acc.Account.ID,
 	})
 

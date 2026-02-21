@@ -1,0 +1,10 @@
+{
+    "root": true,
+    "title": "Cookbook",
+    "description": "More than a static forum? Mix features together to make... more features?",
+    "defaultOpen": false,
+    "pages": [
+        "index",
+        "discord-integration-plugin"
+    ]
+}

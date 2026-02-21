@@ -1,0 +1,38 @@
+golang:
+  output: "../lib/plugin/rpc"
+  package: "rpc"
+  optional_style: "opt"
+  format_mappings:
+    xid:
+      type: "xid.ID"
+      import: "github.com/rs/xid"
+    postID:
+      type: "post.ID"
+      import: "github.com/Southclaws/storyden/app/resources/post"
+    accountID:
+      type: "account.AccountID"
+      import: "github.com/Southclaws/storyden/app/resources/account"
+    nodeID:
+      type: "library.NodeID"
+      import: "github.com/Southclaws/storyden/app/resources/library"
+    eventID:
+      type: "event_ref.EventID"
+      import: "github.com/Southclaws/storyden/app/resources/event/event_ref"
+    reportID:
+      type: "report.ID"
+      import: "github.com/Southclaws/storyden/app/resources/report"
+    reportStatus:
+      type: "report.Status"
+      import: "github.com/Southclaws/storyden/app/resources/report"
+    datagraphRef:
+      type: "datagraph.Ref"
+      import: "github.com/Southclaws/storyden/app/resources/datagraph"
+    notificationEvent:
+      type: "notification.Event"
+      import: "github.com/Southclaws/storyden/app/resources/account/notification"
+
+typescript:
+  output: "../sdk/typescript/src/rpc"
+
+python:
+  output: "../sdk/python/storyden/rpc"

@@ -35,6 +35,13 @@ var (
 	OperationIDPluginGet                        = OperationID{`PluginGet`}
 	OperationIDPluginDelete                     = OperationID{`PluginDelete`}
 	OperationIDPluginSetActiveState             = OperationID{`PluginSetActiveState`}
+	OperationIDPluginGetLogs                    = OperationID{`PluginGetLogs`}
+	OperationIDPluginCycleToken                 = OperationID{`PluginCycleToken`}
+	OperationIDPluginUpdateManifest             = OperationID{`PluginUpdateManifest`}
+	OperationIDPluginUpdatePackage              = OperationID{`PluginUpdatePackage`}
+	OperationIDPluginGetConfigurationSchema     = OperationID{`PluginGetConfigurationSchema`}
+	OperationIDPluginGetConfiguration           = OperationID{`PluginGetConfiguration`}
+	OperationIDPluginUpdateConfiguration        = OperationID{`PluginUpdateConfiguration`}
 	OperationIDRoleCreate                       = OperationID{`RoleCreate`}
 	OperationIDRoleList                         = OperationID{`RoleList`}
 	OperationIDRoleUpdateOrder                  = OperationID{`RoleUpdateOrder`}
@@ -243,6 +250,20 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDPluginDelete, nil
 	case string(`PluginSetActiveState`):
 		return OperationIDPluginSetActiveState, nil
+	case string(`PluginGetLogs`):
+		return OperationIDPluginGetLogs, nil
+	case string(`PluginCycleToken`):
+		return OperationIDPluginCycleToken, nil
+	case string(`PluginUpdateManifest`):
+		return OperationIDPluginUpdateManifest, nil
+	case string(`PluginUpdatePackage`):
+		return OperationIDPluginUpdatePackage, nil
+	case string(`PluginGetConfigurationSchema`):
+		return OperationIDPluginGetConfigurationSchema, nil
+	case string(`PluginGetConfiguration`):
+		return OperationIDPluginGetConfiguration, nil
+	case string(`PluginUpdateConfiguration`):
+		return OperationIDPluginUpdateConfiguration, nil
 	case string(`RoleCreate`):
 		return OperationIDRoleCreate, nil
 	case string(`RoleList`):

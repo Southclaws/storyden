@@ -10,9 +10,16 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   NoContentResponse,
   PluginAddBody,
+  PluginCycleTokenOKResponse,
+  PluginGetConfigurationOKResponse,
+  PluginGetConfigurationSchemaOKResponse,
+  PluginGetLogsOKResponse,
   PluginGetOKResponse,
   PluginListOKResponse,
   PluginSetActiveStateBody,
+  PluginUpdateConfigurationBody,
+  PluginUpdateManifestBody,
+  PluginUpdatePackageBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -60,10 +67,7 @@ export const pluginAdd = async (
   return fetcher<Promise<pluginAddResponse>>(getPluginAddUrl(), {
     ...options,
     method: "POST",
-    headers: {
-      "Content-Type": "application/octet-stream",
-      ...options?.headers,
-    },
+    headers: { "Content-Type": "application/zip", ...options?.headers },
     body: JSON.stringify(pluginAddBody),
   });
 };
@@ -150,6 +154,221 @@ export const pluginSetActiveState = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(pluginSetActiveStateBody),
+    },
+  );
+};
+
+/**
+ * Stream the logs for the specified plugin. If the plugin is running, this
+endpoint will stream live logs after the existing logs have been sent.
+
+ */
+export type pluginGetLogsResponse = {
+  data: PluginGetLogsOKResponse;
+  status: number;
+};
+
+export const getPluginGetLogsUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/logs`;
+};
+
+export const pluginGetLogs = async (
+  pluginInstanceId: string,
+  options?: RequestInit,
+): Promise<pluginGetLogsResponse> => {
+  return fetcher<Promise<pluginGetLogsResponse>>(
+    getPluginGetLogsUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Cycles the static bearer token for an external plugin and returns the
+newly generated token. This operation is only valid for external
+plugins. Supervised plugins cycle their connection token automatically.
+
+ */
+export type pluginCycleTokenResponse = {
+  data: PluginCycleTokenOKResponse;
+  status: number;
+};
+
+export const getPluginCycleTokenUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/token`;
+};
+
+export const pluginCycleToken = async (
+  pluginInstanceId: string,
+  options?: RequestInit,
+): Promise<pluginCycleTokenResponse> => {
+  return fetcher<Promise<pluginCycleTokenResponse>>(
+    getPluginCycleTokenUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+/**
+ * Update the manifest for a plugin. This is used for development of plugins
+where the manifest may change frequently and it's useful to be able to
+update it without re-uploading the entire plugin bundle.
+
+This only works for External plugins that were created by uploading a 
+manifest directly. It does not work for Supervised plugins.
+
+ */
+export type pluginUpdateManifestResponse = {
+  data: PluginGetOKResponse;
+  status: number;
+};
+
+export const getPluginUpdateManifestUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/manifest`;
+};
+
+export const pluginUpdateManifest = async (
+  pluginInstanceId: string,
+  pluginUpdateManifestBody: PluginUpdateManifestBody,
+  options?: RequestInit,
+): Promise<pluginUpdateManifestResponse> => {
+  return fetcher<Promise<pluginUpdateManifestResponse>>(
+    getPluginUpdateManifestUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(pluginUpdateManifestBody),
+    },
+  );
+};
+
+/**
+ * Replace the package archive for a supervised plugin installation.
+
+The uploaded package manifest must have the same plugin ID as the
+currently installed plugin. If the plugin is active, it is restarted
+using the new package. If inactive, the package is replaced without
+changing active state.
+
+ */
+export type pluginUpdatePackageResponse = {
+  data: PluginGetOKResponse;
+  status: number;
+};
+
+export const getPluginUpdatePackageUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/package`;
+};
+
+export const pluginUpdatePackage = async (
+  pluginInstanceId: string,
+  pluginUpdatePackageBody: PluginUpdatePackageBody,
+  options?: RequestInit,
+): Promise<pluginUpdatePackageResponse> => {
+  return fetcher<Promise<pluginUpdatePackageResponse>>(
+    getPluginUpdatePackageUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/zip", ...options?.headers },
+      body: JSON.stringify(pluginUpdatePackageBody),
+    },
+  );
+};
+
+/**
+ * Returns the configuration schema for a plugin as defined in its manifest
+file. The schema should be used to render a configuration form for the
+plugin in the client so that administrators can configure the plugin.
+
+ */
+export type pluginGetConfigurationSchemaResponse = {
+  data: PluginGetConfigurationSchemaOKResponse;
+  status: number;
+};
+
+export const getPluginGetConfigurationSchemaUrl = (
+  pluginInstanceId: string,
+) => {
+  return `/plugins/${pluginInstanceId}/configuration-schema`;
+};
+
+export const pluginGetConfigurationSchema = async (
+  pluginInstanceId: string,
+  options?: RequestInit,
+): Promise<pluginGetConfigurationSchemaResponse> => {
+  return fetcher<Promise<pluginGetConfigurationSchemaResponse>>(
+    getPluginGetConfigurationSchemaUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Get the current configuration values for a plugin. The shape of the
+object is defined by the plugin's manifest and should be used to render
+the current configuration state in the client, using the layout driven
+by the result of `PluginGetConfigurationSchema` to build a form-like UI.
+
+ */
+export type pluginGetConfigurationResponse = {
+  data: PluginGetConfigurationOKResponse;
+  status: number;
+};
+
+export const getPluginGetConfigurationUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/configuration`;
+};
+
+export const pluginGetConfiguration = async (
+  pluginInstanceId: string,
+  options?: RequestInit,
+): Promise<pluginGetConfigurationResponse> => {
+  return fetcher<Promise<pluginGetConfigurationResponse>>(
+    getPluginGetConfigurationUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Update the configuration for a plugin. Each plugin defines its own set
+of configuration parameters in its manifest and this endpoint accepts
+any object validated against that schema. When a valid configuration is
+received, it is sent to the plugin via RPC and the plugin is expected to
+apply the new configuration to itself internally.
+
+ */
+export type pluginUpdateConfigurationResponse = {
+  data: PluginGetConfigurationOKResponse;
+  status: number;
+};
+
+export const getPluginUpdateConfigurationUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/configuration`;
+};
+
+export const pluginUpdateConfiguration = async (
+  pluginInstanceId: string,
+  pluginUpdateConfigurationBody: PluginUpdateConfigurationBody,
+  options?: RequestInit,
+): Promise<pluginUpdateConfigurationResponse> => {
+  return fetcher<Promise<pluginUpdateConfigurationResponse>>(
+    getPluginUpdateConfigurationUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(pluginUpdateConfigurationBody),
     },
   );
 };

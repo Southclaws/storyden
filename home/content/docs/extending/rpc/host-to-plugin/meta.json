@@ -1,0 +1,8 @@
+{
+    "pages": [
+        "index",
+        "configure",
+        "event",
+        "ping"
+    ]
+}

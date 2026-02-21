@@ -1,0 +1,27 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestEvent:
+    description: >
+      Delivers a subscribed Storyden event payload to the plugin.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "event"
+          params:
+            $ref: "../../common/events.yaml#/$defs/EventPayload"
+
+  RPCResponseEvent:
+    description: >
+      Acknowledges that the plugin received the event payload.
+    type: object
+    required: ["ok"]
+    properties:
+      method:
+        type: string
+        const: "event"
+      ok:
+        type: boolean

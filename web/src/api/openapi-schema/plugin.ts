@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.3-canary
  */
+import type { PluginInstanceProps } from "./pluginInstanceProps";
 import type { PluginProps } from "./pluginProps";
 
-export type Plugin = PluginProps;
+export type Plugin = PluginProps & PluginInstanceProps;
