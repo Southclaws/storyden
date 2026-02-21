@@ -67,9 +67,9 @@ func New(
 		logger:          logger,
 	}
 
-	m.reconfigureLimiter(ctx)
-
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		m.reconfigureLimiter(hctx)
+
 		_, err := pubsub.Subscribe(ctx, bus, "limiter.settings_updated", func(ctx context.Context, evt *message.EventSettingsUpdated) error {
 			m.reconfigureLimiter(ctx)
 			return nil
