@@ -13,12 +13,56 @@ env:
   IMAGE_NAME: ${{ github.repository }}
   IMAGE_KIND: backend
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  backend-build:
-    runs-on: ubuntu-latest
+  build-arch:
+    name: Build ${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+            platform: linux/amd64
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+
     steps:
       - uses: actions/checkout@v5
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push (arch-specific temp tag)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          file: ${{ env.DOCKERFILE }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:tmp-${{ env.IMAGE_KIND }}-${{ github.sha }}-${{ matrix.arch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  publish-manifest:
+    name: Publish multi-arch tags
+    needs: [build-arch]
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -32,34 +76,29 @@ jobs:
             type=semver,pattern={{version}},branch=main,enable=${{ startsWith(github.ref, 'refs/tags/') }},suffix=-${{ env.IMAGE_KIND }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
+      - name: Set up Docker Buildx (for imagetools)
         uses: docker/setup-buildx-action@v3
-        with:
-          version: latest
-          driver-opts: |
-            image=moby/buildkit:latest
 
-      - name: Login to DockerHub
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: linux/amd64
-          file: ${{ env.DOCKERFILE }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Create and push multi-arch manifests
+        shell: bash
+        run: |
+          set -euo pipefail
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+          AMD="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:tmp-${{ env.IMAGE_KIND }}-${{ github.sha }}-amd64"
+          ARM="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:tmp-${{ env.IMAGE_KIND }}-${{ github.sha }}-arm64"
+
+          echo "${{ steps.meta.outputs.tags }}" | while read -r TAG; do
+            [ -z "$TAG" ] && continue
+            echo "Publishing manifest: $TAG"
+            docker buildx imagetools create \
+              -t "$TAG" \
+              "$AMD" \
+              "$ARM"
+          done
