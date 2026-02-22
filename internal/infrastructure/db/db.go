@@ -37,14 +37,14 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		// provide the underlying *sql.DB and sqlx to the system
-		fx.Provide(newSQL),
+		fx.Provide(NewSQL),
 
 		// construct a new ent client using the *sql.DB provided above
 		fx.Provide(newEntClient),
 	)
 }
 
-func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
+func NewSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 	driver, path, err := getDriver(cfg.DatabaseURL)
 	if err != nil {
 		return nil, nil, fault.Wrap(err)
@@ -70,7 +70,7 @@ var schemaLock = sync.Mutex{}
 func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, err := connect(wctx, cfg, db)
+	client, err := Connect(wctx, cfg, db)
 	if err != nil {
 		cancel()
 		return nil, err
@@ -148,7 +148,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	return client, nil
 }
 
-func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Client, error) {
+func Connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Client, error) {
 	d, _, err := getDriver(cfg.DatabaseURL)
 	if err != nil {
 		return nil, fault.Wrap(err)
