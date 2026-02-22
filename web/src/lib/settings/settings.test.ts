@@ -62,22 +62,26 @@ test("parseSettings keeps valid metadata and applies nested defaults", () => {
 test("parseSettings falls back to defaults for invalid metadata", () => {
   const originalWarn = console.warn;
   let warned = false;
+  let parsed!: ReturnType<typeof parseSettings>;
+
   console.warn = () => {
     warned = true;
   };
 
-  const parsed = parseSettings(
-    baseInfo({
-      metadata: {
-        feed: {
-          layout: { type: "invalid-layout" },
-          source: { type: "threads" },
-        },
-      } as unknown as Info["metadata"],
-    }),
-  );
-
-  console.warn = originalWarn;
+  try {
+    parsed = parseSettings(
+      baseInfo({
+        metadata: {
+          feed: {
+            layout: { type: "invalid-layout" },
+            source: { type: "threads" },
+          },
+        } as unknown as Info["metadata"],
+      }),
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
 
   assert.ok(warned);
   assert.equal(parsed.metadata, DefaultFrontendConfig);
