@@ -1,0 +1,41 @@
+name: Test frontend
+
+on:
+  push:
+    paths-ignore:
+      - "home/**"
+      - ".vscode/**"
+      - "*.md"
+      - "docker/**"
+      - "docker-compose.yml"
+      - "fly.toml"
+      - "renovate.json"
+      - "*.yml"
+      - "*.yaml"
+      - ".nvmrc"
+      - ".vercelignore"
+
+jobs:
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+          cache-dependency-path: web/yarn.lock
+
+      - run: yarn install --immutable
+        working-directory: web
+      - run: yarn test
+        working-directory: web
+      - run: yarn test:ui
+        working-directory: web

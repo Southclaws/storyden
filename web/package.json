@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "openapi": "orval",
-    "test": "uvu -r tsx src '\\.test\\.ts$'"
+    "test": "uvu -r tsx src '\\.test\\.ts$'",
+    "test:ui": "vitest run"
   },
   "dependencies": {
     "@ark-ui/react": "5.26.2",
@@ -73,6 +74,10 @@
     "@pandacss/types": "^1.4.3",
     "@playwright/test": "^1.57.0",
     "@simplewebauthn/types": "^10.0.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/chroma-js": "^3.1.1",
     "@types/dompurify": "^3.2.0",
@@ -85,11 +90,13 @@
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.38.0",
     "eslint-config-next": "16.0.1",
+    "jsdom": "^28.1.0",
     "orval": "7.2.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "uvu": "^0.5.6"
+    "uvu": "^0.5.6",
+    "vitest": "^4.0.18"
   },
   "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f",
   "engines": {

@@ -106,20 +106,31 @@ export const deriveMutationFromDifference = (
         break;
       }
       case "url": {
-        const urlValue = updatedValue as string | undefined;
-        if (urlValue === undefined) {
+        if (updated.link === undefined) {
           Object.assign(mutation, { url: null });
           return;
-        } else {
-          if (!isValidLinkLike(urlValue)) {
-            console.debug(
-              "Skipping mutation for 'url' because it is not valid",
-              updatedValue,
-            );
-            return;
-          }
         }
-        break;
+
+        const rawURL = updated.link.url;
+        if (!isValidLinkLike(rawURL)) {
+          console.debug(
+            "Skipping mutation for 'url' because it is not valid",
+            rawURL,
+          );
+          return;
+        }
+
+        const normalizedURL = normalizeLink(rawURL);
+        if (normalizedURL === undefined) {
+          console.debug(
+            "Skipping mutation for 'url' because it could not be normalized",
+            rawURL,
+          );
+          return;
+        }
+
+        Object.assign(mutation, { url: normalizedURL });
+        return;
       }
       case "primary_image_asset_id": {
         const primaryImageAssetId = updatedValue as Identifier | undefined;
