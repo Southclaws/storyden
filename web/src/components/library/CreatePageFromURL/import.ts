@@ -104,16 +104,23 @@ export async function* importFromURLGenerator({
       // The slug isn't actually used by the backend lol...
       const tempSlug = `temp-${Date.now()}`;
 
+      // Enhance the content with metadata for better AI suggestions
+      const enhancedContent = `URL: ${url}
+Original Title: ${title || "N/A"}
+
+Content:
+${description}`;
+
       try {
         const [tag_suggestions, title_suggestion, content_suggestion] =
           await Promise.all([
-            nodeGenerateTags(tempSlug, { content: description })
+            nodeGenerateTags(tempSlug, { content: enhancedContent })
               .then((r) => r.tags)
               .catch(() => undefined),
-            nodeGenerateTitle(tempSlug, { content: description })
+            nodeGenerateTitle(tempSlug, { content: enhancedContent })
               .then((r) => r.title)
               .catch(() => undefined),
-            nodeGenerateContent(tempSlug, { content: description })
+            nodeGenerateContent(tempSlug, { content: enhancedContent })
               .then((r) => r.content)
               .catch(() => undefined),
           ]);
