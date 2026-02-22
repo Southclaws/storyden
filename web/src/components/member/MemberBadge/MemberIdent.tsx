@@ -1,6 +1,5 @@
 import { AccountRoleRefList, ProfileReference } from "@/api/openapi-schema";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
-import { isDefaultRole } from "@/lib/role/defaults";
 import { parseRoleMetadata } from "@/lib/role/metadata";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
 import { token } from "@/styled-system/tokens";
@@ -43,7 +42,10 @@ export function MemberIdent({
 }
 
 function topRoleForDecoration(roles: AccountRoleRefList) {
-  return roles.find((r) => !isDefaultRole(r));
+  return roles.find((r) => {
+    const metadata = parseRoleMetadata(r.meta);
+    return metadata.bold || metadata.italic || metadata.coloured;
+  });
 }
 
 function getRoleDecorationStyle(

@@ -93,7 +93,7 @@ describe("MemberIdent decorations", () => {
     );
   });
 
-  it("ignores default roles when selecting top role decoration", () => {
+  it("uses default roles when they have decoration metadata", () => {
     const { container } = render(
       <MemberName
         profile={profileWithRoles([
@@ -118,7 +118,7 @@ describe("MemberIdent decorations", () => {
     const root = container.querySelector(
       ".member-name__show-vertical",
     ) as HTMLDivElement;
-    expect(root.style.getPropertyValue("--colors-color-palette")).toBe("#00ff00");
+    expect(root.style.getPropertyValue("--colors-color-palette")).toBe("#ff0000");
   });
 
   it("falls back to subtle default for handle variant when no custom roles", () => {

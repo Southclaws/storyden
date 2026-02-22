@@ -24,6 +24,10 @@ export function isMemberRole(role: { id: Identifier }) {
   return role.id === DefaultRoleMemberID;
 }
 
+export function isAdminRole(role: { id: Identifier }) {
+  return role.id === DefaultRoleAdminID;
+}
+
 // Tells you if a default role has been edited with custom permissions.
 export function isStoredDefaultRole(role: Role) {
   if (!isDefaultRole(role)) {
@@ -38,6 +42,7 @@ export function isEditableDefaultRole(role: Role) {
   switch (role.id) {
     case DefaultRoleMemberID:
     case DefaultRoleGuestID:
+    case DefaultRoleAdminID:
       return true;
 
     default:

@@ -294,7 +294,6 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				adminName := "admin-override-" + xid.New().String()
 				adminColour := "#ef4444"
 				adminMeta := openapi.Metadata{"style": "admin-glow"}
-				adminPerms := toPerms(role.DefaultRoleAdmin.Permissions.List())
 
 				guestName := "guest-override-" + xid.New().String()
 				guestColour := "#64748b"
@@ -331,7 +330,12 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 					Name:        &adminName,
 					Colour:      &adminColour,
 					Meta:        &adminMeta,
-					Permissions: &adminPerms,
+					Permissions: lo.ToPtr(toPerms(role.DefaultRoleAdmin.Permissions.List())),
+				}, authorSession))(t, http.StatusBadRequest)
+				tests.AssertRequest(cl.RoleUpdateWithResponse(authorCtx, role.DefaultRoleAdminID.String(), openapi.RoleUpdateJSONRequestBody{
+					Name:   &adminName,
+					Colour: &adminColour,
+					Meta:   &adminMeta,
 				}, authorSession))(t, http.StatusOK)
 				tests.AssertRequest(cl.RoleUpdateWithResponse(authorCtx, role.DefaultRoleGuestID.String(), openapi.RoleUpdateJSONRequestBody{
 					Name:        &guestName,
@@ -381,6 +385,12 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				)
 
 				roleList := tests.AssertRequest(cl.RoleListWithResponse(authorCtx, authorSession))(t, http.StatusOK)
+				adminRole, found := lo.Find(roleList.JSON200.Roles, func(in openapi.Role) bool {
+					return in.Id == role.DefaultRoleAdminID.String()
+				})
+				r.True(found, "admin default role should be present in role list")
+				a.Equal(openapi.PermissionList{openapi.ADMINISTRATOR}, adminRole.Permissions)
+
 				guestRole, found := lo.Find(roleList.JSON200.Roles, func(in openapi.Role) bool {
 					return in.Id == role.DefaultRoleGuestID.String()
 				})

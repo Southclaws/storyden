@@ -17,7 +17,10 @@ import (
 	ent_role "github.com/Southclaws/storyden/internal/ent/role"
 )
 
-var ErrWritePermissionsNotAllowed = fault.New("write permissions not allowed on guest role")
+var (
+	ErrWritePermissionsNotAllowed = fault.New("write permissions not allowed on guest role")
+	ErrAdminPermissionsNotAllowed = fault.New("cannot set permissions on admin default role")
+)
 
 type Writer struct {
 	db *ent.Client
@@ -179,6 +182,14 @@ func (w *Writer) updateAdminRole(ctx context.Context, opts ...Mutation) (*role.R
 			opt(mutate)
 		}
 
+		if adminPermissionsMutationSubmitted(mutate) {
+			return nil, fault.Wrap(ErrAdminPermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		mutate.SetPermissions(dt.Map(role.DefaultRoleAdmin.Permissions.List(), func(p rbac.Permission) string {
+			return p.String()
+		}))
+
 		r, err := create.Save(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
@@ -194,12 +205,28 @@ func (w *Writer) updateAdminRole(ctx context.Context, opts ...Mutation) (*role.R
 		opt(mutate)
 	}
 
+	if adminPermissionsMutationSubmitted(mutate) {
+		return nil, fault.Wrap(ErrAdminPermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	r, err := update.Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return role.Map(r)
+}
+
+func adminPermissionsMutationSubmitted(mutate *ent.RoleMutation) bool {
+	if _, ok := mutate.Permissions(); ok {
+		return true
+	}
+
+	if perms, ok := mutate.AppendedPermissions(); ok && len(perms) > 0 {
+		return true
+	}
+
+	return false
 }
 
 func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {

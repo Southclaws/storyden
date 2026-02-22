@@ -9,12 +9,14 @@ import { FormLabel } from "@/components/ui/FormLabel";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
+import { InfoIcon } from "@/components/ui/icons/Info";
 import { Input } from "@/components/ui/input";
 import {
   PermissionList,
   buildPermissionList,
 } from "@/lib/permission/permission";
 import {
+  isAdminRole,
   isDefaultRole,
   isGuestRole,
   isStoredDefaultRole,
@@ -35,6 +37,7 @@ export function RoleEditScreen(props: Props) {
   const permissionList = isGuestRole(props.role)
     ? buildPermissionList(...readPermissions)
     : PermissionList;
+  const canEditPermissions = !isAdminRole(props.role);
 
   const isStored = isStoredDefaultRole(props.role);
   const isDefault = isDefaultRole(props.role);
@@ -164,15 +167,23 @@ export function RoleEditScreen(props: Props) {
 
         <FormControl>
           <FormLabel>Permissions</FormLabel>
-          <CardGroupSelect
-            control={form.control}
-            name="permissions"
-            items={permissionList.map((p) => ({
-              value: p.value,
-              label: p.name,
-              description: p.description,
-            }))}
-          />
+          {canEditPermissions ? (
+            <CardGroupSelect
+              control={form.control}
+              name="permissions"
+              items={permissionList.map((p) => ({
+                value: p.value,
+                label: p.name,
+                description: p.description,
+              }))}
+            />
+          ) : (
+            <styled.p color="fg.muted" fontSize="sm">
+              <InfoIcon display="inline" w="4" />
+              &nbsp;You cannot change the permissions granted to the default
+              Admin role. This role implicitly holds all permissions.
+            </styled.p>
+          )}
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
       </LStack>

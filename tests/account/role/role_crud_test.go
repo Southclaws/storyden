@@ -13,6 +13,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -115,6 +116,16 @@ func TestRoleCRUD(t *testing.T) {
 
 				r.NotNil(get.JSON200.Meta)
 				a.Equal(meta, *get.JSON200.Meta)
+			})
+
+			t.Run("admin_default_role_rejects_permission_updates", func(t *testing.T) {
+				name := "admin-default-role-" + xid.New().String()
+				permissions := openapi.PermissionList{openapi.MANAGECATEGORIES}
+
+				tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx, role.DefaultRoleAdminID.String(), openapi.RoleUpdateJSONRequestBody{
+					Name:        &name,
+					Permissions: &permissions,
+				}, adminSession))(t, http.StatusBadRequest)
 			})
 
 			t.Run("role_reorder_custom_roles", func(t *testing.T) {

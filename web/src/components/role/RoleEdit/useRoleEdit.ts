@@ -11,6 +11,7 @@ import {
 } from "@/api/openapi-client/roles";
 import { Role } from "@/api/openapi-schema";
 import { PermissionSchema } from "@/lib/permission/permission";
+import { isAdminRole } from "@/lib/role/defaults";
 import {
   RoleMetadataSchema,
   parseRoleMetadata,
@@ -51,8 +52,10 @@ export function useRoleEditScreen({ role, onSave }: Props) {
     await handle(
       async () => {
         const payload = {
-          ...data,
+          name: data.name,
+          colour: data.colour,
           meta: writeRoleMetadata(role.meta, data.meta),
+          ...(isAdminRole(role) ? {} : { permissions: data.permissions }),
         };
 
         await roleUpdate(role.id, payload);
