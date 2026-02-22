@@ -179,14 +179,14 @@ export function useLibraryMutation(node?: Node) {
     if (genaiAvailable && description) {
       const [tag_suggestions, title_suggestion, content_suggestion] =
         await Promise.all([
-          suggestTags(id, description),
-          suggestTitle(id, description),
-          suggestSummary(id, description),
+          suggestTags(id, description).catch(() => undefined),
+          suggestTitle(id, description).catch(() => undefined),
+          suggestSummary(id, description).catch(() => undefined),
         ]);
       return {
-        title_suggestion,
-        tag_suggestions,
-        content_suggestion,
+        title_suggestion: title_suggestion || title,
+        tag_suggestions: tag_suggestions || [],
+        content_suggestion: content_suggestion || description,
         primary_image,
       };
     }

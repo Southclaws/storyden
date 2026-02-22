@@ -134,6 +134,66 @@ test("deriveMutationFromDifference does not clear url on invalid updated url", (
   assert.equal(result.nodeMutation, {});
 });
 
+test("deriveMutationFromDifference supports autosave URL typing flow", () => {
+  const base = node("root", {
+    link: linkReference("https://example.com/path"),
+  });
+
+  // User is midway through editing URL: autosave should skip this.
+  const invalidDraft = node("root", {
+    link: {
+      ...linkReference("https://example.com/path"),
+      url: "https://exa",
+    },
+  });
+
+  const invalidResult = deriveMutationFromDifference(base, invalidDraft);
+  assert.ok(invalidResult.clean);
+  assert.equal(invalidResult.nodeMutation, {});
+
+  // User finishes URL: autosave should now commit it.
+  const validDraft = node("root", {
+    link: {
+      ...linkReference("https://example.com/path"),
+      url: "https://example.org/new",
+    },
+  });
+
+  const validResult = deriveMutationFromDifference(base, validDraft);
+  assert.not.ok(validResult.clean);
+  assert.equal(validResult.nodeMutation, { url: "https://example.org/new" });
+});
+
+test("deriveMutationFromDifference supports no-scheme URL typing flow", () => {
+  const base = node("root", {
+    link: linkReference("https://example.com/path"),
+  });
+
+  // User starts typing a new domain without scheme: still invalid, skip.
+  const partialNoScheme = node("root", {
+    link: {
+      ...linkReference("https://example.com/path"),
+      url: "website",
+    },
+  });
+
+  const partialResult = deriveMutationFromDifference(base, partialNoScheme);
+  assert.ok(partialResult.clean);
+  assert.equal(partialResult.nodeMutation, {});
+
+  // Once the domain is complete, autosave should commit normalized https URL.
+  const completeNoScheme = node("root", {
+    link: {
+      ...linkReference("https://example.com/path"),
+      url: "website.com",
+    },
+  });
+
+  const completeResult = deriveMutationFromDifference(base, completeNoScheme);
+  assert.not.ok(completeResult.clean);
+  assert.equal(completeResult.nodeMutation, { url: "https://website.com/" });
+});
+
 test("deriveMutationFromDifference sets primary image to null when cleared", () => {
   const current = node("root", { primary_image: asset("img-1") });
   const updated = node("root", { primary_image: undefined });
