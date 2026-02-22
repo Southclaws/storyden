@@ -83,13 +83,14 @@ export default defineConfig({
       wstack: {
         description: "A HStack with full width and spaced children.",
         jsxName: "WStack",
-        transform() {
+        transform(props) {
           return {
             display: "flex",
             flexDirection: "row",
             gap: "3",
             width: "full",
             justifyContent: "space-between",
+            ...props,
           };
         },
       },

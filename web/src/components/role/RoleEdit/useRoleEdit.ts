@@ -11,6 +11,11 @@ import {
 } from "@/api/openapi-client/roles";
 import { Role } from "@/api/openapi-schema";
 import { PermissionSchema } from "@/lib/permission/permission";
+import {
+  RoleMetadataSchema,
+  parseRoleMetadata,
+  writeRoleMetadata,
+} from "@/lib/role/metadata";
 
 export type Props = {
   role: Role;
@@ -21,13 +26,20 @@ export const FormSchema = z.object({
   name: z.string(),
   colour: z.string(),
   permissions: z.array(PermissionSchema),
+  meta: RoleMetadataSchema,
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useRoleEditScreen({ role, onSave }: Props) {
   const { mutate } = useSWRConfig();
+  const parsedMeta = parseRoleMetadata(role.meta);
   const form = useForm<Form>({
-    defaultValues: role,
+    defaultValues: {
+      name: role.name,
+      colour: role.colour,
+      permissions: role.permissions,
+      meta: parsedMeta,
+    },
     resolver: zodResolver(FormSchema),
   });
 
@@ -38,7 +50,12 @@ export function useRoleEditScreen({ role, onSave }: Props) {
   const handleSave = form.handleSubmit(async (data) => {
     await handle(
       async () => {
-        await roleUpdate(role.id, data);
+        const payload = {
+          ...data,
+          meta: writeRoleMetadata(role.meta, data.meta),
+        };
+
+        await roleUpdate(role.id, payload);
         onSave?.();
       },
       {

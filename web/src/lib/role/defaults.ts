@@ -1,10 +1,10 @@
-import { Permission, Role } from "@/api/openapi-schema";
+import { Identifier, Permission, Role } from "@/api/openapi-schema";
 
 const DefaultRoleGuestID = "0000000000000000000g";
 const DefaultRoleMemberID = "000000000000000000m0";
 const DefaultRoleAdminID = "00000000000000000a00";
 
-export function isDefaultRole(role: Role) {
+export function isDefaultRole(role: { id: Identifier }) {
   switch (role.id) {
     case DefaultRoleGuestID:
     case DefaultRoleMemberID:
@@ -16,11 +16,11 @@ export function isDefaultRole(role: Role) {
   }
 }
 
-export function isGuestRole(role: Role) {
+export function isGuestRole(role: { id: Identifier }) {
   return role.id === DefaultRoleGuestID;
 }
 
-export function isMemberRole(role: Role) {
+export function isMemberRole(role: { id: Identifier }) {
   return role.id === DefaultRoleMemberID;
 }
 

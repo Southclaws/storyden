@@ -1,10 +1,14 @@
-import { Role } from "@/api/openapi-schema";
 import { Badge } from "@/components/ui/badge";
 
 import { badgeColourCSS } from "../colours";
 
+type RoleRef = {
+  name: string;
+  colour: string;
+};
+
 export type Props = {
-  role: Role;
+  role: RoleRef;
 };
 
 export function RoleBadge({ role }: Props) {

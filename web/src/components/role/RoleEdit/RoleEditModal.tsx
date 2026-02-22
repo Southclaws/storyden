@@ -11,6 +11,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { isDefaultRole, isEditableDefaultRole } from "@/lib/role/defaults";
+import { DefaultRoleMetadata } from "@/lib/role/metadata";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
 
 import { RoleEditScreen } from "./RoleEditScreen";
@@ -82,6 +83,7 @@ export function RoleCreateModalTrigger() {
         const created = await roleCreate({
           name: uniqueId("New role "),
           colour,
+          meta: DefaultRoleMetadata,
           permissions: [],
         });
 

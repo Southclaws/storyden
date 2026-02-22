@@ -89,7 +89,6 @@ export function ProfileScreen(props: Props) {
                 size="lg"
                 name="full-vertical"
                 showRoles="all"
-                roles={profile.roles}
               />
             )}
 
