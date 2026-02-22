@@ -22,9 +22,9 @@ const trailingDashRegex = /-+$/;
  */
 export function processMarkInput(raw: string): string {
   const noSpaces = raw.replace(spaceRegex, "-");
-  const collapsed = noSpaces.replace(multiDashRegex, "-");
-  const cleaned = collapsed.replace(disallowedChars, "");
-  const lowercase = cleaned.toLowerCase();
+  const cleaned = noSpaces.replace(disallowedChars, "");
+  const collapsed = cleaned.replace(multiDashRegex, "-");
+  const lowercase = collapsed.toLowerCase();
   return lowercase;
 }
 

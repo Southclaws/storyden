@@ -40,8 +40,13 @@ export function createEmitter<
   function emit<K extends keyof TEvents>(type: K, event: TEvents[K]) {
     const set = listeners.get(type);
     if (!set) return;
-    // Copy to array to avoid issues if handlers mutate the set
-    [...set].forEach((fn) => fn(event));
+    // Iterate a snapshot, but consult the live set so removals during dispatch
+    // can prevent later handlers from firing in this cycle.
+    [...set].forEach((fn) => {
+      if (set.has(fn)) {
+        fn(event);
+      }
+    });
   }
 
   return { on, off, emit };
