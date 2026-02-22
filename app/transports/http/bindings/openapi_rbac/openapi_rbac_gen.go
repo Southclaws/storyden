@@ -21,6 +21,18 @@ type OperationPermissions interface {
 	AdminAccountBanRemove() (bool, *rbac.Permission)
 	AdminAccessKeyList() (bool, *rbac.Permission)
 	AdminAccessKeyDelete() (bool, *rbac.Permission)
+	PluginList() (bool, *rbac.Permission)
+	PluginAdd() (bool, *rbac.Permission)
+	PluginGet() (bool, *rbac.Permission)
+	PluginDelete() (bool, *rbac.Permission)
+	PluginSetActiveState() (bool, *rbac.Permission)
+	PluginGetLogs() (bool, *rbac.Permission)
+	PluginCycleToken() (bool, *rbac.Permission)
+	PluginUpdateManifest() (bool, *rbac.Permission)
+	PluginUpdatePackage() (bool, *rbac.Permission)
+	PluginGetConfigurationSchema() (bool, *rbac.Permission)
+	PluginGetConfiguration() (bool, *rbac.Permission)
+	PluginUpdateConfiguration() (bool, *rbac.Permission)
 	RoleCreate() (bool, *rbac.Permission)
 	RoleList() (bool, *rbac.Permission)
 	RoleUpdateOrder() (bool, *rbac.Permission)
@@ -184,6 +196,30 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminAccessKeyList()
 	case "AdminAccessKeyDelete":
 		return optable.AdminAccessKeyDelete()
+	case "PluginList":
+		return optable.PluginList()
+	case "PluginAdd":
+		return optable.PluginAdd()
+	case "PluginGet":
+		return optable.PluginGet()
+	case "PluginDelete":
+		return optable.PluginDelete()
+	case "PluginSetActiveState":
+		return optable.PluginSetActiveState()
+	case "PluginGetLogs":
+		return optable.PluginGetLogs()
+	case "PluginCycleToken":
+		return optable.PluginCycleToken()
+	case "PluginUpdateManifest":
+		return optable.PluginUpdateManifest()
+	case "PluginUpdatePackage":
+		return optable.PluginUpdatePackage()
+	case "PluginGetConfigurationSchema":
+		return optable.PluginGetConfigurationSchema()
+	case "PluginGetConfiguration":
+		return optable.PluginGetConfiguration()
+	case "PluginUpdateConfiguration":
+		return optable.PluginUpdateConfiguration()
 	case "RoleCreate":
 		return optable.RoleCreate()
 	case "RoleList":

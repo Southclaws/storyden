@@ -11,12 +11,12 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *Mutator) Create(
@@ -68,7 +68,7 @@ func (s *Mutator) Create(
 
 	// Only emit created event (which triggers indexing) if reply is published
 	if !wasMovedToReview {
-		s.bus.Publish(ctx, &message.EventThreadReplyCreated{
+		s.bus.Publish(ctx, &rpc.EventThreadReplyCreated{
 			ThreadID:        p.RootPostID,
 			ReplyID:         p.ID,
 			ThreadAuthorID:  p.RootAuthor.ID,

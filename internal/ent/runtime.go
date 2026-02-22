@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -801,6 +802,45 @@ func init() {
 	// notification.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	notification.IDValidator = func() func(string) error {
 		validators := notificationDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	pluginMixin := schema.Plugin{}.Mixin()
+	pluginMixinFields0 := pluginMixin[0].Fields()
+	_ = pluginMixinFields0
+	pluginMixinFields1 := pluginMixin[1].Fields()
+	_ = pluginMixinFields1
+	pluginMixinFields2 := pluginMixin[2].Fields()
+	_ = pluginMixinFields2
+	pluginFields := schema.Plugin{}.Fields()
+	_ = pluginFields
+	// pluginDescCreatedAt is the schema descriptor for created_at field.
+	pluginDescCreatedAt := pluginMixinFields1[0].Descriptor()
+	// plugin.DefaultCreatedAt holds the default value on creation for the created_at field.
+	plugin.DefaultCreatedAt = pluginDescCreatedAt.Default.(func() time.Time)
+	// pluginDescUpdatedAt is the schema descriptor for updated_at field.
+	pluginDescUpdatedAt := pluginMixinFields2[0].Descriptor()
+	// plugin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	plugin.DefaultUpdatedAt = pluginDescUpdatedAt.Default.(func() time.Time)
+	// plugin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	plugin.UpdateDefaultUpdatedAt = pluginDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// pluginDescID is the schema descriptor for id field.
+	pluginDescID := pluginMixinFields0[0].Descriptor()
+	// plugin.DefaultID holds the default value on creation for the id field.
+	plugin.DefaultID = pluginDescID.Default.(func() xid.ID)
+	// plugin.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	plugin.IDValidator = func() func(string) error {
+		validators := pluginDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

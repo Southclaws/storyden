@@ -1,0 +1,58 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+
+title: PluginConfigurationSchema
+type: object
+properties:
+  fields:
+    type: array
+    items:
+      $ref: "#/$defs/PluginConfigurationFieldSchema"
+
+$defs:
+  PluginConfigurationFieldSchema:
+    allOf:
+      - $ref: "#/$defs/PluginConfigurationFieldBase"
+      - $ref: "#/$defs/PluginConfigurationField"
+
+  PluginConfigurationField:
+    oneOf:
+      - $ref: "#/$defs/PluginConfigurationFieldString"
+      - $ref: "#/$defs/PluginConfigurationFieldNumber"
+      - $ref: "#/$defs/PluginConfigurationFieldBoolean"
+
+  PluginConfigurationFieldBase:
+    type: object
+    required: [id, label, description]
+    properties:
+      id:
+        type: string
+        description: |
+          A unique identifier for this configuration field, used for
+          referencing the field in the plugin configuration object.
+      label:
+        type: string
+        description: A human-readable label for the configuration field.
+      description:
+        type: string
+        description: A description of the configuration field.
+
+  PluginConfigurationFieldString:
+    type: object
+    required: [type]
+    properties:
+      type: { type: string, const: string }
+      default: { type: string }
+
+  PluginConfigurationFieldNumber:
+    type: object
+    required: [type]
+    properties:
+      type: { type: string, const: number }
+      default: { type: number }
+
+  PluginConfigurationFieldBoolean:
+    type: object
+    required: [type]
+    properties:
+      type: { type: string, const: boolean }
+      default: { type: boolean }

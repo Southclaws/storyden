@@ -1,0 +1,40 @@
+---
+title: access_get
+description: Plugin to Host RPC method.
+---
+
+`access_get` is a **Plugin to Host** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/plugin-to-host/access_get.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestAccessGet`
+- Response type: `RPCResponseAccessGet`
+
+## Request contract
+
+Request API access credentials provisioned for this plugin.
+
+
+Required fields:
+- `method`
+
+
+
+## Response contract
+
+Returns API base URL and bearer access key for authenticated API calls.
+
+
+Required fields:
+- `result`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

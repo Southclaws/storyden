@@ -639,6 +639,29 @@ func HasSessionsWith(preds ...predicate.Session) predicate.Account {
 	})
 }
 
+// HasPlugins applies the HasEdge predicate on the "plugins" edge.
+func HasPlugins() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PluginsTable, PluginsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPluginsWith applies the HasEdge predicate on the "plugins" edge with a given conditions (other predicates).
+func HasPluginsWith(preds ...predicate.Plugin) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newPluginsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasEmails applies the HasEdge predicate on the "emails" edge.
 func HasEmails() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

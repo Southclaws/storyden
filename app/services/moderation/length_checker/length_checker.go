@@ -10,20 +10,20 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type LengthChecker struct {
 	settingsRepo *settings.SettingsRepository
 	bus          *pubsub.Bus
 
-	mu                     sync.RWMutex
+	mu                  sync.RWMutex
 	threadBodyLengthMax int
 	replyBodyLengthMax  int
-	enabled                bool
+	enabled             bool
 }
 
 func NewLengthChecker(
@@ -32,11 +32,11 @@ func NewLengthChecker(
 	bus *pubsub.Bus,
 ) *LengthChecker {
 	l := &LengthChecker{
-		settingsRepo:           settingsRepo,
-		bus:                    bus,
+		settingsRepo:        settingsRepo,
+		bus:                 bus,
 		threadBodyLengthMax: 60000,
 		replyBodyLengthMax:  10000,
-		enabled:                true,
+		enabled:             true,
 	}
 
 	lc.Append(fx.StartHook(func(ctx context.Context) error {
@@ -78,7 +78,7 @@ func (l *LengthChecker) loadSettings(ctx context.Context) error {
 	return nil
 }
 
-func (l *LengthChecker) handleSettingsUpdate(ctx context.Context, event *message.EventSettingsUpdated) error {
+func (l *LengthChecker) handleSettingsUpdate(ctx context.Context, event *rpc.EventSettingsUpdated) error {
 	if err := l.loadSettings(ctx); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

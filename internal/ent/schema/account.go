@@ -48,6 +48,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("sessions", Session.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("plugins", Plugin.Type).
+			Annotations(entsql.OnDelete(entsql.Restrict)),
+
 		edge.To("emails", Email.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

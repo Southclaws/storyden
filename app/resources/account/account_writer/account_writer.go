@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
@@ -48,6 +49,12 @@ func WithAdmin(admin bool) Option {
 func WithName(name string) Option {
 	return func(a *ent.AccountMutation) {
 		a.SetName(name)
+	}
+}
+
+func WithKind(kind account.AccountKind) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetKind(ent_account.Kind(kind.String()))
 	}
 }
 

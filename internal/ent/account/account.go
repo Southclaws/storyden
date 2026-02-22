@@ -42,6 +42,8 @@ const (
 	FieldInvitedByID = "invited_by_id"
 	// EdgeSessions holds the string denoting the sessions edge name in mutations.
 	EdgeSessions = "sessions"
+	// EdgePlugins holds the string denoting the plugins edge name in mutations.
+	EdgePlugins = "plugins"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
@@ -99,6 +101,13 @@ const (
 	SessionsInverseTable = "sessions"
 	// SessionsColumn is the table column denoting the sessions relation/edge.
 	SessionsColumn = "account_id"
+	// PluginsTable is the table that holds the plugins relation/edge.
+	PluginsTable = "plugins"
+	// PluginsInverseTable is the table name for the Plugin entity.
+	// It exists in this package in order to avoid circular dependency with the "plugin" package.
+	PluginsInverseTable = "plugins"
+	// PluginsColumn is the table column denoting the plugins relation/edge.
+	PluginsColumn = "added_by"
 	// EmailsTable is the table that holds the emails relation/edge.
 	EmailsTable = "emails"
 	// EmailsInverseTable is the table name for the Email entity.
@@ -415,6 +424,20 @@ func BySessionsCount(opts ...sql.OrderTermOption) OrderOption {
 func BySessions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newSessionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPluginsCount orders the results by plugins count.
+func ByPluginsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPluginsStep(), opts...)
+	}
+}
+
+// ByPlugins orders the results by plugins terms.
+func ByPlugins(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPluginsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -751,6 +774,13 @@ func newSessionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SessionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
+	)
+}
+func newPluginsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PluginsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PluginsTable, PluginsColumn),
 	)
 }
 func newEmailsStep() *sqlgraph.Step {

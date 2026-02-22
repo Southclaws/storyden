@@ -13,11 +13,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var ErrNoParent = fault.New("node has no parent", ftag.With(ftag.InvalidArgument))
@@ -124,7 +124,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		p.bus.Publish(ctx, &message.EventNodeUpdated{
+		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
 			Slug: n.GetSlug(),
 		})
@@ -142,7 +142,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		p.bus.Publish(ctx, &message.EventNodeUpdated{
+		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
 			Slug: n.GetSlug(),
 		})
@@ -160,7 +160,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		p.bus.Publish(ctx, &message.EventNodeUpdated{
+		p.bus.Publish(ctx, &rpc.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
 			Slug: n.GetSlug(),
 		})

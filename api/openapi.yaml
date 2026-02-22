@@ -53,6 +53,8 @@ tags:
     description: General metadata for the instance and uncategorised routes.
   - name: admin
     description: Administration and configuration settings.
+  - name: plugins
+    description: Management of plugins.
   - name: roles
     description: Roles for permissions and aesthetics.
   - name: auth
@@ -377,6 +379,230 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "204": { $ref: "#/components/responses/NoContent" }
+
+  #
+  #          888                   d8b
+  #          888                   Y8P
+  #          888
+  # 88888b.  888 888  888  .d88b.  888 88888b.  .d8888b
+  # 888 "88b 888 888  888 d88P"88b 888 888 "88b 88K
+  # 888  888 888 888  888 888  888 888 888  888 "Y8888b.
+  # 888 d88P 888 Y88b 888 Y88b 888 888 888  888      X88
+  # 88888P"  888  "Y88888  "Y88888 888 888  888  88888P'
+  # 888                        888
+  # 888                   Y8b d88P
+  # 888                    "Y88P"
+  #
+
+  /plugins:
+    get:
+      operationId: PluginList
+      description: List all plugins that are installed on the instance.
+      tags: [plugins]
+      security: [browser: []]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/PluginListOK" }
+    post:
+      operationId: PluginAdd
+      description: |
+        Add a plugin to the instance. This will not install or activate the
+        plugin immediately. It will validate and prepare the plugin for install.
+
+        Plugins can be uploaded directly as files or via a URL to a repository.
+      tags: [plugins]
+      security: [browser: []]
+      requestBody: { $ref: "#/components/requestBodies/PluginAdd" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+
+  /plugins/{plugin_instance_id}:
+    get:
+      operationId: PluginGet
+      description: Get information about a specific plugin.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+    delete:
+      operationId: PluginDelete
+      description: |
+        Completely delete a plugin from the instance. This will uninstall the
+        plugin first then remove its binary file from the storage backend.
+
+        Some plugins may write additional data to the instance, this will not
+        be removed by this operation unless the plugin cleans up after itself.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /plugins/{plugin_instance_id}/active:
+    patch:
+      operationId: PluginSetActiveState
+      description: |
+        Change the active state of a plugin.
+
+        This operation only applies to supervised plugins.
+
+        - `active`: starts the supervised plugin process.
+        - `inactive`: stops the supervised plugin process.
+
+        External plugins cannot be managed with this endpoint and will return
+        a bad request error.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/PluginSetActiveState" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+
+  /plugins/{plugin_instance_id}/logs:
+    get:
+      operationId: PluginGetLogs
+      description: |
+        Stream logs for a supervised plugin.
+
+        If the plugin is running, this endpoint streams live logs after
+        existing log history is sent.
+
+        External plugins do not have host-managed logs and this endpoint
+        returns a bad request error for external mode.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetLogsOK" }
+
+  /plugins/{plugin_instance_id}/token:
+    post:
+      operationId: PluginCycleToken
+      description: |
+        Cycles the static bearer token for an external plugin and returns the
+        newly generated token. This operation is only valid for external
+        plugins. Supervised plugins cycle their connection token automatically.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginCycleTokenOK" }
+
+  /plugins/{plugin_instance_id}/manifest:
+    patch:
+      operationId: PluginUpdateManifest
+      description: |
+        Update the manifest for a plugin. This is used for development of plugins
+        where the manifest may change frequently and it's useful to be able to
+        update it without re-uploading the entire plugin bundle.
+
+        This only works for External plugins that were created by uploading a 
+        manifest directly. It does not work for Supervised plugins.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/PluginUpdateManifest" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+
+  /plugins/{plugin_instance_id}/package:
+    patch:
+      operationId: PluginUpdatePackage
+      description: |
+        Replace the package archive for a supervised plugin installation.
+
+        The uploaded package manifest must have the same plugin ID as the
+        currently installed plugin. If the plugin is active, it is restarted
+        using the new package. If inactive, the package is replaced without
+        changing active state.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/PluginUpdatePackage" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+
+  /plugins/{plugin_instance_id}/configuration-schema:
+    get:
+      operationId: PluginGetConfigurationSchema
+      description: |
+        Returns the configuration schema for a plugin as defined in its manifest
+        file. The schema should be used to render a configuration form for the
+        plugin in the client so that administrators can configure the plugin.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetConfigurationSchemaOK" }
+
+  /plugins/{plugin_instance_id}/configuration:
+    get:
+      operationId: PluginGetConfiguration
+      description: |
+        Get the current configuration values for a plugin. The shape of the
+        object is defined by the plugin's manifest and should be used to render
+        the current configuration state in the client, using the layout driven
+        by the result of `PluginGetConfigurationSchema` to build a form-like UI.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetConfigurationOK" }
+
+    patch:
+      operationId: PluginUpdateConfiguration
+      description: |
+        Update the configuration for a plugin. Each plugin defines its own set
+        of configuration parameters in its manifest and this endpoint accepts
+        any object validated against that schema. When a valid configuration is
+        received, it is sent to the plugin via RPC and the plugin is expected to
+        apply the new configuration to itself internally.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      requestBody:
+        { $ref: "#/components/requestBodies/PluginUpdateConfiguration" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetConfigurationOK" }
 
   #
   #                 888
@@ -2482,6 +2708,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    PluginIDParam:
+      description: Plugin ID.
+      in: path
+      name: plugin_instance_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     RoleIDParam:
       description: Role ID
       in: path
@@ -2976,6 +3210,37 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/ModerationActionInitialProps" }
 
+    PluginAdd:
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: binary
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginInitialProps" }
+
+    PluginSetActiveState:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginActiveStateMutableProps" }
+
+    PluginUpdateManifest:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginManifest" }
+
+    PluginUpdatePackage:
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: binary
+
+    PluginUpdateConfiguration:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginConfiguration" }
+
     RoleCreate:
       content:
         application/json:
@@ -3304,6 +3569,48 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuditEvent"
+
+    PluginListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PluginListResult"
+
+    PluginGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Plugin"
+
+    PluginGetLogsOK:
+      description: OK
+      content:
+        text/event-stream:
+          schema:
+            type: string
+
+    PluginCycleTokenOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PluginCycleToken"
+
+    PluginGetConfigurationSchemaOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PluginConfigurationSchema"
+
+    PluginGetConfigurationOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PluginConfiguration"
 
     AuditEventCreatedOK:
       description: OK
@@ -4467,6 +4774,380 @@ components:
         - nodes
         - collections
         - profile_bio
+
+    #
+    # 8888888b.  888                   d8b
+    # 888   Y88b 888                   Y8P
+    # 888    888 888
+    # 888   d88P 888 888  888  .d88b.  888 88888b.
+    # 8888888P"  888 888  888 d88P"88b 888 888 "88b
+    # 888        888 888  888 888  888 888 888  888
+    # 888        888 Y88b 888 Y88b 888 888 888  888
+    # 888        888  "Y88888  "Y88888 888 888  888
+    #                              888
+    #                         Y8b d88P
+    #                          "Y88P"
+    #
+
+    Plugin:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PluginProps"
+        - $ref: "#/components/schemas/PluginInstanceProps"
+
+    PluginProps:
+      type: object
+      required: [id, added_at, name, status, manifest]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        added_at:
+          type: string
+          format: date-time
+          description: The time the plugin was installed.
+        name: { $ref: "#/components/schemas/PluginName" }
+        description: { $ref: "#/components/schemas/PluginDescription" }
+        version: { $ref: "#/components/schemas/PluginVersion" }
+        status: { $ref: "#/components/schemas/PluginStatus" }
+        manifest: { $ref: "#/components/schemas/PluginManifest" }
+
+    PluginInstanceProps:
+      type: object
+      required: [connection]
+      properties:
+        connection:
+          $ref: "#/components/schemas/PluginModeUnion"
+
+    PluginModeUnion:
+      type: object
+      discriminator:
+        propertyName: mode
+        mapping:
+          supervised: "#/components/schemas/PluginSupervisedProps"
+          external: "#/components/schemas/PluginExternalProps"
+      oneOf:
+        - $ref: "#/components/schemas/PluginSupervisedProps"
+        - $ref: "#/components/schemas/PluginExternalProps"
+
+    PluginSupervisedProps:
+      type: object
+      required: [mode]
+      properties:
+        mode: { $ref: "#/components/schemas/PluginMode" }
+
+    PluginExternalProps:
+      type: object
+      required: [mode, token]
+      properties:
+        mode: { $ref: "#/components/schemas/PluginMode" }
+        token:
+          type: string
+          description: |
+            Static bearer token for external plugins. This field is present
+            for external plugins and omitted for supervised plugins.
+
+    PluginCycleToken:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+
+    PluginInitialProps:
+      type: object
+      discriminator:
+        propertyName: mode
+        mapping:
+          supervised: "#/components/schemas/PluginInitialSupervised"
+          external: "#/components/schemas/PluginInitialExternal"
+      oneOf:
+        - $ref: "#/components/schemas/PluginInitialSupervised"
+        - $ref: "#/components/schemas/PluginInitialExternal"
+
+    PluginInitialSupervised:
+      description: |
+        A supervised plugin is a plugin that is managed and hosted by the 
+        Storyden runtime itself. The URL points to the plugin's source file
+        which the runtime will read, verify and then host itself for the plugin
+        process to connect to.
+
+        This is identical to uploading a plugin directly via binary file, the
+        only difference is it's fetched from a URL rather than uploaded.
+      type: object
+      required: [mode, url]
+      properties:
+        mode: { $ref: "#/components/schemas/PluginMode" }
+        url:
+          type: string
+          format: uri
+          description: A remote URL pointing to a Storyden plugin file.
+
+    PluginInitialExternal:
+      description: |
+        An external plugin is a plugin that is hosted and managed outside of the
+        Storyden runtime. The payload accepts a manifest as defined in the 
+        Plugin RPC spec (`plugin.yaml`) which will be validated upon submission.
+      type: object
+      required: [mode, manifest]
+      properties:
+        mode: { $ref: "#/components/schemas/PluginMode" }
+        manifest:
+          $ref: "#/components/schemas/PluginManifest"
+
+    PluginActiveStateMutableProps:
+      type: object
+      required: [active]
+      properties:
+        active: { $ref: "#/components/schemas/PluginActiveState" }
+
+    PluginManifest:
+      type: object
+      description: |
+        The plugin's manifest information read from the plugin itself. This 
+        describes the version information, the author, its requested access and
+        other information that the plugin has provided.
+
+        This data structure is direct from the plugin itself and is not modified
+        by the runtime. As such, it's not part of the Storyden HTTP API contract
+        so it's left as a free-form object here so that HTTP clients don't rely
+        on its structure here. That being said, the manifest format is defined
+        in a contract as part of the Plugin RPC spec which is a separate spec.
+
+        As a HTTP API consumer, you probably won't need to interact with this in
+        such a way that requires validation, however if you do need the schema,
+        it is located in `plugin.yaml` in the same folder as this specification.
+      additionalProperties: true
+
+    PluginConfigurationSchema:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/PluginConfigurationFieldUnion"
+
+    PluginConfigurationFieldUnion:
+      allOf:
+        - $ref: "#/components/schemas/PluginConfigurationFieldBase"
+        - $ref: "#/components/schemas/PluginConfigurationField"
+
+    PluginConfigurationField:
+      discriminator:
+        propertyName: type
+        mapping:
+          string: "#/components/schemas/PluginConfigurationFieldString"
+          number: "#/components/schemas/PluginConfigurationFieldNumber"
+          boolean: "#/components/schemas/PluginConfigurationFieldBoolean"
+      oneOf:
+        - $ref: "#/components/schemas/PluginConfigurationFieldString"
+        - $ref: "#/components/schemas/PluginConfigurationFieldNumber"
+        - $ref: "#/components/schemas/PluginConfigurationFieldBoolean"
+
+    PluginConfigurationFieldBase:
+      type: object
+      required: [name]
+      properties:
+        id:
+          type: string
+          description: |
+            A unique identifier for this configuration field, used for
+            referencing the field in the plugin configuration object.
+        label:
+          type: string
+          description: A human-readable label for the configuration field.
+        description:
+          type: string
+          description: A description of the configuration field.
+
+    PluginConfigurationFieldString:
+      type: object
+      required: [type, name]
+      properties:
+        type: { type: string, enum: [string] }
+        default: { type: string }
+
+    PluginConfigurationFieldNumber:
+      type: object
+      required: [type, name]
+      properties:
+        type: { type: string, enum: [number] }
+        default: { type: number }
+
+    PluginConfigurationFieldBoolean:
+      type: object
+      required: [type, name]
+      properties:
+        type: { type: string, enum: [boolean] }
+        default: { type: boolean }
+
+    PluginConfiguration:
+      type: object
+      description: |
+        The plugin's configuration as defined by the plugin itself. This is a
+        free-form object that the plugin can define and use for its own purposes.
+        The Storyden runtime does not interpret or modify this data in any way,
+        but simply stores it and provides it to the plugin when requested.
+
+        This is not part of the plugin manifest and is not required to be
+        provided when adding a plugin, but can be set and updated separately
+        after the plugin is added. This allows for dynamic configuration of
+        plugins without needing to modify their manifest or re-add them.
+      additionalProperties: true
+
+    PluginName:
+      description: |
+        The name of the plugin, as defined in the plugin's manifest. This is not
+        a unique identifier and is only used for display purposes.
+      type: string
+
+    PluginDescription:
+      description: |
+        The description of the plugin, as defined in the plugin's manifest.
+      type: string
+
+    PluginVersion:
+      description: |
+        The version of the plugin, as defined in the plugin's manifest. This is
+        not used for any versioning or compatibility purposes by the runtime and
+        is only used for display purposes currently.
+      type: string
+
+    PluginMode:
+      type: string
+      description: |
+        The mode of the plugin, whether it is supervised or external. A
+        supervised plugin is managed and hosted by the Storyden runtime itself,
+        while an external plugin is hosted and managed outside of the Storyden
+        runtime. The mode determines how the plugin interacts with RPCs.
+      enum: [supervised, external]
+
+    PluginActiveState:
+      type: string
+      description: |
+        The state of the plugin, whether it is active, inactive, starting or in
+        an error state. When plugins are added, they are initially inactive and
+        must be activated before being used. When activating, the plugin
+        transitions through the "starting" state while the process starts and
+        connects. An active plugin can be deactivated or if it crashes or
+        encounters an error, it will be set to the "restarting" state and a
+        restart will be attempted. If this succeeds, it will transition back to
+        "active", but if it fails again it will transition to the "error" state.
+      enum:
+        - inactive
+        - starting
+        - connecting
+        - active
+        - error
+        - restarting
+
+    PluginStatus:
+      type: object
+      discriminator:
+        propertyName: active_state
+        mapping:
+          inactive: "#/components/schemas/PluginStatusInactive"
+          starting: "#/components/schemas/PluginStatusStarting"
+          connecting: "#/components/schemas/PluginStatusConnecting"
+          active: "#/components/schemas/PluginStatusActive"
+          error: "#/components/schemas/PluginStatusError"
+          restarting: "#/components/schemas/PluginStatusRestarting"
+      oneOf:
+        - $ref: "#/components/schemas/PluginStatusInactive"
+        - $ref: "#/components/schemas/PluginStatusStarting"
+        - $ref: "#/components/schemas/PluginStatusConnecting"
+        - $ref: "#/components/schemas/PluginStatusActive"
+        - $ref: "#/components/schemas/PluginStatusError"
+        - $ref: "#/components/schemas/PluginStatusRestarting"
+
+    PluginStatusInactive:
+      type: object
+      required: [active_state, deactivated_at]
+      properties:
+        active_state:
+          type: string
+          enum: [inactive]
+        deactivated_at:
+          type: string
+          format: date-time
+          description: The time the plugin was deactivated.
+
+    PluginStatusStarting:
+      type: object
+      required: [active_state, starting_at]
+      properties:
+        active_state:
+          type: string
+          enum: [starting]
+        starting_at:
+          type: string
+          format: date-time
+          description: The time the plugin process started launching.
+
+    PluginStatusConnecting:
+      type: object
+      required: [active_state, connecting_at]
+      properties:
+        active_state:
+          type: string
+          enum: [connecting]
+        connecting_at:
+          type: string
+          format: date-time
+          description: The time the plugin process started waiting for websocket connection.
+
+    PluginStatusActive:
+      type: object
+      required: [active_state, activated_at]
+      properties:
+        active_state:
+          type: string
+          enum: [active]
+        activated_at:
+          type: string
+          format: date-time
+          description: The time the plugin was activated.
+
+    PluginStatusError:
+      type: object
+      description: |
+        If the plugin status is "error" this object will contain the message and
+        any additional technical information provided by the plugin or runtime.
+      required: [active_state, message, details]
+      properties:
+        active_state:
+          type: string
+          enum: [error]
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    PluginStatusRestarting:
+      type: object
+      description: |
+        If the plugin status is "restarting", this object will contain the last
+        error that caused the restart.
+      required: [active_state, message, details]
+      properties:
+        active_state:
+          type: string
+          enum: [restarting]
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    PluginList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Plugin"
+
+    PluginListResult:
+      type: object
+      required: [plugins]
+      properties:
+        plugins: { $ref: "#/components/schemas/PluginList" }
 
     #
     # 8888888b.          888

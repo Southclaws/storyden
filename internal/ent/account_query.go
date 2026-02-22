@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -46,6 +47,7 @@ type AccountQuery struct {
 	inters                     []Interceptor
 	predicates                 []predicate.Account
 	withSessions               *SessionQuery
+	withPlugins                *PluginQuery
 	withEmails                 *EmailQuery
 	withNotifications          *NotificationQuery
 	withTriggeredNotifications *NotificationQuery
@@ -122,6 +124,28 @@ func (_q *AccountQuery) QuerySessions() *SessionQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(session.Table, session.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.SessionsTable, account.SessionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPlugins chains the current query on the "plugins" edge.
+func (_q *AccountQuery) QueryPlugins() *PluginQuery {
+	query := (&PluginClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(plugin.Table, plugin.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PluginsTable, account.PluginsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -850,6 +874,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		inters:                     append([]Interceptor{}, _q.inters...),
 		predicates:                 append([]predicate.Account{}, _q.predicates...),
 		withSessions:               _q.withSessions.Clone(),
+		withPlugins:                _q.withPlugins.Clone(),
 		withEmails:                 _q.withEmails.Clone(),
 		withNotifications:          _q.withNotifications.Clone(),
 		withTriggeredNotifications: _q.withTriggeredNotifications.Clone(),
@@ -889,6 +914,17 @@ func (_q *AccountQuery) WithSessions(opts ...func(*SessionQuery)) *AccountQuery 
 		opt(query)
 	}
 	_q.withSessions = query
+	return _q
+}
+
+// WithPlugins tells the query-builder to eager-load the nodes that are connected to
+// the "plugins" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithPlugins(opts ...func(*PluginQuery)) *AccountQuery {
+	query := (&PluginClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPlugins = query
 	return _q
 }
 
@@ -1234,8 +1270,9 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [25]bool{
+		loadedTypes = [26]bool{
 			_q.withSessions != nil,
+			_q.withPlugins != nil,
 			_q.withEmails != nil,
 			_q.withNotifications != nil,
 			_q.withTriggeredNotifications != nil,
@@ -1287,6 +1324,13 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadSessions(ctx, query, nodes,
 			func(n *Account) { n.Edges.Sessions = []*Session{} },
 			func(n *Account, e *Session) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPlugins; query != nil {
+		if err := _q.loadPlugins(ctx, query, nodes,
+			func(n *Account) { n.Edges.Plugins = []*Plugin{} },
+			func(n *Account, e *Plugin) { n.Edges.Plugins = append(n.Edges.Plugins, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1487,6 +1531,36 @@ func (_q *AccountQuery) loadSessions(ctx context.Context, query *SessionQuery, n
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadPlugins(ctx context.Context, query *PluginQuery, nodes []*Account, init func(*Account), assign func(*Account, *Plugin)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(plugin.FieldAddedBy)
+	}
+	query.Where(predicate.Plugin(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.PluginsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AddedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "added_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -1,0 +1,34 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestPing:
+    description: >
+      Health-check request sent by the host to verify plugin responsiveness.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method"]
+        properties:
+          method:
+            type: string
+            const: "ping"
+          params:
+            type: object
+            properties: {}
+
+  RPCResponsePing:
+    description: >
+      Health-check response from the plugin.
+    type: object
+    required: ["pong"]
+    properties:
+      method:
+        type: string
+        const: "ping"
+      pong:
+        type: boolean
+      uptime_seconds:
+        type: number
+        description: "How long the plugin has been running"
+      status:
+        type: string
+        description: "Optional status message"

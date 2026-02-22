@@ -63,6 +63,9 @@ type Node func(*sql.Selector)
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)
 
+// Plugin is the predicate function for plugin builders.
+type Plugin func(*sql.Selector)
+
 // Post is the predicate function for post builders.
 type Post func(*sql.Selector)
 
