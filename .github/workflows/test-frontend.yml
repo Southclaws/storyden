@@ -37,3 +37,5 @@ jobs:
         working-directory: web
       - run: yarn test
         working-directory: web
+      - run: yarn test:ui
+        working-directory: web

@@ -32,7 +32,7 @@ export function CreateBlockMenu({
   function handleSelect(value: MenuSelectionDetails) {
     emit("library:add-block", {
       type: value.value as LibraryPageBlock["type"],
-      index: index ? index : undefined,
+      index: index ?? undefined,
     });
   }
 
