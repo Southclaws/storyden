@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  closestCenter,
   DndContext,
   DragEndEvent,
   PointerSensor,
@@ -148,7 +149,6 @@ function SortableRoleGrid({ roles, canEdit }: SortableRoleGridProps) {
                   roles: optimisticRoles,
                 };
               },
-              commit: (_current, result) => result,
             },
           ],
           async () => {
@@ -167,7 +167,11 @@ function SortableRoleGrid({ roles, canEdit }: SortableRoleGridProps) {
   }
 
   return (
-    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
       <SortableContext items={allRoleIDs} strategy={rectSortingStrategy}>
         <CardGrid>
           {roles.map((r) => (
@@ -208,7 +212,7 @@ function SortableRoleCard({
   });
 
   const dragStyle = {
-    transform: CSS.Translate.toString(transform),
+    transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
   };

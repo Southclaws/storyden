@@ -16,7 +16,6 @@ export type Props = {
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   showRoles?: "hidden" | "badge" | "all";
-  roles?: AccountRoleList;
   avatar?: "hidden" | "visible";
 
   // NOTE: If you don't need either of these, just render a <MemberIdent />.
@@ -36,7 +35,6 @@ export function MemberBadge({
   name = "hidden",
   avatar = "visible",
   showRoles = "hidden",
-  roles,
   as = "menu",
 }: Props) {
   const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
@@ -52,7 +50,6 @@ export function MemberBadge({
             size={size}
             name={name}
             showRoles={showRoles}
-            roles={roles}
             avatar={avatar}
           />
         </MemberOptionsMenu>
@@ -70,7 +67,6 @@ export function MemberBadge({
         size={size}
         name={name}
         showRoles={showRoles}
-        roles={roles}
         avatar={avatar}
       />
     </Link>

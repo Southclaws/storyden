@@ -1,4 +1,4 @@
-import { AccountRoleList } from "@/api/openapi-schema";
+import { AccountRoleRefList } from "@/api/openapi-schema";
 import { Badge } from "@/components/ui/badge";
 import * as Popover from "@/components/ui/popover";
 import { HStack } from "@/styled-system/jsx";
@@ -6,7 +6,7 @@ import { HStack } from "@/styled-system/jsx";
 import { RoleBadge } from "./RoleBadge";
 
 export type Props = {
-  roles: AccountRoleList;
+  roles: AccountRoleRefList;
   onlyBadgeRole?: boolean;
   limit?: number;
 };
@@ -53,11 +53,11 @@ export function RoleBadgeList({ roles, onlyBadgeRole, limit }: Props) {
   );
 }
 
-function filterBadgeRole(roles: AccountRoleList) {
+function filterBadgeRole(roles: AccountRoleRefList) {
   return roles.filter((r) => r.badge);
 }
 
-function filterDefaults(roles: AccountRoleList) {
+function filterDefaults(roles: AccountRoleRefList) {
   return roles.filter((r) => {
     if (r.default) {
       if (r.name === "Admin") {

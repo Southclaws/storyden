@@ -1,6 +1,9 @@
-import { AccountRoleList, ProfileReference } from "@/api/openapi-schema";
+import { AccountRoleRefList, ProfileReference } from "@/api/openapi-schema";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
+import { isDefaultRole } from "@/lib/role/defaults";
+import { parseRoleMetadata } from "@/lib/role/metadata";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
+import { token } from "@/styled-system/tokens";
 
 import { MemberAvatar } from "./MemberAvatar";
 
@@ -9,7 +12,6 @@ export type Props = {
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   showRoles?: "hidden" | "badge" | "all";
-  roles?: AccountRoleList;
   avatar?: "hidden" | "visible";
 };
 
@@ -19,7 +21,6 @@ export function MemberIdent({
   name = "hidden",
   avatar = "visible",
   showRoles = "hidden",
-  roles,
 }: Props) {
   return (
     <HStack
@@ -36,10 +37,33 @@ export function MemberIdent({
         size={size}
         name={name}
         showRoles={showRoles}
-        roles={roles}
       />
     </HStack>
   );
+}
+
+function topRoleForDecoration(roles: AccountRoleRefList) {
+  return roles.find((r) => !isDefaultRole(r));
+}
+
+function getRoleDecorationStyle(
+  roles: AccountRoleRefList,
+  defaultColour: string,
+  defaultWeight: string,
+  boldWeight: string,
+) {
+  const role = topRoleForDecoration(roles);
+  const metadata = role ? parseRoleMetadata(role.meta) : null;
+  const resolvedWeight = metadata?.bold ? boldWeight : defaultWeight;
+  const resolvedStyle = metadata?.italic ? "italic" : "normal";
+  const resolvedColour =
+    metadata?.coloured && role?.colour ? role.colour : defaultColour;
+
+  return {
+    "--colors-color-palette": resolvedColour,
+    "--decoration-font-style": resolvedStyle,
+    "--decoration-font-weight": resolvedWeight,
+  } as any;
 }
 
 export function MemberName({
@@ -47,10 +71,20 @@ export function MemberName({
   size,
   name = "hidden",
   showRoles = "hidden",
-  roles,
 }: Props) {
   switch (name) {
-    case "full-horizontal":
+    case "full-horizontal": {
+      const decorationStyle = getRoleDecorationStyle(
+        profile.roles,
+        token("colors.fg.default"),
+        size === "lg"
+          ? token("fontWeights.semibold")
+          : token("fontWeights.normal"),
+        size === "lg"
+          ? token("fontWeights.extrabold")
+          : token("fontWeights.bold"),
+      );
+
       return (
         <Flex
           className="member-name__show-horizontal"
@@ -58,18 +92,20 @@ export function MemberName({
           direction="row"
           gap="1"
           alignItems="center"
+          style={decorationStyle}
         >
           <styled.p
             className="member-name__show-horizontal-display-name"
             minW="0"
             fontSize={size}
-            fontWeight={size === "lg" ? "bold" : "medium"}
+            fontWeight="var(--decoration-font-weight)"
+            fontStyle="var(--decoration-font-style)"
             overflowX="hidden"
             overflowY="clip"
             textWrap="nowrap"
             textOverflow="ellipsis"
             lineHeight="tight"
-            color="fg.default"
+            color="colorPalette"
             _containerSmall={{
               display: "none",
             }}
@@ -87,14 +123,29 @@ export function MemberName({
             lineHeight="tight"
             fontSize={size}
             fontWeight="normal"
+            _containerSmall={{
+              color: "colorPalette",
+              fontWeight: "var(--decoration-font-weight)",
+              fontStyle: "var(--decoration-font-style)",
+            }}
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} showRoles={showRoles} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} />
         </Flex>
       );
+    }
 
-    case "full-vertical":
+    case "full-vertical": {
+      const decorationStyle = getRoleDecorationStyle(
+        profile.roles,
+        token("colors.fg.default"),
+        size === "lg"
+          ? token("fontWeights.bold")
+          : token("fontWeights.semibold"),
+        token("fontWeights.extrabold"),
+      );
+
       return (
         <Flex
           className="member-name__show-vertical"
@@ -103,18 +154,20 @@ export function MemberName({
           direction="column"
           gap="0"
           alignItems="start"
+          style={decorationStyle}
         >
           <styled.p
             className="member-name__show-vertical-display-name"
             minW="0"
             fontSize={size}
-            fontWeight={size === "lg" ? "bold" : "medium"}
+            fontWeight="var(--decoration-font-weight)"
+            fontStyle="var(--decoration-font-style)"
             overflowX="hidden"
             overflowY="clip"
             textWrap="nowrap"
             textOverflow="ellipsis"
             lineHeight="tight"
-            color="fg.default"
+            color="colorPalette"
             _containerSmall={{
               display: size === "xs" ? "none" : undefined,
             }}
@@ -139,51 +192,68 @@ export function MemberName({
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} showRoles={showRoles} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} />
         </Flex>
       );
+    }
 
-    case "handle":
+    case "handle": {
+      const decorationStyle = getRoleDecorationStyle(
+        profile.roles,
+        token("colors.fg.subtle"),
+        size === "lg"
+          ? token("fontWeights.medium")
+          : token("fontWeights.normal"),
+        size === "lg"
+          ? token("fontWeights.bold")
+          : token("fontWeights.semibold"),
+      );
+
       return (
         <HStack
           className="member-name__show-handle"
           maxW="full"
           gap="1"
           minW="0"
+          style={decorationStyle}
         >
           <styled.p
             className="member-name__show-handle-handle"
             fontSize={size}
-            fontWeight="normal"
+            fontWeight="var(--decoration-font-weight)"
+            fontStyle="var(--decoration-font-style)"
             overflowX="hidden"
             overflowY="clip"
             textWrap="nowrap"
             textOverflow="ellipsis"
             lineHeight="tight"
-            color="fg.subtle"
+            color="colorPalette"
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} showRoles={showRoles} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} />
         </HStack>
       );
+    }
 
     case "hidden":
       return null;
   }
 }
 
-function Roles({
-  showRoles,
-  roles,
-}: Pick<Props, "profile" | "showRoles" | "roles">) {
+function Roles({ profile, showRoles }: Pick<Props, "profile" | "showRoles">) {
   if (!showRoles) {
     return null;
   }
 
-  if (showRoles === "hidden" || !roles) {
+  if (showRoles === "hidden") {
     return null;
   }
 
-  return <RoleBadgeList roles={roles} onlyBadgeRole={showRoles === "badge"} />;
+  return (
+    <RoleBadgeList
+      roles={profile.roles}
+      onlyBadgeRole={showRoles === "badge"}
+    />
+  );
 }

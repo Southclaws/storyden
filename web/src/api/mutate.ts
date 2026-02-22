@@ -28,8 +28,10 @@ export async function mutateTransaction<
   const snapshots = await Promise.all(
     targets.map(async (t) => ({
       target: t,
-      // mutate(key) returns current cached data (Promise<T | undefined>)
-      prev: await mutate(t.key),
+      // Read current cache value without triggering a revalidation request.
+      prev: await mutate(t.key, (current: any) => current, {
+        revalidate: false,
+      }),
     })),
   );
 

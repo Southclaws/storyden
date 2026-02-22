@@ -2,13 +2,14 @@ import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const wstackConfig = {
-transform() {
+transform(props20) {
   return {
     display: "flex",
     flexDirection: "row",
     gap: "3",
     width: "full",
-    justifyContent: "space-between"
+    justifyContent: "space-between",
+    ...props20
   };
 }}
 
