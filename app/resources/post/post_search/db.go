@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -21,11 +22,12 @@ import (
 )
 
 type database struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) Repository {
-	return &database{db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) Repository {
+	return &database{db: db, roleQuerier: roleQuerier}
 }
 
 func (d *database) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*post.Post], error) {
@@ -38,9 +40,6 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 		Query().
 		Where(predicate).
 		WithAuthor().
-		WithReacts(func(rq *ent.ReactQuery) {
-			rq.WithAccount().Order(react.ByCreatedAt())
-		}).
 		WithTags().
 		WithRoot().
 		Order(ent.Asc(ent_post.FieldCreatedAt)).
@@ -61,6 +60,16 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 
 	r, err := q.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, p := range r {
+		if p.Edges.Author != nil {
+			roleTargets = append(roleTargets, p.Edges.Author)
+		}
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -98,6 +107,23 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 
 	result, err := q.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(result)*4)
+	for _, p := range result {
+		if p.Edges.Author != nil {
+			roleTargets = append(roleTargets, p.Edges.Author)
+		}
+
+		for _, reactionEdge := range p.Edges.Reacts {
+			if reactionEdge == nil || reactionEdge.Edges.Account == nil {
+				continue
+			}
+			roleTargets = append(roleTargets, reactionEdge.Edges.Account)
+		}
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

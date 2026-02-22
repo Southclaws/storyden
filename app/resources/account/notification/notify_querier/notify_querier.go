@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -22,10 +23,11 @@ import (
 type Querier struct {
 	db           *ent.Client
 	postSearcher post_search.Repository
+	roleQuerier  *role_querier.Querier
 }
 
-func New(db *ent.Client, postSearcher post_search.Repository) *Querier {
-	return &Querier{db: db, postSearcher: postSearcher}
+func New(db *ent.Client, postSearcher post_search.Repository, roleQuerier *role_querier.Querier) *Querier {
+	return &Querier{db: db, postSearcher: postSearcher, roleQuerier: roleQuerier}
 }
 
 func (n *Querier) ListNotifications(ctx context.Context, accountID account.AccountID) (notification.Notifications, error) {
@@ -35,6 +37,16 @@ func (n *Querier) ListNotifications(ctx context.Context, accountID account.Accou
 		WithSource().
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, row := range r {
+		if row.Edges.Source != nil {
+			roleTargets = append(roleTargets, row.Edges.Source)
+		}
+	}
+	if err := n.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

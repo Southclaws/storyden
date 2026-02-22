@@ -11,17 +11,19 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 )
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
 type Result struct {
@@ -48,6 +50,16 @@ func (q *Querier) GetFollowers(ctx context.Context, id account.AccountID, page, 
 		WithFollower().
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, follow := range r {
+		if follow.Edges.Follower != nil {
+			roleTargets = append(roleTargets, follow.Edges.Follower)
+		}
+	}
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -88,6 +100,16 @@ func (q *Querier) GetFollowing(ctx context.Context, id account.AccountID, page, 
 		WithFollowing().
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, follow := range r {
+		if follow.Edges.Following != nil {
+			roleTargets = append(roleTargets, follow.Edges.Following)
+		}
+	}
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

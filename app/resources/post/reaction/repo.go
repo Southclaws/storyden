@@ -12,20 +12,22 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/react"
 )
 
 var ErrInvalidEmoji = errors.New("invalid emoji codepoint")
 
-func New(db *ent.Client) (*Querier, *Writer) {
-	q := &Querier{db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) (*Querier, *Writer) {
+	q := &Querier{db: db, roleQuerier: roleQuerier}
 	w := &Writer{db, q}
 	return q, w
 }
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
 func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
@@ -37,6 +39,10 @@ func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound))
 		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, r.Edges.Account); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -56,6 +62,10 @@ func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postI
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound))
 		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, r.Edges.Account); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

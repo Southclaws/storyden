@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -17,11 +18,12 @@ import (
 )
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
 func (d *Querier) Get(ctx context.Context, id post.ID) (*reply.Reply, error) {
@@ -41,6 +43,10 @@ func (d *Querier) Get(ctx context.Context, id post.ID) (*reply.Reply, error) {
 		}).
 		Only(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleHydrationTargets(p)...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
@@ -69,6 +75,14 @@ func (d *Querier) GetMany(ctx context.Context, ids ...post.ID) ([]*reply.Reply, 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
+	targets := make([]*ent.Account, 0, len(posts)*2)
+	for _, p := range posts {
+		targets = append(targets, roleHydrationTargets(p)...)
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, targets...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
 	replies := make([]*reply.Reply, 0, len(posts))
 	for _, p := range posts {
 		r, err := reply.Map(p)
@@ -79,6 +93,27 @@ func (d *Querier) GetMany(ctx context.Context, ids ...post.ID) ([]*reply.Reply, 
 	}
 
 	return replies, nil
+}
+
+func roleHydrationTargets(p *ent.Post) []*ent.Account {
+	targets := make([]*ent.Account, 0, 3)
+	if p.Edges.Author != nil {
+		targets = append(targets, p.Edges.Author)
+	}
+
+	if root := p.Edges.Root; root != nil {
+		if root.Edges.Author != nil {
+			targets = append(targets, root.Edges.Author)
+		}
+	}
+
+	if replyTo := p.Edges.ReplyTo; replyTo != nil {
+		if replyTo.Edges.Author != nil {
+			targets = append(targets, replyTo.Edges.Author)
+		}
+	}
+
+	return targets
 }
 
 func (d *Querier) Probe(ctx context.Context, id post.ID) (*reply.ReplyRef, error) {

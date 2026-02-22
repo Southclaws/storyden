@@ -210,6 +210,10 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, accountEdges...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	accountLookup = account.NewAccountLookup(accountEdges)
 
 	// Join all data together

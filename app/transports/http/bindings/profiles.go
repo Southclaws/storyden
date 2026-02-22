@@ -326,6 +326,7 @@ func serialiseProfileReference(a profile.Ref) openapi.ProfileReference {
 		Suspended: a.Deleted.Ptr(),
 		Handle:    (openapi.AccountHandle)(a.Handle),
 		Name:      a.Name,
+		Roles:     serialiseHeldRoleRefList(a.Roles),
 	}
 }
 
@@ -336,6 +337,7 @@ func serialiseProfileReferenceFromAccount(a account.Account) openapi.ProfileRefe
 		Suspended: a.DeletedAt.Ptr(),
 		Handle:    (openapi.AccountHandle)(a.Handle),
 		Name:      a.Name,
+		Roles:     serialiseHeldRoleRefList(a.Roles),
 	}
 }
 

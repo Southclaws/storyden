@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -22,12 +23,13 @@ import (
 )
 
 type Writer struct {
-	db      *ent.Client
-	querier *reply_querier.Querier
+	db          *ent.Client
+	querier     *reply_querier.Querier
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client, querier *reply_querier.Querier) *Writer {
-	return &Writer{db: db, querier: querier}
+func New(db *ent.Client, querier *reply_querier.Querier, roleQuerier *role_querier.Querier) *Writer {
+	return &Writer{db: db, querier: querier, roleQuerier: roleQuerier}
 }
 
 type Option func(*ent.PostMutation)
@@ -193,6 +195,14 @@ func (d *Writer) Update(ctx context.Context, id post.ID, opts ...Option) (*reply
 		}
 
 		return nil, fault.Wrap(err, fmsg.With("failed to query updated reply"), fctx.With(ctx))
+	}
+
+	targets := []*ent.Account{p.Edges.Author}
+	if p.Edges.Root != nil {
+		targets = append(targets, p.Edges.Root.Edges.Author)
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, targets...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return reply.Map(p)

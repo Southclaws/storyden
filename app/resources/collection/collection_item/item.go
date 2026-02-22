@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -19,12 +20,13 @@ import (
 )
 
 type Repository struct {
-	db      *ent.Client
-	querier *collection_querier.Querier
+	db          *ent.Client
+	querier     *collection_querier.Querier
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client, querier *collection_querier.Querier) *Repository {
-	return &Repository{db: db, querier: querier}
+func New(db *ent.Client, querier *collection_querier.Querier, roleQuerier *role_querier.Querier) *Repository {
+	return &Repository{db: db, querier: querier, roleQuerier: roleQuerier}
 }
 
 type itemChange struct {
@@ -180,6 +182,24 @@ func (d *Repository) ProbeItem(ctx context.Context, qk collection.QueryKey, item
 		}).
 		Only(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, 3)
+	if owner := r.Edges.Owner; owner != nil {
+		roleTargets = append(roleTargets, owner)
+	}
+	if len(r.Edges.CollectionNodes) > 0 && r.Edges.CollectionNodes[0] != nil {
+		if nodeEdge := r.Edges.CollectionNodes[0].Edges.Node; nodeEdge != nil && nodeEdge.Edges.Owner != nil {
+			roleTargets = append(roleTargets, nodeEdge.Edges.Owner)
+		}
+	}
+	if len(r.Edges.CollectionPosts) > 0 && r.Edges.CollectionPosts[0] != nil {
+		if postEdge := r.Edges.CollectionPosts[0].Edges.Post; postEdge != nil && postEdge.Edges.Author != nil {
+			roleTargets = append(roleTargets, postEdge.Edges.Author)
+		}
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

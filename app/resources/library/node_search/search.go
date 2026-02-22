@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -66,14 +67,16 @@ func WithTags(names ...tag_ref.Name) Option {
 }
 
 type service struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client, raw *sqlx.DB) Search {
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_querier.Querier) Search {
 	return &service{
-		db:  db,
-		raw: raw,
+		db:          db,
+		raw:         raw,
+		roleQuerier: roleQuerier,
 	}
 }
 
@@ -123,6 +126,14 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 
 	r, err := query.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r)*2)
+	for _, n := range r {
+		roleTargets = append(roleTargets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+	if err := s.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

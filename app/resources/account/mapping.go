@@ -23,6 +23,14 @@ func MapRef(a *ent.Account) (*Account, error) {
 		return nil, err
 	}
 
+	var roles held.Roles
+	if rolesEdge := a.Edges.AccountRoles; rolesEdge != nil {
+		roles, err = held.MapList(rolesEdge)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &Account{
 		ID:        AccountID(a.ID),
 		CreatedAt: a.CreatedAt,
@@ -33,6 +41,7 @@ func MapRef(a *ent.Account) (*Account, error) {
 		Bio:      bio,
 		Kind:     kind,
 		Admin:    a.Admin, // TODO: should this be derived from roles?
+		Roles:    roles,
 		Metadata: a.Metadata,
 
 		DeletedAt: opt.NewPtr(a.DeletedAt),
@@ -40,68 +49,65 @@ func MapRef(a *ent.Account) (*Account, error) {
 	}, nil
 }
 
-func MapAccount(roles held.Roles) func(a *ent.Account) (*AccountWithEdges, error) {
-	return func(a *ent.Account) (*AccountWithEdges, error) {
-		ref, err := MapRef(a)
-		if err != nil {
-			return nil, err
-		}
-
-		authsEdge, err := a.Edges.AuthenticationOrErr()
-		if err != nil {
-			return nil, err
-		}
-
-		emailsEdge, err := a.Edges.EmailsOrErr()
-		if err != nil {
-			return nil, err
-		}
-
-		auths := dt.Map(authsEdge, func(a *ent.Authentication) string {
-			return a.Service
-		})
-
-		verifiedStatus := VerifiedStatusNone
-		if len(dt.Filter(emailsEdge, func(e *ent.Email) bool { return e.Verified })) > 0 {
-			verifiedStatus = VerifiedStatusVerifiedEmail
-		}
-
-		emails := dt.Map(emailsEdge, MapEmail)
-
-		invitedByEdge := opt.NewPtr(a.Edges.InvitedBy)
-
-		invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Account, error) {
-			c, err := i.Edges.CreatorOrErr()
-			if err != nil {
-				return Account{}, err
-			}
-
-			ib, err := MapRef(c)
-			if err != nil {
-				return Account{}, err
-			}
-
-			return *ib, nil
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		links, err := dt.MapErr(a.Links, MapExternalLink)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		return &AccountWithEdges{
-			Account:        *ref,
-			Roles:          roles,
-			Auths:          auths,
-			EmailAddresses: emails,
-			VerifiedStatus: verifiedStatus,
-			InvitedBy:      invitedBy,
-			ExternalLinks:  links,
-		}, nil
+func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
+	ref, err := MapRef(a)
+	if err != nil {
+		return nil, err
 	}
+
+	authsEdge, err := a.Edges.AuthenticationOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	emailsEdge, err := a.Edges.EmailsOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	auths := dt.Map(authsEdge, func(a *ent.Authentication) string {
+		return a.Service
+	})
+
+	verifiedStatus := VerifiedStatusNone
+	if len(dt.Filter(emailsEdge, func(e *ent.Email) bool { return e.Verified })) > 0 {
+		verifiedStatus = VerifiedStatusVerifiedEmail
+	}
+
+	emails := dt.Map(emailsEdge, MapEmail)
+
+	invitedByEdge := opt.NewPtr(a.Edges.InvitedBy)
+
+	invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Account, error) {
+		c, err := i.Edges.CreatorOrErr()
+		if err != nil {
+			return Account{}, err
+		}
+
+		ib, err := MapRef(c)
+		if err != nil {
+			return Account{}, err
+		}
+
+		return *ib, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	links, err := dt.MapErr(a.Links, MapExternalLink)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return &AccountWithEdges{
+		Account:        *ref,
+		Auths:          auths,
+		EmailAddresses: emails,
+		VerifiedStatus: verifiedStatus,
+		InvitedBy:      invitedBy,
+		ExternalLinks:  links,
+	}, nil
 }
 
 func MapEmail(in *ent.Email) *EmailAddress {

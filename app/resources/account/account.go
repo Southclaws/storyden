@@ -31,6 +31,7 @@ type Account struct {
 	Name     string
 	Bio      datagraph.Content
 	Kind     AccountKind
+	Roles    held.Roles
 	Admin    bool
 	Metadata map[string]any
 
@@ -40,7 +41,6 @@ type Account struct {
 
 type AccountWithEdges struct {
 	Account
-	Roles          held.Roles
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus
