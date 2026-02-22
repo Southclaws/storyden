@@ -31,11 +31,8 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*profile.P
 		Where(account_ent.ID(xid.ID(id))).
 		WithTags().
 		WithEmails().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		WithAuthentication()
 
@@ -48,12 +45,12 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*profile.P
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
+	err = d.roleQuerier.HydrateRoleEdges(ctx, profile.RoleHydrationTargets(result)...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := profile.Map(hr)(result)
+	acc, err := profile.Map(result)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -70,7 +67,6 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*profile.P
 	q := d.db.Account.
 		Query().
 		Where(account_ent.Handle(handle)).
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
 			iq.WithCreator()
 		}).
@@ -85,12 +81,12 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*profile.P
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
+	err = d.roleQuerier.HydrateRoleEdges(ctx, profile.RoleHydrationTargets(result)...)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := profile.Map(hr)(result)
+	acc, err := profile.Map(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -110,27 +106,25 @@ func (d *Querier) GetMany(ctx context.Context, ids ...account.AccountID) ([]*pro
 		Query().
 		Where(account_ent.IDIn(xids...)).
 		WithTags().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Optimise: roleQuerier needs a mapping lookup, edge aggregations
-	// are probably not needed downstream.
+	roleTargets := make([]*ent.Account, 0, len(accounts)*2)
+	for _, a := range accounts {
+		roleTargets = append(roleTargets, profile.RoleHydrationTargets(a)...)
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	profiles := make([]*profile.Public, 0, len(accounts))
 	for _, a := range accounts {
-		hr, err := d.roleQuerier.ListFor(ctx, a)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		acc, err := profile.Map(hr)(a)
+		acc, err := profile.Map(a)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

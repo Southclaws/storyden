@@ -15,6 +15,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -26,13 +27,14 @@ import (
 )
 
 type Querier struct {
-	db  *ent.Client
-	raw *sqlx.DB
-	aq  *account_querier.Querier
+	db          *ent.Client
+	raw         *sqlx.DB
+	aq          *account_querier.Querier
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
-	return &Querier{db, raw, aq}
+func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier, roleQuerier *role_querier.Querier) *Querier {
+	return &Querier{db: db, raw: raw, aq: aq, roleQuerier: roleQuerier}
 }
 
 type options struct {
@@ -204,6 +206,10 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, library.RoleHydrationTargetsFromNode(col)...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	propSchema := library.PropertySchemaQueryRows{}
 	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
 	if err != nil {
@@ -352,6 +358,14 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	roleTargets := make([]*ent.Account, 0, len(nodes))
+	for _, n := range nodes {
+		roleTargets = append(roleTargets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	propSchema := library.PropertySchemaQueryRows{}
 	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, parentID.String())
 	if err != nil {
@@ -397,6 +411,10 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, library.RoleHydrationTargetsFromNode(col)...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	r, err := library.MapNode(true, nil)(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -422,6 +440,14 @@ func (q *Querier) ProbeMany(ctx context.Context, ids ...library.NodeID) ([]*libr
 
 	nodes, err := query.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(nodes))
+	for _, n := range nodes {
+		roleTargets = append(roleTargets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

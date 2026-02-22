@@ -214,6 +214,25 @@ func serialiseHeldRoleList(in held.Roles) openapi.AccountRoleList {
 	return dt.Map(in, serialiseHeldRolePtr)
 }
 
+func serialiseHeldRoleRef(in held.Role) openapi.AccountRoleRef {
+	return openapi.AccountRoleRef{
+		Id:      in.ID.String(),
+		Name:    in.Name,
+		Colour:  in.Colour,
+		Meta:    serialiseMetadata(in.Metadata),
+		Badge:   in.Badge,
+		Default: in.Default,
+	}
+}
+
+func serialiseHeldRoleRefPtr(in *held.Role) openapi.AccountRoleRef {
+	return serialiseHeldRoleRef(*in)
+}
+
+func serialiseHeldRoleRefList(in held.Roles) openapi.AccountRoleRefList {
+	return dt.Map(in, serialiseHeldRoleRefPtr)
+}
+
 func serialisePermission(in rbac.Permission) openapi.Permission {
 	return openapi.Permission(in.String())
 }

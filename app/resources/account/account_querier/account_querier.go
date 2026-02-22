@@ -36,9 +36,7 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		WithTags().
 		WithEmails().
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		WithAuthentication()
 
@@ -51,12 +49,11 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
-	if err != nil {
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleHydrationTargets(result)...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := account.MapAccount(hr)(result)
+	acc, err := account.MapAccount(result)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -71,9 +68,7 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		WithTags().
 		WithEmails().
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			iq.WithCreator()
 		}).
 		WithAuthentication()
 
@@ -86,12 +81,11 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	hr, err := d.roleQuerier.ListFor(ctx, result)
-	if err != nil {
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleHydrationTargets(result)...); err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := account.MapAccount(hr)(result)
+	acc, err := account.MapAccount(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -112,6 +106,10 @@ func (d *Querier) ProbeMany(ctx context.Context, handles ...string) ([]*account.
 		).
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, accounts...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -143,5 +141,22 @@ func (d *Querier) ListByHeldPermission(ctx context.Context, perms ...rbac.Permis
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, accounts...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return dt.MapErr(accounts, account.MapRef)
+}
+
+func roleHydrationTargets(acc *ent.Account) []*ent.Account {
+	targets := []*ent.Account{acc}
+
+	if invitedBy := acc.Edges.InvitedBy; invitedBy != nil {
+		creator, err := invitedBy.Edges.CreatorOrErr()
+		if err == nil {
+			targets = append(targets, creator)
+		}
+	}
+
+	return targets
 }

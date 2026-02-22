@@ -94,6 +94,10 @@ func (w *Writer) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (
 		return w.updateGuestRole(ctx, opts...)
 	}
 
+	if id == role.DefaultRoleAdminID {
+		return w.updateAdminRole(ctx, opts...)
+	}
+
 	update := w.db.Role.UpdateOneID(xid.ID(id))
 	mutation := update.Mutation()
 
@@ -156,6 +160,48 @@ func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role
 	return role.Map(r)
 }
 
+func (w *Writer) updateAdminRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+	rl, found, err := w.lookupRole(ctx, role.DefaultRoleAdminID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !found {
+		create := w.db.Role.Create()
+		mutate := create.Mutation()
+
+		// The default Admin role has a hard-coded ID.
+		mutate.SetID(xid.ID(role.DefaultRoleAdminID))
+		mutate.SetName("Admin")
+		mutate.SetSortKey(role.DefaultRoleAdmin.SortKey)
+
+		for _, opt := range opts {
+			opt(mutate)
+		}
+
+		r, err := create.Save(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return role.Map(r)
+	}
+
+	update := rl.Update()
+	mutate := update.Mutation()
+	mutate.SetSortKey(role.DefaultRoleAdmin.SortKey)
+	for _, opt := range opts {
+		opt(mutate)
+	}
+
+	r, err := update.Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return role.Map(r)
+}
+
 func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
 	rl, found, err := w.lookupRole(ctx, role.DefaultRoleGuestID)
 	if err != nil {
@@ -196,6 +242,13 @@ func (w *Writer) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.R
 	mutate.SetSortKey(role.DefaultRoleGuest.SortKey)
 	for _, opt := range opts {
 		opt(mutate)
+	}
+
+	if perms, ok := mutate.Permissions(); ok {
+		list, _ := rbac.NewPermissions(perms)
+		if list.HasAnyWrite() {
+			return nil, fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
 	}
 
 	r, err := update.Save(ctx)

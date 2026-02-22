@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
@@ -17,11 +18,12 @@ import (
 )
 
 type Writer struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *Writer {
-	return &Writer{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *Writer {
+	return &Writer{db: db, roleQuerier: roleQuerier}
 }
 
 func (n *Writer) Notification(ctx context.Context,
@@ -49,6 +51,20 @@ func (n *Writer) Notification(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	r, err = n.db.Notification.Query().
+		Where(entnotification.ID(r.ID)).
+		WithSource().
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if source := r.Edges.Source; source != nil {
+		if err := n.roleQuerier.HydrateRoleEdges(ctx, source); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	nr, err := notification.Map(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -63,6 +79,20 @@ func (n *Writer) SetRead(ctx context.Context, id xid.ID, read bool) (*notificati
 		Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err = n.db.Notification.Query().
+		Where(entnotification.ID(r.ID)).
+		WithSource().
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if source := r.Edges.Source; source != nil {
+		if err := n.roleQuerier.HydrateRoleEdges(ctx, source); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	nr, err := notification.Map(r)
@@ -80,10 +110,10 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 	}
 
 	defer func() {
-		err = tx.Rollback()
+		_ = tx.Rollback()
 	}()
 
-	updated := make([]*notification.NotificationRef, 0, len(notifications))
+	updatedIDs := make([]xid.ID, 0, len(notifications))
 
 	for _, notif := range notifications {
 		r, err := tx.Notification.UpdateOneID(xid.ID(notif.ID)).
@@ -93,12 +123,49 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+		updatedIDs = append(updatedIDs, r.ID)
+	}
+	if len(updatedIDs) == 0 {
+		if err := tx.Commit(); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		return []*notification.NotificationRef{}, nil
+	}
 
-		nr, err := notification.Map(r)
+	rows, err := tx.Notification.Query().
+		Where(entnotification.IDIn(updatedIDs...)).
+		WithSource().
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	sources := make([]*ent.Account, 0, len(rows))
+	for _, row := range rows {
+		if source := row.Edges.Source; source != nil {
+			sources = append(sources, source)
+		}
+	}
+	if err := n.roleQuerier.HydrateRoleEdges(ctx, sources...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rowByID := make(map[xid.ID]*ent.Notification, len(rows))
+	for _, row := range rows {
+		rowByID[row.ID] = row
+	}
+
+	updated := make([]*notification.NotificationRef, 0, len(updatedIDs))
+	for _, updatedID := range updatedIDs {
+		row := rowByID[updatedID]
+		if row == nil {
+			return nil, fault.New("updated notification missing after requery", fctx.With(ctx))
+		}
+
+		nr, err := notification.Map(row)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
-
 		updated = append(updated, nr)
 	}
 

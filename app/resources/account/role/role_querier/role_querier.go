@@ -9,9 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/role"
-	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/internal/ent"
-	ent_account_role "github.com/Southclaws/storyden/internal/ent/accountroles"
 	ent_role "github.com/Southclaws/storyden/internal/ent/role"
 )
 
@@ -68,61 +66,6 @@ func (q *Querier) List(ctx context.Context) (role.Roles, error) {
 	}
 
 	mapped = append(mapped, defaultRole, guestRole, adminRole)
-
-	sort.Sort(mapped)
-
-	return mapped, nil
-}
-
-func (q *Querier) ListFor(ctx context.Context, account *ent.Account) (held.Roles, error) {
-	roles, err := q.db.AccountRoles.
-		Query().
-		Where(
-			ent_account_role.AccountID(account.ID),
-			ent_account_role.HasRoleWith(ent_role.IDNotIn(
-				xid.ID(role.DefaultRoleGuestID),
-				xid.ID(role.DefaultRoleMemberID),
-				xid.ID(role.DefaultRoleAdminID),
-			)),
-		).
-		WithRole(func(rq *ent.RoleQuery) {
-			rq.Order(ent.Asc(ent_role.FieldSortKey))
-		}).
-		Order(ent.Asc(ent_account_role.FieldCreatedAt)).
-		All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	mapped, err := held.MapList(roles, account.Admin)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	_, memberRole, _, err := q.lookupDefaultRoles(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	// If the default member role has not been modified (aka not added to the DB
-	// with custom permissions) we add the default manually.
-	if memberRole != nil {
-		defaultRole, err := role.Map(memberRole)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		mapped = append(mapped, &held.Role{
-			Role:     *defaultRole,
-			Assigned: account.CreatedAt,
-			Badge:    false,
-			Default:  true,
-		})
-	} else {
-		mapped = append(mapped, &held.Role{
-			Role: role.DefaultRoleMember,
-		})
-	}
 
 	sort.Sort(mapped)
 

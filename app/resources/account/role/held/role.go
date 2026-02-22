@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/role"
@@ -67,17 +68,16 @@ func Map(in *ent.AccountRoles) (*Role, error) {
 		// CreatedAt is the timestamp of the relationship, not the role itself.
 		Assigned: in.CreatedAt,
 		Badge:    opt.NewPtr(in.Badge).OrZero(),
+		Default: in.RoleID == xid.ID(role.DefaultRoleGuestID) ||
+			in.RoleID == xid.ID(role.DefaultRoleMemberID) ||
+			in.RoleID == xid.ID(role.DefaultRoleAdminID),
 	}, nil
 }
 
-func MapList(in []*ent.AccountRoles, admin bool) (Roles, error) {
+func MapList(in []*ent.AccountRoles) (Roles, error) {
 	mapped, err := dt.MapErr(in, Map)
 	if err != nil {
 		return nil, fault.Wrap(err)
-	}
-
-	if admin {
-		mapped = append(mapped, &Role{Role: role.DefaultRoleAdmin, Default: true})
 	}
 
 	sort.Sort(Roles(mapped))

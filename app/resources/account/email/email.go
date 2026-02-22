@@ -151,7 +151,6 @@ func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Addres
 		Where(account_ent.HasEmailsWith(email_ent.EmailAddress(emailAddress.Address))).
 		WithEmails().
 		WithAuthentication().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithTags()
 
 	result, err := q.Only(ctx)
@@ -163,10 +162,7 @@ func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Addres
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(
-		// NOTE: Roles lookup not currently required by callers of this API.
-		nil,
-	)(result)
+	acc, err := account.MapAccount(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}

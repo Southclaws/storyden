@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/like/item_like"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -30,11 +31,12 @@ type Result struct {
 }
 
 type LikeQuerier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *LikeQuerier {
-	return &LikeQuerier{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *LikeQuerier {
+	return &LikeQuerier{db: db, roleQuerier: roleQuerier}
 }
 
 func (l *LikeQuerier) GetPostLikes(ctx context.Context, postID post.ID) ([]*item_like.Like, error) {
@@ -44,6 +46,16 @@ func (l *LikeQuerier) GetPostLikes(ctx context.Context, postID post.ID) ([]*item
 		WithAccount().
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, liked := range r {
+		if liked.Edges.Account != nil {
+			roleTargets = append(roleTargets, liked.Edges.Account)
+		}
+	}
+	if err := l.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -75,6 +87,20 @@ func (l *LikeQuerier) GetProfileLikes(ctx context.Context, accountID account.Acc
 
 	r, err := q.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(r))
+	for _, liked := range r {
+		if liked.Edges.Post == nil {
+			continue
+		}
+
+		if author := liked.Edges.Post.Edges.Author; author != nil {
+			roleTargets = append(roleTargets, author)
+		}
+	}
+	if err := l.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

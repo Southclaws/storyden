@@ -17,6 +17,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -26,12 +27,13 @@ import (
 )
 
 type database struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client, raw *sqlx.DB) Repository {
-	return &database{db, raw}
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_querier.Querier) Repository {
+	return &database{db: db, raw: raw, roleQuerier: roleQuerier}
 }
 
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, error) {
@@ -62,6 +64,14 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 
 	cs, err := query.All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(cs)*2)
+	for _, n := range cs {
+		roleTargets = append(roleTargets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -204,6 +214,14 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 				WithOwner()
 		}).All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	roleTargets := make([]*ent.Account, 0, len(nodeRecords)*2)
+	for _, n := range nodeRecords {
+		roleTargets = append(roleTargets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleTargets...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

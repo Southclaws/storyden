@@ -391,7 +391,15 @@ func (h *Accounts) AccountRoleSetBadge(ctx context.Context, request openapi.Acco
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	updatingSelf := acc.Handle == request.AccountHandle
+	target, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	updatingSelf := accountID == target.ID
 
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		if updatingSelf {
@@ -402,7 +410,7 @@ func (h *Accounts) AccountRoleSetBadge(ctx context.Context, request openapi.Acco
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err = h.roleBadge.Update(ctx, accountID, roleID, true)
+	acc, err = h.roleBadge.Update(ctx, target.ID, roleID, true)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -425,7 +433,15 @@ func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	updatingSelf := acc.Handle == request.AccountHandle
+	target, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	updatingSelf := accountID == target.ID
 
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		if updatingSelf {
@@ -436,7 +452,7 @@ func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err = h.roleBadge.Update(ctx, accountID, roleID, false)
+	acc, err = h.roleBadge.Update(ctx, target.ID, roleID, false)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

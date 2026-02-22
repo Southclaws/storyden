@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -19,11 +20,12 @@ import (
 // which it is and finding that out would require a database call. If you only
 // need to update a shared field such as the content, you should use this type.
 type PostWriter struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *PostWriter {
-	return &PostWriter{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *PostWriter {
+	return &PostWriter{db: db, roleQuerier: roleQuerier}
 }
 
 type Option func(*ent.PostMutation)
@@ -66,6 +68,10 @@ func (p *PostWriter) Update(ctx context.Context, id post.ID, opts ...Option) (*p
 		}).
 		Only(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	if err := p.roleQuerier.HydrateRoleEdges(ctx, r.Edges.Author); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 

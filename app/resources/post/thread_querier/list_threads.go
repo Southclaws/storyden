@@ -26,7 +26,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_asset "github.com/Southclaws/storyden/internal/ent/asset"
-	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	ent_react "github.com/Southclaws/storyden/internal/ent/react"
@@ -60,12 +59,8 @@ func (d *Querier) List(
 
 	query.
 		WithCategory().
-		WithAuthor().
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(ent_asset.ByUpdatedAt(), ent_asset.ByCreatedAt())
-		}).
-		WithCollections(func(cq *ent.CollectionQuery) {
-			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
 		}).
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithFaviconImage().WithPrimaryImage()
@@ -120,6 +115,26 @@ func (d *Querier) List(
 
 	pool := pond.NewGroup()
 
+	var accountLookup account.Lookup
+	pool.SubmitErr(func() error {
+		accountIDs := dt.Map(result, func(p *ent.Post) xid.ID { return p.AccountPosts })
+		accountIDs = lo.Uniq(accountIDs)
+
+		edges, err := d.db.Account.Query().
+			Where(ent_account.IDIn(accountIDs...)).
+			All(ctx)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := d.roleQuerier.HydrateRoleEdges(ctx, edges...); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		accountLookup = account.NewAccountLookup(edges)
+		return nil
+	})
+
 	var readStates post.ReadStateMap
 	pool.SubmitErr(func() error {
 		r, err := d.getReadStatus(ctx, ids, accountID.String())
@@ -165,7 +180,7 @@ func (d *Querier) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapper := thread.Mapper(nil, readStates, likesMap, collectionsMap, repliesMap, nil)
+	mapper := thread.Mapper(accountLookup, readStates, likesMap, collectionsMap, repliesMap, nil)
 	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -339,6 +354,10 @@ func (d *Querier) GetMany(ctx context.Context, threadIDs []post.ID, accountID op
 		Where(ent_account.IDIn(accountIDs...)).
 		All(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, accountEdges...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

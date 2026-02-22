@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -15,11 +16,12 @@ import (
 )
 
 type Repository struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *Repository {
-	return &Repository{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *Repository {
+	return &Repository{db: db, roleQuerier: roleQuerier}
 }
 
 func (r *Repository) Store(ctx context.Context,
@@ -60,6 +62,12 @@ func (r *Repository) Store(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if q.Edges.Author != nil {
+		if err := r.roleQuerier.HydrateRoleEdges(ctx, q.Edges.Author); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	return Map(q)
 }
 
@@ -70,6 +78,12 @@ func (r *Repository) Get(ctx context.Context, id xid.ID) (*Question, error) {
 		Only(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if q.Edges.Author != nil {
+		if err := r.roleQuerier.HydrateRoleEdges(ctx, q.Edges.Author); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return Map(q)
@@ -84,6 +98,12 @@ func (r *Repository) GetByQuerySlug(ctx context.Context, query string) (*Questio
 		Only(ctx)
 	if err != nil {
 		return nil, err
+	}
+
+	if q.Edges.Author != nil {
+		if err := r.roleQuerier.HydrateRoleEdges(ctx, q.Edges.Author); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return Map(q)
