@@ -3,12 +3,14 @@ package report_test
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -80,6 +82,7 @@ func TestReportAuthorization(t *testing.T) {
 
 			t.Run("moderator_can_list_all_reports", func(t *testing.T) {
 				t.Parallel()
+				r := require.New(t)
 				a := assert.New(t)
 
 				comment := "spam content"
@@ -90,11 +93,46 @@ func TestReportAuthorization(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, rep)
 
-				list, err := cl.ReportListWithResponse(root, &openapi.ReportListParams{}, session3)
-				tests.Ok(t, err, list)
+				findReport := func() (*openapi.Report, bool) {
+					const maxPages = 20
+					const maxScans = 3
 
-				foundReport, foundOk := lo.Find(list.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep.JSON200.Id })
-				a.True(foundOk)
+					status := openapi.Submitted
+					kind := "post"
+
+					for scan := 0; scan < maxScans; scan++ {
+						var page *openapi.PaginationQuery
+
+						for p := 0; p < maxPages; p++ {
+							list, err := cl.ReportListWithResponse(root, &openapi.ReportListParams{
+								Page:   page,
+								Status: &status,
+								Kind:   &kind,
+							}, session3)
+							if err != nil || list == nil || list.JSON200 == nil {
+								return nil, false
+							}
+
+							foundReport, foundOk := lo.Find(list.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep.JSON200.Id })
+							if foundOk {
+								return &foundReport, true
+							}
+
+							if list.JSON200.NextPage == nil {
+								break
+							}
+
+							next := openapi.PaginationQuery(strconv.Itoa(*list.JSON200.NextPage))
+							page = &next
+						}
+					}
+
+					return nil, false
+				}
+
+				foundReport, foundOk := findReport()
+				r.True(foundOk)
+				r.NotNil(foundReport)
 				a.Equal("spam content", *foundReport.Comment)
 				a.Equal(acc1.JSON200.Id, foundReport.ReportedBy.Id)
 			})
@@ -172,6 +210,7 @@ func TestReportAuthorization(t *testing.T) {
 
 			t.Run("regular_member_cannot_list_all_reports", func(t *testing.T) {
 				t.Parallel()
+				r := require.New(t)
 				a := assert.New(t)
 
 				comment1 := "spam 1"
@@ -194,7 +233,7 @@ func TestReportAuthorization(t *testing.T) {
 				tests.Ok(t, err, list1)
 
 				_, foundRep1 := lo.Find(list1.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep1.JSON200.Id })
-				a.True(foundRep1)
+				r.True(foundRep1)
 
 				_, foundRep2 := lo.Find(list1.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep2.JSON200.Id })
 				a.False(foundRep2)
@@ -220,6 +259,7 @@ func TestReportAuthorization(t *testing.T) {
 
 			t.Run("filter_by_status", func(t *testing.T) {
 				t.Parallel()
+				r := require.New(t)
 				a := assert.New(t)
 
 				comment1 := "spam 1"
@@ -251,7 +291,7 @@ func TestReportAuthorization(t *testing.T) {
 				tests.Ok(t, err, listSubmitted)
 
 				_, foundRep1 := lo.Find(listSubmitted.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep1.JSON200.Id })
-				a.True(foundRep1)
+				r.True(foundRep1)
 
 				_, foundRep2 := lo.Find(listSubmitted.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep2.JSON200.Id })
 				a.False(foundRep2)
@@ -266,11 +306,12 @@ func TestReportAuthorization(t *testing.T) {
 				a.False(foundRep1Ack)
 
 				_, foundRep2Ack := lo.Find(listAcknowledged.JSON200.Reports, func(r openapi.Report) bool { return r.Id == rep2.JSON200.Id })
-				a.True(foundRep2Ack)
+				r.True(foundRep2Ack)
 			})
 
 			t.Run("filter_by_kind", func(t *testing.T) {
 				t.Parallel()
+				r := require.New(t)
 				a := assert.New(t)
 
 				commentPost := "spam post"
@@ -296,7 +337,7 @@ func TestReportAuthorization(t *testing.T) {
 				tests.Ok(t, err, listPost)
 
 				_, foundPost := lo.Find(listPost.JSON200.Reports, func(r openapi.Report) bool { return r.Id == repPost.JSON200.Id })
-				a.True(foundPost)
+				r.True(foundPost)
 
 				_, foundProfile := lo.Find(listPost.JSON200.Reports, func(r openapi.Report) bool { return r.Id == repProfile.JSON200.Id })
 				a.False(foundProfile)
@@ -311,7 +352,7 @@ func TestReportAuthorization(t *testing.T) {
 				a.False(foundPostInProfile)
 
 				_, foundProfileInProfile := lo.Find(listProfile.JSON200.Reports, func(r openapi.Report) bool { return r.Id == repProfile.JSON200.Id })
-				a.True(foundProfileInProfile)
+				r.True(foundProfileInProfile)
 			})
 		}))
 	}))

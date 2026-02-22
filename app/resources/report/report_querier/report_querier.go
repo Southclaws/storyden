@@ -90,7 +90,10 @@ func (q *Querier) List(
 	query.
 		WithReportedBy().
 		WithHandledBy().
-		Order(ent.Desc(entreport.FieldUpdatedAt))
+		Order(
+			ent.Desc(entreport.FieldUpdatedAt),
+			ent.Desc(entreport.FieldID),
+		)
 
 	total, err := query.Count(ctx)
 	if err != nil {
