@@ -14,7 +14,7 @@ test.describe("Logout", () => {
     await expect(page).toHaveURL("/", { timeout: 10000 });
 
     await page.getByRole("button", { name: "Account menu" }).click();
-    await page.getByRole("link", { name: "Logout" }).click();
+    await page.getByRole("menuitem", { name: "Logout" }).click();
 
     await expect(page.getByRole("link", { name: "Register" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Login" })).toBeVisible();

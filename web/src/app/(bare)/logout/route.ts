@@ -13,6 +13,7 @@ export async function GET() {
   revalidatePath("/", "layout");
 
   return NextResponse.redirect(WEB_ADDRESS, {
+    status: 303,
     headers: {
       "Clear-Site-Data": `"*"`,
       "Cache-Control": "no-cache, no-store, must-revalidate",

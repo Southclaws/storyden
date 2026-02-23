@@ -23,7 +23,7 @@ async function registerUser(page: Page, username: string) {
 
 async function logout(page: Page) {
   await page.getByRole("button", { name: "Account menu" }).click();
-  await page.getByRole("link", { name: "Logout" }).click();
+  await page.getByRole("menuitem", { name: "Logout" }).click();
   await expect(page.getByRole("link", { name: "Login" })).toBeVisible();
 }
 
