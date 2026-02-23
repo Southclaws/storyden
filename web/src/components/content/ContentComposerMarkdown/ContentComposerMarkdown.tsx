@@ -3,7 +3,8 @@ import Markdown from "react-markdown";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import { Switch } from "@/components/ui/switch";
-import { Box, LStack, styled } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
+import { remarkLooseLists } from "@/utils/markdown";
 
 import { ComposerTools } from "../ComposerTools";
 import { ContentDragOverlay } from "../ContentDragOverlay";
@@ -32,8 +33,15 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
 
   if (props.disabled) {
     return (
-      <LStack position="relative" minHeight="8" maxHeight="fit">
-        <Markdown className="typography">{value}</Markdown>
+      <LStack
+        className="markdown-editor-readonly"
+        position="relative"
+        minHeight="8"
+        maxHeight="fit"
+      >
+        <Markdown className="typography" remarkPlugins={[remarkLooseLists]}>
+          {value}
+        </Markdown>
       </LStack>
     );
   }

@@ -106,6 +106,8 @@ body {
   */
 
 .typography {
+  width: 100%;
+
   /* BLOCK ELEMENTS */
 
   p:not([data-no-typography] *) {

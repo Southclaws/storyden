@@ -1,8 +1,11 @@
 import DOMPurify from "dompurify";
+import type { List, ListItem, Root } from "mdast";
 import html from "remark-html";
 import remarkParse from "remark-parse";
 import TurndownService from "turndown";
+import type { Plugin } from "unified";
 import { unified } from "unified";
+import { visit } from "unist-util-visit";
 
 import { deriveError } from "./error";
 
@@ -57,10 +60,20 @@ turndownService.addRule("strikethrough", {
   replacement: (content) => `~~${content}~~`,
 });
 
+export const remarkLooseLists: Plugin<[], Root> = () => (tree) => {
+  visit(tree, "list", (node: List) => {
+    node.spread = true;
+  });
+  visit(tree, "listItem", (node: ListItem) => {
+    node.spread = true;
+  });
+};
+
 export async function markdownToHTML(markdown: string): Promise<string> {
   try {
     const result = await unified()
       .use(remarkParse)
+      .use(remarkLooseLists)
       .use(html, { sanitize: false })
       .process(markdown);
 
