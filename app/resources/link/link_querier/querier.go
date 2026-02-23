@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -17,11 +19,15 @@ import (
 )
 
 type LinkQuerier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *LinkQuerier {
-	return &LinkQuerier{db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *LinkQuerier {
+	return &LinkQuerier{
+		db:          db,
+		roleQuerier: roleQuerier,
+	}
 }
 
 type Result struct {
@@ -71,12 +77,32 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := d.roleQuerier.HydrateRoleEdges(ctx, roleHydrationTargets(r)...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	link, err := link.Map(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return link, nil
+}
+
+func roleHydrationTargets(r *ent.Link) []*ent.Account {
+	targets := make([]*ent.Account, 0, len(r.Edges.Posts)+len(r.Edges.Nodes))
+
+	for _, p := range r.Edges.Posts {
+		if p != nil && p.Edges.Author != nil {
+			targets = append(targets, p.Edges.Author)
+		}
+	}
+
+	for _, n := range r.Edges.Nodes {
+		targets = append(targets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+
+	return targets
 }
 
 func (d *LinkQuerier) GetByID(ctx context.Context, id link.LinkID) (*link_ref.LinkRef, error) {

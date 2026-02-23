@@ -3,6 +3,7 @@ package role_test
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/Southclaws/opt"
@@ -88,6 +89,27 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 			}, authorSession))(t, http.StatusOK)
 			tests.AssertRequest(cl.CollectionAddPostWithResponse(authorCtx, collectionCreate.JSON200.Id, threadCreate.JSON200.Id, authorSession))(t, http.StatusOK)
 			tests.AssertRequest(cl.CollectionAddNodeWithResponse(authorCtx, collectionCreate.JSON200.Id, nodeCreate.JSON200.Id, authorSession))(t, http.StatusOK)
+
+			linkServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Content-Type", "text/html; charset=utf-8")
+				_, _ = w.Write([]byte(`<!doctype html><html><head><title>Role Link Test</title></head><body>ok</body></html>`))
+			}))
+			t.Cleanup(linkServer.Close)
+			linkURL := linkServer.URL + "/sprites-dev"
+
+			threadWithLink := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
+				Title:      "thread-with-link-and-roles-" + xid.New().String(),
+				Body:       opt.New("<p>thread body with link</p>").Ptr(),
+				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
+				Visibility: &vis,
+				Url:        &linkURL,
+			}, authorSession))(t, http.StatusOK)
+
+			nodeWithLink := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, openapi.NodeCreateJSONRequestBody{
+				Name:       "node-with-link-and-roles-" + xid.New().String(),
+				Visibility: &vis,
+				Url:        &linkURL,
+			}, authorSession))(t, http.StatusOK)
 
 			assertRoleRef := func(
 				t *testing.T,
@@ -273,6 +295,22 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 
 				r.True(foundThreadItem, "expected thread item in collection")
 				r.True(foundNodeItem, "expected node item in collection")
+			})
+
+			t.Run("link_get_related_profiles", func(t *testing.T) {
+				r := require.New(t)
+				linkRef := threadWithLink.JSON200.Link
+				r.NotNil(linkRef, "thread with URL should include link reference")
+
+				linkGet := tests.AssertRequest(cl.LinkGetWithResponse(authorCtx, linkRef.Slug, authorSession))(t, http.StatusOK)
+
+				r.NotEmpty(linkGet.JSON200.Posts, "link should reference at least one post")
+				assertProfileRefHasCustomRole(t, "link.get post author should include assigned custom role", linkGet.JSON200.Posts[0].Author.Roles)
+
+				r.NotEmpty(linkGet.JSON200.Nodes, "link should reference at least one node")
+				assertProfileRefHasCustomRole(t, "link.get node owner should include assigned custom role", linkGet.JSON200.Nodes[0].Owner.Roles)
+
+				r.Equal(nodeWithLink.JSON200.Id, linkGet.JSON200.Nodes[0].Id)
 			})
 
 			t.Run("default_role_overrides_are_reflected", func(t *testing.T) {
