@@ -16,7 +16,7 @@ test.describe("Login", () => {
     await expect(page).toHaveURL("/", { timeout: 10000 });
 
     await page.getByRole("button", { name: "Account menu" }).click();
-    await page.getByRole("link", { name: "Logout" }).click();
+    await page.getByRole("menuitem", { name: "Logout" }).click();
 
     await page.getByRole("link", { name: "Login" }).click();
     await page.getByRole("textbox", { name: "username" }).fill(username);
@@ -43,7 +43,7 @@ test.describe("Login", () => {
     await expect(page).toHaveURL("/", { timeout: 10000 });
 
     await page.getByRole("button", { name: "Account menu" }).click();
-    await page.getByRole("link", { name: "Logout" }).click();
+    await page.getByRole("menuitem", { name: "Logout" }).click();
 
     await page.getByRole("link", { name: "Login" }).click();
     await page.getByRole("textbox", { name: "username" }).fill(username);
