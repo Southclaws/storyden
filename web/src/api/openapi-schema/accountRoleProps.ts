@@ -9,7 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 
 export interface AccountRoleProps {
-  /** One role may be designated as a badge for the account. If ture, it
+  /** One role may be designated as a badge for the account. If true, it
 should be displayed prominently on the profile or in other contexts.
  */
   badge: boolean;
