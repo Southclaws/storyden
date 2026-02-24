@@ -10,7 +10,6 @@ kill_timeout = 5
   PUBLIC_API_ADDRESS = "https://makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
-  CACHE_PROVIDER          = "redis"
   EMAIL_PROVIDER          = "sendgrid"
   LANGUAGE_MODEL_PROVIDER = "openai"
   MCP_ENABLED             = "true"
