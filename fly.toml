@@ -4,10 +4,10 @@ app          = "storyden"
 kill_timeout = 5
 
 [build]
-  dockerfile = "docker/api/Dockerfile"
+  dockerfile = "docker/all/Dockerfile"
 
 [env]
-  PUBLIC_API_ADDRESS = "https://api.makeroom.club"
+  PUBLIC_API_ADDRESS = "https://makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
   CACHE_PROVIDER          = "redis"
