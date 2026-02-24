@@ -231,17 +231,25 @@ func TestRoleCRUD(t *testing.T) {
 
 				roles := listResp.JSON200.Roles
 				r.True(len(roles) >= 5)
-				a.Equal("0000000000000000000g", roles[0].Id, "guest role must remain first")
-				a.Equal("000000000000000000m0", roles[1].Id, "member role must remain second")
+				a.Equal("00000000000000000a00", roles[0].Id, "admin role must remain first")
+				a.Equal("0000000000000000000g", roles[len(roles)-1].Id, "guest role must remain last")
 
 				ids := lo.Map(roles, func(r openapi.Role, _ int) string { return r.Id })
+				idxAdmin := lo.IndexOf(ids, role.DefaultRoleAdminID.String())
+				idxMember := lo.IndexOf(ids, role.DefaultRoleMemberID.String())
+				idxGuest := lo.IndexOf(ids, role.DefaultRoleGuestID.String())
 				idx1 := lo.IndexOf(ids, role1.Id)
 				idx2 := lo.IndexOf(ids, role2.Id)
 				idx3 := lo.IndexOf(ids, role3.Id)
 
+				r.NotEqual(-1, idxAdmin)
+				r.NotEqual(-1, idxMember)
+				r.NotEqual(-1, idxGuest)
 				r.NotEqual(-1, idx1)
 				r.NotEqual(-1, idx2)
 				r.NotEqual(-1, idx3)
+				a.True(idxAdmin < idx3, "admin should remain higher priority than custom roles")
+				a.True(idxMember < idxGuest, "member should remain higher priority than guest")
 				a.True(idx3 < idx1 && idx1 < idx2, "custom roles should match reordered precedence")
 
 				tests.AssertRequest(cl.RoleUpdateOrderWithResponse(adminCtx, openapi.RoleUpdateOrderJSONRequestBody{

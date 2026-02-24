@@ -90,7 +90,7 @@ func (q *Querier) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Account
 			return ia < ib
 		}
 
-		return sa < sb
+		return sa > sb
 	}
 
 	byAccount := lo.GroupBy(accountRoles, func(r *ent.AccountRoles) xid.ID { return r.AccountID })

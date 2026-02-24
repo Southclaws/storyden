@@ -31,7 +31,7 @@ type Roles []*Role
 
 func (a Roles) Len() int           { return len(a) }
 func (a Roles) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Roles) Less(i, j int) bool { return a[i].SortKey < a[j].SortKey }
+func (a Roles) Less(i, j int) bool { return a[i].SortKey > a[j].SortKey }
 
 func (r Roles) Permissions() rbac.Permissions {
 	set := map[rbac.Permission]bool{}

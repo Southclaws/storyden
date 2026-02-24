@@ -357,7 +357,9 @@ func (w *Writer) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
 	}()
 
 	for i, id := range ids {
-		_, err := tx.Role.UpdateOneID(xid.ID(id)).SetSortKey(float64(i)).Save(ctx)
+		sortKey := float64(len(ids) - i)
+
+		_, err := tx.Role.UpdateOneID(xid.ID(id)).SetSortKey(sortKey).Save(ctx)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}

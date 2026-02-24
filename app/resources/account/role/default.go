@@ -33,7 +33,7 @@ var DefaultRoleMember = Role{
 		rbac.PermissionReadCollection,
 		rbac.PermissionCollectionSubmit,
 	),
-	SortKey: -1, // Always sorts after guest and before custom roles.
+	SortKey: -1, // Always sorts above guest and below custom roles.
 }
 
 var DefaultRoleGuest = Role{
@@ -48,7 +48,7 @@ var DefaultRoleGuest = Role{
 		rbac.PermissionListCollections,
 		rbac.PermissionReadCollection,
 	),
-	SortKey: -2, // Always sorts first.
+	SortKey: -2, // Always sorts last.
 }
 
 var DefaultRoleAdmin = Role{
@@ -56,5 +56,5 @@ var DefaultRoleAdmin = Role{
 	Name:        "Admin",
 	Colour:      "red",
 	Permissions: rbac.NewList(rbac.PermissionAdministrator),
-	SortKey:     math.MaxFloat64, // Always sorts last.
+	SortKey:     math.MaxFloat64, // Always sorts first.
 }
