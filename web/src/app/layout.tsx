@@ -19,6 +19,7 @@ const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 export default async function RootLayout({ children }: PropsWithChildren) {
   const session = await getServerSession();
   const settings = await getSettings();
+  //
 
   return (
     <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
