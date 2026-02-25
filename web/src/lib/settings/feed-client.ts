@@ -18,8 +18,11 @@ type FeedEditorStateOptions = {
   initialSettings?: Settings;
 };
 
-export function useFeedConfig(initialSettings?: Settings): FeedConfig {
-  const { settings } = useSettings(initialSettings);
+export function useFeedConfig(
+  initialSettings?: Settings,
+  revalidateOnMount = false,
+): FeedConfig {
+  const { settings } = useSettings(initialSettings, revalidateOnMount);
 
   return (
     settings?.metadata.feed ??
@@ -69,7 +72,7 @@ export function useFeedEditorState({
   const isEditing = editing === "feed";
 
   function handleToggleEditing() {
-    if (editing) {
+    if (editing === "feed") {
       setEditing(null);
     } else {
       setEditing("feed");

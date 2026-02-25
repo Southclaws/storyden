@@ -21,7 +21,7 @@ export function FeedScreenContent({
   initialSettings,
   initialSession,
 }: Props) {
-  const feed = useFeedConfig(initialSettings);
+  const feed = useFeedConfig(initialSettings, true);
 
   switch (feed.source.type) {
     case "threads":
@@ -42,7 +42,7 @@ export function FeedScreenContent({
       return (
         <LibraryFeedScreen
           initialData={initialData.library}
-          initialSettings={initialSettings}
+          feed={feed}
         />
       );
 

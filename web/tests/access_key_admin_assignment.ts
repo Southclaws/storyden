@@ -6,8 +6,9 @@
  */
 import { BrowserContext, Page } from "@playwright/test";
 
-import { accountAddRole } from "../src/api/openapi-client/accounts";
 import { authPasswordSignup } from "../src/api/openapi-client/auth";
+
+import { createAccessKeyClient, type AccessKeyClient } from "./admin_client";
 
 const DEFAULT_ROLE_ADMIN_ID = "00000000000000000a00";
 
@@ -22,29 +23,14 @@ export function getAdminAccessKey(): string {
 
 export async function withAccessKey<T>(
   accessKey: string,
-  fn: () => Promise<T>,
+  fn: (client: AccessKeyClient) => Promise<T>,
 ): Promise<T> {
-  const baseFetch = globalThis.fetch;
-
-  const authorizedFetch: typeof fetch = async (
-    ...args: Parameters<typeof fetch>
-  ) => {
-    const [input, init] = args;
-    const request = input instanceof Request ? input : new Request(input, init);
-    const headers = new Headers(request.headers);
-    headers.set("Authorization", `Bearer ${accessKey}`);
-    return baseFetch(new Request(request, { headers }));
-  };
-
-  globalThis.fetch = authorizedFetch;
-  try {
-    return await fn();
-  } finally {
-    globalThis.fetch = baseFetch;
-  }
+  return fn(createAccessKeyClient(accessKey));
 }
 
-export async function withAdminAccessKey<T>(fn: () => Promise<T>): Promise<T> {
+export async function withAdminAccessKey<T>(
+  fn: (client: AccessKeyClient) => Promise<T>,
+): Promise<T> {
   return withAccessKey(getAdminAccessKey(), fn);
 }
 
@@ -72,7 +58,7 @@ export async function createAdmin(
     token: password,
   });
 
-  await withAdminAccessKey(async () => {
+  await withAdminAccessKey(async ({ accountAddRole }) => {
     await accountAddRole(username, DEFAULT_ROLE_ADMIN_ID);
   });
 }

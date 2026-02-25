@@ -8,6 +8,6 @@ export const EditingSchema = z.preprocess(
 
     return value;
   },
-  z.enum(["settings", "feed"]),
+  z.enum(["settings", "feed"]).optional(),
 );
 export type Editing = z.infer<typeof EditingSchema>;

@@ -7,17 +7,14 @@ import { type NodeListResult } from "@/api/openapi-schema";
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { type FeedConfig } from "@/lib/settings/feed";
-import { useFeedConfig } from "@/lib/settings/feed-client";
-import { type Settings } from "@/lib/settings/settings";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 export type Props = {
   initialData?: NodeListResult;
-  initialSettings?: Settings;
+  feed: FeedConfig;
 };
 
-export function LibraryFeedScreen({ initialData, initialSettings }: Props) {
-  const feed = useFeedConfig(initialSettings);
+export function LibraryFeedScreen({ initialData, feed }: Props) {
   if (feed.source.type !== "library") {
     return null;
   }
@@ -33,7 +30,13 @@ export function LibraryFeedScreen({ initialData, initialSettings }: Props) {
   );
 }
 
-function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
+function LibraryFeedNode({
+  initialData,
+  nodeID,
+}: {
+  initialData?: NodeListResult;
+  nodeID: string;
+}) {
   const { data, error } = useNodeGet(
     nodeID,
     {},

@@ -13,8 +13,16 @@ export async function getSettings(): Promise<Settings> {
   }
 }
 
-export function useSettings(fallbackData?: Settings) {
-  const { data, error } = useGetInfo({ swr: { fallbackData } });
+export function useSettings(
+  fallbackData?: Settings,
+  revalidateOnMount = false,
+) {
+  const { data, error } = useGetInfo({
+    swr: {
+      fallbackData,
+      revalidateOnMount,
+    },
+  });
   if (!data) {
     return {
       ready: false as const,

@@ -5,8 +5,6 @@ import {
   login,
   withAdminAccessKey,
 } from "../access_key_admin_assignment";
-import { categoryCreate } from "../../src/api/openapi-client/categories";
-import { threadCreate } from "../../src/api/openapi-client/threads";
 
 const PASSWORD = "TestPassword123!";
 
@@ -16,7 +14,7 @@ async function createCategoryAndThreads(
   const categoryThreadTitle = `Category thread ${seed}`;
   const uncategorisedThreadTitle = `Uncategorised thread ${seed}`;
 
-  await withAdminAccessKey(async () => {
+  await withAdminAccessKey(async ({ categoryCreate, threadCreate }) => {
     const category = await categoryCreate({
       colour: "#3b82f6",
       description: `E2E category ${seed}`,

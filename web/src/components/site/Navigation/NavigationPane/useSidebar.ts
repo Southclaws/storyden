@@ -50,10 +50,11 @@ export function useSidebar(
         return;
       }
 
-      element.setAttribute("aria-hidden", (!next).toString());
       if (next) {
+        element.removeAttribute("aria-hidden");
         element.removeAttribute("inert");
       } else {
+        element.setAttribute("aria-hidden", "true");
         element.setAttribute("inert", "");
       }
     });

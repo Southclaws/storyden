@@ -28,7 +28,6 @@ export function SidebarToggle({ initialValue }: Props) {
       title={label}
       aria-expanded={isOpen}
       aria-controls="navigation__leftbar navigation__rightbar"
-      aria-pressed={isOpen}
       data-state={isOpen ? "open" : "closed"}
     >
       <Sidebar open={isOpen} aria-hidden="true" focusable="false" />

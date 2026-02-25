@@ -53,7 +53,7 @@ type Props = {
 type UpdateFeed = (feed: FeedConfig) => Promise<void>;
 
 export function AdminZone({ initialSession, initialSettings }: Props) {
-  const feed = useFeedConfig(initialSettings);
+  const feed = useFeedConfig(initialSettings, false);
   const { updateFeed } = useFeedMutation();
   const { isEditingEnabled, isEditing, handleToggleEditing } =
     useFeedEditorState({ initialSession, initialSettings });
