@@ -6,19 +6,46 @@
  */
 import { BrowserContext, Page } from "@playwright/test";
 
+import { accountAddRole } from "../src/api/openapi-client/accounts";
+import { authPasswordSignup } from "../src/api/openapi-client/auth";
+
 const DEFAULT_ROLE_ADMIN_ID = "00000000000000000a00";
 
-function getApiUrl(): string {
-  return process.env["PUBLIC_API_ADDRESS"] || "http://localhost:8001";
-}
-
 // This key has permission to assign administrator role to other accounts.
-function getAdminAccessKey(): string {
+export function getAdminAccessKey(): string {
   const key = process.env["E2E_ADMIN_ACCESS_KEY"];
   if (!key) {
     throw new Error("E2E_ADMIN_ACCESS_KEY environment variable not set");
   }
   return key;
+}
+
+export async function withAccessKey<T>(
+  accessKey: string,
+  fn: () => Promise<T>,
+): Promise<T> {
+  const baseFetch = globalThis.fetch;
+
+  const authorizedFetch: typeof fetch = async (
+    ...args: Parameters<typeof fetch>
+  ) => {
+    const [input, init] = args;
+    const request = input instanceof Request ? input : new Request(input, init);
+    const headers = new Headers(request.headers);
+    headers.set("Authorization", `Bearer ${accessKey}`);
+    return baseFetch(new Request(request, { headers }));
+  };
+
+  globalThis.fetch = authorizedFetch;
+  try {
+    return await fn();
+  } finally {
+    globalThis.fetch = baseFetch;
+  }
+}
+
+export async function withAdminAccessKey<T>(fn: () => Promise<T>): Promise<T> {
+  return withAccessKey(getAdminAccessKey(), fn);
 }
 
 export async function registerUser(
@@ -40,41 +67,14 @@ export async function createAdmin(
   username: string,
   password: string,
 ): Promise<void> {
-  const apiUrl = getApiUrl();
-  const adminAccessKey = getAdminAccessKey();
-
-  const registerResp = await fetch(`${apiUrl}/api/auth/password/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      identifier: username,
-      token: password,
-    }),
+  await authPasswordSignup({
+    identifier: username,
+    token: password,
   });
 
-  if (!registerResp.ok) {
-    throw new Error(
-      `Failed to register user: ${registerResp.status} ${await registerResp.text()}`,
-    );
-  }
-
-  const assignResp = await fetch(
-    `${apiUrl}/api/accounts/${username}/roles/${DEFAULT_ROLE_ADMIN_ID}`,
-    {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${adminAccessKey}`,
-      },
-    },
-  );
-
-  if (!assignResp.ok) {
-    throw new Error(
-      `Failed to assign admin role: ${assignResp.status} ${await assignResp.text()}`,
-    );
-  }
+  await withAdminAccessKey(async () => {
+    await accountAddRole(username, DEFAULT_ROLE_ADMIN_ID);
+  });
 }
 
 export async function createAccountWithRole(
@@ -87,24 +87,10 @@ export async function createAccountWithRole(
     return createAdmin(context, username, password);
   }
 
-  const apiUrl = getApiUrl();
-
-  const registerResp = await fetch(`${apiUrl}/api/auth/password/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      identifier: username,
-      token: password,
-    }),
+  await authPasswordSignup({
+    identifier: username,
+    token: password,
   });
-
-  if (!registerResp.ok) {
-    throw new Error(
-      `Failed to register user: ${registerResp.status} ${await registerResp.text()}`,
-    );
-  }
 }
 
 export async function login(page: Page, username: string, password: string) {
