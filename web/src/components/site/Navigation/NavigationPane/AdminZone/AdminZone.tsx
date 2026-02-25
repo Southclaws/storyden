@@ -77,7 +77,15 @@ export function AdminZone() {
 
         <HStack gap="1">
           {isRouteEditable && (
-            <IconButton size="xs" variant="ghost" onClick={handleToggleEditing}>
+            <IconButton
+              size="xs"
+              variant="ghost"
+              onClick={handleToggleEditing}
+              type="button"
+              aria-label={isEditing ? "Close feed editor" : "Open feed editor"}
+              aria-pressed={isEditing}
+              title={isEditing ? "Close feed editor" : "Open feed editor"}
+            >
               <EditIcon w="4" />
             </IconButton>
           )}

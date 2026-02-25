@@ -67,11 +67,21 @@ export async function Navigation({
       >
         <DesktopCommandBar />
 
-        <Box className={styles["leftbar"]}>
+        <Box
+          id="navigation__leftbar"
+          className={styles["leftbar"]}
+          aria-hidden={!showLeftBar}
+          inert={!showLeftBar}
+        >
           <NavigationPane />
         </Box>
 
-        <Box className={styles["rightbar"]}>
+        <Box
+          id="navigation__rightbar"
+          className={styles["rightbar"]}
+          aria-hidden={!showLeftBar}
+          inert={!showLeftBar}
+        >
           <ContextPane>{contextpane}</ContextPane>
         </Box>
 

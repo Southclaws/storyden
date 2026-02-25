@@ -48,6 +48,45 @@ async function dismissOnboarding(page: Page) {
   }
 }
 
+async function openSidebar(page: Page) {
+  const sidebarToggle = page.getByRole("button", {
+    name: /navigation sidebar/i,
+  });
+  await expect(sidebarToggle).toBeVisible();
+
+  if ((await sidebarToggle.getAttribute("aria-expanded")) !== "true") {
+    await sidebarToggle.click();
+  }
+
+  await expect(sidebarToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#navigation__leftbar")).toBeVisible();
+}
+
+async function closeSidebar(page: Page) {
+  const sidebarToggle = page.getByRole("button", {
+    name: /navigation sidebar/i,
+  });
+  await expect(sidebarToggle).toBeVisible();
+
+  if ((await sidebarToggle.getAttribute("aria-expanded")) !== "false") {
+    await sidebarToggle.click();
+  }
+
+  await expect(sidebarToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#navigation__leftbar")).not.toBeVisible();
+}
+
+async function openFeedEditorFromSidebar(page: Page) {
+  await openSidebar(page);
+
+  const editButton = page.getByRole("button", { name: "Open feed editor" });
+  await expect(editButton).toBeVisible();
+  await editButton.click();
+
+  await expect(page).toHaveURL(/editing=feed/);
+  await expect(page.getByText("Editing Home")).toBeVisible();
+}
+
 async function chooseSelectOption(
   page: Page,
   select: Locator,
@@ -86,9 +125,8 @@ test.describe("AdminZone Feed Settings", () => {
     await createAdmin(page.context(), adminHandle, PASSWORD);
     await login(page, adminHandle, PASSWORD);
     await dismissOnboarding(page);
-
-    await page.goto("/?editing=feed");
-    await expect(page.getByText("Editing Home")).toBeVisible();
+    await page.goto("/");
+    await openFeedEditorFromSidebar(page);
 
     const sourceSelect = page.getByRole("combobox", { name: "Source" });
     await expect(sourceSelect).toContainText("Threads");
@@ -135,5 +173,7 @@ test.describe("AdminZone Feed Settings", () => {
       .filter({ hasText: /Uncategorised only|All threads|None/ });
     await expect(listDisplayComboboxes).toHaveCount(0);
     await expect(sourceSelect).toContainText("Threads");
+
+    await closeSidebar(page);
   });
 });
