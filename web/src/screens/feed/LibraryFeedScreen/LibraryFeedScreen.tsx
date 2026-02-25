@@ -3,18 +3,21 @@
 import { Unready } from "src/components/site/Unready";
 
 import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
-import { NodeListResult } from "@/api/openapi-schema";
+import { type NodeListResult } from "@/api/openapi-schema";
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { type FeedConfig } from "@/lib/settings/feed";
+import { useFeedConfig } from "@/lib/settings/feed-client";
+import { type Settings } from "@/lib/settings/settings";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 export type Props = {
   initialData?: NodeListResult;
+  initialSettings?: Settings;
 };
 
-export function LibraryFeedScreen({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+export function LibraryFeedScreen({ initialData, initialSettings }: Props) {
+  const feed = useFeedConfig(initialSettings);
   if (feed.source.type !== "library") {
     return null;
   }
@@ -25,7 +28,9 @@ export function LibraryFeedScreen({ initialData }: Props) {
     );
   }
 
-  return <LibraryFeedRoot initialData={initialData} />;
+  return (
+    <LibraryFeedRoot initialData={initialData} layoutType={feed.layout.type} />
+  );
 }
 
 function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
@@ -48,8 +53,13 @@ function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
   );
 }
 
-function LibraryFeedRoot({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+function LibraryFeedRoot({
+  initialData,
+  layoutType,
+}: {
+  initialData?: NodeListResult;
+  layoutType: FeedConfig["layout"]["type"];
+}) {
   const { data, error } = useNodeList(
     {
       //
@@ -66,7 +76,7 @@ function LibraryFeedRoot({ initialData }: Props) {
     return <EmptyState />;
   }
 
-  switch (feed.layout.type) {
+  switch (layoutType) {
     case "grid":
       return (
         <NodeCardGrid libraryPath={[]} nodes={data.nodes} context="library" />

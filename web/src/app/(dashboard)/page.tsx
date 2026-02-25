@@ -2,8 +2,6 @@ import { z } from "zod";
 
 import { UnreadyBanner } from "src/components/site/Unready";
 
-import { getServerSession } from "@/auth/server-session";
-import { getSettings } from "@/lib/settings/settings-server";
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {
@@ -20,18 +18,9 @@ type Query = z.infer<typeof QuerySchema>;
 
 export default async function Page({ searchParams }: Props) {
   try {
-    const session = await getServerSession();
-    const settings = await getSettings();
-
     const { page } = QuerySchema.parse(await searchParams);
 
-    return (
-      <FeedScreen
-        page={page ?? 1}
-        initialSession={session}
-        initialSettings={settings}
-      />
-    );
+    return <FeedScreen page={page ?? 1} />;
   } catch (error) {
     return <UnreadyBanner error={error} />;
   }

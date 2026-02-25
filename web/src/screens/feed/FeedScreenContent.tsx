@@ -1,31 +1,27 @@
 "use client";
 
-import {
-  CategoryList,
-  CategoryListResult,
-  NodeListResult,
-  ThreadListResult,
-} from "@/api/openapi-schema";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { type Account } from "@/api/openapi-schema";
+import { useFeedConfig } from "@/lib/settings/feed-client";
+import { type Settings } from "@/lib/settings/settings";
 
 import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
 
 import { LibraryFeedScreen } from "./LibraryFeedScreen/LibraryFeedScreen";
 import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
-
-export type InitialData = {
-  threads?: ThreadListResult;
-  page?: number;
-  library?: NodeListResult;
-  categories?: CategoryListResult;
-};
+import { InitialData } from "./types";
 
 type Props = {
   initialData: InitialData;
+  initialSettings?: Settings;
+  initialSession?: Account;
 };
 
-export function FeedScreenContent({ initialData }: Props) {
-  const { feed } = useSettingsContext();
+export function FeedScreenContent({
+  initialData,
+  initialSettings,
+  initialSession,
+}: Props) {
+  const feed = useFeedConfig(initialSettings);
 
   switch (feed.source.type) {
     case "threads":
@@ -33,6 +29,8 @@ export function FeedScreenContent({ initialData }: Props) {
         <ThreadFeedScreen
           initialPage={initialData.page}
           initialPageData={initialData.threads}
+          initialSession={initialSession}
+          initialSettings={initialSettings}
           category={undefined}
           paginationBasePath="/"
           showCategorySelect={true}
@@ -41,7 +39,12 @@ export function FeedScreenContent({ initialData }: Props) {
       );
 
     case "library":
-      return <LibraryFeedScreen initialData={initialData.library} />;
+      return (
+        <LibraryFeedScreen
+          initialData={initialData.library}
+          initialSettings={initialSettings}
+        />
+      );
 
     case "categories":
       return (

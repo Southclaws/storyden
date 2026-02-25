@@ -73,7 +73,10 @@ export async function Navigation({
           aria-hidden={!showLeftBar}
           inert={!showLeftBar}
         >
-          <NavigationPane />
+          <NavigationPane
+            initialSession={sessionAccount}
+            initialSettings={globalSettings}
+          />
         </Box>
 
         <Box
