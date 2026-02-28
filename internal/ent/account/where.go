@@ -91,6 +91,11 @@ func Bio(v string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldBio, v))
 }
 
+// Signature applies equality check predicate on the "signature" field. It's identical to SignatureEQ.
+func Signature(v string) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldSignature, v))
+}
+
 // Admin applies equality check predicate on the "admin" field. It's identical to AdminEQ.
 func Admin(v bool) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAdmin, v))
@@ -484,6 +489,81 @@ func BioEqualFold(v string) predicate.Account {
 // BioContainsFold applies the ContainsFold predicate on the "bio" field.
 func BioContainsFold(v string) predicate.Account {
 	return predicate.Account(sql.FieldContainsFold(FieldBio, v))
+}
+
+// SignatureEQ applies the EQ predicate on the "signature" field.
+func SignatureEQ(v string) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldSignature, v))
+}
+
+// SignatureNEQ applies the NEQ predicate on the "signature" field.
+func SignatureNEQ(v string) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldSignature, v))
+}
+
+// SignatureIn applies the In predicate on the "signature" field.
+func SignatureIn(vs ...string) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldSignature, vs...))
+}
+
+// SignatureNotIn applies the NotIn predicate on the "signature" field.
+func SignatureNotIn(vs ...string) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldSignature, vs...))
+}
+
+// SignatureGT applies the GT predicate on the "signature" field.
+func SignatureGT(v string) predicate.Account {
+	return predicate.Account(sql.FieldGT(FieldSignature, v))
+}
+
+// SignatureGTE applies the GTE predicate on the "signature" field.
+func SignatureGTE(v string) predicate.Account {
+	return predicate.Account(sql.FieldGTE(FieldSignature, v))
+}
+
+// SignatureLT applies the LT predicate on the "signature" field.
+func SignatureLT(v string) predicate.Account {
+	return predicate.Account(sql.FieldLT(FieldSignature, v))
+}
+
+// SignatureLTE applies the LTE predicate on the "signature" field.
+func SignatureLTE(v string) predicate.Account {
+	return predicate.Account(sql.FieldLTE(FieldSignature, v))
+}
+
+// SignatureContains applies the Contains predicate on the "signature" field.
+func SignatureContains(v string) predicate.Account {
+	return predicate.Account(sql.FieldContains(FieldSignature, v))
+}
+
+// SignatureHasPrefix applies the HasPrefix predicate on the "signature" field.
+func SignatureHasPrefix(v string) predicate.Account {
+	return predicate.Account(sql.FieldHasPrefix(FieldSignature, v))
+}
+
+// SignatureHasSuffix applies the HasSuffix predicate on the "signature" field.
+func SignatureHasSuffix(v string) predicate.Account {
+	return predicate.Account(sql.FieldHasSuffix(FieldSignature, v))
+}
+
+// SignatureIsNil applies the IsNil predicate on the "signature" field.
+func SignatureIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldSignature))
+}
+
+// SignatureNotNil applies the NotNil predicate on the "signature" field.
+func SignatureNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldSignature))
+}
+
+// SignatureEqualFold applies the EqualFold predicate on the "signature" field.
+func SignatureEqualFold(v string) predicate.Account {
+	return predicate.Account(sql.FieldEqualFold(FieldSignature, v))
+}
+
+// SignatureContainsFold applies the ContainsFold predicate on the "signature" field.
+func SignatureContainsFold(v string) predicate.Account {
+	return predicate.Account(sql.FieldContainsFold(FieldSignature, v))
 }
 
 // KindEQ applies the EQ predicate on the "kind" field.

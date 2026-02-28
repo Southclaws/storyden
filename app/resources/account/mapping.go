@@ -18,6 +18,11 @@ func MapRef(a *ent.Account) (*Account, error) {
 		return nil, err
 	}
 
+	signature, err := opt.MapErr(opt.NewPtr(a.Signature), datagraph.NewRichText)
+	if err != nil {
+		return nil, err
+	}
+
 	kind, err := NewAccountKind(string(a.Kind))
 	if err != nil {
 		return nil, err
@@ -36,13 +41,14 @@ func MapRef(a *ent.Account) (*Account, error) {
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,
 
-		Handle:   a.Handle,
-		Name:     a.Name,
-		Bio:      bio,
-		Kind:     kind,
-		Admin:    a.Admin, // TODO: should this be derived from roles?
-		Roles:    roles,
-		Metadata: a.Metadata,
+		Handle:    a.Handle,
+		Name:      a.Name,
+		Bio:       bio,
+		Signature: signature,
+		Kind:      kind,
+		Admin:     a.Admin, // TODO: should this be derived from roles?
+		Roles:     roles,
+		Metadata:  a.Metadata,
 
 		DeletedAt: opt.NewPtr(a.DeletedAt),
 		IndexedAt: opt.NewPtr(a.IndexedAt),

@@ -4132,6 +4132,11 @@ components:
       description: The rich-text bio for an account's public profile.
       example: <body><p>hi, my name is</p><p>southclaws</p></body>
 
+    AccountSignature:
+      type: string
+      description: The rich-text signature shown beneath a member's posts.
+      example: <body><p>Sent with love from London!</p></body>
+
     EmailAddress:
       description: A valid email address.
       type: string
@@ -4147,6 +4152,7 @@ components:
         suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
+        signature: { $ref: "#/components/schemas/AccountSignature" }
         roles: { $ref: "#/components/schemas/AccountRoleRefList" }
 
     ThreadTitle:
@@ -4322,6 +4328,11 @@ components:
           description: |
             The maximum allowed size (in bytes) for reply bodies. Posts that
             exceed this size will be rejected by the moderation service.
+        signature_length_max:
+          type: integer
+          description: |
+            The maximum allowed size (in visual characters) for account
+            signatures. Signatures exceeding this length are rejected.
         word_block_list:
           type: array
           description: |
@@ -5165,6 +5176,8 @@ components:
           $ref: "#/components/schemas/AccountRoleList"
         bio:
           $ref: "#/components/schemas/AccountBio"
+        signature:
+          $ref: "#/components/schemas/AccountSignature"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
@@ -5189,6 +5202,8 @@ components:
           $ref: "#/components/schemas/AccountName"
         bio:
           $ref: "#/components/schemas/AccountBio"
+        signature:
+          $ref: "#/components/schemas/AccountSignature"
         interests:
           $ref: "#/components/schemas/TagNameList"
         links:
@@ -5515,6 +5530,8 @@ components:
               $ref: "#/components/schemas/AccountRoleList"
             bio:
               $ref: "#/components/schemas/AccountBio"
+            signature:
+              $ref: "#/components/schemas/AccountSignature"
             image:
               type: string
             followers:

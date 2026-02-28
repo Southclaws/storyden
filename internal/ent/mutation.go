@@ -103,6 +103,7 @@ type AccountMutation struct {
 	handle                         *string
 	name                           *string
 	bio                            *string
+	signature                      *string
 	kind                           *account.Kind
 	admin                          *bool
 	links                          *[]schema.ExternalLink
@@ -581,6 +582,55 @@ func (m *AccountMutation) BioCleared() bool {
 func (m *AccountMutation) ResetBio() {
 	m.bio = nil
 	delete(m.clearedFields, account.FieldBio)
+}
+
+// SetSignature sets the "signature" field.
+func (m *AccountMutation) SetSignature(s string) {
+	m.signature = &s
+}
+
+// Signature returns the value of the "signature" field in the mutation.
+func (m *AccountMutation) Signature() (r string, exists bool) {
+	v := m.signature
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSignature returns the old "signature" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldSignature(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSignature is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSignature requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSignature: %w", err)
+	}
+	return oldValue.Signature, nil
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (m *AccountMutation) ClearSignature() {
+	m.signature = nil
+	m.clearedFields[account.FieldSignature] = struct{}{}
+}
+
+// SignatureCleared returns if the "signature" field was cleared in this mutation.
+func (m *AccountMutation) SignatureCleared() bool {
+	_, ok := m.clearedFields[account.FieldSignature]
+	return ok
+}
+
+// ResetSignature resets all changes to the "signature" field.
+func (m *AccountMutation) ResetSignature() {
+	m.signature = nil
+	delete(m.clearedFields, account.FieldSignature)
 }
 
 // SetKind sets the "kind" field.
@@ -2175,7 +2225,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -2196,6 +2246,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.bio != nil {
 		fields = append(fields, account.FieldBio)
+	}
+	if m.signature != nil {
+		fields = append(fields, account.FieldSignature)
 	}
 	if m.kind != nil {
 		fields = append(fields, account.FieldKind)
@@ -2234,6 +2287,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case account.FieldBio:
 		return m.Bio()
+	case account.FieldSignature:
+		return m.Signature()
 	case account.FieldKind:
 		return m.Kind()
 	case account.FieldAdmin:
@@ -2267,6 +2322,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case account.FieldBio:
 		return m.OldBio(ctx)
+	case account.FieldSignature:
+		return m.OldSignature(ctx)
 	case account.FieldKind:
 		return m.OldKind(ctx)
 	case account.FieldAdmin:
@@ -2334,6 +2391,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBio(v)
+		return nil
+	case account.FieldSignature:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSignature(v)
 		return nil
 	case account.FieldKind:
 		v, ok := value.(account.Kind)
@@ -2409,6 +2473,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldBio) {
 		fields = append(fields, account.FieldBio)
 	}
+	if m.FieldCleared(account.FieldSignature) {
+		fields = append(fields, account.FieldSignature)
+	}
 	if m.FieldCleared(account.FieldLinks) {
 		fields = append(fields, account.FieldLinks)
 	}
@@ -2440,6 +2507,9 @@ func (m *AccountMutation) ClearField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ClearBio()
+		return nil
+	case account.FieldSignature:
+		m.ClearSignature()
 		return nil
 	case account.FieldLinks:
 		m.ClearLinks()
@@ -2478,6 +2548,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ResetBio()
+		return nil
+	case account.FieldSignature:
+		m.ResetSignature()
 		return nil
 	case account.FieldKind:
 		m.ResetKind()

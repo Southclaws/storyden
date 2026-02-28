@@ -32,6 +32,7 @@ var DefaultSettings = Settings{
 		Moderation: opt.New(ModerationServiceSettings{
 			ThreadBodyLengthMax: opt.New(60000),
 			ReplyBodyLengthMax:  opt.New(10000),
+			SignatureLengthMax:  opt.New(500),
 		}),
 	}),
 }

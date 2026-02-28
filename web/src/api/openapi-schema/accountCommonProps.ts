@@ -12,6 +12,7 @@ import type { AccountEmailAddressList } from "./accountEmailAddressList";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountRoleList } from "./accountRoleList";
+import type { AccountSignature } from "./accountSignature";
 import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
 import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
@@ -32,6 +33,7 @@ export interface AccountCommonProps {
   name: AccountName;
   notifications?: NotificationCount;
   roles: AccountRoleList;
+  signature?: AccountSignature;
   suspended?: MemberSuspendedDate;
   verified_status: AccountVerifiedStatus;
 }

@@ -15,6 +15,7 @@ import { Byline } from "../../content/Byline";
 import { PostReviewBadge } from "../PostReviewBadge";
 import { ReactList } from "../ReactList/ReactList";
 import { ReplyMenu } from "../ReplyMenu/ReplyMenu";
+import { Signature } from "../Signature";
 
 import { ReplyToButton } from "./ReplyToButton";
 import { useFragmentScroll } from "./useFragmentScroll";
@@ -33,7 +34,13 @@ export function Reply(props: Props) {
   } = useReply(props);
   const isTargeted = useFragmentScroll(props.reply.id);
 
-  const { initialSession, thread, reply, currentPage } = props;
+  const {
+    initialSession,
+    thread,
+    reply,
+    currentPage,
+    initialSignatureConfig,
+  } = props;
 
   const isInReview = reply.visibility === "review";
 
@@ -106,6 +113,13 @@ export function Reply(props: Props) {
           disabled={!isEditing}
           handleEmptyStateChange={handlers.handleEmptyStateChange}
         />
+
+        {initialSignatureConfig.enabled && (
+          <Signature
+            signature={reply.author.signature}
+            maxHeight={initialSignatureConfig.maxHeight}
+          />
+        )}
       </styled.form>
 
       <WStack>

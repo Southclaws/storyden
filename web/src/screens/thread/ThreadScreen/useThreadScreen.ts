@@ -17,6 +17,7 @@ import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useBeacon } from "@/lib/beacon/useBeacon";
 import { useReportContext } from "@/lib/report/useReportContext";
+import type { SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { withUndo } from "@/lib/thread/undo";
 import { hasPermission } from "@/utils/permissions";
@@ -26,6 +27,7 @@ export type Props = {
   initialPage?: number;
   slug: string;
   thread: ThreadGetResponse;
+  initialSignatureConfig?: SignatureConfig;
 };
 
 export const FormSchema = z.object({

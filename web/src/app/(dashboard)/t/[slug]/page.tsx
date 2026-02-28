@@ -32,6 +32,7 @@ export default async function Page(props: Props) {
   });
 
   const session = await getServerSession();
+  const settings = await getSettings();
 
   return (
     <ThreadScreen
@@ -39,6 +40,7 @@ export default async function Page(props: Props) {
       initialPage={page}
       slug={slug}
       thread={data}
+      initialSignatureConfig={settings.metadata.signatures}
     />
   );
 }
