@@ -30,6 +30,8 @@ const (
 	FieldName = "name"
 	// FieldBio holds the string denoting the bio field in the database.
 	FieldBio = "bio"
+	// FieldSignature holds the string denoting the signature field in the database.
+	FieldSignature = "signature"
 	// FieldKind holds the string denoting the kind field in the database.
 	FieldKind = "kind"
 	// FieldAdmin holds the string denoting the admin field in the database.
@@ -275,6 +277,7 @@ var Columns = []string{
 	FieldHandle,
 	FieldName,
 	FieldBio,
+	FieldSignature,
 	FieldKind,
 	FieldAdmin,
 	FieldLinks,
@@ -387,6 +390,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByBio orders the results by the bio field.
 func ByBio(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBio, opts...).ToFunc()
+}
+
+// BySignature orders the results by the signature field.
+func BySignature(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSignature, opts...).ToFunc()
 }
 
 // ByKind orders the results by the kind field.

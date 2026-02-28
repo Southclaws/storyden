@@ -1,15 +1,17 @@
 "use client";
 
+import { useAdminSettingsGet } from "@/api/openapi-client/admin";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { useSettings } from "@/lib/settings/settings-client";
+import { parseAdminSettings } from "@/lib/settings/settings";
 
 import { InterfaceSettingsForm } from "../../components/admin/InterfaceSettings/InterfaceSettings";
 
 export function InterfaceSettingsScreen() {
-  const { ready, error, settings } = useSettings();
-  if (!ready) {
+  const { error, data } = useAdminSettingsGet();
+
+  if (!data) {
     return <UnreadyBanner error={error} />;
   }
 
-  return <InterfaceSettingsForm settings={settings} />;
+  return <InterfaceSettingsForm settings={parseAdminSettings(data)} />;
 }

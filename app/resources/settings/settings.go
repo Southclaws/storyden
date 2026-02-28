@@ -60,6 +60,7 @@ type RateLimitServiceSettings struct {
 type ModerationServiceSettings struct {
 	ThreadBodyLengthMax opt.Optional[int]
 	ReplyBodyLengthMax  opt.Optional[int]
+	SignatureLengthMax  opt.Optional[int]
 	WordBlockList       opt.Optional[[]string]
 	WordReportList      opt.Optional[[]string]
 }

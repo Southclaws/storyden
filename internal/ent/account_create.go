@@ -128,6 +128,20 @@ func (_c *AccountCreate) SetNillableBio(v *string) *AccountCreate {
 	return _c
 }
 
+// SetSignature sets the "signature" field.
+func (_c *AccountCreate) SetSignature(v string) *AccountCreate {
+	_c.mutation.SetSignature(v)
+	return _c
+}
+
+// SetNillableSignature sets the "signature" field if the given value is not nil.
+func (_c *AccountCreate) SetNillableSignature(v *string) *AccountCreate {
+	if v != nil {
+		_c.SetSignature(*v)
+	}
+	return _c
+}
+
 // SetKind sets the "kind" field.
 func (_c *AccountCreate) SetKind(v account.Kind) *AccountCreate {
 	_c.mutation.SetKind(v)
@@ -722,6 +736,10 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 		_node.Bio = value
 	}
+	if value, ok := _c.mutation.Signature(); ok {
+		_spec.SetField(account.FieldSignature, field.TypeString, value)
+		_node.Signature = &value
+	}
 	if value, ok := _c.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
@@ -1288,6 +1306,24 @@ func (u *AccountUpsert) ClearBio() *AccountUpsert {
 	return u
 }
 
+// SetSignature sets the "signature" field.
+func (u *AccountUpsert) SetSignature(v string) *AccountUpsert {
+	u.Set(account.FieldSignature, v)
+	return u
+}
+
+// UpdateSignature sets the "signature" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateSignature() *AccountUpsert {
+	u.SetExcluded(account.FieldSignature)
+	return u
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (u *AccountUpsert) ClearSignature() *AccountUpsert {
+	u.SetNull(account.FieldSignature)
+	return u
+}
+
 // SetKind sets the "kind" field.
 func (u *AccountUpsert) SetKind(v account.Kind) *AccountUpsert {
 	u.Set(account.FieldKind, v)
@@ -1519,6 +1555,27 @@ func (u *AccountUpsertOne) UpdateBio() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearBio() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetSignature sets the "signature" field.
+func (u *AccountUpsertOne) SetSignature(v string) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetSignature(v)
+	})
+}
+
+// UpdateSignature sets the "signature" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateSignature() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateSignature()
+	})
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (u *AccountUpsertOne) ClearSignature() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearSignature()
 	})
 }
 
@@ -1933,6 +1990,27 @@ func (u *AccountUpsertBulk) UpdateBio() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearBio() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetSignature sets the "signature" field.
+func (u *AccountUpsertBulk) SetSignature(v string) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetSignature(v)
+	})
+}
+
+// UpdateSignature sets the "signature" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateSignature() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateSignature()
+	})
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (u *AccountUpsertBulk) ClearSignature() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearSignature()
 	})
 }
 

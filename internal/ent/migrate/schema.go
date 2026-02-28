@@ -18,6 +18,7 @@ var (
 		{Name: "handle", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "bio", Type: field.TypeString, Nullable: true},
+		{Name: "signature", Type: field.TypeString, Nullable: true},
 		{Name: "kind", Type: field.TypeEnum, Enums: []string{"human", "bot"}, Default: "human"},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
@@ -32,7 +33,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "accounts_invitations_invited",
-				Columns:    []*schema.Column{AccountsColumns[12]},
+				Columns:    []*schema.Column{AccountsColumns[13]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

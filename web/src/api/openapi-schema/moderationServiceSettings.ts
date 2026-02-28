@@ -13,6 +13,10 @@ export interface ModerationServiceSettings {
 exceed this size will be rejected by the moderation service.
  */
   reply_body_length_max?: number;
+  /** The maximum allowed size (in visual characters) for account
+signatures. Signatures exceeding this length are rejected.
+ */
+  signature_length_max?: number;
   /** The maximum allowed size (in bytes) for thread bodies. Posts that
 exceed this size will be rejected by the moderation service.
  */

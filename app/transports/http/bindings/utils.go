@@ -44,6 +44,7 @@ func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 		Handle:         acc.Handle,
 		Name:           acc.Name,
 		Bio:            acc.Bio.HTML(),
+		Signature:      opt.Map(acc.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
 		Meta:           acc.Metadata,
 		Links:          serialiseExternalLinks(acc.ExternalLinks),
 		CreatedAt:      acc.CreatedAt,

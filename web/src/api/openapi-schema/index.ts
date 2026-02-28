@@ -46,6 +46,7 @@ export * from "./accountRoleRef";
 export * from "./accountRoleRefList";
 export * from "./accountRoleRefProps";
 export * from "./accountSetAvatarBody";
+export * from "./accountSignature";
 export * from "./accountUpdateBody";
 export * from "./accountUpdateOKResponse";
 export * from "./accountVerifiedStatus";

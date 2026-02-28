@@ -15,6 +15,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
@@ -307,6 +308,7 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 		Suspended: in.Deleted.Ptr(),
 		DeletedAt: in.Deleted.Ptr(),
 		Bio:       in.Bio.HTML(),
+		Signature: opt.Map(in.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
 		Handle:    in.Handle,
 		Name:      in.Name,
 		Roles:     serialiseHeldRoleList(in.Roles),
@@ -326,6 +328,7 @@ func serialiseProfileReference(a profile.Ref) openapi.ProfileReference {
 		Suspended: a.Deleted.Ptr(),
 		Handle:    (openapi.AccountHandle)(a.Handle),
 		Name:      a.Name,
+		Signature: opt.Map(a.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
 		Roles:     serialiseHeldRoleRefList(a.Roles),
 	}
 }
@@ -337,6 +340,7 @@ func serialiseProfileReferenceFromAccount(a account.Account) openapi.ProfileRefe
 		Suspended: a.DeletedAt.Ptr(),
 		Handle:    (openapi.AccountHandle)(a.Handle),
 		Name:      a.Name,
+		Signature: opt.Map(a.Signature, func(s datagraph.Content) string { return s.HTML() }).Ptr(),
 		Roles:     serialiseHeldRoleRefList(a.Roles),
 	}
 }

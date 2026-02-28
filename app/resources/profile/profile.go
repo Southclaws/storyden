@@ -17,20 +17,26 @@ import (
 )
 
 type Ref struct {
-	ID       account.AccountID
-	Created  time.Time
-	Updated  time.Time
-	Deleted  opt.Optional[time.Time]
-	Handle   string
-	Name     string
-	Bio      datagraph.Content
-	Roles    held.Roles
-	Admin    bool
-	Metadata map[string]any
+	ID        account.AccountID
+	Created   time.Time
+	Updated   time.Time
+	Deleted   opt.Optional[time.Time]
+	Handle    string
+	Name      string
+	Bio       datagraph.Content
+	Signature opt.Optional[datagraph.Content]
+	Roles     held.Roles
+	Admin     bool
+	Metadata  map[string]any
 }
 
 func MapRef(a *ent.Account) (*Ref, error) {
 	bio, err := datagraph.NewRichText(a.Bio)
+	if err != nil {
+		return nil, err
+	}
+
+	signature, err := opt.MapErr(opt.NewPtr(a.Signature), datagraph.NewRichText)
 	if err != nil {
 		return nil, err
 	}
@@ -46,16 +52,17 @@ func MapRef(a *ent.Account) (*Ref, error) {
 	}
 
 	return &Ref{
-		ID:       account.AccountID(a.ID),
-		Created:  a.CreatedAt,
-		Updated:  a.UpdatedAt,
-		Deleted:  opt.NewPtr(a.DeletedAt),
-		Handle:   a.Handle,
-		Name:     a.Name,
-		Bio:      bio,
-		Roles:    roles,
-		Admin:    a.Admin,
-		Metadata: a.Metadata,
+		ID:        account.AccountID(a.ID),
+		Created:   a.CreatedAt,
+		Updated:   a.UpdatedAt,
+		Deleted:   opt.NewPtr(a.DeletedAt),
+		Handle:    a.Handle,
+		Name:      a.Name,
+		Bio:       bio,
+		Signature: signature,
+		Roles:     roles,
+		Admin:     a.Admin,
+		Metadata:  a.Metadata,
 	}, nil
 }
 

@@ -26,6 +26,7 @@ func (Account) Fields() []ent.Field {
 		field.String("handle").Unique().NotEmpty(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
+		field.String("signature").Optional().Nillable(),
 		field.Enum("kind").
 			Values("human", "bot").
 			Default("human").

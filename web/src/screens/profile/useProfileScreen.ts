@@ -7,17 +7,23 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useProfileGet } from "src/api/openapi-client/profiles";
-import { Account, ProfileGetOKResponse } from "src/api/openapi-schema";
+import {
+  Account,
+  AccountMutableProps,
+  ProfileGetOKResponse,
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
-import { hasPermission, hasPermissionOr } from "@/utils/permissions";
+import type { SignatureConfig } from "@/lib/settings/settings";
+import { hasPermissionOr } from "@/utils/permissions";
 import { isSlug } from "@/utils/slugify";
 
 export type Props = {
   initialSession?: Account;
   profile: ProfileGetOKResponse;
+  initialSignatureConfig: SignatureConfig;
 };
 
 export const FormSchema = z.object({
@@ -27,16 +33,23 @@ export const FormSchema = z.object({
     .min(1, "Please enter a handle")
     .max(30, "Handle must be 30 characters or less")
     .refine(isSlug, {
-      message: "Handle can only contain letters, numbers, hyphens, and underscores",
+      message:
+        "Handle can only contain letters, numbers, hyphens, and underscores",
     }),
 
-  bio: z.string().max(200, "Bio must be 200 characters or less"),
+  bio: z.string(),
+  signature: z.string(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useProfileScreen({ initialSession, profile }: Props) {
+export function useProfileScreen({
+  initialSession,
+  profile,
+  initialSignatureConfig,
+}: Props) {
   const router = useRouter();
   const session = useSession(initialSession);
+  const signaturesEnabled = initialSignatureConfig.enabled;
   const [isEditing, setEditing] = useQueryState("edit", {
     ...parseAsBoolean,
     defaultValue: false,
@@ -49,6 +62,7 @@ export function useProfileScreen({ initialSession, profile }: Props) {
       name: profile.name,
       handle: profile.handle,
       bio: profile.bio,
+      signature: profile.signature ?? "",
     },
   });
 
@@ -69,9 +83,13 @@ export function useProfileScreen({ initialSession, profile }: Props) {
   }
 
   const handleSave = form.handleSubmit(async (data) => {
+    const payload: AccountMutableProps = signaturesEnabled
+      ? data
+      : { ...data, signature: undefined };
+
     await handle(
       async () => {
-        await update(data);
+        await update(payload);
 
         if (data.handle !== profile.handle) {
           router.replace(`/m/${data.handle}`);
@@ -103,6 +121,7 @@ export function useProfileScreen({ initialSession, profile }: Props) {
       isEditing,
       isSelf,
       canViewAccount,
+      signaturesEnabled,
     },
     data: {
       session,

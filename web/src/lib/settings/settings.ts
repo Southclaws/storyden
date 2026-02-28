@@ -15,6 +15,10 @@ export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
   editor: DefaultEditorSettings,
   sidebar: DefaultSidebarSettings,
+  signatures: {
+    enabled: true,
+    maxHeight: 160,
+  },
 } as const;
 
 export const DefaultSettings = {
@@ -35,9 +39,16 @@ export const FrontendConfigurationSchema = z
     feed: FeedConfigSchema,
     editor: EditorSettingsSchema.default(DefaultEditorSettings),
     sidebar: SidebarSettingsSchema.default(DefaultSidebarSettings),
+    signatures: z
+      .object({
+        enabled: z.boolean().default(true),
+        maxHeight: z.number().int().positive().max(2000).default(160),
+      })
+      .default({ enabled: true, maxHeight: 160 }),
   })
   .default(DefaultFrontendConfig);
 export type FrontendConfiguration = z.infer<typeof FrontendConfigurationSchema>;
+export type SignatureConfig = FrontendConfiguration["signatures"];
 
 // Settings is the union of the backend typed config and the frontend config.
 export type Settings = Info & {

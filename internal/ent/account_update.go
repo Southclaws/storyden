@@ -147,6 +147,26 @@ func (_u *AccountUpdate) ClearBio() *AccountUpdate {
 	return _u
 }
 
+// SetSignature sets the "signature" field.
+func (_u *AccountUpdate) SetSignature(v string) *AccountUpdate {
+	_u.mutation.SetSignature(v)
+	return _u
+}
+
+// SetNillableSignature sets the "signature" field if the given value is not nil.
+func (_u *AccountUpdate) SetNillableSignature(v *string) *AccountUpdate {
+	if v != nil {
+		_u.SetSignature(*v)
+	}
+	return _u
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (_u *AccountUpdate) ClearSignature() *AccountUpdate {
+	_u.mutation.ClearSignature()
+	return _u
+}
+
 // SetKind sets the "kind" field.
 func (_u *AccountUpdate) SetKind(v account.Kind) *AccountUpdate {
 	_u.mutation.SetKind(v)
@@ -1205,6 +1225,12 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := _u.mutation.Signature(); ok {
+		_spec.SetField(account.FieldSignature, field.TypeString, value)
+	}
+	if _u.mutation.SignatureCleared() {
+		_spec.ClearField(account.FieldSignature, field.TypeString)
 	}
 	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
@@ -2475,6 +2501,26 @@ func (_u *AccountUpdateOne) ClearBio() *AccountUpdateOne {
 	return _u
 }
 
+// SetSignature sets the "signature" field.
+func (_u *AccountUpdateOne) SetSignature(v string) *AccountUpdateOne {
+	_u.mutation.SetSignature(v)
+	return _u
+}
+
+// SetNillableSignature sets the "signature" field if the given value is not nil.
+func (_u *AccountUpdateOne) SetNillableSignature(v *string) *AccountUpdateOne {
+	if v != nil {
+		_u.SetSignature(*v)
+	}
+	return _u
+}
+
+// ClearSignature clears the value of the "signature" field.
+func (_u *AccountUpdateOne) ClearSignature() *AccountUpdateOne {
+	_u.mutation.ClearSignature()
+	return _u
+}
+
 // SetKind sets the "kind" field.
 func (_u *AccountUpdateOne) SetKind(v account.Kind) *AccountUpdateOne {
 	_u.mutation.SetKind(v)
@@ -3563,6 +3609,12 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 	}
 	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := _u.mutation.Signature(); ok {
+		_spec.SetField(account.FieldSignature, field.TypeString, value)
+	}
+	if _u.mutation.SignatureCleared() {
+		_spec.ClearField(account.FieldSignature, field.TypeString)
 	}
 	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)

@@ -3,6 +3,7 @@ import { Fragment } from "react";
 
 import { Account, Thread } from "src/api/openapi-schema";
 
+import type { SignatureConfig } from "@/lib/settings/settings";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { Reply } from "../Reply/Reply";
@@ -11,9 +12,15 @@ type Props = {
   initialSession?: Account;
   thread: Thread;
   currentPage?: number;
+  initialSignatureConfig: SignatureConfig;
 };
 
-export function ReplyList({ initialSession, thread, currentPage }: Props) {
+export function ReplyList({
+  initialSession,
+  thread,
+  currentPage,
+  initialSignatureConfig,
+}: Props) {
   return (
     <styled.ol
       listStyleType="none"
@@ -33,7 +40,13 @@ export function ReplyList({ initialSession, thread, currentPage }: Props) {
             {start && <IntervalDivider interval={{ start, end }} />}
 
             <styled.li listStyleType="none" m="0">
-              <Reply initialSession={initialSession} thread={thread} reply={reply} currentPage={currentPage} />
+              <Reply
+                initialSession={initialSession}
+                thread={thread}
+                reply={reply}
+                currentPage={currentPage}
+                initialSignatureConfig={initialSignatureConfig}
+              />
             </styled.li>
           </Fragment>
         );

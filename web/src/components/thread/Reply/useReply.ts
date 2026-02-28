@@ -9,6 +9,7 @@ import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useReportContext } from "@/lib/report/useReportContext";
+import type { SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { withUndo } from "@/lib/thread/undo";
 import { hasPermission } from "@/utils/permissions";
@@ -23,6 +24,7 @@ export type Props = {
   thread: Thread;
   reply: Reply;
   currentPage?: number;
+  initialSignatureConfig: SignatureConfig;
 };
 
 export function useReply({

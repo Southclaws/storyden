@@ -38,6 +38,7 @@ type Partial struct {
 	Handle    opt.Optional[string]
 	Name      opt.Optional[string]
 	Bio       opt.Optional[string]
+	Signature opt.Optional[string]
 	Interests opt.Optional[[]xid.ID]
 	Links     opt.Optional[[]account.ExternalLink]
 	Meta      opt.Optional[map[string]any]
@@ -58,6 +59,9 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 	}
 	if v, ok := params.Bio.Get(); ok {
 		opts = append(opts, account_writer.SetBio(v))
+	}
+	if v, ok := params.Signature.Get(); ok {
+		opts = append(opts, account_writer.SetSignature(v))
 	}
 	if v, ok := params.Interests.Get(); ok {
 		opts = append(opts, account_writer.SetInterests(v))

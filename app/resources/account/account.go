@@ -27,13 +27,14 @@ type Account struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Handle   string
-	Name     string
-	Bio      datagraph.Content
-	Kind     AccountKind
-	Roles    held.Roles
-	Admin    bool
-	Metadata map[string]any
+	Handle    string
+	Name      string
+	Bio       datagraph.Content
+	Signature opt.Optional[datagraph.Content]
+	Kind      AccountKind
+	Roles     held.Roles
+	Admin     bool
+	Metadata  map[string]any
 
 	DeletedAt opt.Optional[time.Time]
 	IndexedAt opt.Optional[time.Time]

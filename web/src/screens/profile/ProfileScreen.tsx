@@ -38,9 +38,13 @@ export function ProfileScreen(props: Props) {
   }
 
   const { session, profile } = data;
-  const { isSelf, isEditing, canViewAccount } = state;
+  const { isSelf, isEditing, canViewAccount, signaturesEnabled } = state;
   const isEmpty =
     !profile.bio || profile.bio === "" || profile.bio === "<body></body>";
+  const isSignatureEmpty =
+    !profile.signature ||
+    profile.signature === "" ||
+    profile.signature === "<body></body>";
 
   return (
     <LStack w="full">
@@ -147,6 +151,21 @@ export function ProfileScreen(props: Props) {
               placeholder="This profile has no bio yet..."
             />
           )}
+
+          {signaturesEnabled &&
+            (isSignatureEmpty && !isEditing ? (
+              <styled.p color="fg.subtle" fontStyle="italic">
+                This profile has no signature yet...
+              </styled.p>
+            ) : (
+              <ContentFormField<Form>
+                control={form.control}
+                name="signature"
+                initialValue={profile.signature ?? ""}
+                disabled={!isEditing}
+                placeholder="This profile has no signature yet..."
+              />
+            ))}
         </styled.form>
 
         {profile.deletedAt && (

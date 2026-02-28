@@ -11,6 +11,7 @@ import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountRoleList } from "./accountRoleList";
+import type { AccountSignature } from "./accountSignature";
 import type { LikeScore } from "./likeScore";
 import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
@@ -37,5 +38,6 @@ export type PublicProfileAllOf = {
   meta: Metadata;
   name: AccountName;
   roles: AccountRoleList;
+  signature?: AccountSignature;
   suspended?: MemberSuspendedDate;
 };

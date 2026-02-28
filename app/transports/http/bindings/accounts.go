@@ -19,9 +19,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_manage"
@@ -44,6 +46,7 @@ type Accounts struct {
 	accountAuth   *account_auth.Manager
 	accountEmail  *account_email.Manager
 	accountManage *account_manage.Manager
+	settingsRepo  *settings.SettingsRepository
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
 	webAddress    url.URL
@@ -60,6 +63,7 @@ func NewAccounts(
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
 	accountManage *account_manage.Manager,
+	settingsRepo *settings.SettingsRepository,
 	roleAssign *role_assign.Assignment,
 	roleBadge *role_badge.Writer,
 ) Accounts {
@@ -73,6 +77,7 @@ func NewAccounts(
 		accountAuth:   accountAuth,
 		accountEmail:  accountEmail,
 		accountManage: accountManage,
+		settingsRepo:  settingsRepo,
 		roleAssign:    roleAssign,
 		roleBadge:     roleBadge,
 		webAddress:    cfg.PublicWebAddress,
@@ -158,10 +163,40 @@ func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpd
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	var signature opt.Optional[string]
+	if request.Body.Signature != nil {
+		signatureContent, err := datagraph.NewRichText(*request.Body.Signature)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		settingsData, err := i.settingsRepo.Get(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		maxChars := settingsData.Services.
+			OrZero().
+			Moderation.OrZero().
+			SignatureLengthMax.Or(500)
+
+		if len([]rune(signatureContent.Plaintext())) > maxChars {
+			return nil, fault.Wrap(
+				fault.New("signature character limit exceeded"),
+				fctx.With(ctx),
+				ftag.With(ftag.InvalidArgument),
+				fmsg.WithDesc("signature", "Your signature is too long."),
+			)
+		}
+
+		signature = opt.New(signatureContent.HTML())
+	}
+
 	acc, err := i.accountUpdate.Update(ctx, accountID, account_update.Partial{
 		Handle:    opt.NewPtrMap(request.Body.Handle, func(i openapi.AccountHandle) string { return string(i) }),
 		Name:      opt.NewPtr(request.Body.Name),
 		Bio:       opt.NewPtr(request.Body.Bio),
+		Signature: signature,
 		Links:     links,
 		Meta:      opt.NewPtr((*map[string]any)(request.Body.Meta)),
 		Interests: opt.NewPtrMap(request.Body.Interests, tagsIDs),

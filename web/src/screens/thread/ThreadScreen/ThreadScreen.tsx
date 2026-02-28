@@ -19,6 +19,7 @@ import { PostReviewBadge } from "@/components/thread/PostReviewBadge";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyProvider } from "@/components/thread/ReplyContext";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
+import { Signature } from "@/components/thread/Signature";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { TagListField } from "@/components/thread/ThreadTagList";
@@ -54,6 +55,10 @@ export function ThreadScreen(props: Props) {
   }
 
   const { thread } = data;
+  const signatureConfig = props.initialSignatureConfig ?? {
+    enabled: true,
+    maxHeight: 160,
+  };
 
   return (
     <ReplyProvider>
@@ -150,6 +155,13 @@ export function ThreadScreen(props: Props) {
             disabled={!isEditing}
             handleEmptyStateChange={handlers.handleEmptyStateChange}
           />
+
+          {signatureConfig.enabled && (
+            <Signature
+              signature={thread.author.signature}
+              maxHeight={signatureConfig.maxHeight}
+            />
+          )}
         </styled.form>
 
         <ThreadStats thread={thread} />
@@ -168,6 +180,7 @@ export function ThreadScreen(props: Props) {
             initialSession={props.initialSession}
             thread={thread}
             currentPage={data.thread.replies.current_page}
+            initialSignatureConfig={signatureConfig}
           />
 
           {data.thread.replies.total_pages > 1 && (

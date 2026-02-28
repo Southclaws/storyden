@@ -57,6 +57,12 @@ func WithBio(v datagraph.Content) Option {
 	}
 }
 
+func WithSignature(v datagraph.Content) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetSignature(v.HTML())
+	}
+}
+
 func WithInvitedBy(id xid.ID) Option {
 	return func(a *ent.AccountMutation) {
 		a.SetInvitedByID(id)
@@ -78,6 +84,12 @@ func SetName(name string) Mutation {
 func SetBio(bio string) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.SetBio(bio)
+	}
+}
+
+func SetSignature(signature string) Mutation {
+	return func(u *ent.AccountUpdateOne) {
+		u.SetSignature(signature)
 	}
 }
 
