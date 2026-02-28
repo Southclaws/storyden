@@ -18,6 +18,7 @@ import type {
   AssetUploadBody,
   BeaconBody,
   GetInfoOKResponse,
+  GetSessionOKResponse,
   GetSpec200,
   InternalServerErrorResponse,
   UnauthorisedResponse,
@@ -145,6 +146,48 @@ export const useGetDocs = <TError = InternalServerErrorResponse>(options?: {
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getGetDocsKey() : null));
   const swrFn = () => getDocs();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Provides the instance settings and, if authenticated, the member's
+settings as well. This is effectively the same as calling `GetInfo` and
+`AccountGet` at the same time. This is a convenience endpoint to reduce
+round-trips for root level data needed to render a client's initial UI.
+
+ */
+export const getSession = () => {
+  return fetcher<GetSessionOKResponse>({ url: `/session`, method: "GET" });
+};
+
+export const getGetSessionKey = () => [`/session`] as const;
+
+export type GetSessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSession>>
+>;
+export type GetSessionQueryError = InternalServerErrorResponse;
+
+export const useGetSession = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof getSession>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getGetSessionKey() : null));
+  const swrFn = () => getSession();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

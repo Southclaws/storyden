@@ -171,6 +171,20 @@ paths:
               schema:
                 type: string
 
+  /session:
+    get:
+      operationId: GetSession
+      description: |
+        Provides the instance settings and, if authenticated, the member's
+        settings as well. This is effectively the same as calling `GetInfo` and
+        `AccountGet` at the same time. This is a convenience endpoint to reduce
+        round-trips for root level data needed to render a client's initial UI.
+      security: []
+      tags: [misc]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/GetSessionOK" }
+
   /info:
     get:
       operationId: GetInfo
@@ -3277,6 +3291,14 @@ components:
           schema:
             $ref: "#/components/schemas/Info"
 
+    GetSessionOK:
+      description: OK
+      headers: { <<: *cache_response_headers }
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SessionInfo"
+
     AdminSettingsGetOK:
       description: OK
       content:
@@ -3988,6 +4010,14 @@ components:
           $ref: "#/components/schemas/InstanceCapabilityList"
         metadata:
           $ref: "#/components/schemas/Metadata"
+
+    SessionInfo:
+      description: |
+        The combination of public info and the requesting account's settings.
+      required: [info]
+      properties:
+        info: { $ref: "#/components/schemas/Info" }
+        account: { $ref: "#/components/schemas/Account" }
 
     OnboardingStatus:
       description: |

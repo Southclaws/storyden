@@ -7,7 +7,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/branding/banner"
 	"github.com/Southclaws/storyden/app/services/branding/icon"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
@@ -15,17 +17,49 @@ import (
 )
 
 type Info struct {
-	systemInfo *instance_info.Provider
-	is         icon.Service
-	os         banner.Service
+	systemInfo  *instance_info.Provider
+	accountInfo *account_querier.Querier
+	is          icon.Service
+	os          banner.Service
 }
 
-func NewInfo(systemInfo *instance_info.Provider, is icon.Service, os banner.Service) Info {
+func NewInfo(systemInfo *instance_info.Provider, accountInfo *account_querier.Querier, is icon.Service, os banner.Service) Info {
 	return Info{
-		systemInfo: systemInfo,
-		is:         is,
-		os:         os,
+		systemInfo:  systemInfo,
+		accountInfo: accountInfo,
+		is:          is,
+		os:          os,
 	}
+}
+
+func (i Info) GetSession(ctx context.Context, request openapi.GetSessionRequestObject) (openapi.GetSessionResponseObject, error) {
+	info, err := i.systemInfo.Get(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	sessionInfo := openapi.SessionInfo{
+		Info: serialiseInfo(info),
+	}
+
+	if accountID, ok := session.GetOptAccountID(ctx).Get(); ok {
+		accountData, err := i.accountInfo.GetByID(ctx, accountID)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		account := serialiseAccount(accountData)
+		sessionInfo.Account = &account
+	}
+
+	return openapi.GetSession200JSONResponse{
+		GetSessionOKJSONResponse: openapi.GetSessionOKJSONResponse{
+			Body: sessionInfo,
+			Headers: openapi.GetSessionOKResponseHeaders{
+				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
+			},
+		},
+	}, nil
 }
 
 func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject) (openapi.GetInfoResponseObject, error) {

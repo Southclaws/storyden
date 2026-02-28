@@ -12,6 +12,7 @@ import type {
   AssetUploadBody,
   BeaconBody,
   GetInfoOKResponse,
+  GetSessionOKResponse,
   GetSpec200,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -85,6 +86,31 @@ export const getDocs = async (
   options?: RequestInit,
 ): Promise<getDocsResponse> => {
   return fetcher<Promise<getDocsResponse>>(getGetDocsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Provides the instance settings and, if authenticated, the member's
+settings as well. This is effectively the same as calling `GetInfo` and
+`AccountGet` at the same time. This is a convenience endpoint to reduce
+round-trips for root level data needed to render a client's initial UI.
+
+ */
+export type getSessionResponse = {
+  data: GetSessionOKResponse;
+  status: number;
+};
+
+export const getGetSessionUrl = () => {
+  return `/session`;
+};
+
+export const getSession = async (
+  options?: RequestInit,
+): Promise<getSessionResponse> => {
+  return fetcher<Promise<getSessionResponse>>(getGetSessionUrl(), {
     ...options,
     method: "GET",
   });

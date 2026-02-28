@@ -22,6 +22,10 @@ func (m *Mapping) GetInfo() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
+func (m *Mapping) GetSettings() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
 func (m *Mapping) IconGet() (bool, *rbac.Permission) {
 	return false, nil // Public
 }

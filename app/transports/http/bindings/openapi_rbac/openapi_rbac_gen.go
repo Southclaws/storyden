@@ -7,6 +7,7 @@ type OperationPermissions interface {
 	GetSpec() (bool, *rbac.Permission)
 	GetDocs() (bool, *rbac.Permission)
 	GetInfo() (bool, *rbac.Permission)
+	GetSettings() (bool, *rbac.Permission)
 	IconGet() (bool, *rbac.Permission)
 	IconUpload() (bool, *rbac.Permission)
 	BannerGet() (bool, *rbac.Permission)
@@ -156,6 +157,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.GetDocs()
 	case "GetInfo":
 		return optable.GetInfo()
+	case "GetSettings":
+		return optable.GetSettings()
 	case "IconGet":
 		return optable.IconGet()
 	case "IconUpload":
