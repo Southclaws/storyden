@@ -193,7 +193,7 @@
       default: ""
       description: |-
         Either:
-        - `otlp` for any standard OpenTelemetry collector.
+        - `otlp` for any standard OpenTelemetry collector, or `file://...` JSONL output when `OTEL_EXPORTER_OTLP_ENDPOINT` is a file URL.
         - `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
         - `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
 
@@ -203,6 +203,10 @@
       default: ""
       description: |-
         The collector endpoint for sending OTEL data.
+
+        This also supports file output for local profiling when `OTEL_PROVIDER=otlp`
+        by setting a `file://` URL, for example: `file:///tmp/storyden-traces.jsonl`
+        or `file:./otel-logs.jsonl`.
 
     - env: "SENTRY_DSN"
       name: SentryDSN

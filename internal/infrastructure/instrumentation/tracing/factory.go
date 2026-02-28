@@ -9,6 +9,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	sentryotel "github.com/getsentry/sentry-go/otel"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
@@ -101,6 +102,28 @@ func newExporter(ctx context.Context,
 		endpoint := cfg.OTELEndpoint.String()
 		if endpoint == "" {
 			return nil, fault.New("OTEL_EXPORTER_OTLP_ENDPOINT is required when using the otlp provider")
+		}
+
+		if cfg.OTELEndpoint.Scheme == "file" {
+			path := cfg.OTELEndpoint.Path
+			if path == "" {
+				path = cfg.OTELEndpoint.Opaque
+			}
+
+			if path == "" {
+				return nil, fault.New("OTEL_EXPORTER_OTLP_ENDPOINT must contain a file path when using file:// endpoint")
+			}
+
+			otlp, err := otlptrace.New(ctx, newOTLPJSONLClient(path))
+			if err != nil {
+				return nil, fault.Wrap(err, fmsg.With("failed to create OTLP JSONL exporter"))
+			}
+
+			logger.Info("configured OTLP JSONL trace exporter", slog.String("path", path))
+
+			return []trace.TracerProviderOption{
+				trace.WithBatcher(otlp),
+			}, nil
 		}
 
 		opts := []otlptracehttp.Option{
