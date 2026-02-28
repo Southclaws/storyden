@@ -11,11 +11,15 @@ import (
 
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 // ResolveRoleIDs resolves account<>role assignments using internal cache with
 // DB fallback for misses.
 func (w *Assignment) ResolveRoleIDs(ctx context.Context, accountIDs []xid.ID) (map[xid.ID][]xid.ID, map[xid.ID][]*ent.AccountRoles, error) {
+	ctx, span := w.ins.Instrument(ctx, kv.Int("accounts_count", len(accountIDs)))
+	defer span.End()
+
 	idsByAccount := make(map[xid.ID][]xid.ID, len(accountIDs))
 	byAccountRows := map[xid.ID][]*ent.AccountRoles{}
 	missing := make([]xid.ID, 0, len(accountIDs))
@@ -32,8 +36,10 @@ func (w *Assignment) ResolveRoleIDs(ctx context.Context, accountIDs []xid.ID) (m
 	}
 
 	if len(missing) == 0 {
+		ctx = span.Annotate(kv.Int("cache_miss_count", 0))
 		return idsByAccount, byAccountRows, nil
 	}
+	ctx = span.Annotate(kv.Int("cache_miss_count", len(missing)))
 
 	loadedIDs, loadedRows, err := w.ResolveRoleIDsFresh(ctx, missing)
 	if err != nil {
@@ -51,6 +57,9 @@ func (w *Assignment) ResolveRoleIDs(ctx context.Context, accountIDs []xid.ID) (m
 }
 
 func (w *Assignment) ResolveRoleIDsFresh(ctx context.Context, accountIDs []xid.ID) (map[xid.ID][]xid.ID, map[xid.ID][]*ent.AccountRoles, error) {
+	ctx, span := w.ins.Instrument(ctx, kv.Int("accounts_count", len(accountIDs)))
+	defer span.End()
+
 	idsByAccount := make(map[xid.ID][]xid.ID, len(accountIDs))
 	if len(accountIDs) == 0 {
 		return idsByAccount, map[xid.ID][]*ent.AccountRoles{}, nil

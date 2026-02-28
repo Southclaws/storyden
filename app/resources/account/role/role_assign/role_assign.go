@@ -14,18 +14,23 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 type Assignment struct {
+	ins   spanner.Instrumentation
 	db    *ent.Client
 	store cache.Store
 }
 
 func New(
+	ins spanner.Builder,
 	db *ent.Client,
 	store cache.Store,
 ) *Assignment {
 	return &Assignment{
+		ins:   ins.Build(),
 		db:    db,
 		store: store,
 	}
@@ -66,6 +71,12 @@ func split(mutations ...Mutation) (adds, removes []xid.ID, admin opt.Optional[bo
 }
 
 func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, roles ...Mutation) error {
+	ctx, span := w.ins.Instrument(ctx,
+		kv.String("account_id", xid.ID(accountID).String()),
+		kv.Int("mutations_count", len(roles)),
+	)
+	defer span.End()
+
 	tx, err := w.db.Tx(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

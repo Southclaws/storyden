@@ -15,24 +15,32 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 type Hydrator struct {
+	ins                spanner.Instrumentation
 	roleRepo           *role_repo.Repository
 	assignmentResolver *role_assign.Assignment
 }
 
 func New(
+	ins spanner.Builder,
 	roleRepo *role_repo.Repository,
 	assignmentResolver *role_assign.Assignment,
 ) *Hydrator {
 	return &Hydrator{
+		ins:                ins.Build(),
 		roleRepo:           roleRepo,
 		assignmentResolver: assignmentResolver,
 	}
 }
 
 func (r *Hydrator) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Account) error {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("accounts_count", len(accounts)))
+	defer span.End()
+
 	accountIDs := make([]xid.ID, 0, len(accounts))
 	seen := make(map[xid.ID]struct{}, len(accounts))
 	hasAdmin := false
@@ -55,6 +63,8 @@ func (r *Hydrator) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Accoun
 		return nil
 	}
 
+	ctx = span.Annotate(kv.Int("deduped_accounts_count", len(accountIDs)))
+
 	idsByAccount, byAccountRows, err := r.assignmentResolver.ResolveRoleIDs(ctx, accountIDs)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -67,6 +77,7 @@ func (r *Hydrator) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Accoun
 
 	staleAccountIDs := findAccountsWithMissingRoles(idsByAccount, roleByID)
 	if len(staleAccountIDs) > 0 {
+		ctx = span.Annotate(kv.Int("stale_accounts_count", len(staleAccountIDs)))
 		refreshedIDs, refreshedRows, err := r.assignmentResolver.ResolveRoleIDsFresh(ctx, staleAccountIDs)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -175,6 +186,9 @@ func (r *Hydrator) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Accoun
 }
 
 func (r *Hydrator) HydrateDefaultRoleEdges(ctx context.Context, accounts ...*ent.Account) error {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("accounts_count", len(accounts)))
+	defer span.End()
+
 	return r.HydrateRoleEdges(ctx, accounts...)
 }
 
@@ -233,6 +247,12 @@ func roleSortKey(id role.RoleID, current float64) float64 {
 }
 
 func (r *Hydrator) rolesByID(ctx context.Context, idsByAccount map[xid.ID][]xid.ID, hasAdmin bool) (map[role.RoleID]*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx,
+		kv.Int("accounts_count", len(idsByAccount)),
+		kv.Bool("has_admin", hasAdmin),
+	)
+	defer span.End()
+
 	roleIDSet := map[role.RoleID]struct{}{
 		role.DefaultRoleMemberID: {},
 	}
@@ -249,6 +269,8 @@ func (r *Hydrator) rolesByID(ctx context.Context, idsByAccount map[xid.ID][]xid.
 	for id := range roleIDSet {
 		roleIDs = append(roleIDs, id)
 	}
+
+	ctx = span.Annotate(kv.Int("role_ids_count", len(roleIDs)))
 
 	roleByID, err := r.roleRepo.GetMany(ctx, roleIDs...)
 	if err != nil {

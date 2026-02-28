@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"log/slog"
 	"math/rand"
 	"os"
 	"strconv"
@@ -25,6 +26,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache/local"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -187,15 +190,52 @@ func newSeeder(db *ent.Client) (*seeder, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	roleRepo := role_repo.New(db, store)
-	assignment := role_assign.New(db, store)
-	hydrator := role_hydrate.New(roleRepo, assignment)
-	accountRepo := account_repo.New(db, roleRepo, hydrator, store)
+	ins := noopBuilder{}
+	roleRepo := role_repo.New(ins, db, store)
+	assignment := role_assign.New(ins, db, store)
+	hydrator := role_hydrate.New(ins, roleRepo, assignment)
+	accountRepo := account_repo.New(ins, db, roleRepo, hydrator, store)
 
 	return &seeder{
 		db:            db,
 		accountWriter: account_writer.New(accountRepo),
 	}, nil
+}
+
+type noopBuilder struct{}
+
+func (noopBuilder) Build() spanner.Instrumentation {
+	return noopInstrumentation{}
+}
+
+type noopInstrumentation struct{}
+
+func (noopInstrumentation) Instrument(ctx context.Context, _ ...kv.Attr) (context.Context, spanner.Span) {
+	return ctx, noopSpan{ctx: ctx}
+}
+
+func (noopInstrumentation) InstrumentNamed(ctx context.Context, _ string, _ ...kv.Attr) (context.Context, spanner.Span) {
+	return ctx, noopSpan{ctx: ctx}
+}
+
+type noopSpan struct {
+	ctx context.Context
+}
+
+func (n noopSpan) End() {}
+
+func (n noopSpan) Annotate(_ ...kv.Attr) context.Context {
+	return n.ctx
+}
+
+func (noopSpan) Event(_ string, _ ...kv.Attr) {}
+
+func (noopSpan) Logger() *slog.Logger {
+	return slog.Default()
+}
+
+func (noopSpan) Wrap(err error, _ string, _ ...kv.Attr) error {
+	return err
 }
 
 func (s *seeder) createRandomAccount(ctx context.Context) (*ent.Account, error) {

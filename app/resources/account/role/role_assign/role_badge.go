@@ -12,9 +12,17 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 func (w *Assignment) SetBadge(ctx context.Context, accountID account_ref.ID, roleID role.RoleID, badge bool) error {
+	ctx, span := w.ins.Instrument(ctx,
+		kv.String("account_id", xid.ID(accountID).String()),
+		kv.String("role_id", xid.ID(roleID).String()),
+		kv.Bool("badge", badge),
+	)
+	defer span.End()
+
 	tx, err := w.db.Tx(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

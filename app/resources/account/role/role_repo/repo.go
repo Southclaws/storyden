@@ -16,6 +16,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_role "github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 var (
@@ -24,12 +26,14 @@ var (
 )
 
 type Repository struct {
+	ins   spanner.Instrumentation
 	db    *ent.Client
 	store cache.Store
 }
 
-func New(db *ent.Client, store cache.Store) *Repository {
+func New(ins spanner.Builder, db *ent.Client, store cache.Store) *Repository {
 	return &Repository{
+		ins:   ins.Build(),
 		db:    db,
 		store: store,
 	}
@@ -63,6 +67,9 @@ func WithMeta(meta map[string]any) Mutation {
 }
 
 func (r *Repository) Create(ctx context.Context, name string, colour string, perms rbac.PermissionList, opts ...Mutation) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("role_name", name))
+	defer span.End()
+
 	ps := dt.Map(perms, func(p rbac.Permission) string { return p.String() })
 	nextSortKey, err := r.nextCustomSortKey(ctx)
 	if err != nil {
@@ -96,6 +103,9 @@ func (r *Repository) Create(ctx context.Context, name string, colour string, per
 }
 
 func (r *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("role_id", xid.ID(id).String()))
+	defer span.End()
+
 	if id == role.DefaultRoleMemberID {
 		return r.updateDefaultRole(ctx, opts...)
 	}
@@ -131,6 +141,9 @@ func (r *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutatio
 }
 
 func (r *Repository) Get(ctx context.Context, id role.RoleID) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("role_id", xid.ID(id).String()))
+	defer span.End()
+
 	mapped, err := r.GetMany(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -145,9 +158,14 @@ func (r *Repository) Get(ctx context.Context, id role.RoleID) (*role.Role, error
 }
 
 func (r *Repository) List(ctx context.Context) (role.Roles, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	if cached, ok := r.getRoleListCache(ctx); ok {
+		ctx = span.Annotate(kv.Bool("cache_hit", true))
 		return cached, nil
 	}
+	ctx = span.Annotate(kv.Bool("cache_hit", false))
 
 	loaded, err := r.listFromDB(ctx)
 	if err != nil {
@@ -160,6 +178,9 @@ func (r *Repository) List(ctx context.Context) (role.Roles, error) {
 }
 
 func (r *Repository) GetMany(ctx context.Context, ids ...role.RoleID) (map[role.RoleID]*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("role_ids_count", len(ids)))
+	defer span.End()
+
 	if len(ids) == 0 {
 		return map[role.RoleID]*role.Role{}, nil
 	}
@@ -191,6 +212,7 @@ func (r *Repository) GetMany(ctx context.Context, ids ...role.RoleID) (map[role.
 
 		missing = append(missing, id)
 	}
+	ctx = span.Annotate(kv.Int("cache_miss_count", len(missing)))
 
 	if len(missing) == 0 {
 		return byID, nil
@@ -229,14 +251,23 @@ func (r *Repository) GetMany(ctx context.Context, ids ...role.RoleID) (map[role.
 }
 
 func (r *Repository) GetMemberRole(ctx context.Context) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	return r.getOrDefaultRole(ctx, role.DefaultRoleMemberID)
 }
 
 func (r *Repository) GetGuestRole(ctx context.Context) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	return r.getOrDefaultRole(ctx, role.DefaultRoleGuestID)
 }
 
 func (r *Repository) GetAdminRole(ctx context.Context) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	return r.getOrDefaultRole(ctx, role.DefaultRoleAdminID)
 }
 
@@ -273,6 +304,9 @@ func (r *Repository) getOrDefaultRole(ctx context.Context, id role.RoleID) (*rol
 }
 
 func (r *Repository) Delete(ctx context.Context, id role.RoleID) error {
+	ctx, span := r.ins.Instrument(ctx, kv.String("role_id", xid.ID(id).String()))
+	defer span.End()
+
 	tx, err := r.db.Tx(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -297,6 +331,9 @@ func (r *Repository) Delete(ctx context.Context, id role.RoleID) error {
 }
 
 func (r *Repository) UpdateSortOrder(ctx context.Context, ids []role.RoleID) error {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("role_ids_count", len(ids)))
+	defer span.End()
+
 	for _, id := range ids {
 		if id == role.DefaultRoleGuestID || id == role.DefaultRoleMemberID || id == role.DefaultRoleAdminID {
 			return fault.New("default roles cannot be reordered", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
@@ -361,6 +398,9 @@ func (r *Repository) UpdateSortOrder(ctx context.Context, ids []role.RoleID) err
 }
 
 func (r *Repository) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	rl, found, err := r.lookupRole(ctx, role.DefaultRoleMemberID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -416,6 +456,9 @@ func (r *Repository) updateDefaultRole(ctx context.Context, opts ...Mutation) (*
 }
 
 func (r *Repository) updateAdminRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	rl, found, err := r.lookupRole(ctx, role.DefaultRoleAdminID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -483,6 +526,9 @@ func (r *Repository) updateAdminRole(ctx context.Context, opts ...Mutation) (*ro
 }
 
 func (r *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+	ctx, span := r.ins.Instrument(ctx)
+	defer span.End()
+
 	rl, found, err := r.lookupRole(ctx, role.DefaultRoleGuestID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

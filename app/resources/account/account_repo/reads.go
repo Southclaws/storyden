@@ -9,6 +9,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -16,10 +18,13 @@ import (
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 	entpredicate "github.com/Southclaws/storyden/internal/ent/predicate"
 	role_ent "github.com/Southclaws/storyden/internal/ent/role"
-	"github.com/rs/xid"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 func (r *Repository) GetByID(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("account_id", id.String()))
+	defer span.End()
+
 	q := r.db.Account.
 		Query().
 		Where(account_ent.ID(xid.ID(id))).
@@ -53,6 +58,9 @@ func (r *Repository) GetByID(ctx context.Context, id account.AccountID) (*accoun
 }
 
 func (r *Repository) LookupByHandle(ctx context.Context, handle string) (*account.AccountWithEdges, bool, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("handle", handle))
+	defer span.End()
+
 	q := r.db.Account.
 		Query().
 		Where(account_ent.Handle(handle)).
@@ -86,13 +94,18 @@ func (r *Repository) LookupByHandle(ctx context.Context, handle string) (*accoun
 }
 
 func (r *Repository) GetRefByID(ctx context.Context, id account.AccountID) (*account.Account, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.String("account_id", id.String()))
+	defer span.End()
+
 	if cached, ok := r.accountCache.get(ctx, xid.ID(id)); ok {
+		ctx = span.Annotate(kv.Bool("cache_hit", true))
 		if err := r.refreshCachedRoles(ctx, cached); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		return cached, nil
 	}
+	ctx = span.Annotate(kv.Bool("cache_hit", false))
 
 	result, err := r.db.Account.
 		Query().
@@ -121,6 +134,9 @@ func (r *Repository) GetRefByID(ctx context.Context, id account.AccountID) (*acc
 }
 
 func (r *Repository) refreshCachedRoles(ctx context.Context, acc *account.Account) error {
+	ctx, span := r.ins.Instrument(ctx, kv.String("account_id", acc.ID.String()))
+	defer span.End()
+
 	hydrationTarget := &ent.Account{
 		ID:        xid.ID(acc.ID),
 		CreatedAt: acc.CreatedAt,
@@ -142,6 +158,9 @@ func (r *Repository) refreshCachedRoles(ctx context.Context, acc *account.Accoun
 }
 
 func (r *Repository) ProbeMany(ctx context.Context, handles ...string) ([]*account.Account, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("handles_count", len(handles)))
+	defer span.End()
+
 	if len(handles) == 0 {
 		return []*account.Account{}, nil
 	}
@@ -165,6 +184,9 @@ func (r *Repository) ProbeMany(ctx context.Context, handles ...string) ([]*accou
 }
 
 func (r *Repository) ListByHeldPermission(ctx context.Context, perms ...rbac.Permission) ([]*account.Account, error) {
+	ctx, span := r.ins.Instrument(ctx, kv.Int("permissions_count", len(perms)))
+	defer span.End()
+
 	if len(perms) == 0 {
 		return []*account.Account{}, nil
 	}
