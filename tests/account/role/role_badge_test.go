@@ -20,7 +20,8 @@ import (
 )
 
 func TestRoleBadges(t *testing.T) {
-	t.Parallel()
+	// Intentionally not parallel: this suite creates and assigns roles, which
+	// can race with other role tests that mutate shared role state.
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
@@ -63,8 +64,6 @@ func TestRoleBadges(t *testing.T) {
 			}
 
 			t.Run("set_own_role_as_badge", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -90,8 +89,6 @@ func TestRoleBadges(t *testing.T) {
 			})
 
 			t.Run("non_role_manager_cannot_set_other_member_badges", func(t *testing.T) {
-				t.Parallel()
-
 				targetCtx, targetHandle, _, role1ID, _ := setupBadgeScenario(t)
 				actorCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 				actorSession := sh.WithSession(actorCtx)
@@ -102,8 +99,6 @@ func TestRoleBadges(t *testing.T) {
 			})
 
 			t.Run("role_manager_can_set_other_member_badges", func(t *testing.T) {
-				t.Parallel()
-
 				r := require.New(t)
 				a := assert.New(t)
 

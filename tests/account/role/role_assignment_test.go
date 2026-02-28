@@ -19,7 +19,8 @@ import (
 )
 
 func TestRoleAssignment(t *testing.T) {
-	t.Parallel()
+	// Intentionally not parallel: this suite mutates global roles and account
+	// role assignments that are shared across role package tests.
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,

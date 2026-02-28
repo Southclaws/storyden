@@ -22,7 +22,8 @@ import (
 )
 
 func TestRoleCRUD(t *testing.T) {
-	t.Parallel()
+	// Intentionally not parallel: this suite mutates the global role set and
+	// role ordering, which is shared across role tests in CI.
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
