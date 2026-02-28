@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/reaction"
+	"github.com/Southclaws/storyden/app/resources/post/reaction/reaction_repo"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -256,7 +256,7 @@ Storyden is still in development so please give the repository a watch if you're
 	}
 )
 
-func threads(tr *thread_writer.Writer, pr *reply_writer.Writer, rr *reaction.Writer, ar *asset_writer.Writer) {
+func threads(tr *thread_writer.Writer, pr *reply_writer.Writer, rr *reaction_repo.Writer, ar *asset_writer.Writer) {
 	ctx := context.Background()
 
 	for _, t := range Threads {

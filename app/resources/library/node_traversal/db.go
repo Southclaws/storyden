@@ -17,7 +17,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -29,10 +29,10 @@ import (
 type database struct {
 	db          *ent.Client
 	raw         *sqlx.DB
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_querier.Querier) Repository {
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) Repository {
 	return &database{db: db, raw: raw, roleQuerier: roleQuerier}
 }
 

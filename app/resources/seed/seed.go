@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
-	"github.com/Southclaws/storyden/app/resources/post/reaction"
+	"github.com/Southclaws/storyden/app/resources/post/reaction/reaction_repo"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -56,7 +56,7 @@ func New(
 	category_repo category.Repository,
 	thread_repo *thread_writer.Writer,
 	post_repo *reply_writer.Writer,
-	react_repo *reaction.Writer,
+	react_repo *reaction_repo.Writer,
 	assetWriter *asset_writer.Writer,
 	node_repo *node_writer.Writer,
 ) (r Ready) {

@@ -156,6 +156,20 @@ func (_c *AccountCreate) SetNillableKind(v *account.Kind) *AccountCreate {
 	return _c
 }
 
+// SetVerifiedStatus sets the "verified_status" field.
+func (_c *AccountCreate) SetVerifiedStatus(v account.VerifiedStatus) *AccountCreate {
+	_c.mutation.SetVerifiedStatus(v)
+	return _c
+}
+
+// SetNillableVerifiedStatus sets the "verified_status" field if the given value is not nil.
+func (_c *AccountCreate) SetNillableVerifiedStatus(v *account.VerifiedStatus) *AccountCreate {
+	if v != nil {
+		_c.SetVerifiedStatus(*v)
+	}
+	return _c
+}
+
 // SetAdmin sets the "admin" field.
 func (_c *AccountCreate) SetAdmin(v bool) *AccountCreate {
 	_c.mutation.SetAdmin(v)
@@ -622,6 +636,10 @@ func (_c *AccountCreate) defaults() {
 		v := account.DefaultKind
 		_c.mutation.SetKind(v)
 	}
+	if _, ok := _c.mutation.VerifiedStatus(); !ok {
+		v := account.DefaultVerifiedStatus
+		_c.mutation.SetVerifiedStatus(v)
+	}
 	if _, ok := _c.mutation.Admin(); !ok {
 		v := account.DefaultAdmin
 		_c.mutation.SetAdmin(v)
@@ -662,6 +680,14 @@ func (_c *AccountCreate) check() error {
 	if v, ok := _c.mutation.Kind(); ok {
 		if err := account.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.VerifiedStatus(); !ok {
+		return &ValidationError{Name: "verified_status", err: errors.New(`ent: missing required field "Account.verified_status"`)}
+	}
+	if v, ok := _c.mutation.VerifiedStatus(); ok {
+		if err := account.VerifiedStatusValidator(v); err != nil {
+			return &ValidationError{Name: "verified_status", err: fmt.Errorf(`ent: validator failed for field "Account.verified_status": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Admin(); !ok {
@@ -743,6 +769,10 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
+	}
+	if value, ok := _c.mutation.VerifiedStatus(); ok {
+		_spec.SetField(account.FieldVerifiedStatus, field.TypeEnum, value)
+		_node.VerifiedStatus = value
 	}
 	if value, ok := _c.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
@@ -1336,6 +1366,18 @@ func (u *AccountUpsert) UpdateKind() *AccountUpsert {
 	return u
 }
 
+// SetVerifiedStatus sets the "verified_status" field.
+func (u *AccountUpsert) SetVerifiedStatus(v account.VerifiedStatus) *AccountUpsert {
+	u.Set(account.FieldVerifiedStatus, v)
+	return u
+}
+
+// UpdateVerifiedStatus sets the "verified_status" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateVerifiedStatus() *AccountUpsert {
+	u.SetExcluded(account.FieldVerifiedStatus)
+	return u
+}
+
 // SetAdmin sets the "admin" field.
 func (u *AccountUpsert) SetAdmin(v bool) *AccountUpsert {
 	u.Set(account.FieldAdmin, v)
@@ -1590,6 +1632,20 @@ func (u *AccountUpsertOne) SetKind(v account.Kind) *AccountUpsertOne {
 func (u *AccountUpsertOne) UpdateKind() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateKind()
+	})
+}
+
+// SetVerifiedStatus sets the "verified_status" field.
+func (u *AccountUpsertOne) SetVerifiedStatus(v account.VerifiedStatus) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetVerifiedStatus(v)
+	})
+}
+
+// UpdateVerifiedStatus sets the "verified_status" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateVerifiedStatus() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateVerifiedStatus()
 	})
 }
 
@@ -2025,6 +2081,20 @@ func (u *AccountUpsertBulk) SetKind(v account.Kind) *AccountUpsertBulk {
 func (u *AccountUpsertBulk) UpdateKind() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.UpdateKind()
+	})
+}
+
+// SetVerifiedStatus sets the "verified_status" field.
+func (u *AccountUpsertBulk) SetVerifiedStatus(v account.VerifiedStatus) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetVerifiedStatus(v)
+	})
+}
+
+// UpdateVerifiedStatus sets the "verified_status" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateVerifiedStatus() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateVerifiedStatus()
 	})
 }
 

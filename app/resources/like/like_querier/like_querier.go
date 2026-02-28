@@ -11,7 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/like/item_like"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -32,10 +32,10 @@ type Result struct {
 
 type LikeQuerier struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) *LikeQuerier {
+func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *LikeQuerier {
 	return &LikeQuerier{db: db, roleQuerier: roleQuerier}
 }
 

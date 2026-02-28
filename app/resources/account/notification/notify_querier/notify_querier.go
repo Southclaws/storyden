@@ -11,7 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -23,10 +23,10 @@ import (
 type Querier struct {
 	db           *ent.Client
 	postSearcher post_search.Repository
-	roleQuerier  *role_querier.Querier
+	roleQuerier  *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, postSearcher post_search.Repository, roleQuerier *role_querier.Querier) *Querier {
+func New(db *ent.Client, postSearcher post_search.Repository, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{db: db, postSearcher: postSearcher, roleQuerier: roleQuerier}
 }
 

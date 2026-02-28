@@ -10,17 +10,20 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_repo"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 	email_ent "github.com/Southclaws/storyden/internal/ent/email"
 )
 
 type Repository struct {
-	db *ent.Client
+	db          *ent.Client
+	accountRepo *account_querier.Querier
 }
 
-func New(db *ent.Client) *Repository {
-	return &Repository{db: db}
+func New(db *ent.Client, accountRepo *account_querier.Querier) *Repository {
+	return &Repository{db: db, accountRepo: accountRepo}
 }
 
 func (r *Repository) Add(ctx context.Context,
@@ -56,6 +59,10 @@ func (r *Repository) Add(ctx context.Context,
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
+		if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
 		return account.MapEmail(updated), nil
 	}
 
@@ -71,6 +78,10 @@ func (r *Repository) Add(ctx context.Context,
 		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -120,10 +131,17 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 
 func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address) error {
 	_, err := r.db.Email.Update().
-		Where(email_ent.EmailAddress(email.Address)).
+		Where(
+			email_ent.EmailAddress(email.Address),
+			email_ent.AccountID(xid.ID(accountID)),
+		).
 		SetVerified(true).
 		Save(ctx)
 	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -177,6 +195,34 @@ func (r *Repository) Remove(ctx context.Context, accountID account.AccountID, em
 			email_ent.HasAccountWith(account_ent.ID(xid.ID(accountID))),
 		).
 		Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (r *Repository) syncAccountVerifiedStatus(ctx context.Context, accountID account.AccountID) error {
+	verified, err := r.db.Email.Query().
+		Where(
+			email_ent.AccountID(xid.ID(accountID)),
+			email_ent.Verified(true),
+		).
+		Exist(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	status := account.VerifiedStatusNone
+	if verified {
+		status = account.VerifiedStatusVerifiedEmail
+	}
+
+	_, err = r.accountRepo.Update(ctx, accountID, account_repo.SetVerifiedStatus(status))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

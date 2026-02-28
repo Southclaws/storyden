@@ -181,6 +181,20 @@ func (_u *AccountUpdate) SetNillableKind(v *account.Kind) *AccountUpdate {
 	return _u
 }
 
+// SetVerifiedStatus sets the "verified_status" field.
+func (_u *AccountUpdate) SetVerifiedStatus(v account.VerifiedStatus) *AccountUpdate {
+	_u.mutation.SetVerifiedStatus(v)
+	return _u
+}
+
+// SetNillableVerifiedStatus sets the "verified_status" field if the given value is not nil.
+func (_u *AccountUpdate) SetNillableVerifiedStatus(v *account.VerifiedStatus) *AccountUpdate {
+	if v != nil {
+		_u.SetVerifiedStatus(*v)
+	}
+	return _u
+}
+
 // SetAdmin sets the "admin" field.
 func (_u *AccountUpdate) SetAdmin(v bool) *AccountUpdate {
 	_u.mutation.SetAdmin(v)
@@ -1178,6 +1192,11 @@ func (_u *AccountUpdate) check() error {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.VerifiedStatus(); ok {
+		if err := account.VerifiedStatusValidator(v); err != nil {
+			return &ValidationError{Name: "verified_status", err: fmt.Errorf(`ent: validator failed for field "Account.verified_status": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -1234,6 +1253,9 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.VerifiedStatus(); ok {
+		_spec.SetField(account.FieldVerifiedStatus, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
@@ -2535,6 +2557,20 @@ func (_u *AccountUpdateOne) SetNillableKind(v *account.Kind) *AccountUpdateOne {
 	return _u
 }
 
+// SetVerifiedStatus sets the "verified_status" field.
+func (_u *AccountUpdateOne) SetVerifiedStatus(v account.VerifiedStatus) *AccountUpdateOne {
+	_u.mutation.SetVerifiedStatus(v)
+	return _u
+}
+
+// SetNillableVerifiedStatus sets the "verified_status" field if the given value is not nil.
+func (_u *AccountUpdateOne) SetNillableVerifiedStatus(v *account.VerifiedStatus) *AccountUpdateOne {
+	if v != nil {
+		_u.SetVerifiedStatus(*v)
+	}
+	return _u
+}
+
 // SetAdmin sets the "admin" field.
 func (_u *AccountUpdateOne) SetAdmin(v bool) *AccountUpdateOne {
 	_u.mutation.SetAdmin(v)
@@ -3545,6 +3581,11 @@ func (_u *AccountUpdateOne) check() error {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.VerifiedStatus(); ok {
+		if err := account.VerifiedStatusValidator(v); err != nil {
+			return &ValidationError{Name: "verified_status", err: fmt.Errorf(`ent: validator failed for field "Account.verified_status": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -3618,6 +3659,9 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 	}
 	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.VerifiedStatus(); ok {
+		_spec.SetField(account.FieldVerifiedStatus, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)

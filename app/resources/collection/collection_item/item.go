@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -22,10 +22,10 @@ import (
 type Repository struct {
 	db          *ent.Client
 	querier     *collection_querier.Querier
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, querier *collection_querier.Querier, roleQuerier *role_querier.Querier) *Repository {
+func New(db *ent.Client, querier *collection_querier.Querier, roleQuerier *role_hydrate.Hydrator) *Repository {
 	return &Repository{db: db, querier: querier, roleQuerier: roleQuerier}
 }
 

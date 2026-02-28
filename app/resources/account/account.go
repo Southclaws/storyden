@@ -10,6 +10,7 @@ import (
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -18,23 +19,22 @@ import (
 
 var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
 
-type AccountID xid.ID
-
-func (u AccountID) String() string { return xid.ID(u).String() }
+type AccountID = account_ref.ID
 
 type Account struct {
 	ID        AccountID
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Handle    string
-	Name      string
-	Bio       datagraph.Content
-	Signature opt.Optional[datagraph.Content]
-	Kind      AccountKind
-	Roles     held.Roles
-	Admin     bool
-	Metadata  map[string]any
+	Handle         string
+	Name           string
+	Bio            datagraph.Content
+	Signature      opt.Optional[datagraph.Content]
+	Kind           AccountKind
+	VerifiedStatus VerifiedStatus
+	Roles          held.Roles
+	Admin          bool
+	Metadata       map[string]any
 
 	DeletedAt opt.Optional[time.Time]
 	IndexedAt opt.Optional[time.Time]

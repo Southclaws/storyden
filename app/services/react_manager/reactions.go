@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_querier"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
+	"github.com/Southclaws/storyden/app/resources/post/reaction/reaction_repo"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -20,8 +21,8 @@ import (
 
 type Reactor struct {
 	accountQuerier *account_querier.Querier
-	reactWriter    *reaction.Writer
-	reactReader    *reaction.Querier
+	reactWriter    *reaction_repo.Writer
+	reactReader    *reaction_repo.Querier
 	postQuerier    *post_querier.Querier
 	bus            *pubsub.Bus
 	cache          *thread_cache.Cache
@@ -29,8 +30,8 @@ type Reactor struct {
 
 func New(
 	accountQuerier *account_querier.Querier,
-	reactWriter *reaction.Writer,
-	reactReader *reaction.Querier,
+	reactWriter *reaction_repo.Writer,
+	reactReader *reaction_repo.Querier,
 	postQuerier *post_querier.Querier,
 	bus *pubsub.Bus,
 	cache *thread_cache.Cache,

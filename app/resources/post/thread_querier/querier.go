@@ -9,7 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -24,10 +24,10 @@ type Querier struct {
 	ins         spanner.Instrumentation
 	db          *ent.Client
 	raw         *sqlx.DB
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(ins spanner.Builder, db *ent.Client, raw *sqlx.DB, roleQuerier *role_querier.Querier) *Querier {
+func New(ins spanner.Builder, db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{
 		ins:         ins.Build(),
 		db:          db,

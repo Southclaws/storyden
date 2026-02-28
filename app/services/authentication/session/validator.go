@@ -35,23 +35,7 @@ func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Qu
 	}
 }
 
-// func (v *Validator) ValidateSession(ctx context.Context, raw string) (context.Context, error) {
-// 	var err error
-// 	if len(raw) == 20 /* xid.encodedLen */ {
-// 		ctx, err = v.ValidateSessionToken(ctx, raw)
-// 	} else if len(raw) == access_key.AccessKeyLength {
-// 		ctx, err = v.ValidateAccessKeyToken(ctx, raw)
-// 	}
-// 	if err != nil {
-// 		return nil, fault.Wrap(err, fctx.With(ctx))
-// 	}
-
-// 	// Hydrate the context with role information
-
-// 	return ctx, nil
-// }
-
-func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.AccountWithEdges) (role.Roles, error) {
+func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.Account) (role.Roles, error) {
 	if acc.Admin {
 		return acc.Roles.Roles(), nil
 	}
@@ -95,7 +79,7 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := v.accountQuerier.GetByID(ctx, tv.AccountID)
+	acc, err := v.accountQuerier.GetRefByID(ctx, tv.AccountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -105,7 +89,7 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccountAndToken(ctx, acc.Account, roles, raw), nil
+	return WithAccountAndToken(ctx, *acc, roles, raw), nil
 }
 
 // ValidateAccessKeyToken validates an access key token and returns a context with account info.
@@ -130,7 +114,7 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := v.accountQuerier.GetByID(ctx, ar.Account.ID)
+	acc, err := v.accountQuerier.GetRefByID(ctx, ar.Account.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -140,7 +124,7 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, acc.Account, roles), nil
+	return WithAccessKey(ctx, *acc, roles), nil
 }
 
 // WithUnauthenticatedRoles returns a context with guest role permissions.

@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/sortrule"
@@ -24,7 +24,7 @@ type Filter func(*ent.AccountQuery)
 
 type Querier struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
 func WithDisplayNameContains(q string) Filter {
@@ -129,7 +129,7 @@ func WithInvitedByHandles(handles []string) Filter {
 	}
 }
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
