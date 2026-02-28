@@ -141,6 +141,7 @@
 
   .leftbar {
     opacity: 0;
+    visibility: hidden;
     display: block;
     grid-area: leftbar;
     max-height: 100%;
@@ -157,6 +158,7 @@
 
   .rightbar {
     opacity: 0;
+    visibility: hidden;
     display: block;
     grid-area: rightbar;
     overflow: hidden;
@@ -168,6 +170,7 @@
 
   .navigation__container[data-leftbar-shown="false"] .leftbar {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
     /* NOTE: Doesn't work properly on initial page load, causes the sidebar to
     flicker visible and play the animation, need a way to not do this soon. */
@@ -176,6 +179,7 @@
 
   .navigation__container[data-leftbar-shown="true"] .leftbar {
     opacity: 1;
+    visibility: visible;
     pointer-events: all;
 
     animation: fadeInLeft 0.2s ease-in-out;
@@ -183,11 +187,13 @@
 
   .navigation__container[data-leftbar-shown="false"] .rightbar {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
   }
 
   .navigation__container[data-leftbar-shown="true"] .rightbar {
     opacity: 1;
+    visibility: visible;
     pointer-events: all;
 
     animation: fadeInRight 0.2s ease-in-out;

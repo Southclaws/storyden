@@ -1,33 +1,37 @@
-import { Account } from "@/api/openapi-schema";
 import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
 import { nodeListCached } from "@/lib/library/server-node-list";
-import { FrontendConfiguration, Settings } from "@/lib/settings/settings";
+import { type FrontendConfiguration } from "@/lib/settings/settings";
+import { getSettings } from "@/lib/settings/settings-server";
 import { VStack } from "@/styled-system/jsx";
 
-import { FeedScreenContent, InitialData } from "./FeedScreenContent";
+import { FeedScreenContent } from "./FeedScreenContent";
+import { InitialData } from "./types";
 
-export type PageProps = {
-  initialSession?: Account;
+export type Props = {
   page: number;
-};
-
-export type Props = PageProps & {
-  initialSettings: Settings;
 };
 
 // NOTE: The FeedScreen (index page) is server hydrated on first load, but the
 // admin may configure different sources/layouts which is post-hydration and
 // client side. In this case, there is no server side hydrated data available.
 // Not a problem just worth pointing out here.
-export async function FeedScreen({ page, initialSettings }: Props) {
+export async function FeedScreen({ page }: Props) {
+  const initialSession = await getServerSession();
+  const initialSettings = await getSettings();
+
   const feedConfig = initialSettings.metadata.feed;
   const initialData = await getInitialFeedData(feedConfig, page);
 
   return (
     <VStack>
-      <FeedScreenContent initialData={initialData} />
+      <FeedScreenContent
+        initialData={initialData}
+        initialSettings={initialSettings}
+        initialSession={initialSession}
+      />
     </VStack>
   );
 }

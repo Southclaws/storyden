@@ -38,6 +38,26 @@ export function useSidebar(
     document
       .querySelector("#navigation__container")
       ?.setAttribute("data-leftbar-shown", next.toString());
+
+    // Keep accessibility tree in sync with visible state.
+    const sidebars = [
+      document.querySelector("#navigation__leftbar"),
+      document.querySelector("#navigation__rightbar"),
+    ];
+
+    sidebars.forEach((element) => {
+      if (!element) {
+        return;
+      }
+
+      if (next) {
+        element.removeAttribute("aria-hidden");
+        element.removeAttribute("inert");
+      } else {
+        element.setAttribute("aria-hidden", "true");
+        element.setAttribute("inert", "");
+      }
+    });
   }
 
   return {

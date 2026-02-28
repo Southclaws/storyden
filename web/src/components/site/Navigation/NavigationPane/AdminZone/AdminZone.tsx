@@ -8,10 +8,9 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useSWRConfig } from "swr";
 
-import { Node } from "@/api/openapi-schema";
+import { type Account, type Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
 import { InfoTip } from "@/components/site/InfoTip";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import * as Checkbox from "@/components/ui/checkbox";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
@@ -25,6 +24,13 @@ import { LayoutListIcon } from "@/components/ui/icons/LayoutList";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
+import { type FeedConfig } from "@/lib/settings/feed";
+import {
+  useFeedConfig,
+  useFeedEditorState,
+  useFeedMutation,
+} from "@/lib/settings/feed-client";
+import { type Settings } from "@/lib/settings/settings";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Route, useRoute } from "../../useRoute";
@@ -39,9 +45,18 @@ const editableRoute: Record<Route["name"], boolean> = {
   settings: false,
 };
 
-export function AdminZone() {
+type Props = {
+  initialSession?: Account;
+  initialSettings?: Settings;
+};
+
+type UpdateFeed = (feed: FeedConfig) => Promise<void>;
+
+export function AdminZone({ initialSession, initialSettings }: Props) {
+  const feed = useFeedConfig(initialSettings, false);
+  const { updateFeed } = useFeedMutation();
   const { isEditingEnabled, isEditing, handleToggleEditing } =
-    useSettingsContext();
+    useFeedEditorState({ initialSession, initialSettings });
 
   const route = useRoute();
   const isRouteEditable = route && editableRoute[route.name];
@@ -77,7 +92,15 @@ export function AdminZone() {
 
         <HStack gap="1">
           {isRouteEditable && (
-            <IconButton size="xs" variant="ghost" onClick={handleToggleEditing}>
+            <IconButton
+              size="xs"
+              variant="ghost"
+              onClick={handleToggleEditing}
+              type="button"
+              aria-label={isEditing ? "Close feed editor" : "Open feed editor"}
+              aria-pressed={isEditing}
+              title={isEditing ? "Close feed editor" : "Open feed editor"}
+            >
               <EditIcon w="4" />
             </IconButton>
           )}
@@ -94,7 +117,7 @@ export function AdminZone() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
           >
             <LStack py="2">
-              <RouteConfig route={route} />
+              <RouteConfig feed={feed} updateFeed={updateFeed} route={route} />
             </LStack>
           </MotionBox>
         )}
@@ -103,10 +126,18 @@ export function AdminZone() {
   );
 }
 
-function RouteConfig({ route }: { route?: Route }) {
+function RouteConfig({
+  route,
+  feed,
+  updateFeed,
+}: {
+  route?: Route;
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   switch (route?.name) {
     case "index":
-      return <FeedConfig />;
+      return <FeedConfig feed={feed} updateFeed={updateFeed} />;
 
     default:
       return null;
@@ -144,14 +175,13 @@ const layouts = [
   },
 ];
 
-export function FeedConfig() {
-  const { isEditingEnabled, isEditing, feed, updateFeed, handleToggleEditing } =
-    useSettingsContext();
-
-  if (!isEditingEnabled) {
-    return null;
-  }
-
+export function FeedConfig({
+  feed,
+  updateFeed,
+}: {
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   const sourceCollection = createListCollection({ items: sources });
   const layoutCollection = createListCollection({ items: layouts });
 
@@ -292,29 +322,37 @@ export function FeedConfig() {
         </Select.Root>
       )}
 
-      <SourceConfig />
+      <SourceConfig feed={feed} updateFeed={updateFeed} />
     </LStack>
   );
 }
 
-function SourceConfig() {
-  const { feed } = useSettingsContext();
-
+function SourceConfig({
+  feed,
+  updateFeed,
+}: {
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   switch (feed.source.type) {
     case "threads":
-      return <SourceThreadsConfig />;
+      return <SourceThreadsConfig feed={feed} updateFeed={updateFeed} />;
     case "library":
-      return <SourceLibraryConfig />;
+      return <SourceLibraryConfig feed={feed} updateFeed={updateFeed} />;
     case "categories":
-      return <SourceCategoriesConfig />;
+      return <SourceCategoriesConfig feed={feed} updateFeed={updateFeed} />;
     default:
       return null;
   }
 }
 
-function SourceThreadsConfig() {
-  const { feed, updateFeed } = useSettingsContext();
-
+function SourceThreadsConfig({
+  feed,
+  updateFeed,
+}: {
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   if (feed.source.type !== "threads") {
     return null;
   }
@@ -361,9 +399,13 @@ function SourceThreadsConfig() {
   );
 }
 
-function SourceLibraryConfig() {
-  const { feed, updateFeed } = useSettingsContext();
-
+function SourceLibraryConfig({
+  feed,
+  updateFeed,
+}: {
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   if (feed.source.type !== "library") {
     return null;
   }
@@ -416,8 +458,13 @@ const threadListModes = [
   },
 ];
 
-function SourceCategoriesConfig() {
-  const { feed, updateFeed } = useSettingsContext();
+function SourceCategoriesConfig({
+  feed,
+  updateFeed,
+}: {
+  feed: FeedConfig;
+  updateFeed: UpdateFeed;
+}) {
   const { mutate } = useSWRConfig();
 
   if (feed.source.type !== "categories") {

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { Editing, EditingSchema } from "@/components/site/editing";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -25,18 +26,6 @@ export const FormSchema = z.object({
   content: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
-
-export const EditingSchema = z.preprocess(
-  (v) => {
-    if (typeof v === "string" && v === "") {
-      return undefined;
-    }
-
-    return v;
-  },
-  z.enum(["settings", "feed"]),
-);
-export type Editing = z.infer<typeof EditingSchema>;
 
 export function useSiteContextPane({ session, initialSettings }: Props) {
   session = useSession(session);

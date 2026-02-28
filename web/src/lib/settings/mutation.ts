@@ -73,9 +73,6 @@ export function useSettingsMutation() {
       async () => {
         return await adminSettingsUpdate(patch);
       },
-      {
-        revalidate: true,
-      },
     );
   }
 
