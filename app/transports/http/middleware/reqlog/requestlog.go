@@ -80,8 +80,11 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 					errorlog := title + ": " + err.Error()
 
+					err = span.Wrap(err, errorlog)
+
 					logger.Error(errorlog,
-						slog.String("error", span.Wrap(err, errorlog, kv.String("trace", string(trace))).Error()),
+						slog.String("error", err.Error()),
+						slog.Any("trace", trace),
 					)
 
 					w.WriteHeader(http.StatusInternalServerError)
