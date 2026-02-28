@@ -76,7 +76,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 		return nil, err
 	}
 
-	tr := tf.Build(lc, "ent")
+	tr := tf.Build(lc)
 
 	client.Intercept(ent.InterceptFunc(func(next ent.Querier) ent.Querier {
 		return ent.QuerierFunc(func(ctx context.Context, query ent.Query) (ent.Value, error) {

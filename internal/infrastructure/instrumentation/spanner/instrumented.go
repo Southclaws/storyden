@@ -20,11 +20,7 @@ import (
 
 // Build is to be used in services during initialisation.
 func (i *service) Build() Instrumentation {
-	pc, _, _, _ := runtime.Caller(1)
-	path := runtime.FuncForPC(pc).Name()
-	caller := filepath.Base(path)
-	pkg := strings.Split(caller, ".")[0]
-	tr := i.tf.Build(i.lc, pkg)
+	tr := i.tf.Build(i.lc)
 
 	return &impl{
 		logger: i.lg,

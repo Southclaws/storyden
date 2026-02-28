@@ -12,5 +12,5 @@ type Tracer interface {
 }
 
 type Factory interface {
-	Build(lc fx.Lifecycle, serviceName string) Tracer
+	Build(lc fx.Lifecycle) Tracer
 }

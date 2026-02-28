@@ -19,15 +19,17 @@ import (
 )
 
 type factory struct {
-	provider string
-	opts     []trace.TracerProviderOption
+	provider       string
+	tracerProvider *trace.TracerProvider
 }
 
 func Build() fx.Option {
 	return fx.Provide(newExporter, newTracerFactory)
 }
 
-func newTracerFactory(ctx context.Context,
+func newTracerFactory(
+	lc fx.Lifecycle,
+	ctx context.Context,
 	cfg config.Config,
 	logger *slog.Logger,
 	opts []trace.TracerProviderOption,
@@ -36,9 +38,32 @@ func newTracerFactory(ctx context.Context,
 		logger.Error("otel error", slog.String("error", err.Error()))
 	}))
 
+	res, err := resource.New(ctx,
+		resource.WithAttributes(
+			semconv.ServiceName("storyden"),
+		),
+	)
+	if err != nil {
+		return factory{}, fault.Wrap(err, fmsg.With("failed to create resource"))
+	}
+
+	opts = append(opts, trace.WithResource(res))
+
+	tp := trace.NewTracerProvider(opts...)
+	otel.SetTracerProvider(tp)
+
+	lc.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			if err := tp.Shutdown(ctx); err != nil {
+				return fault.Wrap(err)
+			}
+			return nil
+		},
+	})
+
 	return factory{
-		provider: cfg.OTELProvider,
-		opts:     opts,
+		provider:       cfg.OTELProvider,
+		tracerProvider: tp,
 	}, nil
 }
 
@@ -105,26 +130,6 @@ func newExporter(ctx context.Context,
 	}
 }
 
-// Build constructs a new tracer for use within a system component.
-func (f factory) Build(lc fx.Lifecycle, serviceName string) Tracer {
-	opts := append(f.opts, trace.WithResource(resource.NewWithAttributes(
-		semconv.SchemaURL,
-		semconv.ServiceName(serviceName),
-	)))
-
-	tp := trace.NewTracerProvider(opts...)
-
-	lc.Append(fx.Hook{
-		OnStop: func(ctx context.Context) error {
-			if err := tp.Shutdown(ctx); err != nil {
-				return fault.Wrap(err)
-			}
-
-			return nil
-		},
-	})
-
-	tracer := tp.Tracer("storyden")
-
-	return tracer
+func (f factory) Build(lc fx.Lifecycle) Tracer {
+	return f.tracerProvider.Tracer("storyden")
 }
