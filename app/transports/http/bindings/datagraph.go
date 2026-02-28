@@ -57,14 +57,14 @@ func NewDatagraph(
 	// which we need for streaming Q&A responses for that ✨chatgpt✨ effect.
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			ii, err := info.Get(context.Background())
-			if err != nil {
-				return fault.Wrap(err, fctx.With(c.Request().Context()))
-			}
-			isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
-
 			path := c.Path()
 			if path == "/api/datagraph/ask" {
+				ii, err := info.Get(c.Request().Context())
+				if err != nil {
+					return fault.Wrap(err, fctx.With(c.Request().Context()))
+				}
+
+				isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
 				if !isEnabled {
 					return echo.NewHTTPError(http.StatusNotImplemented, "Semdex is not enabled")
 				}
