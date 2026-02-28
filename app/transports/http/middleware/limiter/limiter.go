@@ -3,7 +3,6 @@ package limiter
 import (
 	"context"
 	"log/slog"
-	"net"
 	"net/http"
 	"strconv"
 	"sync/atomic"
@@ -40,7 +39,6 @@ type Middleware struct {
 	configPeriod     time.Duration
 	configBucket     time.Duration
 	configGuestCost  int
-	kf               KeyFunc
 	sizeLimit        int64
 	settingsRepo     *settings.SettingsRepository
 	logger           *slog.Logger
@@ -61,7 +59,6 @@ func New(
 		configPeriod:    cfg.RateLimitPeriod,
 		configBucket:    cfg.RateLimitBucket,
 		configGuestCost: cfg.RateLimitGuestCost,
-		kf:              fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
 		sizeLimit:       MaxRequestSizeBytes,
 		settingsRepo:    settingsRepo,
 		logger:          logger,
@@ -153,15 +150,9 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			key, err := m.kf(r)
-			if err != nil {
-				m.logger.Error("failed to extract rate limit key from request",
-					slog.String("error", err.Error()),
-					slog.String("path", r.URL.Path),
-					slog.String("method", r.Method),
-				)
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
+			key := reqinfo.GetClientAddress(ctx)
+			if key == "" {
+				key = r.RemoteAddr
 			}
 
 			isAuthenticated := session.GetOptAccountID(ctx).Ok()
@@ -255,24 +246,6 @@ func (m *Middleware) getLookup(ctx context.Context) map[string]int {
 	}
 
 	return overrides
-}
-
-type KeyFunc func(r *http.Request) (string, error)
-
-func fromIP(headers ...string) KeyFunc {
-	return func(r *http.Request) (string, error) {
-		for _, h := range headers {
-			if v := r.Header.Get(h); v != "" {
-				return v, nil
-			}
-		}
-
-		ip, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			return "", err
-		}
-		return ip, nil
-	}
 }
 
 func (m *Middleware) WithRequestSizeLimiter() func(http.Handler) http.Handler {

@@ -16,11 +16,12 @@ type Info struct {
 	OperationID string
 	UserAgent   useragent.UserAgent
 	CacheQuery  cachecontrol.Query
+	ClientAddr  string
 }
 
 type infoKey struct{}
 
-func WithRequestInfo(ctx context.Context, r *http.Request, opid string) context.Context {
+func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAddr string) context.Context {
 	ua := useragent.Parse(r.Header.Get("User-Agent"))
 
 	ifNoneMatch := opt.NewIf(r.Header.Get("If-None-Match"), notEmpty)
@@ -37,41 +38,42 @@ func WithRequestInfo(ctx context.Context, r *http.Request, opid string) context.
 		OperationID: opid,
 		UserAgent:   ua,
 		CacheQuery:  cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
+		ClientAddr:  clientAddr,
 	}
 
 	return context.WithValue(ctx, infoKey{}, info)
 }
 
 func GetOperationID(ctx context.Context) string {
-	v := ctx.Value(infoKey{})
-	i, ok := v.(Info)
-	if !ok {
-		return "unknown"
-	}
-
+	i := getInfo(ctx)
 	return i.OperationID
 }
 
 func GetDeviceName(ctx context.Context) string {
-	v := ctx.Value(infoKey{})
-	i, ok := v.(Info)
-	if !ok {
-		return "Unknown"
-	}
-
+	i := getInfo(ctx)
 	ua := i.UserAgent
 
 	return fmt.Sprintf("%s (%s)", ua.Name, ua.OS)
 }
 
 func GetCacheQuery(ctx context.Context) cachecontrol.Query {
+	i := getInfo(ctx)
+	return i.CacheQuery
+}
+
+func GetClientAddress(ctx context.Context) string {
+	i := getInfo(ctx)
+	return i.ClientAddr
+}
+
+func getInfo(ctx context.Context) Info {
 	v := ctx.Value(infoKey{})
 	i, ok := v.(Info)
 	if !ok {
-		return cachecontrol.Query{}
+		panic("reqinfo: request info missing from context; ensure headers.WithHeaderContext is first in middleware chain")
 	}
 
-	return i.CacheQuery
+	return i
 }
 
 func notEmpty(s string) bool {

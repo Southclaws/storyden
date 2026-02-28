@@ -37,7 +37,7 @@ func (m *Middleware) WithHeaderContext() func(next http.Handler) http.Handler {
 				opid = rt.Operation.OperationID
 			}
 
-			newctx := reqinfo.WithRequestInfo(ctx, r, opid)
+			newctx := reqinfo.WithRequestInfo(ctx, r, opid, clientAddress(r))
 
 			r = r.WithContext(newctx)
 

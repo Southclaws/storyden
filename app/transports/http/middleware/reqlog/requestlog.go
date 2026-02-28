@@ -7,6 +7,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
@@ -47,10 +48,14 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 			title := r.Method + " " + r.URL.Path
 
 			wr := &withStatus{ResponseWriter: w}
+			clientAddress := reqinfo.GetClientAddress(r.Context())
+			if clientAddress == "" {
+				clientAddress = r.RemoteAddr
+			}
 
 			ctx, span := m.ins.InstrumentNamed(r.Context(), title,
 				kv.String("http.request.header.origin", origin),
-				kv.String("client.address", r.RemoteAddr),
+				kv.String("client.address", clientAddress),
 				kv.String("http.request.method", r.Method),
 				kv.String("url.query", r.URL.Query().Encode()),
 				kv.Int("http.request.body.size", int(r.ContentLength)),
