@@ -2,6 +2,7 @@ package integration
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/url"
 	"os"
@@ -33,6 +34,8 @@ import (
 //	    }))
 //	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
+	t.Helper()
+
 	defaultConfig := config.Config{
 		PublicAPIAddress: *utils.Must(url.Parse("http://localhost")),
 		PublicWebAddress: *utils.Must(url.Parse("http://localhost")),
@@ -55,9 +58,6 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
-	t.Cleanup(func() {
-		cf()
-	})
 
 	o = append(o,
 		// main application dependencies
@@ -65,6 +65,15 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 
 		// provide a global context
 		fx.Provide(func() context.Context { return ctx }),
+
+		// Integration tests run many app instances in parallel. Cap per-app DB
+		// pools to avoid exhausting postgres max_connections in CI.
+		fx.Invoke(func(db *sql.DB) {
+			db.SetMaxOpenConns(4)
+			db.SetMaxIdleConns(4)
+			db.SetConnMaxLifetime(30 * time.Second)
+			db.SetConnMaxIdleTime(15 * time.Second)
+		}),
 	)
 
 	// if this test has a custom config, merge+overwrite with the defaults.
@@ -75,10 +84,20 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	o = append(o, fx.Provide(func() config.Config { return defaultConfig }))
 
 	app := fx.New(o...)
+	t.Cleanup(func() {
+		stopCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		if err := app.Stop(stopCtx); err != nil {
+			t.Errorf("failed to stop integration app: %v", err)
+		}
+
+		cf()
+	})
+
 	err := app.Start(ctx)
 	if err != nil {
-		fmt.Println(err)
-		t.Error(err)
+		t.Fatalf("failed to start integration app: %v", err)
 	}
 }
 
