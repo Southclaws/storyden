@@ -84,11 +84,11 @@ require (
 	github.com/twilio/twilio-go v1.28.3
 	github.com/weaviate/weaviate v1.33.4
 	github.com/weaviate/weaviate-go-client/v5 v5.5.0
-	go.opentelemetry.io/otel v1.38.0
+	go.opentelemetry.io/otel v1.40.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.38.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.38.0
-	go.opentelemetry.io/otel/sdk v1.38.0
-	go.opentelemetry.io/otel/trace v1.38.0
+	go.opentelemetry.io/otel/sdk v1.40.0
+	go.opentelemetry.io/otel/trace v1.40.0
 	go.opentelemetry.io/proto/otlp v1.7.1
 	golang.org/x/exp v0.0.0-20260218203240-3dfff04db8fa
 	golang.org/x/sync v0.19.0
@@ -234,9 +234,9 @@ require (
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	go.etcd.io/bbolt v1.4.3 // indirect
 	go.mongodb.org/mongo-driver v1.17.3 // indirect
-	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.61.0 // indirect
-	go.opentelemetry.io/otel/metric v1.38.0 // indirect
+	go.opentelemetry.io/otel/metric v1.40.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
