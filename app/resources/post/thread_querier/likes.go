@@ -26,6 +26,9 @@ group by p.id
 `
 
 func (d *Querier) getLikesStatus(ctx context.Context, ids []xid.ID, accountID string) (post.PostLikesMap, error) {
+	ctx, span := d.ins.InstrumentNamed(ctx, "likes_status")
+	defer span.End()
+
 	if len(ids) == 0 {
 		return post.PostLikesMap{}, nil
 	}
