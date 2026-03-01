@@ -216,7 +216,32 @@ func getDriver(databaseURL string) (string, string, error) {
 		return "sqlite", path, nil
 
 	case "libsql":
-		// NOTE: Only remote Turso, local file-based libSQL is not supported.
+		// NOTE: We consider URLs of the form:
+		// libsql://./path
+		// or
+		// libsql:///path
+		// to be local disk databases and normalise to an absolute path.
+		if (u.Host == "" || u.Host == ".") && u.Path != "" {
+			path := u.Path
+			if u.Host == "." {
+				path = "." + u.Path
+			}
+
+			if !filepath.IsAbs(path) {
+				absPath, err := filepath.Abs(path)
+				if err != nil {
+					return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("failed to resolve libsql relative path: %s", u)))
+				}
+				path = absPath
+			}
+
+			return "libsql", (&url.URL{
+				Scheme:   "file",
+				Path:     path,
+				RawQuery: u.RawQuery,
+			}).String(), nil
+		}
+
 		return "libsql", databaseURL, nil
 
 	default:
