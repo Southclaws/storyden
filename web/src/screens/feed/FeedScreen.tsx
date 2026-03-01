@@ -1,3 +1,4 @@
+import { nodeGet } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { categoryListCached } from "@/lib/category/server-category-list";
@@ -44,8 +45,8 @@ async function getInitialFeedData(
     switch (feedConfig.source.type) {
       case "threads":
         return {
-          page: page ?? 1,
-          threads: (
+          initialPage: page ?? 1,
+          initialThreadList: (
             await threadList(
               {
                 page: page?.toString(),
@@ -62,8 +63,22 @@ async function getInitialFeedData(
         };
 
       case "library":
+        if (feedConfig.source.node) {
+          return {
+            initialLibraryNode: (
+              await nodeGet(feedConfig.source.node, undefined, {
+                cache: "no-store",
+                next: {
+                  tags: ["feed"],
+                  revalidate: 0,
+                },
+              })
+            ).data,
+          };
+        }
+
         return {
-          library: (await nodeListCached()).data,
+          initialLibraryNodeList: (await nodeListCached()).data,
         };
 
       case "categories": {
@@ -82,9 +97,9 @@ async function getInitialFeedData(
         ).data;
 
         return {
-          categories,
-          page: page ?? 1,
-          threads,
+          initialCategoryList: categories,
+          initialPage: page ?? 1,
+          initialThreadList: threads,
         };
       }
     }

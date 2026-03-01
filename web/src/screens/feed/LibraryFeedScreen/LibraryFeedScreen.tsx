@@ -3,45 +3,56 @@
 import { Unready } from "src/components/site/Unready";
 
 import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
-import { type NodeListResult } from "@/api/openapi-schema";
+import {
+  type NodeGetOKResponse,
+  type NodeListResult,
+} from "@/api/openapi-schema";
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { type FeedConfig } from "@/lib/settings/feed";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 export type Props = {
-  initialData?: NodeListResult;
+  initialNodeList?: NodeListResult;
+  initialNode?: NodeGetOKResponse;
   feed: FeedConfig;
 };
 
-export function LibraryFeedScreen({ initialData, feed }: Props) {
+export function LibraryFeedScreen({
+  initialNodeList,
+  initialNode,
+  feed,
+}: Props) {
   if (feed.source.type !== "library") {
     return null;
   }
 
   if (feed.source.node) {
     return (
-      <LibraryFeedNode initialData={initialData} nodeID={feed.source.node} />
+      <LibraryFeedNode initialNode={initialNode} nodeID={feed.source.node} />
     );
   }
 
   return (
-    <LibraryFeedRoot initialData={initialData} layoutType={feed.layout.type} />
+    <LibraryFeedRoot
+      initialNodeList={initialNodeList}
+      layoutType={feed.layout.type}
+    />
   );
 }
 
 function LibraryFeedNode({
-  initialData,
+  initialNode,
   nodeID,
 }: {
-  initialData?: NodeListResult;
+  initialNode?: NodeGetOKResponse;
   nodeID: string;
 }) {
   const { data, error } = useNodeGet(
     nodeID,
     {},
     {
-      // swr: { fallbackData: initialData },
+      swr: { fallbackData: initialNode },
     },
   );
   if (!data) {
@@ -57,10 +68,10 @@ function LibraryFeedNode({
 }
 
 function LibraryFeedRoot({
-  initialData,
+  initialNodeList,
   layoutType,
 }: {
-  initialData?: NodeListResult;
+  initialNodeList?: NodeListResult;
   layoutType: FeedConfig["layout"]["type"];
 }) {
   const { data, error } = useNodeList(
@@ -68,7 +79,7 @@ function LibraryFeedRoot({
       //
     },
     {
-      swr: { fallbackData: initialData },
+      swr: { fallbackData: initialNodeList },
     },
   );
   if (!data) {

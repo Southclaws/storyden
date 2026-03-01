@@ -1,12 +1,14 @@
 import {
-  CategoryListResult,
+  CategoryListOKResponse,
+  NodeGetOKResponse,
   NodeListResult,
   ThreadListResult,
 } from "@/api/openapi-schema";
 
 export type InitialData = {
-  threads?: ThreadListResult;
-  page?: number;
-  library?: NodeListResult;
-  categories?: CategoryListResult;
+  initialPage?: number;
+  initialThreadList?: ThreadListResult;
+  initialLibraryNodeList?: NodeListResult;
+  initialLibraryNode?: NodeGetOKResponse;
+  initialCategoryList?: CategoryListOKResponse;
 };

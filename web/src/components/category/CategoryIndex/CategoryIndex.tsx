@@ -1,9 +1,10 @@
 import { match } from "ts-pattern";
 
-import { ThreadListResult } from "@/api/openapi-schema";
+import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
 import { CategoryTree } from "@/lib/category/tree";
+import { Settings } from "@/lib/settings/settings";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -13,22 +14,27 @@ import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 import { CategoryLayout } from "./CategoryCardLayout";
 
 export type Props = {
+  initialSession?: Account;
+  initialSettings?: Settings;
+  initialThreadList?: ThreadListResult;
+  initialThreadListPage?: number;
+
   layout: "grid" | "list";
   threadListMode: "none" | "all" | "uncategorised";
   showQuickShare: boolean;
   categories: CategoryTree[];
-  initialThreadList?: ThreadListResult;
-  initialThreadListPage?: number;
   paginationBasePath: string;
 };
 
 export function CategoryIndex({
+  initialSession,
+  initialSettings,
+  initialThreadList,
+  initialThreadListPage,
   layout,
   threadListMode,
   showQuickShare,
   categories,
-  initialThreadList,
-  initialThreadListPage,
   paginationBasePath,
 }: Props) {
   const categoryCount = categories.length;
@@ -79,10 +85,12 @@ export function CategoryIndex({
       </LStack>
 
       <ThreadListSection
+        initialThreadListPage={initialThreadListPage}
+        initialSession={initialSession}
+        initialSettings={initialSettings}
+        initialThreadList={initialThreadList}
         mode={threadListMode}
         showQuickShare={showQuickShare}
-        initialThreadList={initialThreadList}
-        initialPage={initialThreadListPage}
         paginationBasePath={paginationBasePath}
       />
     </LStack>
@@ -90,16 +98,20 @@ export function CategoryIndex({
 }
 
 function ThreadListSection({
+  initialSession,
+  initialSettings,
+  initialThreadList,
+  initialThreadListPage,
   mode,
   showQuickShare,
-  initialThreadList,
-  initialPage,
   paginationBasePath,
 }: {
+  initialSession?: Account;
+  initialSettings?: Settings;
+  initialThreadList?: ThreadListResult;
+  initialThreadListPage?: number;
   mode: "none" | "all" | "uncategorised";
   showQuickShare: boolean;
-  initialThreadList?: ThreadListResult;
-  initialPage?: number;
   paginationBasePath: string;
 }) {
   if (mode === "none") {
@@ -125,8 +137,10 @@ function ThreadListSection({
       )}
 
       <ThreadFeedScreen
-        initialPage={initialPage}
+        initialPage={initialThreadListPage}
         initialPageData={initialThreadList}
+        initialSession={initialSession}
+        initialSettings={initialSettings}
         category={mode === "all" ? undefined : null}
         paginationBasePath={paginationBasePath}
         showCategorySelect={showCategorySelect}

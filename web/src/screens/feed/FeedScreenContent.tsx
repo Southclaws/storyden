@@ -27,8 +27,8 @@ export function FeedScreenContent({
     case "threads":
       return (
         <ThreadFeedScreen
-          initialPage={initialData.page}
-          initialPageData={initialData.threads}
+          initialPage={initialData.initialPage}
+          initialPageData={initialData.initialThreadList}
           initialSession={initialSession}
           initialSettings={initialSettings}
           category={undefined}
@@ -41,7 +41,8 @@ export function FeedScreenContent({
     case "library":
       return (
         <LibraryFeedScreen
-          initialData={initialData.library}
+          initialNodeList={initialData.initialLibraryNodeList}
+          initialNode={initialData.initialLibraryNode}
           feed={feed}
         />
       );
@@ -49,12 +50,14 @@ export function FeedScreenContent({
     case "categories":
       return (
         <CategoryIndexScreen
+          initialThreadListPage={initialData.initialPage}
+          initialThreadList={initialData.initialThreadList}
+          initialSession={initialSession}
+          initialSettings={initialSettings}
+          initialCategoryList={initialData.initialCategoryList}
           layout={feed.layout.type}
           threadListMode={feed.source.threadListMode}
           showQuickShare={feed.source.quickShare === "enabled"}
-          initialCategoryList={initialData.categories}
-          initialThreadList={initialData.threads}
-          initialThreadListPage={initialData.page}
           paginationBasePath="/"
         />
       );

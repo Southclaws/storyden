@@ -1,18 +1,26 @@
 "use client";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-import { CategoryListOKResponse, ThreadListResult } from "@/api/openapi-schema";
+import {
+  Account,
+  CategoryListOKResponse,
+  ThreadListResult,
+} from "@/api/openapi-schema";
 import { CategoryIndex } from "@/components/category/CategoryIndex/CategoryIndex";
 import { Unready } from "@/components/site/Unready";
 import { buildCategoryTree } from "@/lib/category/tree";
+import { Settings } from "@/lib/settings/settings";
 
 export type Props = {
+  initialThreadListPage?: number;
+  initialThreadList?: ThreadListResult;
+  initialSession?: Account;
+  initialSettings?: Settings;
+  initialCategoryList?: CategoryListOKResponse;
+
   layout: "grid" | "list";
   threadListMode: "none" | "all" | "uncategorised";
   showQuickShare: boolean;
-  initialCategoryList?: CategoryListOKResponse;
-  initialThreadList?: ThreadListResult;
-  initialThreadListPage?: number;
   paginationBasePath: string;
 };
 
@@ -47,12 +55,14 @@ export function CategoryIndexScreen(props: Props) {
 
   return (
     <CategoryIndex
+      initialThreadListPage={props.initialThreadListPage}
+      initialSession={props.initialSession}
+      initialSettings={props.initialSettings}
+      initialThreadList={props.initialThreadList}
       layout={props.layout}
       threadListMode={props.threadListMode}
       showQuickShare={props.showQuickShare}
       categories={tree}
-      initialThreadList={props.initialThreadList}
-      initialThreadListPage={props.initialThreadListPage}
       paginationBasePath={props.paginationBasePath}
     />
   );
