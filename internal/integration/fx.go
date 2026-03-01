@@ -48,9 +48,10 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 			panic("maybe accidental prod DATABASE_URL in integration tests!")
 		}
 		defaultConfig.DatabaseURL = makePerTestDatabaseURL(dbURL, t.Name())
+		fmt.Println("Using database URL from environment: ", defaultConfig.DatabaseURL)
 	} else {
 		defaultConfig.DatabaseURL = makePerTestDatabaseURL("sqlite://data/data.db", t.Name())
-		// Generate a unique database per test, avoids SQLite write contention.
+		fmt.Println("Using database URL default: ", defaultConfig.DatabaseURL)
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
