@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 const likesCountManyQuery = `select
@@ -25,7 +26,9 @@ group by p.id
 `
 
 func (d *Querier) getLikesStatus(ctx context.Context, ids []xid.ID, accountID string) (post.PostLikesMap, error) {
-	ctx, span := d.ins.InstrumentNamed(ctx, "likes_status")
+	ctx, span := d.ins.InstrumentNamed(ctx, "likes_status",
+		kv.Int("id_count", len(ids)),
+	)
 	defer span.End()
 
 	if len(ids) == 0 {
@@ -44,6 +47,10 @@ func (d *Querier) getLikesStatus(ctx context.Context, ids []xid.ID, accountID st
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	span.Annotate(
+		kv.Int("result_rows", len(likes)),
+	)
 
 	return likes.Map(), nil
 }

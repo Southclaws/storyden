@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 const newRepliesCountManyQuery_sqlite = `select
@@ -57,6 +58,11 @@ func (d *Querier) newRepliesCountManyQuery() string {
 }
 
 func (d *Querier) getReadStatus(ctx context.Context, ids []xid.ID, accountID string) (post.ReadStateMap, error) {
+	ctx, span := d.ins.InstrumentNamed(ctx, "read_status_query",
+		kv.Int("id_count", len(ids)),
+	)
+	defer span.End()
+
 	if len(ids) == 0 {
 		return post.ReadStateMap{}, nil
 	}
@@ -70,6 +76,10 @@ func (d *Querier) getReadStatus(ctx context.Context, ids []xid.ID, accountID str
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	span.Annotate(
+		kv.Int("result_rows", len(readStates)),
+	)
 
 	return readStates.Map(), nil
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 var ErrNoPermission = fault.New("unauthenticated user cannot view unpublished threads", ftag.With(ftag.PermissionDenied))
@@ -27,10 +28,12 @@ func (s *service) Get(
 	threadID post.ID,
 	pageParams pagination.Parameters,
 ) (*thread.Thread, error) {
-	ctx, span := s.ins.Instrument(ctx)
-	defer span.End()
-
 	accountID := session.GetOptAccountID(ctx)
+
+	ctx, span := s.ins.Instrument(ctx,
+		kv.String("account_id", accountID.String()),
+	)
+	defer span.End()
 
 	thr, err := s.threadQuerier.Get(ctx, threadID, pageParams, accountID)
 	if err != nil {

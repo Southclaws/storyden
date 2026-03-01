@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 const repliesCountManyQuery = `select
@@ -25,6 +26,11 @@ group by p.id
 `
 
 func (d *Querier) getRepliesStatus(ctx context.Context, ids []xid.ID, accountID string) (post.PostRepliesMap, error) {
+	ctx, span := d.ins.InstrumentNamed(ctx, "replies_status_query",
+		kv.Int("id_count", len(ids)),
+	)
+	defer span.End()
+
 	if len(ids) == 0 {
 		return post.PostRepliesMap{}, nil
 	}
@@ -38,6 +44,10 @@ func (d *Querier) getRepliesStatus(ctx context.Context, ids []xid.ID, accountID 
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	span.Annotate(
+		kv.Int("result_rows", len(replies)),
+	)
 
 	return replies.Map(), nil
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 const collectionsCountManyQuery = `select
@@ -26,6 +27,11 @@ group by p.id
 `
 
 func (d *Querier) getCollectionsStatus(ctx context.Context, ids []xid.ID, accountID string) (collection_item_status.CollectionStatusMap, error) {
+	ctx, span := d.ins.InstrumentNamed(ctx, "collections_status_query",
+		kv.Int("id_count", len(ids)),
+	)
+	defer span.End()
+
 	if len(ids) == 0 {
 		return collection_item_status.CollectionStatusMap{}, nil
 	}
@@ -39,6 +45,10 @@ func (d *Querier) getCollectionsStatus(ctx context.Context, ids []xid.ID, accoun
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	span.Annotate(
+		kv.Int("result_rows", len(collections)),
+	)
 
 	return collections.Map(), nil
 }

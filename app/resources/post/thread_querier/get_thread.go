@@ -171,6 +171,21 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	rootReplies := replyStatsMap.Status(xid.ID(threadID))
+	rootCollections := collectionsMap.Status(xid.ID(threadID))
+	rootRead := readStateMap.Status(xid.ID(threadID))
+	_, hasRootRead := rootRead.Get()
+	span.Annotate(
+		kv.Int("reply_rows", len(replyStatsMap)),
+		kv.Int("collection_rows", len(collectionsMap)),
+		kv.Int("read_rows", len(readStateMap)),
+		kv.Int("root_reply_count", rootReplies.Count),
+		kv.Int("root_replied_count", rootReplies.Replied),
+		kv.Int("root_collection_count", rootCollections.Count),
+		kv.Bool("root_has_collected", rootCollections.Status),
+		kv.Bool("root_has_read_state", hasRootRead),
+	)
+
 	allPosts := append(repliesResult, threadResult)
 	for _, p := range repliesResult {
 		if p.Edges.ReplyTo != nil {
@@ -194,6 +209,12 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	rootLikes := likesMap.Status(xid.ID(threadID))
+	span.Annotate(
+		kv.Int("likes_rows", len(likesMap)),
+		kv.Int("root_like_count", rootLikes.Count),
+		kv.Bool("root_liked", rootLikes.Status),
+	)
 
 	// React lookup contributes to the account query.
 	reacters := dt.Map(reactResult, func(r *ent.React) xid.ID { return r.AccountID })

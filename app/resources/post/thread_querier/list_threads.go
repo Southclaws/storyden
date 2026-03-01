@@ -202,6 +202,13 @@ func (d *Querier) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	span.Annotate(
+		kv.Int("replies_rows", len(repliesMap)),
+		kv.Int("collections_rows", len(collectionsMap)),
+		kv.Int("likes_rows", len(likesMap)),
+		kv.Int("read_rows", len(readStates)),
+	)
+
 	mapper := thread.Mapper(accountLookup, readStates, likesMap, collectionsMap, repliesMap, nil)
 	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
