@@ -20,7 +20,9 @@ var (
 	ErrMalformedContextValue = errors.New("malformed context value: internal bug")
 )
 
-var contextKey = struct{}{}
+type contextKey struct{}
+
+var sessionContextKey = contextKey{}
 
 type sessionContext struct {
 	account opt.Optional[account.Account]
@@ -36,7 +38,7 @@ type sessionContext struct {
 }
 
 func WithAccount(ctx context.Context, u account.Account, roles role.Roles) context.Context {
-	return context.WithValue(ctx, contextKey, sessionContext{
+	return context.WithValue(ctx, sessionContextKey, sessionContext{
 		account:        opt.New(u),
 		roles:          roles,
 		securityScheme: "browser",
@@ -45,7 +47,7 @@ func WithAccount(ctx context.Context, u account.Account, roles role.Roles) conte
 }
 
 func WithAccountAndToken(ctx context.Context, u account.Account, roles role.Roles, token string) context.Context {
-	return context.WithValue(ctx, contextKey, sessionContext{
+	return context.WithValue(ctx, sessionContextKey, sessionContext{
 		account:        opt.New(u),
 		roles:          roles,
 		securityScheme: "browser",
@@ -54,7 +56,7 @@ func WithAccountAndToken(ctx context.Context, u account.Account, roles role.Role
 }
 
 func WithAccessKey(ctx context.Context, u account.Account, roles role.Roles) context.Context {
-	return context.WithValue(ctx, contextKey, sessionContext{
+	return context.WithValue(ctx, sessionContextKey, sessionContext{
 		account:        opt.New(u),
 		roles:          roles,
 		securityScheme: "access_key",
@@ -63,7 +65,7 @@ func WithAccessKey(ctx context.Context, u account.Account, roles role.Roles) con
 }
 
 func WithGuest(ctx context.Context, roles role.Roles) context.Context {
-	return context.WithValue(ctx, contextKey, sessionContext{
+	return context.WithValue(ctx, sessionContextKey, sessionContext{
 		account:        opt.NewEmpty[account.Account](),
 		roles:          roles,
 		securityScheme: "browser",
@@ -72,7 +74,7 @@ func WithGuest(ctx context.Context, roles role.Roles) context.Context {
 }
 
 func WithInternal(ctx context.Context) context.Context {
-	return context.WithValue(ctx, contextKey, sessionContext{
+	return context.WithValue(ctx, sessionContextKey, sessionContext{
 		account:        opt.NewEmpty[account.Account](),
 		roles:          role.Roles{},
 		securityScheme: "",
@@ -81,7 +83,7 @@ func WithInternal(ctx context.Context) context.Context {
 }
 
 func Authorise(ctx context.Context, fn func() error, perms ...rbac.Permission) error {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		panic("request context does not contain a session context value, this is an internal bug")
 	}
@@ -95,7 +97,7 @@ func Authorise(ctx context.Context, fn func() error, perms ...rbac.Permission) e
 }
 
 func GetRoles(ctx context.Context) role.Roles {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		panic("request context does not contain a session context value, this is an internal bug")
 	}
@@ -110,7 +112,7 @@ func GetRoles(ctx context.Context) role.Roles {
 
 // GetAccountID pulls out an account ID associated with the call.
 func GetAccountID(ctx context.Context) (account.AccountID, error) {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		panic("request context does not contain a session context value, this is an internal bug")
 	}
@@ -134,7 +136,7 @@ func GetAccountID(ctx context.Context) (account.AccountID, error) {
 
 // GetAccount pulls out an account associated with the call.
 func GetAccount(ctx context.Context) (account.Account, error) {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		panic("request context does not contain a session context value, this is an internal bug")
 	}
@@ -157,7 +159,7 @@ func GetAccount(ctx context.Context) (account.Account, error) {
 }
 
 func GetSecurityScheme(ctx context.Context) (string, error) {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		panic("request context does not contain a session context value, this is an internal bug")
 	}
@@ -171,7 +173,7 @@ func GetSecurityScheme(ctx context.Context) (string, error) {
 }
 
 func GetOptAccountID(ctx context.Context) opt.Optional[account.AccountID] {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		return opt.NewEmpty[account.AccountID]()
 	}
@@ -190,7 +192,7 @@ func GetOptAccountID(ctx context.Context) opt.Optional[account.AccountID] {
 }
 
 func GetOptAccount(ctx context.Context) opt.Optional[account.Account] {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		return opt.NewEmpty[account.Account]()
 	}
@@ -211,7 +213,7 @@ func GetOptAccount(ctx context.Context) opt.Optional[account.Account] {
 // GetSessionToken retrieves the session token from the context if present.
 // This is only available for browser sessions, not access keys.
 func GetSessionToken(ctx context.Context) opt.Optional[string] {
-	value := ctx.Value(contextKey)
+	value := ctx.Value(sessionContextKey)
 	if value == nil {
 		return opt.NewEmpty[string]()
 	}

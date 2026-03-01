@@ -21,6 +21,8 @@ type Info struct {
 
 type infoKey struct{}
 
+var requestInfoContextKey = infoKey{}
+
 func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAddr string) context.Context {
 	ua := useragent.Parse(r.Header.Get("User-Agent"))
 
@@ -41,7 +43,7 @@ func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAd
 		ClientAddr:  clientAddr,
 	}
 
-	return context.WithValue(ctx, infoKey{}, info)
+	return context.WithValue(ctx, requestInfoContextKey, info)
 }
 
 func GetOperationID(ctx context.Context) string {
@@ -67,7 +69,7 @@ func GetClientAddress(ctx context.Context) string {
 }
 
 func getInfo(ctx context.Context) Info {
-	v := ctx.Value(infoKey{})
+	v := ctx.Value(requestInfoContextKey)
 	i, ok := v.(Info)
 	if !ok {
 		panic("reqinfo: request info missing from context; ensure headers.WithHeaderContext is first in middleware chain")

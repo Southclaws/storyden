@@ -34,10 +34,12 @@ func WithAccount(ctx context.Context, aw *account_writer.Writer, template accoun
 	return ctx, &acc.Account
 }
 
-var contextKey = struct{}{}
+type accountIDContextKey struct{}
+
+var accountIDKey = accountIDContextKey{}
 
 func WithAccountID(ctx context.Context, id account.AccountID) context.Context {
-	return context.WithValue(ctx, contextKey, id)
+	return context.WithValue(ctx, accountIDKey, id)
 }
 
 func WithSessionFromHeader(t *testing.T, ctx context.Context, header http.Header) openapi.RequestEditorFn {
@@ -69,7 +71,7 @@ func newSessionHelper(
 }
 
 func (h *SessionHelper) WithSession(ctx context.Context) openapi.RequestEditorFn {
-	accountID := ctx.Value(contextKey).(account.AccountID)
+	accountID := ctx.Value(accountIDKey).(account.AccountID)
 
 	t, err := h.tr.Issue(context.Background(), accountID)
 	if err != nil {
