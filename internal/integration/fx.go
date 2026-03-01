@@ -119,9 +119,8 @@ func makePerTestDatabaseURL(databaseURL string, testName string) string {
 	}
 
 	timePrefix := time.Now().Format(time.RFC3339)
-	testName = sanitizeDBTestName(testName)
 
-	testSuffix := fmt.Sprintf("%s-%s", timePrefix, testName)
+	testSuffix := sanitizeDBTestName(fmt.Sprintf("%s-%s", timePrefix, testName))
 
 	switch u.Scheme {
 	case "libsql":
