@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 
-import { getGetInfoKey } from "@/api/openapi-client/misc";
+import { getGetSessionKey } from "@/api/openapi-client/misc";
 import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
@@ -246,7 +246,7 @@ function RateLimitTester() {
   const [xRateLimit, setXRateLimit] = useState<Record<string, any>>({});
 
   async function run(auth: boolean) {
-    const resp = await fetch(`${API_ADDRESS}/api${getGetInfoKey()[0]}`, {
+    const resp = await fetch(`${API_ADDRESS}/api${getGetSessionKey()[0]}`, {
       credentials: auth ? "include" : "omit",
       mode: "cors",
     });

@@ -3,7 +3,7 @@ import z from "zod";
 import { Account } from "@/api/openapi-schema";
 
 import { EditorSettingsSchema } from "./editor";
-import { FrontendConfiguration, Settings } from "./settings";
+import { FrontendConfiguration } from "./settings";
 import { SidebarSettingsSchema } from "./sidebar";
 
 const MemberCustomSettingsParseSchema = z.object({
@@ -32,9 +32,11 @@ export const DefaultMemberSettings: MemberCustomSettings = {
 };
 
 export function parseMemberSettings(
-  data: Account,
+  data?: Account,
   global?: FrontendConfiguration,
-): Member {
+): Member | undefined {
+  if (!data) return;
+
   const parsed = MemberCustomSettingsParseSchema.safeParse(data.meta ?? {});
 
   const rawMeta = parsed.success ? parsed.data : {};
@@ -46,13 +48,13 @@ export function parseMemberSettings(
     editor: {
       mode:
         rawMeta.editor?.mode ??
-        global?.editor.mode ??
+        global?.editor?.mode ??
         DefaultMemberSettings.editor.mode,
     },
     sidebar: {
       defaultState:
         rawMeta.sidebar?.defaultState ??
-        global?.sidebar.defaultState ??
+        global?.sidebar?.defaultState ??
         DefaultMemberSettings.sidebar.defaultState,
     },
   };

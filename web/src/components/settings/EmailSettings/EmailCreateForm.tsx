@@ -6,8 +6,8 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import {
   accountEmailAdd,
-  getAccountGetKey,
 } from "@/api/openapi-client/accounts";
+import { getGetSessionKey } from "@/api/openapi-client/misc";
 import { Button } from "@/components/ui/button";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
@@ -39,7 +39,7 @@ export function EmailCreateForm(props: Props) {
       },
       {
         async cleanup() {
-          await mutate(getAccountGetKey());
+          await mutate(getGetSessionKey());
         },
         promiseToast: {
           loading: "Adding email address...",

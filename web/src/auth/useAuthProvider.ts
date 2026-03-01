@@ -1,7 +1,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
+import { useAccountSession } from "src/auth";
 
 const PRIVATE_PAGES = ["/settings", "/new", "/admin"];
 
@@ -10,7 +10,7 @@ function privatePage(pathName: string): boolean {
 }
 
 export function useAuthProvider() {
-  const { isLoading, data, error } = useAccountGet();
+  const { isLoading, data, error } = useAccountSession();
   const { push } = useRouter();
   const pathname = usePathname();
 

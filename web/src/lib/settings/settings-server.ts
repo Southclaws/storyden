@@ -1,16 +1,16 @@
 import { cache } from "react";
 import "server-only";
 
-import { getInfo } from "@/api/openapi-server/misc";
+import { getSession } from "@/api/openapi-server/misc";
 
 import { DefaultSettings, Settings, parseSettings } from "./settings";
 
 const getSettingsCached = cache(async () => {
-  const { data } = await getInfo({
+  const { data } = await getSession({
     cache: "no-store",
   });
 
-  return parseSettings(data);
+  return parseSettings(data.info);
 });
 
 export async function getSettings(): Promise<Settings> {

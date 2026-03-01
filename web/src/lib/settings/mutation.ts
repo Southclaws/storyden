@@ -7,10 +7,14 @@ import {
   adminSettingsUpdate,
   getAdminSettingsGetKey,
 } from "@/api/openapi-client/admin";
-import { getGetInfoKey } from "@/api/openapi-client/misc";
+import {
+  getGetInfoKey,
+  getGetSessionKey,
+} from "@/api/openapi-client/misc";
 import {
   AdminSettingsMutableProps,
   AdminSettingsProps,
+  GetSessionOKResponse,
   Info,
 } from "@/api/openapi-schema";
 
@@ -21,9 +25,29 @@ export function useSettingsMutation() {
 
   const infoKey = getGetInfoKey();
   const adminSettingsKey = getAdminSettingsGetKey();
+  const sessionKey = getGetSessionKey();
 
   async function revalidate(data?: Info) {
-    await mutate(infoKey, data);
+    if (!data) {
+      await Promise.all([mutate(infoKey), mutate(sessionKey)]);
+      return;
+    }
+
+    await Promise.all([
+      mutate(infoKey, data, { revalidate: false }),
+      mutate(
+        sessionKey,
+        (current: GetSessionOKResponse | undefined) => {
+          if (!current) return current;
+
+          return {
+            ...current,
+            info: data,
+          } satisfies GetSessionOKResponse;
+        },
+        { revalidate: false },
+      ),
+    ]);
   }
 
   async function updateSettings(patch: AdminSettingsMutableProps) {
@@ -67,6 +91,33 @@ export function useSettingsMutation() {
             if (!current) return current;
 
             return adminToInfo(updated);
+          },
+        },
+        {
+          key: sessionKey,
+          optimistic: (current: GetSessionOKResponse | undefined) => {
+            if (!current) return current;
+            const { services, ...publicPatch } = patch;
+
+            return {
+              ...current,
+              info: {
+                ...current.info,
+                ...publicPatch,
+                metadata: {
+                  ...current.info.metadata,
+                  ...patch.metadata,
+                },
+              },
+            } satisfies GetSessionOKResponse;
+          },
+          commit: (current, result) => {
+            if (!current) return current;
+
+            return {
+              ...current,
+              info: adminToInfo(result),
+            } satisfies GetSessionOKResponse;
           },
         },
       ],

@@ -28,7 +28,7 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useSiteContextPane({ session, initialSettings }: Props) {
-  session = useSession(session);
+  session = useSession(session, initialSettings);
   const [editing, setEditing] = useQueryState<null | Editing>("editing", {
     defaultValue: null,
     clearOnDefault: true,

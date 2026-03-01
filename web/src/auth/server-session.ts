@@ -4,12 +4,16 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 
 import { RequestError } from "@/api/common";
-import { accountGet } from "@/api/openapi-server/accounts";
+import { getSession } from "@/api/openapi-server/misc";
 
-const getSessionCached = cache(async () => {
-  return await accountGet({
-    cache: "default",
+const getSessionCached = cache(async (sessionCookie: string) => {
+  void sessionCookie;
+
+  const { data } = await getSession({
+    cache: "no-store",
   });
+
+  return data;
 });
 
 export async function getServerSession() {
@@ -18,9 +22,9 @@ export async function getServerSession() {
   if (!session) return;
 
   try {
-    const { data } = await getSessionCached();
+    const data = await getSessionCached(session.value);
 
-    return data;
+    return data.account;
   } catch (e) {
     if (e instanceof RequestError) {
       if (e.status === 401) {

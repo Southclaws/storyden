@@ -1,9 +1,9 @@
-import { useAccountGet } from "@/api/openapi-client/accounts";
+import { useAccountSession } from "@/auth";
 import { EmailSettings } from "@/components/settings/EmailSettings/EmailSettings";
 import { UnreadyBanner } from "@/components/site/Unready";
 
 export function MemberEmailSettingsScreen() {
-  const { data, error } = useAccountGet();
+  const { data, error } = useAccountSession();
   if (!data) {
     return <UnreadyBanner error={error} />;
   }

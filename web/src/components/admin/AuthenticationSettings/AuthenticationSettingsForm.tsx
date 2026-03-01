@@ -5,7 +5,10 @@ import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
-import { getGetInfoKey } from "@/api/openapi-client/misc";
+import {
+  getGetInfoKey,
+  getGetSessionKey,
+} from "@/api/openapi-client/misc";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
 import { CardGroupRadio } from "@/components/ui/form/CardGroupRadio";
@@ -48,7 +51,10 @@ export function useAuthenticationSettingsForm(props: Props) {
         await adminSettingsUpdate({
           authentication_mode: data.authentication_mode,
         });
-        mutate(getGetInfoKey());
+        await Promise.all([
+          mutate(getGetInfoKey()),
+          mutate(getGetSessionKey()),
+        ]);
       },
       {
         promiseToast: {

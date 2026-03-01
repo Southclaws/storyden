@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { handle } from "@/api/client";
-import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authEmailPasswordSignup } from "@/api/openapi-client/auth";
+import { useAccountSession } from "@/auth";
 import { PasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
 import { refreshFeed } from "@/lib/feed/refresh";
 import { deriveError } from "@/utils/error";
@@ -25,13 +25,13 @@ export function useRegisterEmailForm() {
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
-  const { mutate } = useAccountGet();
+  const { mutate } = useAccountSession();
 
   const handleSubmit = form.handleSubmit(async (payload: Form) => {
     await handle(
       async () => {
         await authEmailPasswordSignup(payload);
-        mutate();
+        await mutate();
         refreshFeed();
         router.push("/");
       },

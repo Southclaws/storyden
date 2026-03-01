@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
 import { authPasswordSignin } from "src/api/openapi-client/auth";
 import { APIError } from "src/api/openapi-schema";
+import { useAccountSession } from "src/auth";
 import { passkeyLogin } from "src/components/auth/webauthn/utils";
 import { deriveError } from "src/utils/error";
 
@@ -41,7 +41,7 @@ export function useLoginHandleForm() {
     resolver: zodResolver(FormSchema),
   });
   const { push } = useRouter();
-  const { mutate } = useAccountGet();
+  const { mutate } = useAccountSession();
 
   const isWebauthnEnabled = isWebauthnAvailable();
 
@@ -75,9 +75,9 @@ export function useLoginHandleForm() {
     }
 
     await authPasswordSignin(parsed.data)
-      .then(() => {
+      .then(async () => {
+        await mutate();
         push("/");
-        mutate();
       })
       .catch((e: APIError) => setError("root", { message: deriveError(e) }));
   }
@@ -85,8 +85,8 @@ export function useLoginHandleForm() {
   async function handleWebauthn(payload: Form) {
     try {
       await passkeyLogin(payload.identifier);
+      await mutate();
       push("/");
-      mutate();
     } catch (error) {
       setError("root", { message: deriveError(error) });
     }

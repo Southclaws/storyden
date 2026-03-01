@@ -6,8 +6,8 @@ import { useSWRConfig } from "swr";
 import { handle } from "@/api/client";
 import {
   accountEmailRemove,
-  getAccountGetKey,
 } from "@/api/openapi-client/accounts";
+import { getGetSessionKey } from "@/api/openapi-client/misc";
 import { AccountEmailAddress } from "@/api/openapi-schema";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { useConfirmation } from "@/components/site/useConfirmation";
@@ -31,7 +31,7 @@ export function EmailCard({ email }: Props) {
       },
       {
         async cleanup() {
-          await mutate(getAccountGetKey());
+          await mutate(getGetSessionKey());
         },
         promiseToast: {
           loading: "Deleting email address...",

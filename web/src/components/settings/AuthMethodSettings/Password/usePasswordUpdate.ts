@@ -1,13 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
 import { authPasswordUpdate } from "src/api/openapi-client/auth";
-import { APIError } from "src/api/openapi-schema";
+import { useAccountSession } from "src/auth";
 import { deriveError } from "src/utils/error";
 
 import { handle } from "@/api/client";
@@ -23,7 +21,7 @@ export function usePasswordUpdate() {
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
-  const { mutate } = useAccountGet();
+  const { mutate } = useAccountSession();
 
   const handlePasswordChange = form.handleSubmit(async (payload: Form) => {
     await handle(

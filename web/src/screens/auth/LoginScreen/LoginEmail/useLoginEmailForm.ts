@@ -6,11 +6,11 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { handle } from "@/api/client";
-import { useAccountGet } from "@/api/openapi-client/accounts";
 import {
   authEmailPasswordSignin,
   authPasswordSignin,
 } from "@/api/openapi-client/auth";
+import { useAccountSession } from "@/auth";
 import {
   ExistingPasswordSchema,
   UsernameOrEmailSchema,
@@ -29,7 +29,7 @@ export function useLoginEmailForm() {
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
-  const { mutate } = useAccountGet();
+  const { mutate } = useAccountSession();
 
   const handleSubmit = form.handleSubmit(async (payload: Form) => {
     await handle(async () => {
@@ -47,7 +47,7 @@ export function useLoginEmailForm() {
         });
       }
 
-      mutate();
+      await mutate();
       refreshFeed();
       router.push("/");
     });
