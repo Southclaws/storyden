@@ -90,7 +90,7 @@ const nodePropertiesQuery = `with
       or ps.id = n.property_schema_id
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
-      n.id = $1
+      n.id = ?
     group by ps.id, psf.id
   ),
   child_properties as (
@@ -107,7 +107,7 @@ const nodePropertiesQuery = `with
       inner join property_schemas ps on ps.id = cn.property_schema_id
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
-      n.id = $1
+      n.id = ?
     group by ps.id, psf.id
   )
 select
