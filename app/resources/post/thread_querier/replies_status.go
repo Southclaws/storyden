@@ -17,7 +17,7 @@ import (
 const repliesCountManyQuery = `select
   p.id                                                  post_id,
   count(r.id)                                           replies,
-  sum(case when r.account_posts = $1 then 1 else 0 end) replied
+  sum(case when r.account_posts = ? then 1 else 0 end) replied
 from
   posts p
   left join posts r on r.root_post_id = p.id and r.deleted_at is null
@@ -39,7 +39,7 @@ func (d *Querier) getRepliesStatus(ctx context.Context, ids []xid.ID, accountID 
 	idList := strings.Join(quotedIDs, ",")
 
 	var replies post.PostRepliesResults
-	repliesQuery := fmt.Sprintf(repliesCountManyQuery, idList)
+	repliesQuery := d.raw.Rebind(fmt.Sprintf(repliesCountManyQuery, idList))
 	err := d.raw.SelectContext(ctx, &replies, repliesQuery, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

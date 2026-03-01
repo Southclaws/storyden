@@ -90,7 +90,7 @@ const nodePropertiesQuery = `with
       or ps.id = n.property_schema_id
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
-      n.id = $1
+      n.id = ?
     group by ps.id, psf.id
   ),
   child_properties as (
@@ -107,7 +107,7 @@ const nodePropertiesQuery = `with
       inner join property_schemas ps on ps.id = cn.property_schema_id
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
-      n.id = $1
+      n.id = ?
     group by ps.id, psf.id
   )
 select
@@ -211,7 +211,8 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 	}
 
 	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	nodePropertiesQueryRebound := q.raw.Rebind(nodePropertiesQuery)
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQueryRebound, col.ID.String(), col.ID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -367,7 +368,8 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 	}
 
 	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, parentID.String())
+	nodePropertiesQueryRebound := q.raw.Rebind(nodePropertiesQuery)
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQueryRebound, parentID.String(), parentID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
