@@ -6,27 +6,35 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/role"
-	"github.com/Southclaws/storyden/app/resources/message"
-	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 type Assignment struct {
-	db             *ent.Client
-	accountQuerier *account_querier.Querier
-	profileCache   *profile_cache.Cache
-	bus            *pubsub.Bus
+	ins   spanner.Instrumentation
+	db    *ent.Client
+	store cache.Store
 }
 
-func New(db *ent.Client, accountQuerier *account_querier.Querier, profileCache *profile_cache.Cache, bus *pubsub.Bus) *Assignment {
-	return &Assignment{db: db, accountQuerier: accountQuerier, profileCache: profileCache, bus: bus}
+func New(
+	ins spanner.Builder,
+	db *ent.Client,
+	store cache.Store,
+) *Assignment {
+	return &Assignment{
+		ins:   ins.Build(),
+		db:    db,
+		store: store,
+	}
 }
 
 type Mutation struct {
@@ -63,8 +71,20 @@ func split(mutations ...Mutation) (adds, removes []xid.ID, admin opt.Optional[bo
 	return
 }
 
-func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.AccountWithEdges, error) {
-	update := w.db.Account.UpdateOneID(xid.ID(accountID))
+func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, roles ...Mutation) error {
+	ctx, span := w.ins.Instrument(ctx,
+		kv.String("account_id", xid.ID(accountID).String()),
+		kv.Int("mutations_count", len(roles)),
+	)
+	defer span.End()
+
+	tx, err := w.db.Tx(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	defer func() { _ = tx.Rollback() }()
+
+	update := tx.Account.UpdateOneID(xid.ID(accountID))
 	mutation := update.Mutation()
 
 	roles = dt.Filter(roles, func(m Mutation) bool {
@@ -80,19 +100,30 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 		mutation.SetAdmin(a)
 	}
 
-	err := w.profileCache.Invalidate(ctx, xid.ID(accountID))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	_, err = update.Save(ctx)
-	if err != nil && !ent.IsConstraintError(err) {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	w.bus.Publish(ctx, &message.EventAccountUpdated{
-		ID: accountID,
-	})
+	roleIDs, err := tx.AccountRoles.Query().
+		Where(ent_accountroles.AccountIDEQ(xid.ID(accountID))).
+		All(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
 
-	return w.accountQuerier.GetByID(ctx, accountID)
+	if err := w.storeRoleAssignmentsCache(ctx, xid.ID(accountID), roleIDs); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := tx.Commit(); err != nil {
+		_ = w.deleteRoleIDsCache(ctx, xid.ID(accountID))
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }

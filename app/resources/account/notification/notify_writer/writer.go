@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
@@ -19,10 +19,10 @@ import (
 
 type Writer struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) *Writer {
+func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Writer {
 	return &Writer{db: db, roleQuerier: roleQuerier}
 }
 

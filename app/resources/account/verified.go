@@ -6,5 +6,5 @@ type verifiedStatusEnum string
 
 const (
 	verifiedStatusNone          verifiedStatusEnum = "none"
-	verifiedStatusVerifiedEmail verifiedStatusEnum = "verified_email"
+	verifiedStatusVerifiedEmail verifiedStatusEnum = "email"
 )

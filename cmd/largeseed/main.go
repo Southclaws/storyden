@@ -16,12 +16,16 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_repo"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache/local"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/noop"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
@@ -178,12 +182,22 @@ type seeder struct {
 	accountWriter *account_writer.Writer
 }
 
-func newSeeder(db *ent.Client) *seeder {
-	accountQuerier := account_querier.New(db, role_querier.New(db))
+func newSeeder(db *ent.Client) (*seeder, error) {
+	store, err := local.New()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	ins := noop.NewBuilder()
+	roleRepo := role_repo.New(ins, db, store)
+	assignment := role_assign.New(ins, db, store)
+	hydrator := role_hydrate.New(ins, roleRepo, assignment)
+	accountRepo := account_repo.New(ins, db, roleRepo, hydrator, store)
+
 	return &seeder{
 		db:            db,
-		accountWriter: account_writer.New(db, accountQuerier),
-	}
+		accountWriter: account_writer.New(accountRepo),
+	}, nil
 }
 
 func (s *seeder) createRandomAccount(ctx context.Context) (*ent.Account, error) {
@@ -432,7 +446,10 @@ func main() {
 	fmt.Printf("Connected to database: %s\n", dbPath)
 
 	// Create seeder
-	seeder := newSeeder(client)
+	seeder, err := newSeeder(client)
+	if err != nil {
+		log.Fatalf("Failed to initialise seeder: %v", err)
+	}
 
 	// Seed data
 	if err := seeder.seedData(context.Background(), 10000, 50); err != nil {

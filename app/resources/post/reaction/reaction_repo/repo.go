@@ -1,4 +1,4 @@
-package reaction
+package reaction_repo
 
 import (
 	"context"
@@ -12,14 +12,15 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/react"
 )
 
 var ErrInvalidEmoji = errors.New("invalid emoji codepoint")
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) (*Querier, *Writer) {
+func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) (*Querier, *Writer) {
 	q := &Querier{db: db, roleQuerier: roleQuerier}
 	w := &Writer{db, q}
 	return q, w
@@ -27,10 +28,10 @@ func New(db *ent.Client, roleQuerier *role_querier.Querier) (*Querier, *Writer) 
 
 type Querier struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
+func (q *Querier) Get(ctx context.Context, reactID reaction.ReactID) (*reaction.React, error) {
 	r, err := q.db.React.Query().
 		Where(react.ID(xid.ID(reactID))).
 		WithAccount().
@@ -46,10 +47,10 @@ func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(r)
+	return reaction.Map(r)
 }
 
-func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*React, error) {
+func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*reaction.React, error) {
 	r, err := q.db.React.Query().
 		Where(
 			react.AccountID(xid.ID(accountID)),
@@ -69,7 +70,7 @@ func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postI
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(r)
+	return reaction.Map(r)
 }
 
 type Writer struct {
@@ -77,8 +78,8 @@ type Writer struct {
 	querier *Querier
 }
 
-func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xid.ID, emojiID string) (*React, error) {
-	e, ok := IsValidEmoji(emojiID)
+func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xid.ID, emojiID string) (*reaction.React, error) {
+	e, ok := reaction.IsValidEmoji(emojiID)
 	if !ok {
 		return nil, fault.Wrap(ErrInvalidEmoji, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -92,7 +93,7 @@ func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xi
 		return w.querier.Lookup(ctx, accountID, postID, e)
 	}
 
-	return w.querier.Get(ctx, ReactID(*reactID))
+	return w.querier.Get(ctx, reaction.ReactID(*reactID))
 }
 
 func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*xid.ID, error) {
@@ -123,9 +124,13 @@ func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID
 	return &reactID, nil
 }
 
-func (w *Writer) Remove(ctx context.Context, accountID account.AccountID, reactID ReactID) error {
-	err := w.db.React.
-		DeleteOneID(xid.ID(reactID)).
+func (w *Writer) Remove(ctx context.Context, accountID account.AccountID, reactID reaction.ReactID) error {
+	_, err := w.db.React.
+		Delete().
+		Where(
+			react.ID(xid.ID(reactID)),
+			react.AccountID(xid.ID(accountID)),
+		).
 		Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

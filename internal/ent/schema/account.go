@@ -33,6 +33,12 @@ func (Account) Fields() []ent.Field {
 			Annotations(
 				entsql.Default("human"),
 			),
+		field.Enum("verified_status").
+			Values("none", "email").
+			Default("none").
+			Annotations(
+				entsql.Default("none"),
+			),
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
 		field.JSON("metadata", map[string]any{}).Optional(),

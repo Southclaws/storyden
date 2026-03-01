@@ -586,6 +586,26 @@ func KindNotIn(vs ...Kind) predicate.Account {
 	return predicate.Account(sql.FieldNotIn(FieldKind, vs...))
 }
 
+// VerifiedStatusEQ applies the EQ predicate on the "verified_status" field.
+func VerifiedStatusEQ(v VerifiedStatus) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldVerifiedStatus, v))
+}
+
+// VerifiedStatusNEQ applies the NEQ predicate on the "verified_status" field.
+func VerifiedStatusNEQ(v VerifiedStatus) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldVerifiedStatus, v))
+}
+
+// VerifiedStatusIn applies the In predicate on the "verified_status" field.
+func VerifiedStatusIn(vs ...VerifiedStatus) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldVerifiedStatus, vs...))
+}
+
+// VerifiedStatusNotIn applies the NotIn predicate on the "verified_status" field.
+func VerifiedStatusNotIn(vs ...VerifiedStatus) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldVerifiedStatus, vs...))
+}
+
 // AdminEQ applies the EQ predicate on the "admin" field.
 func AdminEQ(v bool) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAdmin, v))

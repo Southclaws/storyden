@@ -15,7 +15,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -30,10 +30,10 @@ type Querier struct {
 	db          *ent.Client
 	raw         *sqlx.DB
 	aq          *account_querier.Querier
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier, roleQuerier *role_querier.Querier) *Querier {
+func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{db: db, raw: raw, aq: aq, roleQuerier: roleQuerier}
 }
 

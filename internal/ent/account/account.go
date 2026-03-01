@@ -34,6 +34,8 @@ const (
 	FieldSignature = "signature"
 	// FieldKind holds the string denoting the kind field in the database.
 	FieldKind = "kind"
+	// FieldVerifiedStatus holds the string denoting the verified_status field in the database.
+	FieldVerifiedStatus = "verified_status"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
 	// FieldLinks holds the string denoting the links field in the database.
@@ -279,6 +281,7 @@ var Columns = []string{
 	FieldBio,
 	FieldSignature,
 	FieldKind,
+	FieldVerifiedStatus,
 	FieldAdmin,
 	FieldLinks,
 	FieldMetadata,
@@ -349,6 +352,32 @@ func KindValidator(k Kind) error {
 	}
 }
 
+// VerifiedStatus defines the type for the "verified_status" enum field.
+type VerifiedStatus string
+
+// VerifiedStatusNone is the default value of the VerifiedStatus enum.
+const DefaultVerifiedStatus = VerifiedStatusNone
+
+// VerifiedStatus values.
+const (
+	VerifiedStatusNone  VerifiedStatus = "none"
+	VerifiedStatusEmail VerifiedStatus = "email"
+)
+
+func (vs VerifiedStatus) String() string {
+	return string(vs)
+}
+
+// VerifiedStatusValidator is a validator for the "verified_status" field enum values. It is called by the builders before save.
+func VerifiedStatusValidator(vs VerifiedStatus) error {
+	switch vs {
+	case VerifiedStatusNone, VerifiedStatusEmail:
+		return nil
+	default:
+		return fmt.Errorf("account: invalid enum value for verified_status field: %q", vs)
+	}
+}
+
 // OrderOption defines the ordering options for the Account queries.
 type OrderOption func(*sql.Selector)
 
@@ -400,6 +429,11 @@ func BySignature(opts ...sql.OrderTermOption) OrderOption {
 // ByKind orders the results by the kind field.
 func ByKind(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldKind, opts...).ToFunc()
+}
+
+// ByVerifiedStatus orders the results by the verified_status field.
+func ByVerifiedStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVerifiedStatus, opts...).ToFunc()
 }
 
 // ByAdmin orders the results by the admin field.

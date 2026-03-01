@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_repo"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
@@ -13,8 +14,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
@@ -46,7 +48,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
-	"github.com/Southclaws/storyden/app/resources/post/reaction"
+	"github.com/Southclaws/storyden/app/resources/post/reaction/reaction_repo"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
 	"github.com/Southclaws/storyden/app/resources/post/reply_writer"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
@@ -69,14 +71,16 @@ func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			settings.New,
+			role_assign.New,
+			role_repo.New,
+			role_hydrate.New,
+			account_repo.New,
 			account_querier.New,
 			account_writer.New,
 			access_key.New,
 			email.New,
-			role_assign.New,
 			role_querier.New,
 			role_writer.New,
-			role_badge.New,
 			invitation_querier.New,
 			invitation_writer.New,
 			asset_querier.New,
@@ -95,7 +99,7 @@ func Build() fx.Option {
 			thread_writer.New,
 			thread_querier.New,
 			thread_cache.New,
-			reaction.New,
+			reaction_repo.New,
 			like_querier.New,
 			like_writer.New,
 			post_querier.New,

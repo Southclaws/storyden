@@ -12,6 +12,15 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+func mapVerifiedStatus(in string) (VerifiedStatus, error) {
+	// Backward compatibility for any rows that still have the legacy value.
+	if in == "verified_email" {
+		return VerifiedStatusVerifiedEmail, nil
+	}
+
+	return NewVerifiedStatus(in)
+}
+
 func MapRef(a *ent.Account) (*Account, error) {
 	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {
@@ -24,6 +33,11 @@ func MapRef(a *ent.Account) (*Account, error) {
 	}
 
 	kind, err := NewAccountKind(string(a.Kind))
+	if err != nil {
+		return nil, err
+	}
+
+	verifiedStatus, err := mapVerifiedStatus(string(a.VerifiedStatus))
 	if err != nil {
 		return nil, err
 	}
@@ -41,14 +55,15 @@ func MapRef(a *ent.Account) (*Account, error) {
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,
 
-		Handle:    a.Handle,
-		Name:      a.Name,
-		Bio:       bio,
-		Signature: signature,
-		Kind:      kind,
-		Admin:     a.Admin, // TODO: should this be derived from roles?
-		Roles:     roles,
-		Metadata:  a.Metadata,
+		Handle:         a.Handle,
+		Name:           a.Name,
+		Bio:            bio,
+		Signature:      signature,
+		Kind:           kind,
+		VerifiedStatus: verifiedStatus,
+		Admin:          a.Admin, // TODO: should this be derived from roles?
+		Roles:          roles,
+		Metadata:       a.Metadata,
 
 		DeletedAt: opt.NewPtr(a.DeletedAt),
 		IndexedAt: opt.NewPtr(a.IndexedAt),
@@ -74,11 +89,6 @@ func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
 	auths := dt.Map(authsEdge, func(a *ent.Authentication) string {
 		return a.Service
 	})
-
-	verifiedStatus := VerifiedStatusNone
-	if len(dt.Filter(emailsEdge, func(e *ent.Email) bool { return e.Verified })) > 0 {
-		verifiedStatus = VerifiedStatusVerifiedEmail
-	}
 
 	emails := dt.Map(emailsEdge, MapEmail)
 
@@ -110,7 +120,6 @@ func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
 		Account:        *ref,
 		Auths:          auths,
 		EmailAddresses: emails,
-		VerifiedStatus: verifiedStatus,
 		InvitedBy:      invitedBy,
 		ExternalLinks:  links,
 	}, nil

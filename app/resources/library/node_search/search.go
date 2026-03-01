@@ -11,7 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -69,10 +69,10 @@ func WithTags(names ...tag_ref.Name) Option {
 type service struct {
 	db          *ent.Client
 	raw         *sqlx.DB
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_querier.Querier) Search {
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) Search {
 	return &service{
 		db:          db,
 		raw:         raw,

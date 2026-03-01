@@ -105,6 +105,7 @@ type AccountMutation struct {
 	bio                            *string
 	signature                      *string
 	kind                           *account.Kind
+	verified_status                *account.VerifiedStatus
 	admin                          *bool
 	links                          *[]schema.ExternalLink
 	appendlinks                    []schema.ExternalLink
@@ -667,6 +668,42 @@ func (m *AccountMutation) OldKind(ctx context.Context) (v account.Kind, err erro
 // ResetKind resets all changes to the "kind" field.
 func (m *AccountMutation) ResetKind() {
 	m.kind = nil
+}
+
+// SetVerifiedStatus sets the "verified_status" field.
+func (m *AccountMutation) SetVerifiedStatus(as account.VerifiedStatus) {
+	m.verified_status = &as
+}
+
+// VerifiedStatus returns the value of the "verified_status" field in the mutation.
+func (m *AccountMutation) VerifiedStatus() (r account.VerifiedStatus, exists bool) {
+	v := m.verified_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVerifiedStatus returns the old "verified_status" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldVerifiedStatus(ctx context.Context) (v account.VerifiedStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVerifiedStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVerifiedStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVerifiedStatus: %w", err)
+	}
+	return oldValue.VerifiedStatus, nil
+}
+
+// ResetVerifiedStatus resets all changes to the "verified_status" field.
+func (m *AccountMutation) ResetVerifiedStatus() {
+	m.verified_status = nil
 }
 
 // SetAdmin sets the "admin" field.
@@ -2225,7 +2262,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -2252,6 +2289,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.kind != nil {
 		fields = append(fields, account.FieldKind)
+	}
+	if m.verified_status != nil {
+		fields = append(fields, account.FieldVerifiedStatus)
 	}
 	if m.admin != nil {
 		fields = append(fields, account.FieldAdmin)
@@ -2291,6 +2331,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Signature()
 	case account.FieldKind:
 		return m.Kind()
+	case account.FieldVerifiedStatus:
+		return m.VerifiedStatus()
 	case account.FieldAdmin:
 		return m.Admin()
 	case account.FieldLinks:
@@ -2326,6 +2368,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldSignature(ctx)
 	case account.FieldKind:
 		return m.OldKind(ctx)
+	case account.FieldVerifiedStatus:
+		return m.OldVerifiedStatus(ctx)
 	case account.FieldAdmin:
 		return m.OldAdmin(ctx)
 	case account.FieldLinks:
@@ -2405,6 +2449,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKind(v)
+		return nil
+	case account.FieldVerifiedStatus:
+		v, ok := value.(account.VerifiedStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVerifiedStatus(v)
 		return nil
 	case account.FieldAdmin:
 		v, ok := value.(bool)
@@ -2554,6 +2605,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldKind:
 		m.ResetKind()
+		return nil
+	case account.FieldVerifiedStatus:
+		m.ResetVerifiedStatus()
 		return nil
 	case account.FieldAdmin:
 		m.ResetAdmin()

@@ -10,7 +10,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
@@ -18,10 +18,10 @@ import (
 
 type Querier struct {
 	db          *ent.Client
-	roleQuerier *role_querier.Querier
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 

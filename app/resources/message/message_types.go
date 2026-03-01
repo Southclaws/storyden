@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
@@ -40,9 +40,9 @@ type EventThreadDeleted struct {
 type EventThreadReplyCreated struct {
 	ThreadID        post.ID
 	ReplyID         post.ID
-	ThreadAuthorID  account.AccountID
-	ReplyAuthorID   account.AccountID
-	ReplyToAuthorID opt.Optional[account.AccountID]
+	ThreadAuthorID  account_ref.ID
+	ReplyAuthorID   account_ref.ID
+	ReplyToAuthorID opt.Optional[account_ref.ID]
 	ReplyToTargetID opt.Optional[post.ID]
 }
 
@@ -101,7 +101,7 @@ type EventCategoryDeleted struct {
 }
 
 type EventMemberMentioned struct {
-	By     account.AccountID
+	By     account_ref.ID
 	Source datagraph.Ref
 	Item   datagraph.Ref
 }
@@ -169,23 +169,23 @@ type CommandNodeDeindex struct {
 // -
 
 type EventAccountCreated struct {
-	ID account.AccountID
+	ID account_ref.ID
 }
 
 type EventAccountUpdated struct {
-	ID account.AccountID
+	ID account_ref.ID
 }
 
 type EventAccountSuspended struct {
-	ID account.AccountID
+	ID account_ref.ID
 }
 
 type EventAccountUnsuspended struct {
-	ID account.AccountID
+	ID account_ref.ID
 }
 
 type CommandProfileIndex struct {
-	ID account.AccountID
+	ID account_ref.ID
 }
 
 // -
@@ -195,8 +195,8 @@ type CommandProfileIndex struct {
 type CommandSendNotification struct {
 	Event    notification.Event
 	Item     *datagraph.Ref
-	TargetID account.AccountID
-	SourceID opt.Optional[account.AccountID]
+	TargetID account_ref.ID
+	SourceID opt.Optional[account_ref.ID]
 }
 
 type CommandSendEmail struct {
@@ -205,7 +205,7 @@ type CommandSendEmail struct {
 
 type CommandSendBeacon struct {
 	Item    datagraph.Ref
-	Subject opt.Optional[account.AccountID]
+	Subject opt.Optional[account_ref.ID]
 }
 
 // -
@@ -215,14 +215,14 @@ type CommandSendBeacon struct {
 type EventReportCreated struct {
 	ID         report.ID
 	Target     *datagraph.Ref
-	ReportedBy opt.Optional[account.AccountID]
+	ReportedBy opt.Optional[account_ref.ID]
 }
 
 type EventReportUpdated struct {
 	ID         report.ID
 	Target     *datagraph.Ref
-	ReportedBy opt.Optional[account.AccountID]
-	HandledBy  opt.Optional[account.AccountID]
+	ReportedBy opt.Optional[account_ref.ID]
+	HandledBy  opt.Optional[account_ref.ID]
 	Status     report.Status
 }
 
