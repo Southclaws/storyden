@@ -193,25 +193,8 @@ func getDriver(databaseURL string) (string, string, error) {
 
 	case "sqlite", "sqlite3":
 		path, _ := strings.CutPrefix(databaseURL, u.Scheme+"://")
-
-		// NOTE: SQLite has a bug where if the path does not exist, it provides
-		// an incorrect and confusing error message about memory allocation. So
-		// we need to perform the checks against the path with a proper error.
-		if _, err := os.Stat(filepath.Dir(path)); err != nil {
-			if os.IsNotExist(err) {
-				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-					return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not create directory for sqlite database: %s", u)))
-				}
-			} else {
-				return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not read directory: %s", u)))
-			}
-		}
-
-		// Try to write to the directory. This provides a better error message
-		// compared to SQLite which will give you nonsense if it can't write.
-		testwrite := filepath.Join(filepath.Dir(path), ".perm_check")
-		if err := os.WriteFile(testwrite, []byte("ok"), 0o644); err != nil {
-			return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("cannot write to directory for sqlite database: %s", u)))
+		if err := ensureDatabasePathWritable(path, "sqlite", u); err != nil {
+			return "", "", err
 		}
 
 		return "sqlite", path, nil
@@ -236,6 +219,10 @@ func getDriver(databaseURL string) (string, string, error) {
 				path = absPath
 			}
 
+			if err := ensureDatabasePathWritable(path, "libsql", u); err != nil {
+				return "", "", err
+			}
+
 			return "libsql", (&url.URL{
 				Scheme:   "file",
 				Path:     path,
@@ -248,6 +235,27 @@ func getDriver(databaseURL string) (string, string, error) {
 	default:
 		return "", "", fault.Newf("unsupported scheme: %s", u.Scheme)
 	}
+}
+
+func ensureDatabasePathWritable(path string, driver string, u *url.URL) error {
+	// NOTE: SQLite-backed drivers can return misleading "out of memory" errors
+	// when the target directory does not exist or is not writable.
+	if _, err := os.Stat(filepath.Dir(path)); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+				return fault.Wrap(err, fmsg.With(fmt.Sprintf("could not create directory for %s database: %s", driver, u)))
+			}
+		} else {
+			return fault.Wrap(err, fmsg.With(fmt.Sprintf("could not read directory: %s", u)))
+		}
+	}
+
+	testwrite := filepath.Join(filepath.Dir(path), ".perm_check")
+	if err := os.WriteFile(testwrite, []byte("ok"), 0o644); err != nil {
+		return fault.Wrap(err, fmsg.With(fmt.Sprintf("cannot write to directory for %s database: %s", driver, u)))
+	}
+
+	return nil
 }
 
 // populateLastReplyAt is a data migration hook that fills NULL last_reply_at values
