@@ -211,7 +211,8 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 	}
 
 	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	nodePropertiesQueryRebound := q.raw.Rebind(nodePropertiesQuery)
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQueryRebound, col.ID.String(), col.ID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -367,7 +368,8 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 	}
 
 	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, parentID.String())
+	nodePropertiesQueryRebound := q.raw.Rebind(nodePropertiesQuery)
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQueryRebound, parentID.String(), parentID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
