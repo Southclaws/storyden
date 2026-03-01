@@ -23,7 +23,6 @@ export function ThreadFeedScreen({
   hideCategoryBadge = false,
   showQuickShare = true,
   initialSession,
-  initialSettings,
 }: Props & {
   showCategorySelect: boolean;
   hideCategoryBadge?: boolean;
@@ -31,13 +30,11 @@ export function ThreadFeedScreen({
   initialSession?: Account;
   initialSettings?: Settings;
 }) {
-  const session = useSession(initialSession, initialSettings);
-
   return (
     <LStack>
       {showQuickShare && (
         <QuickShare
-          initialSession={session}
+          initialSession={initialSession}
           initialCategory={category}
           showCategorySelect={showCategorySelect}
         />
