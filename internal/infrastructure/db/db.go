@@ -52,6 +52,7 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 		return nil, nil, fault.Wrap(err)
 	}
 
+	//
 	d, err := sql.Open(driver, path)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to open driver"))
