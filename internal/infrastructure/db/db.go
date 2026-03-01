@@ -57,8 +57,15 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to open driver"))
 	}
 
-	x, err := sqlx.Connect(driver, path)
+	if err := d.Ping(); err != nil {
+		_ = d.Close()
+		return nil, nil, fault.Wrap(err, fmsg.With("failed to ping database"))
+	}
+
+	x := sqlx.NewDb(d, driver)
+	err = x.Ping()
 	if err != nil {
+		_ = d.Close()
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
 	}
 
