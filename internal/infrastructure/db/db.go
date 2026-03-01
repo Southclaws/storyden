@@ -52,7 +52,6 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 		return nil, nil, fault.Wrap(err)
 	}
 
-	//
 	d, err := sql.Open(driver, path)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to open driver"))
@@ -223,10 +222,23 @@ func getDriver(databaseURL string) (string, string, error) {
 				return "", "", err
 			}
 
+			q := u.Query()
+			pragmas := q["_pragma"]
+			hasForeignKeysPragma := false
+			for _, pragma := range pragmas {
+				if pragma == "foreign_keys(1)" {
+					hasForeignKeysPragma = true
+					break
+				}
+			}
+			if !hasForeignKeysPragma {
+				q.Add("_pragma", "foreign_keys(1)")
+			}
+
 			return "libsql", (&url.URL{
 				Scheme:   "file",
 				Path:     path,
-				RawQuery: u.RawQuery,
+				RawQuery: q.Encode(),
 			}).String(), nil
 		}
 

@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -47,6 +48,31 @@ func TestGetDriverLibsqlLocalFilePath(t *testing.T) {
 
 	if !strings.Contains(path, "_pragma=foreign_keys(1)") {
 		t.Fatalf("expected rewritten path to preserve query params, got %q", path)
+	}
+}
+
+func TestGetDriverLibsqlLocalAddsForeignKeysPragma(t *testing.T) {
+	t.Parallel()
+
+	dbFile := filepath.Join(t.TempDir(), "storyden-libsql-no-pragma.db")
+	dsn := "libsql://" + dbFile
+
+	driver, path, err := getDriver(dsn)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if driver != "libsql" {
+		t.Fatalf("expected driver libsql, got %q", driver)
+	}
+
+	u, err := url.Parse(path)
+	if err != nil {
+		t.Fatalf("failed to parse rewritten URL: %v", err)
+	}
+
+	if !strings.Contains(strings.Join(u.Query()["_pragma"], ","), "foreign_keys(1)") {
+		t.Fatalf("expected local libsql URL to include _pragma=foreign_keys(1), got %q", path)
 	}
 }
 
