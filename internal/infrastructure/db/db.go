@@ -30,6 +30,8 @@ import (
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
+	ent_email "github.com/Southclaws/storyden/internal/ent/email"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
@@ -127,6 +129,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				schema.WithDropColumn(true),
 				schema.WithApplyHook(populateLastReplyAt()),
 				schema.WithApplyHook(migrateReplyVisibility()),
+				schema.WithApplyHook(migrateAccountVerifiedStatus()),
 			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}
@@ -292,6 +295,61 @@ func migrateReplyVisibility() schema.ApplyHook {
 			`, []any{}, nil)
 			if err != nil {
 				return fault.Wrap(err, fmsg.With("failed to migrate reply visibility from draft to published"))
+			}
+
+			return nil
+		})
+	}
+}
+
+// migrateAccountVerifiedStatus is a data migration hook for backfilling the
+// accounts.verified_status field from existing verified emails when the column
+// is added or modified.
+func migrateAccountVerifiedStatus() schema.ApplyHook {
+	return func(next schema.Applier) schema.Applier {
+		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			hasChange := false
+			for _, c := range plan.Changes {
+				m, ok := c.Source.(*atlas_schema.ModifyTable)
+				if !ok || m.T.Name != ent_account.Table {
+					continue
+				}
+
+				changes := atlas_schema.Changes(m.Changes)
+				if changes.IndexAddColumn(ent_account.FieldVerifiedStatus) != -1 ||
+					changes.IndexModifyColumn(ent_account.FieldVerifiedStatus) != -1 {
+					hasChange = true
+					break
+				}
+			}
+
+			if err := next.Apply(ctx, conn, plan); err != nil {
+				return err
+			}
+
+			if !hasChange {
+				return nil
+			}
+
+			err := conn.Exec(ctx, fmt.Sprintf(`
+				UPDATE %s
+				SET %s = 'email'
+				WHERE EXISTS (
+					SELECT 1
+					FROM %s
+					WHERE %s.%s = %s.%s
+					  AND %s.%s = true
+				)
+			`,
+				ent_account.Table,
+				ent_account.FieldVerifiedStatus,
+				ent_email.Table,
+				ent_email.Table, ent_email.FieldAccountID,
+				ent_account.Table, ent_account.FieldID,
+				ent_email.Table, ent_email.FieldVerified,
+			), []any{}, nil)
+			if err != nil {
+				return fault.Wrap(err, fmsg.With("failed to backfill account verified_status"))
 			}
 
 			return nil
