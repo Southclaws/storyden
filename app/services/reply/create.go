@@ -28,6 +28,10 @@ func (s *Mutator) Create(
 	opts := partial.Opts()
 	opts = append(opts, reply_writer.WithVisibility(visibility.VisibilityPublished))
 
+	if err := s.cache.Invalidate(ctx, xid.ID(parentID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate thread cache"))
+	}
+
 	p, err := s.replyWriter.Create(ctx, authorID, parentID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
@@ -48,15 +52,6 @@ func (s *Mutator) Create(
 			p = updatedReply
 			wasMovedToReview = true
 		}
-	}
-
-	pref, err := s.replyQuerier.Probe(ctx, p.ID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	replyToAuthorID := opt.Map(p.ReplyTo, func(r reply.Reply) account.AccountID {
