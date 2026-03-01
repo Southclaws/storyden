@@ -14,13 +14,12 @@ import (
 )
 
 const repliesCountManyQuery = `select
-  p.id        post_id,
-  count(r.id) replies,
-  count(a.id) replied
+  p.id                                                  post_id,
+  count(r.id)                                           replies,
+  sum(case when r.account_posts = $1 then 1 else 0 end) replied
 from
   posts p
   left join posts r on r.root_post_id = p.id and r.deleted_at is null
-  left join accounts a on a.id = r.account_posts and a.id = $1
 where p.id in (%s)
 group by p.id
 `

@@ -14,13 +14,12 @@ import (
 )
 
 const likesCountManyQuery = `select
-  p.id        post_id, -- the post (thread or reply) ID
-  count(*)    likes,   -- number of likes
-  count(a.id) liked    -- has the account making the query liked this post?
+  p.id        post_id,                                      -- the post (thread or reply) ID
+  count(*)    likes,                                        -- number of likes
+  sum(case when lp.account_id = $1 then 1 else 0 end) liked -- has the account making the query liked this post?
 from
   like_posts lp
   inner join posts p on p.id = lp.post_id
-  left join accounts a on lp.account_id = a.id and a.id = $1
 where p.id in (%s)
 group by p.id
 `

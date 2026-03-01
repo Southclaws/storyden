@@ -14,14 +14,13 @@ import (
 )
 
 const collectionsCountManyQuery = `select
-  p.id        item_id,
-  count(cp.post_id) collections,
-  count(a.id) has_in_collection
+  p.id                                                        item_id,
+  count(cp.post_id)                                           collections,
+  sum(case when c.account_collections = $1 then 1 else 0 end) has_in_collection
 from
   posts p
   left join collection_posts cp on cp.post_id = p.id
   left join collections c on c.id = cp.collection_id
-  left join accounts a on c.account_collections = a.id and a.id = $1
 where p.id in (%s)
 group by p.id
 `
