@@ -80,7 +80,9 @@ type Config struct {
 	   The accepted schemes for this URL are:
 	   - `sqlite://` or `sqlite3://` for SQLite or Litestream.
 	   - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
-	   - `libsql://` for Turso remote SQLite. **Note:** This is currently experimental, only remote Turso databases are supported.
+	   - `libsql://` for Turso/libSQL.
+	     - Remote Turso example: `libsql://your-db.turso.io?authToken=...`
+	     - Local file-backed libSQL example: `libsql://./relative/path` or `libsql:///absolute/path`
 	*/
 	DatabaseURL string `default:"sqlite://data/data.db?_pragma=foreign_keys(1)" envconfig:"DATABASE_URL"`
 	/*
@@ -155,12 +157,18 @@ type Config struct {
 
 	/*
 	   Either:
-	   - `otlp` for any standard OpenTelemetry collector.
+	   - `otlp` for any standard OpenTelemetry collector, or `file://...` JSONL output when `OTEL_EXPORTER_OTLP_ENDPOINT` is a file URL.
 	   - `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
 	   - `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
 	*/
 	OTELProvider string `default:"" envconfig:"OTEL_PROVIDER"`
-	// The collector endpoint for sending OTEL data.
+	/*
+	   The collector endpoint for sending OTEL data.
+
+	   This also supports file output for local profiling when `OTEL_PROVIDER=otlp`
+	   by setting a `file://` URL, for example: `file:///tmp/storyden-traces.jsonl`
+	   or `file:./otel-logs.jsonl`.
+	*/
 	OTELEndpoint url.URL `default:"" envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 	// When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
 	SentryDSN string `default:"" envconfig:"SENTRY_DSN"`

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -45,25 +47,11 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		if isMaybeProdDB(dbURL) {
 			panic("maybe accidental prod DATABASE_URL in integration tests!")
 		}
-		defaultConfig.DatabaseURL = dbURL
+		defaultConfig.DatabaseURL = makePerTestDatabaseURL(dbURL, t.Name())
+		fmt.Println("Using database URL from environment: ", defaultConfig.DatabaseURL)
 	} else {
-		// Generate a unique database per test, avoids SQLite write contention.
-		testDatabaseName := time.Now().Format(time.RFC3339) + t.Name()
-
-		opts := url.Values{"_pragma": []string{
-			"foreign_keys(1)",
-			"busy_timeout(10000)",
-			"journal_mode(WAL)",
-			"synchronous(NORMAL)",
-			"cache_size(1000000000)",
-			"temp_store(MEMORY)",
-		}}.Encode()
-
-		defaultConfig.DatabaseURL = fmt.Sprintf(
-			"sqlite://data/%s.db?%s",
-			testDatabaseName,
-			opts,
-		)
+		defaultConfig.DatabaseURL = makePerTestDatabaseURL("sqlite://data/data.db", t.Name())
+		fmt.Println("Using database URL default: ", defaultConfig.DatabaseURL)
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
@@ -112,6 +100,7 @@ func isMaybeProdDB(url string) bool {
 		"cockroachlabs",
 		"cloud",
 		"verify-full",
+		".turso.io",
 	}
 
 	for _, v := range dangerous {
@@ -121,4 +110,132 @@ func isMaybeProdDB(url string) bool {
 	}
 
 	return false
+}
+
+func makePerTestDatabaseURL(databaseURL string, testName string) string {
+	u, err := url.Parse(databaseURL)
+	if err != nil {
+		panic(err)
+	}
+
+	timePrefix := time.Now().Format(time.RFC3339)
+
+	testSuffix := sanitizeDBTestName(fmt.Sprintf("%s-%s", timePrefix, testName))
+
+	switch u.Scheme {
+	case "libsql":
+		// Keep remote Turso URLs shared. Only local file-backed libsql should
+		// get isolated per-test files.
+		if isLibsqlRemote(u) {
+			return databaseURL
+		}
+
+		rewritten := *u
+		rewritten.Path = appendSuffixToFilePath(u.Path, testSuffix)
+
+		q := rewritten.Query()
+		desired := []string{
+			"foreign_keys(1)",
+			"busy_timeout(10000)",
+			"journal_mode(WAL)",
+			"synchronous(NORMAL)",
+			"cache_size(1000000000)",
+			"temp_store(MEMORY)",
+		}
+		present := make(map[string]struct{}, len(q["_pragma"]))
+		for _, v := range q["_pragma"] {
+			present[v] = struct{}{}
+		}
+		for _, pragma := range desired {
+			if _, ok := present[pragma]; ok {
+				continue
+			}
+			q.Add("_pragma", pragma)
+		}
+
+		rewritten.RawQuery = q.Encode()
+
+		return rewritten.String()
+
+	case "sqlite", "sqlite3":
+		if u.Path == "" {
+			return databaseURL
+		}
+
+		rewritten := *u
+		rewritten.Path = appendSuffixToFilePath(u.Path, testSuffix)
+
+		desired := []string{
+			"foreign_keys(1)",
+			"busy_timeout(10000)",
+			"journal_mode(WAL)",
+			"synchronous(NORMAL)",
+			"cache_size(1000000000)",
+			"temp_store(MEMORY)",
+		}
+
+		q := rewritten.Query()
+		present := make(map[string]struct{}, len(q["_pragma"]))
+		for _, v := range q["_pragma"] {
+			present[v] = struct{}{}
+		}
+
+		for _, pragma := range desired {
+			if _, ok := present[pragma]; ok {
+				continue
+			}
+			q.Add("_pragma", pragma)
+		}
+
+		rewritten.RawQuery = q.Encode()
+
+		return rewritten.String()
+
+	default:
+		return databaseURL
+	}
+}
+
+func isLibsqlRemote(u *url.URL) bool {
+	switch u.Host {
+	case "", ".":
+		return false
+	default:
+		return true
+	}
+}
+
+func appendSuffixToFilePath(filePath string, suffix string) string {
+	ext := path.Ext(filePath)
+	base := strings.TrimSuffix(filePath, ext)
+	if ext == "" {
+		ext = ".db"
+	}
+	return base + "-" + suffix + ext
+}
+
+func sanitizeDBTestName(name string) string {
+	// Keep names filesystem-safe and deterministic across OSes.
+	mapped := strings.Map(func(r rune) rune {
+		switch {
+		case r >= 'a' && r <= 'z':
+			return r
+		case r >= 'A' && r <= 'Z':
+			return r
+		case r >= '0' && r <= '9':
+			return r
+		case r == '-', r == '_':
+			return r
+		default:
+			return '_'
+		}
+	}, name)
+
+	mapped = strings.Trim(mapped, "_")
+	if mapped == "" {
+		return "test"
+	}
+
+	// Avoid excessively long filenames in deep package test paths.
+	return filepath.Base(mapped)
 }

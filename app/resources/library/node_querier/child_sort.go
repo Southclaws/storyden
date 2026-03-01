@@ -59,7 +59,7 @@ select
 from
   nodes n
   left join properties p on n.id = p.node_id
-  inner join property_schema_fields f on p.field_id = f.id and f.name = $1
+  inner join property_schema_fields f on p.field_id = f.id and f.name = ?
 where
   n.id in (%s)
 order by
@@ -82,7 +82,7 @@ select
 from
   nodes n
   left join properties p on n.id = p.node_id
-  inner join property_schema_fields f on p.field_id = f.id and f.name = $1
+  inner join property_schema_fields f on p.field_id = f.id and f.name = ?
 where
   n.id in (%s)
 order by
@@ -110,7 +110,7 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 	// "asc" or "desc" in NewChildSortRule. Unfortunately both Go and SQL don't
 	// allow parameterizing the ORDER BY direction because nothing about SQL has
 	// improved since 1973...
-	case "sqlite":
+	case "sqlite", "sqlite3", "libsql":
 		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_sqlite,
 			idList,
 			csr.Dir,
@@ -118,7 +118,7 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 			csr.Page.Offset(),
 		)
 
-	case "pgx":
+	case "pgx", "postgres":
 		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_postgres,
 			idList,
 			csr.Dir, // this
@@ -132,6 +132,8 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 	default:
 		return nil, fault.New("unexpected failure in database driver switch")
 	}
+
+	queryTemplate = q.raw.Rebind(queryTemplate)
 
 	err := q.raw.SelectContext(ctx, &rows, queryTemplate, csr.Field)
 	if err != nil {

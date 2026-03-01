@@ -54,7 +54,7 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 
 	d, err := sql.Open(driver, path)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fmsg.With("failed to connect to database"))
+		return nil, nil, fault.Wrap(err, fmsg.With("failed to open driver"))
 	}
 
 	x, err := sqlx.Connect(driver, path)
@@ -192,36 +192,82 @@ func getDriver(databaseURL string) (string, string, error) {
 
 	case "sqlite", "sqlite3":
 		path, _ := strings.CutPrefix(databaseURL, u.Scheme+"://")
-
-		// NOTE: SQLite has a bug where if the path does not exist, it provides
-		// an incorrect and confusing error message about memory allocation. So
-		// we need to perform the checks against the path with a proper error.
-		if _, err := os.Stat(filepath.Dir(path)); err != nil {
-			if os.IsNotExist(err) {
-				if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-					return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not create directory for sqlite database: %s", u)))
-				}
-			} else {
-				return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("could not read directory: %s", u)))
-			}
-		}
-
-		// Try to write to the directory. This provides a better error message
-		// compared to SQLite which will give you nonsense if it can't write.
-		testwrite := filepath.Join(filepath.Dir(path), ".perm_check")
-		if err := os.WriteFile(testwrite, []byte("ok"), 0o644); err != nil {
-			return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("cannot write to directory for sqlite database: %s", u)))
+		if err := ensureDatabasePathWritable(path, "sqlite", u); err != nil {
+			return "", "", err
 		}
 
 		return "sqlite", path, nil
 
 	case "libsql":
-		// NOTE: Only remote Turso, local file-based libSQL is not supported.
+		// NOTE: We consider URLs of the form:
+		// libsql://./path
+		// or
+		// libsql:///path
+		// to be local disk databases and normalise to an absolute path.
+		if (u.Host == "" || u.Host == ".") && u.Path != "" {
+			path := u.Path
+			if u.Host == "." {
+				path = "." + u.Path
+			}
+
+			if !filepath.IsAbs(path) {
+				absPath, err := filepath.Abs(path)
+				if err != nil {
+					return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("failed to resolve libsql relative path: %s", u)))
+				}
+				path = absPath
+			}
+
+			if err := ensureDatabasePathWritable(path, "libsql", u); err != nil {
+				return "", "", err
+			}
+
+			q := u.Query()
+			pragmas := q["_pragma"]
+			hasForeignKeysPragma := false
+			for _, pragma := range pragmas {
+				if pragma == "foreign_keys(1)" {
+					hasForeignKeysPragma = true
+					break
+				}
+			}
+			if !hasForeignKeysPragma {
+				q.Add("_pragma", "foreign_keys(1)")
+			}
+
+			return "libsql", (&url.URL{
+				Scheme:   "file",
+				Path:     path,
+				RawQuery: q.Encode(),
+			}).String(), nil
+		}
+
 		return "libsql", databaseURL, nil
 
 	default:
 		return "", "", fault.Newf("unsupported scheme: %s", u.Scheme)
 	}
+}
+
+func ensureDatabasePathWritable(path string, driver string, u *url.URL) error {
+	// NOTE: SQLite-backed drivers can return misleading "out of memory" errors
+	// when the target directory does not exist or is not writable.
+	if _, err := os.Stat(filepath.Dir(path)); err != nil {
+		if os.IsNotExist(err) {
+			if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+				return fault.Wrap(err, fmsg.With(fmt.Sprintf("could not create directory for %s database: %s", driver, u)))
+			}
+		} else {
+			return fault.Wrap(err, fmsg.With(fmt.Sprintf("could not read directory: %s", u)))
+		}
+	}
+
+	testwrite := filepath.Join(filepath.Dir(path), ".perm_check")
+	if err := os.WriteFile(testwrite, []byte("ok"), 0o644); err != nil {
+		return fault.Wrap(err, fmsg.With(fmt.Sprintf("cannot write to directory for %s database: %s", driver, u)))
+	}
+
+	return nil
 }
 
 // populateLastReplyAt is a data migration hook that fills NULL last_reply_at values
