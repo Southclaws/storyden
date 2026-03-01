@@ -46,8 +46,13 @@ func TestGetDriverLibsqlLocalFilePath(t *testing.T) {
 		t.Fatalf("expected local libsql path to be rewritten as file:// URL, got %q", path)
 	}
 
-	if !strings.Contains(path, "_pragma=foreign_keys(1)") {
-		t.Fatalf("expected rewritten path to preserve query params, got %q", path)
+	u, err := url.Parse(path)
+	if err != nil {
+		t.Fatalf("failed to parse rewritten URL: %v", err)
+	}
+
+	if !strings.Contains(strings.Join(u.Query()["_pragma"], ","), "foreign_keys(1)") {
+		t.Fatalf("expected rewritten path to include _pragma=foreign_keys(1), got %q", path)
 	}
 }
 
