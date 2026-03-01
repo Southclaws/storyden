@@ -6,17 +6,16 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
-	model "github.com/Southclaws/storyden/internal/ent"
 )
 
 var (
-	ErrNoAccountWithID     = errors.New("an account does not exist with the specified ID")
 	ErrNoAccountWithHandle = errors.New("an account does not exist with the specified handle")
 )
 
@@ -52,35 +51,24 @@ func IdentifierFrom(id xid.ID) *Identifier {
 	return &oid
 }
 
-// ID will resolve the Unique value to an account's ID using a repository. Since
-// this is used a lot as most of the system supports using IDs and handles
-// interchangably, the repository this uses should make heavy use of caching.
+// ResolveHandle resolves either a handle or ID string to an account ID using a
+// minimal probe path.
 func ResolveHandle(ctx context.Context, r *profile_querier.Querier, u AccountHandle) (account.AccountID, error) {
-	if id, err := xid.FromString(string(u)); err == nil {
-		a, err := r.GetByID(ctx, account.AccountID(id))
-		if err != nil {
-			if model.IsNotFound(err) {
-				// NOTE: In the unlikely chance that a user sets their handle to
-				// a valid XID string, this will produce a confusing result.
-				return account.AccountID(xid.NilID()), fault.Wrap(ErrNoAccountWithID, fctx.With(ctx), ftag.With(ftag.NotFound))
-			}
-
-			return account.AccountID(xid.NilID()), err
-		}
-
-		return account.AccountID(a.ID), nil
-	}
-
-	a, found, err := r.LookupByHandle(ctx, string(u))
+	id, found, err := r.ProbeID(ctx, string(u))
 	if err != nil {
 		return account.AccountID(xid.NilID()), err
 	}
 
 	if !found {
-		return account.AccountID(xid.NilID()), fault.Wrap(ErrNoAccountWithHandle, fctx.With(ctx), ftag.With(ftag.NotFound))
+		return account.AccountID(xid.NilID()), fault.Wrap(
+			ErrNoAccountWithHandle,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("account not found", "No account exists with the specified handle."),
+		)
 	}
 
-	return account.AccountID(a.ID), nil
+	return id, nil
 }
 
 func OptionalID(ctx context.Context, r *profile_querier.Querier, u *AccountHandle) (opt.Optional[account.AccountID], error) {

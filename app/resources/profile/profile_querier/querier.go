@@ -25,6 +25,32 @@ func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *Querier {
 	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
+// ProbeID resolves either a handle or an account ID string to an AccountID
+// using the minimal possible query path.
+//
+// If the value is already a valid XID, this short-circuits and returns the ID
+// directly with no database query.
+func (d *Querier) ProbeID(ctx context.Context, value string) (account.AccountID, bool, error) {
+	if id, err := xid.FromString(value); err == nil {
+		return account.AccountID(id), true, nil
+	}
+
+	id, err := d.db.Account.
+		Query().
+		Where(account_ent.Handle(value)).
+		Select(account_ent.FieldID).
+		OnlyID(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return account.AccountID(xid.NilID()), false, nil
+		}
+
+		return account.AccountID(xid.NilID()), false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return account.AccountID(id), true, nil
+}
+
 func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*profile.Public, error) {
 	q := d.db.Account.
 		Query().
