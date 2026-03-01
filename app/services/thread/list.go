@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
 type Params struct {
@@ -34,6 +35,13 @@ func (s *service) List(ctx context.Context,
 	opts Params,
 ) (*thread_querier.Result, error) {
 	accountID := session.GetOptAccountID(ctx)
+
+	ctx, span := s.ins.Instrument(ctx,
+		kv.Int("page", page),
+		kv.Int("size", size),
+		kv.String("account_id", accountID.String()),
+	)
+	defer span.End()
 
 	q := []thread_querier.Query{
 		thread_querier.HasNotBeenDeleted(),

@@ -48,6 +48,14 @@ func (d *Querier) List(
 		size = 100
 	}
 
+	ctx, span := d.ins.Instrument(ctx,
+		kv.Int("page", page),
+		kv.Int("size", size),
+		kv.String("account_id", accountID.String()),
+		kv.Int("query_options_count", len(opts)),
+	)
+	defer span.End()
+
 	query := d.db.Post.Query().Where(ent_post.RootPostIDIsNil())
 	queryOptions := threadListOptions{
 		q: query,
@@ -117,6 +125,9 @@ func (d *Querier) List(
 
 	var accountLookup account.Lookup
 	pool.SubmitErr(func() error {
+		ctx, accountSpan := d.ins.InstrumentNamed(ctx, "thread_accounts")
+		defer accountSpan.End()
+
 		accountIDs := dt.Map(result, func(p *ent.Post) xid.ID { return p.AccountPosts })
 		accountIDs = lo.Uniq(accountIDs)
 
@@ -137,6 +148,9 @@ func (d *Querier) List(
 
 	var readStates post.ReadStateMap
 	pool.SubmitErr(func() error {
+		ctx, readSpan := d.ins.InstrumentNamed(ctx, "read_status")
+		defer readSpan.End()
+
 		r, err := d.getReadStatus(ctx, ids, accountID.String())
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -147,6 +161,9 @@ func (d *Querier) List(
 
 	var repliesMap post.PostRepliesMap
 	pool.SubmitErr(func() error {
+		ctx, repliesSpan := d.ins.InstrumentNamed(ctx, "replies_status")
+		defer repliesSpan.End()
+
 		r, err := d.getRepliesStatus(ctx, ids, accountID.String())
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -157,6 +174,8 @@ func (d *Querier) List(
 
 	var likesMap post.PostLikesMap
 	pool.SubmitErr(func() error {
+		// NOTE: getLikesStatus itself is already instrumented.
+
 		r, err := d.getLikesStatus(ctx, ids, accountID.String())
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -167,6 +186,9 @@ func (d *Querier) List(
 
 	var collectionsMap collection_item_status.CollectionStatusMap
 	pool.SubmitErr(func() error {
+		ctx, collectionsSpan := d.ins.InstrumentNamed(ctx, "collections_status")
+		defer collectionsSpan.End()
+
 		r, err := d.getCollectionsStatus(ctx, ids, accountID.String())
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
