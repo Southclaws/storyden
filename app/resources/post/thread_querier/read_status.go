@@ -21,7 +21,7 @@ const newRepliesCountManyQuery_sqlite = `select
 from
   posts p
   inner join post_reads pr
-    on pr.root_post_id = p.id and pr.account_id = $1
+    on pr.root_post_id = p.id and pr.account_id = ?
   left join posts r
     on r.root_post_id = p.id
     and r.deleted_at is null
@@ -37,7 +37,7 @@ const newRepliesCountManyQuery_postgres = `select
 from
   posts p
   inner join post_reads pr
-    on pr.root_post_id = p.id and pr.account_id = $1
+    on pr.root_post_id = p.id and pr.account_id = ?
   left join posts r
     on r.root_post_id = p.id
     and r.deleted_at is null
@@ -71,7 +71,7 @@ func (d *Querier) getReadStatus(ctx context.Context, ids []xid.ID, accountID str
 	idList := strings.Join(quotedIDs, ",")
 
 	var readStates post.ReadStateResults
-	readQuery := fmt.Sprintf(d.newRepliesCountManyQuery(), idList)
+	readQuery := d.raw.Rebind(fmt.Sprintf(d.newRepliesCountManyQuery(), idList))
 	err := d.raw.SelectContext(ctx, &readStates, readQuery, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

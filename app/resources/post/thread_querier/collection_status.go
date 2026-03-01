@@ -17,7 +17,7 @@ import (
 const collectionsCountManyQuery = `select
   p.id                                                        item_id,
   count(cp.post_id)                                           collections,
-  sum(case when c.account_collections = $1 then 1 else 0 end) has_in_collection
+  sum(case when c.account_collections = ? then 1 else 0 end) has_in_collection
 from
   posts p
   left join collection_posts cp on cp.post_id = p.id
@@ -40,7 +40,7 @@ func (d *Querier) getCollectionsStatus(ctx context.Context, ids []xid.ID, accoun
 	idList := strings.Join(quotedIDs, ",")
 
 	var collections collection_item_status.CollectionStatusResults
-	collectionsQuery := fmt.Sprintf(collectionsCountManyQuery, idList)
+	collectionsQuery := d.raw.Rebind(fmt.Sprintf(collectionsCountManyQuery, idList))
 	err := d.raw.SelectContext(ctx, &collections, collectionsQuery, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

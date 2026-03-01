@@ -17,7 +17,7 @@ import (
 const likesCountManyQuery = `select
   p.id        post_id,                                      -- the post (thread or reply) ID
   count(*)    likes,                                        -- number of likes
-  sum(case when lp.account_id = $1 then 1 else 0 end) liked -- has the account making the query liked this post?
+  sum(case when lp.account_id = ? then 1 else 0 end) liked -- has the account making the query liked this post?
 from
   like_posts lp
   inner join posts p on p.id = lp.post_id
@@ -41,7 +41,7 @@ func (d *Querier) getLikesStatus(ctx context.Context, ids []xid.ID, accountID st
 	var likes post.PostLikesResults
 
 	// NOTE: Safe SQL parameterization for ID list. IDs are direct from a query.
-	likesQuery := fmt.Sprintf(likesCountManyQuery, idList)
+	likesQuery := d.raw.Rebind(fmt.Sprintf(likesCountManyQuery, idList))
 
 	err := d.raw.SelectContext(ctx, &likes, likesQuery, accountID)
 	if err != nil {
