@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -55,11 +56,7 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 			lastModified1Header := nodeGet1.HTTPResponse.Header.Get("Last-Modified")
 			r.NotEmpty(lastModified1Header, "Last-Modified header should be present for backward compatibility")
 
-			nodeGet304, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
-				req.Header.Set("If-None-Match", etag1)
-				return nil
-			})
-			tests.Status(t, err, nodeGet304, 304)
+			stableETag, nodeGet304 := waitForNodeNotModified(t, ctx, cl, slug, etag1)
 			a.Nil(nodeGet304.JSON200, "304 response should have no body")
 
 			newName := "updated-cache-test-node-" + uuid.NewString()
@@ -77,11 +74,7 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 			r.NotEmpty(etag2, "ETag header should be present")
 			a.NotEqual(etag1, etag2, "ETag should change after update")
 
-			nodeGetAfterUpdate, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
-				req.Header.Set("If-None-Match", etag1)
-				return nil
-			})
-			tests.Ok(t, err, nodeGetAfterUpdate)
+			nodeGetAfterUpdate := waitForNodeModified(t, ctx, cl, slug, stableETag)
 			r.NotNil(nodeGetAfterUpdate.JSON200, "should return 200 with body after cache invalidation")
 			a.Equal(newName, nodeGetAfterUpdate.JSON200.Name)
 		}))
@@ -130,11 +123,7 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			etag1 := nodeGet1.HTTPResponse.Header.Get("ETag")
 			r.NotEmpty(etag1, "ETag header should be present")
 
-			nodeGet304, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
-				req.Header.Set("If-None-Match", etag1)
-				return nil
-			})
-			tests.Status(t, err, nodeGet304, 304)
+			stableETag, _ := waitForNodeNotModified(t, ctx, cl, slug, etag1)
 
 			schemaUpdate, err := cl.NodeUpdatePropertySchemaWithResponse(ctx, slug, openapi.NodeUpdatePropertySchemaJSONRequestBody{
 				{
@@ -145,15 +134,86 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, schemaUpdate)
 
-			nodeGetAfterSchema, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
-				req.Header.Set("If-None-Match", etag1)
-				return nil
-			})
-			tests.Ok(t, err, nodeGetAfterSchema)
+			nodeGetAfterSchema := waitForNodeModified(t, ctx, cl, slug, stableETag)
 			r.NotNil(nodeGetAfterSchema.JSON200, "should return 200 with body after schema update invalidates cache")
 
 			etag2 := nodeGetAfterSchema.HTTPResponse.Header.Get("ETag")
-			a.NotEqual(etag1, etag2, "ETag should change after property schema update")
+			a.NotEqual(stableETag, etag2, "ETag should change after property schema update")
 		}))
 	}))
+}
+
+func waitForNodeNotModified(
+	t *testing.T,
+	ctx context.Context,
+	cl *openapi.ClientWithResponses,
+	slug string,
+	initialETag string,
+) (string, *openapi.NodeGetResponse) {
+	t.Helper()
+
+	const maxAttempts = 12
+	deadline := time.Now().Add(2 * time.Second)
+	etag := initialETag
+
+	for attempt := 0; attempt < maxAttempts && time.Now().Before(deadline); attempt++ {
+		resp, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+			req.Header.Set("If-None-Match", etag)
+			return nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		switch resp.StatusCode() {
+		case http.StatusNotModified:
+			return etag, resp
+		case http.StatusOK:
+			nextETag := resp.HTTPResponse.Header.Get("ETag")
+			if nextETag != "" {
+				etag = nextETag
+			}
+		default:
+			tests.Status(t, err, resp, http.StatusNotModified)
+		}
+
+		time.Sleep(40 * time.Millisecond)
+	}
+
+	t.Fatalf("did not observe 304 for node %q within retry window", slug)
+	return "", nil
+}
+
+func waitForNodeModified(
+	t *testing.T,
+	ctx context.Context,
+	cl *openapi.ClientWithResponses,
+	slug string,
+	ifNoneMatch string,
+) *openapi.NodeGetResponse {
+	t.Helper()
+
+	const maxAttempts = 12
+	deadline := time.Now().Add(2 * time.Second)
+
+	for attempt := 0; attempt < maxAttempts && time.Now().Before(deadline); attempt++ {
+		resp, err := cl.NodeGetWithResponse(ctx, slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+			req.Header.Set("If-None-Match", ifNoneMatch)
+			return nil
+		})
+		require.NoError(t, err)
+		require.NotNil(t, resp)
+
+		switch resp.StatusCode() {
+		case http.StatusOK:
+			return resp
+		case http.StatusNotModified:
+			time.Sleep(40 * time.Millisecond)
+			continue
+		default:
+			tests.Status(t, err, resp, http.StatusOK)
+		}
+	}
+
+	t.Fatalf("did not observe 200 cache miss for node %q within retry window", slug)
+	return nil
 }

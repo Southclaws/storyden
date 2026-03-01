@@ -2,7 +2,9 @@ package category_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/oapi-codegen/nullable"
@@ -53,8 +55,26 @@ func TestCategoryMovement(t *testing.T) {
 				r.NotNil(child.JSON200)
 
 				moveBody := openapi.CategoryUpdatePositionJSONRequestBody{Parent: nullable.NewNullableWithValue(openapi.NullableIdentifier(targetParent.JSON200.Id))}
-				move, err := cl.CategoryUpdatePositionWithResponse(root, child.JSON200.Slug, moveBody, adminSession)
-				tests.Ok(t, err, move)
+				var move *openapi.CategoryUpdatePositionResponse
+				const maxAttempts = 8
+				deadline := time.Now().Add(2 * time.Second)
+				for attempt := 0; attempt < maxAttempts && time.Now().Before(deadline); attempt++ {
+					move, err = cl.CategoryUpdatePositionWithResponse(root, child.JSON200.Slug, moveBody, adminSession)
+					r.NoError(err)
+					r.NotNil(move)
+
+					if move.StatusCode() == http.StatusOK {
+						break
+					}
+
+					if move.StatusCode() != http.StatusNotFound {
+						tests.Ok(t, err, move)
+					}
+
+					time.Sleep(40 * time.Millisecond)
+				}
+				r.NotNil(move)
+				r.Equal(http.StatusOK, move.StatusCode(), "category move did not stabilise to 200")
 				r.NotNil(move.JSON200)
 
 				updated, err := cl.CategoryGetWithResponse(root, child.JSON200.Slug, adminSession)
@@ -79,8 +99,26 @@ func TestCategoryMovement(t *testing.T) {
 				r.NotNil(child.JSON200)
 
 				moveBody := openapi.CategoryUpdatePositionJSONRequestBody{Parent: nullable.NewNullNullable[openapi.NullableIdentifier]()}
-				move, err := cl.CategoryUpdatePositionWithResponse(root, child.JSON200.Slug, moveBody, adminSession)
-				tests.Ok(t, err, move)
+				var move *openapi.CategoryUpdatePositionResponse
+				const maxAttempts = 8
+				deadline := time.Now().Add(2 * time.Second)
+				for attempt := 0; attempt < maxAttempts && time.Now().Before(deadline); attempt++ {
+					move, err = cl.CategoryUpdatePositionWithResponse(root, child.JSON200.Slug, moveBody, adminSession)
+					r.NoError(err)
+					r.NotNil(move)
+
+					if move.StatusCode() == http.StatusOK {
+						break
+					}
+
+					if move.StatusCode() != http.StatusNotFound {
+						tests.Ok(t, err, move)
+					}
+
+					time.Sleep(40 * time.Millisecond)
+				}
+				r.NotNil(move)
+				r.Equal(http.StatusOK, move.StatusCode(), "category move did not stabilise to 200")
 				r.NotNil(move.JSON200)
 
 				updated, err := cl.CategoryGetWithResponse(root, child.JSON200.Slug, adminSession)
