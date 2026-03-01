@@ -35,11 +35,11 @@ func (d *Querier) ProbeID(ctx context.Context, value string) (account.AccountID,
 		return account.AccountID(id), true, nil
 	}
 
-	id, err := d.db.Account.
+	a, err := d.db.Account.
 		Query().
 		Where(account_ent.Handle(value)).
 		Select(account_ent.FieldID).
-		OnlyID(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return account.AccountID(xid.NilID()), false, nil
@@ -48,7 +48,7 @@ func (d *Querier) ProbeID(ctx context.Context, value string) (account.AccountID,
 		return account.AccountID(xid.NilID()), false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return account.AccountID(id), true, nil
+	return account.AccountID(a.ID), true, nil
 }
 
 func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*profile.Public, error) {
