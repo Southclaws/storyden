@@ -22,7 +22,7 @@ func (m *Mapping) GetInfo() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
-func (m *Mapping) GetSettings() (bool, *rbac.Permission) {
+func (m *Mapping) GetSession() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 

@@ -15,6 +15,7 @@ var (
 	OperationIDGetVersion                       = OperationID{`GetVersion`}
 	OperationIDGetSpec                          = OperationID{`GetSpec`}
 	OperationIDGetDocs                          = OperationID{`GetDocs`}
+	OperationIDGetSession                       = OperationID{`GetSession`}
 	OperationIDGetInfo                          = OperationID{`GetInfo`}
 	OperationIDIconGet                          = OperationID{`IconGet`}
 	OperationIDIconUpload                       = OperationID{`IconUpload`}
@@ -198,6 +199,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDGetSpec, nil
 	case string(`GetDocs`):
 		return OperationIDGetDocs, nil
+	case string(`GetSession`):
+		return OperationIDGetSession, nil
 	case string(`GetInfo`):
 		return OperationIDGetInfo, nil
 	case string(`IconGet`):
