@@ -98,10 +98,6 @@ func (w *Assignment) storeRoleAssignmentsCache(ctx context.Context, accountID xi
 	return nil
 }
 
-func (w *Assignment) invalidateRoleIDsCache(ctx context.Context, accountID xid.ID) error {
-	return w.deleteRoleIDsCache(ctx, accountID)
-}
-
 func (w *Assignment) key(accountID xid.ID) string {
 	return cachePrefix + accountID.String()
 }

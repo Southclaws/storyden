@@ -185,13 +185,6 @@ func (r *Hydrator) HydrateRoleEdges(ctx context.Context, accounts ...*ent.Accoun
 	return nil
 }
 
-func (r *Hydrator) HydrateDefaultRoleEdges(ctx context.Context, accounts ...*ent.Account) error {
-	ctx, span := r.ins.Instrument(ctx, kv.Int("accounts_count", len(accounts)))
-	defer span.End()
-
-	return r.HydrateRoleEdges(ctx, accounts...)
-}
-
 func mapRoleToEnt(in *role.Role) *ent.Role {
 	if in == nil {
 		return nil

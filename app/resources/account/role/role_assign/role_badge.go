@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	ent_accountroles "github.com/Southclaws/storyden/internal/ent/accountroles"
-	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 )
 
@@ -29,11 +28,6 @@ func (w *Assignment) SetBadge(ctx context.Context, accountID account_ref.ID, rol
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	predicate := []predicate.AccountRoles{
-		accountroles.AccountIDEQ(xid.ID(accountID)),
-		accountroles.RoleIDEQ(xid.ID(roleID)),
-	}
-
 	// Only one role can be set as a badge, clear all first, then set if true.
 
 	err = tx.AccountRoles.Update().
@@ -46,7 +40,10 @@ func (w *Assignment) SetBadge(ctx context.Context, accountID account_ref.ID, rol
 
 	if badge {
 		err = tx.AccountRoles.Update().
-			Where(predicate...).
+			Where(
+				accountroles.AccountIDEQ(xid.ID(accountID)),
+				accountroles.RoleIDEQ(xid.ID(roleID)),
+			).
 			SetBadge(true).
 			Exec(ctx)
 		if err != nil {
@@ -66,7 +63,7 @@ func (w *Assignment) SetBadge(ctx context.Context, accountID account_ref.ID, rol
 	}
 
 	if err := tx.Commit(); err != nil {
-		_ = w.invalidateRoleIDsCache(ctx, xid.ID(accountID))
+		_ = w.deleteRoleIDsCache(ctx, xid.ID(accountID))
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

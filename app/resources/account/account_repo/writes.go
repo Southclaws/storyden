@@ -161,14 +161,15 @@ func (r *Repository) Update(ctx context.Context, id account.AccountID, opts ...M
 
 	saved, err := update.Save(ctx)
 	if err != nil {
-		if ent.IsConstraintError(err) {
-			return nil, fault.Wrap(err,
-				fctx.With(ctx),
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		} else if ent.IsConstraintError(err) {
+			err = fault.Wrap(err,
 				ftag.With(ftag.AlreadyExists),
 				fmsg.WithDesc("unique constraint violation", "The specified handle has already been used."))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
 	return r.GetByID(ctx, account.AccountID(saved.ID))

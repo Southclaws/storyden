@@ -120,7 +120,6 @@ func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
 		Account:        *ref,
 		Auths:          auths,
 		EmailAddresses: emails,
-		VerifiedStatus: ref.VerifiedStatus,
 		InvitedBy:      invitedBy,
 		ExternalLinks:  links,
 	}, nil

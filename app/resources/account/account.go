@@ -44,7 +44,6 @@ type AccountWithEdges struct {
 	Account
 	Auths          []string
 	EmailAddresses []*EmailAddress
-	VerifiedStatus VerifiedStatus
 	InvitedBy      opt.Optional[Account]
 	ExternalLinks  []ExternalLink
 }

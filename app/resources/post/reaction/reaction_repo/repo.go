@@ -125,8 +125,12 @@ func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID
 }
 
 func (w *Writer) Remove(ctx context.Context, accountID account.AccountID, reactID reaction.ReactID) error {
-	err := w.db.React.
-		DeleteOneID(xid.ID(reactID)).
+	_, err := w.db.React.
+		Delete().
+		Where(
+			react.ID(xid.ID(reactID)),
+			react.AccountID(xid.ID(accountID)),
+		).
 		Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

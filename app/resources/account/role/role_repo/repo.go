@@ -127,6 +127,10 @@ func (r *Repository) Update(ctx context.Context, id role.RoleID, opts ...Mutatio
 
 	row, err := update.Save(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -315,6 +319,10 @@ func (r *Repository) Delete(ctx context.Context, id role.RoleID) error {
 
 	err = tx.Role.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			err = fault.Wrap(err, ftag.With(ftag.NotFound))
+		}
+
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -546,11 +554,8 @@ func (r *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*ro
 			opt(mutate)
 		}
 
-		if perms, ok := mutate.Permissions(); ok {
-			list, _ := rbac.NewPermissions(perms)
-			if list.HasAnyWrite() {
-				return nil, fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-			}
+		if err := validateGuestPermissionsMutation(ctx, mutate); err != nil {
+			return nil, err
 		}
 
 		row, err := create.Save(ctx)
@@ -575,11 +580,8 @@ func (r *Repository) updateGuestRole(ctx context.Context, opts ...Mutation) (*ro
 		opt(mutate)
 	}
 
-	if perms, ok := mutate.Permissions(); ok {
-		list, _ := rbac.NewPermissions(perms)
-		if list.HasAnyWrite() {
-			return nil, fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-		}
+	if err := validateGuestPermissionsMutation(ctx, mutate); err != nil {
+		return nil, err
 	}
 
 	row, err := update.Save(ctx)
@@ -628,6 +630,30 @@ func (r *Repository) nextCustomSortKey(ctx context.Context) (float64, error) {
 	})
 
 	return customRoles[len(customRoles)-1].SortKey + 1, nil
+}
+
+func validateGuestPermissionsMutation(ctx context.Context, mutate *ent.RoleMutation) error {
+	if perms, ok := mutate.Permissions(); ok {
+		list, err := rbac.NewPermissions(perms)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		if list.HasAnyWrite() {
+			return fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+
+	if perms, ok := mutate.AppendedPermissions(); ok && len(perms) > 0 {
+		list, err := rbac.NewPermissions(perms)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		if list.HasAnyWrite() {
+			return fault.Wrap(ErrWritePermissionsNotAllowed, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+
+	return nil
 }
 
 func adminPermissionsMutationSubmitted(mutate *ent.RoleMutation) bool {

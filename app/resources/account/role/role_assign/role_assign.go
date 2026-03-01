@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -100,7 +101,11 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, 
 	}
 
 	_, err = update.Save(ctx)
-	if err != nil && !ent.IsConstraintError(err) {
+	if err != nil {
+		if ent.IsConstraintError(err) {
+			return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -116,7 +121,7 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account_ref.ID, 
 	}
 
 	if err := tx.Commit(); err != nil {
-		_ = w.invalidateRoleIDsCache(ctx, xid.ID(accountID))
+		_ = w.deleteRoleIDsCache(ctx, xid.ID(accountID))
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

@@ -137,6 +137,9 @@ func (r *Repository) refreshCachedRoles(ctx context.Context, acc *account.Accoun
 	ctx, span := r.ins.Instrument(ctx, kv.String("account_id", acc.ID.String()))
 	defer span.End()
 
+	// Intentionally hydrate against a minimal synthetic account so we can
+	// refresh role edges from cache-backed repositories without reloading the
+	// full account. The hydrator only needs ID, CreatedAt and Admin for this.
 	hydrationTarget := &ent.Account{
 		ID:        xid.ID(acc.ID),
 		CreatedAt: acc.CreatedAt,

@@ -2,6 +2,7 @@ package email
 
 import (
 	"context"
+	"log/slog"
 	"net/mail"
 
 	"github.com/Southclaws/fault"
@@ -59,9 +60,7 @@ func (r *Repository) Add(ctx context.Context,
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		r.trySyncVerifiedStatus(ctx, accountID)
 
 		return account.MapEmail(updated), nil
 	}
@@ -81,9 +80,7 @@ func (r *Repository) Add(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	r.trySyncVerifiedStatus(ctx, accountID)
 
 	return account.MapEmail(result), nil
 }
@@ -141,9 +138,7 @@ func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, em
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	r.trySyncVerifiedStatus(ctx, accountID)
 
 	return nil
 }
@@ -199,14 +194,12 @@ func (r *Repository) Remove(ctx context.Context, accountID account.AccountID, em
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.syncAccountVerifiedStatus(ctx, accountID); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	r.trySyncVerifiedStatus(ctx, accountID)
 
 	return nil
 }
 
-func (r *Repository) syncAccountVerifiedStatus(ctx context.Context, accountID account.AccountID) error {
+func (r *Repository) syncVerifiedStatus(ctx context.Context, accountID account.AccountID) error {
 	verified, err := r.db.Email.Query().
 		Where(
 			email_ent.AccountID(xid.ID(accountID)),
@@ -228,4 +221,13 @@ func (r *Repository) syncAccountVerifiedStatus(ctx context.Context, accountID ac
 	}
 
 	return nil
+}
+
+func (r *Repository) trySyncVerifiedStatus(ctx context.Context, accountID account.AccountID) {
+	if err := r.syncVerifiedStatus(ctx, accountID); err != nil {
+		slog.Error("failed to sync account verified status",
+			slog.String("account_id", accountID.String()),
+			slog.String("error", err.Error()),
+		)
+	}
 }

@@ -76,6 +76,11 @@ func (w *Assignment) ResolveRoleIDsFresh(ctx context.Context, accountIDs []xid.I
 	byAccountRows := lo.GroupBy(accountRoles, func(ar *ent.AccountRoles) xid.ID { return ar.AccountID })
 	for _, accountID := range accountIDs {
 		rows := byAccountRows[accountID]
+		if rows == nil {
+			rows = []*ent.AccountRoles{}
+			byAccountRows[accountID] = rows
+		}
+
 		roleIDs := dt.Map(rows, func(ar *ent.AccountRoles) xid.ID { return ar.RoleID })
 		idsByAccount[accountID] = roleIDs
 		if err := w.storeRoleAssignmentsCache(ctx, accountID, rows); err != nil {
