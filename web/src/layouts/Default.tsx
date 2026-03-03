@@ -2,6 +2,8 @@ import { PropsWithChildren, ReactNode } from "react";
 
 import { Navigation } from "src/components/site/Navigation/Navigation";
 
+import { MotdBanner } from "@/components/site/MotdBanner/MotdBanner";
+import { getSettings } from "@/lib/settings/settings-server";
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -12,6 +14,8 @@ export async function Default({
   contextpane,
   children,
 }: PropsWithChildren<Props>) {
+  const settings = await getSettings();
+
   return (
     <Flex
       minHeight="dvh"
@@ -27,6 +31,7 @@ export async function Default({
           height="full"
           minW="0"
         >
+          <MotdBanner motd={settings.motd} />
           {children}
           <Box height="24"></Box>
         </styled.main>

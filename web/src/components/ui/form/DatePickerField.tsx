@@ -1,3 +1,4 @@
+import { type DateValue, parseDate } from "@internationalized/date";
 import { DatePickerValueChangeDetails } from "@ark-ui/react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
@@ -11,13 +12,11 @@ export function DatePickerInputField<T extends FieldValues>({
   return (
     <Controller<T>
       {...controllerProps}
-      render={({ formState, field }) => {
-        const defaultValue = formState.defaultValues![controllerProps.name];
-
+      render={({ field }) => {
         function handleChange({ value }: DatePickerValueChangeDetails) {
           const first = value[0];
           if (!first) {
-            field.onChange(undefined);
+            field.onChange("");
             return;
           }
 
@@ -26,9 +25,22 @@ export function DatePickerInputField<T extends FieldValues>({
           field.onChange(changeValue);
         }
 
+        function parseValue(value: unknown): DateValue[] | undefined {
+          if (typeof value !== "string" || value.trim() === "") return undefined;
+
+          try {
+            const datePart = value.split("T")[0];
+            if (!datePart) return undefined;
+            return [parseDate(datePart)];
+          } catch {
+            return undefined;
+          }
+        }
+        const fieldValue = parseValue(field.value);
+
         return (
           <DatePicker
-            defaultValue={defaultValue}
+            value={fieldValue ?? []}
             onValueChange={handleChange}
           />
         );

@@ -19,7 +19,7 @@ export const alert = defineSlotRecipe({
       gap: "1",
     },
     description: {
-      color: "fg.muted",
+      color: "fg.subtle",
       textStyle: "sm",
     },
     icon: {

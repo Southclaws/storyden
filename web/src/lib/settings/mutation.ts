@@ -12,6 +12,8 @@ import {
   AdminSettingsMutableProps,
   AdminSettingsProps,
   Info,
+  MessageOfTheDay,
+  MessageOfTheDayMutableProps,
 } from "@/api/openapi-schema";
 
 import { AdminSettings } from "./settings";
@@ -51,11 +53,12 @@ export function useSettingsMutation() {
           key: infoKey,
           optimistic: (current: Info | undefined) => {
             if (!current) return current;
-            const { services, ...publicPatch } = patch;
+            const { services, motd, ...publicPatch } = patch;
 
             return {
               ...current,
               ...publicPatch,
+              motd: mergeMotd(current.motd, motd),
               metadata: {
                 ...current.metadata,
                 ...patch.metadata,
@@ -87,5 +90,37 @@ function adminToInfo(admin: AdminSettingsProps): Info {
     ...admin,
     capabilities: admin.capabilities ?? [],
     onboarding_status: "complete",
+  };
+}
+
+function mergeMotd(
+  current: MessageOfTheDay | undefined,
+  patch: MessageOfTheDayMutableProps | undefined,
+): MessageOfTheDay | undefined {
+  if (patch === undefined) {
+    return current;
+  }
+
+  // Sending an empty object is used by admin settings as an explicit clear.
+  if (Object.keys(patch).length === 0) {
+    return undefined;
+  }
+
+  const content = patch.content ?? current?.content;
+  if (content === undefined) {
+    return current;
+  }
+
+  return {
+    ...current,
+    ...patch,
+    content,
+    metadata:
+      patch.metadata || current?.metadata
+        ? {
+            ...(current?.metadata ?? {}),
+            ...(patch.metadata ?? {}),
+          }
+        : undefined,
   };
 }

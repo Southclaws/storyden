@@ -1,7 +1,11 @@
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 
-import type { AdminSettingsProps, Info } from "@/api/openapi-schema";
+import type {
+  AdminSettingsProps,
+  Info,
+  MessageOfTheDay,
+} from "@/api/openapi-schema";
 import { AuthMode } from "@/api/openapi-schema";
 
 import {
@@ -105,6 +109,32 @@ test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
   assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
+});
+
+test("parseSettings keeps valid motd metadata type", () => {
+  const parsed = parseSettings(
+    baseInfo({
+      motd: {
+        content: "<p>hi</p>",
+        metadata: { type: "alert" },
+      },
+    }),
+  );
+
+  assert.equal(parsed.motd?.metadata?.type, "alert");
+});
+
+test("parseSettings drops invalid motd metadata type", () => {
+  const parsed = parseSettings(
+    baseInfo({
+      motd: {
+        content: "<p>hi</p>",
+        metadata: { type: "invalid" } as unknown as Info["metadata"],
+      } as MessageOfTheDay,
+    }),
+  );
+
+  assert.equal(parsed.motd?.metadata, undefined);
 });
 
 test.run();

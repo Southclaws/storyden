@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AuthMode } from "./authMode";
 import type { InstanceCapabilityList } from "./instanceCapabilityList";
+import type { MessageOfTheDay } from "./messageOfTheDay";
 import type { Metadata } from "./metadata";
 import type { OnboardingStatus } from "./onboardingStatus";
 import type { PostContent } from "./postContent";
@@ -23,6 +24,7 @@ export interface Info {
   content: PostContent;
   description: string;
   metadata?: Metadata;
+  motd?: MessageOfTheDay;
   onboarding_status: OnboardingStatus;
   title: string;
 }

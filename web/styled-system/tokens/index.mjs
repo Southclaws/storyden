@@ -3659,6 +3659,230 @@ const tokens = {
     "value": "var(--colors-blue-text)",
     "variable": "var(--colors-blue-text)"
   },
+  "colors.green.1": {
+    "value": "var(--colors-green-1)",
+    "variable": "var(--colors-green-1)"
+  },
+  "colors.green.2": {
+    "value": "var(--colors-green-2)",
+    "variable": "var(--colors-green-2)"
+  },
+  "colors.green.3": {
+    "value": "var(--colors-green-3)",
+    "variable": "var(--colors-green-3)"
+  },
+  "colors.green.4": {
+    "value": "var(--colors-green-4)",
+    "variable": "var(--colors-green-4)"
+  },
+  "colors.green.5": {
+    "value": "var(--colors-green-5)",
+    "variable": "var(--colors-green-5)"
+  },
+  "colors.green.6": {
+    "value": "var(--colors-green-6)",
+    "variable": "var(--colors-green-6)"
+  },
+  "colors.green.7": {
+    "value": "var(--colors-green-7)",
+    "variable": "var(--colors-green-7)"
+  },
+  "colors.green.8": {
+    "value": "var(--colors-green-8)",
+    "variable": "var(--colors-green-8)"
+  },
+  "colors.green.9": {
+    "value": "var(--colors-green-9)",
+    "variable": "var(--colors-green-9)"
+  },
+  "colors.green.10": {
+    "value": "var(--colors-green-10)",
+    "variable": "var(--colors-green-10)"
+  },
+  "colors.green.11": {
+    "value": "var(--colors-green-11)",
+    "variable": "var(--colors-green-11)"
+  },
+  "colors.green.12": {
+    "value": "var(--colors-green-12)",
+    "variable": "var(--colors-green-12)"
+  },
+  "colors.green.a1": {
+    "value": "var(--colors-green-a1)",
+    "variable": "var(--colors-green-a1)"
+  },
+  "colors.green.a2": {
+    "value": "var(--colors-green-a2)",
+    "variable": "var(--colors-green-a2)"
+  },
+  "colors.green.a3": {
+    "value": "var(--colors-green-a3)",
+    "variable": "var(--colors-green-a3)"
+  },
+  "colors.green.a4": {
+    "value": "var(--colors-green-a4)",
+    "variable": "var(--colors-green-a4)"
+  },
+  "colors.green.a5": {
+    "value": "var(--colors-green-a5)",
+    "variable": "var(--colors-green-a5)"
+  },
+  "colors.green.a6": {
+    "value": "var(--colors-green-a6)",
+    "variable": "var(--colors-green-a6)"
+  },
+  "colors.green.a7": {
+    "value": "var(--colors-green-a7)",
+    "variable": "var(--colors-green-a7)"
+  },
+  "colors.green.a8": {
+    "value": "var(--colors-green-a8)",
+    "variable": "var(--colors-green-a8)"
+  },
+  "colors.green.a9": {
+    "value": "var(--colors-green-a9)",
+    "variable": "var(--colors-green-a9)"
+  },
+  "colors.green.a10": {
+    "value": "var(--colors-green-a10)",
+    "variable": "var(--colors-green-a10)"
+  },
+  "colors.green.a11": {
+    "value": "var(--colors-green-a11)",
+    "variable": "var(--colors-green-a11)"
+  },
+  "colors.green.a12": {
+    "value": "var(--colors-green-a12)",
+    "variable": "var(--colors-green-a12)"
+  },
+  "colors.green.default": {
+    "value": "var(--colors-green-default)",
+    "variable": "var(--colors-green-default)"
+  },
+  "colors.green.emphasized": {
+    "value": "var(--colors-green-emphasized)",
+    "variable": "var(--colors-green-emphasized)"
+  },
+  "colors.green.fg": {
+    "value": "var(--colors-green-fg)",
+    "variable": "var(--colors-green-fg)"
+  },
+  "colors.green.text": {
+    "value": "var(--colors-green-text)",
+    "variable": "var(--colors-green-text)"
+  },
+  "colors.red.1": {
+    "value": "var(--colors-red-1)",
+    "variable": "var(--colors-red-1)"
+  },
+  "colors.red.2": {
+    "value": "var(--colors-red-2)",
+    "variable": "var(--colors-red-2)"
+  },
+  "colors.red.3": {
+    "value": "var(--colors-red-3)",
+    "variable": "var(--colors-red-3)"
+  },
+  "colors.red.4": {
+    "value": "var(--colors-red-4)",
+    "variable": "var(--colors-red-4)"
+  },
+  "colors.red.5": {
+    "value": "var(--colors-red-5)",
+    "variable": "var(--colors-red-5)"
+  },
+  "colors.red.6": {
+    "value": "var(--colors-red-6)",
+    "variable": "var(--colors-red-6)"
+  },
+  "colors.red.7": {
+    "value": "var(--colors-red-7)",
+    "variable": "var(--colors-red-7)"
+  },
+  "colors.red.8": {
+    "value": "var(--colors-red-8)",
+    "variable": "var(--colors-red-8)"
+  },
+  "colors.red.9": {
+    "value": "var(--colors-red-9)",
+    "variable": "var(--colors-red-9)"
+  },
+  "colors.red.10": {
+    "value": "var(--colors-red-10)",
+    "variable": "var(--colors-red-10)"
+  },
+  "colors.red.11": {
+    "value": "var(--colors-red-11)",
+    "variable": "var(--colors-red-11)"
+  },
+  "colors.red.12": {
+    "value": "var(--colors-red-12)",
+    "variable": "var(--colors-red-12)"
+  },
+  "colors.red.a1": {
+    "value": "var(--colors-red-a1)",
+    "variable": "var(--colors-red-a1)"
+  },
+  "colors.red.a2": {
+    "value": "var(--colors-red-a2)",
+    "variable": "var(--colors-red-a2)"
+  },
+  "colors.red.a3": {
+    "value": "var(--colors-red-a3)",
+    "variable": "var(--colors-red-a3)"
+  },
+  "colors.red.a4": {
+    "value": "var(--colors-red-a4)",
+    "variable": "var(--colors-red-a4)"
+  },
+  "colors.red.a5": {
+    "value": "var(--colors-red-a5)",
+    "variable": "var(--colors-red-a5)"
+  },
+  "colors.red.a6": {
+    "value": "var(--colors-red-a6)",
+    "variable": "var(--colors-red-a6)"
+  },
+  "colors.red.a7": {
+    "value": "var(--colors-red-a7)",
+    "variable": "var(--colors-red-a7)"
+  },
+  "colors.red.a8": {
+    "value": "var(--colors-red-a8)",
+    "variable": "var(--colors-red-a8)"
+  },
+  "colors.red.a9": {
+    "value": "var(--colors-red-a9)",
+    "variable": "var(--colors-red-a9)"
+  },
+  "colors.red.a10": {
+    "value": "var(--colors-red-a10)",
+    "variable": "var(--colors-red-a10)"
+  },
+  "colors.red.a11": {
+    "value": "var(--colors-red-a11)",
+    "variable": "var(--colors-red-a11)"
+  },
+  "colors.red.a12": {
+    "value": "var(--colors-red-a12)",
+    "variable": "var(--colors-red-a12)"
+  },
+  "colors.red.default": {
+    "value": "var(--colors-red-default)",
+    "variable": "var(--colors-red-default)"
+  },
+  "colors.red.emphasized": {
+    "value": "var(--colors-red-emphasized)",
+    "variable": "var(--colors-red-emphasized)"
+  },
+  "colors.red.fg": {
+    "value": "var(--colors-red-fg)",
+    "variable": "var(--colors-red-fg)"
+  },
+  "colors.red.text": {
+    "value": "var(--colors-red-text)",
+    "variable": "var(--colors-red-text)"
+  },
   "colors.overflow-fade": {
     "value": "var(--colors-overflow-fade)",
     "variable": "var(--colors-overflow-fade)"
