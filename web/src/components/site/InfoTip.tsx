@@ -1,5 +1,6 @@
 import { PropsWithChildren } from "react";
 
+import { Portal } from "@ark-ui/react";
 import { IconButton } from "@/components/ui/icon-button";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import * as Popover from "@/components/ui/popover";
@@ -17,17 +18,19 @@ export function InfoTip({ title, children }: PropsWithChildren<Props>) {
           <InfoIcon />
         </IconButton>
       </Popover.Trigger>
-      <Popover.Positioner>
-        <Popover.Content>
-          <Popover.Arrow>
-            <Popover.ArrowTip />
-          </Popover.Arrow>
-          <LStack gap="1">
-            <Popover.Title>{title}</Popover.Title>
-            <Popover.Description>{children}</Popover.Description>
-          </LStack>
-        </Popover.Content>
-      </Popover.Positioner>
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content>
+            <Popover.Arrow>
+              <Popover.ArrowTip />
+            </Popover.Arrow>
+            <LStack gap="1">
+              <Popover.Title>{title}</Popover.Title>
+              <Popover.Description>{children}</Popover.Description>
+            </LStack>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
     </Popover.Root>
   );
 }
