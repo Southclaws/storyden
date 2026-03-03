@@ -12,7 +12,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 const (
@@ -30,17 +29,11 @@ func New(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	store cache.Store,
-	bus *pubsub.Bus,
 ) *Cache {
 	c := &Cache{
 		store: store,
 		clock: time.Now,
 	}
-
-	register := func(hook fx.Hook) { lc.Append(hook) }
-	register(fx.StartHook(func(hctx context.Context) error {
-		return c.subscribe(ctx, bus)
-	}))
 
 	return c
 }

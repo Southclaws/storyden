@@ -110,6 +110,10 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Store(ctx, cat.Slug, cat.UpdatedAt); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	s.bus.Publish(ctx, &message.EventCategoryUpdated{Slug: cat.Slug})
 
 	return cat, nil
