@@ -25,13 +25,13 @@ type version struct {
 	one     int  // always v1
 	year    int  // two-digit year
 	release int  // release identifier
-	canary  bool // true if not a release but a canary build
+	post    bool // true if not a release but a post build
 }
 
 func (v *version) String() string {
 	str := fmt.Sprintf("v%d.%02d.%d", v.one, v.year, v.release)
-	if v.canary {
-		str += "-canary"
+	if v.post {
+		str += "-post"
 	}
 	return str
 }
@@ -132,8 +132,8 @@ func runNext(current version, write bool) error {
 	return nil
 }
 
-func runCanary(current version) error {
-	current.canary = true
+func runPostRelease(current version) error {
+	current.post = true
 	if err := writeVersion(current); err != nil {
 		return fmt.Errorf("failed to write new version: %w", err)
 	}
@@ -141,15 +141,15 @@ func runCanary(current version) error {
 	return nil
 }
 
-func run(write, canary bool) error {
+func run(write, post bool) error {
 	current, err := getCurrent()
 	if err != nil {
 		return fmt.Errorf("failed to get current version: %w", err)
 	}
 
-	if canary {
-		if err := runCanary(*current); err != nil {
-			return fmt.Errorf("failed to run canary version: %w", err)
+	if post {
+		if err := runPostRelease(*current); err != nil {
+			return fmt.Errorf("failed to run post version: %w", err)
 		}
 	} else {
 		if err := runNext(*current, write); err != nil {
@@ -162,10 +162,10 @@ func run(write, canary bool) error {
 
 func main() {
 	write := flag.Bool("w", false, "Write the new version to files")
-	canary := flag.Bool("c", false, "For post-release run, run this script again with -c to write a canary version to files")
+	post := flag.Bool("c", false, "For post-release run, run this script again with -c to write a post version to files")
 	flag.Parse()
 
-	if err := run(*write, *canary); err != nil {
+	if err := run(*write, *post); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to run release script: %v\n", err)
 		os.Exit(1)
 	}

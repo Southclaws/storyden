@@ -51,7 +51,7 @@ Storyden releases tagged versions using a simple version number which applies to
 
 This format was chosen for compatibility with package/app registries and developer expectations, but it does not follow semantic versioning, it's more of a "build number" similar to how video games are versioned.
 
-Outside of a release commit/image, version numbers inside files and the API will be suffixed with `-canary` to indicate you're off a stable release.
+Outside of a release commit/image, version numbers inside files and the API will be suffixed with `-post` to indicate you're off a stable release.
 
 ## What can it do
 
