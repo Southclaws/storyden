@@ -1,6 +1,9 @@
 import { defineSemanticTokens } from "@pandacss/dev";
 
+import amber from "@/theme/base/colours/amber";
 import blue from "@/theme/base/colours/blue";
+import green from "@/theme/base/colours/green";
+import red from "@/theme/base/colours/red";
 
 import { accent } from "./accent";
 import { bg } from "./bg";
@@ -18,6 +21,8 @@ export const colours = defineSemanticTokens.colors({
   accent,
 
   blue: blue.semanticTokens,
+  green: green.semanticTokens,
+  red: red.semanticTokens,
 
   cardBackgroundGradient: {
     value: "linear-gradient(90deg, var(--colors-bg), transparent)",

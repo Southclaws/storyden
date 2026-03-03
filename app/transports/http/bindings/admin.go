@@ -84,6 +84,32 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	var motd opt.Optional[settings.MessageOfTheDay]
+	if request.Body.Motd != nil {
+		// An explicitly empty MOTD object is interpreted as a clear request.
+		if request.Body.Motd.Content == nil &&
+			request.Body.Motd.StartAt == nil &&
+			request.Body.Motd.EndAt == nil &&
+			request.Body.Motd.Metadata == nil {
+			motd = opt.New(settings.MessageOfTheDay{})
+		} else {
+			var motdBody datagraph.Content
+			if request.Body.Motd.Content != nil {
+				motdBody, err = datagraph.NewRichText(*request.Body.Motd.Content)
+				if err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx))
+				}
+			}
+
+			motd = opt.New(settings.MessageOfTheDay{
+				Content:  motdBody,
+				StartAt:  opt.NewPtr(request.Body.Motd.StartAt),
+				EndAt:    opt.NewPtr(request.Body.Motd.EndAt),
+				Metadata: opt.NewPtr((*map[string]any)(request.Body.Motd.Metadata)),
+			})
+		}
+	}
+
 	var services opt.Optional[settings.ServiceSettings]
 	if request.Body.Services != nil {
 		var rateLimit opt.Optional[settings.RateLimitServiceSettings]
@@ -126,6 +152,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		AuthenticationMode: authMode,
 		Services:           services,
 		Metadata:           opt.NewPtr((*map[string]any)(request.Body.Metadata)),
+		Motd:               motd,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -382,6 +409,16 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		Services:           opt.Map(in.Services, serialiseServiceSettings).Ptr(),
 		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
+		Motd:               opt.Map(in.Motd, serialiseMOTD).Ptr(),
+	}
+}
+
+func serialiseMOTD(in settings.MessageOfTheDay) openapi.MessageOfTheDay {
+	return openapi.MessageOfTheDay{
+		Content:  in.Content.HTML(),
+		StartAt:  in.StartAt.Ptr(),
+		EndAt:    in.EndAt.Ptr(),
+		Metadata: (*openapi.Metadata)(in.Metadata.Ptr()),
 	}
 }
 

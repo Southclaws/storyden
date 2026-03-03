@@ -299,6 +299,8 @@ export * from "./linkTitle";
 export * from "./mark";
 export * from "./memberJoinedDate";
 export * from "./memberSuspendedDate";
+export * from "./messageOfTheDay";
+export * from "./messageOfTheDayMutableProps";
 export * from "./metadata";
 export * from "./moderationActionCreateBody";
 export * from "./moderationActionCreatePurgeAccount";

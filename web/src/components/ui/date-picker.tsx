@@ -15,6 +15,7 @@ import { IconButton } from "./icon-button";
 import { CalendarIcon } from "./icons/Calendar";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons/Chevron";
 import { Input as UIInput } from "./input";
+import { formatISODate, parseISODate } from "./date-picker-iso";
 
 const { withProvider, withContext } = createStyleContext(datePicker);
 
@@ -157,11 +158,13 @@ export const DatePicker = (props: ArkDatePicker.RootBaseProps) => {
       positioning={{ sameWidth: true }}
       startOfWeek={1}
       selectionMode="single"
+      format={formatISODate}
+      parse={parseISODate}
       {...props}
     >
       <Control>
         <Input index={0} asChild>
-          <UIInput />
+          <UIInput placeholder="YYYY-MM-DD" />
         </Input>
         <Trigger asChild>
           <IconButton
@@ -333,16 +336,18 @@ export const DateRangePicker = ({
       positioning={{ sameWidth: true }}
       startOfWeek={1}
       selectionMode="range"
+      format={formatISODate}
+      parse={parseISODate}
       {...props}
     >
       <Control>
         {!hideInputs && (
           <>
             <Input index={0} asChild>
-              <UIInput size="sm" placeholder="Start date" />
+              <UIInput size="sm" placeholder="YYYY-MM-DD" />
             </Input>
             <Input index={1} asChild>
-              <UIInput size="sm" placeholder="End date" />
+              <UIInput size="sm" placeholder="YYYY-MM-DD" />
             </Input>
           </>
         )}

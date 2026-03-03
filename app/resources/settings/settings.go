@@ -42,6 +42,17 @@ type Settings struct {
 	// Metadata is an arbitrary object which can be used by frontends/clients to
 	// store vendor-specific configuration to control the client implementation.
 	Metadata opt.Optional[map[string]any]
+
+	// Motd is an optional announcement banner shown to all site visitors.
+	Motd opt.Optional[MessageOfTheDay]
+}
+
+// MessageOfTheDay is a date-bound rich text announcement.
+type MessageOfTheDay struct {
+	Content  datagraph.Content
+	StartAt  opt.Optional[time.Time]
+	EndAt    opt.Optional[time.Time]
+	Metadata opt.Optional[map[string]any]
 }
 
 type ServiceSettings struct {
@@ -67,6 +78,19 @@ type ModerationServiceSettings struct {
 
 // Merge will combine "updated" into "s" while overwriting any new values.
 func (s *Settings) Merge(updated Settings) error {
+	if updated.Motd.Ok() {
+		next := updated.Motd.OrZero()
+
+		// A fully empty MOTD patch is used to clear the existing announcement.
+		if next.Content.IsEmpty() &&
+			!next.StartAt.Ok() &&
+			!next.EndAt.Ok() &&
+			!next.Metadata.Ok() {
+			s.Motd = opt.NewEmpty[MessageOfTheDay]()
+			updated.Motd = opt.NewEmpty[MessageOfTheDay]()
+		}
+	}
+
 	err := mergo.Merge(s, &updated, mergo.WithOverride)
 	if err != nil {
 		return err

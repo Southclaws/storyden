@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { AdminSettingsProps, AuthMode, Info } from "@/api/openapi-schema";
+import {
+  AdminSettingsProps,
+  AuthMode,
+  Info,
+  MessageOfTheDay,
+} from "@/api/openapi-schema";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { EditorSettingsSchema } from "./editor";
@@ -10,6 +15,20 @@ import { DefaultSidebarSettings, SidebarSettingsSchema } from "./sidebar";
 export const DefaultEditorSettings = {
   mode: "richtext" as const,
 } as const;
+
+export const MotdAlertTypeSchema = z.enum([
+  "celebration",
+  "information",
+  "alert",
+]);
+export type MotdAlertType = z.infer<typeof MotdAlertTypeSchema>;
+
+export const MotdMetadataSchema = z
+  .object({
+    type: MotdAlertTypeSchema,
+  })
+  .passthrough();
+export type MotdMetadata = z.infer<typeof MotdMetadataSchema>;
 
 export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
@@ -51,12 +70,17 @@ export type FrontendConfiguration = z.infer<typeof FrontendConfigurationSchema>;
 export type SignatureConfig = FrontendConfiguration["signatures"];
 
 // Settings is the union of the backend typed config and the frontend config.
-export type Settings = Info & {
+export type ParsedMotd = Omit<MessageOfTheDay, "metadata"> & {
+  metadata?: MotdMetadata;
+};
+export type Settings = Omit<Info, "motd"> & {
+  motd?: ParsedMotd;
   metadata: FrontendConfiguration;
 };
 
 // AdminSettings is non-public administration settings + parsed metadata config.
-export type AdminSettings = AdminSettingsProps & {
+export type AdminSettings = Omit<AdminSettingsProps, "motd"> & {
+  motd?: ParsedMotd;
   metadata: FrontendConfiguration;
 };
 
@@ -67,7 +91,11 @@ export function parseSettings(data: Info): Settings {
     console.warn("Failed to parse frontend configuration:", parsed.error);
   }
 
-  const settings = { ...data, metadata } satisfies Settings;
+  const settings = {
+    ...data,
+    metadata,
+    motd: parseMotd(data.motd),
+  } satisfies Settings;
 
   return settings;
 }
@@ -79,7 +107,22 @@ export function parseAdminSettings(data: AdminSettingsProps): AdminSettings {
     console.warn("Failed to parse frontend configuration:", parsed.error);
   }
 
-  const settings = { ...data, metadata } satisfies AdminSettings;
+  const settings = {
+    ...data,
+    metadata,
+    motd: parseMotd(data.motd),
+  } satisfies AdminSettings;
 
   return settings;
+}
+
+function parseMotd(motd: MessageOfTheDay | undefined): ParsedMotd | undefined {
+  if (!motd) return undefined;
+
+  const parsed = MotdMetadataSchema.safeParse(motd.metadata);
+
+  return {
+    ...motd,
+    metadata: parsed.success ? parsed.data : undefined,
+  };
 }

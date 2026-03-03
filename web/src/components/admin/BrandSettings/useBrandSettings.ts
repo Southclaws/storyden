@@ -8,23 +8,51 @@ import { getColourVariants } from "src/utils/colour";
 
 import { handle } from "@/api/client";
 import { useSettingsMutation } from "@/lib/settings/mutation";
-import { Settings } from "@/lib/settings/settings";
+import { MotdAlertTypeSchema, Settings } from "@/lib/settings/settings";
 import { getIconURL } from "@/utils/icon";
 
 export type Props = {
   settings: Settings;
 };
 
-export const FormSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  content: z.string().optional(),
-  accentColour: z.string(),
-});
+export const FormSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    content: z.string().optional(),
+    accentColour: z.string(),
+    motdContent: z.string().optional(),
+    motdStartAt: z.string().optional(),
+    motdEndAt: z.string().optional(),
+    motdType: MotdAlertTypeSchema.optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.motdStartAt || !data.motdEndAt) {
+        return true;
+      }
+
+      const start = new Date(data.motdStartAt).getTime();
+      const end = new Date(data.motdEndAt).getTime();
+      if (Number.isNaN(start) || Number.isNaN(end)) {
+        return true;
+      }
+
+      return start <= end;
+    },
+    {
+      message: "MOTD end date must be after start date.",
+      path: ["motdEndAt"],
+    },
+  );
 export type Form = z.infer<typeof FormSchema>;
 
 export function useBrandSettings({ settings }: Props) {
   const { revalidate, updateSettings } = useSettingsMutation();
+  const [motdContentInitialValue, setMotdContentInitialValue] = useState<
+    string | undefined
+  >(settings.motd?.content);
+  const [motdContentResetKey, setMotdContentResetKey] = useState<string>();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,6 +60,10 @@ export function useBrandSettings({ settings }: Props) {
       description: settings.description,
       content: settings.content,
       accentColour: settings.accent_colour,
+      motdContent: settings.motd?.content,
+      motdStartAt: settings.motd?.start_at,
+      motdEndAt: settings.motd?.end_at,
+      motdType: settings.motd?.metadata?.type,
     },
   });
   const [currentIcon, setCurrentIcon] = useState<File | undefined>(undefined);
@@ -65,12 +97,27 @@ export function useBrandSettings({ settings }: Props) {
   const onSubmit = form.handleSubmit(async (data) => {
     handle(
       async () => {
-        updateColour(data.accentColour);
+        const motdType = data["motdType"];
+        updateColour(data["accentColour"]);
+        const hasMotd =
+          Boolean(data["motdContent"]?.trim()) ||
+          Boolean(data["motdStartAt"]) ||
+          Boolean(data["motdEndAt"]) ||
+          Boolean(motdType);
+
         await updateSettings({
-          title: data.title,
-          description: data.description,
-          content: data.content,
-          accent_colour: data.accentColour,
+          title: data["title"],
+          description: data["description"],
+          content: data["content"],
+          accent_colour: data["accentColour"],
+          motd: hasMotd
+            ? {
+                content: data["motdContent"],
+                start_at: toISODateTime(data["motdStartAt"]),
+                end_at: toISODateTime(data["motdEndAt"]),
+                metadata: motdType ? { type: motdType } : undefined,
+              }
+            : {},
         });
       },
       {
@@ -100,7 +147,40 @@ export function useBrandSettings({ settings }: Props) {
 
   const onContrastChange = (v: number) => {
     setContrast(v);
-    updateColour(form.getValues().accentColour);
+    updateColour(form.getValues("accentColour"));
+  };
+
+  const onClearMotdDates = () => {
+    form.setValue("motdStartAt", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue("motdEndAt", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
+  const onClearMotd = () => {
+    form.setValue("motdContent", undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue("motdStartAt", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue("motdEndAt", "", {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    form.setValue("motdType", undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    setMotdContentInitialValue(undefined);
+    setMotdContentResetKey(String(Date.now()));
   };
 
   return {
@@ -112,6 +192,19 @@ export function useBrandSettings({ settings }: Props) {
     onSaveIcon,
     onColourChangePreview,
     onContrastChange,
+    onClearMotdDates,
+    onClearMotd,
+    motdContentInitialValue,
+    motdContentResetKey,
     contrast,
   };
+}
+
+function toISODateTime(value?: string): string | undefined {
+  if (!value) return undefined;
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+
+  return parsed.toISOString();
 }

@@ -24,7 +24,7 @@ export function SelectField<
   T extends FieldValues,
   Item extends ListCollectionItem,
 >({ collection, placeholder, ...controllerProps }: SelectFieldProps<T, Item>) {
-  const defaultValue = controllerProps.defaultValue as string;
+  const defaultValue = controllerProps.defaultValue as string | undefined;
 
   return (
     <Controller<T>
@@ -32,16 +32,15 @@ export function SelectField<
       render={({ field, formState, fieldState }) => {
         function handleChange({ value }: SelectValueChangeDetails) {
           const [v] = value;
-          if (!v) return;
-          field.onChange(v);
+          field.onChange(v ?? undefined);
         }
 
         return (
           <Select.Root
             minW="max"
             size="sm"
-            value={[field.value]}
-            defaultValue={[defaultValue]}
+            value={field.value != null ? [field.value] : []}
+            defaultValue={defaultValue != null ? [defaultValue] : []}
             collection={collection}
             positioning={{ sameWidth: false }}
             onValueChange={handleChange}

@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { AdminSettingsServiceProps } from "./adminSettingsServiceProps";
 import type { AuthMode } from "./authMode";
 import type { InstanceCapabilityList } from "./instanceCapabilityList";
+import type { MessageOfTheDay } from "./messageOfTheDay";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
 
@@ -23,6 +24,7 @@ export interface AdminSettingsProps {
   content: PostContent;
   description: string;
   metadata?: Metadata;
+  motd?: MessageOfTheDay;
   services?: AdminSettingsServiceProps;
   title: string;
 }

@@ -4010,6 +4010,8 @@ components:
           $ref: "#/components/schemas/InstanceCapabilityList"
         metadata:
           $ref: "#/components/schemas/Metadata"
+        motd:
+          $ref: "#/components/schemas/MessageOfTheDay"
 
     SessionInfo:
       description: |
@@ -4264,6 +4266,8 @@ components:
           $ref: "#/components/schemas/AdminSettingsServiceProps"
         metadata:
           $ref: "#/components/schemas/Metadata"
+        motd:
+          $ref: "#/components/schemas/MessageOfTheDay"
 
     AdminSettingsMutableProps:
       type: object
@@ -4284,6 +4288,37 @@ components:
           description: |
             The settings metadata may be used by frontends to store arbitrary
             vendor-specific configuration data specific to the frontend itself.
+          $ref: "#/components/schemas/Metadata"
+        motd:
+          $ref: "#/components/schemas/MessageOfTheDayMutableProps"
+
+    MessageOfTheDay:
+      type: object
+      required: [content]
+      properties:
+        content:
+          $ref: "#/components/schemas/PostContent"
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+
+    MessageOfTheDayMutableProps:
+      type: object
+      properties:
+        content:
+          $ref: "#/components/schemas/PostContent"
+        start_at:
+          type: string
+          format: date-time
+        end_at:
+          type: string
+          format: date-time
+        metadata:
           $ref: "#/components/schemas/Metadata"
 
     AdminSettingsServiceProps:

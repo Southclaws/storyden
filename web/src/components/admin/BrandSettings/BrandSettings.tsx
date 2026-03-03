@@ -1,11 +1,15 @@
+import { createListCollection } from "@ark-ui/react";
+
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
+import { DatePickerInputField } from "@/components/ui/form/DatePickerField";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
+import { SelectField } from "@/components/ui/form/SelectField";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,7 +24,15 @@ import { lstack } from "@/styled-system/patterns";
 
 import { BannerEditor } from "./BannerEditor/BannerEditor";
 import { IconEditor } from "./IconEditor/IconEditor";
-import { Props, useBrandSettings } from "./useBrandSettings";
+import { Form, Props, useBrandSettings } from "./useBrandSettings";
+
+const MOTD_TYPE_COLLECTION = createListCollection({
+  items: [
+    { label: "Celebration", value: "celebration" },
+    { label: "Information", value: "information" },
+    { label: "Alert", value: "alert" },
+  ],
+});
 
 export function BrandSettingsForm(props: Props) {
   const {
@@ -31,6 +43,10 @@ export function BrandSettingsForm(props: Props) {
     currentIcon,
     onSaveIcon,
     onColourChangePreview,
+    onClearMotdDates,
+    onClearMotd,
+    motdContentInitialValue,
+    motdContentResetKey,
   } = useBrandSettings(props);
 
   return (
@@ -130,6 +146,85 @@ export function BrandSettingsForm(props: Props) {
             Pick a colour that best represents your community or brand. It will
             be used throughout the site for accenting certain elements such as
             buttons, mobile browser borders, PWA theme, etc.
+          </FormHelperText>
+        </FormControl>
+
+        <WStack mt="2">
+          <Heading size="sm">Message of the Day</Heading>
+          <Button type="submit" size="sm">
+            Save
+          </Button>
+        </WStack>
+
+        <FormControl>
+          <WStack alignItems="center">
+            <FormLabel>MOTD content</FormLabel>
+            <Button
+              type="button"
+              size="xs"
+              variant="outline"
+              onClick={onClearMotd}
+            >
+              Clear MOTD
+            </Button>
+          </WStack>
+          <CardBox>
+            <ContentFormField
+              control={control}
+              name="motdContent"
+              initialValue={motdContentInitialValue}
+              resetKey={motdContentResetKey}
+              placeholder="Optional site-wide announcement..."
+            />
+            <FormErrorText>
+              {formState.errors.motdContent?.message}
+            </FormErrorText>
+          </CardBox>
+          <FormHelperText>Banner message content.</FormHelperText>
+        </FormControl>
+
+        <Stack
+          gap="4"
+          direction={{
+            base: "column",
+            lg: "row",
+          }}
+          width="full"
+        >
+          <FormControl>
+            <FormLabel>MOTD starts at</FormLabel>
+            <DatePickerInputField<Form> name="motdStartAt" control={control} />
+            <FormErrorText>
+              {formState.errors.motdStartAt?.message}
+            </FormErrorText>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>MOTD ends at</FormLabel>
+            <DatePickerInputField<Form> name="motdEndAt" control={control} />
+            <FormErrorText>{formState.errors.motdEndAt?.message}</FormErrorText>
+          </FormControl>
+        </Stack>
+        <Button
+          type="button"
+          size="xs"
+          variant="outline"
+          onClick={onClearMotdDates}
+        >
+          Clear dates
+        </Button>
+
+        <FormControl>
+          <FormLabel>MOTD alert type</FormLabel>
+          <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
+            control={control}
+            name="motdType"
+            collection={MOTD_TYPE_COLLECTION}
+            placeholder="Select alert type"
+          />
+          <FormErrorText>{formState.errors.motdType?.message}</FormErrorText>
+          <FormHelperText>
+            Choose how the banner message is styled.
           </FormHelperText>
         </FormControl>
 

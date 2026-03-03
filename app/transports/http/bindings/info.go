@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
@@ -137,6 +138,7 @@ func serialiseInfo(info *instance_info.Info) openapi.Info {
 		AuthenticationMode: openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		Capabilities:       serialiseCapabilitiesList(info.Capabilities),
 		Metadata:           (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
+		Motd:               opt.Map(info.Settings.Motd, serialiseMOTD).Ptr(),
 	}
 }
 
