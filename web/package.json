@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "v1.26.5",
+  "version": "v1.26.5-post",
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
