@@ -401,3 +401,29 @@ func TestNeedsSpaceCJKRegression(t *testing.T) {
 	r.Len(ps, 1)
 	r.Equal("深度学习与神经网络。", ps[0])
 }
+
+func TestNewRichTextSanitizesScriptableMarkup(t *testing.T) {
+	r := require.New(t)
+
+	c, err := NewRichText(`<body><p>safe</p><img src=x onerror=alert(1)><script>alert(1)</script><iframe src="https://evil.example"></iframe></body>`)
+	r.NoError(err)
+
+	html := c.HTML()
+	r.Contains(html, "<body>")
+	r.Contains(html, "<p>safe</p>")
+	r.NotContains(strings.ToLower(html), "onerror")
+	r.NotContains(strings.ToLower(html), "<script")
+	r.NotContains(strings.ToLower(html), "<iframe")
+}
+
+func TestNewRichTextFromMarkdownDoesNotPreserveArbitraryClasses(t *testing.T) {
+	r := require.New(t)
+
+	c, err := NewRichTextFromMarkdown("```js&#x20;xss\nalert(1)\n```")
+	r.NoError(err)
+
+	html := c.HTML()
+	r.Contains(html, "<code>")
+	r.NotContains(html, `class="language-js xss"`)
+	r.NotContains(html, `class="xss"`)
+}
