@@ -221,6 +221,7 @@ $defs:
     oneOf:
       - $ref: "rpc/plugin-to-host/access_get.yaml#/$defs/RPCRequestAccessGet"
       - $ref: "rpc/plugin-to-host/get_config.yaml#/$defs/RPCRequestGetConfig"
+      - $ref: "rpc/plugin-to-host/robot_run.yaml#/$defs/RPCRequestRobotRun"
 
   PluginToHostResponse:
     allOf:
@@ -234,3 +235,4 @@ $defs:
     oneOf:
       - $ref: "rpc/plugin-to-host/access_get.yaml#/$defs/RPCResponseAccessGet"
       - $ref: "rpc/plugin-to-host/get_config.yaml#/$defs/RPCResponseGetConfig"
+      - $ref: "rpc/plugin-to-host/robot_run.yaml#/$defs/RPCResponseRobotRun"

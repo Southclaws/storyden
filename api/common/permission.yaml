@@ -29,6 +29,8 @@ oneOf:
   - $ref: "#/$defs/MANAGE_ROLES"
   - $ref: "#/$defs/MANAGE_REPORTS"
   - $ref: "#/$defs/VIEW_ACCOUNTS"
+  - $ref: "#/$defs/USE_ROBOTS"
+  - $ref: "#/$defs/MANAGE_ROBOTS"
   - $ref: "#/$defs/ADMINISTRATOR"
 
 $defs:
@@ -175,6 +177,18 @@ $defs:
     const: VIEW_ACCOUNTS
     title: View accounts
     description: Access detailed account records by account ID.
+
+  USE_ROBOTS:
+    type: string
+    const: USE_ROBOTS
+    title: Use robots
+    description: Use robots to automate actions on the platform.
+
+  MANAGE_ROBOTS:
+    type: string
+    const: MANAGE_ROBOTS
+    title: Manage robots
+    description: Create, edit and delete robots.
 
   ADMINISTRATOR:
     type: string

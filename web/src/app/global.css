@@ -9,6 +9,7 @@
 }
 
 :root {
+  --app-nav-h: 136px;
   --global-font-size: 1rem;
   --global-font-size-sm: 1rem;
   --global-font-size-md: 1.125rem;
@@ -55,6 +56,12 @@
     calc(var(--global-font-size-h6) / 4) + 4vw,
     var(--global-font-size-h6)
   );
+}
+
+@media (min-width: 768px) {
+  :root {
+    --app-nav-h: 100px;
+  }
 }
 
 @supports (font-size: 1cqi) {

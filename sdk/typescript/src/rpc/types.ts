@@ -724,6 +724,13 @@ export interface RPCRequestGetConfigParams {
   keys?: string[];
 }
 
+export interface RPCRequestRobotRunParams {
+  // Input message for the robot.
+  message: string;
+  // The Robot to invoke.
+  robot_id: string;
+}
+
 
 // Request API access credentials provisioned for this plugin.
 export interface RPCRequestAccessGet {
@@ -740,9 +747,18 @@ export interface RPCRequestGetConfig {
   params?: RPCRequestGetConfigParams;
 }
 
+// Run a one-shot robot invocation and return the assistant's final text response.
+export interface RPCRequestRobotRun {
+  method: "robot_run";
+  id: string;
+  jsonrpc: string;
+  params: RPCRequestRobotRunParams;
+}
+
 export type PluginToHostRequest =
   | RPCRequestAccessGet
-  | RPCRequestGetConfig;
+  | RPCRequestGetConfig
+  | RPCRequestRobotRun;
 
 export function isRPCRequestAccessGet(value: PluginToHostRequest): value is RPCRequestAccessGet {
   return value.method === "access_get";
@@ -750,6 +766,10 @@ export function isRPCRequestAccessGet(value: PluginToHostRequest): value is RPCR
 
 export function isRPCRequestGetConfig(value: PluginToHostRequest): value is RPCRequestGetConfig {
   return value.method === "get_config";
+}
+
+export function isRPCRequestRobotRun(value: PluginToHostRequest): value is RPCRequestRobotRun {
+  return value.method === "robot_run";
 }
 
 export interface PluginToHostResponseError {
@@ -786,9 +806,19 @@ export interface RPCResponseGetConfig {
   config: Record<string, unknown>;
 }
 
+// Final result of a one-shot robot invocation.
+export interface RPCResponseRobotRun {
+  method: "robot_run";
+  // Error message if invocation failed.
+  error?: string;
+  // Final assistant text response.
+  response?: string;
+}
+
 export type PluginToHostResponseUnion =
   | RPCResponseAccessGet
-  | RPCResponseGetConfig;
+  | RPCResponseGetConfig
+  | RPCResponseRobotRun;
 
 export function isRPCResponseAccessGet(value: PluginToHostResponseUnion): value is RPCResponseAccessGet {
   return value.method === "access_get";
@@ -796,6 +826,10 @@ export function isRPCResponseAccessGet(value: PluginToHostResponseUnion): value 
 
 export function isRPCResponseGetConfig(value: PluginToHostResponseUnion): value is RPCResponseGetConfig {
   return value.method === "get_config";
+}
+
+export function isRPCResponseRobotRun(value: PluginToHostResponseUnion): value is RPCResponseRobotRun {
+  return value.method === "robot_run";
 }
 
 export interface PluginToHostResponse {

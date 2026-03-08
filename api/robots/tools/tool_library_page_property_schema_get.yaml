@@ -1,0 +1,64 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPagePropertySchemaGet
+x-storyden-role: READ_PUBLISHED_LIBRARY
+title: library_page_property_schema_get
+description: Get the property schema for a library page's children. This returns the schema fields that define what properties child pages can have.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPagePropertySchemaGetInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPagePropertySchemaGetOutput"
+definitions:
+  ToolLibraryPagePropertySchemaGetInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The slug or ID of the library page to get the property schema for
+    additionalProperties: false
+  ToolLibraryPagePropertySchemaGetOutput:
+    type: object
+    required:
+      - fields
+    properties:
+      has_schema:
+        type: boolean
+        description: Whether this page has a property schema defined for its children
+      fields:
+        type: array
+        description: The schema fields that define properties for child pages
+        items:
+          $ref: "#/definitions/PropertySchemaField"
+    additionalProperties: false
+  PropertySchemaField:
+    type: object
+    required:
+      - id
+      - name
+      - type
+    properties:
+      id:
+        type: string
+        description: Unique identifier for this field
+      name:
+        type: string
+        description: Display name of the field
+      type:
+        type: string
+        enum:
+          - text
+          - number
+          - timestamp
+          - boolean
+        description: Data type of the field
+      sort:
+        type: string
+        description: Sort key for ordering fields
+    additionalProperties: false

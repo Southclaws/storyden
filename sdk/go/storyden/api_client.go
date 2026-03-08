@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -51,4 +53,36 @@ func (p *Plugin) BuildAPIClient(ctx context.Context) (*openapi.ClientWithRespons
 			return nil
 		}),
 	)
+}
+
+func (p *Plugin) RunRobot(ctx context.Context, robotID xid.ID, message string) (string, error) {
+	req := rpc.RPCRequestRobotRun{
+		Jsonrpc: "2.0",
+		Method:  "robot_run",
+		Params: rpc.RPCRequestRobotRunParams{
+			Message: message,
+			RobotID: robotID,
+		},
+	}
+
+	resp, err := p.Send(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	typed, ok := resp.(*rpc.RPCResponseRobotRun)
+	if !ok {
+		return "", fmt.Errorf("unexpected RPC response type: %T", resp)
+	}
+
+	if methodErr, ok := typed.Error.Get(); ok {
+		return "", fmt.Errorf("robot_run error: %s", methodErr)
+	}
+
+	response, ok := typed.Response.Get()
+	if !ok {
+		return "", fmt.Errorf("robot_run response missing")
+	}
+
+	return response, nil
 }
