@@ -1,0 +1,68 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolThreadGet
+x-storyden-role: READ_PUBLISHED_THREADS
+title: thread_get
+description: Get a specific thread with its content. Returns the thread details
+  including author, content, and category information.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadGetInput"
+  output:
+    $ref: "#/definitions/ToolThreadGetOutput"
+definitions:
+  ToolThreadGetInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The unique identifier of the thread to retrieve
+      page:
+        type: integer
+        minimum: 1
+        description: "Page number for replies (default: 1)"
+    additionalProperties: false
+  ToolThreadGetOutput:
+    type: object
+    required:
+      - slug
+      - title
+      - content
+      - visibility
+      - author
+      - category
+      - tags
+      - created_at
+    properties:
+      slug:
+        type: string
+      title:
+        type: string
+      content:
+        type: string
+        description: Thread content as plain text
+      visibility:
+        type: string
+      author:
+        type: string
+        description: Author handle
+      category:
+        type: string
+        description: Category name
+      tags:
+        type: array
+        items:
+          type: string
+      created_at:
+        type: string
+        description: Creation timestamp
+      url:
+        type: string
+        description: Associated URL if present
+    additionalProperties: false

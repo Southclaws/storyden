@@ -12,6 +12,8 @@ export interface Conditions {
 	"_closed": string
 	/** `&:is([open], [data-state=open])` */
 	"_open": string
+	/** `details[open] &` */
+	"_detailsOpen": string
 	/** `&:is([data-state=on])` */
 	"_on": string
 	/** `&:is([data-state=off])` */

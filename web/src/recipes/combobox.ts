@@ -71,6 +71,10 @@ export const combobox = defineSlotRecipe({
         },
       },
     },
+    list: {
+      maxHeight: "64",
+      overflowY: "auto",
+    },
     itemGroupLabel: {
       fontWeight: "semibold",
       textStyle: "sm",

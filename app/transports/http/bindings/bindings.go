@@ -88,6 +88,7 @@ type Bindings struct {
 	Links
 	Datagraph
 	Events
+	Robots
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -123,6 +124,7 @@ func bindingsProviders() fx.Option {
 		NewLinks,
 		NewDatagraph,
 		NewEvents,
+		NewRobots,
 	)
 }
 

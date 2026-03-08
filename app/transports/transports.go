@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http"
 	"github.com/Southclaws/storyden/app/transports/mcp"
 	"github.com/Southclaws/storyden/app/transports/rpc"
+	"github.com/Southclaws/storyden/app/transports/sse"
 )
 
 func Build() fx.Option {
@@ -16,5 +17,6 @@ func Build() fx.Option {
 		http.Build(),
 		mcp.Build(),
 		rpc.Build(),
+		sse.Build(),
 	)
 }

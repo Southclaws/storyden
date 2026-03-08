@@ -1,0 +1,42 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotSwitch
+x-storyden-role: USE_ROBOTS
+title: robot_switch
+description: Switch the current conversation to a different Robot (agent). Use
+  this when the user wants to talk to a different specialized agent or when a
+  different agent would be better suited to help with the user's request.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotSwitchInput"
+  output:
+    $ref: "#/definitions/ToolRobotSwitchOutput"
+definitions:
+  ToolRobotSwitchInput:
+    type: object
+    required:
+      - robot_id
+    properties:
+      robot_id:
+        type: string
+        pattern: ^[0-9a-v]{20}$
+        description: The ID of the Robot (agent) to switch to. Must be a valid XID
+          format (20 character alphanumeric string). Use robot_list to see
+          available Robot IDs.
+    additionalProperties: false
+  ToolRobotSwitchOutput:
+    type: object
+    required:
+      - success
+      - robot_id
+    properties:
+      success:
+        type: boolean
+        description: Whether the agent switch was successful
+      robot_id:
+        type: string
+        description: The ID of the robot that was switched to
+    additionalProperties: false
