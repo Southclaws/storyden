@@ -14,6 +14,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     go mod download
 
 COPY ./app ./app
+COPY ./lib ./lib
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 
