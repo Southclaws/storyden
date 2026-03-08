@@ -10,9 +10,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
@@ -38,7 +38,7 @@ func (m *Manager) UpdateRoles(ctx context.Context, accountID account_ref.ID, rol
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventAccountUpdated{ID: accountID})
+	m.bus.Publish(ctx, &rpc.EventAccountUpdated{ID: accountID})
 
 	return nil
 }
@@ -52,7 +52,7 @@ func (m *Manager) SetBadge(ctx context.Context, accountID account_ref.ID, roleID
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventAccountUpdated{ID: accountID})
+	m.bus.Publish(ctx, &rpc.EventAccountUpdated{ID: accountID})
 
 	return nil
 }

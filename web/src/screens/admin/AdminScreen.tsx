@@ -5,6 +5,7 @@ import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
 import * as Tabs from "@/components/ui/tabs";
+import { useCapability } from "@/lib/settings/capabilities";
 
 import { AccessKeySettingsScreen } from "./AccessKeySettingsScreen";
 import { AuditLogSettingsScreen } from "./AuditLogSettingsScreen/AuditLogSettingsScreen";
@@ -12,11 +13,13 @@ import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
 import { BrandSettingsScreen } from "./BrandSettingsScreen";
 import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
+import { PluginSettingsScreen } from "./PluginSettingsScreen";
 import { SystemSettingsScreen } from "./SystemSettingsScreen";
 
 const DEFAULT_TAB = "brand";
 
 export function AdminScreen() {
+  const pluginsEnabled = useCapability("plugins");
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -28,8 +31,13 @@ export function AdminScreen() {
   useEffect(() => {
     if (!tab) {
       setTab(DEFAULT_TAB);
+      return;
     }
-  }, [tab, setTab]);
+
+    if (!pluginsEnabled && tab === "plugins") {
+      setTab(DEFAULT_TAB);
+    }
+  }, [pluginsEnabled, tab, setTab]);
 
   function handleTabChange({ value }: TabsValueChangeDetails) {
     setTab(value);
@@ -53,6 +61,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
+        {pluginsEnabled && <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>}
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -83,6 +92,12 @@ export function AdminScreen() {
       <Tabs.Content value="access_keys">
         <AccessKeySettingsScreen />
       </Tabs.Content>
+
+      {pluginsEnabled && (
+        <Tabs.Content value="plugins">
+          <PluginSettingsScreen />
+        </Tabs.Content>
+      )}
     </Tabs.Root>
   );
 }

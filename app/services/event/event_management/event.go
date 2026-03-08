@@ -21,13 +21,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/participation"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var errNotAuthorised = fault.New("not authorised")
@@ -133,12 +133,12 @@ func (m *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventActivityCreated{
+	m.bus.Publish(ctx, &rpc.EventActivityCreated{
 		ID: evt.ID,
 	})
 
 	if vis == visibility.VisibilityPublished {
-		m.bus.Publish(ctx, &message.EventActivityPublished{
+		m.bus.Publish(ctx, &rpc.EventActivityPublished{
 			ID: evt.ID,
 		})
 	}
@@ -189,13 +189,13 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to update event"))
 	}
 
-	m.bus.Publish(ctx, &message.EventActivityUpdated{
+	m.bus.Publish(ctx, &rpc.EventActivityUpdated{
 		ID: evt.ID,
 	})
 
 	if vis, ok := partial.Visibility.Get(); ok && vis == visibility.VisibilityPublished {
 		if current.Visibility != evt.Visibility {
-			m.bus.Publish(ctx, &message.EventActivityPublished{
+			m.bus.Publish(ctx, &rpc.EventActivityPublished{
 				ID: evt.ID,
 			})
 		}
@@ -234,7 +234,7 @@ func (m *Manager) Delete(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &message.EventActivityDeleted{
+	m.bus.Publish(ctx, &rpc.EventActivityDeleted{
 		ID: evt.ID,
 	})
 

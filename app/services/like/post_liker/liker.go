@@ -7,11 +7,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_querier"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type PostLiker struct {
@@ -50,7 +50,7 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 		return err
 	}
 
-	l.bus.Publish(ctx, &message.EventPostLiked{
+	l.bus.Publish(ctx, &rpc.EventPostLiked{
 		PostID:     postID,
 		RootPostID: postRef.Root,
 	})
@@ -73,7 +73,7 @@ func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.Accoun
 		return err
 	}
 
-	l.bus.Publish(ctx, &message.EventPostUnliked{
+	l.bus.Publish(ctx, &rpc.EventPostUnliked{
 		PostID:     postID,
 		RootPostID: postRef.Root,
 	})

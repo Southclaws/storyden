@@ -13,11 +13,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/integration"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func TestEventBus_SingleSubscriber(t *testing.T) {
@@ -133,10 +133,10 @@ func TestPublishNamed_ReceivesEventsViaGoChannel(t *testing.T) {
 			a := assert.New(t)
 
 			topicName := "tests.named.channels.single"
-			received := make(chan message.EventThreadPublished, 1)
+			received := make(chan rpc.EventThreadPublished, 1)
 
 			sub, err := pubsub.SubscribeNamed(ctx, bus, topicName, "named_channel_handler", func(ctx context.Context, payload json.RawMessage) error {
-				var event message.EventThreadPublished
+				var event rpc.EventThreadPublished
 				if err := json.Unmarshal(payload, &event); err != nil {
 					return err
 				}
@@ -149,7 +149,7 @@ func TestPublishNamed_ReceivesEventsViaGoChannel(t *testing.T) {
 			})
 
 			wantID := post.ID(xid.New())
-			err = bus.PublishNamed(ctx, topicName, message.EventThreadPublished{ID: wantID})
+			err = bus.PublishNamed(ctx, topicName, rpc.EventThreadPublished{ID: wantID})
 			r.NoError(err)
 
 			select {
@@ -176,10 +176,10 @@ func TestSubscribeNamed_ReceivesEventsViaAMQP(t *testing.T) {
 			a := assert.New(t)
 
 			topicName := "tests.named.amqp.single"
-			received := make(chan message.EventThreadPublished, 1)
+			received := make(chan rpc.EventThreadPublished, 1)
 
 			sub, err := pubsub.SubscribeNamed(ctx, bus, topicName, "dynamic_single_handler", func(ctx context.Context, payload json.RawMessage) error {
-				var event message.EventThreadPublished
+				var event rpc.EventThreadPublished
 				if err := json.Unmarshal(payload, &event); err != nil {
 					return err
 				}
@@ -193,7 +193,7 @@ func TestSubscribeNamed_ReceivesEventsViaAMQP(t *testing.T) {
 
 			wantID := post.ID(xid.New())
 
-			err = bus.PublishNamed(ctx, topicName, message.EventThreadPublished{ID: wantID})
+			err = bus.PublishNamed(ctx, topicName, rpc.EventThreadPublished{ID: wantID})
 			r.NoError(err)
 
 			select {
@@ -315,9 +315,9 @@ func TestPublishNamed_DeliversToTypedSubscriber(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			recv := make(chan message.EventThreadPublished, 1)
+			recv := make(chan rpc.EventThreadPublished, 1)
 
-			sub, err := pubsub.Subscribe(ctx, bus, "named_to_typed_handler", func(ctx context.Context, event *message.EventThreadPublished) error {
+			sub, err := pubsub.Subscribe(ctx, bus, "named_to_typed_handler", func(ctx context.Context, event *rpc.EventThreadPublished) error {
 				recv <- *event
 				return nil
 			})
@@ -326,10 +326,10 @@ func TestPublishNamed_DeliversToTypedSubscriber(t *testing.T) {
 				r.NoError(sub.Close())
 			})
 
-			topicName := reflect.TypeOf(message.EventThreadPublished{}).String()
+			topicName := reflect.TypeOf(rpc.EventThreadPublished{}).String()
 			wantID := post.ID(xid.New())
 
-			err = bus.PublishNamed(ctx, topicName, message.EventThreadPublished{ID: wantID})
+			err = bus.PublishNamed(ctx, topicName, rpc.EventThreadPublished{ID: wantID})
 			r.NoError(err)
 
 			select {
@@ -352,11 +352,11 @@ func TestPublishersAndSubscribers_MixedNamedAndTyped(t *testing.T) {
 			r := require.New(t)
 			a := assert.New(t)
 
-			topicName := reflect.TypeOf(message.EventThreadPublished{}).String()
+			topicName := reflect.TypeOf(rpc.EventThreadPublished{}).String()
 			typedRecv := make(chan post.ID, 2)
 			dynamicRecv := make(chan post.ID, 2)
 
-			typedSub, err := pubsub.Subscribe(ctx, bus, "mixed_typed_handler", func(ctx context.Context, event *message.EventThreadPublished) error {
+			typedSub, err := pubsub.Subscribe(ctx, bus, "mixed_typed_handler", func(ctx context.Context, event *rpc.EventThreadPublished) error {
 				typedRecv <- event.ID
 				return nil
 			})
@@ -366,7 +366,7 @@ func TestPublishersAndSubscribers_MixedNamedAndTyped(t *testing.T) {
 			})
 
 			dynamicSub, err := pubsub.SubscribeNamed(ctx, bus, topicName, "mixed_dynamic_handler", func(ctx context.Context, payload json.RawMessage) error {
-				var event message.EventThreadPublished
+				var event rpc.EventThreadPublished
 				if err := json.Unmarshal(payload, &event); err != nil {
 					return err
 				}
@@ -389,12 +389,12 @@ func TestPublishersAndSubscribers_MixedNamedAndTyped(t *testing.T) {
 			}
 
 			wantAuto := post.ID(xid.New())
-			r.NoError(bus.MustPublish(ctx, message.EventThreadPublished{ID: wantAuto}))
+			r.NoError(bus.MustPublish(ctx, rpc.EventThreadPublished{ID: wantAuto}))
 			a.Equal(wantAuto, waitID(typedRecv, 2*time.Second))
 			a.Equal(wantAuto, waitID(dynamicRecv, 2*time.Second))
 
 			wantNamed := post.ID(xid.New())
-			r.NoError(bus.PublishNamed(ctx, topicName, message.EventThreadPublished{ID: wantNamed}))
+			r.NoError(bus.PublishNamed(ctx, topicName, rpc.EventThreadPublished{ID: wantNamed}))
 			a.Equal(wantNamed, waitID(typedRecv, 2*time.Second))
 			a.Equal(wantNamed, waitID(dynamicRecv, 2*time.Second))
 		}))

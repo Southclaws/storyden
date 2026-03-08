@@ -1,0 +1,9 @@
+{
+  "id": "crash-connect",
+  "author": "storyden",
+  "name": "Crash Connect Plugin",
+  "description": "Test plugin that crashes during websocket connection",
+  "version": "1.0.0",
+  "command": "./crash_connect",
+  "events_consumed": []
+}

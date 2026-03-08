@@ -1,0 +1,41 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestAccessGet:
+    description: >
+      Request API access credentials provisioned for this plugin.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method"]
+        properties:
+          method:
+            type: string
+            const: "access_get"
+
+  RPCResponseAccessGet:
+    description: >
+      Returns API base URL and bearer access key for authenticated API calls.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcResponse"
+      - type: object
+        required: ["result"]
+        properties:
+          method:
+            type: string
+            const: "access_get"
+          result:
+            $ref: "#/$defs/RPCResponseAccessGetResult"
+
+  RPCResponseAccessGetResult:
+    type: object
+    required:
+      - api_base_url
+      - access_key
+    properties:
+      api_base_url:
+        type: string
+        format: uri
+        description: Base URL for API requests.
+      access_key:
+        type: string
+        description: Bearer access key for API authentication.

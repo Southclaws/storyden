@@ -96,6 +96,8 @@ func statusFromErrorKind(k ftag.Kind) int {
 		return http.StatusForbidden
 	case ftag.Unauthenticated:
 		return http.StatusUnauthorized
+	case ftag.Cancelled:
+		return http.StatusBadGateway
 	default:
 		return http.StatusInternalServerError
 	}
@@ -113,6 +115,8 @@ func errorKindFromStatus(s int) ftag.Kind {
 		return ftag.Unauthenticated
 	case http.StatusUnauthorized:
 		return ftag.PermissionDenied
+	case http.StatusBadGateway:
+		return ftag.Cancelled
 	default:
 		return ftag.Internal
 	}

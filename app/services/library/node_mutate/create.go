@@ -11,9 +11,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *Manager) Create(ctx context.Context,
@@ -60,13 +60,13 @@ func (s *Manager) Create(ctx context.Context,
 		}
 	}
 
-	s.bus.Publish(ctx, &message.EventNodeCreated{
+	s.bus.Publish(ctx, &rpc.EventNodeCreated{
 		ID:   library.NodeID(n.Mark.ID()),
 		Slug: n.GetSlug(),
 	})
 
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
-		s.bus.Publish(ctx, &message.EventNodePublished{
+		s.bus.Publish(ctx, &rpc.EventNodePublished{
 			ID:   library.NodeID(n.Mark.ID()),
 			Slug: n.GetSlug(),
 		})

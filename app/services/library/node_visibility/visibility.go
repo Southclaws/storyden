@@ -12,11 +12,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -82,18 +82,18 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 	if oldVisibility != vis {
 		switch vis {
 		case visibility.VisibilityPublished:
-			m.bus.Publish(ctx, &message.EventNodePublished{
+			m.bus.Publish(ctx, &rpc.EventNodePublished{
 				ID:   library.NodeID(n.Mark.ID()),
 				Slug: n.GetSlug(),
 			})
 		case visibility.VisibilityReview:
-			m.bus.Publish(ctx, &message.EventNodeSubmittedForReview{
+			m.bus.Publish(ctx, &rpc.EventNodeSubmittedForReview{
 				ID:   library.NodeID(n.Mark.ID()),
 				Slug: n.GetSlug(),
 			})
 		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
 			if oldVisibility == visibility.VisibilityPublished {
-				m.bus.Publish(ctx, &message.EventNodeUnpublished{
+				m.bus.Publish(ctx, &rpc.EventNodeUnpublished{
 					ID:   library.NodeID(n.Mark.ID()),
 					Slug: n.GetSlug(),
 				})

@@ -1,0 +1,117 @@
+---
+title: Discord Connector
+description: A Discord-first community workflow for building a Storyden knowledgebase with plugins.
+---
+
+Most communities are chat-first now, especially on Discord. That is great for energy, terrible for memory.
+
+This recipe is for communities that already live in Discord but want Storyden to be the long-term brain for links, references, and "wait where did we post that?" moments.
+
+This recipe is intended to spark a bit of the creative juices. The plugin example code is fairly simple and ripe for stealing, editing and improving! If you're a developer or have one on speed dial, you can have a custom bot for your community set up quickly!
+
+## Chat First, Memory Second
+
+The real plugin code lives here:
+
+- [Discord connector manifest](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/manifest.yaml)
+- [Discord connector implementation](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
+
+The current implementation is fully usable and serves as a neat example of some Storyden plugin capabilities:
+
+- it subscribes to [`EventThreadPublished`](/docs/extending/manifest#events_consumed)
+- it posts published threads into discord
+- it registers discord slash commands: `/latest`, `/save`, `/search`
+- it calls Storyden APIs through plugin-provisioned API access (manifest `access`)
+
+If you want the runtime model details, start with [Extending Storyden](/docs/extending), [Plugin Model](/docs/extending/model), [Manifest](/docs/extending/manifest), and [Security](/docs/extending/security).
+
+## The Real Problem It Solves
+
+If your community is active, this pattern solves boring but annoying problems:
+
+- great links disappear in fast-moving channels
+- the same questions get answered repeatedly
+- newcomers cannot find old "golden answers"
+- moderators become human search engines
+
+You can see why this matters in [The power of a community-driven knowledgebase](/blog/power-of-community-knowledgebase) and [Links](/docs/introduction/links).
+
+## What Each Command Does
+
+### `/latest`
+
+`/latest` fetches the most recent published thread and posts a short summary.
+
+- API used: [Thread List](/docs/api/threads/ThreadList)
+- Code path: [`handleCommand -> fetchLatestThread`](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
+
+### `/save`
+
+`/save` scans recent messages in the channel where the command was run, finds the most recent URL, and saves it as a Storyden Link.
+
+Current behavior in code:
+
+1. Read recent channel messages (newest first).
+2. Extract first valid URL from the latest matching message.
+3. Submit URL to [Link Create](/docs/api/links/LinkCreate).
+4. Return saved link details back to Discord.
+
+- API used: [Link Create](/docs/api/links/LinkCreate)
+- Code path: [`handleSave -> findLatestChannelURL`](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
+
+### `/search`
+
+`/search` queries Storyden's Link index and returns matching links.
+
+Current behavior in code:
+
+1. Accept query string from slash command option.
+2. Call [Link List](/docs/api/links/LinkList) with `q`.
+3. Return top link results in Discord.
+
+- API used: [Link List](/docs/api/links/LinkList)
+- Code path: [`handleSearch`](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
+
+<Callout type="info">
+  `/search` intentionally uses Link search, not Datagraph search, because this
+  plugin is focused on community link recall.
+</Callout>
+
+## Event Flow: Published Threads
+
+When a new thread is published, the plugin receives `EventThreadPublished`, fetches thread details, and posts to the configured Discord channel.
+
+- Event contract: [Manifest `events_consumed`](/docs/extending/manifest#events_consumed)
+- RPC reference: [Host to Plugin `event`](/docs/extending/rpc/host-to-plugin/event)
+- API used for thread details: [Thread Get](/docs/api/threads/ThreadGet)
+- Code path: [`handleThreadPublished`](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/main.go)
+
+## Plugin Contract You Actually Need
+
+Everything here is grounded in current plugin contracts:
+
+- event subscriptions in [`events_consumed`](/docs/extending/manifest#events_consumed)
+- API identity and permission requests in [`access`](/docs/extending/manifest#access)
+- operator-provided config fields in [`configuration_schema`](/docs/extending/manifest#configuration_schema)
+- runtime messaging via [Host-to-Plugin RPC](/docs/extending/rpc/host-to-plugin) and [Plugin-to-Host RPC](/docs/extending/rpc/plugin-to-host)
+
+This example plugin currently expects these config fields:
+
+- `discord_token`
+- `channel_id`
+
+Source of truth: [plugin manifest](https://github.com/Southclaws/storyden/blob/main/plugins/discord-connector/manifest.yaml)
+
+## Safety and Scope
+
+- request only the API permissions you truly need in manifest `access.permissions`
+- keep Discord token and RPC token handling aligned with [plugin security guidance](/docs/extending/security#token-handling-guidance)
+- choose [external mode](/docs/extending/model#external) for fast local development
+
+## Outcome
+
+The community keeps chatting where they already are.
+
+Storyden quietly accumulates a searchable, durable link memory in the background.
+
+No culture change campaign required. Just a good connector.

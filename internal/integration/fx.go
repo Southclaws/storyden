@@ -44,6 +44,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		RateLimitPeriod:  time.Hour,
 		RateLimitBucket:  time.Minute,
 		EmailProvider:    "mock",
+		PluginDataPath:   makePerTestPluginDataPath(t.Name()),
 	}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
@@ -257,4 +258,11 @@ func sanitizeDBTestName(name string) string {
 
 	// Avoid excessively long filenames in deep package test paths.
 	return filepath.Base(mapped)
+}
+
+func makePerTestPluginDataPath(testName string) string {
+	timePrefix := time.Now().Format(time.RFC3339Nano)
+	testSuffix := sanitizeDBTestName(fmt.Sprintf("%s-%s", timePrefix, testName))
+
+	return filepath.Join(os.TempDir(), "storyden-plugin-test-data", testSuffix, "plugins")
 }

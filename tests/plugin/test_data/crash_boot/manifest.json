@@ -1,0 +1,9 @@
+{
+  "id": "crash-boot",
+  "author": "storyden",
+  "name": "Crash Boot Plugin",
+  "description": "Test plugin that crashes immediately on startup",
+  "version": "1.0.0",
+  "command": "./crash_boot",
+  "events_consumed": []
+}

@@ -10,12 +10,13 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
-	account_ent "github.com/Southclaws/storyden/internal/ent/account"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/schema"
-	"github.com/rs/xid"
 )
 
 type (
@@ -37,6 +38,12 @@ func WithAdmin(admin bool) Option {
 func WithName(name string) Option {
 	return func(a *ent.AccountMutation) {
 		a.SetName(name)
+	}
+}
+
+func WithKind(kind account.AccountKind) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetKind(ent_account.Kind(kind.String()))
 	}
 }
 
@@ -92,7 +99,7 @@ func SetAdmin(status bool) Mutation {
 
 func SetVerifiedStatus(status account.VerifiedStatus) Mutation {
 	return func(u *ent.AccountUpdateOne) {
-		u.SetVerifiedStatus(account_ent.VerifiedStatus(status.String()))
+		u.SetVerifiedStatus(ent_account.VerifiedStatus(status.String()))
 	}
 }
 

@@ -175,6 +175,7 @@ export function MultiSelectPicker({
       lazyMount
       positioning={{
         placement: "bottom-end",
+        strategy: "fixed",
       }}
       {...menuVariantProps}
     >
@@ -268,8 +269,8 @@ export function MultiSelectPicker({
       </Menu.Trigger>
 
       <Portal>
-        <Menu.Positioner>
-          <Menu.Content>
+        <Menu.Positioner zIndex="popover">
+          <Menu.Content zIndex="popover">
             <Menu.ItemGroup pl="2" py="1">
               <Input
                 size={size}

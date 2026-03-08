@@ -1,0 +1,41 @@
+---
+title: event
+description: Host to Plugin RPC method.
+---
+
+`event` is a **Host to Plugin** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/host-to-plugin/event.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestEvent`
+- Response type: `RPCResponseEvent`
+
+## Request contract
+
+Delivers a subscribed Storyden event payload to the plugin.
+
+
+Required fields:
+- `method`
+- `params`
+
+
+
+## Response contract
+
+Acknowledges that the plugin received the event payload.
+
+
+Required fields:
+- `ok`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

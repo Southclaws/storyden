@@ -73,7 +73,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				a := assert.New(t)
 
 				res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-					{Name: "weight", Type: openapi.Number, Sort: "1"},
+					{Name: "weight", Type: openapi.PropertyTypeNumber, Sort: "1"},
 				}, session)
 				tests.Ok(t, err, res)
 
@@ -81,7 +81,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				tests.Ok(t, err, parent)
 				r.Equal(1, len(parent.JSON200.ChildPropertySchema))
 				matchSchema(t, openapi.PropertySchemaList{
-					{Name: "weight", Type: openapi.Number, Sort: "1"},
+					{Name: "weight", Type: openapi.PropertyTypeNumber, Sort: "1"},
 				}, parent.JSON200.ChildPropertySchema)
 
 				// Update the schema
@@ -89,9 +89,9 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				weightField := parent.JSON200.ChildPropertySchema[0]
 
 				res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-					{Fid: &weightField.Fid, Name: "weight", Type: openapi.Number, Sort: "1"},
-					{Name: "kind", Type: openapi.Text, Sort: "2"},
-					{Name: "added", Type: openapi.Timestamp, Sort: "3"},
+					{Fid: &weightField.Fid, Name: "weight", Type: openapi.PropertyTypeNumber, Sort: "1"},
+					{Name: "kind", Type: openapi.PropertyTypeText, Sort: "2"},
+					{Name: "added", Type: openapi.PropertyTypeTimestamp, Sort: "3"},
 				}, session)
 				tests.Ok(t, err, res)
 
@@ -99,9 +99,9 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				tests.Ok(t, err, parent)
 				r.Equal(3, len(parent.JSON200.ChildPropertySchema))
 				matchSchema(t, openapi.PropertySchemaList{
-					{Name: "weight", Type: openapi.Number, Sort: "1"},
-					{Name: "kind", Type: openapi.Text, Sort: "2"},
-					{Name: "added", Type: openapi.Timestamp, Sort: "3"},
+					{Name: "weight", Type: openapi.PropertyTypeNumber, Sort: "1"},
+					{Name: "kind", Type: openapi.PropertyTypeText, Sort: "2"},
+					{Name: "added", Type: openapi.PropertyTypeTimestamp, Sort: "3"},
 				}, parent.JSON200.ChildPropertySchema)
 
 				// Delete the schema
@@ -144,7 +144,7 @@ func TestNodesPropertySchemas_EmptyNode(t *testing.T) {
 				r := require.New(t)
 
 				res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-					{Name: "weight", Type: openapi.Number, Sort: "1"},
+					{Name: "weight", Type: openapi.PropertyTypeNumber, Sort: "1"},
 				}, session)
 				tests.Ok(t, err, res)
 

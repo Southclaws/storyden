@@ -6,9 +6,9 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Mentioner struct {
@@ -33,10 +33,10 @@ func (n *Mentioner) Send(ctx context.Context, by account.AccountID, source datag
 			continue
 		}
 
-		n.bus.Publish(ctx, &message.EventMemberMentioned{
+		n.bus.Publish(ctx, &rpc.EventMemberMentioned{
 			By:     by,
-			Source: source,
-			Item:   *i,
+			Source: rpc.DatagraphRefToRPC(source),
+			Item:   rpc.DatagraphRefToRPC(*i),
 		})
 	}
 }

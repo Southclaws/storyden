@@ -1,0 +1,7 @@
+{
+    "pages": [
+        "events",
+        "host-to-plugin",
+        "plugin-to-host"
+    ]
+}

@@ -12,9 +12,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	authentication_repo "github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Service interface {
@@ -55,7 +55,7 @@ func (s *service) Suspend(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventAccountSuspended{
+	s.bus.Publish(ctx, &rpc.EventAccountSuspended{
 		ID: id,
 	})
 
@@ -68,7 +68,7 @@ func (s *service) Reinstate(ctx context.Context, id account.AccountID) (*account
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventAccountUnsuspended{
+	s.bus.Publish(ctx, &rpc.EventAccountUnsuspended{
 		ID: id,
 	})
 
