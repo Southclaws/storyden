@@ -1,0 +1,86 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolThreadCreate
+x-storyden-role: CREATE_POST
+title: thread_create
+description: Create a new discussion thread in the forum. Threads are
+  discussions organized by category with tags for better discovery.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadCreateInput"
+  output:
+    $ref: "#/definitions/ToolThreadCreateOutput"
+definitions:
+  ToolThreadCreateInput:
+    type: object
+    required:
+      - title
+      - body
+      - category
+    properties:
+      title:
+        type: string
+        minLength: 1
+        description: The title of the thread
+      body:
+        type: string
+        minLength: 1
+        description: The content of the thread in HTML format
+      category:
+        type: string
+        description: The category slug for the thread. Use category_list to see
+          available categories.
+      visibility:
+        type: string
+        enum:
+          - published
+          - draft
+        description: "Thread visibility (default: published)"
+      url:
+        type: string
+        format: uri
+        description: Optional URL if this thread is about a specific link
+      tags:
+        type: array
+        description: Optional tags for the thread
+        items:
+          type: string
+    additionalProperties: false
+  ToolThreadCreateOutput:
+    type: object
+    required:
+      - slug
+      - title
+    properties:
+      slug:
+        type: string
+        description: The thread slug
+      title:
+        type: string
+        description: The thread title
+      created_at:
+        type: string
+        description: Creation timestamp
+      content:
+        type: string
+        description: Thread content as plain text
+      visibility:
+        type: string
+        description: Thread visibility
+      author:
+        type: string
+        description: Author handle
+      category:
+        type: string
+        description: Category name
+      tags:
+        type: array
+        items:
+          type: string
+      url:
+        type: string
+        description: Associated URL if present
+    additionalProperties: false

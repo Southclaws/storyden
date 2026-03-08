@@ -33,7 +33,7 @@ export async function Default({
         >
           <MotdBanner motd={settings.motd} />
           {children}
-          <Box height="24"></Box>
+          {/* <Box height="24"></Box> */}
         </styled.main>
       </Navigation>
     </Flex>

@@ -1,0 +1,61 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageTree
+x-storyden-role: READ_PUBLISHED_LIBRARY
+title: library_page_list
+description: Get the full tree structure of pages in the library. Returns a
+  hierarchical view of all wiki pages showing their parent-child relationships.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageTreeInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageTreeOutput"
+definitions:
+  ToolLibraryPageTreeInput:
+    type: object
+    properties:
+      depth:
+        type: integer
+        minimum: -1
+        description: Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for
+          root + children, etc.)
+    additionalProperties: false
+  ToolLibraryPageTreeOutput:
+    type: object
+    required:
+      - pages
+    properties:
+      pages:
+        type: array
+        description: List of pages in tree structure
+        items:
+          $ref: "#/definitions/LibraryPageTreeNode"
+    additionalProperties: false
+  LibraryPageTreeNode:
+    type: object
+    required:
+      - slug
+      - name
+      - description
+    properties:
+      slug:
+        type: string
+        description: URL-friendly identifier for the page
+      name:
+        type: string
+        description: Display name of the page
+      description:
+        type: string
+        description: Brief description of the page
+      parent:
+        type: string
+        description: Slug of the parent page (omitted for root pages)
+      tags:
+        type: array
+        description: Tags associated with this page
+        items:
+          type: string
+    additionalProperties: false

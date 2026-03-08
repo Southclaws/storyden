@@ -1,0 +1,66 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageCreate
+x-storyden-role: MANAGE_LIBRARY
+title: create_library_page
+description: Create a new page in the library. A slug will be generated
+  automatically if not provided.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageCreateInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageCreateOutput"
+definitions:
+  ToolLibraryPageCreateInput:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        minLength: 1
+        description: The name/title of the page
+      slug:
+        type: string
+        description: The unique slug for this page. If not provided, one will be
+          generated from the name.
+      content:
+        type: string
+        description: The content of the page in HTML format
+      parent:
+        type: string
+        description: Slug of the parent page. Only include if you already have a parent
+          slug available. Leave empty to create a root-level page.
+      visibility:
+        type: string
+        enum:
+          - published
+          - draft
+        description: "Visibility of the page (default: published)"
+      url:
+        type: string
+        format: uri
+        description: Optional external URL if this page references a topic on another
+          website
+      tags:
+        type: array
+        items:
+          type: string
+        description: Optional tags to categorise this page
+    additionalProperties: false
+  ToolLibraryPageCreateOutput:
+    type: object
+    required:
+      - slug
+      - name
+    properties:
+      slug:
+        type: string
+        description: The slug of the created page
+      name:
+        type: string
+        description: The name of the created page
+    additionalProperties: false
