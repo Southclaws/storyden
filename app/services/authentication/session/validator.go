@@ -48,6 +48,11 @@ func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.Acc
 		return acc.Roles.Roles(), nil
 	}
 
+	if acc.Kind == account.AccountKindBot {
+		span.Event("bot account bypassed email verification role gate")
+		return acc.Roles.Roles(), nil
+	}
+
 	requiresEmailVerification, err := v.installationRequiresEmailVerification(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

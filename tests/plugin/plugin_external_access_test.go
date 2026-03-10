@@ -152,6 +152,71 @@ func TestExternalPluginAccessKeyAndClientBuilder(t *testing.T) {
 	}))
 }
 
+func TestExternalPluginAccessSubmitLibraryNodeInEmailMode(t *testing.T) {
+	integration.Test(t, &config.Config{
+		PluginMaxRestartAttempts:    1,
+		PluginMaxBackoffDuration:    100 * time.Millisecond,
+		PluginRuntimeCrashThreshold: 1 * time.Second,
+		PluginRuntimeCrashBackoff:   100 * time.Millisecond,
+	}, e2e.Setup(), rpc_transport.Build(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		accountWrite *account_writer.Writer,
+		runner plugin_runner.Host,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+
+			adminSession, _ := createAdminSession(root, cl, sh, accountWrite, r)
+			emailMode := openapi.Email
+			tests.AssertRequest(
+				cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{
+					AuthenticationMode: &emailMode,
+				}, adminSession),
+			)(t, http.StatusOK)
+
+			manifest := openapi.PluginManifest(map[string]any{
+				"id":              "test-access-submit-" + xid.New().String(),
+				"name":            "External Access Submit",
+				"author":          "test-author",
+				"description":     "External plugin submit access test",
+				"version":         "1.0.0",
+				"command":         "./plugin",
+				"events_consumed": []string{},
+				"access": map[string]any{
+					"handle":      "submit-" + xid.New().String(),
+					"name":        "Submit Access Bot",
+					"permissions": []string{"SUBMIT_LIBRARY_NODE"},
+				},
+			})
+			_, installationID, token := addExternalPluginWithManifest(t, root, cl, adminSession, r, manifest)
+
+			rpcURL := externalRPCURL(t, ts.URL, token)
+			pl, stop, done := runExternalSDKAccessPlugin(root, t, rpcURL)
+			defer waitForPluginStop(done)
+			defer stop()
+
+			requireSessionState(t, root, runner, installationID, resource_plugin.ReportedStateActive)
+
+			access, err := pl.GetAccess(root)
+			r.NoError(err)
+			accessAuth := accessKeyAuth(access.AccessKey)
+
+			review := openapi.Review
+			nodeCreate := tests.AssertRequest(
+				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name:       "plugin-submit-review-" + xid.New().String(),
+					Visibility: &review,
+				}, accessAuth),
+			)(t, http.StatusOK)
+			r.Equal(openapi.Review, nodeCreate.JSON200.Visibility)
+		}))
+	}))
+}
+
 func TestExternalPluginAccessPermissionsSyncOnManifestUpdate(t *testing.T) {
 	integration.Test(t, &config.Config{
 		PluginMaxRestartAttempts:    1,
