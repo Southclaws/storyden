@@ -96,7 +96,9 @@ func (w *Writer) Remove(ctx context.Context, plid plugin.InstallationID) error {
 	if r.Supervised {
 		p := w.FilePath(plid)
 		if err = w.store.Delete(ctx, p); err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
+			if ftag.Get(err) != ftag.NotFound {
+				return fault.Wrap(err, fctx.With(ctx))
+			}
 		}
 	}
 
