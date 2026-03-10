@@ -75,7 +75,7 @@ export function PluginStatusToggle({ plugin }: Props) {
   const icon = (() => {
     switch (displayState) {
       case PluginActiveState.active:
-        return <RunningAnimatedIcon size={16} color="accent.9" />;
+        return <RunningAnimatedIcon size={16} color="fg.accent" />;
       case PluginActiveState.inactive:
         return <PauseCircleIcon size={16} />;
       case PluginActiveState.error:
@@ -114,7 +114,7 @@ export function PluginStatusToggle({ plugin }: Props) {
         overflow="hidden"
         bgColor={isActive ? "accent.4" : "bg.subtle"}
         borderColor={isActive ? "accent.3" : "border.subtle"}
-        color={isActive ? "accent.9" : "fg.subtle"}
+        color={isActive ? "fg.accent" : "fg.subtle"}
         borderRightWidth="none"
       >
         <AnimatePresence mode="wait">
@@ -155,7 +155,7 @@ export function PluginStatusToggle({ plugin }: Props) {
         borderWidth="thin"
         borderLeftWidth="none"
         borderColor={isActive ? "border.subtle" : "accent.5"}
-        color={isActive ? "fg.subtle" : "accent.9"}
+        color={isActive ? "fg.subtle" : "fg.accent"}
         _hover={{
           bgColor: isActive ? "bg.muted" : "accent.5",
         }}
