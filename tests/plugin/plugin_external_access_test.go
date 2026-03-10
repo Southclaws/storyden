@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -154,7 +153,7 @@ func TestExternalPluginAccessKeyAndClientBuilder(t *testing.T) {
 }
 
 func TestExternalPluginAccessSubmitLibraryNodeInEmailMode(t *testing.T) {
-	if shouldSkipEmailModePluginAccessTest() {
+	if tests.IsSharedPostgresDatabase() {
 		t.Skip("skipping email-mode plugin access test on shared postgres database")
 	}
 
@@ -220,12 +219,6 @@ func TestExternalPluginAccessSubmitLibraryNodeInEmailMode(t *testing.T) {
 			r.Equal(openapi.Review, nodeCreate.JSON200.Visibility)
 		}))
 	}))
-}
-
-func shouldSkipEmailModePluginAccessTest() bool {
-	databaseURL := strings.ToLower(os.Getenv("DATABASE_URL"))
-
-	return strings.HasPrefix(databaseURL, "postgresql://")
 }
 
 func TestExternalPluginAccessPermissionsSyncOnManifestUpdate(t *testing.T) {
