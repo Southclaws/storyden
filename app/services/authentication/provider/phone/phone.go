@@ -33,7 +33,7 @@ var (
 
 var (
 	requiredMode = authentication.ModePhone
-	service      = authentication.ServicePhoneVerify
+	service      = authentication.AuthServicePhoneVerify
 	tokenType    = authentication.TokenTypeNone
 )
 

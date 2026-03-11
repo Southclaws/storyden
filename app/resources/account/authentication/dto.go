@@ -65,10 +65,7 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		return nil, err
 	}
 
-	service, err := NewService(m.Service)
-	if err != nil {
-		return nil, err
-	}
+	service := NewService(m.Service)
 
 	return &Authentication{
 		ID:         ID(m.ID),

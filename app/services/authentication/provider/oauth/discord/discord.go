@@ -24,7 +24,7 @@ import (
 )
 
 var (
-	service   = authentication.ServiceOAuthDiscord
+	service   = authentication.AuthServiceOAuthDiscord
 	tokenType = authentication.TokenTypeOAuth
 	endpoint  = oauth2.Endpoint{
 		AuthURL:   "https://discord.com/oauth2/authorize",
