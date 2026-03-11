@@ -1,0 +1,77 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolThreadList
+x-storyden-role: READ_PUBLISHED_THREADS
+title: thread_list
+description: List and search discussion threads with filtering and pagination.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadListInput"
+  output:
+    $ref: "#/definitions/ToolThreadListOutput"
+definitions:
+  ToolThreadListInput:
+    type: object
+    properties:
+      query:
+        type: string
+        description: Search query to filter threads
+      visibility:
+        type: string
+        enum:
+          - draft
+          - published
+        description: Filter by visibility
+      page:
+        type: integer
+        minimum: 1
+        description: "Page number (default: 1)"
+    additionalProperties: false
+  ToolThreadListOutput:
+    type: object
+    required:
+      - threads
+      - current_page
+      - total_pages
+      - total_results
+    properties:
+      threads:
+        type: array
+        items:
+          $ref: "#/definitions/ThreadSummary"
+      current_page:
+        type: integer
+      total_pages:
+        type: integer
+      total_results:
+        type: integer
+      next_page:
+        type: integer
+        description: Next page number if available
+    additionalProperties: false
+  ThreadSummary:
+    type: object
+    required:
+      - slug
+      - title
+      - excerpt
+      - author
+      - category
+    properties:
+      slug:
+        type: string
+      title:
+        type: string
+      excerpt:
+        type: string
+        description: Short excerpt of the thread
+      author:
+        type: string
+        description: Author handle
+      category:
+        type: string
+        description: Category name
+    additionalProperties: false

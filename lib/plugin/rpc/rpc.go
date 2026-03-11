@@ -1012,6 +1012,13 @@ type RPCRequestGetConfigParams struct {
 	Keys []string `json:"keys,omitempty"`
 }
 
+type RPCRequestRobotRunParams struct {
+	// Input message for the robot.
+	Message string `json:"message"`
+	// The Robot to invoke.
+	RobotID xid.ID `json:"robot_id"`
+}
+
 type PluginToHostRequestUnion interface {
 	PluginToHostRequestType() string
 	isPluginToHostRequest()
@@ -1051,6 +1058,8 @@ func (w *PluginToHostRequest) UnmarshalJSON(data []byte) error {
 		v = &RPCRequestAccessGet{}
 	case "get_config":
 		v = &RPCRequestGetConfig{}
+	case "robot_run":
+		v = &RPCRequestRobotRun{}
 	default:
 		return fmt.Errorf("PluginToHostRequest: unknown type %q", peek.Type)
 	}
@@ -1085,6 +1094,18 @@ type RPCRequestGetConfig struct {
 func (RPCRequestGetConfig) isPluginToHostRequest() {}
 
 func (RPCRequestGetConfig) PluginToHostRequestType() string { return "get_config" }
+
+// Run a one-shot robot invocation and return the assistant's final text response.
+type RPCRequestRobotRun struct {
+	ID      xid.ID                   `json:"id"`
+	Jsonrpc string                   `json:"jsonrpc"`
+	Method  string                   `json:"method"`
+	Params  RPCRequestRobotRunParams `json:"params"`
+}
+
+func (RPCRequestRobotRun) isPluginToHostRequest() {}
+
+func (RPCRequestRobotRun) PluginToHostRequestType() string { return "robot_run" }
 
 type PluginToHostResponseError struct {
 	Code    opt.Optional[int]    `json:"code,omitempty"`
@@ -1142,6 +1163,8 @@ func (w *PluginToHostResponseUnion) UnmarshalJSON(data []byte) error {
 		v = &RPCResponseAccessGet{}
 	case "get_config":
 		v = &RPCResponseGetConfig{}
+	case "robot_run":
+		v = &RPCResponseRobotRun{}
 	default:
 		return fmt.Errorf("PluginToHostResponseUnion: unknown type %q", peek.Type)
 	}
@@ -1177,6 +1200,19 @@ type RPCResponseGetConfig struct {
 func (RPCResponseGetConfig) isPluginToHostResponseUnion() {}
 
 func (RPCResponseGetConfig) PluginToHostResponseUnionType() string { return "get_config" }
+
+// Final result of a one-shot robot invocation.
+type RPCResponseRobotRun struct {
+	// Error message if invocation failed.
+	Error  opt.Optional[string] `json:"error,omitempty"`
+	Method string               `json:"method"`
+	// Final assistant text response.
+	Response opt.Optional[string] `json:"response,omitempty"`
+}
+
+func (RPCResponseRobotRun) isPluginToHostResponseUnion() {}
+
+func (RPCResponseRobotRun) PluginToHostResponseUnionType() string { return "robot_run" }
 
 type PluginToHostResponse struct {
 	Error   opt.Optional[PluginToHostResponseError] `json:"error,omitempty"`

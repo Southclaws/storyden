@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
+	"github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
@@ -32,6 +33,7 @@ type Handler struct {
 	roleAssigner   *account_role_assign.Manager
 	accessKeys     *access_key.Repository
 	pluginReader   *plugin_reader.Reader
+	robotAgent     *robot.Agent
 
 	mu           sync.Mutex
 	cachedAccess *rpc.RPCResponseAccessGetResult
@@ -49,6 +51,7 @@ func New(
 	roleAssigner *account_role_assign.Manager,
 	accessKeys *access_key.Repository,
 	pluginReader *plugin_reader.Reader,
+	robotAgent *robot.Agent,
 ) *Handler {
 	return &Handler{
 		installationID: installationID,
@@ -62,6 +65,7 @@ func New(
 		roleAssigner:   roleAssigner,
 		accessKeys:     accessKeys,
 		pluginReader:   pluginReader,
+		robotAgent:     robotAgent,
 	}
 }
 
@@ -83,6 +87,20 @@ func (h *Handler) Handle(ctx context.Context, req rpc.PluginToHostRequestUnion) 
 
 	case *rpc.RPCRequestGetConfig:
 		result, err := h.handleGetConfig(ctx, v)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return &rpc.PluginToHostResponse{
+			ID:      v.ID,
+			Jsonrpc: "2.0",
+			Result: rpc.PluginToHostResponseUnion{
+				PluginToHostResponseUnionUnion: result,
+			},
+		}, nil
+
+	case *rpc.RPCRequestRobotRun:
+		result, err := h.handleRobotRun(ctx, v)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

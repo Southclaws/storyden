@@ -1,0 +1,57 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotUpdate
+x-storyden-role: MANAGE_ROBOTS
+title: robot_update
+description: Update a Robot's configuration. You can modify its name,
+  description, playbook (directive), or tools. Only provide the fields you want
+  to change.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolRobotUpdateInput"
+  output:
+    $ref: "#/definitions/ToolRobotUpdateOutput"
+definitions:
+  ToolRobotUpdateInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        pattern: ^[0-9a-v]{20}$
+        description: The unique identifier of the Robot to update. Must be a valid XID
+          format (20 character alphanumeric string).
+      name:
+        type: string
+        minLength: 1
+        description: The new name for the Robot
+      description:
+        type: string
+        description: The new description for the Robot
+      playbook:
+        type: string
+        minLength: 1
+        description: The new directive/system prompt for the Robot
+      tools:
+        type: array
+        description: The new list of tool names that the Robot can use.
+        items:
+          type: string
+    additionalProperties: false
+  ToolRobotUpdateOutput:
+    type: object
+    required:
+      - id
+      - name
+    properties:
+      id:
+        type: string
+        description: The unique identifier of the updated Robot
+      name:
+        type: string
+        description: The Robot's name
+    additionalProperties: false

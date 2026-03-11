@@ -647,6 +647,15 @@ class RPCRequestGetConfigParams(BaseModel):
     keys: List[str] | None = None
 
 
+class RPCRequestRobotRunParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Input message for the robot."""
+    message: str = Field(min_length=1)
+    """The Robot to invoke."""
+    robot_id: str
+
+
 """Request API access credentials provisioned for this plugin."""
 
 class RPCRequestAccessGet(JsonRpcRequest):
@@ -659,8 +668,15 @@ class RPCRequestGetConfig(JsonRpcRequest):
     method: Literal["get_config"]
     params: RPCRequestGetConfigParams | None = None
 
+
+"""Run a one-shot robot invocation and return the assistant's final text response."""
+
+class RPCRequestRobotRun(JsonRpcRequest):
+    method: Literal["robot_run"]
+    params: RPCRequestRobotRunParams
+
 PluginToHostRequest = Annotated[
-    Union[RPCRequestAccessGet, RPCRequestGetConfig],
+    Union[RPCRequestAccessGet, RPCRequestGetConfig, RPCRequestRobotRun],
     Field(discriminator="method"),
 ]
 
@@ -704,8 +720,19 @@ class RPCResponseGetConfig(BaseModel):
     """Configuration key-value pairs"""
     config: Dict[str, Any]
 
+
+"""Final result of a one-shot robot invocation."""
+
+class RPCResponseRobotRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    method: Literal["robot_run"]
+    """Error message if invocation failed."""
+    error: str | None = None
+    """Final assistant text response."""
+    response: str | None = None
+
 PluginToHostResponseUnion = Annotated[
-    Union[RPCResponseAccessGet, RPCResponseGetConfig],
+    Union[RPCResponseAccessGet, RPCResponseGetConfig, RPCResponseRobotRun],
     Field(discriminator="method"),
 ]
 

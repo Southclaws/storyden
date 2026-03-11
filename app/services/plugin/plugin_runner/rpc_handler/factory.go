@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
+	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -24,6 +25,7 @@ type Factory struct {
 	roleAssigner   *account_role_assign.Manager
 	accessKeys     *access_key.Repository
 	pluginReader   *plugin_reader.Reader
+	robotAgent     *robotservice.Agent
 }
 
 func NewFactory(
@@ -35,6 +37,7 @@ func NewFactory(
 	roleAssigner *account_role_assign.Manager,
 	accessKeys *access_key.Repository,
 	pluginReader *plugin_reader.Reader,
+	robotAgent *robotservice.Agent,
 ) *Factory {
 	return &Factory{
 		apiBaseURL:     cfg.PublicAPIAddress,
@@ -45,6 +48,7 @@ func NewFactory(
 		roleAssigner:   roleAssigner,
 		accessKeys:     accessKeys,
 		pluginReader:   pluginReader,
+		robotAgent:     robotAgent,
 	}
 }
 
@@ -65,5 +69,6 @@ func (f *Factory) New(
 		f.roleAssigner,
 		f.accessKeys,
 		f.pluginReader,
+		f.robotAgent,
 	)
 }

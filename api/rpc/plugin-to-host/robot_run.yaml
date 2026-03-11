@@ -1,0 +1,41 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestRobotRun:
+    description: >
+      Run a one-shot robot invocation and return the assistant's final text response.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_run"
+          params:
+            type: object
+            required: ["message", "robot_id"]
+            properties:
+              message:
+                type: string
+                minLength: 1
+                description: Input message for the robot.
+              robot_id:
+                type: string
+                format: xid
+                description: The Robot to invoke.
+
+  RPCResponseRobotRun:
+    description: >
+      Final result of a one-shot robot invocation.
+    type: object
+    required: ["method"]
+    properties:
+      method:
+        type: string
+        const: "robot_run"
+      response:
+        type: string
+        description: Final assistant text response.
+      error:
+        type: string
+        description: Error message if invocation failed.

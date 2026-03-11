@@ -52,6 +52,7 @@ export default defineConfig({
       "&:is(:indeterminate, [data-indeterminate], [aria-checked=mixed], [data-state=indeterminate])",
     closed: "&:is([data-state=closed])",
     open: "&:is([open], [data-state=open])",
+    detailsOpen: "details[open] &",
     on: "&:is([data-state=on])",
     off: "&:is([data-state=off])",
     hidden: "&:is([hidden])",

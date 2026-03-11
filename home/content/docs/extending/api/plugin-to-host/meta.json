@@ -1,6 +1,7 @@
 {
     "pages": [
         "access_get",
-        "get_config"
+        "get_config",
+        "robot_run"
     ]
 }

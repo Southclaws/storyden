@@ -1,0 +1,1989 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "CategoryItem": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Category description",
+          "type": "string"
+        },
+        "name": {
+          "description": "Category name",
+          "type": "string"
+        },
+        "slug": {
+          "description": "Category slug",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "name"
+      ],
+      "type": "object"
+    },
+    "DatagraphItemRef": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier of the datagraph item",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Type of datagraph item (thread, node, profile, collection, etc.)",
+          "enum": [
+            "post",
+            "thread",
+            "reply",
+            "node",
+            "collection",
+            "profile",
+            "event"
+          ],
+          "type": "string"
+        },
+        "slug": {
+          "description": "URL-friendly slug of the datagraph item",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "slug",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "LibraryPageSearchItem": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "Page content excerpt",
+          "type": "string"
+        },
+        "description": {
+          "description": "Brief description",
+          "type": "string"
+        },
+        "name": {
+          "description": "Page name/title",
+          "type": "string"
+        },
+        "slug": {
+          "description": "URL-friendly identifier",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "name"
+      ],
+      "type": "object"
+    },
+    "LibraryPageTreeNode": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Brief description of the page",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the page",
+          "type": "string"
+        },
+        "parent": {
+          "description": "Slug of the parent page (omitted for root pages)",
+          "type": "string"
+        },
+        "slug": {
+          "description": "URL-friendly identifier for the page",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags associated with this page",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "slug",
+        "name",
+        "description"
+      ],
+      "type": "object"
+    },
+    "PropertySchemaField": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this field",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the field",
+          "type": "string"
+        },
+        "sort": {
+          "description": "Sort key for ordering fields",
+          "type": "string"
+        },
+        "type": {
+          "description": "Data type of the field",
+          "enum": [
+            "text",
+            "number",
+            "timestamp",
+            "boolean"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "type": "object"
+    },
+    "PropertySchemaFieldMutation": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Field ID - if provided, updates an existing field. If omitted, creates a new field.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the field",
+          "minLength": 1,
+          "type": "string"
+        },
+        "type": {
+          "description": "Data type of the field",
+          "enum": [
+            "text",
+            "number",
+            "timestamp",
+            "boolean"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "type": "object"
+    },
+    "PropertySchemaFieldResult": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Unique identifier for this field",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the field",
+          "type": "string"
+        },
+        "type": {
+          "description": "Data type of the field",
+          "enum": [
+            "text",
+            "number",
+            "timestamp",
+            "boolean"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type"
+      ],
+      "type": "object"
+    },
+    "PropertyValueMutation": {
+      "additionalProperties": false,
+      "properties": {
+        "field_id": {
+          "description": "The ID of the schema field this property value is for",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value to set for this property",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field_id",
+        "value"
+      ],
+      "type": "object"
+    },
+    "PropertyValueResult": {
+      "additionalProperties": false,
+      "properties": {
+        "field_id": {
+          "description": "The ID of the schema field",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the field",
+          "type": "string"
+        },
+        "type": {
+          "description": "Data type of the field",
+          "enum": [
+            "text",
+            "number",
+            "timestamp",
+            "boolean"
+          ],
+          "type": "string"
+        },
+        "value": {
+          "description": "The current value of this property",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field_id",
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "RobotChatContext": {
+      "additionalProperties": false,
+      "properties": {
+        "datagraph_item": {
+          "$ref": "#/definitions/DatagraphItemRef",
+          "description": "Optional reference to a datagraph item if the user is viewing one (e.g., a thread, library page, profile)"
+        },
+        "page_type": {
+          "description": "Human-readable page type if not viewing a specific datagraph item. Examples: 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form text since the backend doesn't know about frontend routes.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "RobotItem": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Human-readable description of the Robot's purpose",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "name": {
+          "description": "Robot name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "SearchedItem": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Brief description or excerpt",
+          "type": "string"
+        },
+        "id": {
+          "description": "Unique identifier",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Type of content",
+          "type": "string"
+        },
+        "name": {
+          "description": "Title or name",
+          "type": "string"
+        },
+        "slug": {
+          "description": "URL friendly identifier",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "slug",
+        "name"
+      ],
+      "type": "object"
+    },
+    "TagItem": {
+      "additionalProperties": false,
+      "properties": {
+        "item_count": {
+          "description": "Number of items tagged with this tag",
+          "type": "integer"
+        },
+        "name": {
+          "description": "The tag name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "item_count"
+      ],
+      "type": "object"
+    },
+    "ThreadSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author handle",
+          "type": "string"
+        },
+        "category": {
+          "description": "Category name",
+          "type": "string"
+        },
+        "excerpt": {
+          "description": "Short excerpt of the thread",
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "title",
+        "excerpt",
+        "author",
+        "category"
+      ],
+      "type": "object"
+    },
+    "ToolCategoryList": {
+      "$id": "ToolCategoryList",
+      "description": "List all thread categories with their names and descriptions",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolCategoryListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolCategoryListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "category_list",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_THREADS"
+    },
+    "ToolCategoryListInput": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "ToolCategoryListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "items": {
+            "$ref": "#/definitions/CategoryItem"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "categories"
+      ],
+      "type": "object"
+    },
+    "ToolInfo": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Brief description of what the tool does",
+          "type": "string"
+        },
+        "name": {
+          "description": "The tool name identifier",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageCreate": {
+      "$id": "ToolLibraryPageCreate",
+      "description": "Create a new page in the library. A slug will be generated automatically if not provided.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "create_library_page",
+      "type": "object",
+      "x-storyden-role": "MANAGE_LIBRARY"
+    },
+    "ToolLibraryPageCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "The content of the page in HTML format",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name/title of the page",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent": {
+          "description": "Slug of the parent page. Only include if you already have a parent slug available. Leave empty to create a root-level page.",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The unique slug for this page. If not provided, one will be generated from the name.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Optional tags to categorise this page",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "url": {
+          "description": "Optional external URL if this page references a topic on another website",
+          "format": "uri",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Visibility of the page (default: published)",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the created page",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The slug of the created page",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageGet": {
+      "$id": "ToolLibraryPageGet",
+      "description": "Get detailed information about a specific library page by its slug.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "get_library_page",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_LIBRARY"
+    },
+    "ToolLibraryPageGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the library page to retrieve",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "child_pages": {
+          "description": "Slugs of child pages",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Brief description of the page",
+          "type": "string"
+        },
+        "name": {
+          "description": "Display name of the page",
+          "type": "string"
+        },
+        "slug": {
+          "description": "URL-friendly identifier for the page",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Tags associated with this page",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "slug",
+        "name",
+        "tags",
+        "child_pages"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertiesUpdate": {
+      "$id": "ToolLibraryPagePropertiesUpdate",
+      "description": "Update property values on a library page. The page must have a property schema defined by its parent. Each property value corresponds to a field in the schema.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPagePropertiesUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPagePropertiesUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_page_properties_update",
+      "type": "object",
+      "x-storyden-role": "MANAGE_LIBRARY"
+    },
+    "ToolLibraryPagePropertiesUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The slug or ID of the library page to update properties on",
+          "minLength": 1,
+          "type": "string"
+        },
+        "properties": {
+          "description": "The property values to set",
+          "items": {
+            "$ref": "#/definitions/PropertyValueMutation"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertiesUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "properties": {
+          "description": "The updated property values",
+          "items": {
+            "$ref": "#/definitions/PropertyValueResult"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "properties"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertySchemaGet": {
+      "$id": "ToolLibraryPagePropertySchemaGet",
+      "description": "Get the property schema for a library page's children. This returns the schema fields that define what properties child pages can have.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPagePropertySchemaGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPagePropertySchemaGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_page_property_schema_get",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_LIBRARY"
+    },
+    "ToolLibraryPagePropertySchemaGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The slug or ID of the library page to get the property schema for",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertySchemaGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "The schema fields that define properties for child pages",
+          "items": {
+            "$ref": "#/definitions/PropertySchemaField"
+          },
+          "type": "array"
+        },
+        "has_schema": {
+          "description": "Whether this page has a property schema defined for its children",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "fields"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertySchemaUpdate": {
+      "$id": "ToolLibraryPagePropertySchemaUpdate",
+      "description": "Update the property schema for a library page's children. This defines what properties child pages can have. Fields without an ID will be created as new fields. Fields with an ID will be updated. Existing fields not in the list will be removed.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPagePropertySchemaUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPagePropertySchemaUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_page_property_schema_update",
+      "type": "object",
+      "x-storyden-role": "MANAGE_LIBRARY"
+    },
+    "ToolLibraryPagePropertySchemaUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "The schema fields to set. Fields with an ID update existing fields, fields without an ID create new ones. Omitted existing fields will be removed.",
+          "items": {
+            "$ref": "#/definitions/PropertySchemaFieldMutation"
+          },
+          "type": "array"
+        },
+        "id": {
+          "description": "The slug or ID of the parent library page whose children's schema to update",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "fields"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPagePropertySchemaUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "description": "The updated schema fields",
+          "items": {
+            "$ref": "#/definitions/PropertySchemaFieldResult"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "fields"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageSearch": {
+      "$id": "ToolLibraryPageSearch",
+      "description": "Search for pages in the library wiki. Returns matching pages based on the search query.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageSearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageSearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "search_library_pages",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_LIBRARY"
+    },
+    "ToolLibraryPageSearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "description": "The search query text",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageSearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "description": "List of matching library pages",
+          "items": {
+            "$ref": "#/definitions/LibraryPageSearchItem"
+          },
+          "type": "array"
+        },
+        "results": {
+          "description": "Total number of results found",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "results",
+        "items"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageTree": {
+      "$id": "ToolLibraryPageTree",
+      "description": "Get the full tree structure of pages in the library. Returns a hierarchical view of all wiki pages showing their parent-child relationships.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageTreeInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageTreeOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "library_page_list",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_LIBRARY"
+    },
+    "ToolLibraryPageTreeInput": {
+      "additionalProperties": false,
+      "properties": {
+        "depth": {
+          "description": "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)",
+          "minimum": -1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "ToolLibraryPageTreeOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "pages": {
+          "description": "List of pages in tree structure",
+          "items": {
+            "$ref": "#/definitions/LibraryPageTreeNode"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "pages"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageUpdate": {
+      "$id": "ToolLibraryPageUpdate",
+      "description": "Update an existing page in the library. Only provide the fields you want to change.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLibraryPageUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLibraryPageUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "update_library_page",
+      "type": "object",
+      "x-storyden-role": "MANAGE_LIBRARY"
+    },
+    "ToolLibraryPageUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "description": "The new content of the page in HTML format",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the page to update",
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "The new name/title of the page",
+          "minLength": 1,
+          "type": "string"
+        },
+        "parent": {
+          "description": "New parent page slug. Provide to move the page to a different parent.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "New tags to categorise this page",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "url": {
+          "description": "New external URL reference",
+          "format": "uri",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "New visibility of the page",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolLibraryPageUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "The name of the updated page",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The slug of the updated page",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolLinkCreate": {
+      "$id": "ToolLinkCreate",
+      "description": "Create or update a link in the shared bookmarks list. Fetches the URL and extracts OpenGraph metadata (title, description) and plain text content. Useful for bookmarking websites, articles, or any web content.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolLinkCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolLinkCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "link_create",
+      "type": "object",
+      "x-storyden-role": "CREATE_POST"
+    },
+    "ToolLinkCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "url": {
+          "description": "The URL to create a bookmark for. Must be a valid HTTP/HTTPS URL.",
+          "format": "uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "type": "object"
+    },
+    "ToolLinkCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "opengraph_description": {
+          "description": "Description extracted from OpenGraph metadata",
+          "type": "string"
+        },
+        "opengraph_title": {
+          "description": "Title extracted from OpenGraph metadata",
+          "type": "string"
+        },
+        "plain_text": {
+          "description": "Plain text content extracted from the page",
+          "type": "string"
+        },
+        "slug": {
+          "description": "Unique identifier for the link",
+          "type": "string"
+        },
+        "url": {
+          "description": "The bookmarked URL",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "url"
+      ],
+      "type": "object"
+    },
+    "ToolRobotCreate": {
+      "$id": "ToolRobotCreate",
+      "description": "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_create",
+      "type": "object",
+      "x-storyden-role": "MANAGE_ROBOTS"
+    },
+    "ToolRobotCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Optional human-readable description of the Robot's purpose and capabilities",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the Robot - should be descriptive and help identify its purpose",
+          "minLength": 1,
+          "type": "string"
+        },
+        "playbook": {
+          "description": "The directive/system prompt that defines how the Robot behaves, what it helps with, and its personality. This is the primary instruction that guides the Robot's behavior.",
+          "minLength": 1,
+          "type": "string"
+        },
+        "tools": {
+          "description": "List of tool names that the Robot can use.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "playbook"
+      ],
+      "type": "object"
+    },
+    "ToolRobotCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the created Robot",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the Robot",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolRobotDelete": {
+      "$id": "ToolRobotDelete",
+      "description": "Delete a Robot permanently.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotDeleteInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotDeleteOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_delete",
+      "type": "object",
+      "x-storyden-role": "MANAGE_ROBOTS"
+    },
+    "ToolRobotDeleteInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the Robot to delete. Must be a valid XID format (20 character alphanumeric string).",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotDeleteOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The ID of the deleted Robot",
+          "type": "string"
+        },
+        "success": {
+          "description": "Whether the deletion was successful",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotGet": {
+      "$id": "ToolRobotGet",
+      "description": "Get details of a specific Robot by its ID. Use this to view the full configuration of a Robot.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_get",
+      "type": "object",
+      "x-storyden-role": "MANAGE_ROBOTS"
+    },
+    "ToolRobotGetAllToolNames": {
+      "$id": "ToolRobotGetAllToolNames",
+      "description": "Get a list of all available tool names and their descriptions. This is useful when creating or updating a Robot to know what tools are available without loading full schemas. Returns a lightweight list of tool names and brief descriptions.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotGetAllToolNamesInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotGetAllToolNamesOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "system_all_tool_names",
+      "type": "object",
+      "x-storyden-role": "USE_ROBOTS"
+    },
+    "ToolRobotGetAllToolNamesInput": {
+      "additionalProperties": false,
+      "properties": {},
+      "type": "object"
+    },
+    "ToolRobotGetAllToolNamesOutput": {
+      "description": "List of all available tools with their names and descriptions",
+      "properties": {
+        "tools": {
+          "items": {
+            "$ref": "#/definitions/ToolInfo"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "ToolRobotGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the Robot to retrieve. Must be a valid XID format (20 character alphanumeric string). Example: cq3pqt0q91s73dq8r000",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Human-readable description of the Robot's purpose",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the Robot",
+          "type": "string"
+        },
+        "name": {
+          "description": "The name of the Robot",
+          "type": "string"
+        },
+        "playbook": {
+          "description": "The Robot's directive",
+          "type": "string"
+        },
+        "tools": {
+          "description": "List of tool names that the Robot can use",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "playbook",
+        "tools"
+      ],
+      "type": "object"
+    },
+    "ToolRobotList": {
+      "$id": "ToolRobotList",
+      "description": "List all available Robots. Use this to see what Robots have been created and what they do.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_list",
+      "type": "object",
+      "x-storyden-role": "MANAGE_ROBOTS"
+    },
+    "ToolRobotListInput": {
+      "additionalProperties": false,
+      "properties": {
+        "limit": {
+          "description": "Maximum number of Robots to return (default 20)",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "ToolRobotListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "robots": {
+          "description": "List of Robots",
+          "items": {
+            "$ref": "#/definitions/RobotItem"
+          },
+          "type": "array"
+        },
+        "total": {
+          "description": "Total number of Robots found",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "robots",
+        "total"
+      ],
+      "type": "object"
+    },
+    "ToolRobotSwitch": {
+      "$id": "ToolRobotSwitch",
+      "description": "Switch the current conversation to a different Robot (agent). Use this when the user wants to talk to a different specialized agent or when a different agent would be better suited to help with the user's request.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotSwitchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotSwitchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_switch",
+      "type": "object",
+      "x-storyden-role": "USE_ROBOTS"
+    },
+    "ToolRobotSwitchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "robot_id": {
+          "description": "The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs.",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "robot_id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotSwitchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "robot_id": {
+          "description": "The ID of the robot that was switched to",
+          "type": "string"
+        },
+        "success": {
+          "description": "Whether the agent switch was successful",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "success",
+        "robot_id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotUpdate": {
+      "$id": "ToolRobotUpdate",
+      "description": "Update a Robot's configuration. You can modify its name, description, playbook (directive), or tools. Only provide the fields you want to change.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolRobotUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolRobotUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "robot_update",
+      "type": "object",
+      "x-storyden-role": "MANAGE_ROBOTS"
+    },
+    "ToolRobotUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "The new description for the Robot",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the Robot to update. Must be a valid XID format (20 character alphanumeric string).",
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "name": {
+          "description": "The new name for the Robot",
+          "minLength": 1,
+          "type": "string"
+        },
+        "playbook": {
+          "description": "The new directive/system prompt for the Robot",
+          "minLength": 1,
+          "type": "string"
+        },
+        "tools": {
+          "description": "The new list of tool names that the Robot can use.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolRobotUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the updated Robot",
+          "type": "string"
+        },
+        "name": {
+          "description": "The Robot's name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolSearch": {
+      "$id": "ToolSearch",
+      "description": "Search the Storyden knowledge base for library pages, forum threads, and other content. Returns relevant results matching the query.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolSearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolSearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "search",
+      "type": "object",
+      "x-storyden-role": "USE_ROBOTS"
+    },
+    "ToolSearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "authors": {
+          "description": "Filter by author handles (usernames). Do not use '@' prefix.",
+          "items": {
+            "pattern": "^[a-zA-Z0-9_-]+$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "categories": {
+          "description": "Filter by category names (for forum threads). Category names are case-insensitive.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "kind": {
+          "description": "Filter by content types.",
+          "items": {
+            "enum": [
+              "post",
+              "thread",
+              "reply",
+              "node",
+              "collection",
+              "profile",
+              "event"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "max_results": {
+          "description": "Maximum number of results to return (default 10, max 100)",
+          "maximum": 100,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "description": "The search query text",
+          "minLength": 1,
+          "type": "string"
+        },
+        "tags": {
+          "description": "Filter by tag names. Tags are case-sensitive.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ToolSearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "description": "List of search results",
+          "items": {
+            "$ref": "#/definitions/SearchedItem"
+          },
+          "type": "array"
+        },
+        "results": {
+          "description": "Total number of results found",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "results",
+        "items"
+      ],
+      "type": "object"
+    },
+    "ToolTagList": {
+      "$id": "ToolTagList",
+      "description": "Get a list of all tags on the site or search for tags by name. Tags are labels used to categorize and organize content. Each tag includes its name and the number of items tagged with it.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolTagListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolTagListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "tag_list",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_THREADS"
+    },
+    "ToolTagListInput": {
+      "additionalProperties": false,
+      "properties": {
+        "query": {
+          "description": "Optional search query to filter tags by name. If not provided, returns all tags.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ToolTagListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "tags": {
+          "description": "List of tags",
+          "items": {
+            "$ref": "#/definitions/TagItem"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "tags"
+      ],
+      "type": "object"
+    },
+    "ToolThreadCreate": {
+      "$id": "ToolThreadCreate",
+      "description": "Create a new discussion thread in the forum. Threads are discussions organized by category with tags for better discovery.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_create",
+      "type": "object",
+      "x-storyden-role": "CREATE_POST"
+    },
+    "ToolThreadCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "description": "The content of the thread in HTML format",
+          "minLength": 1,
+          "type": "string"
+        },
+        "category": {
+          "description": "The category slug for the thread. Use category_list to see available categories.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Optional tags for the thread",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "The title of the thread",
+          "minLength": 1,
+          "type": "string"
+        },
+        "url": {
+          "description": "Optional URL if this thread is about a specific link",
+          "format": "uri",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Thread visibility (default: published)",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "body",
+        "category"
+      ],
+      "type": "object"
+    },
+    "ToolThreadCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author handle",
+          "type": "string"
+        },
+        "category": {
+          "description": "Category name",
+          "type": "string"
+        },
+        "content": {
+          "description": "Thread content as plain text",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Creation timestamp",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The thread slug",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "The thread title",
+          "type": "string"
+        },
+        "url": {
+          "description": "Associated URL if present",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Thread visibility",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "title"
+      ],
+      "type": "object"
+    },
+    "ToolThreadGet": {
+      "$id": "ToolThreadGet",
+      "description": "Get a specific thread with its content. Returns the thread details including author, content, and category information.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_get",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_THREADS"
+    },
+    "ToolThreadGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "The unique identifier of the thread to retrieve",
+          "minLength": 1,
+          "type": "string"
+        },
+        "page": {
+          "description": "Page number for replies (default: 1)",
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolThreadGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author handle",
+          "type": "string"
+        },
+        "category": {
+          "description": "Category name",
+          "type": "string"
+        },
+        "content": {
+          "description": "Thread content as plain text",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Creation timestamp",
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "description": "Associated URL if present",
+          "type": "string"
+        },
+        "visibility": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "title",
+        "content",
+        "visibility",
+        "author",
+        "category",
+        "tags",
+        "created_at"
+      ],
+      "type": "object"
+    },
+    "ToolThreadList": {
+      "$id": "ToolThreadList",
+      "description": "List and search discussion threads with filtering and pagination.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_list",
+      "type": "object",
+      "x-storyden-role": "READ_PUBLISHED_THREADS"
+    },
+    "ToolThreadListInput": {
+      "additionalProperties": false,
+      "properties": {
+        "page": {
+          "description": "Page number (default: 1)",
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "description": "Search query to filter threads",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Filter by visibility",
+          "enum": [
+            "draft",
+            "published"
+          ],
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ToolThreadListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "current_page": {
+          "type": "integer"
+        },
+        "next_page": {
+          "description": "Next page number if available",
+          "type": "integer"
+        },
+        "threads": {
+          "items": {
+            "$ref": "#/definitions/ThreadSummary"
+          },
+          "type": "array"
+        },
+        "total_pages": {
+          "type": "integer"
+        },
+        "total_results": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "threads",
+        "current_page",
+        "total_pages",
+        "total_results"
+      ],
+      "type": "object"
+    },
+    "ToolThreadReply": {
+      "$id": "ToolThreadReply",
+      "description": "Add a reply to an existing thread",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadReplyInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadReplyOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_reply",
+      "type": "object",
+      "x-storyden-role": "CREATE_POST"
+    },
+    "ToolThreadReplyInput": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "description": "The reply content in HTML format",
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the thread to reply to",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "body"
+      ],
+      "type": "object"
+    },
+    "ToolThreadReplyOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author handle",
+          "type": "string"
+        },
+        "content": {
+          "description": "Reply content as plain text",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Creation timestamp",
+          "type": "string"
+        },
+        "updated_at": {
+          "description": "Update timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "author",
+        "content",
+        "created_at",
+        "updated_at"
+      ],
+      "type": "object"
+    },
+    "ToolThreadUpdate": {
+      "$id": "ToolThreadUpdate",
+      "description": "Update an existing thread's properties",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolThreadUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolThreadUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "thread_update",
+      "type": "object",
+      "x-storyden-role": "MANAGE_POSTS"
+    },
+    "ToolThreadUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "body": {
+          "description": "New content for the thread in HTML format",
+          "minLength": 1,
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique identifier of the thread to update",
+          "minLength": 1,
+          "type": "string"
+        },
+        "tags": {
+          "description": "New tags for the thread",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "New title for the thread",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "New visibility: published or draft",
+          "enum": [
+            "published",
+            "draft"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolThreadUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "description": "Author handle",
+          "type": "string"
+        },
+        "category": {
+          "description": "Category name",
+          "type": "string"
+        },
+        "content": {
+          "description": "Thread content as plain text",
+          "type": "string"
+        },
+        "created_at": {
+          "description": "Creation timestamp",
+          "type": "string"
+        },
+        "slug": {
+          "description": "The thread slug",
+          "type": "string"
+        },
+        "tags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "title": {
+          "description": "The thread title",
+          "type": "string"
+        },
+        "url": {
+          "description": "Associated URL if present",
+          "type": "string"
+        },
+        "visibility": {
+          "description": "Thread visibility",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slug",
+        "title"
+      ],
+      "type": "object"
+    }
+  }
+}
