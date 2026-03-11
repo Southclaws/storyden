@@ -61,6 +61,7 @@ test("parseSettings keeps valid metadata and applies nested defaults", () => {
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
   assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
+  assert.equal(parsed.metadata.theme, { css: [], scripts: [] });
 });
 
 test("parseSettings falls back to defaults for invalid metadata", () => {
@@ -109,6 +110,26 @@ test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
   assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
+  assert.equal(parsed.metadata.theme, { css: [], scripts: [] });
+});
+
+test("parseSettings keeps valid theme metadata", () => {
+  const parsed = parseSettings(
+    baseInfo({
+      metadata: {
+        ...DefaultFrontendConfig,
+        theme: {
+          css: ["/api/info/theme/assets/custom-css"],
+          scripts: ["/api/info/theme/assets/custom-js"],
+        },
+      },
+    }),
+  );
+
+  assert.equal(parsed.metadata.theme, {
+    css: ["/api/info/theme/assets/custom-css"],
+    scripts: ["/api/info/theme/assets/custom-js"],
+  });
 });
 
 test("parseSettings keeps valid motd metadata type", () => {

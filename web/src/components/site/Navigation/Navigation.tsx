@@ -38,12 +38,15 @@ export async function Navigation({
   return (
     <Box
       id="navigation__container"
-      className={styles["navigation__container"]}
+      className={`sd-navigation sd-navigation__container ${styles["navigation__container"]}`}
       w="full"
       data-leftbar-shown={showLeftBar}
     >
-      <Box id="navigation__scroll" className={styles["navgrid"]}>
-        <Box className={styles["main"]}>
+      <Box
+        id="navigation__scroll"
+        className={`sd-navigation__scroll ${styles["navgrid"]}`}
+      >
+        <Box className={`sd-navigation__main ${styles["main"]}`}>
           {/*  */}
           <Onboarding />
           <VerificationBanner
@@ -62,14 +65,14 @@ export async function Navigation({
         top="0"
         left="0"
         height="dvh"
-        className={styles["navgrid"]}
+        className={`sd-navigation__fixed ${styles["navgrid"]}`}
         pointerEvents="none"
       >
         <DesktopCommandBar />
 
         <Box
           id="navigation__leftbar"
-          className={styles["leftbar"]}
+          className={`sd-navigation__leftbar ${styles["leftbar"]}`}
           aria-hidden={!showLeftBar}
           inert={!showLeftBar}
         >
@@ -81,7 +84,7 @@ export async function Navigation({
 
         <Box
           id="navigation__rightbar"
-          className={styles["rightbar"]}
+          className={`sd-navigation__rightbar ${styles["rightbar"]}`}
           aria-hidden={!showLeftBar}
           inert={!showLeftBar}
         >

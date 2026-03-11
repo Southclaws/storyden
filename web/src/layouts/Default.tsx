@@ -18,6 +18,7 @@ export async function Default({
 
   return (
     <Flex
+      className="sd-layout sd-layout--dashboard"
       minHeight="dvh"
       width="full"
       flexDirection="row"
@@ -26,6 +27,7 @@ export async function Default({
     >
       <Navigation contextpane={contextpane}>
         <styled.main
+          className="sd-screen sd-screen--dashboard"
           containerType="inline-size"
           width="full"
           height="full"

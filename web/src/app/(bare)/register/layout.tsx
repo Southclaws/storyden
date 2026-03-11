@@ -5,7 +5,7 @@ import { VStack } from "@/styled-system/jsx";
 
 export default async function Layout({ children }: PropsWithChildren) {
   return (
-    <VStack w="full">
+    <VStack className="sd-screen sd-screen--register" w="full">
       {children}
 
       <LinkButton size="xs" variant="subtle" href="/login">

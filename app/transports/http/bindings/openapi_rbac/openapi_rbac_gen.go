@@ -12,6 +12,9 @@ type OperationPermissions interface {
 	IconUpload() (bool, *rbac.Permission)
 	BannerGet() (bool, *rbac.Permission)
 	BannerUpload() (bool, *rbac.Permission)
+	ThemeGet() (bool, *rbac.Permission)
+	ThemeAssetUpload() (bool, *rbac.Permission)
+	ThemeAssetGet() (bool, *rbac.Permission)
 	SendBeacon() (bool, *rbac.Permission)
 	AdminSettingsGet() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
@@ -179,6 +182,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.BannerGet()
 	case "BannerUpload":
 		return optable.BannerUpload()
+	case "ThemeGet":
+		return optable.ThemeGet()
+	case "ThemeAssetUpload":
+		return optable.ThemeAssetUpload()
+	case "ThemeAssetGet":
+		return optable.ThemeAssetGet()
 	case "SendBeacon":
 		return optable.SendBeacon()
 	case "AdminSettingsGet":

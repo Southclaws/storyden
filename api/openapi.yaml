@@ -243,6 +243,43 @@ paths:
         "200":
           description: OK
 
+  /info/theme:
+    get:
+      operationId: ThemeGet
+      description: |
+        Get the active custom theme manifest for the installation.
+      security: []
+      tags: [misc]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/ThemeGetOK" }
+
+  /info/theme/assets:
+    post:
+      operationId: ThemeAssetUpload
+      description: Upload a theme asset file (CSS or JS).
+      tags: [misc]
+      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      parameters:
+        - $ref: "#/components/parameters/ContentLength"
+        - $ref: "#/components/parameters/AssetNameQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ThemeAssetUploadOK" }
+
+  /info/theme/assets/{asset_filename}:
+    get:
+      operationId: ThemeAssetGet
+      description: Download a theme asset file by filename.
+      security: []
+      tags: [misc]
+      parameters: [$ref: "#/components/parameters/AssetPathParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AssetGetOK" }
+
   /beacon:
     post:
       operationId: SendBeacon
@@ -3564,6 +3601,20 @@ components:
           schema:
             $ref: "#/components/schemas/SessionInfo"
 
+    ThemeGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ThemeManifest"
+
+    ThemeAssetUploadOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Asset"
+
     AdminSettingsGetOK:
       description: OK
       content:
@@ -4319,6 +4370,20 @@ components:
           $ref: "#/components/schemas/Metadata"
         motd:
           $ref: "#/components/schemas/MessageOfTheDay"
+
+    ThemeManifest:
+      description: Active custom theme asset manifest for the web frontend.
+      type: object
+      required: [css, scripts]
+      properties:
+        css:
+          type: array
+          items:
+            type: string
+        scripts:
+          type: array
+          items:
+            type: string
 
     SessionInfo:
       description: |

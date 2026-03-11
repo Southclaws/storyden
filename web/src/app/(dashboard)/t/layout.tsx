@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
 
 export default async function Layout({ children }: PropsWithChildren) {
-  return children;
+  return <div className="sd-screen sd-screen--thread">{children}</div>;
 }

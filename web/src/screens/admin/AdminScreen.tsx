@@ -15,6 +15,7 @@ import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
 import { PluginSettingsScreen } from "./PluginSettingsScreen";
 import { SystemSettingsScreen } from "./SystemSettingsScreen";
+import { ThemeSettingsScreen } from "./ThemeSettingsScreen";
 
 const DEFAULT_TAB = "brand";
 
@@ -59,6 +60,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="system">System</Tabs.Trigger>
         <Tabs.Trigger value="audit">Audit Log</Tabs.Trigger>
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
+        <Tabs.Trigger value="theme">Theme</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
         {pluginsEnabled && <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>}
@@ -83,6 +85,10 @@ export function AdminScreen() {
 
       <Tabs.Content value="interface">
         <InterfaceSettingsScreen />
+      </Tabs.Content>
+
+      <Tabs.Content value="theme">
+        <ThemeSettingsScreen />
       </Tabs.Content>
 
       <Tabs.Content value="authentication">
