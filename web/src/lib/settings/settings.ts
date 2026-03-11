@@ -34,11 +34,15 @@ export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
   editor: DefaultEditorSettings,
   sidebar: DefaultSidebarSettings,
+  theme: {
+    css: [] as string[],
+    scripts: [] as string[],
+  },
   signatures: {
     enabled: true,
     maxHeight: 160,
   },
-} as const;
+};
 
 export const DefaultSettings = {
   title: "Storyden",
@@ -58,6 +62,12 @@ export const FrontendConfigurationSchema = z
     feed: FeedConfigSchema,
     editor: EditorSettingsSchema.default(DefaultEditorSettings),
     sidebar: SidebarSettingsSchema.default(DefaultSidebarSettings),
+    theme: z
+      .object({
+        css: z.array(z.string()).default([]),
+        scripts: z.array(z.string()).default([]),
+      })
+      .default({ css: [], scripts: [] }),
     signatures: z
       .object({
         enabled: z.boolean().default(true),

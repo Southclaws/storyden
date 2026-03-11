@@ -6,6 +6,8 @@ import { getColourAsHex } from "src/utils/colour";
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
+import { filterAllowedThemeAssets } from "@/lib/theme/manifest";
+import { getServerThemeManifest } from "@/lib/theme/theme-server";
 import { getIconURL } from "@/utils/icon";
 
 import "./global.css";
@@ -15,8 +17,18 @@ import { Providers } from "./providers";
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
+  const manifest = await getServerThemeManifest();
+  const themeAssets = filterAllowedThemeAssets(manifest, {
+    webAddress: WEB_ADDRESS,
+    apiAddress: API_ADDRESS,
+  });
+
   return (
-    <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${interDisplay.variable} sd-app sd-app--root`}
+      data-sd-theme-api="v1"
+    >
       <head>
         {/*
           NOTE: Because the browser side does not support dynamic environment
@@ -37,10 +49,31 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         */}
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/theme.css" />
+
+        {themeAssets.css.map((href, i) => (
+          // eslint-disable-next-line @next/next/no-css-tags
+          <link
+            key={`theme-css-${i}-${href}`}
+            rel="stylesheet"
+            href={href}
+            data-sd-theme-asset="css"
+          />
+        ))}
+
+        {themeAssets.scripts.map((src, i) => (
+          <script
+            key={`theme-script-${i}-${src}`}
+            src={src}
+            defer
+            data-sd-theme-asset="script"
+          />
+        ))}
       </head>
 
-      <body>
-        <Providers>{children}</Providers>
+      <body className="sd-app__body">
+        <div className="sd-app__viewport">
+          <Providers>{children}</Providers>
+        </div>
       </body>
     </html>
   );

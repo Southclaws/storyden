@@ -4,7 +4,7 @@ import { PropsWithChildren } from "react";
 import { getSettings } from "@/lib/settings/settings-server";
 
 export default async function Layout({ children }: PropsWithChildren) {
-  return <>{children}</>;
+  return <div className="sd-screen sd-screen--compose">{children}</div>;
 }
 
 export async function generateMetadata(): Promise<Metadata> {

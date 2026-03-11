@@ -13,11 +13,8 @@ import { getSettings } from "@/lib/settings/settings-server";
 
 export async function GET() {
   const settings = await getSettings();
-
   const cv = getColourVariants(settings.accent_colour);
-
   const rules = Object.entries(cv).map(([k, v]) => `${k}: ${v};`);
-
   const document = css`
     :root {
       ${rules.join("\n      ")}
@@ -25,9 +22,7 @@ export async function GET() {
   `;
 
   return new NextResponse(document, {
-    headers: {
-      "Content-Type": "text/css",
-    },
+    headers: { "Content-Type": "text/css" },
   });
 }
 

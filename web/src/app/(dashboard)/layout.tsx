@@ -6,5 +6,9 @@ export default async function Layout({
   children,
   contextpane,
 }: PropsWithChildren<{ contextpane: React.ReactNode }>) {
-  return <Default contextpane={contextpane}>{children}</Default>;
+  return (
+    <Default contextpane={contextpane}>
+      <div className="sd-screen sd-screen--dashboard-route">{children}</div>
+    </Default>
+  );
 }

@@ -18,7 +18,7 @@ export default async function Layout({ children }: PropsWithChildren) {
 
   return (
     <Fullpage>
-      <VStack minH="dvh" py="24">
+      <VStack className="sd-layout sd-layout--bare" minH="dvh" py="24">
         <CardBox className={vstack()} maxW="sm" gap="4" p="4">
           <WStack>
             <BackAction />
@@ -39,7 +39,7 @@ export default async function Layout({ children }: PropsWithChildren) {
             </styled.h1>
           </VStack>
 
-          {children}
+          <div className="sd-screen sd-screen--bare-route">{children}</div>
         </CardBox>
       </VStack>
     </Fullpage>

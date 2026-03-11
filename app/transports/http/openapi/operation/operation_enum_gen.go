@@ -21,6 +21,9 @@ var (
 	OperationIDIconUpload                       = OperationID{`IconUpload`}
 	OperationIDBannerGet                        = OperationID{`BannerGet`}
 	OperationIDBannerUpload                     = OperationID{`BannerUpload`}
+	OperationIDThemeGet                         = OperationID{`ThemeGet`}
+	OperationIDThemeAssetUpload                 = OperationID{`ThemeAssetUpload`}
+	OperationIDThemeAssetGet                    = OperationID{`ThemeAssetGet`}
 	OperationIDSendBeacon                       = OperationID{`SendBeacon`}
 	OperationIDAdminSettingsGet                 = OperationID{`AdminSettingsGet`}
 	OperationIDAdminSettingsUpdate              = OperationID{`AdminSettingsUpdate`}
@@ -223,6 +226,12 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDBannerGet, nil
 	case string(`BannerUpload`):
 		return OperationIDBannerUpload, nil
+	case string(`ThemeGet`):
+		return OperationIDThemeGet, nil
+	case string(`ThemeAssetUpload`):
+		return OperationIDThemeAssetUpload, nil
+	case string(`ThemeAssetGet`):
+		return OperationIDThemeAssetGet, nil
 	case string(`SendBeacon`):
 		return OperationIDSendBeacon, nil
 	case string(`AdminSettingsGet`):

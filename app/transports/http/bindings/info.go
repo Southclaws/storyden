@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/branding/banner"
 	"github.com/Southclaws/storyden/app/services/branding/icon"
+	"github.com/Southclaws/storyden/app/services/branding/theme"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -22,14 +23,22 @@ type Info struct {
 	accountInfo *account_querier.Querier
 	is          icon.Service
 	os          banner.Service
+	ts          theme.Service
 }
 
-func NewInfo(systemInfo *instance_info.Provider, accountInfo *account_querier.Querier, is icon.Service, os banner.Service) Info {
+func NewInfo(
+	systemInfo *instance_info.Provider,
+	accountInfo *account_querier.Querier,
+	is icon.Service,
+	os banner.Service,
+	ts theme.Service,
+) Info {
 	return Info{
 		systemInfo:  systemInfo,
 		accountInfo: accountInfo,
 		is:          is,
 		os:          os,
+		ts:          ts,
 	}
 }
 
@@ -128,6 +137,73 @@ func (i Info) BannerUpload(ctx context.Context, request openapi.BannerUploadRequ
 	return openapi.BannerUpload200Response{}, nil
 }
 
+func (i Info) ThemeGet(ctx context.Context, request openapi.ThemeGetRequestObject) (openapi.ThemeGetResponseObject, error) {
+	manifest, err := i.ts.GetManifest(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.ThemeGet200JSONResponse{
+		ThemeGetOKJSONResponse: openapi.ThemeGetOKJSONResponse{
+			Css:     manifest.CSS,
+			Scripts: manifest.Scripts,
+		},
+	}, nil
+}
+
+func (i Info) ThemeAssetUpload(ctx context.Context, request openapi.ThemeAssetUploadRequestObject) (openapi.ThemeAssetUploadResponseObject, error) {
+	if request.Params.Filename == nil {
+		return nil, fault.Wrap(fault.New("filename query parameter is required"), fctx.With(ctx))
+	}
+
+	a, kind, err := i.ts.UploadAsset(ctx, request.Body, request.Params.ContentLength, *request.Params.Filename)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	out := serialiseAssetPtr(a)
+	out.Path = theme.BuildAssetURL(a.Name.String())
+	out.MimeType = kind.MIME()
+
+	return openapi.ThemeAssetUpload200JSONResponse{
+		ThemeAssetUploadOKJSONResponse: openapi.ThemeAssetUploadOKJSONResponse(out),
+	}, nil
+}
+
+func (i Info) ThemeAssetGet(ctx context.Context, request openapi.ThemeAssetGetRequestObject) (openapi.ThemeAssetGetResponseObject, error) {
+	a, r, err := i.ts.GetAsset(ctx, request.AssetFilename)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	contentType := a.MIME.String()
+
+	// Theme assets uploaded before MIME fixes may be stored as octet-stream.
+	// Resolve MIME from the active manifest so CSS/JS still load correctly.
+	if contentType == "application/octet-stream" {
+		if manifest, err := i.ts.GetManifest(ctx); err == nil {
+			assetPath := theme.BuildAssetURL(a.Name.String())
+			switch {
+			case containsString(manifest.CSS, assetPath):
+				contentType = theme.AssetKindStylesheet.MIME()
+			case containsString(manifest.Scripts, assetPath):
+				contentType = theme.AssetKindScript.MIME()
+			}
+		}
+	}
+
+	return openapi.ThemeAssetGet200AsteriskResponse{
+		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
+			Body:          r,
+			ContentType:   contentType,
+			ContentLength: int64(a.Size),
+			Headers: openapi.AssetGetOKResponseHeaders{
+				CacheControl: "public, max-age=31536000",
+			},
+		},
+	}, nil
+}
+
 func serialiseInfo(info *instance_info.Info) openapi.Info {
 	return openapi.Info{
 		Title:              info.Settings.Title.OrZero(),
@@ -146,4 +222,14 @@ func serialiseCapabilitiesList(cs instance_info.Capabilities) openapi.InstanceCa
 	return dt.Map(cs, func(c instance_info.Capability) openapi.InstanceCapability {
 		return openapi.InstanceCapability(c.String())
 	})
+}
+
+func containsString(items []string, value string) bool {
+	for _, item := range items {
+		if item == value {
+			return true
+		}
+	}
+
+	return false
 }

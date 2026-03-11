@@ -5,7 +5,7 @@ import { HStack, VStack } from "@/styled-system/jsx";
 
 export default async function Layout({ children }: PropsWithChildren) {
   return (
-    <VStack w="full">
+    <VStack className="sd-screen sd-screen--password-reset" w="full">
       {children}
 
       <HStack>
