@@ -182,6 +182,7 @@ type Config struct {
 
 	   - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
 	   - `sendgrid` for SendGrid based email sending.
+	   - `smtp` for SMTP-based email sending through any SMTP server.
 	   - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 	*/
 	EmailProvider string `envconfig:"EMAIL_PROVIDER"`
@@ -203,6 +204,44 @@ type Config struct {
 	   This is typically a long string of characters that you can generate in the SendGrid dashboard.
 	*/
 	SendGridAPIKey string `envconfig:"SENDGRID_API_KEY"`
+	/*
+	   The hostname of the SMTP server. This is required for sending emails via SMTP.
+
+	   This is typically something like `smtp.gmail.com`, `smtp.outlook.com`, or your organization's SMTP server.
+	*/
+	SMTPHost string `envconfig:"SMTP_HOST"`
+	/*
+	   The port of the SMTP server. This is required for sending emails via SMTP.
+
+	   Common values are:
+	   - `587` for STARTTLS (recommended)
+	   - `465` for implicit TLS/SSL
+	   - `25` for unencrypted SMTP (not recommended for production)
+	*/
+	SMTPPort int `envconfig:"SMTP_PORT"`
+	// The username for SMTP authentication. This is typically your email address.
+	SMTPUsername string `envconfig:"SMTP_USERNAME"`
+	// The password for SMTP authentication. For services like Gmail, this may be an "app password" rather than your regular password.
+	SMTPPassword string `envconfig:"SMTP_PASSWORD"`
+	/*
+	   The name that will be used as the sender name for emails sent via SMTP.
+
+	   This is typically the name of your community or organisation.
+	*/
+	SMTPFromName string `envconfig:"SMTP_FROM_NAME"`
+	/*
+	   The email address that will be used as the sender address for emails sent via SMTP.
+
+	   This is typically a no-reply address, such as `no-reply@<your-domain>`.
+	*/
+	SMTPFromAddress string `envconfig:"SMTP_FROM_ADDRESS"`
+	/*
+	   Whether to require TLS encryption for SMTP connections.
+
+	   When enabled, Storyden uses implicit TLS on port `465` and STARTTLS on other ports.
+	   Set to `false` only if your SMTP server does not support encryption (not recommended).
+	*/
+	SMTPUseTLS bool `default:"true" envconfig:"SMTP_USE_TLS"`
 
 	// -
 	// Authentication
