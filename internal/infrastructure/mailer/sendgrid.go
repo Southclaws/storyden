@@ -44,7 +44,6 @@ func (m *SendGrid) Send(
 	message := mail.NewSingleEmail(from, msg.Subject, to, msg.Content.Plain, msg.Content.HTML)
 
 	m.logger.Info("sending live email",
-		slog.String("email", to.Address),
 		slog.String("name", to.Name),
 		slog.String("subject", msg.Subject),
 	)

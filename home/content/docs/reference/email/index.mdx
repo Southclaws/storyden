@@ -1,0 +1,51 @@
+---
+title: Email
+description: Email in Storyden is optional and intentionally minimal.
+---
+
+Storyden can run with email, or with no email at all.
+
+That second option is unusual, but it is useful for communities that want to avoid collecting personal data like email addresses.
+
+## What Email Is Used For
+
+Storyden currently sends email for authentication flows only:
+
+- Email verification codes for email-based sign-in/sign-up flows.
+- Password reset links for password-based accounts.
+
+There are currently no email notifications for replies, mentions, reactions, digests, or marketing.
+
+## Running Storyden With No Email
+
+If you do not want to use email:
+
+1. Leave `EMAIL_PROVIDER` unset in [Configuration](/docs/reference/configuration).
+2. Keep authentication mode on username/handle in [Settings](/docs/reference/settings).
+3. Use non-email auth methods where needed, such as [OAuth providers](/docs/reference/oauth).
+
+<Callout type="info">
+  This only happens in a narrow misconfiguration path: first enable an email
+  provider, then switch auth mode to email, then later remove email provider
+  config. In that case, Storyden falls back to handle mode so members are not
+  locked out.
+</Callout>
+
+## Privacy Note
+
+Running without email is a solid fit for anonymous or pseudonymous communities.
+
+If you enable login methods that return an email address (for example some OAuth providers), Storyden may still store that address for account linking. See the [OAuth provider docs](/docs/reference/oauth) for that flow.
+
+## Email Providers
+
+<Cards>
+  <Card href="/docs/reference/email/smtp" title="SMTP">
+    Use your own SMTP server or a hosted SMTP relay.
+  </Card>
+  <Card href="/docs/reference/email/sendgrid" title="SendGrid">
+    Use SendGrid as a managed email delivery provider.
+  </Card>
+</Cards>
+
+For all environment variables and defaults, use the [Configuration reference](/docs/reference/configuration).

@@ -1,0 +1,36 @@
+---
+title: SendGrid
+description: Configure Storyden to send emails through SendGrid.
+---
+
+[SendGrid](https://www.twilio.com/en-us/sendgrid) is a simple provider for sending emails with a generous free tier.
+
+## Required Configuration
+
+Set these environment variables:
+
+- `EMAIL_PROVIDER=sendgrid`
+- `SENDGRID_FROM_NAME`
+- `SENDGRID_FROM_ADDRESS`
+- `SENDGRID_API_KEY`
+- `JWT_SECRET`
+
+Use the [Configuration reference](/docs/reference/configuration) for complete field details.
+
+## Example
+
+```bash
+EMAIL_PROVIDER=sendgrid
+SENDGRID_FROM_NAME="My Community"
+SENDGRID_FROM_ADDRESS=no-reply@example.com
+SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxx
+JWT_SECRET=replace-with-a-long-random-secret
+```
+
+<Callout type="info">
+  You can generate a JWT secret with `openssl rand -hex 32`.
+</Callout>
+
+## Sender Setup
+
+Make sure the sender address/domain is verified in SendGrid before going live, otherwise delivery can fail or end up in spam.
