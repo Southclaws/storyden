@@ -280,42 +280,9 @@ When enabling email features, you must also set `JWT_SECRET` as this is used to 
 Either:
 
 - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
-- `sendgrid` for SendGrid based email sending.
 - `smtp` for SMTP-based email sending through any SMTP server.
+- `sendgrid` for SendGrid based email sending.
 - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
-
-### `SENDGRID_FROM_NAME`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-The name that will be used as the sender name for emails sent via SendGrid.
-
-This is typically the name of your community or organisation.
-
-### `SENDGRID_FROM_ADDRESS`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-The email address that will be used as the sender address for emails sent via SendGrid.
-
-This is typically a no-reply address, such as `no-reply@<your-domain>`.
-
-### `SENDGRID_API_KEY`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-The API key for the SendGrid account. This is required for sending emails via SendGrid.
-
-This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
 ### `SMTP_HOST`
 
@@ -393,6 +360,39 @@ Whether to require TLS encryption for SMTP connections.
 
 When enabled, Storyden uses implicit TLS on port `465` and STARTTLS on other ports.
 Set to `false` only if your SMTP server does not support encryption (not recommended).
+
+### `SENDGRID_FROM_NAME`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The name that will be used as the sender name for emails sent via SendGrid.
+
+This is typically the name of your community or organisation.
+
+### `SENDGRID_FROM_ADDRESS`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The email address that will be used as the sender address for emails sent via SendGrid.
+
+This is typically a no-reply address, such as `no-reply@<your-domain>`.
+
+### `SENDGRID_API_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The API key for the SendGrid account. This is required for sending emails via SendGrid.
+
+This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
 ## Authentication
 
@@ -1051,3 +1051,4 @@ Pinecone provides hosting on different cloud providers, see the Pinecone documen
 </table>
 
 Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
+

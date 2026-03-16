@@ -230,31 +230,9 @@
         Either:
 
         - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
-        - `sendgrid` for SendGrid based email sending.
         - `smtp` for SMTP-based email sending through any SMTP server.
+        - `sendgrid` for SendGrid based email sending.
         - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
-
-    - env: "SENDGRID_FROM_NAME"
-      name: SendGridFromName
-      type: string
-      description: |-
-        The name that will be used as the sender name for emails sent via SendGrid.
-
-        This is typically the name of your community or organisation.
-    - env: "SENDGRID_FROM_ADDRESS"
-      name: SendGridFromAddress
-      type: string
-      description: |-
-        The email address that will be used as the sender address for emails sent via SendGrid.
-
-        This is typically a no-reply address, such as `no-reply@<your-domain>`.
-    - env: "SENDGRID_API_KEY"
-      name: SendGridAPIKey
-      type: string
-      description: |-
-        The API key for the SendGrid account. This is required for sending emails via SendGrid.
-
-        This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
     - env: "SMTP_HOST"
       name: SMTPHost
@@ -312,6 +290,28 @@
 
         When enabled, Storyden uses implicit TLS on port `465` and STARTTLS on other ports.
         Set to `false` only if your SMTP server does not support encryption (not recommended).
+
+    - env: "SENDGRID_FROM_NAME"
+      name: SendGridFromName
+      type: string
+      description: |-
+        The name that will be used as the sender name for emails sent via SendGrid.
+
+        This is typically the name of your community or organisation.
+    - env: "SENDGRID_FROM_ADDRESS"
+      name: SendGridFromAddress
+      type: string
+      description: |-
+        The email address that will be used as the sender address for emails sent via SendGrid.
+
+        This is typically a no-reply address, such as `no-reply@<your-domain>`.
+    - env: "SENDGRID_API_KEY"
+      name: SendGridAPIKey
+      type: string
+      description: |-
+        The API key for the SendGrid account. This is required for sending emails via SendGrid.
+
+        This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
 - section: Authentication
   description: |-

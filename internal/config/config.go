@@ -181,29 +181,11 @@ type Config struct {
 	   Either:
 
 	   - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
-	   - `sendgrid` for SendGrid based email sending.
 	   - `smtp` for SMTP-based email sending through any SMTP server.
+	   - `sendgrid` for SendGrid based email sending.
 	   - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 	*/
 	EmailProvider string `envconfig:"EMAIL_PROVIDER"`
-	/*
-	   The name that will be used as the sender name for emails sent via SendGrid.
-
-	   This is typically the name of your community or organisation.
-	*/
-	SendGridFromName string `envconfig:"SENDGRID_FROM_NAME"`
-	/*
-	   The email address that will be used as the sender address for emails sent via SendGrid.
-
-	   This is typically a no-reply address, such as `no-reply@<your-domain>`.
-	*/
-	SendGridFromAddress string `envconfig:"SENDGRID_FROM_ADDRESS"`
-	/*
-	   The API key for the SendGrid account. This is required for sending emails via SendGrid.
-
-	   This is typically a long string of characters that you can generate in the SendGrid dashboard.
-	*/
-	SendGridAPIKey string `envconfig:"SENDGRID_API_KEY"`
 	/*
 	   The hostname of the SMTP server. This is required for sending emails via SMTP.
 
@@ -242,6 +224,24 @@ type Config struct {
 	   Set to `false` only if your SMTP server does not support encryption (not recommended).
 	*/
 	SMTPUseTLS bool `default:"true" envconfig:"SMTP_USE_TLS"`
+	/*
+	   The name that will be used as the sender name for emails sent via SendGrid.
+
+	   This is typically the name of your community or organisation.
+	*/
+	SendGridFromName string `envconfig:"SENDGRID_FROM_NAME"`
+	/*
+	   The email address that will be used as the sender address for emails sent via SendGrid.
+
+	   This is typically a no-reply address, such as `no-reply@<your-domain>`.
+	*/
+	SendGridFromAddress string `envconfig:"SENDGRID_FROM_ADDRESS"`
+	/*
+	   The API key for the SendGrid account. This is required for sending emails via SendGrid.
+
+	   This is typically a long string of characters that you can generate in the SendGrid dashboard.
+	*/
+	SendGridAPIKey string `envconfig:"SENDGRID_API_KEY"`
 
 	// -
 	// Authentication
