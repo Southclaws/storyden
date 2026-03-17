@@ -6,7 +6,9 @@ import { VStack } from "@/styled-system/jsx";
 import { PasswordResetEmailScreen } from "./PasswordResetEmailScreen";
 
 export async function PasswordResetScreen() {
-  const { data } = await authProviderList();
+  const { data } = await authProviderList({
+    cache: "no-store",
+  });
 
   switch (data.mode) {
     case AuthMode.handle:
