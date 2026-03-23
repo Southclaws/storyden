@@ -6,6 +6,7 @@ import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
 import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
@@ -27,8 +28,9 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
   const permalink = getPermalinkForPost(thread.slug, reply.id, currentPage);
 
   const isSharingEnabled = useShare();
-  const isEditingEnabled = account?.id === reply.author.id;
-  const isDeletingEnabled = account?.id === reply.author.id;
+  const isEditingEnabled = canEditPost(reply, account);
+  const isDeletingEnabled =
+    canDeletePost(reply, account) && reply.deletedAt === undefined;
 
   async function handleCopyURL() {
     copyToClipboard(permalink);
