@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, intervalToDuration } from "date-fns";
+import { register } from "node:module";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -131,6 +132,7 @@ export function useSystemSettings({ settings }: Props) {
   });
 
   return {
+    register: form.register,
     control: form.control,
     formState: form.formState,
     onSubmit,
