@@ -55,6 +55,20 @@ func New(
 	}
 
 	proxy := httputil.NewSingleHostReverseProxy(&cfg.FrontendProxy)
+	proxy.Director = nil
+	proxy.Rewrite = func(req *httputil.ProxyRequest) {
+		// Preserve the incoming XFF chain when proxying backend->frontend.
+		// This hop is an internal subrequest in bundled mode, not a distinct proxy boundary.
+		incomingXFF := strings.TrimSpace(req.In.Header.Get("X-Forwarded-For"))
+
+		req.SetURL(&cfg.FrontendProxy)
+		req.Out.Host = req.In.Host
+		req.SetXForwarded()
+
+		if incomingXFF != "" {
+			req.Out.Header.Set("X-Forwarded-For", incomingXFF)
+		}
+	}
 
 	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		logger.Error("frontend proxy error",

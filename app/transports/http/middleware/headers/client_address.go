@@ -109,8 +109,8 @@ func (m *Middleware) ssrClientAddress(r *http.Request, resolvedClientAddress str
 func parseTrustedProxyCIDRs(cidrs []string) []netip.Prefix {
 	prefixes := make([]netip.Prefix, 0, len(cidrs))
 	for _, c := range cidrs {
-		prefix, err := netip.ParsePrefix(strings.TrimSpace(c))
-		if err != nil {
+		prefix, ok := settings.ParseTrustedProxyPrefix(c)
+		if !ok {
 			continue
 		}
 		prefixes = append(prefixes, prefix)

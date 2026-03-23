@@ -3,7 +3,6 @@ package bindings
 import (
 	"context"
 	"net/http"
-	"net/netip"
 	"strconv"
 	"strings"
 	"time"
@@ -11,6 +10,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
@@ -162,6 +162,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 					return nil, fault.Wrap(
 						fault.New("invalid client_ip_mode: "+string(*ip.ClientIpMode)),
 						fctx.With(ctx),
+						fmsg.WithDesc("invalid client IP mode", "The selected client IP mode is not valid."),
 						ftag.With(ftag.InvalidArgument),
 					)
 				}
@@ -170,11 +171,15 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 
 			var trustedProxyCIDRs opt.Optional[[]string]
 			if ip.TrustedProxyCidrs != nil {
-				normalised := normaliseCIDRList(*ip.TrustedProxyCidrs)
-				if invalid := invalidCIDRs(normalised); len(invalid) > 0 {
+				normalised, invalid := settings.NormaliseTrustedProxyCIDRs(*ip.TrustedProxyCidrs)
+				if len(invalid) > 0 {
 					return nil, fault.Wrap(
 						fault.New("invalid trusted_proxy_cidrs: "+strings.Join(invalid, ", ")),
 						fctx.With(ctx),
+						fmsg.WithDesc(
+							"invalid trusted proxy CIDRs",
+							"One or more trusted proxy CIDR values are invalid. Use values like 172.16.0.0/12 or 2001:db8::/32.",
+						),
 						ftag.With(ftag.InvalidArgument),
 					)
 				}
@@ -230,18 +235,6 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	}, nil
 }
 
-func normaliseCIDRList(values []string) []string {
-	out := make([]string, 0, len(values))
-	for _, value := range values {
-		v := strings.TrimSpace(value)
-		if v == "" {
-			continue
-		}
-		out = append(out, v)
-	}
-	return out
-}
-
 func mapOpenAPIClientIPMode(in openapi.ClientIPServiceSettingsClientIpMode) (settings.ClientIPMode, bool) {
 	switch in {
 	case openapi.SingleHeader:
@@ -253,16 +246,6 @@ func mapOpenAPIClientIPMode(in openapi.ClientIPServiceSettingsClientIpMode) (set
 	default:
 		return settings.ClientIPMode{}, false
 	}
-}
-
-func invalidCIDRs(values []string) []string {
-	out := make([]string, 0)
-	for _, value := range values {
-		if _, err := netip.ParsePrefix(value); err != nil {
-			out = append(out, value)
-		}
-	}
-	return out
 }
 
 func (a *Admin) AuditEventList(ctx context.Context, request openapi.AuditEventListRequestObject) (openapi.AuditEventListResponseObject, error) {

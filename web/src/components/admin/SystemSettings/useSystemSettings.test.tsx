@@ -13,6 +13,12 @@ describe("useSystemSettings helpers", () => {
     ]);
   });
 
+  it("preserves CIDR suffixes such as /24", () => {
+    expect(parseTrustedProxyCidrs("172.16.38.226/24")).toEqual([
+      "172.16.38.226/24",
+    ]);
+  });
+
   it("sends only mode for remote_addr", () => {
     expect(
       buildClientIPSettingsPayload(

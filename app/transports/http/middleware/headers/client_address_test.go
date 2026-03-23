@@ -228,3 +228,18 @@ func TestWithHeaderContextStoresSSRResolvedClientAddressWithoutSSRIPHeader(t *te
 	require.True(t, called)
 	require.Equal(t, http.StatusNoContent, rr.Code)
 }
+
+func TestParseTrustedProxyCIDRsAcceptsHostPrefixAndPlainIP(t *testing.T) {
+	t.Parallel()
+
+	ranges := parseTrustedProxyCIDRs([]string{
+		"172.16.38.226/24",
+		"203.0.113.7",
+		"2001:db8::7/64",
+	})
+
+	require.Len(t, ranges, 3)
+	assert.Equal(t, "172.16.38.0/24", ranges[0].String())
+	assert.Equal(t, "203.0.113.7/32", ranges[1].String())
+	assert.Equal(t, "2001:db8::/64", ranges[2].String())
+}

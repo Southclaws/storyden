@@ -131,7 +131,6 @@ export function useSystemSettings({ settings }: Props) {
   });
 
   return {
-    register: form.register,
     control: form.control,
     formState: form.formState,
     onSubmit,
