@@ -9,6 +9,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/jmoiron/sqlx"
 
+	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
+	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -18,12 +20,13 @@ import (
 )
 
 type Querier struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	db          *ent.Client
+	raw         *sqlx.DB
+	roleQuerier *role_hydrate.Hydrator
 }
 
-func New(db *ent.Client, raw *sqlx.DB) *Querier {
-	return &Querier{db, raw}
+func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) *Querier {
+	return &Querier{db, raw, roleQuerier}
 }
 
 const tagItemsCountManyQuery = `select
@@ -104,10 +107,30 @@ func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := q.roleQuerier.HydrateRoleEdges(ctx, roleHydrationTargets(r)...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tag, err := tag.Map(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return tag, nil
+}
+
+func roleHydrationTargets(r *ent.Tag) []*ent.Account {
+	targets := make([]*ent.Account, 0, len(r.Edges.Posts)+len(r.Edges.Nodes))
+
+	for _, p := range r.Edges.Posts {
+		if p != nil && p.Edges.Author != nil {
+			targets = append(targets, p.Edges.Author)
+		}
+	}
+
+	for _, n := range r.Edges.Nodes {
+		targets = append(targets, library.RoleHydrationTargetsFromNode(n)...)
+	}
+
+	return targets
 }
