@@ -46,7 +46,10 @@ export function useThreadMenu({
   } = useConfirmation(handleDelete);
 
   const isSharingEnabled = useShare();
-  const isEditingEnabled = canEditPost(thread, account) && editingEnabled;
+  const isEditingEnabled =
+    canEditPost(thread, account) &&
+    thread.deletedAt === undefined &&
+    editingEnabled;
   const isMovingEnabled = canEditPost(thread, account) && movingEnabled;
   const isDeletingEnabled =
     canDeletePost(thread, account) && thread.deletedAt === undefined;

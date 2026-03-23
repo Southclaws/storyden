@@ -5,6 +5,7 @@ import { useSession } from "src/auth";
 import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
+import { useReportContext } from "@/lib/report/useReportContext";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
@@ -21,6 +22,7 @@ export type Props = {
 
 export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
   const { revalidate, deleteReply } = useThreadMutations(thread, currentPage);
+  const { resolveReport } = useReportContext();
 
   const account = useSession();
   const [, copyToClipboard] = useCopyToClipboard();
@@ -28,7 +30,8 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
   const permalink = getPermalinkForPost(thread.slug, reply.id, currentPage);
 
   const isSharingEnabled = useShare();
-  const isEditingEnabled = canEditPost(reply, account);
+  const isEditingEnabled =
+    canEditPost(reply, account) && reply.deletedAt === undefined;
   const isDeletingEnabled =
     canDeletePost(reply, account) && reply.deletedAt === undefined;
 
@@ -57,6 +60,7 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
           toastId: `reply-${reply.id}`,
           action: async () => {
             await deleteReply(reply.id);
+            await resolveReport();
           },
           onUndo: () => {},
         });
