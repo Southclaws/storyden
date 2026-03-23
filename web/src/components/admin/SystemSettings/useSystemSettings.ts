@@ -117,15 +117,14 @@ export function useSystemSettings({ settings }: Props) {
             client_ip: clientIP,
           },
         });
+
+        form.reset(data);
+        await revalidate();
       },
       {
         promiseToast: {
           loading: "Saving settings...",
           success: "Settings saved",
-        },
-        cleanup: async () => {
-          form.reset(data);
-          await revalidate();
         },
       },
     );
