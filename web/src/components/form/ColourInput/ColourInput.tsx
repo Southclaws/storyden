@@ -1,5 +1,5 @@
 import { CSSProperties, Ref, forwardRef } from "react";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
 import { FormControl } from "@/components/ui/form/FormControl";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
@@ -94,18 +94,21 @@ export function ColourInput(props: Props) {
   );
 }
 
-type FieldProps = {
-  control: Control<any>;
-  name: string;
-  defaultValue: string;
+type FieldProps<T extends FieldValues> = {
+  control: Control<T>;
+  name: Path<T>;
+  defaultValue?: string;
   onUpdate: (v: string) => void;
 };
 
-const _ColourField = (props: FieldProps, ref: Ref<HTMLDivElement>) => {
+function _ColourField<T extends FieldValues>(
+  props: FieldProps<T>,
+  ref: Ref<HTMLDivElement>,
+) {
   return (
     <FormControl ref={ref}>
-      <Controller
-        defaultValue={props.defaultValue}
+      <Controller<T>
+        defaultValue={props.defaultValue as any}
         render={({ field: { onChange, ...field } }) => {
           return (
             <ColourInput
@@ -120,6 +123,8 @@ const _ColourField = (props: FieldProps, ref: Ref<HTMLDivElement>) => {
       />
     </FormControl>
   );
-};
+}
 
-export const ColourField = forwardRef(_ColourField);
+export const ColourField = forwardRef(_ColourField) as <T extends FieldValues>(
+  props: FieldProps<T> & { ref?: Ref<HTMLDivElement> },
+) => ReturnType<typeof _ColourField<T>>;

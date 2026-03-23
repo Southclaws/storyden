@@ -134,10 +134,10 @@ export function BrandSettingsForm(props: Props) {
           <HStack>
             <Box>
               <ColourField
+                name="accentColour"
                 defaultValue={props.settings.accent_colour}
                 control={control}
                 onUpdate={onColourChangePreview}
-                {...register("accentColour")}
               />
             </Box>
           </HStack>
