@@ -11,11 +11,12 @@ import (
 func TestNormaliseCIDRList(t *testing.T) {
 	t.Parallel()
 
-	out, invalid := normaliseCIDRList([]string{
+	out, invalid := settings.NormaliseTrustedProxyCIDRs([]string{
 		" 10.0.0.0/8 ",
 		"",
 		"   ",
 		"172.16.0.0/12",
+		"172.16.0.0/24",
 		"172.16.38.226/24",
 		"203.0.113.7",
 	})
@@ -24,6 +25,7 @@ func TestNormaliseCIDRList(t *testing.T) {
 	assert.Equal(t, []string{
 		"10.0.0.0/8",
 		"172.16.0.0/12",
+		"172.16.0.0/24",
 		"172.16.38.0/24",
 		"203.0.113.7/32",
 	}, out)
@@ -32,7 +34,7 @@ func TestNormaliseCIDRList(t *testing.T) {
 func TestNormaliseCIDRListInvalidCIDRs(t *testing.T) {
 	t.Parallel()
 
-	out, invalid := normaliseCIDRList([]string{
+	out, invalid := settings.NormaliseTrustedProxyCIDRs([]string{
 		"10.0.0.0/8",
 		"not-a-cidr",
 		"172.16.0.0",
