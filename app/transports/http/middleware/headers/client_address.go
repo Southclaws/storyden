@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 const (
@@ -91,7 +92,7 @@ func (m *Middleware) currentClientIPConfiguration() clientIPConfiguration {
 }
 
 func (m *Middleware) clientAddressWithConfig(r *http.Request, cfg clientIPConfiguration) string {
-	if key := getClientIPKey(r, cfg); key != "" {
+	if key := getClientIPKey(r, cfg, m.trustedSSRSourceRanges); key != "" {
 		return key
 	}
 
@@ -118,7 +119,7 @@ func parseTrustedProxyCIDRs(cidrs []string) []netip.Prefix {
 	return prefixes
 }
 
-func getClientIPKey(r *http.Request, cfg clientIPConfiguration) string {
+func getClientIPKey(r *http.Request, cfg clientIPConfiguration, trustedSSRSourceRanges []netip.Prefix) string {
 	remote := parseRemoteAddrIP(r.RemoteAddr)
 	if remote == "" {
 		remote = strings.TrimSpace(r.RemoteAddr)
@@ -135,18 +136,23 @@ func getClientIPKey(r *http.Request, cfg clientIPConfiguration) string {
 		}
 		return remote
 	case settings.ClientIPModeXFFTrustedProxies:
-		return getTrustedProxyXFFIP(r, remote, cfg.trustedProxyRanges, isSSRRequest(r))
+		return getTrustedProxyXFFIP(r, remote, cfg.trustedProxyRanges, trustedSSRSourceRanges)
 	default:
 		return remote
 	}
 }
 
-func getTrustedProxyXFFIP(r *http.Request, remote string, trusted []netip.Prefix, allowLoopback bool) string {
+func getTrustedProxyXFFIP(r *http.Request, remote string, trusted []netip.Prefix, trustedSSRSourceRanges []netip.Prefix) string {
 	remoteAddr, ok := parseAddr(remote)
 	if !ok {
 		return remote
 	}
-	if !isTrustedProxy(remoteAddr, trusted) && !(allowLoopback && remoteAddr.IsLoopback()) {
+
+	trustXFF := isTrustedProxy(remoteAddr, trusted)
+	if !trustXFF && isSSRRequest(r) {
+		trustXFF = isTrustedProxy(remoteAddr, trustedSSRSourceRanges)
+	}
+	if !trustXFF {
 		return remote
 	}
 
@@ -237,4 +243,62 @@ func isTrustedProxy(addr netip.Addr, trusted []netip.Prefix) bool {
 
 func isSSRRequest(r *http.Request) bool {
 	return strings.TrimSpace(r.Header.Get(ssrRequestHeader)) != ""
+}
+
+func parseTrustedSSRSourceRanges(cfg config.Config) ([]netip.Prefix, []string) {
+	prefixes := make([]netip.Prefix, 0)
+	seen := make(map[string]struct{})
+
+	addPrefix := func(input string) bool {
+		prefix, ok := settings.ParseTrustedProxyPrefix(input)
+		if !ok {
+			return false
+		}
+
+		key := prefix.String()
+		if _, exists := seen[key]; exists {
+			return true
+		}
+
+		seen[key] = struct{}{}
+		prefixes = append(prefixes, prefix)
+		return true
+	}
+
+	frontendHost := strings.TrimSpace(cfg.FrontendProxy.Hostname())
+	switch strings.ToLower(frontendHost) {
+	case "":
+	case "localhost":
+		addPrefix("127.0.0.1/32")
+		addPrefix("::1/128")
+	default:
+		if addr, ok := parseAddr(frontendHost); ok {
+			addPrefix(addr.String())
+		}
+	}
+
+	invalid := make([]string, 0)
+	for _, raw := range splitTrustedSourceCIDRList(cfg.SSRTrustedSourceCIDRs) {
+		if !addPrefix(raw) {
+			invalid = append(invalid, raw)
+		}
+	}
+
+	return prefixes, invalid
+}
+
+func splitTrustedSourceCIDRList(input string) []string {
+	parts := strings.FieldsFunc(input, func(r rune) bool {
+		return r == ',' || r == '\n'
+	})
+
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		trimmed := strings.TrimSpace(p)
+		if trimmed == "" {
+			continue
+		}
+		out = append(out, trimmed)
+	}
+	return out
 }

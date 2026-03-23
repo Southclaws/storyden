@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"net/netip"
 	"sync/atomic"
 
 	"go.uber.org/fx"
@@ -13,26 +14,37 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Middleware struct {
-	clientIPConfig atomic.Value
-	settingsRepo   *settings.SettingsRepository
-	logger         *slog.Logger
+	clientIPConfig         atomic.Value
+	trustedSSRSourceRanges []netip.Prefix
+	settingsRepo           *settings.SettingsRepository
+	logger                 *slog.Logger
 }
 
 func New(
 	ctx context.Context,
 	lc fx.Lifecycle,
+	cfg config.Config,
 	settingsRepo *settings.SettingsRepository,
 	bus *pubsub.Bus,
 	logger *slog.Logger,
 ) *Middleware {
+	ssrTrustedSourceRanges, invalidSSRTrustedSourceCIDRs := parseTrustedSSRSourceRanges(cfg)
+	if len(invalidSSRTrustedSourceCIDRs) > 0 {
+		logger.Warn("invalid SSR trusted source CIDRs ignored",
+			"invalid_cidrs", invalidSSRTrustedSourceCIDRs,
+		)
+	}
+
 	m := &Middleware{
-		settingsRepo: settingsRepo,
-		logger:       logger,
+		trustedSSRSourceRanges: ssrTrustedSourceRanges,
+		settingsRepo:           settingsRepo,
+		logger:                 logger,
 	}
 	m.clientIPConfig.Store(defaultClientIPConfiguration())
 

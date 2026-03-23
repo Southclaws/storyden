@@ -46,6 +46,16 @@ type Config struct {
 	   In the default `fullstack` image, this is set to `http://localhost:3000` which is the default port for the Next.js process.
 	*/
 	FrontendProxy url.URL `default:"" envconfig:"PROXY_FRONTEND_ADDRESS"`
+	/*
+	   Comma or newline separated list of CIDR ranges (or plain IPs) that are allowed as direct source addresses for SSR-origin API requests (`X-Storyden-SSR: 1`) when resolving `X-Forwarded-For` in `xff_trusted_proxies` mode.
+
+	   This is useful when your frontend SSR process runs outside the backend host and therefore SSR API calls do not originate from loopback.
+
+	   Storyden also derives trusted SSR source addresses from `PROXY_FRONTEND_ADDRESS` when possible:
+	   - `localhost` trusts both `127.0.0.1/32` and `::1/128`
+	   - literal IP hosts are trusted automatically
+	*/
+	SSRTrustedSourceCIDRs string `default:"" envconfig:"SSR_TRUSTED_SOURCE_CIDRS"`
 
 	// -
 	// Development tools

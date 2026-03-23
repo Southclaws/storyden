@@ -1,25 +1,38 @@
 import { NextResponse } from "next/server";
 
 import { RequestError } from "@/api/common";
-import { APIError } from "@/api/openapi-schema";
+import {
+  APIError,
+  ClientInfo,
+  NetworkHeadersSample,
+} from "@/api/openapi-schema";
+import { adminSettingsGet } from "@/api/openapi-server/admin";
 import { getSession } from "@/api/openapi-server/misc";
 
 export async function GET() {
   try {
-    const resp = await getSession({
-      cache: "no-store",
-    });
+    const [sessionResp, adminResp] = await Promise.all([
+      getSession({
+        cache: "no-store",
+      }),
+      adminSettingsGet({
+        cache: "no-store",
+      }),
+    ]);
 
-    return NextResponse.json(
-      {
-        client: resp.data.client ?? null,
+    const payload: {
+      client: ClientInfo | null;
+      headers: NetworkHeadersSample | null;
+    } = {
+      client: sessionResp.data.client ?? null,
+      headers: adminResp.data.headers ?? null,
+    };
+
+    return NextResponse.json(payload, {
+      headers: {
+        "Cache-Control": "no-store",
       },
-      {
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      },
-    );
+    });
   } catch (err) {
     if (err instanceof RequestError) {
       const payload: APIError = {

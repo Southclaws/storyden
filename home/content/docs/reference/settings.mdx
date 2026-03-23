@@ -36,7 +36,7 @@ You can configure anything you see on the admin page via the API programmaticall
 
 ## Client IP and SSR
 
-Client IP mode, trusted CIDRs and related settings on this page affect how Storyden resolves browser-origin API requests.
+Client IP mode, trusted CIDRs and related settings on this page affect how Storyden resolves client IPs for API request context.
 
 If you use the official Storyden Next.js frontend with SSR, Storyden forwards only `X-Forwarded-For` from the SSR request back to the API, and the backend applies the same client-IP mode logic to both browser and SSR API calls.
 

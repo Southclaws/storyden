@@ -2,6 +2,7 @@ import { createListCollection } from "@ark-ui/react";
 import { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 
+import { adminSettingsGet } from "@/api/openapi-client/admin";
 import { getGetInfoKey, getSession } from "@/api/openapi-client/misc";
 import { ClientInfo, NetworkHeadersSample } from "@/api/openapi-schema";
 import { InfoTip } from "@/components/site/InfoTip";
@@ -311,9 +312,8 @@ export function SystemSettingsForm(props: Props) {
 
         <ClientIPTester
           canRun={!formState.isDirty && !formState.isSubmitting}
+          initialHeaders={props.settings.headers}
         />
-
-        <NetworkHeaderSample headers={props.settings.headers} />
       </CardBox>
     </styled.form>
   );
@@ -321,13 +321,13 @@ export function SystemSettingsForm(props: Props) {
 
 type ClientIPTesterProps = {
   canRun: boolean;
+  initialHeaders?: NetworkHeadersSample;
 };
 
-type NetworkHeaderSampleProps = {
-  headers?: NetworkHeadersSample;
-};
-
-function NetworkHeaderSample({ headers }: NetworkHeaderSampleProps) {
+function formatNetworkHeaderSample(
+  label: string,
+  headers: NetworkHeadersSample | null,
+) {
   const direct = headers?.headers ?? {};
   const ssr = headers?.headers_ssr ?? {};
   const rawClientAddress = headers?.raw_client_address?.trim() ?? "";
@@ -343,73 +343,71 @@ function NetworkHeaderSample({ headers }: NetworkHeaderSampleProps) {
     !rawClientAddress
   ) {
     return (
-      <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
-        <styled.p>No network header sample is available.</styled.p>
-        <styled.p>
-          This occurs if you are not behind a proxy, or the proxy is not using
-          conventional forwarding headers such as <code>X-Forwarded-For</code>.
-        </styled.p>
-      </CardBox>
+      <>
+        {label}
+        <br />
+        (none)
+      </>
     );
   }
 
   return (
-    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
-      <styled.p>
-        These are sampled network headers seen by Storyden on this admin
-        settings request. Use them to configure trusted client IP settings.
-      </styled.p>
-
-      <styled.pre textWrap="wrap">
-        Raw client address:
-        <br />
-        {rawClientAddress || "(none)"}
-        <br />
-        <br />
-        Browser/API headers:
-        <br />
-        {directEntries.length === 0 && "(none)"}
-        {directEntries.map(([name, value]) => (
-          <span key={`direct-${name}`}>
-            {name}: {value}
-            <br />
-          </span>
-        ))}
-        <br />
-        SSR-forwarded headers:
-        <br />
-        {ssrEntries.length === 0 && "(none)"}
-        {ssrEntries.map(([name, value]) => (
-          <span key={`ssr-${name}`}>
-            {name}: {value}
-            <br />
-          </span>
-        ))}
-      </styled.pre>
-    </CardBox>
+    <>
+      {label}
+      <br />
+      Raw client address:
+      <br />
+      {rawClientAddress || "(none)"}
+      <br />
+      <br />
+      Browser/API headers:
+      <br />
+      {directEntries.length === 0 && "(none)"}
+      {directEntries.map(([name, value]) => (
+        <span key={`${label}-direct-${name}`}>
+          {name}: {value}
+          <br />
+        </span>
+      ))}
+      <br />
+      SSR-forwarded headers:
+      <br />
+      {ssrEntries.length === 0 && "(none)"}
+      {ssrEntries.map(([name, value]) => (
+        <span key={`${label}-ssr-${name}`}>
+          {name}: {value}
+          <br />
+        </span>
+      ))}
+    </>
   );
 }
 
-function ClientIPTester({ canRun }: ClientIPTesterProps) {
+function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ssrClientInfo, setSSRClientInfo] = useState<ClientInfo | null>(null);
   const [browserClientInfo, setBrowserClientInfo] = useState<ClientInfo | null>(
     null,
   );
+  const [browserHeaderSample, setBrowserHeaderSample] =
+    useState<NetworkHeadersSample | null>(initialHeaders ?? null);
+  const [ssrHeaderSample, setSSRHeaderSample] =
+    useState<NetworkHeadersSample | null>(null);
 
   async function loadClientIPTest() {
     setLoading(true);
     setError(null);
 
     try {
-      const [ssrResp, browserResp] = await Promise.all([
+      const [ssrResp, browserResp, browserAdminSettings] = await Promise.all([
         fetch("/client-ip-test", {
           credentials: "include",
           cache: "no-store",
           mode: "cors",
         }),
         getSession(),
+        adminSettingsGet(),
       ]);
 
       if (!ssrResp.ok) {
@@ -421,12 +419,19 @@ function ClientIPTester({ canRun }: ClientIPTesterProps) {
         );
       }
 
-      const ssrData = (await ssrResp.json()) as { client: ClientInfo | null };
+      const ssrData = (await ssrResp.json()) as {
+        client: ClientInfo | null;
+        headers?: NetworkHeadersSample | null;
+      };
       setSSRClientInfo(ssrData.client ?? null);
       setBrowserClientInfo(browserResp.client ?? null);
+      setSSRHeaderSample(ssrData.headers ?? null);
+      setBrowserHeaderSample(browserAdminSettings.headers ?? null);
     } catch (err) {
       setSSRClientInfo(null);
       setBrowserClientInfo(null);
+      setSSRHeaderSample(null);
+      setBrowserHeaderSample(null);
       setError(deriveError(err));
     } finally {
       setLoading(false);
@@ -471,6 +476,24 @@ function ClientIPTester({ canRun }: ClientIPTesterProps) {
         <br />
         Browser React Render client.ip_address = '
         {browserClientInfo?.ip_address ?? ""}'
+        <br />
+        <br />
+        These are sampled network headers seen by Storyden while running the
+        client IP test.
+        <br />
+        Use them to configure trusted client IP settings.
+        <br />
+        <br />
+        {formatNetworkHeaderSample(
+          "Browser/API sample (admin settings request):",
+          browserHeaderSample,
+        )}
+        <br />
+        <br />
+        {formatNetworkHeaderSample(
+          "SSR/API sample (SSR subrequest):",
+          ssrHeaderSample,
+        )}
       </styled.pre>
 
       <HStack justify="end">

@@ -11,8 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newTestMiddleware(cfg clientIPConfiguration) *Middleware {
-	mw := &Middleware{}
+func newTestMiddleware(cfg clientIPConfiguration, trustedSSRSourceCIDRs ...string) *Middleware {
+	mw := &Middleware{
+		trustedSSRSourceRanges: parseTrustedProxyCIDRs(trustedSSRSourceCIDRs),
+	}
 	mw.clientIPConfig.Store(cfg)
 	return mw
 }
@@ -110,7 +112,7 @@ func TestClientAddressTrustedXFFModeAllowsSSRLoopbackRemoteIPv6(t *testing.T) {
 		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
 	}
 
-	key := newTestMiddleware(cfg).clientAddress(req)
+	key := newTestMiddleware(cfg, "::1/128").clientAddress(req)
 	assert.Equal(t, "198.51.100.9", key)
 }
 
@@ -127,7 +129,57 @@ func TestClientAddressTrustedXFFModeAllowsSSRLoopbackRemoteIPv4(t *testing.T) {
 		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
 	}
 
+	key := newTestMiddleware(cfg, "127.0.0.1/32").clientAddress(req)
+	assert.Equal(t, "198.51.100.9", key)
+}
+
+func TestClientAddressTrustedXFFModeSSRHeaderIgnoredWhenSSRSourceUntrusted(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "[::1]:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
+	}
+
 	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "::1", key)
+}
+
+func TestClientAddressTrustedXFFModeTrustedSSRSourceNotAppliedWithoutSSRHeader(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "127.0.0.1:1234"
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
+	}
+
+	key := newTestMiddleware(cfg, "127.0.0.1/32").clientAddress(req)
+	assert.Equal(t, "127.0.0.1", key)
+}
+
+func TestClientAddressTrustedXFFModeUsesConfiguredExternalSSRSource(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "10.12.0.9:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
+	}
+
+	key := newTestMiddleware(cfg, "10.12.0.0/16").clientAddress(req)
 	assert.Equal(t, "198.51.100.9", key)
 }
 

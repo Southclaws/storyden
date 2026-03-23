@@ -38,6 +38,13 @@ Client IP settings live in the Admin UI and are applied immediately:
 
 There is no separate SSR secret configuration.
 
+For `xff_trusted_proxies` mode, SSR-origin API calls can also trust a separate "SSR source" peer address list:
+
+- `SSR_TRUSTED_SOURCE_CIDRS` (env): comma/newline-separated CIDRs or IPs.
+- `PROXY_FRONTEND_ADDRESS` (env): if host is `localhost` or a literal IP, Storyden auto-trusts it as an SSR source.
+
+This is used only for SSR-marked requests (`X-Storyden-SSR: 1`) so bundled or externally hosted frontends can forward browser XFF chains without hard-coding loopback trust.
+
 ## Reverse Proxy Guidance
 
 When running behind proxies/CDNs:
@@ -64,11 +71,13 @@ Storyden will use the `X-Forwarded-For` header to determine the client IP — bu
 #### How it works
 
 1. Storyden checks the request's `RemoteAddr` (the immediate peer).
-2. If that IP is **not in your trusted proxy CIDRs**, the request is treated as direct and `RemoteAddr` is used.
+2. If that IP is **not in your trusted proxy CIDRs**, Storyden only continues for SSR-marked requests when `RemoteAddr` is in SSR trusted sources derived from `PROXY_FRONTEND_ADDRESS` and/or `SSR_TRUSTED_SOURCE_CIDRS`. Otherwise it is treated as direct and `RemoteAddr` is used.
 3. If it _is_ trusted, Storyden reads the full `X-Forwarded-For` chain.
 4. It walks the chain **from right to left**, skipping any IPs that are also trusted proxies or unparseable.
 5. The first IP that is **not a trusted proxy** is selected as the client IP.
 6. If all IPs in the chain are trusted proxies (or unparseable), it falls back to `RemoteAddr`.
+
+For browser-origin requests, only `trusted_proxy_cidrs` is considered. SSR trusted sources are only used when `X-Storyden-SSR: 1` is present.
 
 #### Why this is safe
 
