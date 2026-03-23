@@ -286,9 +286,9 @@ export function SystemSettingsForm(props: Props) {
             <Input {...register("client_ip_header")} />
             <FormHelperText>
               Header to trust for the canonical client IP (for example
-              CF-Connecting-IP, Fly-Client-IP, X-Real-IP, or
-              Storyden-Client-IP). Do not use this mode unless this header is
-              guaranteed to be injected by trusted infrastructure.
+              CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
+              unless this header is guaranteed to be injected by trusted
+              infrastructure.
             </FormHelperText>
           </FormControl>
         )}
