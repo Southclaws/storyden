@@ -7,16 +7,19 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.6-post
  */
-import type { Account } from "./account";
-import type { ClientInfo } from "./clientInfo";
-import type { Info } from "./info";
 
 /**
- * The combination of public info and the requesting account's settings.
-
+ * Information about the client making the request.
  */
-export interface SessionInfo {
-  account?: Account;
-  client?: ClientInfo;
-  info: Info;
+export interface ClientInfo {
+  /** The client's IP address, resolved using the configured rules set by
+the `client_ip_mode` admin setting. May be IPv4 or IPv6.
+ */
+  ip_address: string;
+  /** If the frontend being used supports server-side rendering this field
+will be populated on an SSR request showing the backend-resolved
+client IP address when the X-Storyden-SSR header is present.
+May be IPv4 or IPv6.
+ */
+  ip_address_ssr?: string;
 }

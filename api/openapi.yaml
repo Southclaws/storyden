@@ -4327,6 +4327,25 @@ components:
       properties:
         info: { $ref: "#/components/schemas/Info" }
         account: { $ref: "#/components/schemas/Account" }
+        client: { $ref: "#/components/schemas/ClientInfo" }
+
+    ClientInfo:
+      description: Information about the client making the request.
+      type: object
+      required: [ip_address]
+      properties:
+        ip_address:
+          type: string
+          description: |
+            The client's IP address, resolved using the configured rules set by
+            the `client_ip_mode` admin setting. May be IPv4 or IPv6.
+        ip_address_ssr:
+          type: string
+          description: |
+            If the frontend being used supports server-side rendering this field
+            will be populated on an SSR request showing the backend-resolved
+            client IP address when the X-Storyden-SSR header is present.
+            May be IPv4 or IPv6.
 
     OnboardingStatus:
       description: |
@@ -4576,6 +4595,8 @@ components:
           $ref: "#/components/schemas/Metadata"
         motd:
           $ref: "#/components/schemas/MessageOfTheDay"
+        headers:
+          $ref: "#/components/schemas/NetworkHeadersSample"
 
     AdminSettingsMutableProps:
       type: object
@@ -4632,10 +4653,42 @@ components:
     AdminSettingsServiceProps:
       type: object
       properties:
+        client_ip:
+          $ref: "#/components/schemas/ClientIPServiceSettings"
         rate_limiting:
           $ref: "#/components/schemas/RateLimitServiceSettings"
         moderation:
           $ref: "#/components/schemas/ModerationServiceSettings"
+
+    ClientIPServiceSettings:
+      type: object
+      properties:
+        client_ip_mode:
+          type: string
+          enum: [remote_addr, single_header, xff_trusted_proxies]
+          description: |
+            Strategy used to derive the client IP address stored in request info context.
+
+            - `remote_addr`: use only the request socket remote address.
+            - `single_header`: trust a single configured header.
+            - `xff_trusted_proxies`: trust `X-Forwarded-For` only when the
+              request comes from a trusted proxy, selecting the first non-proxy
+              IP from the right of the list in `X-Forwarded-For`.
+
+        client_ip_header:
+          type: string
+          description: |
+            Header name used when `client_ip_mode` is `single_header`.
+            Common values include `CF-Connecting-IP`, `Fly-Client-IP`, or `X-Real-IP`.
+
+        trusted_proxy_cidrs:
+          type: array
+          description: |
+            Trusted proxy CIDR ranges. `X-Forwarded-For` is only used if
+            `RemoteAddr` is within these ranges; the first non-proxy IP from the
+            right is selected as the client.
+          items:
+            type: string
 
     RateLimitServiceSettings:
       type: object
@@ -4718,6 +4771,34 @@ components:
             A list of blocklisted words that will automatically report and hide
             any posts that contain them.
           items:
+            type: string
+
+    NetworkHeadersSample:
+      type: object
+      description: |
+        A sample of network headers received by the backend from the client or
+        proxy. This is used for configuring the client IP mode.
+      properties:
+        raw_client_address:
+          type: string
+          description: |
+            The raw client address as seen by the backend, without any
+            processing or trust-based overrides. This is typically the remote
+            address of a reverse proxy. Use this to configure trusted proxies.
+        headers:
+          type: object
+          description: |
+            A sample of the headers directly received by the backend from the
+            client or proxy if any.
+          additionalProperties:
+            type: string
+        headers_ssr:
+          type: object
+          description: |
+            If the frontend being used supports server-side rendering this field
+            will be populated on an SSR request showing the headers that the
+            frontend program passed to the backend via Storyden specific header.
+          additionalProperties:
             type: string
 
     AuditEvent:

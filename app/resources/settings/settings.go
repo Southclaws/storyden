@@ -56,8 +56,15 @@ type MessageOfTheDay struct {
 }
 
 type ServiceSettings struct {
+	ClientIP   opt.Optional[ClientIPServiceSettings]
 	RateLimit  opt.Optional[RateLimitServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
+}
+
+type ClientIPServiceSettings struct {
+	ClientIPMode      opt.Optional[ClientIPMode]
+	ClientIPHeader    opt.Optional[string]
+	TrustedProxyCIDRs opt.Optional[[]string]
 }
 
 type RateLimitServiceSettings struct {

@@ -7,16 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.6-post
  */
-import type { Account } from "./account";
-import type { ClientInfo } from "./clientInfo";
-import type { Info } from "./info";
 
 /**
- * The combination of public info and the requesting account's settings.
+ * A sample of the headers directly received by the backend from the
+client or proxy if any.
 
  */
-export interface SessionInfo {
-  account?: Account;
-  client?: ClientInfo;
-  info: Info;
-}
+export type NetworkHeadersSampleHeaders = { [key: string]: string };

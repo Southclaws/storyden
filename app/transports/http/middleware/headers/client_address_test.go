@@ -5,117 +5,221 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestClientAddress(t *testing.T) {
+func newTestMiddleware(cfg clientIPConfiguration) *Middleware {
+	mw := &Middleware{}
+	mw.clientIPConfig.Store(cfg)
+	return mw
+}
+
+func TestClientAddressRemoteAddrMode(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		name       string
-		remoteAddr string
-		headers    map[string][]string
-		want       string
-	}{
-		{
-			name:       "forwarded preferred and rightmost",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"Forwarded":       {`for=198.51.100.9;proto=https, for=198.51.100.10`},
-				"X-Forwarded-For": {"203.0.113.7"},
-			},
-			want: "198.51.100.10",
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "203.0.113.5:1234"
+	req.Header.Set("X-Forwarded-For", "198.51.100.1")
+
+	key := newTestMiddleware(
+		clientIPConfiguration{Mode: settings.ClientIPModeRemoteAddr},
+	).clientAddress(req)
+
+	assert.Equal(t, "203.0.113.5", key)
+}
+
+func TestClientAddressSingleHeaderMode(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "203.0.113.5:1234"
+	req.Header.Set("CF-Connecting-IP", "198.51.100.1")
+
+	key := newTestMiddleware(
+		clientIPConfiguration{
+			Mode:   settings.ClientIPModeSingleHeader,
+			Header: "CF-Connecting-IP",
 		},
-		{
-			name:       "forwarded quoted ipv6 with port",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"Forwarded": {`for="[2001:db8:cafe::17]:4711";proto=https`},
-			},
-			want: "2001:db8:cafe::17",
+	).clientAddress(req)
+
+	assert.Equal(t, "198.51.100.1", key)
+}
+
+func TestClientAddressSingleHeaderModeTrimsConfiguredHeaderName(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "203.0.113.5:1234"
+	req.Header.Set("X-Real-IP", "198.51.100.77")
+
+	key := newTestMiddleware(
+		clientIPConfiguration{
+			Mode:   settings.ClientIPModeSingleHeader,
+			Header: "  X-Real-IP  ",
 		},
-		{
-			name:       "xff rightmost entry",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"X-Forwarded-For": {"203.0.113.4, 203.0.113.5"},
-			},
-			want: "203.0.113.5",
-		},
-		{
-			name:       "xff strips port",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"X-Forwarded-For": {"203.0.113.4:5432"},
-			},
-			want: "203.0.113.4",
-		},
-		{
-			name:       "multiple xff header values uses last header",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"X-Forwarded-For": {"203.0.113.4, 203.0.113.5", "198.51.100.77"},
-			},
-			want: "198.51.100.77",
-		},
-		{
-			name:       "unknown skipped",
-			remoteAddr: "172.16.0.1:1234",
-			headers: map[string][]string{
-				"Forwarded":       {`for=unknown`},
-				"X-Forwarded-For": {"unknown, 203.0.113.99"},
-			},
-			want: "203.0.113.99",
-		},
-		{
-			name:       "remote addr fallback strips port",
-			remoteAddr: "172.16.0.1:1234",
-			want:       "172.16.0.1",
-		},
-		{
-			name:       "remote addr raw fallback",
-			remoteAddr: "127.0.0.1",
-			want:       "127.0.0.1",
-		},
+	).clientAddress(req)
+
+	assert.Equal(t, "198.51.100.77", key)
+}
+
+func TestClientAddressTrustedXFFMode(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "172.16.0.4:1234"
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"172.16.0.0/12", "203.0.113.0/24"}),
 	}
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "198.51.100.9", key)
+}
 
-			req, err := http.NewRequest(http.MethodGet, "/test", nil)
-			assert.NoError(t, err)
-			req.RemoteAddr = tt.remoteAddr
+func TestClientAddressTrustedXFFFallbackWhenRemoteUntrusted(t *testing.T) {
+	t.Parallel()
 
-			for k, values := range tt.headers {
-				for _, v := range values {
-					req.Header.Add(k, v)
-				}
-			}
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "192.0.2.20:1234"
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
 
-			assert.Equal(t, tt.want, clientAddress(req))
-		})
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"172.16.0.0/12", "203.0.113.0/24"}),
 	}
+
+	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "192.0.2.20", key)
+}
+
+func TestClientAddressSSRHeaderDoesNotChangeSingleHeaderModeBehaviour(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "192.0.2.2:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Set("CF-Connecting-IP", "198.51.100.55")
+
+	key := newTestMiddleware(clientIPConfiguration{
+		Mode:   settings.ClientIPModeSingleHeader,
+		Header: "CF-Connecting-IP",
+	}).clientAddress(req)
+	assert.Equal(t, "198.51.100.55", key)
+}
+
+func TestClientAddressSSRHeaderDoesNotChangeRemoteAddrModeBehaviour(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "192.0.2.2:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Set("X-Forwarded-For", "203.0.113.99, 198.51.100.22")
+	req.Header.Set("X-Real-IP", "198.51.100.22")
+
+	key := newTestMiddleware(
+		clientIPConfiguration{Mode: settings.ClientIPModeRemoteAddr},
+	).clientAddress(req)
+	assert.Equal(t, "192.0.2.2", key)
+}
+
+func TestClientAddressSSRHeaderDoesNotChangeXFFTrustedProxyModeBehaviour(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "172.16.0.4:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"172.16.0.0/12", "203.0.113.0/24"}),
+	}
+
+	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "198.51.100.9", key)
 }
 
 func TestWithHeaderContextStoresClientAddress(t *testing.T) {
 	t.Parallel()
 
-	mw := New()
+	mw := newTestMiddleware(clientIPConfiguration{
+		Mode:   settings.ClientIPModeSingleHeader,
+		Header: "CF-Connecting-IP",
+	})
 
 	req := httptest.NewRequest(http.MethodGet, "/api/version", nil)
 	req.RemoteAddr = "172.16.0.1:9999"
-	req.Header.Add("X-Forwarded-For", "203.0.113.10, 198.51.100.1")
+	req.Header.Set("CF-Connecting-IP", "198.51.100.44")
 
 	rr := httptest.NewRecorder()
 	called := false
 
 	handler := mw.WithHeaderContext()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		called = true
-		assert.Equal(t, "198.51.100.1", reqinfo.GetClientAddress(r.Context()))
+		assert.Equal(t, "198.51.100.44", reqinfo.GetClientAddress(r.Context()))
+		assert.Equal(t, "", reqinfo.GetSSRClientAddress(r.Context()))
+		w.WriteHeader(http.StatusNoContent)
+	}))
+
+	handler.ServeHTTP(rr, req)
+
+	require.True(t, called)
+	require.Equal(t, http.StatusNoContent, rr.Code)
+}
+
+func TestWithHeaderContextStoresSSRClientAddress(t *testing.T) {
+	t.Parallel()
+
+	mw := newTestMiddleware(clientIPConfiguration{
+		Mode:   settings.ClientIPModeSingleHeader,
+		Header: "CF-Connecting-IP",
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/api/version", nil)
+	req.RemoteAddr = "192.0.2.2:9999"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Set("CF-Connecting-IP", "198.51.100.77")
+
+	rr := httptest.NewRecorder()
+	called := false
+
+	handler := mw.WithHeaderContext()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "198.51.100.77", reqinfo.GetSSRClientAddress(r.Context()))
+		w.WriteHeader(http.StatusNoContent)
+	}))
+
+	handler.ServeHTTP(rr, req)
+
+	require.True(t, called)
+	require.Equal(t, http.StatusNoContent, rr.Code)
+}
+
+func TestWithHeaderContextStoresSSRResolvedClientAddressWithoutSSRIPHeader(t *testing.T) {
+	t.Parallel()
+
+	mw := newTestMiddleware(clientIPConfiguration{
+		Mode:   settings.ClientIPModeSingleHeader,
+		Header: "CF-Connecting-IP",
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/api/version", nil)
+	req.RemoteAddr = "192.0.2.2:9999"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Set("CF-Connecting-IP", "198.51.100.91")
+
+	rr := httptest.NewRecorder()
+	called := false
+
+	handler := mw.WithHeaderContext()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+		assert.Equal(t, "198.51.100.91", reqinfo.GetClientAddress(r.Context()))
+		assert.Equal(t, "198.51.100.91", reqinfo.GetSSRClientAddress(r.Context()))
 		w.WriteHeader(http.StatusNoContent)
 	}))
 
