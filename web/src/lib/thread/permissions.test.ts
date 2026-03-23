@@ -39,6 +39,13 @@ test("canDeletePost/canEditPost allows MANAGE_POSTS even when not author", () =>
   assert.ok(canEditPost(pr, acc));
 });
 
+test("canDeletePost/canEditPost allows ADMINISTRATOR even when not author", () => {
+  const pr = post("author-1");
+  const acc = account("admin-1", [Permission.ADMINISTRATOR]);
+  assert.ok(canDeletePost(pr, acc));
+  assert.ok(canEditPost(pr, acc));
+});
+
 test("canDeletePost/canEditPost denies non-author without permission", () => {
   const pr = post("author-1");
   const acc = account("user-1", [Permission.READ_PROFILE]);
