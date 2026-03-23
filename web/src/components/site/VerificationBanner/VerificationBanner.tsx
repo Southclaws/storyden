@@ -39,7 +39,7 @@ export function VerificationBanner({ session, settings }: Props) {
         <p>
           Please{" "}
           <Link
-            href="/settings?tab=auth"
+            href="/settings?tab=email"
             style={{ textDecoration: "underline" }}
           >
             verify your email in settings
