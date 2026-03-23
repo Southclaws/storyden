@@ -13,17 +13,18 @@ import (
 )
 
 type Info struct {
-	OperationID string
-	UserAgent   useragent.UserAgent
-	CacheQuery  cachecontrol.Query
-	ClientAddr  string
+	OperationID   string
+	UserAgent     useragent.UserAgent
+	CacheQuery    cachecontrol.Query
+	ClientAddr    string
+	ClientAddrSSR string
 }
 
 type infoKey struct{}
 
 var requestInfoContextKey = infoKey{}
 
-func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAddr string) context.Context {
+func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAddr string, clientAddrSSR string) context.Context {
 	ua := useragent.Parse(r.Header.Get("User-Agent"))
 
 	ifNoneMatch := opt.NewIf(r.Header.Get("If-None-Match"), notEmpty)
@@ -37,10 +38,11 @@ func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAd
 	}
 
 	info := Info{
-		OperationID: opid,
-		UserAgent:   ua,
-		CacheQuery:  cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
-		ClientAddr:  clientAddr,
+		OperationID:   opid,
+		UserAgent:     ua,
+		CacheQuery:    cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
+		ClientAddr:    clientAddr,
+		ClientAddrSSR: clientAddrSSR,
 	}
 
 	return context.WithValue(ctx, requestInfoContextKey, info)
@@ -66,6 +68,11 @@ func GetCacheQuery(ctx context.Context) cachecontrol.Query {
 func GetClientAddress(ctx context.Context) string {
 	i := getInfo(ctx)
 	return i.ClientAddr
+}
+
+func GetSSRClientAddress(ctx context.Context) string {
+	i := getInfo(ctx)
+	return i.ClientAddrSSR
 }
 
 func getInfo(ctx context.Context) Info {

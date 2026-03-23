@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
 import { RequestError, buildRequest, buildResult } from "./common";
@@ -14,6 +14,8 @@ type Result<T> = {
   data: T;
   status: number;
 };
+
+const SSR_NETWORK_HEADER_NAMES = ["x-forwarded-for"] as const;
 
 export const fetcher = async <T>(
   url: string,
@@ -47,6 +49,7 @@ export const fetcher = async <T>(
   });
 
   req.headers.set("Cookie", await getCookieHeader());
+  await applyForwardedClientHeaders(req.headers);
 
   const response = await fetch(req);
 
@@ -71,4 +74,30 @@ async function getCookieHeader(): Promise<string> {
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");
+}
+
+async function applyForwardedClientHeaders(out: Headers): Promise<void> {
+  const h = await nextHeaders();
+  out.set("x-storyden-ssr", "1");
+  forwardSSRNetworkHeaders(out, h);
+}
+
+export function forwardSSRNetworkHeaders(
+  out: Headers,
+  incoming: Headers,
+): void {
+  for (const headerName of SSR_NETWORK_HEADER_NAMES) {
+    const normalisedHeaderName = headerName.trim().toLowerCase();
+    if (!normalisedHeaderName) {
+      continue;
+    }
+
+    const value = incoming.get(normalisedHeaderName)?.trim();
+    if (!value) {
+      continue;
+    }
+
+    // Forward canonical network headers as-is.
+    out.set(normalisedHeaderName, value);
+  }
 }

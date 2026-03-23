@@ -12,6 +12,7 @@ import type { AuthMode } from "./authMode";
 import type { InstanceCapabilityList } from "./instanceCapabilityList";
 import type { MessageOfTheDay } from "./messageOfTheDay";
 import type { Metadata } from "./metadata";
+import type { NetworkHeadersSample } from "./networkHeadersSample";
 import type { PostContent } from "./postContent";
 
 /**
@@ -23,6 +24,7 @@ export interface AdminSettingsProps {
   capabilities?: InstanceCapabilityList;
   content: PostContent;
   description: string;
+  headers?: NetworkHeadersSample;
   metadata?: Metadata;
   motd?: MessageOfTheDay;
   services?: AdminSettingsServiceProps;

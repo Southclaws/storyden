@@ -2,7 +2,10 @@ package bindings
 
 import (
 	"context"
+	"net/http"
+	"net/netip"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -10,6 +13,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -50,8 +54,9 @@ func NewAdmin(
 	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
 	actionDispatcher *action_dispatcher.Service,
+	router *echo.Echo,
 ) Admin {
-	return Admin{
+	a := Admin{
 		accountQuery:     accountQuery,
 		profileQuery:     profileQuery,
 		auditQuerier:     auditQuerier,
@@ -60,6 +65,27 @@ func NewAdmin(
 		akr:              akr,
 		actionDispatcher: actionDispatcher,
 	}
+
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if c.Path() != adminSettingsPath {
+				return next(c)
+			}
+
+			switch c.Request().Method {
+			case http.MethodGet:
+				sample := buildNetworkHeadersSample(c.Request())
+				if sample != nil {
+					ctx := context.WithValue(c.Request().Context(), networkHeadersSampleContextKey{}, sample)
+					c.SetRequest(c.Request().WithContext(ctx))
+				}
+			}
+
+			return next(c)
+		}
+	})
+
+	return a
 }
 
 func (a *Admin) AdminSettingsGet(ctx context.Context, request openapi.AdminSettingsGetRequestObject) (openapi.AdminSettingsGetResponseObject, error) {
@@ -69,7 +95,9 @@ func (a *Admin) AdminSettingsGet(ctx context.Context, request openapi.AdminSetti
 	}
 
 	return openapi.AdminSettingsGet200JSONResponse{
-		AdminSettingsGetOKJSONResponse: openapi.AdminSettingsGetOKJSONResponse(serialiseSettings(settings)),
+		AdminSettingsGetOKJSONResponse: openapi.AdminSettingsGetOKJSONResponse(
+			serialiseSettings(settings, getNetworkHeadersSample(ctx)),
+		),
 	}, nil
 }
 
@@ -124,6 +152,42 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			})
 		}
 
+		var clientIP opt.Optional[settings.ClientIPServiceSettings]
+		if request.Body.Services.ClientIp != nil {
+			ip := request.Body.Services.ClientIp
+			var clientIPMode opt.Optional[settings.ClientIPMode]
+			if ip.ClientIpMode != nil {
+				mode, ok := mapOpenAPIClientIPMode(*ip.ClientIpMode)
+				if !ok {
+					return nil, fault.Wrap(
+						fault.New("invalid client_ip_mode: "+string(*ip.ClientIpMode)),
+						fctx.With(ctx),
+						ftag.With(ftag.InvalidArgument),
+					)
+				}
+				clientIPMode = opt.New(mode)
+			}
+
+			var trustedProxyCIDRs opt.Optional[[]string]
+			if ip.TrustedProxyCidrs != nil {
+				normalised := normaliseCIDRList(*ip.TrustedProxyCidrs)
+				if invalid := invalidCIDRs(normalised); len(invalid) > 0 {
+					return nil, fault.Wrap(
+						fault.New("invalid trusted_proxy_cidrs: "+strings.Join(invalid, ", ")),
+						fctx.With(ctx),
+						ftag.With(ftag.InvalidArgument),
+					)
+				}
+				trustedProxyCIDRs = opt.New(normalised)
+			}
+
+			clientIP = opt.New(settings.ClientIPServiceSettings{
+				ClientIPMode:      clientIPMode,
+				ClientIPHeader:    opt.NewPtr(ip.ClientIpHeader),
+				TrustedProxyCIDRs: trustedProxyCIDRs,
+			})
+		}
+
 		var moderation opt.Optional[settings.ModerationServiceSettings]
 		if request.Body.Services.Moderation != nil {
 			moderationBody := request.Body.Services.Moderation
@@ -136,8 +200,9 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			})
 		}
 
-		if rateLimit.Ok() || moderation.Ok() {
+		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() {
 			services = opt.New(settings.ServiceSettings{
+				ClientIP:   clientIP,
 				RateLimit:  rateLimit,
 				Moderation: moderation,
 			})
@@ -159,8 +224,45 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 	}
 
 	return openapi.AdminSettingsUpdate200JSONResponse{
-		AdminSettingsUpdateOKJSONResponse: openapi.AdminSettingsUpdateOKJSONResponse(serialiseSettings(settings)),
+		AdminSettingsUpdateOKJSONResponse: openapi.AdminSettingsUpdateOKJSONResponse(
+			serialiseSettings(settings, nil),
+		),
 	}, nil
+}
+
+func normaliseCIDRList(values []string) []string {
+	out := make([]string, 0, len(values))
+	for _, value := range values {
+		v := strings.TrimSpace(value)
+		if v == "" {
+			continue
+		}
+		out = append(out, v)
+	}
+	return out
+}
+
+func mapOpenAPIClientIPMode(in openapi.ClientIPServiceSettingsClientIpMode) (settings.ClientIPMode, bool) {
+	switch in {
+	case openapi.SingleHeader:
+		return settings.ClientIPModeSingleHeader, true
+	case openapi.XffTrustedProxies:
+		return settings.ClientIPModeXFFTrustedProxies, true
+	case openapi.RemoteAddr:
+		return settings.ClientIPModeRemoteAddr, true
+	default:
+		return settings.ClientIPMode{}, false
+	}
+}
+
+func invalidCIDRs(values []string) []string {
+	out := make([]string, 0)
+	for _, value := range values {
+		if _, err := netip.ParsePrefix(value); err != nil {
+			out = append(out, value)
+		}
+	}
+	return out
 }
 
 func (a *Admin) AuditEventList(ctx context.Context, request openapi.AuditEventListRequestObject) (openapi.AuditEventListResponseObject, error) {
@@ -400,7 +502,7 @@ func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminA
 	return openapi.NoContentResponse{}, nil
 }
 
-func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
+func serialiseSettings(in *settings.Settings, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
 		AccentColour:       in.AccentColour.OrZero(),
 		Description:        in.Description.OrZero(),
@@ -410,6 +512,7 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		Services:           opt.Map(in.Services, serialiseServiceSettings).Ptr(),
 		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
 		Motd:               opt.Map(in.Motd, serialiseMOTD).Ptr(),
+		Headers:            headers,
 	}
 }
 
@@ -424,8 +527,19 @@ func serialiseMOTD(in settings.MessageOfTheDay) openapi.MessageOfTheDay {
 
 func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettingsServiceProps {
 	return openapi.AdminSettingsServiceProps{
+		ClientIp:     opt.Map(in.ClientIP, serialiseClientIPSettings).Ptr(),
 		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
 		Moderation:   opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
+	}
+}
+
+func serialiseClientIPSettings(in settings.ClientIPServiceSettings) openapi.ClientIPServiceSettings {
+	return openapi.ClientIPServiceSettings{
+		ClientIpMode: opt.Map(in.ClientIPMode, func(v settings.ClientIPMode) openapi.ClientIPServiceSettingsClientIpMode {
+			return openapi.ClientIPServiceSettingsClientIpMode(v.String())
+		}).Ptr(),
+		ClientIpHeader:    in.ClientIPHeader.Ptr(),
+		TrustedProxyCidrs: in.TrustedProxyCIDRs.Ptr(),
 	}
 }
 

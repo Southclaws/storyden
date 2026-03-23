@@ -1,15 +1,20 @@
+import { createListCollection } from "@ark-ui/react";
 import { useEffect, useState } from "react";
 import { useWatch } from "react-hook-form";
 
-import { getGetInfoKey } from "@/api/openapi-client/misc";
+import { getGetInfoKey, getSession } from "@/api/openapi-client/misc";
+import { ClientInfo, NetworkHeadersSample } from "@/api/openapi-schema";
 import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
+import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
+import { SelectField } from "@/components/ui/form/SelectField";
 import { SliderField } from "@/components/ui/form/SliderField";
 import { Heading } from "@/components/ui/heading";
+import { Input } from "@/components/ui/input";
 import { API_ADDRESS } from "@/config";
 import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -21,13 +26,31 @@ import {
   DEFAULT_RATE_LIMIT_BUCKET,
   DEFAULT_RATE_LIMIT_GUEST_COST,
   DEFAULT_RATE_LIMIT_PERIOD,
+  Form,
   Props,
   formatSeconds,
   useSystemSettings,
 } from "./useSystemSettings";
 
+const CLIENT_IP_MODE_COLLECTION = createListCollection({
+  items: [
+    {
+      label: "Raw IP (default)",
+      value: "remote_addr",
+    },
+    {
+      label: "Single trusted header",
+      value: "single_header",
+    },
+    {
+      label: "X-Forwarded-For with trusted proxy CIDRs",
+      value: "xff_trusted_proxies",
+    },
+  ],
+});
+
 export function SystemSettingsForm(props: Props) {
-  const { control, formState, onSubmit } = useSystemSettings(props);
+  const { control, register, formState, onSubmit } = useSystemSettings(props);
   const [showError, setShowError] = useState(true);
 
   // Watch form values for live preview
@@ -38,6 +61,7 @@ export function SystemSettingsForm(props: Props) {
     control,
     name: "rate_limit_guest_cost",
   });
+  const clientIPMode = useWatch({ control, name: "client_ip_mode" });
 
   const guestRateLimit = Math.floor(
     (rateLimit ?? DEFAULT_RATE_LIMIT) /
@@ -237,9 +261,316 @@ export function SystemSettingsForm(props: Props) {
             rateLimitPeriod={rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD}
           />
         </FormControl>
+
+        <Heading>Client IP strategy</Heading>
+
+        <FormControl>
+          <FormLabel>Client IP mode</FormLabel>
+          <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+            control={control}
+            name="client_ip_mode"
+            collection={CLIENT_IP_MODE_COLLECTION}
+            placeholder="Select client IP mode"
+          />
+          <FormHelperText>
+            Choose how Storyden resolves client addresses for request context.
+            The default uses only RemoteAddr and does not trust forwarded
+            headers. Header-based modes should only be used when your edge
+            proxy/CDN strips or overwrites client-provided forwarding headers.
+          </FormHelperText>
+        </FormControl>
+
+        {clientIPMode === "single_header" && (
+          <FormControl>
+            <FormLabel>Client IP header</FormLabel>
+            <Input {...register("client_ip_header")} />
+            <FormHelperText>
+              Header to trust for the canonical client IP (for example
+              CF-Connecting-IP, Fly-Client-IP, X-Real-IP, or
+              Storyden-Client-IP). Do not use this mode unless this header is
+              guaranteed to be injected by trusted infrastructure.
+            </FormHelperText>
+          </FormControl>
+        )}
+
+        {clientIPMode === "xff_trusted_proxies" && (
+          <FormControl>
+            <FormLabel>Trusted proxy CIDRs</FormLabel>
+            <Input
+              {...register("trusted_proxy_cidrs")}
+              placeholder="10.0.0.0/8, 172.16.0.0/12"
+            />
+            <FormHelperText>
+              Comma-separated CIDR ranges that are allowed to append XFF hops.
+              Storyden will only trust XFF when RemoteAddr is in these ranges.
+              Include every proxy hop in your chain to avoid collapsing users to
+              a shared proxy IP.
+            </FormHelperText>
+          </FormControl>
+        )}
+
+        <ClientIPTester
+          canRun={!formState.isDirty && !formState.isSubmitting}
+        />
+
+        <NetworkHeaderSample headers={props.settings.headers} />
       </CardBox>
     </styled.form>
   );
+}
+
+type ClientIPTesterProps = {
+  canRun: boolean;
+};
+
+type NetworkHeaderSampleProps = {
+  headers?: NetworkHeadersSample;
+};
+
+function NetworkHeaderSample({ headers }: NetworkHeaderSampleProps) {
+  const direct = headers?.headers ?? {};
+  const ssr = headers?.headers_ssr ?? {};
+  const rawClientAddress = headers?.raw_client_address?.trim() ?? "";
+
+  const directEntries = Object.entries(direct).sort(([a], [b]) =>
+    a.localeCompare(b),
+  );
+  const ssrEntries = Object.entries(ssr).sort(([a], [b]) => a.localeCompare(b));
+
+  if (
+    directEntries.length === 0 &&
+    ssrEntries.length === 0 &&
+    !rawClientAddress
+  ) {
+    return (
+      <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
+        <styled.p>No network header sample is available.</styled.p>
+        <styled.p>
+          This occurs if you are not behind a proxy, or the proxy is not using
+          conventional forwarding headers such as <code>X-Forwarded-For</code>.
+        </styled.p>
+      </CardBox>
+    );
+  }
+
+  return (
+    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
+      <styled.p>
+        These are sampled network headers seen by Storyden on this admin
+        settings request. Use them to configure trusted client IP settings.
+      </styled.p>
+
+      <styled.pre textWrap="wrap">
+        Raw client address:
+        <br />
+        {rawClientAddress || "(none)"}
+        <br />
+        <br />
+        Browser/API headers:
+        <br />
+        {directEntries.length === 0 && "(none)"}
+        {directEntries.map(([name, value]) => (
+          <span key={`direct-${name}`}>
+            {name}: {value}
+            <br />
+          </span>
+        ))}
+        <br />
+        SSR-forwarded headers:
+        <br />
+        {ssrEntries.length === 0 && "(none)"}
+        {ssrEntries.map(([name, value]) => (
+          <span key={`ssr-${name}`}>
+            {name}: {value}
+            <br />
+          </span>
+        ))}
+      </styled.pre>
+    </CardBox>
+  );
+}
+
+function ClientIPTester({ canRun }: ClientIPTesterProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ssrClientInfo, setSSRClientInfo] = useState<ClientInfo | null>(null);
+  const [browserClientInfo, setBrowserClientInfo] = useState<ClientInfo | null>(
+    null,
+  );
+
+  async function loadClientIPTest() {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [ssrResp, browserResp] = await Promise.all([
+        fetch("/client-ip-test", {
+          credentials: "include",
+          cache: "no-store",
+          mode: "cors",
+        }),
+        getSession(),
+      ]);
+
+      if (!ssrResp.ok) {
+        const data = (await ssrResp.json().catch(() => undefined)) as
+          | { message?: string }
+          | undefined;
+        throw new Error(
+          data?.message ?? `SSR test request failed with ${ssrResp.status}`,
+        );
+      }
+
+      const ssrData = (await ssrResp.json()) as { client: ClientInfo | null };
+      setSSRClientInfo(ssrData.client ?? null);
+      setBrowserClientInfo(browserResp.client ?? null);
+    } catch (err) {
+      setSSRClientInfo(null);
+      setBrowserClientInfo(null);
+      setError(deriveError(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void (async () => {
+      await loadClientIPTest();
+    })();
+  }, []);
+
+  const warnings = getClientIPWarnings(ssrClientInfo, browserClientInfo);
+
+  return (
+    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
+      <styled.p>
+        This client IP test runs automatically and compares what Storyden sees
+        from an SSR-origin call and a browser-origin call.
+      </styled.p>
+
+      {error && <styled.p color="fg.error">{error}</styled.p>}
+
+      {warnings.length > 0 && (
+        <Alert.Root>
+          <Alert.Content>
+            <Alert.Title>Potential IP config issue</Alert.Title>
+            <Alert.Description>
+              <styled.ul>
+                {warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </styled.ul>
+            </Alert.Description>
+          </Alert.Content>
+        </Alert.Root>
+      )}
+
+      <styled.pre textWrap="wrap">
+        Server HTML Render client.ip_address_ssr = '
+        {ssrClientInfo?.ip_address_ssr ?? ""}'
+        <br />
+        Browser React Render client.ip_address = '
+        {browserClientInfo?.ip_address ?? ""}'
+      </styled.pre>
+
+      <HStack justify="end">
+        <Button
+          type="button"
+          variant="subtle"
+          size="xs"
+          onClick={() => {
+            if (!canRun) {
+              setError("Save settings before refreshing the client IP test.");
+              return;
+            }
+            void loadClientIPTest();
+          }}
+          loading={loading}
+          disabled={!canRun}
+        >
+          Refresh Client IP Test
+        </Button>
+      </HStack>
+    </CardBox>
+  );
+}
+
+function getClientIPWarnings(
+  ssrClientInfo: ClientInfo | null,
+  browserClientInfo: ClientInfo | null,
+): string[] {
+  const warnings: string[] = [];
+
+  const ssrIP = ssrClientInfo?.ip_address_ssr?.trim() ?? "";
+  const browserIP = browserClientInfo?.ip_address?.trim() ?? "";
+
+  if (ssrIP && browserIP && ssrIP !== browserIP) {
+    warnings.push(
+      `SSR and browser resolved IPs differ (${ssrIP} vs ${browserIP}).`,
+    );
+  }
+
+  const ipValues: Array<{ label: string; value: string }> = [
+    {
+      label: "SSR request resolved IP",
+      value: ssrIP,
+    },
+    { label: "Browser resolved IP", value: browserIP },
+  ];
+
+  const internalByIP = new Map<string, string[]>();
+  for (const candidate of ipValues) {
+    const value = candidate.value.trim();
+    if (value && isLikelyInternalIP(value)) {
+      const labels = internalByIP.get(value) ?? [];
+      labels.push(candidate.label);
+      internalByIP.set(value, labels);
+    }
+  }
+
+  for (const [value, labels] of internalByIP) {
+    if (labels.length === 1) {
+      warnings.push(`${labels[0]} looks internal/private (${value}).`);
+    } else {
+      warnings.push(
+        `${labels.join(" and ")} look internal/private (${value}).`,
+      );
+    }
+  }
+
+  return warnings;
+}
+
+function isLikelyInternalIP(ip: string): boolean {
+  const trimmed = ip.trim();
+  if (!trimmed) return false;
+
+  if (trimmed === "::1") return true;
+  if (trimmed.includes(":")) {
+    const lower = trimmed.toLowerCase();
+    return (
+      lower.startsWith("fc") ||
+      lower.startsWith("fd") ||
+      lower.startsWith("fe80:")
+    );
+  }
+
+  const parts = trimmed.split(".");
+  if (parts.length !== 4) return false;
+
+  const octets = parts.map((p) => Number.parseInt(p, 10));
+  if (octets.some((n) => Number.isNaN(n) || n < 0 || n > 255)) return false;
+
+  const a = octets[0] ?? -1;
+  const b = octets[1] ?? -1;
+  if (a === 10) return true;
+  if (a === 127) return true;
+  if (a === 192 && b === 168) return true;
+  if (a === 169 && b === 254) return true;
+  if (a === 172 && b >= 16 && b <= 31) return true;
+  if (a === 100 && b >= 64 && b <= 127) return true;
+
+  return false;
 }
 
 function RateLimitTester() {

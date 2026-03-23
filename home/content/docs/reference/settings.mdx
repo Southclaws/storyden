@@ -33,3 +33,11 @@ Finally, the colour wheel allows you to set an accent colour for the site. This 
 ## API
 
 You can configure anything you see on the admin page via the API programmatically. This is useful if you want to set up a new site with a script or change settings based on schedules or other events.
+
+## Client IP and SSR
+
+Client IP mode, trusted CIDRs and related settings on this page affect how Storyden resolves browser-origin API requests.
+
+If you use the official Storyden Next.js frontend with SSR, Storyden forwards only `X-Forwarded-For` from the SSR request back to the API, and the backend applies the same client-IP mode logic to both browser and SSR API calls.
+
+See [SSR Client IP Forwarding](/docs/reference/ssr-client-ip) for deployment guidance and when each layer should be configured.

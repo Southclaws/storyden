@@ -15,9 +15,37 @@ func (d *SettingsRepository) hydrateConfigDefaults(in *ent.Setting) (*Settings, 
 		return nil, fault.Wrap(err)
 	}
 
+	d.hydrateClientIPDefaults(settings)
 	d.hydrateRateLimitDefaults(settings)
 
 	return settings, nil
+}
+
+func (d *SettingsRepository) hydrateClientIPDefaults(settings *Settings) {
+	services, ok := settings.Services.Get()
+	if !ok {
+		services = ServiceSettings{}
+	}
+
+	clientIP, ok := services.ClientIP.Get()
+	if !ok {
+		services.ClientIP = opt.New(ClientIPServiceSettings{
+			ClientIPMode:   opt.New(ClientIPModeRemoteAddr),
+			ClientIPHeader: opt.New("X-Real-IP"),
+		})
+		settings.Services = opt.New(services)
+		return
+	}
+
+	if !clientIP.ClientIPMode.Ok() {
+		clientIP.ClientIPMode = opt.New(ClientIPModeRemoteAddr)
+	}
+	if !clientIP.ClientIPHeader.Ok() {
+		clientIP.ClientIPHeader = opt.New("X-Real-IP")
+	}
+
+	services.ClientIP = opt.New(clientIP)
+	settings.Services = opt.New(services)
 }
 
 func (d *SettingsRepository) hydrateRateLimitDefaults(settings *Settings) {

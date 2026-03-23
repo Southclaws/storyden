@@ -15,6 +15,8 @@ export const DEFAULT_RATE_LIMIT = 5000;
 export const DEFAULT_RATE_LIMIT_PERIOD = 3600;
 export const DEFAULT_RATE_LIMIT_BUCKET = 60;
 export const DEFAULT_RATE_LIMIT_GUEST_COST = 1;
+export const DEFAULT_CLIENT_IP_MODE = "remote_addr";
+export const DEFAULT_CLIENT_IP_HEADER = "X-Real-IP";
 
 export function formatSeconds(seconds: number): string {
   const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
@@ -29,8 +31,43 @@ export const FormSchema = z.object({
   rate_limit_bucket: z.number().default(DEFAULT_RATE_LIMIT_BUCKET),
   rate_limit_guest_cost: z.number().default(DEFAULT_RATE_LIMIT_GUEST_COST),
   cost_overrides: z.record(z.string(), z.number()).default({}),
+  client_ip_mode: z
+    .enum(["remote_addr", "single_header", "xff_trusted_proxies"])
+    .default("remote_addr"),
+  client_ip_header: z.string().default(DEFAULT_CLIENT_IP_HEADER),
+  trusted_proxy_cidrs: z.string().default(""),
 });
 export type Form = z.infer<typeof FormSchema>;
+
+export function parseTrustedProxyCidrs(value: string): string[] {
+  return value
+    .split(/[\n,]/)
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+export function buildClientIPSettingsPayload(
+  data: Pick<Form, "client_ip_mode" | "client_ip_header">,
+  trustedProxyCidrs: string[],
+) {
+  const payload: {
+    client_ip_mode: Form["client_ip_mode"];
+    client_ip_header?: string;
+    trusted_proxy_cidrs?: string[];
+  } = {
+    client_ip_mode: data.client_ip_mode,
+  };
+
+  if (data.client_ip_mode === "single_header") {
+    payload.client_ip_header = data.client_ip_header;
+  }
+
+  if (data.client_ip_mode === "xff_trusted_proxies") {
+    payload.trusted_proxy_cidrs = trustedProxyCidrs;
+  }
+
+  return payload;
+}
 
 export function useSystemSettings({ settings }: Props) {
   const { revalidate, updateSettings } = useSettingsMutation();
@@ -49,10 +86,21 @@ export function useSystemSettings({ settings }: Props) {
         settings.services?.rate_limiting?.rate_limit_guest_cost ??
         DEFAULT_RATE_LIMIT_GUEST_COST,
       cost_overrides: settings.services?.rate_limiting?.cost_overrides ?? {},
+      client_ip_mode:
+        settings.services?.client_ip?.client_ip_mode ?? DEFAULT_CLIENT_IP_MODE,
+      client_ip_header:
+        settings.services?.client_ip?.client_ip_header ??
+        DEFAULT_CLIENT_IP_HEADER,
+      trusted_proxy_cidrs: (
+        settings.services?.client_ip?.trusted_proxy_cidrs ?? []
+      ).join(", "),
     },
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
+    const trustedProxyCidrs = parseTrustedProxyCidrs(data.trusted_proxy_cidrs);
+    const clientIP = buildClientIPSettingsPayload(data, trustedProxyCidrs);
+
     await handle(
       async () => {
         await updateSettings({
@@ -65,6 +113,7 @@ export function useSystemSettings({ settings }: Props) {
               rate_limit_guest_cost: data.rate_limit_guest_cost,
               cost_overrides: data.cost_overrides,
             },
+            client_ip: clientIP,
           },
         });
       },
@@ -74,6 +123,7 @@ export function useSystemSettings({ settings }: Props) {
           success: "Settings saved",
         },
         cleanup: async () => {
+          form.reset(data);
           await revalidate();
         },
       },

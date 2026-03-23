@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/branding/banner"
 	"github.com/Southclaws/storyden/app/services/branding/icon"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -41,6 +42,12 @@ func (i Info) GetSession(ctx context.Context, request openapi.GetSessionRequestO
 
 	sessionInfo := openapi.SessionInfo{
 		Info: serialiseInfo(info),
+		Client: &openapi.ClientInfo{
+			IpAddress: reqinfo.GetClientAddress(ctx),
+			IpAddressSsr: opt.NewIf(reqinfo.GetSSRClientAddress(ctx), func(v string) bool {
+				return v != ""
+			}).Ptr(),
+		},
 	}
 
 	if accountID, ok := session.GetOptAccountID(ctx).Get(); ok {
