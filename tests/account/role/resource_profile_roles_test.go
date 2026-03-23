@@ -84,6 +84,21 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				Visibility: &vis,
 			}, authorSession))(t, http.StatusOK)
 
+			tagName := "role-tag-" + xid.New().String()
+			tagNames := openapi.TagNameList{tagName}
+			taggedThreadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
+				Title:      "tagged-thread-with-roles-" + xid.New().String(),
+				Body:       opt.New("<p>tagged thread body</p>").Ptr(),
+				Category:   opt.New(threadCategory.JSON200.Id).Ptr(),
+				Visibility: &vis,
+				Tags:       &tagNames,
+			}, authorSession))(t, http.StatusOK)
+			taggedNodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(authorCtx, openapi.NodeCreateJSONRequestBody{
+				Name:       "tagged-node-with-roles-" + xid.New().String(),
+				Visibility: &vis,
+				Tags:       &tagNames,
+			}, authorSession))(t, http.StatusOK)
+
 			collectionCreate := tests.AssertRequest(cl.CollectionCreateWithResponse(authorCtx, openapi.CollectionCreateJSONRequestBody{
 				Name: "collection-with-roles-" + xid.New().String(),
 			}, authorSession))(t, http.StatusOK)
@@ -311,6 +326,31 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				assertProfileRefHasCustomRole(t, "link.get node owner should include assigned custom role", linkGet.JSON200.Nodes[0].Owner.Roles)
 
 				r.Equal(nodeWithLink.JSON200.Id, linkGet.JSON200.Nodes[0].Id)
+			})
+
+			t.Run("tag_get_items_owner_and_item_refs", func(t *testing.T) {
+				r := require.New(t)
+				tagGet := tests.AssertRequest(cl.TagGetWithResponse(authorCtx, tagName, authorSession))(t, http.StatusOK)
+
+				var foundThreadItem bool
+				var foundNodeItem bool
+
+				for _, item := range tagGet.JSON200.Items {
+					threadItem, threadErr := item.AsDatagraphItemThread()
+					if threadErr == nil && threadItem.Ref.Id == taggedThreadCreate.JSON200.Id {
+						foundThreadItem = true
+						assertProfileRefHasCustomRole(t, "tag.get thread author should include assigned custom role", threadItem.Ref.Author.Roles)
+					}
+
+					nodeItem, nodeErr := item.AsDatagraphItemNode()
+					if nodeErr == nil && nodeItem.Ref.Id == taggedNodeCreate.JSON200.Id {
+						foundNodeItem = true
+						assertProfileRefHasCustomRole(t, "tag.get node owner should include assigned custom role", nodeItem.Ref.Owner.Roles)
+					}
+				}
+
+				r.True(foundThreadItem, "expected tagged thread item in tag.get response")
+				r.True(foundNodeItem, "expected tagged node item in tag.get response")
 			})
 
 			t.Run("default_role_overrides_are_reflected", func(t *testing.T) {
