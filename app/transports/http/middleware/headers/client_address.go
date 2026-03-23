@@ -135,15 +135,18 @@ func getClientIPKey(r *http.Request, cfg clientIPConfiguration) string {
 		}
 		return remote
 	case settings.ClientIPModeXFFTrustedProxies:
-		return getTrustedProxyXFFIP(r, remote, cfg.trustedProxyRanges)
+		return getTrustedProxyXFFIP(r, remote, cfg.trustedProxyRanges, isSSRRequest(r))
 	default:
 		return remote
 	}
 }
 
-func getTrustedProxyXFFIP(r *http.Request, remote string, trusted []netip.Prefix) string {
+func getTrustedProxyXFFIP(r *http.Request, remote string, trusted []netip.Prefix, allowLoopback bool) string {
 	remoteAddr, ok := parseAddr(remote)
-	if !ok || !isTrustedProxy(remoteAddr, trusted) {
+	if !ok {
+		return remote
+	}
+	if !isTrustedProxy(remoteAddr, trusted) && !(allowLoopback && remoteAddr.IsLoopback()) {
 		return remote
 	}
 
@@ -230,4 +233,8 @@ func isTrustedProxy(addr netip.Addr, trusted []netip.Prefix) bool {
 		}
 	}
 	return false
+}
+
+func isSSRRequest(r *http.Request) bool {
+	return strings.TrimSpace(r.Header.Get(ssrRequestHeader)) != ""
 }

@@ -97,6 +97,40 @@ func TestClientAddressTrustedXFFFallbackWhenRemoteUntrusted(t *testing.T) {
 	assert.Equal(t, "192.0.2.20", key)
 }
 
+func TestClientAddressTrustedXFFModeAllowsSSRLoopbackRemoteIPv6(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "[::1]:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
+	}
+
+	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "198.51.100.9", key)
+}
+
+func TestClientAddressTrustedXFFModeAllowsSSRLoopbackRemoteIPv4(t *testing.T) {
+	t.Parallel()
+
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.RemoteAddr = "127.0.0.1:1234"
+	req.Header.Set(ssrRequestHeader, "1")
+	req.Header.Add("X-Forwarded-For", "198.51.100.9, 203.0.113.7")
+
+	cfg := clientIPConfiguration{
+		Mode:               settings.ClientIPModeXFFTrustedProxies,
+		trustedProxyRanges: parseTrustedProxyCIDRs([]string{"203.0.113.0/24"}),
+	}
+
+	key := newTestMiddleware(cfg).clientAddress(req)
+	assert.Equal(t, "198.51.100.9", key)
+}
+
 func TestClientAddressSSRHeaderDoesNotChangeSingleHeaderModeBehaviour(t *testing.T) {
 	t.Parallel()
 
