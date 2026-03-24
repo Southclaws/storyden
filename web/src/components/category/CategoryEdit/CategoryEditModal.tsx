@@ -1,4 +1,5 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
+import { Controller } from "react-hook-form";
 
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { ColourPickerField } from "@/components/ui/ColourPickerField";
@@ -7,6 +8,7 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormFeedback } from "@/components/ui/form/FormFeedback";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input, InputPrefix } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
@@ -104,6 +106,25 @@ export function CategoryEditModal(props: Props) {
             <ColourPickerField control={form.control} name="colour" />
             <FormFeedback error={form.formState.errors["colour"]?.message}>
               The colour for the category.
+            </FormFeedback>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>Visibility</FormLabel>
+            <Controller
+              control={form.control}
+              name="is_hidden"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={(details) => field.onChange(details.checked)}
+                >
+                  Hidden category
+                </Switch>
+              )}
+            />
+            <FormFeedback>
+              Hidden categories and their subcategories are not shown publicly.
             </FormFeedback>
           </FormControl>
         </VStack>

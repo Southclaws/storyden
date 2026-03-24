@@ -7690,6 +7690,7 @@ type CategoryMutation struct {
 	sort               *int
 	addsort            *int
 	admin              *bool
+	visibility         *category.Visibility
 	metadata           *map[string]interface{}
 	clearedFields      map[string]struct{}
 	posts              map[xid.ID]struct{}
@@ -8119,6 +8120,42 @@ func (m *CategoryMutation) ResetAdmin() {
 	m.admin = nil
 }
 
+// SetVisibility sets the "visibility" field.
+func (m *CategoryMutation) SetVisibility(c category.Visibility) {
+	m.visibility = &c
+}
+
+// Visibility returns the value of the "visibility" field in the mutation.
+func (m *CategoryMutation) Visibility() (r category.Visibility, exists bool) {
+	v := m.visibility
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVisibility returns the old "visibility" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldVisibility(ctx context.Context) (v category.Visibility, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVisibility is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVisibility requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVisibility: %w", err)
+	}
+	return oldValue.Visibility, nil
+}
+
+// ResetVisibility resets all changes to the "visibility" field.
+func (m *CategoryMutation) ResetVisibility() {
+	m.visibility = nil
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (m *CategoryMutation) SetParentCategoryID(x xid.ID) {
 	m.parent = &x
@@ -8488,7 +8525,7 @@ func (m *CategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategoryMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, category.FieldCreatedAt)
 	}
@@ -8512,6 +8549,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.admin != nil {
 		fields = append(fields, category.FieldAdmin)
+	}
+	if m.visibility != nil {
+		fields = append(fields, category.FieldVisibility)
 	}
 	if m.parent != nil {
 		fields = append(fields, category.FieldParentCategoryID)
@@ -8546,6 +8586,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Sort()
 	case category.FieldAdmin:
 		return m.Admin()
+	case category.FieldVisibility:
+		return m.Visibility()
 	case category.FieldParentCategoryID:
 		return m.ParentCategoryID()
 	case category.FieldCoverImageAssetID:
@@ -8577,6 +8619,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldSort(ctx)
 	case category.FieldAdmin:
 		return m.OldAdmin(ctx)
+	case category.FieldVisibility:
+		return m.OldVisibility(ctx)
 	case category.FieldParentCategoryID:
 		return m.OldParentCategoryID(ctx)
 	case category.FieldCoverImageAssetID:
@@ -8647,6 +8691,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAdmin(v)
+		return nil
+	case category.FieldVisibility:
+		v, ok := value.(category.Visibility)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVisibility(v)
 		return nil
 	case category.FieldParentCategoryID:
 		v, ok := value.(xid.ID)
@@ -8777,6 +8828,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 		return nil
 	case category.FieldAdmin:
 		m.ResetAdmin()
+		return nil
+	case category.FieldVisibility:
+		m.ResetVisibility()
 		return nil
 	case category.FieldParentCategoryID:
 		m.ResetParentCategoryID()

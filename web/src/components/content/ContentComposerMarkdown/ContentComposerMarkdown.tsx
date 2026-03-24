@@ -55,7 +55,11 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
         onClick={handleTogglePreview}
         workingCount={uploadingCount}
       >
-        <Switch size="sm" checked={showPreview} onClick={handleTogglePreview}>
+        <Switch
+          size="sm"
+          checked={showPreview}
+          onCheckedChange={handleTogglePreview}
+        >
           Preview
         </Switch>
       </ComposerTools>

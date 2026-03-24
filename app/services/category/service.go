@@ -12,8 +12,13 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/audit"
+	"github.com/Southclaws/storyden/app/resources/audit/audit_writer"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/category_cache"
+	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -36,6 +41,7 @@ type Partial struct {
 	Parent            opt.Optional[category.CategoryID]
 	CoverImageAssetID deletable.Value[*xid.ID]
 	Meta              opt.Optional[map[string]any]
+	Visibility        opt.Optional[visibility.Visibility]
 }
 
 type Move struct {
@@ -53,6 +59,7 @@ type service struct {
 	category_repo *category.Repository
 	cache         *category_cache.Cache
 	bus           *pubsub.Bus
+	auditWriter   *audit_writer.Writer
 }
 
 func New(
@@ -60,12 +67,14 @@ func New(
 	category_repo *category.Repository,
 	cache *category_cache.Cache,
 	bus *pubsub.Bus,
+	auditWriter *audit_writer.Writer,
 ) Service {
 	return &service{
 		accountQuery:  accountQuery,
 		category_repo: category_repo,
 		cache:         cache,
 		bus:           bus,
+		auditWriter:   auditWriter,
 	}
 }
 
@@ -88,6 +97,9 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 
 	if v, ok := partial.Meta.Get(); ok {
 		opts = append(opts, category.WithMeta(v))
+	}
+	if v, ok := partial.Visibility.Get(); ok {
+		opts = append(opts, category.WithVisibility(v))
 	}
 
 	name, ok := partial.Name.Get()
@@ -151,6 +163,31 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 	cat, err := s.category_repo.UpdateCategory(ctx, slug, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if v, ok := partial.Visibility.Get(); ok {
+		updated, err := s.category_repo.UpdateCategoryVisibility(ctx, slug, v)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		if len(updated) > 0 {
+			cat = updated[0]
+		}
+
+		enactedBy := session.GetOptAccountID(ctx)
+		_, err = s.auditWriter.Create(
+			ctx,
+			audit.EventTypeCategoryVisibilityUpdated,
+			enactedBy,
+			opt.NewEmpty[datagraph.Ref](),
+			map[string]any{
+				"slug":       slug,
+				"visibility": v.String(),
+			},
+		)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: cat.Slug})

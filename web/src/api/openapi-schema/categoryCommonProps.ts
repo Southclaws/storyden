@@ -13,6 +13,7 @@ import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
+import type { Visibility } from "./visibility";
 
 export interface CategoryCommonProps {
   children: CategoryList;
@@ -25,4 +26,5 @@ export interface CategoryCommonProps {
   parent?: Identifier;
   slug: CategorySlug;
   sort: number;
+  visibility: Visibility;
 }

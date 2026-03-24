@@ -13,6 +13,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -72,6 +73,12 @@ func WithMeta(v map[string]any) Option {
 	}
 }
 
+func WithVisibility(v visibility.Visibility) Option {
+	return func(cm *ent.CategoryMutation) {
+		cm.SetVisibility(category.Visibility(v.String()))
+	}
+}
+
 func WithCoverImageAssetID(id *xid.ID) Option {
 	return func(cm *ent.CategoryMutation) {
 		if id == nil {
@@ -110,6 +117,7 @@ func (d *Repository) CreateCategory(ctx context.Context, name, desc, colour stri
 	mutation.SetColour(colour)
 	mutation.SetSort(sort)
 	mutation.SetAdmin(admin)
+	mutation.SetVisibility(category.VisibilityPublished)
 
 	for _, fn := range opts {
 		fn(mutation)
@@ -143,6 +151,8 @@ from
   inner join posts p on p.category_id = c.id
     and p.deleted_at is null
     and p.visibility = 'published'
+where
+  c.visibility = 'published'
 group by
   c.id
 `
@@ -161,10 +171,14 @@ func (p CategoryThreadsResults) Map() CategoryThreadsMap {
 	return lo.KeyBy(p, func(x CategoryThreadsResult) xid.ID { return x.CategoryID })
 }
 
-func (d *Repository) GetCategories(ctx context.Context, admin bool) ([]*Category, error) {
+func (d *Repository) GetCategories(ctx context.Context, includeHidden bool) ([]*Category, error) {
 	filters := []predicate.Category{}
 
-	if !admin {
+	if !includeHidden {
+		filters = append(filters, category.VisibilityEQ(category.VisibilityPublished))
+	}
+
+	if !includeHidden {
 		filters = append(filters, category.AdminEQ(false))
 	}
 
@@ -244,6 +258,47 @@ func (d *Repository) Get(ctx context.Context, slug string) (*Category, error) {
 	})
 
 	return category, nil
+}
+
+func (d *Repository) UpdateCategoryVisibility(ctx context.Context, slug string, vis visibility.Visibility) ([]*Category, error) {
+	const descendantsQuery = `
+with recursive descendants as (
+  select id from categories where slug = ?
+  union all
+  select c.id
+  from categories c
+  inner join descendants d on c.parent_category_id = d.id
+)
+select id from descendants
+`
+
+	var ids []xid.ID
+	if err := d.raw.SelectContext(ctx, &ids, descendantsQuery, slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if len(ids) == 0 {
+		return nil, fault.New("category not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	if _, err := d.db.Category.Update().
+		Where(category.IDIn(ids...)).
+		SetVisibility(category.Visibility(vis.String())).
+		Save(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	cats, err := d.db.Category.Query().
+		Where(category.IDIn(ids...)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(cats) == 0 {
+		return nil, fault.New("category visibility update affected no rows", fctx.With(ctx))
+	}
+
+	return dt.Map(cats, FromModel), nil
 }
 
 func (d *Repository) UpdateCategory(ctx context.Context, slug string, opts ...Option) (*Category, error) {

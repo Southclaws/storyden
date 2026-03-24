@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_category "github.com/Southclaws/storyden/internal/ent/category"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 )
@@ -34,6 +35,10 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 	predicate := ent_post.And(
 		ent_post.VisibilityEQ(ent_post.VisibilityPublished),
 		ent_post.DeletedAtIsNil(),
+		ent_post.Or(
+			ent_post.CategoryIDIsNil(),
+			ent_post.HasCategoryWith(ent_category.VisibilityEQ(ent_category.VisibilityPublished)),
+		),
 	)
 
 	q := d.db.Post.

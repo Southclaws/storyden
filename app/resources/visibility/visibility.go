@@ -1,6 +1,7 @@
 package visibility
 
 import (
+	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -17,6 +18,6 @@ const (
 	visibilityPublished visibilityEnum = "published"
 )
 
-func NewVisibilityFromEnt[T post.Visibility | node.Visibility | collection.Visibility](in T) Visibility {
+func NewVisibilityFromEnt[T post.Visibility | node.Visibility | collection.Visibility | category.Visibility](in T) Visibility {
 	return Visibility{visibilityEnum(in)}
 }

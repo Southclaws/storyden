@@ -36,6 +36,8 @@ type Category struct {
 	Sort int `json:"sort,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
+	// Visibility holds the value of the "visibility" field.
+	Visibility category.Visibility `json:"visibility,omitempty"`
 	// ParentCategoryID holds the value of the "parent_category_id" field.
 	ParentCategoryID xid.ID `json:"parent_category_id,omitempty"`
 	// CoverImageAssetID holds the value of the "cover_image_asset_id" field.
@@ -116,7 +118,7 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case category.FieldSort:
 			values[i] = new(sql.NullInt64)
-		case category.FieldName, category.FieldSlug, category.FieldDescription, category.FieldColour:
+		case category.FieldName, category.FieldSlug, category.FieldDescription, category.FieldColour, category.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case category.FieldCreatedAt, category.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -190,6 +192,12 @@ func (_m *Category) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
 				_m.Admin = value.Bool
+			}
+		case category.FieldVisibility:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field visibility", values[i])
+			} else if value.Valid {
+				_m.Visibility = category.Visibility(value.String)
 			}
 		case category.FieldParentCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -291,6 +299,9 @@ func (_m *Category) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Admin))
+	builder.WriteString(", ")
+	builder.WriteString("visibility=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("parent_category_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ParentCategoryID))
