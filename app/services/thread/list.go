@@ -45,6 +45,7 @@ func (s *service) List(ctx context.Context,
 
 	q := []thread_querier.Query{
 		thread_querier.HasNotBeenDeleted(),
+		thread_querier.HasVisibleCategories(),
 	}
 
 	opts.Query.Call(func(value string) { q = append(q, thread_querier.HasKeyword(value)) })

@@ -98,7 +98,12 @@ func HasTags(ids []xid.ID) Query {
 func HasCategories(cf CategoryFilter) Query {
 	return func(q *threadListOptions) {
 		if len(cf.Slugs) > 0 {
-			q.q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(cf.Slugs...)))
+			q.q.Where(ent_post.HasCategoryWith(
+				ent_category.And(
+					ent_category.SlugIn(cf.Slugs...),
+					ent_category.VisibilityEQ(ent_category.VisibilityPublished),
+				),
+			))
 		} else {
 			if cf.Uncategorised {
 				q.q.Where(ent_post.CategoryIDIsNil())
@@ -106,6 +111,17 @@ func HasCategories(cf CategoryFilter) Query {
 				// No filter, fetch all threads.
 			}
 		}
+	}
+}
+
+func HasVisibleCategories() Query {
+	return func(q *threadListOptions) {
+		q.q.Where(
+			ent_post.Or(
+				ent_post.CategoryIDIsNil(),
+				ent_post.HasCategoryWith(ent_category.VisibilityEQ(ent_category.VisibilityPublished)),
+			),
+		)
 	}
 }
 

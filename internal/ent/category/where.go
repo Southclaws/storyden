@@ -496,6 +496,26 @@ func AdminNEQ(v bool) predicate.Category {
 	return predicate.Category(sql.FieldNEQ(FieldAdmin, v))
 }
 
+// VisibilityEQ applies the EQ predicate on the "visibility" field.
+func VisibilityEQ(v Visibility) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldVisibility, v))
+}
+
+// VisibilityNEQ applies the NEQ predicate on the "visibility" field.
+func VisibilityNEQ(v Visibility) predicate.Category {
+	return predicate.Category(sql.FieldNEQ(FieldVisibility, v))
+}
+
+// VisibilityIn applies the In predicate on the "visibility" field.
+func VisibilityIn(vs ...Visibility) predicate.Category {
+	return predicate.Category(sql.FieldIn(FieldVisibility, vs...))
+}
+
+// VisibilityNotIn applies the NotIn predicate on the "visibility" field.
+func VisibilityNotIn(vs ...Visibility) predicate.Category {
+	return predicate.Category(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
 // ParentCategoryIDEQ applies the EQ predicate on the "parent_category_id" field.
 func ParentCategoryIDEQ(v xid.ID) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldParentCategoryID, v))

@@ -81,7 +81,7 @@ export function NotificationScreen(props: Props) {
           <Switch
             size="sm"
             checked={showingArchived}
-            onClick={handlers.handleToggleStatus}
+            onCheckedChange={handlers.handleToggleStatus}
           >
             Archived
           </Switch>

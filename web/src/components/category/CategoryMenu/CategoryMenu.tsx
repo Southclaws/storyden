@@ -14,6 +14,7 @@ import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 import { CategoryCreateMenuItem } from "../CategoryCreate/CategoryCreateMenuItem";
 import { CategoryDeleteMenuItem } from "../CategoryDelete/CategoryDeleteMenuItem";
 import { CategoryEditMenuItem } from "../CategoryEdit/CategoryEdit";
+import { CategoryVisibilityToggleMenuItem } from "../CategoryVisibilityToggle/CategoryVisibilityToggleMenuItem";
 
 type Props = {
   category: Category;
@@ -105,6 +106,7 @@ export function CategoryMenu(props: Props) {
 
                 <Menu.ItemGroup id="manage">
                   <CategoryCreateMenuItem parentCategory={category} />
+                  <CategoryVisibilityToggleMenuItem category={category} />
                   <CategoryEditMenuItem {...category} />
                   <CategoryDeleteMenuItem {...category} />
                 </Menu.ItemGroup>

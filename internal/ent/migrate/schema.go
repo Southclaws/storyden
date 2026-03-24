@@ -229,6 +229,7 @@ var (
 		{Name: "colour", Type: field.TypeString, Default: "#8577ce"},
 		{Name: "sort", Type: field.TypeInt, Default: -1},
 		{Name: "admin", Type: field.TypeBool, Default: false},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "published"},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "parent_category_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "cover_image_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -241,13 +242,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "categories_categories_children",
-				Columns:    []*schema.Column{CategoriesColumns[10]},
+				Columns:    []*schema.Column{CategoriesColumns[11]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "categories_assets_cover_image",
-				Columns:    []*schema.Column{CategoriesColumns[11]},
+				Columns:    []*schema.Column{CategoriesColumns[12]},
 				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

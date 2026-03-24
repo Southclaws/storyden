@@ -20,6 +20,7 @@ export const FormSchema = z.object({
   description: z.string().min(1),
   colour: z.string().default("#fff"),
   cover_image: z.custom<Asset>().nullable().optional(),
+  is_hidden: z.boolean().default(false),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -32,6 +33,7 @@ export function useCategoryEdit(props: Props) {
       description: props.category.description,
       colour: props.category.colour,
       cover_image: props.category.cover_image || null,
+      is_hidden: props.category.visibility === "unlisted",
     },
   });
   const pathname = usePathname();
@@ -45,10 +47,11 @@ export function useCategoryEdit(props: Props) {
 
     await handle(
       async () => {
-        const { cover_image, ...rest } = data;
+        const { cover_image, is_hidden, ...rest } = data;
         const updateData = {
           ...rest,
           cover_image_asset_id: cover_image?.id || null,
+          visibility: is_hidden ? "unlisted" : "published",
         };
         await updateCategory(originalSlug, updateData);
 

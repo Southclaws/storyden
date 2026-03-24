@@ -3,6 +3,7 @@
 package category
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -31,6 +32,8 @@ const (
 	FieldSort = "sort"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
+	// FieldVisibility holds the string denoting the visibility field in the database.
+	FieldVisibility = "visibility"
 	// FieldParentCategoryID holds the string denoting the parent_category_id field in the database.
 	FieldParentCategoryID = "parent_category_id"
 	// FieldCoverImageAssetID holds the string denoting the cover_image_asset_id field in the database.
@@ -82,6 +85,7 @@ var Columns = []string{
 	FieldColour,
 	FieldSort,
 	FieldAdmin,
+	FieldVisibility,
 	FieldParentCategoryID,
 	FieldCoverImageAssetID,
 	FieldMetadata,
@@ -117,6 +121,34 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )
+
+// Visibility defines the type for the "visibility" enum field.
+type Visibility string
+
+// VisibilityPublished is the default value of the Visibility enum.
+const DefaultVisibility = VisibilityPublished
+
+// Visibility values.
+const (
+	VisibilityDraft     Visibility = "draft"
+	VisibilityUnlisted  Visibility = "unlisted"
+	VisibilityReview    Visibility = "review"
+	VisibilityPublished Visibility = "published"
+)
+
+func (v Visibility) String() string {
+	return string(v)
+}
+
+// VisibilityValidator is a validator for the "visibility" field enum values. It is called by the builders before save.
+func VisibilityValidator(v Visibility) error {
+	switch v {
+	case VisibilityDraft, VisibilityUnlisted, VisibilityReview, VisibilityPublished:
+		return nil
+	default:
+		return fmt.Errorf("category: invalid enum value for visibility field: %q", v)
+	}
+}
 
 // OrderOption defines the ordering options for the Category queries.
 type OrderOption func(*sql.Selector)
@@ -164,6 +196,11 @@ func BySort(opts ...sql.OrderTermOption) OrderOption {
 // ByAdmin orders the results by the admin field.
 func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
+}
+
+// ByVisibility orders the results by the visibility field.
+func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
 }
 
 // ByParentCategoryID orders the results by the parent_category_id field.

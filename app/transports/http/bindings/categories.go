@@ -13,6 +13,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/category_cache"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -64,7 +67,10 @@ func (c Categories) CategoryCreate(ctx context.Context, request openapi.Category
 }
 
 func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryListRequestObject) (openapi.CategoryListResponseObject, error) {
-	cats, err := c.category_repo.GetCategories(ctx, false)
+	permissions := session.GetRoles(ctx).Permissions()
+	includeHidden := permissions.HasAny(rbac.PermissionManageCategories, rbac.PermissionAdministrator)
+
+	cats, err := c.category_repo.GetCategories(ctx, includeHidden)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -156,6 +162,15 @@ func (c Categories) CategoryUpdate(ctx context.Context, request openapi.Category
 		return &xidValue
 	})
 
+	categoryVisibility := opt.NewEmpty[visibility.Visibility]()
+	if request.Body.Visibility != nil {
+		v, err := visibility.NewVisibility(string(*request.Body.Visibility))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		categoryVisibility = opt.New(v)
+	}
+
 	cat, err := c.category_svc.Update(ctx, request.CategorySlug, category_svc.Partial{
 		Name:              opt.NewPtr(request.Body.Name),
 		Slug:              opt.NewPtr(request.Body.Slug),
@@ -163,6 +178,7 @@ func (c Categories) CategoryUpdate(ctx context.Context, request openapi.Category
 		Colour:            opt.NewPtr(request.Body.Colour),
 		CoverImageAssetID: coverImageAssetID,
 		Meta:              opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Visibility:        categoryVisibility,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -207,6 +223,7 @@ func serialiseCategory(c *category.Category) openapi.Category {
 		CoverImage:  opt.Map(c.CoverImage, serialiseAsset).Ptr(),
 		Children:    children,
 		Meta:        (*openapi.Metadata)(&c.Metadata),
+		Visibility:  openapi.Visibility(c.Visibility.String()),
 	}
 }
 
@@ -230,6 +247,7 @@ func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
 		CoverImage:  opt.Map(c.CoverImage, serialiseAsset).Ptr(),
 		Children:    children,
 		Meta:        (*openapi.Metadata)(&c.Metadata),
+		Visibility:  openapi.Visibility(c.Visibility.String()),
 	}
 }
 

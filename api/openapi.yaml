@@ -6472,7 +6472,7 @@ components:
 
     CategoryCommonProps:
       type: object
-      required: [name, slug, description, colour, sort, children]
+      required: [name, slug, description, colour, sort, children, visibility]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -6491,6 +6491,7 @@ components:
           $ref: "#/components/schemas/Asset"
         children: { $ref: "#/components/schemas/CategoryList" }
         meta: { $ref: "#/components/schemas/Metadata" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
 
     CategoryInitialProps:
       type: object
@@ -6527,6 +6528,7 @@ components:
           nullable: true
           description: Optional cover image asset identifier for the category.
         meta: { $ref: "#/components/schemas/Metadata" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
 
     CategoryDeleteProps:
       type: object

@@ -122,6 +122,20 @@ func (_c *CategoryCreate) SetNillableAdmin(v *bool) *CategoryCreate {
 	return _c
 }
 
+// SetVisibility sets the "visibility" field.
+func (_c *CategoryCreate) SetVisibility(v category.Visibility) *CategoryCreate {
+	_c.mutation.SetVisibility(v)
+	return _c
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (_c *CategoryCreate) SetNillableVisibility(v *category.Visibility) *CategoryCreate {
+	if v != nil {
+		_c.SetVisibility(*v)
+	}
+	return _c
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (_c *CategoryCreate) SetParentCategoryID(v xid.ID) *CategoryCreate {
 	_c.mutation.SetParentCategoryID(v)
@@ -297,6 +311,10 @@ func (_c *CategoryCreate) defaults() {
 		v := category.DefaultAdmin
 		_c.mutation.SetAdmin(v)
 	}
+	if _, ok := _c.mutation.Visibility(); !ok {
+		v := category.DefaultVisibility
+		_c.mutation.SetVisibility(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := category.DefaultID()
 		_c.mutation.SetID(v)
@@ -328,6 +346,14 @@ func (_c *CategoryCreate) check() error {
 	}
 	if _, ok := _c.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`ent: missing required field "Category.admin"`)}
+	}
+	if _, ok := _c.mutation.Visibility(); !ok {
+		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Category.visibility"`)}
+	}
+	if v, ok := _c.mutation.Visibility(); ok {
+		if err := category.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Category.visibility": %w`, err)}
+		}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := category.IDValidator(v.String()); err != nil {
@@ -401,6 +427,10 @@ func (_c *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
+	}
+	if value, ok := _c.mutation.Visibility(); ok {
+		_spec.SetField(category.FieldVisibility, field.TypeEnum, value)
+		_node.Visibility = value
 	}
 	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
@@ -614,6 +644,18 @@ func (u *CategoryUpsert) UpdateAdmin() *CategoryUpsert {
 	return u
 }
 
+// SetVisibility sets the "visibility" field.
+func (u *CategoryUpsert) SetVisibility(v category.Visibility) *CategoryUpsert {
+	u.Set(category.FieldVisibility, v)
+	return u
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateVisibility() *CategoryUpsert {
+	u.SetExcluded(category.FieldVisibility)
+	return u
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (u *CategoryUpsert) SetParentCategoryID(v xid.ID) *CategoryUpsert {
 	u.Set(category.FieldParentCategoryID, v)
@@ -821,6 +863,20 @@ func (u *CategoryUpsertOne) SetAdmin(v bool) *CategoryUpsertOne {
 func (u *CategoryUpsertOne) UpdateAdmin() *CategoryUpsertOne {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *CategoryUpsertOne) SetVisibility(v category.Visibility) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateVisibility() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateVisibility()
 	})
 }
 
@@ -1207,6 +1263,20 @@ func (u *CategoryUpsertBulk) SetAdmin(v bool) *CategoryUpsertBulk {
 func (u *CategoryUpsertBulk) UpdateAdmin() *CategoryUpsertBulk {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetVisibility sets the "visibility" field.
+func (u *CategoryUpsertBulk) SetVisibility(v category.Visibility) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetVisibility(v)
+	})
+}
+
+// UpdateVisibility sets the "visibility" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateVisibility() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateVisibility()
 	})
 }
 

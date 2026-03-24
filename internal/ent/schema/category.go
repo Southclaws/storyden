@@ -25,6 +25,7 @@ func (Category) Fields() []ent.Field {
 		field.String("colour").Default("#8577ce"),
 		field.Int("sort").Default(-1),
 		field.Bool("admin").Default(false),
+		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesPublished),
 		field.String("parent_category_id").
 			GoType(xid.ID{}).
 			Optional(),

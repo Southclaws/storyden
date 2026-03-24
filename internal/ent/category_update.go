@@ -129,6 +129,20 @@ func (_u *CategoryUpdate) SetNillableAdmin(v *bool) *CategoryUpdate {
 	return _u
 }
 
+// SetVisibility sets the "visibility" field.
+func (_u *CategoryUpdate) SetVisibility(v category.Visibility) *CategoryUpdate {
+	_u.mutation.SetVisibility(v)
+	return _u
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (_u *CategoryUpdate) SetNillableVisibility(v *category.Visibility) *CategoryUpdate {
+	if v != nil {
+		_u.SetVisibility(*v)
+	}
+	return _u
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (_u *CategoryUpdate) SetParentCategoryID(v xid.ID) *CategoryUpdate {
 	_u.mutation.SetParentCategoryID(v)
@@ -344,6 +358,16 @@ func (_u *CategoryUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *CategoryUpdate) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
+		if err := category.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Category.visibility": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdate {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -351,6 +375,9 @@ func (_u *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Categ
 }
 
 func (_u *CategoryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -382,6 +409,9 @@ func (_u *CategoryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Visibility(); ok {
+		_spec.SetField(category.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
@@ -656,6 +686,20 @@ func (_u *CategoryUpdateOne) SetNillableAdmin(v *bool) *CategoryUpdateOne {
 	return _u
 }
 
+// SetVisibility sets the "visibility" field.
+func (_u *CategoryUpdateOne) SetVisibility(v category.Visibility) *CategoryUpdateOne {
+	_u.mutation.SetVisibility(v)
+	return _u
+}
+
+// SetNillableVisibility sets the "visibility" field if the given value is not nil.
+func (_u *CategoryUpdateOne) SetNillableVisibility(v *category.Visibility) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetVisibility(*v)
+	}
+	return _u
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (_u *CategoryUpdateOne) SetParentCategoryID(v xid.ID) *CategoryUpdateOne {
 	_u.mutation.SetParentCategoryID(v)
@@ -884,6 +928,16 @@ func (_u *CategoryUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *CategoryUpdateOne) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
+		if err := category.VisibilityValidator(v); err != nil {
+			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Category.visibility": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (_u *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdateOne {
 	_u.modifiers = append(_u.modifiers, modifiers...)
@@ -891,6 +945,9 @@ func (_u *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Ca
 }
 
 func (_u *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -939,6 +996,9 @@ func (_u *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err 
 	}
 	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.Visibility(); ok {
+		_spec.SetField(category.FieldVisibility, field.TypeEnum, value)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)

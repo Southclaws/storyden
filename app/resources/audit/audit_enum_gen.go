@@ -12,11 +12,12 @@ type EventType struct {
 }
 
 var (
-	EventTypeThreadDeleted        = EventType{eventTypeThreadDeleted}
-	EventTypeThreadReplyDeleted   = EventType{eventTypeThreadReplyDeleted}
-	EventTypeAccountSuspended     = EventType{eventTypeAccountSuspended}
-	EventTypeAccountUnsuspended   = EventType{eventTypeAccountUnsuspended}
-	EventTypeAccountContentPurged = EventType{eventTypeAccountContentPurged}
+	EventTypeThreadDeleted             = EventType{eventTypeThreadDeleted}
+	EventTypeThreadReplyDeleted        = EventType{eventTypeThreadReplyDeleted}
+	EventTypeAccountSuspended          = EventType{eventTypeAccountSuspended}
+	EventTypeAccountUnsuspended        = EventType{eventTypeAccountUnsuspended}
+	EventTypeAccountContentPurged      = EventType{eventTypeAccountContentPurged}
+	EventTypeCategoryVisibilityUpdated = EventType{eventTypeCategoryVisibilityUpdated}
 )
 
 func (r EventType) Format(f fmt.State, verb rune) {
@@ -66,6 +67,8 @@ func NewEventType(__iNpUt__ string) (EventType, error) {
 		return EventTypeAccountUnsuspended, nil
 	case string(eventTypeAccountContentPurged):
 		return EventTypeAccountContentPurged, nil
+	case string(eventTypeCategoryVisibilityUpdated):
+		return EventTypeCategoryVisibilityUpdated, nil
 	default:
 		return EventType{}, fmt.Errorf("invalid value for type 'EventType': '%s'", __iNpUt__)
 	}

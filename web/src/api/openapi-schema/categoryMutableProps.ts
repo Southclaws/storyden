@@ -11,6 +11,7 @@ import type { CategoryMutablePropsCoverImageAssetId } from "./categoryMutablePro
 import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
 import type { Metadata } from "./metadata";
+import type { Visibility } from "./visibility";
 
 export interface CategoryMutableProps {
   colour?: string;
@@ -23,4 +24,5 @@ export interface CategoryMutableProps {
   meta?: Metadata;
   name?: CategoryName;
   slug?: CategorySlug;
+  visibility?: Visibility;
 }

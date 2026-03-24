@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -38,6 +39,7 @@ type Category struct {
 	Recent      []PostMeta
 	PostCount   int
 	Metadata    map[string]any
+	Visibility  visibility.Visibility
 	UpdatedAt   time.Time
 }
 
@@ -90,6 +92,7 @@ func FromModel(c *ent.Category) *Category {
 		Children:    children,
 		Recent:      recent,
 		Metadata:    c.Metadata,
+		Visibility:  visibility.NewVisibilityFromEnt(c.Visibility),
 		UpdatedAt:   c.UpdatedAt,
 	}
 }
