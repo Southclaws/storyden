@@ -5,6 +5,7 @@ import Link from "next/link";
 import { InvitedByFilter } from "@/components/library/members/MemberFilters/InvitedByFilter";
 import { JoinedDateFilter } from "@/components/library/members/MemberFilters/JoinedDateFilter";
 import { RoleFilter } from "@/components/library/members/MemberFilters/RoleFilter";
+import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { SortMenu } from "@/components/library/members/MemberFilters/SortMenu";
 import { EmptyState } from "@/components/site/EmptyState";
@@ -70,10 +71,7 @@ export function AdminMemberIndexScreen(props: Props) {
         <Flex
           w="full"
           gap="2"
-          flexDir={{
-            base: "column",
-            md: "row",
-          }}
+          flexDir="row"
           flexWrap="wrap"
           alignItems="start"
         >
@@ -130,143 +128,141 @@ export function AdminMemberIndexScreen(props: Props) {
         <EmptyState>No accounts matched the current admin filters.</EmptyState>
       ) : (
         <VStack gap="4" alignItems="stretch">
-          {data.accounts.map((account) => (
-            <CardBox
-              key={account.id}
-              p={{ base: "3", md: "4" }}
-              borderWidth="thin"
-            >
-              <VStack alignItems="stretch" gap="4">
-                <WStack
-                  justifyContent="space-between"
-                  alignItems="start"
-                  gap="3"
-                  flexWrap="wrap"
-                >
-                  <VStack alignItems="stretch" gap="2" minW="0">
-                    <Link href={`/m/${account.handle}`} style={{ width: "100%" }}>
-                      <MemberIdent
-                        profile={asProfileReference(account)}
-                        name="full-horizontal"
-                        size="md"
-                      />
-                    </Link>
-                  </VStack>
+          {data.accounts.map((account) => {
+            const authServices = dedupe(account.auth_services);
 
-                  <HStack gap="2" flexWrap="wrap">
-                    {account.admin && (
-                      <Badge colorPalette="orange">admin</Badge>
-                    )}
-                    {account.suspended ? (
-                      <Badge colorPalette="red">suspended</Badge>
-                    ) : (
-                      <Badge colorPalette="green">active</Badge>
-                    )}
-                    <Badge variant="outline">{account.verified_status}</Badge>
-                  </HStack>
-                </WStack>
+            return (
+              <CardBox
+                key={account.id}
+                p={{ base: "3", md: "4" }}
+                borderWidth="thin"
+              >
+                <VStack alignItems="stretch" gap="3">
+                  <WStack
+                    justifyContent="space-between"
+                    alignItems="start"
+                    gap="3"
+                    flexWrap="wrap"
+                  >
+                    <HStack gap="2" flexWrap="wrap" minW="0" alignItems="center">
+                      <Link href={`/m/${account.handle}`} style={{ minWidth: 0 }}>
+                        <MemberIdent
+                          profile={asProfileReference(account)}
+                          name="full-horizontal"
+                          size="md"
+                        />
+                      </Link>
+                      {account.admin && <Badge colorPalette="orange">admin</Badge>}
+                      {account.suspended ? (
+                        <Badge colorPalette="red">suspended</Badge>
+                      ) : (
+                        <Badge colorPalette="green">active</Badge>
+                      )}
+                      <Badge variant="outline">{account.verified_status}</Badge>
+                    </HStack>
 
-                <WStack gap="3" alignItems="start" flexWrap="wrap">
+                    <Timestamp created={account.joined} color="fg.subtle" large />
+                  </WStack>
+
                   <styled.code color="fg.muted" fontSize="xs" fontFamily="mono">
                     {account.id}
                   </styled.code>
-                  <Timestamp created={account.joined} color="fg.subtle" large />
-                </WStack>
 
-                <Grid
-                  gridTemplateColumns={{
-                    base: "1fr",
-                    lg: "repeat(2, minmax(0, 1fr))",
-                  }}
-                  gap={{ base: "3", lg: "4" }}
-                >
-                  <Box p="3" borderRadius="md" bg="bg.muted">
-                    <InfoBlock label="Emails">
-                      <VStack alignItems="stretch" gap="1.5">
-                        {account.email_addresses.length === 0 ? (
-                          <styled.span color="fg.muted" fontSize="sm">
-                            No email addresses
-                          </styled.span>
-                        ) : (
-                          account.email_addresses.map((email) => (
-                            <HStack
-                              key={email.id}
-                              justifyContent="space-between"
-                              gap="2"
-                              flexWrap="wrap"
-                            >
-                              <styled.span fontFamily="mono" fontSize="sm">
-                                {email.email_address}
-                              </styled.span>
-                              <Badge variant="outline">
-                                {email.verified ? "verified" : "unverified"}
+                  <Grid
+                    gridTemplateColumns={{
+                      base: "1fr",
+                      lg: "repeat(2, minmax(0, 1fr))",
+                    }}
+                    gap="3"
+                  >
+                    <VStack alignItems="stretch" gap="3">
+                      <InfoBlock label="Emails">
+                        <VStack alignItems="stretch" gap="1.5">
+                          {account.email_addresses.length === 0 ? (
+                            <styled.span color="fg.muted" fontSize="sm">
+                              No email addresses
+                            </styled.span>
+                          ) : (
+                            account.email_addresses.map((email) => (
+                              <HStack
+                                key={email.id}
+                                justifyContent="space-between"
+                                gap="2"
+                                flexWrap="wrap"
+                              >
+                                <styled.span fontFamily="mono" fontSize="sm">
+                                  {email.email_address}
+                                </styled.span>
+                                <Badge variant="outline">
+                                  {email.verified ? "verified" : "unverified"}
+                                </Badge>
+                              </HStack>
+                            ))
+                          )}
+                        </VStack>
+                      </InfoBlock>
+
+                      <InfoBlock label="Roles">
+                        <HStack gap="2" flexWrap="wrap">
+                          {account.roles.length === 0 ? (
+                            <styled.span color="fg.muted" fontSize="sm">
+                              No roles
+                            </styled.span>
+                          ) : (
+                            account.roles.map((role) => (
+                              <Badge key={role.id} variant="subtle">
+                                {role.name}
                               </Badge>
-                            </HStack>
-                          ))
-                        )}
-                      </VStack>
-                    </InfoBlock>
-                  </Box>
+                            ))
+                          )}
+                        </HStack>
+                      </InfoBlock>
+                    </VStack>
 
-                  <Box p="3" borderRadius="md" bg="bg.muted">
-                    <InfoBlock label="Auth services">
-                      <HStack gap="2" flexWrap="wrap">
-                        {dedupe(account.auth_services).length === 0 ? (
-                          <styled.span color="fg.muted" fontSize="sm">
-                            None
-                          </styled.span>
-                        ) : (
-                          <>
-                            {dedupe(account.auth_services)
-                              .slice(0, 5)
-                              .map((service) => (
+                    <VStack alignItems="stretch" gap="3">
+                      <InfoBlock label="Auth services">
+                        <HStack gap="2" flexWrap="wrap">
+                          {authServices.length === 0 ? (
+                            <styled.span color="fg.muted" fontSize="sm">
+                              None
+                            </styled.span>
+                          ) : (
+                            <>
+                              {authServices.slice(0, 5).map((service) => (
                                 <Badge key={service} variant="outline">
                                   {service}
                                 </Badge>
                               ))}
-                            {dedupe(account.auth_services).length > 5 && (
-                              <Badge variant="subtle" colorPalette="gray">
-                                +{dedupe(account.auth_services).length - 5} more
-                              </Badge>
-                            )}
-                          </>
-                        )}
-                      </HStack>
-                    </InfoBlock>
-                  </Box>
+                              {authServices.length > 5 && (
+                                <Badge variant="subtle" colorPalette="gray">
+                                  +{authServices.length - 5} more
+                                </Badge>
+                              )}
+                            </>
+                          )}
+                        </HStack>
+                      </InfoBlock>
 
-                  <Box p="3" borderRadius="md" bg="bg.muted">
-                    <InfoBlock label="Roles">
-                      <HStack gap="2" flexWrap="wrap">
-                        {account.roles.length === 0 ? (
-                          <styled.span color="fg.muted" fontSize="sm">
-                            No roles
-                          </styled.span>
+                      <InfoBlock label="Invitation">
+                        {account.invited_by ? (
+                          <MemberBadge
+                            profile={account.invited_by}
+                            name="handle"
+                            size="sm"
+                            avatar="hidden"
+                          />
                         ) : (
-                          account.roles.map((role) => (
-                            <Badge key={role.id} variant="subtle">
-                              {role.name}
-                            </Badge>
-                          ))
+                          <styled.span color="fg.subtle" fontStyle="italic">
+                            n/a
+                          </styled.span>
                         )}
-                      </HStack>
-                    </InfoBlock>
-                  </Box>
-
-                  <Box p="3" borderRadius="md" bg="bg.muted">
-                    <InfoBlock label="Invitation">
-                      <styled.span color="fg.subtle" fontSize="sm">
-                        Invited by{" "}
-                        {account.invited_by
-                          ? `@${account.invited_by.handle}`
-                          : "n/a"}
-                      </styled.span>
-                    </InfoBlock>
-                  </Box>
-                </Grid>
-              </VStack>
-            </CardBox>
-          ))}
+                      </InfoBlock>
+                    </VStack>
+                  </Grid>
+                </VStack>
+              </CardBox>
+            );
+          })}
         </VStack>
       )}
     </VStack>
