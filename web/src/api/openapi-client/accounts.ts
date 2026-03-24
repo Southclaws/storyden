@@ -19,6 +19,8 @@ import type {
   AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
+  AccountListOKResponse,
+  AccountListParams,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
@@ -30,6 +32,61 @@ import type {
   UnauthorisedResponse,
 } from "../openapi-schema";
 
+/**
+ * List accounts for administrative moderation purposes. This endpoint is
+intended for staff-facing member search and returns denser account data
+than the public profile listing such as email addresses, held auth
+services and administrative flags.
+
+ */
+export const accountList = (params?: AccountListParams) => {
+  return fetcher<AccountListOKResponse>({
+    url: `/admin/accounts`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getAccountListKey = (params?: AccountListParams) =>
+  [`/admin/accounts`, ...(params ? [params] : [])] as const;
+
+export type AccountListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountList>>
+>;
+export type AccountListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAccountList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(
+  params?: AccountListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof accountList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAccountListKey(params) : null));
+  const swrFn = () => accountList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 /**
  * Get the information for the currently authenticated account.
  */

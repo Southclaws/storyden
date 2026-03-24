@@ -49,6 +49,7 @@ export function JoinedDateFilter() {
         defaultValue={parseInitialValue()}
         onValueChange={handleValueChange}
         active={!!joined}
+        triggerLabel="Joined"
         hideInputs={true}
         triggerClassName={css({
           borderRightRadius: "none",

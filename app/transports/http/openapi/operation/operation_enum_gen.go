@@ -24,6 +24,7 @@ var (
 	OperationIDSendBeacon                       = OperationID{`SendBeacon`}
 	OperationIDAdminSettingsGet                 = OperationID{`AdminSettingsGet`}
 	OperationIDAdminSettingsUpdate              = OperationID{`AdminSettingsUpdate`}
+	OperationIDAccountList                      = OperationID{`AccountList`}
 	OperationIDAuditEventList                   = OperationID{`AuditEventList`}
 	OperationIDAuditEventGet                    = OperationID{`AuditEventGet`}
 	OperationIDModerationActionCreate           = OperationID{`ModerationActionCreate`}
@@ -229,6 +230,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAdminSettingsGet, nil
 	case string(`AdminSettingsUpdate`):
 		return OperationIDAdminSettingsUpdate, nil
+	case string(`AccountList`):
+		return OperationIDAccountList, nil
 	case string(`AuditEventList`):
 		return OperationIDAuditEventList, nil
 	case string(`AuditEventGet`):

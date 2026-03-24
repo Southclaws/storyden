@@ -297,6 +297,30 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
 
+  /admin/accounts:
+    get:
+      operationId: AccountList
+      description: |
+        List accounts for administrative moderation purposes. This endpoint is
+        intended for staff-facing member search and returns denser account data
+        than the public profile listing such as email addresses, held auth
+        services and administrative flags.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/ProfilesSortByQuery"
+        - $ref: "#/components/parameters/ProfilesRoleFilterQuery"
+        - $ref: "#/components/parameters/ProfilesJoinRangeQuery"
+        - $ref: "#/components/parameters/ProfilesInvitedByQuery"
+        - $ref: "#/components/parameters/AdminAccountsSuspendedQuery"
+        - $ref: "#/components/parameters/AdminAccountsAdminQuery"
+        - $ref: "#/components/parameters/AdminAccountsAuthServicesQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountListOK" }
+
   /admin/audit-events:
     get:
       operationId: AuditEventList
@@ -2796,6 +2820,31 @@ components:
         type: array
         items: { $ref: "#/components/schemas/AccountHandle" }
 
+    AdminAccountsSuspendedQuery:
+      description: Filter accounts by suspension state.
+      name: suspended
+      in: query
+      required: false
+      schema:
+        type: boolean
+
+    AdminAccountsAdminQuery:
+      description: Filter accounts by administrator status.
+      name: admin
+      in: query
+      required: false
+      schema:
+        type: boolean
+
+    AdminAccountsAuthServicesQuery:
+      description: Filter accounts by one or more active authentication services.
+      name: auth_service
+      in: query
+      required: false
+      explode: true
+      schema:
+        $ref: "#/components/schemas/AuthProviderIdentifierList"
+
     AccountHandleQueryParam:
       description: Account handle.
       example: southclaws
@@ -3719,6 +3768,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OwnedAccessKeyListResult"
+
+    AccountListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountListResult"
 
     AccessKeyListOK:
       description: OK
@@ -5499,13 +5555,19 @@ components:
         - email
         - phone
 
+    AuthProviderIdentifier:
+      type: string
+
+    AuthProviderIdentifierList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AuthProviderIdentifier"
+
     AuthProvider:
       type: object
       required: [provider, name]
       properties:
-        provider:
-          description: The slug name of the provider.
-          type: string
+        provider: { $ref: "#/components/schemas/AuthProviderIdentifier" }
         name:
           description: The human-readable name of the provider.
           type: string
@@ -5979,6 +6041,10 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/AccountCommonProps"
 
+    AccountList:
+      type: array
+      items: { $ref: "#/components/schemas/Account" }
+
     AccountCommonProps:
       required:
         [
@@ -5991,6 +6057,7 @@ components:
           meta,
           verified_status,
           email_addresses,
+          auth_services,
           admin,
         ]
       properties:
@@ -6014,6 +6081,8 @@ components:
           $ref: "#/components/schemas/AccountVerifiedStatus"
         email_addresses:
           $ref: "#/components/schemas/AccountEmailAddressList"
+        auth_services:
+          $ref: "#/components/schemas/AuthProviderIdentifierList"
         notifications:
           $ref: "#/components/schemas/NotificationCount"
         admin:
@@ -6099,6 +6168,14 @@ components:
       required: [email_address]
       properties:
         email_address: { $ref: "#/components/schemas/EmailAddress" }
+
+    AccountListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [accounts]
+          properties:
+            accounts: { $ref: "#/components/schemas/AccountList" }
 
     #
     # 8888888                   d8b 888             888    d8b

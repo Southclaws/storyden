@@ -14,6 +14,7 @@ import type { AccountName } from "./accountName";
 import type { AccountRoleList } from "./accountRoleList";
 import type { AccountSignature } from "./accountSignature";
 import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
+import type { AuthProviderIdentifierList } from "./authProviderIdentifierList";
 import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
 import type { Metadata } from "./metadata";
@@ -23,6 +24,7 @@ import type { ProfileReference } from "./profileReference";
 
 export interface AccountCommonProps {
   admin: boolean;
+  auth_services: AuthProviderIdentifierList;
   bio: AccountBio;
   email_addresses: AccountEmailAddressList;
   handle: AccountHandle;

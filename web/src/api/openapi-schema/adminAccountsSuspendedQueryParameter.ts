@@ -7,12 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.6-post
  */
-import type { AuthProviderIdentifier } from "./authProviderIdentifier";
 
-export interface AuthProvider {
-  /** The hyperlink to render for the user. */
-  link?: string;
-  /** The human-readable name of the provider. */
-  name: string;
-  provider: AuthProviderIdentifier;
-}
+/**
+ * Filter accounts by suspension state.
+ */
+export type AdminAccountsSuspendedQueryParameter = boolean;

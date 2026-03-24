@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_repo"
+	"github.com/Southclaws/storyden/app/resources/account/account_search"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
@@ -78,6 +79,7 @@ func Build() fx.Option {
 			role_hydrate.New,
 			account_repo.New,
 			account_querier.New,
+			account_search.New,
 			account_writer.New,
 			access_key.New,
 			email.New,

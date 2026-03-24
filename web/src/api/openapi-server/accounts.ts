@@ -13,11 +13,58 @@ import type {
   AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
+  AccountListOKResponse,
+  AccountListParams,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
+
+/**
+ * List accounts for administrative moderation purposes. This endpoint is
+intended for staff-facing member search and returns denser account data
+than the public profile listing such as email addresses, held auth
+services and administrative flags.
+
+ */
+export type accountListResponse = {
+  data: AccountListOKResponse;
+  status: number;
+};
+
+export const getAccountListUrl = (params?: AccountListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["roles", "invited_by", "auth_service"];
+
+    if (value instanceof Array && explodeParameters.includes(key)) {
+      value.forEach((v) =>
+        normalizedParams.append(key, v === null ? "null" : v.toString()),
+      );
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/admin/accounts?${normalizedParams.toString()}`
+    : `/admin/accounts`;
+};
+
+export const accountList = async (
+  params?: AccountListParams,
+  options?: RequestInit,
+): Promise<accountListResponse> => {
+  return fetcher<Promise<accountListResponse>>(getAccountListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
 
 /**
  * Get the information for the currently authenticated account.
