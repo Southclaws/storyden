@@ -38,6 +38,10 @@ Client IP settings live in the Admin UI and are applied immediately:
 - `client_ip_header`: trusted header name for `single_header`
 - `trusted_proxy_cidrs`: trusted proxy ranges for `xff_trusted_proxies`
 
+You can use the diagnostic tools in the System settings screen to configure and validate your client IP mode.
+
+![2026-03-24-19-35-20.png](2026-03-24-19-35-20.png)
+
 There is currently no separate setup for SSR. If you run the frontend as a separate process perhaps for load balancing purposes, you will need to configure your reverse proxy to include `X-Forwarded-For`, the frontend will include this with requests to the API and apply the same logic to incoming requests.
 
 For `xff_trusted_proxies` mode, SSR-origin API calls can also trust a separate "SSR source" peer address list:
