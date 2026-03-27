@@ -12,12 +12,14 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/dig"
 	"go.uber.org/fx"
+	"go.uber.org/fx/fxevent"
 
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
 	transport "github.com/Southclaws/storyden/app/transports"
 	"github.com/Southclaws/storyden/internal/boot_time"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/fxlogger"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 )
 
@@ -25,8 +27,17 @@ import (
 // The server will shut down if the root context is cancelled
 // nolint:errcheck
 func Start(ctx context.Context) {
+	// TEMPORARY: Do not release this in v1.25.9!!!
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+
+	logger = logger.With("component", "bootstrap")
+
 	app := fx.New(
-		fx.NopLogger,
+		fx.WithLogger(func() fxevent.Logger {
+			return fxlogger.New(logger)
+		}),
 
 		fx.Provide(func() context.Context { return ctx }),
 
