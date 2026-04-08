@@ -11,6 +11,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/account/invitation/invitation_querier"
 	"github.com/Southclaws/storyden/app/resources/account/invitation/invitation_writer"
+	"github.com/Southclaws/storyden/app/resources/account/moderation_note/moderation_note_querier"
+	"github.com/Southclaws/storyden/app/resources/account/moderation_note/moderation_note_writer"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
@@ -85,6 +87,8 @@ func Build() fx.Option {
 			role_writer.New,
 			invitation_querier.New,
 			invitation_writer.New,
+			moderation_note_querier.New,
+			moderation_note_writer.New,
 			asset_querier.New,
 			asset_writer.New,
 			audit_querier.New,

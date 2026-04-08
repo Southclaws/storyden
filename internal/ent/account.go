@@ -107,11 +107,15 @@ type AccountEdges struct {
 	HandledReports []*Report `json:"handled_reports,omitempty"`
 	// AuditLogs holds the value of the audit_logs edge.
 	AuditLogs []*AuditLog `json:"audit_logs,omitempty"`
+	// ModerationNotes holds the value of the moderation_notes edge.
+	ModerationNotes []*ModerationNote `json:"moderation_notes,omitempty"`
+	// AuthoredModerationNotes holds the value of the authored_moderation_notes edge.
+	AuthoredModerationNotes []*ModerationNote `json:"authored_moderation_notes,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [26]bool
+	loadedTypes [28]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -341,10 +345,28 @@ func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
 	return nil, &NotLoadedError{edge: "audit_logs"}
 }
 
+// ModerationNotesOrErr returns the ModerationNotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) ModerationNotesOrErr() ([]*ModerationNote, error) {
+	if e.loadedTypes[25] {
+		return e.ModerationNotes, nil
+	}
+	return nil, &NotLoadedError{edge: "moderation_notes"}
+}
+
+// AuthoredModerationNotesOrErr returns the AuthoredModerationNotes value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) {
+	if e.loadedTypes[26] {
+		return e.AuthoredModerationNotes, nil
+	}
+	return nil, &NotLoadedError{edge: "authored_moderation_notes"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[27] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -616,6 +638,16 @@ func (_m *Account) QueryHandledReports() *ReportQuery {
 // QueryAuditLogs queries the "audit_logs" edge of the Account entity.
 func (_m *Account) QueryAuditLogs() *AuditLogQuery {
 	return NewAccountClient(_m.config).QueryAuditLogs(_m)
+}
+
+// QueryModerationNotes queries the "moderation_notes" edge of the Account entity.
+func (_m *Account) QueryModerationNotes() *ModerationNoteQuery {
+	return NewAccountClient(_m.config).QueryModerationNotes(_m)
+}
+
+// QueryAuthoredModerationNotes queries the "authored_moderation_notes" edge of the Account entity.
+func (_m *Account) QueryAuthoredModerationNotes() *ModerationNoteQuery {
+	return NewAccountClient(_m.config).QueryAuthoredModerationNotes(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

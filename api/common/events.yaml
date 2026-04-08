@@ -33,6 +33,8 @@ $defs:
       - EventAccountUpdated
       - EventAccountSuspended
       - EventAccountUnsuspended
+      - EventModerationNoteCreated
+      - EventModerationNoteDeleted
       - EventReportCreated
       - EventReportUpdated
       - EventActivityCreated
@@ -70,6 +72,8 @@ $defs:
       - $ref: "#/$defs/EventAccountUpdated"
       - $ref: "#/$defs/EventAccountSuspended"
       - $ref: "#/$defs/EventAccountUnsuspended"
+      - $ref: "#/$defs/EventModerationNoteCreated"
+      - $ref: "#/$defs/EventModerationNoteDeleted"
       - $ref: "#/$defs/EventReportCreated"
       - $ref: "#/$defs/EventReportUpdated"
       - $ref: "#/$defs/EventActivityCreated"
@@ -456,6 +460,36 @@ $defs:
         type: string
         format: accountID
         description: "Account ID"
+
+  EventModerationNoteCreated:
+    type: object
+    description: "Emitted when a moderator creates an internal account moderation note."
+    required: ["event", "account_id", "note_id"]
+    properties:
+      event: { type: string, const: "EventModerationNoteCreated" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Target account ID"
+      note_id:
+        type: string
+        format: xid
+        description: "Moderation note ID"
+
+  EventModerationNoteDeleted:
+    type: object
+    description: "Emitted when a moderator deletes an internal account moderation note."
+    required: ["event", "account_id", "note_id"]
+    properties:
+      event: { type: string, const: "EventModerationNoteDeleted" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Target account ID"
+      note_id:
+        type: string
+        format: xid
+        description: "Moderation note ID"
 
   # Report events
 

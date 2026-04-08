@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -625,6 +626,36 @@ func (_u *AccountUpdate) AddAuditLogs(v ...*AuditLog) *AccountUpdate {
 	return _u.AddAuditLogIDs(ids...)
 }
 
+// AddModerationNoteIDs adds the "moderation_notes" edge to the ModerationNote entity by IDs.
+func (_u *AccountUpdate) AddModerationNoteIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddModerationNoteIDs(ids...)
+	return _u
+}
+
+// AddModerationNotes adds the "moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdate) AddModerationNotes(v ...*ModerationNote) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddModerationNoteIDs(ids...)
+}
+
+// AddAuthoredModerationNoteIDs adds the "authored_moderation_notes" edge to the ModerationNote entity by IDs.
+func (_u *AccountUpdate) AddAuthoredModerationNoteIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddAuthoredModerationNoteIDs(ids...)
+	return _u
+}
+
+// AddAuthoredModerationNotes adds the "authored_moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdate) AddAuthoredModerationNotes(v ...*ModerationNote) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAuthoredModerationNoteIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -1153,6 +1184,48 @@ func (_u *AccountUpdate) RemoveAuditLogs(v ...*AuditLog) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuditLogIDs(ids...)
+}
+
+// ClearModerationNotes clears all "moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdate) ClearModerationNotes() *AccountUpdate {
+	_u.mutation.ClearModerationNotes()
+	return _u
+}
+
+// RemoveModerationNoteIDs removes the "moderation_notes" edge to ModerationNote entities by IDs.
+func (_u *AccountUpdate) RemoveModerationNoteIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveModerationNoteIDs(ids...)
+	return _u
+}
+
+// RemoveModerationNotes removes "moderation_notes" edges to ModerationNote entities.
+func (_u *AccountUpdate) RemoveModerationNotes(v ...*ModerationNote) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveModerationNoteIDs(ids...)
+}
+
+// ClearAuthoredModerationNotes clears all "authored_moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdate) ClearAuthoredModerationNotes() *AccountUpdate {
+	_u.mutation.ClearAuthoredModerationNotes()
+	return _u
+}
+
+// RemoveAuthoredModerationNoteIDs removes the "authored_moderation_notes" edge to ModerationNote entities by IDs.
+func (_u *AccountUpdate) RemoveAuthoredModerationNoteIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveAuthoredModerationNoteIDs(ids...)
+	return _u
+}
+
+// RemoveAuthoredModerationNotes removes "authored_moderation_notes" edges to ModerationNote entities.
+func (_u *AccountUpdate) RemoveAuthoredModerationNotes(v ...*ModerationNote) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAuthoredModerationNoteIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -2444,6 +2517,96 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.ModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedModerationNotesIDs(); len(nodes) > 0 && !_u.mutation.ModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AuthoredModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAuthoredModerationNotesIDs(); len(nodes) > 0 && !_u.mutation.AuthoredModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AuthoredModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3082,6 +3245,36 @@ func (_u *AccountUpdateOne) AddAuditLogs(v ...*AuditLog) *AccountUpdateOne {
 	return _u.AddAuditLogIDs(ids...)
 }
 
+// AddModerationNoteIDs adds the "moderation_notes" edge to the ModerationNote entity by IDs.
+func (_u *AccountUpdateOne) AddModerationNoteIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddModerationNoteIDs(ids...)
+	return _u
+}
+
+// AddModerationNotes adds the "moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdateOne) AddModerationNotes(v ...*ModerationNote) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddModerationNoteIDs(ids...)
+}
+
+// AddAuthoredModerationNoteIDs adds the "authored_moderation_notes" edge to the ModerationNote entity by IDs.
+func (_u *AccountUpdateOne) AddAuthoredModerationNoteIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddAuthoredModerationNoteIDs(ids...)
+	return _u
+}
+
+// AddAuthoredModerationNotes adds the "authored_moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdateOne) AddAuthoredModerationNotes(v ...*ModerationNote) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAuthoredModerationNoteIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -3610,6 +3803,48 @@ func (_u *AccountUpdateOne) RemoveAuditLogs(v ...*AuditLog) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuditLogIDs(ids...)
+}
+
+// ClearModerationNotes clears all "moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdateOne) ClearModerationNotes() *AccountUpdateOne {
+	_u.mutation.ClearModerationNotes()
+	return _u
+}
+
+// RemoveModerationNoteIDs removes the "moderation_notes" edge to ModerationNote entities by IDs.
+func (_u *AccountUpdateOne) RemoveModerationNoteIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveModerationNoteIDs(ids...)
+	return _u
+}
+
+// RemoveModerationNotes removes "moderation_notes" edges to ModerationNote entities.
+func (_u *AccountUpdateOne) RemoveModerationNotes(v ...*ModerationNote) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveModerationNoteIDs(ids...)
+}
+
+// ClearAuthoredModerationNotes clears all "authored_moderation_notes" edges to the ModerationNote entity.
+func (_u *AccountUpdateOne) ClearAuthoredModerationNotes() *AccountUpdateOne {
+	_u.mutation.ClearAuthoredModerationNotes()
+	return _u
+}
+
+// RemoveAuthoredModerationNoteIDs removes the "authored_moderation_notes" edge to ModerationNote entities by IDs.
+func (_u *AccountUpdateOne) RemoveAuthoredModerationNoteIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveAuthoredModerationNoteIDs(ids...)
+	return _u
+}
+
+// RemoveAuthoredModerationNotes removes "authored_moderation_notes" edges to ModerationNote entities.
+func (_u *AccountUpdateOne) RemoveAuthoredModerationNotes(v ...*ModerationNote) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAuthoredModerationNoteIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -4924,6 +5159,96 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(auditlog.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedModerationNotesIDs(); len(nodes) > 0 && !_u.mutation.ModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AuthoredModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAuthoredModerationNotesIDs(); len(nodes) > 0 && !_u.mutation.AuthoredModerationNotesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AuthoredModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

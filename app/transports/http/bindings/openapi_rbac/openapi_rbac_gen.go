@@ -66,6 +66,9 @@ type OperationPermissions interface {
 	AccountGet() (bool, *rbac.Permission)
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountView() (bool, *rbac.Permission)
+	AccountModerationNoteList() (bool, *rbac.Permission)
+	AccountModerationNoteCreate() (bool, *rbac.Permission)
+	AccountModerationNoteDelete() (bool, *rbac.Permission)
 	AccountAuthProviderList() (bool, *rbac.Permission)
 	AccountAuthMethodDelete() (bool, *rbac.Permission)
 	AccountEmailAdd() (bool, *rbac.Permission)
@@ -287,6 +290,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountUpdate()
 	case "AccountView":
 		return optable.AccountView()
+	case "AccountModerationNoteList":
+		return optable.AccountModerationNoteList()
+	case "AccountModerationNoteCreate":
+		return optable.AccountModerationNoteCreate()
+	case "AccountModerationNoteDelete":
+		return optable.AccountModerationNoteDelete()
 	case "AccountAuthProviderList":
 		return optable.AccountAuthProviderList()
 	case "AccountAuthMethodDelete":

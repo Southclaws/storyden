@@ -1114,6 +1114,51 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
 
+  /accounts/{account_id}/moderation-notes:
+    get:
+      operationId: AccountModerationNoteList
+      description: |
+        List internal moderation notes for an account. Notes are never public
+        and are only visible to staff with VIEW_MODERATION_NOTES permission.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AccountModerationNoteListOK" }
+    post:
+      operationId: AccountModerationNoteCreate
+      description: |
+        Create an internal moderation note for an account. Notes are immutable
+        and always include the author and timestamp for auditing.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/AccountModerationNoteCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AccountModerationNoteCreateOK" }
+
+  /accounts/{account_id}/moderation-notes/{moderation_note_id}:
+    delete:
+      operationId: AccountModerationNoteDelete
+      description: |
+        Delete an internal moderation note for an account.
+      tags: [accounts]
+      parameters:
+        - { $ref: "#/components/parameters/AccountIDParam" }
+        - { $ref: "#/components/parameters/ModerationNoteIDParam" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
   /accounts/self/auth-methods:
     get:
       operationId: AccountAuthProviderList
@@ -2754,6 +2799,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    ModerationNoteIDParam:
+      description: Moderation note ID.
+      name: moderation_note_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     AccountHandleParam:
       description: Account handle.
       example: southclaws
@@ -3350,6 +3403,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AccountEmailInitialProps" }
 
+    AccountModerationNoteCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ModerationNoteInitialProps" }
+
     AccountSetAvatar:
       content:
         application/octet-stream:
@@ -3755,6 +3813,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AccountAuthMethods"
+
+    AccountModerationNoteListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModerationNoteListResult"
+
+    AccountModerationNoteCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ModerationNote"
 
     AccountGetAvatar:
       description: OK
@@ -4815,6 +4887,8 @@ components:
         - account_suspended
         - account_unsuspended
         - account_content_purged
+        - moderation_note_created
+        - moderation_note_deleted
 
     AuditEventProps:
       required: [id, type, timestamp]
@@ -4837,12 +4911,16 @@ components:
           account_suspended: "#/components/schemas/AuditEventAccountSuspended"
           account_unsuspended: "#/components/schemas/AuditEventAccountUnsuspended"
           account_content_purged: "#/components/schemas/AuditEventAccountContentPurged"
+          moderation_note_created: "#/components/schemas/AuditEventModerationNoteCreated"
+          moderation_note_deleted: "#/components/schemas/AuditEventModerationNoteDeleted"
       oneOf:
         - $ref: "#/components/schemas/AuditEventThreadDeleted"
         - $ref: "#/components/schemas/AuditEventThreadReplyDeleted"
         - $ref: "#/components/schemas/AuditEventAccountSuspended"
         - $ref: "#/components/schemas/AuditEventAccountUnsuspended"
         - $ref: "#/components/schemas/AuditEventAccountContentPurged"
+        - $ref: "#/components/schemas/AuditEventModerationNoteCreated"
+        - $ref: "#/components/schemas/AuditEventModerationNoteDeleted"
 
     AuditEventThreadDeleted:
       type: object
@@ -4880,6 +4958,22 @@ components:
         account_id: { $ref: "#/components/schemas/Identifier" }
         included:
           $ref: "#/components/schemas/ModerationActionPurgeAccountContentTypeList"
+
+    AuditEventModerationNoteCreated:
+      type: object
+      required: [type, account_id, note_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        note_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventModerationNoteDeleted:
+      type: object
+      required: [type, account_id, note_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        note_id: { $ref: "#/components/schemas/Identifier" }
 
     AuditEventList:
       type: array
@@ -5468,6 +5562,8 @@ components:
         - "MANAGE_ROLES"
         - "MANAGE_REPORTS"
         - "VIEW_ACCOUNTS"
+        - "VIEW_MODERATION_NOTES"
+        - "MANAGE_MODERATION_NOTES"
         # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
 
@@ -6045,6 +6141,55 @@ components:
       properties:
         active: { $ref: "#/components/schemas/AccountAuthMethodList" }
         available: { $ref: "#/components/schemas/AuthProviderList" }
+
+    ModerationNote:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/ModerationNoteMetadata"
+        - $ref: "#/components/schemas/ModerationNoteProps"
+
+    ModerationNoteProps:
+      type: object
+      required: [content]
+      properties:
+        author:
+          $ref: "#/components/schemas/ProfileReference"
+        content:
+          $ref: "#/components/schemas/ModerationNoteContent"
+
+    ModerationNoteMetadata:
+      type: object
+      required: [id, created_at]
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        created_at:
+          type: string
+          format: date-time
+
+    ModerationNoteInitialProps:
+      type: object
+      required: [content]
+      properties:
+        content:
+          $ref: "#/components/schemas/ModerationNoteContent"
+
+    ModerationNoteContent:
+      type: string
+      minLength: 1
+      maxLength: 2000
+
+    ModerationNoteList:
+      type: array
+      items:
+        $ref: "#/components/schemas/ModerationNote"
+
+    ModerationNoteListResult:
+      type: object
+      required: [notes]
+      properties:
+        notes:
+          $ref: "#/components/schemas/ModerationNoteList"
 
     AccountAuthMethodList:
       type: array

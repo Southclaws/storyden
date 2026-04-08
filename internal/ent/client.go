@@ -33,6 +33,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -91,6 +92,8 @@ type Client struct {
 	Link *LinkClient
 	// MentionProfile is the client for interacting with the MentionProfile builders.
 	MentionProfile *MentionProfileClient
+	// ModerationNote is the client for interacting with the ModerationNote builders.
+	ModerationNote *ModerationNoteClient
 	// Node is the client for interacting with the Node builders.
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
@@ -149,6 +152,7 @@ func (c *Client) init() {
 	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.MentionProfile = NewMentionProfileClient(c.config)
+	c.ModerationNote = NewModerationNoteClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
@@ -273,6 +277,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		LikePost:            NewLikePostClient(cfg),
 		Link:                NewLinkClient(cfg),
 		MentionProfile:      NewMentionProfileClient(cfg),
+		ModerationNote:      NewModerationNoteClient(cfg),
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Plugin:              NewPluginClient(cfg),
@@ -324,6 +329,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		LikePost:            NewLikePostClient(cfg),
 		Link:                NewLinkClient(cfg),
 		MentionProfile:      NewMentionProfileClient(cfg),
+		ModerationNote:      NewModerationNoteClient(cfg),
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Plugin:              NewPluginClient(cfg),
@@ -371,9 +377,9 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Plugin, c.Post, c.PostRead,
-		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
-		c.Report, c.Role, c.Session, c.Setting, c.Tag,
+		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
+		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -386,9 +392,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Plugin, c.Post, c.PostRead,
-		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
-		c.Report, c.Role, c.Session, c.Setting, c.Tag,
+		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
+		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -431,6 +437,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Link.mutate(ctx, m)
 	case *MentionProfileMutation:
 		return c.MentionProfile.mutate(ctx, m)
+	case *ModerationNoteMutation:
+		return c.ModerationNote.mutate(ctx, m)
 	case *NodeMutation:
 		return c.Node.mutate(ctx, m)
 	case *NotificationMutation:
@@ -967,6 +975,38 @@ func (c *AccountClient) QueryAuditLogs(_m *Account) *AuditLogQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(auditlog.Table, auditlog.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuditLogsTable, account.AuditLogsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryModerationNotes queries the moderation_notes edge of a Account.
+func (c *AccountClient) QueryModerationNotes(_m *Account) *ModerationNoteQuery {
+	query := (&ModerationNoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(moderationnote.Table, moderationnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ModerationNotesTable, account.ModerationNotesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthoredModerationNotes queries the authored_moderation_notes edge of a Account.
+func (c *AccountClient) QueryAuthoredModerationNotes(_m *Account) *ModerationNoteQuery {
+	query := (&ModerationNoteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(moderationnote.Table, moderationnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthoredModerationNotesTable, account.AuthoredModerationNotesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -3778,6 +3818,171 @@ func (c *MentionProfileClient) mutate(ctx context.Context, m *MentionProfileMuta
 		return (&MentionProfileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown MentionProfile mutation op: %q", m.Op())
+	}
+}
+
+// ModerationNoteClient is a client for the ModerationNote schema.
+type ModerationNoteClient struct {
+	config
+}
+
+// NewModerationNoteClient returns a client for the ModerationNote from the given config.
+func NewModerationNoteClient(c config) *ModerationNoteClient {
+	return &ModerationNoteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `moderationnote.Hooks(f(g(h())))`.
+func (c *ModerationNoteClient) Use(hooks ...Hook) {
+	c.hooks.ModerationNote = append(c.hooks.ModerationNote, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `moderationnote.Intercept(f(g(h())))`.
+func (c *ModerationNoteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ModerationNote = append(c.inters.ModerationNote, interceptors...)
+}
+
+// Create returns a builder for creating a ModerationNote entity.
+func (c *ModerationNoteClient) Create() *ModerationNoteCreate {
+	mutation := newModerationNoteMutation(c.config, OpCreate)
+	return &ModerationNoteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ModerationNote entities.
+func (c *ModerationNoteClient) CreateBulk(builders ...*ModerationNoteCreate) *ModerationNoteCreateBulk {
+	return &ModerationNoteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ModerationNoteClient) MapCreateBulk(slice any, setFunc func(*ModerationNoteCreate, int)) *ModerationNoteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ModerationNoteCreateBulk{err: fmt.Errorf("calling to ModerationNoteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ModerationNoteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ModerationNoteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ModerationNote.
+func (c *ModerationNoteClient) Update() *ModerationNoteUpdate {
+	mutation := newModerationNoteMutation(c.config, OpUpdate)
+	return &ModerationNoteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ModerationNoteClient) UpdateOne(_m *ModerationNote) *ModerationNoteUpdateOne {
+	mutation := newModerationNoteMutation(c.config, OpUpdateOne, withModerationNote(_m))
+	return &ModerationNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ModerationNoteClient) UpdateOneID(id xid.ID) *ModerationNoteUpdateOne {
+	mutation := newModerationNoteMutation(c.config, OpUpdateOne, withModerationNoteID(id))
+	return &ModerationNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ModerationNote.
+func (c *ModerationNoteClient) Delete() *ModerationNoteDelete {
+	mutation := newModerationNoteMutation(c.config, OpDelete)
+	return &ModerationNoteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ModerationNoteClient) DeleteOne(_m *ModerationNote) *ModerationNoteDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ModerationNoteClient) DeleteOneID(id xid.ID) *ModerationNoteDeleteOne {
+	builder := c.Delete().Where(moderationnote.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ModerationNoteDeleteOne{builder}
+}
+
+// Query returns a query builder for ModerationNote.
+func (c *ModerationNoteClient) Query() *ModerationNoteQuery {
+	return &ModerationNoteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeModerationNote},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ModerationNote entity by its id.
+func (c *ModerationNoteClient) Get(ctx context.Context, id xid.ID) (*ModerationNote, error) {
+	return c.Query().Where(moderationnote.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ModerationNoteClient) GetX(ctx context.Context, id xid.ID) *ModerationNote {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a ModerationNote.
+func (c *ModerationNoteClient) QueryAccount(_m *ModerationNote) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(moderationnote.Table, moderationnote.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, moderationnote.AccountTable, moderationnote.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthor queries the author edge of a ModerationNote.
+func (c *ModerationNoteClient) QueryAuthor(_m *ModerationNote) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(moderationnote.Table, moderationnote.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, moderationnote.AuthorTable, moderationnote.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ModerationNoteClient) Hooks() []Hook {
+	return c.hooks.ModerationNote
+}
+
+// Interceptors returns the client interceptors.
+func (c *ModerationNoteClient) Interceptors() []Interceptor {
+	return c.inters.ModerationNote
+}
+
+func (c *ModerationNoteClient) mutate(ctx context.Context, m *ModerationNoteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ModerationNoteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ModerationNoteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ModerationNoteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ModerationNoteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ModerationNote mutation op: %q", m.Op())
 	}
 }
 
@@ -6613,16 +6818,16 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Plugin, Post,
-		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Role, Session, Setting, Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
+		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
+		Question, React, Report, Role, Session, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Plugin, Post,
-		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Role, Session, Setting, Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
+		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
+		Question, React, Report, Role, Session, Setting, Tag []ent.Interceptor
 	}
 )
 

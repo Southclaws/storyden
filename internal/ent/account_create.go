@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -588,6 +589,36 @@ func (_c *AccountCreate) AddAuditLogs(v ...*AuditLog) *AccountCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddAuditLogIDs(ids...)
+}
+
+// AddModerationNoteIDs adds the "moderation_notes" edge to the ModerationNote entity by IDs.
+func (_c *AccountCreate) AddModerationNoteIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddModerationNoteIDs(ids...)
+	return _c
+}
+
+// AddModerationNotes adds the "moderation_notes" edges to the ModerationNote entity.
+func (_c *AccountCreate) AddModerationNotes(v ...*ModerationNote) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddModerationNoteIDs(ids...)
+}
+
+// AddAuthoredModerationNoteIDs adds the "authored_moderation_notes" edge to the ModerationNote entity by IDs.
+func (_c *AccountCreate) AddAuthoredModerationNoteIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddAuthoredModerationNoteIDs(ids...)
+	return _c
+}
+
+// AddAuthoredModerationNotes adds the "authored_moderation_notes" edges to the ModerationNote entity.
+func (_c *AccountCreate) AddAuthoredModerationNotes(v ...*ModerationNote) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddAuthoredModerationNoteIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
@@ -1203,6 +1234,38 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(auditlog.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ModerationNotesTable,
+			Columns: []string{account.ModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.AuthoredModerationNotesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredModerationNotesTable,
+			Columns: []string{account.AuthoredModerationNotesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

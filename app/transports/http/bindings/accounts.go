@@ -15,6 +15,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/moderation_note"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
@@ -26,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_manage"
+	"github.com/Southclaws/storyden/app/services/account/account_moderation_note"
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -37,18 +39,19 @@ import (
 )
 
 type Accounts struct {
-	profile_cache *profile_cache.Cache
-	avatarService avatar.Service
-	authManager   *authentication.Manager
-	accountQuery  *account_querier.Querier
-	profileQuery  *profile_querier.Querier
-	accountUpdate *account_update.Updater
-	accountAuth   *account_auth.Manager
-	accountEmail  *account_email.Manager
-	accountManage *account_manage.Manager
-	settingsRepo  *settings.SettingsRepository
-	roleAssign    *account_role_assign.Manager
-	webAddress    url.URL
+	profile_cache         *profile_cache.Cache
+	avatarService         avatar.Service
+	authManager           *authentication.Manager
+	accountQuery          *account_querier.Querier
+	profileQuery          *profile_querier.Querier
+	accountUpdate         *account_update.Updater
+	accountAuth           *account_auth.Manager
+	accountEmail          *account_email.Manager
+	accountManage         *account_manage.Manager
+	accountModerationNote *account_moderation_note.Manager
+	settingsRepo          *settings.SettingsRepository
+	roleAssign            *account_role_assign.Manager
+	webAddress            url.URL
 }
 
 func NewAccounts(
@@ -62,22 +65,24 @@ func NewAccounts(
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
 	accountManage *account_manage.Manager,
+	accountModerationNote *account_moderation_note.Manager,
 	settingsRepo *settings.SettingsRepository,
 	roleAssign *account_role_assign.Manager,
 ) Accounts {
 	return Accounts{
-		profile_cache: profile_cache,
-		avatarService: avatarService,
-		authManager:   authManager,
-		accountQuery:  accountQuery,
-		profileQuery:  profileQuery,
-		accountUpdate: accountUpdate,
-		accountAuth:   accountAuth,
-		accountEmail:  accountEmail,
-		accountManage: accountManage,
-		settingsRepo:  settingsRepo,
-		roleAssign:    roleAssign,
-		webAddress:    cfg.PublicWebAddress,
+		profile_cache:         profile_cache,
+		avatarService:         avatarService,
+		authManager:           authManager,
+		accountQuery:          accountQuery,
+		profileQuery:          profileQuery,
+		accountUpdate:         accountUpdate,
+		accountAuth:           accountAuth,
+		accountEmail:          accountEmail,
+		accountManage:         accountManage,
+		accountModerationNote: accountModerationNote,
+		settingsRepo:          settingsRepo,
+		roleAssign:            roleAssign,
+		webAddress:            cfg.PublicWebAddress,
 	}
 }
 
@@ -147,6 +152,58 @@ func (i *Accounts) AccountView(ctx context.Context, request openapi.AccountViewR
 			},
 		},
 	}, nil
+}
+
+func (i *Accounts) AccountModerationNoteList(ctx context.Context, request openapi.AccountModerationNoteListRequestObject) (openapi.AccountModerationNoteListResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	notes, err := i.accountModerationNote.ListByAccountID(ctx, account.AccountID(targetID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountModerationNoteList200JSONResponse{
+		AccountModerationNoteListOKJSONResponse: openapi.AccountModerationNoteListOKJSONResponse{
+			Notes: dt.Map(notes, serialiseModerationNote),
+		},
+	}, nil
+}
+
+func (i *Accounts) AccountModerationNoteCreate(ctx context.Context, request openapi.AccountModerationNoteCreateRequestObject) (openapi.AccountModerationNoteCreateResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	note, err := i.accountModerationNote.Create(ctx, account.AccountID(targetID), request.Body.Content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountModerationNoteCreate200JSONResponse{
+		AccountModerationNoteCreateOKJSONResponse: openapi.AccountModerationNoteCreateOKJSONResponse(serialiseModerationNote(note)),
+	}, nil
+}
+
+func (i *Accounts) AccountModerationNoteDelete(ctx context.Context, request openapi.AccountModerationNoteDeleteRequestObject) (openapi.AccountModerationNoteDeleteResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	noteID, err := xid.FromString(request.ModerationNoteId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid moderation note ID", "The moderation note ID provided is invalid."))
+	}
+
+	if err := i.accountModerationNote.Delete(ctx, account.AccountID(targetID), noteID); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountModerationNoteDelete204Response{}, nil
 }
 
 func (i *Accounts) AccountUpdate(ctx context.Context, request openapi.AccountUpdateRequestObject) (openapi.AccountUpdateResponseObject, error) {
@@ -528,5 +585,16 @@ func serialiseAuthMethod(webAddress url.URL) func(in *account_auth.AuthMethod) (
 			Identifier: in.Instance.Identifier,
 			Provider:   p,
 		}, nil
+	}
+}
+
+func serialiseModerationNote(note *moderation_note.Note) openapi.ModerationNote {
+	author := opt.Map(note.Author, serialiseProfileReference).Ptr()
+
+	return openapi.ModerationNote{
+		Id:        openapi.Identifier(note.ID.String()),
+		Author:    author,
+		Content:   note.Content,
+		CreatedAt: note.CreatedAt,
 	}
 }

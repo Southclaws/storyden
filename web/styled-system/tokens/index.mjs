@@ -3883,6 +3883,118 @@ const tokens = {
     "value": "var(--colors-red-text)",
     "variable": "var(--colors-red-text)"
   },
+  "colors.amber.1": {
+    "value": "var(--colors-amber-1)",
+    "variable": "var(--colors-amber-1)"
+  },
+  "colors.amber.2": {
+    "value": "var(--colors-amber-2)",
+    "variable": "var(--colors-amber-2)"
+  },
+  "colors.amber.3": {
+    "value": "var(--colors-amber-3)",
+    "variable": "var(--colors-amber-3)"
+  },
+  "colors.amber.4": {
+    "value": "var(--colors-amber-4)",
+    "variable": "var(--colors-amber-4)"
+  },
+  "colors.amber.5": {
+    "value": "var(--colors-amber-5)",
+    "variable": "var(--colors-amber-5)"
+  },
+  "colors.amber.6": {
+    "value": "var(--colors-amber-6)",
+    "variable": "var(--colors-amber-6)"
+  },
+  "colors.amber.7": {
+    "value": "var(--colors-amber-7)",
+    "variable": "var(--colors-amber-7)"
+  },
+  "colors.amber.8": {
+    "value": "var(--colors-amber-8)",
+    "variable": "var(--colors-amber-8)"
+  },
+  "colors.amber.9": {
+    "value": "var(--colors-amber-9)",
+    "variable": "var(--colors-amber-9)"
+  },
+  "colors.amber.10": {
+    "value": "var(--colors-amber-10)",
+    "variable": "var(--colors-amber-10)"
+  },
+  "colors.amber.11": {
+    "value": "var(--colors-amber-11)",
+    "variable": "var(--colors-amber-11)"
+  },
+  "colors.amber.12": {
+    "value": "var(--colors-amber-12)",
+    "variable": "var(--colors-amber-12)"
+  },
+  "colors.amber.a1": {
+    "value": "var(--colors-amber-a1)",
+    "variable": "var(--colors-amber-a1)"
+  },
+  "colors.amber.a2": {
+    "value": "var(--colors-amber-a2)",
+    "variable": "var(--colors-amber-a2)"
+  },
+  "colors.amber.a3": {
+    "value": "var(--colors-amber-a3)",
+    "variable": "var(--colors-amber-a3)"
+  },
+  "colors.amber.a4": {
+    "value": "var(--colors-amber-a4)",
+    "variable": "var(--colors-amber-a4)"
+  },
+  "colors.amber.a5": {
+    "value": "var(--colors-amber-a5)",
+    "variable": "var(--colors-amber-a5)"
+  },
+  "colors.amber.a6": {
+    "value": "var(--colors-amber-a6)",
+    "variable": "var(--colors-amber-a6)"
+  },
+  "colors.amber.a7": {
+    "value": "var(--colors-amber-a7)",
+    "variable": "var(--colors-amber-a7)"
+  },
+  "colors.amber.a8": {
+    "value": "var(--colors-amber-a8)",
+    "variable": "var(--colors-amber-a8)"
+  },
+  "colors.amber.a9": {
+    "value": "var(--colors-amber-a9)",
+    "variable": "var(--colors-amber-a9)"
+  },
+  "colors.amber.a10": {
+    "value": "var(--colors-amber-a10)",
+    "variable": "var(--colors-amber-a10)"
+  },
+  "colors.amber.a11": {
+    "value": "var(--colors-amber-a11)",
+    "variable": "var(--colors-amber-a11)"
+  },
+  "colors.amber.a12": {
+    "value": "var(--colors-amber-a12)",
+    "variable": "var(--colors-amber-a12)"
+  },
+  "colors.amber.default": {
+    "value": "var(--colors-amber-default)",
+    "variable": "var(--colors-amber-default)"
+  },
+  "colors.amber.emphasized": {
+    "value": "var(--colors-amber-emphasized)",
+    "variable": "var(--colors-amber-emphasized)"
+  },
+  "colors.amber.fg": {
+    "value": "var(--colors-amber-fg)",
+    "variable": "var(--colors-amber-fg)"
+  },
+  "colors.amber.text": {
+    "value": "var(--colors-amber-text)",
+    "variable": "var(--colors-amber-text)"
+  },
   "colors.overflow-fade": {
     "value": "var(--colors-overflow-fade)",
     "variable": "var(--colors-overflow-fade)"

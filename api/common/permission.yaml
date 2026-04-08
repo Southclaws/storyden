@@ -29,6 +29,8 @@ oneOf:
   - $ref: "#/$defs/MANAGE_ROLES"
   - $ref: "#/$defs/MANAGE_REPORTS"
   - $ref: "#/$defs/VIEW_ACCOUNTS"
+  - $ref: "#/$defs/VIEW_MODERATION_NOTES"
+  - $ref: "#/$defs/MANAGE_MODERATION_NOTES"
   - $ref: "#/$defs/ADMINISTRATOR"
 
 $defs:
@@ -175,6 +177,18 @@ $defs:
     const: VIEW_ACCOUNTS
     title: View accounts
     description: Access detailed account records by account ID.
+
+  VIEW_MODERATION_NOTES:
+    type: string
+    const: VIEW_MODERATION_NOTES
+    title: View moderation notes
+    description: Read internal moderation notes attached to member accounts.
+
+  MANAGE_MODERATION_NOTES:
+    type: string
+    const: MANAGE_MODERATION_NOTES
+    title: Manage moderation notes
+    description: Create and delete internal staff-only moderation notes attached to member accounts.
 
   ADMINISTRATOR:
     type: string

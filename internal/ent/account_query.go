@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -42,37 +43,39 @@ import (
 // AccountQuery is the builder for querying Account entities.
 type AccountQuery struct {
 	config
-	ctx                        *QueryContext
-	order                      []account.OrderOption
-	inters                     []Interceptor
-	predicates                 []predicate.Account
-	withSessions               *SessionQuery
-	withPlugins                *PluginQuery
-	withEmails                 *EmailQuery
-	withNotifications          *NotificationQuery
-	withTriggeredNotifications *NotificationQuery
-	withFollowing              *AccountFollowQuery
-	withFollowedBy             *AccountFollowQuery
-	withInvitations            *InvitationQuery
-	withInvitedBy              *InvitationQuery
-	withPosts                  *PostQuery
-	withQuestions              *QuestionQuery
-	withReacts                 *ReactQuery
-	withLikes                  *LikePostQuery
-	withMentions               *MentionProfileQuery
-	withRoles                  *RoleQuery
-	withAuthentication         *AuthenticationQuery
-	withTags                   *TagQuery
-	withCollections            *CollectionQuery
-	withNodes                  *NodeQuery
-	withAssets                 *AssetQuery
-	withEvents                 *EventParticipantQuery
-	withPostReads              *PostReadQuery
-	withReports                *ReportQuery
-	withHandledReports         *ReportQuery
-	withAuditLogs              *AuditLogQuery
-	withAccountRoles           *AccountRolesQuery
-	modifiers                  []func(*sql.Selector)
+	ctx                         *QueryContext
+	order                       []account.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.Account
+	withSessions                *SessionQuery
+	withPlugins                 *PluginQuery
+	withEmails                  *EmailQuery
+	withNotifications           *NotificationQuery
+	withTriggeredNotifications  *NotificationQuery
+	withFollowing               *AccountFollowQuery
+	withFollowedBy              *AccountFollowQuery
+	withInvitations             *InvitationQuery
+	withInvitedBy               *InvitationQuery
+	withPosts                   *PostQuery
+	withQuestions               *QuestionQuery
+	withReacts                  *ReactQuery
+	withLikes                   *LikePostQuery
+	withMentions                *MentionProfileQuery
+	withRoles                   *RoleQuery
+	withAuthentication          *AuthenticationQuery
+	withTags                    *TagQuery
+	withCollections             *CollectionQuery
+	withNodes                   *NodeQuery
+	withAssets                  *AssetQuery
+	withEvents                  *EventParticipantQuery
+	withPostReads               *PostReadQuery
+	withReports                 *ReportQuery
+	withHandledReports          *ReportQuery
+	withAuditLogs               *AuditLogQuery
+	withModerationNotes         *ModerationNoteQuery
+	withAuthoredModerationNotes *ModerationNoteQuery
+	withAccountRoles            *AccountRolesQuery
+	modifiers                   []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -659,6 +662,50 @@ func (_q *AccountQuery) QueryAuditLogs() *AuditLogQuery {
 	return query
 }
 
+// QueryModerationNotes chains the current query on the "moderation_notes" edge.
+func (_q *AccountQuery) QueryModerationNotes() *ModerationNoteQuery {
+	query := (&ModerationNoteClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(moderationnote.Table, moderationnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ModerationNotesTable, account.ModerationNotesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAuthoredModerationNotes chains the current query on the "authored_moderation_notes" edge.
+func (_q *AccountQuery) QueryAuthoredModerationNotes() *ModerationNoteQuery {
+	query := (&ModerationNoteClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(moderationnote.Table, moderationnote.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthoredModerationNotesTable, account.AuthoredModerationNotesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAccountRoles chains the current query on the "account_roles" edge.
 func (_q *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 	query := (&AccountRolesClient{config: _q.config}).Query()
@@ -868,37 +915,39 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:                     _q.config,
-		ctx:                        _q.ctx.Clone(),
-		order:                      append([]account.OrderOption{}, _q.order...),
-		inters:                     append([]Interceptor{}, _q.inters...),
-		predicates:                 append([]predicate.Account{}, _q.predicates...),
-		withSessions:               _q.withSessions.Clone(),
-		withPlugins:                _q.withPlugins.Clone(),
-		withEmails:                 _q.withEmails.Clone(),
-		withNotifications:          _q.withNotifications.Clone(),
-		withTriggeredNotifications: _q.withTriggeredNotifications.Clone(),
-		withFollowing:              _q.withFollowing.Clone(),
-		withFollowedBy:             _q.withFollowedBy.Clone(),
-		withInvitations:            _q.withInvitations.Clone(),
-		withInvitedBy:              _q.withInvitedBy.Clone(),
-		withPosts:                  _q.withPosts.Clone(),
-		withQuestions:              _q.withQuestions.Clone(),
-		withReacts:                 _q.withReacts.Clone(),
-		withLikes:                  _q.withLikes.Clone(),
-		withMentions:               _q.withMentions.Clone(),
-		withRoles:                  _q.withRoles.Clone(),
-		withAuthentication:         _q.withAuthentication.Clone(),
-		withTags:                   _q.withTags.Clone(),
-		withCollections:            _q.withCollections.Clone(),
-		withNodes:                  _q.withNodes.Clone(),
-		withAssets:                 _q.withAssets.Clone(),
-		withEvents:                 _q.withEvents.Clone(),
-		withPostReads:              _q.withPostReads.Clone(),
-		withReports:                _q.withReports.Clone(),
-		withHandledReports:         _q.withHandledReports.Clone(),
-		withAuditLogs:              _q.withAuditLogs.Clone(),
-		withAccountRoles:           _q.withAccountRoles.Clone(),
+		config:                      _q.config,
+		ctx:                         _q.ctx.Clone(),
+		order:                       append([]account.OrderOption{}, _q.order...),
+		inters:                      append([]Interceptor{}, _q.inters...),
+		predicates:                  append([]predicate.Account{}, _q.predicates...),
+		withSessions:                _q.withSessions.Clone(),
+		withPlugins:                 _q.withPlugins.Clone(),
+		withEmails:                  _q.withEmails.Clone(),
+		withNotifications:           _q.withNotifications.Clone(),
+		withTriggeredNotifications:  _q.withTriggeredNotifications.Clone(),
+		withFollowing:               _q.withFollowing.Clone(),
+		withFollowedBy:              _q.withFollowedBy.Clone(),
+		withInvitations:             _q.withInvitations.Clone(),
+		withInvitedBy:               _q.withInvitedBy.Clone(),
+		withPosts:                   _q.withPosts.Clone(),
+		withQuestions:               _q.withQuestions.Clone(),
+		withReacts:                  _q.withReacts.Clone(),
+		withLikes:                   _q.withLikes.Clone(),
+		withMentions:                _q.withMentions.Clone(),
+		withRoles:                   _q.withRoles.Clone(),
+		withAuthentication:          _q.withAuthentication.Clone(),
+		withTags:                    _q.withTags.Clone(),
+		withCollections:             _q.withCollections.Clone(),
+		withNodes:                   _q.withNodes.Clone(),
+		withAssets:                  _q.withAssets.Clone(),
+		withEvents:                  _q.withEvents.Clone(),
+		withPostReads:               _q.withPostReads.Clone(),
+		withReports:                 _q.withReports.Clone(),
+		withHandledReports:          _q.withHandledReports.Clone(),
+		withAuditLogs:               _q.withAuditLogs.Clone(),
+		withModerationNotes:         _q.withModerationNotes.Clone(),
+		withAuthoredModerationNotes: _q.withAuthoredModerationNotes.Clone(),
+		withAccountRoles:            _q.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -1181,6 +1230,28 @@ func (_q *AccountQuery) WithAuditLogs(opts ...func(*AuditLogQuery)) *AccountQuer
 	return _q
 }
 
+// WithModerationNotes tells the query-builder to eager-load the nodes that are connected to
+// the "moderation_notes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithModerationNotes(opts ...func(*ModerationNoteQuery)) *AccountQuery {
+	query := (&ModerationNoteClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withModerationNotes = query
+	return _q
+}
+
+// WithAuthoredModerationNotes tells the query-builder to eager-load the nodes that are connected to
+// the "authored_moderation_notes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithAuthoredModerationNotes(opts ...func(*ModerationNoteQuery)) *AccountQuery {
+	query := (&ModerationNoteClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withAuthoredModerationNotes = query
+	return _q
+}
+
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
@@ -1270,7 +1341,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [26]bool{
+		loadedTypes = [28]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -1296,6 +1367,8 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withReports != nil,
 			_q.withHandledReports != nil,
 			_q.withAuditLogs != nil,
+			_q.withModerationNotes != nil,
+			_q.withAuthoredModerationNotes != nil,
 			_q.withAccountRoles != nil,
 		}
 	)
@@ -1493,6 +1566,22 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadAuditLogs(ctx, query, nodes,
 			func(n *Account) { n.Edges.AuditLogs = []*AuditLog{} },
 			func(n *Account, e *AuditLog) { n.Edges.AuditLogs = append(n.Edges.AuditLogs, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withModerationNotes; query != nil {
+		if err := _q.loadModerationNotes(ctx, query, nodes,
+			func(n *Account) { n.Edges.ModerationNotes = []*ModerationNote{} },
+			func(n *Account, e *ModerationNote) { n.Edges.ModerationNotes = append(n.Edges.ModerationNotes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withAuthoredModerationNotes; query != nil {
+		if err := _q.loadAuthoredModerationNotes(ctx, query, nodes,
+			func(n *Account) { n.Edges.AuthoredModerationNotes = []*ModerationNote{} },
+			func(n *Account, e *ModerationNote) {
+				n.Edges.AuthoredModerationNotes = append(n.Edges.AuthoredModerationNotes, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -2331,6 +2420,69 @@ func (_q *AccountQuery) loadAuditLogs(ctx context.Context, query *AuditLogQuery,
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "enacted_by_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadModerationNotes(ctx context.Context, query *ModerationNoteQuery, nodes []*Account, init func(*Account), assign func(*Account, *ModerationNote)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(moderationnote.FieldAccountID)
+	}
+	query.Where(predicate.ModerationNote(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.ModerationNotesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadAuthoredModerationNotes(ctx context.Context, query *ModerationNoteQuery, nodes []*Account, init func(*Account), assign func(*Account, *ModerationNote)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(moderationnote.FieldAuthorID)
+	}
+	query.Where(predicate.ModerationNote(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.AuthoredModerationNotesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AuthorID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "author_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "author_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -27,6 +27,8 @@ export const pluginEventNames = [
   "EventAccountUpdated",
   "EventAccountSuspended",
   "EventAccountUnsuspended",
+  "EventModerationNoteCreated",
+  "EventModerationNoteDeleted",
   "EventReportCreated",
   "EventReportUpdated",
   "EventActivityCreated",

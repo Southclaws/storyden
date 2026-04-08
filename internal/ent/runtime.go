@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
@@ -724,6 +725,55 @@ func init() {
 	// mentionprofile.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	mentionprofile.IDValidator = func() func(string) error {
 		validators := mentionprofileDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	moderationnoteMixin := schema.ModerationNote{}.Mixin()
+	moderationnoteMixinFields0 := moderationnoteMixin[0].Fields()
+	_ = moderationnoteMixinFields0
+	moderationnoteMixinFields1 := moderationnoteMixin[1].Fields()
+	_ = moderationnoteMixinFields1
+	moderationnoteFields := schema.ModerationNote{}.Fields()
+	_ = moderationnoteFields
+	// moderationnoteDescCreatedAt is the schema descriptor for created_at field.
+	moderationnoteDescCreatedAt := moderationnoteMixinFields1[0].Descriptor()
+	// moderationnote.DefaultCreatedAt holds the default value on creation for the created_at field.
+	moderationnote.DefaultCreatedAt = moderationnoteDescCreatedAt.Default.(func() time.Time)
+	// moderationnoteDescContent is the schema descriptor for content field.
+	moderationnoteDescContent := moderationnoteFields[2].Descriptor()
+	// moderationnote.ContentValidator is a validator for the "content" field. It is called by the builders before save.
+	moderationnote.ContentValidator = func() func(string) error {
+		validators := moderationnoteDescContent.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content string) error {
+			for _, fn := range fns {
+				if err := fn(content); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// moderationnoteDescID is the schema descriptor for id field.
+	moderationnoteDescID := moderationnoteMixinFields0[0].Descriptor()
+	// moderationnote.DefaultID holds the default value on creation for the id field.
+	moderationnote.DefaultID = moderationnoteDescID.Default.(func() xid.ID)
+	// moderationnote.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	moderationnote.IDValidator = func() func(string) error {
+		validators := moderationnoteDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

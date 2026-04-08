@@ -13,9 +13,13 @@ import type {
   AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
+  AccountModerationNoteCreateBody,
+  AccountModerationNoteCreateOKResponse,
+  AccountModerationNoteListOKResponse,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
+  NoContentResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -88,6 +92,93 @@ export const accountView = async (
     ...options,
     method: "GET",
   });
+};
+
+/**
+ * List internal moderation notes for an account. Notes are never public
+and are only visible to staff with VIEW_MODERATION_NOTES permission.
+
+ */
+export type accountModerationNoteListResponse = {
+  data: AccountModerationNoteListOKResponse;
+  status: number;
+};
+
+export const getAccountModerationNoteListUrl = (accountId: string) => {
+  return `/accounts/${accountId}/moderation-notes`;
+};
+
+export const accountModerationNoteList = async (
+  accountId: string,
+  options?: RequestInit,
+): Promise<accountModerationNoteListResponse> => {
+  return fetcher<Promise<accountModerationNoteListResponse>>(
+    getAccountModerationNoteListUrl(accountId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create an internal moderation note for an account. Notes are immutable
+and always include the author and timestamp for auditing.
+
+ */
+export type accountModerationNoteCreateResponse = {
+  data: AccountModerationNoteCreateOKResponse;
+  status: number;
+};
+
+export const getAccountModerationNoteCreateUrl = (accountId: string) => {
+  return `/accounts/${accountId}/moderation-notes`;
+};
+
+export const accountModerationNoteCreate = async (
+  accountId: string,
+  accountModerationNoteCreateBody: AccountModerationNoteCreateBody,
+  options?: RequestInit,
+): Promise<accountModerationNoteCreateResponse> => {
+  return fetcher<Promise<accountModerationNoteCreateResponse>>(
+    getAccountModerationNoteCreateUrl(accountId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(accountModerationNoteCreateBody),
+    },
+  );
+};
+
+/**
+ * Delete an internal moderation note for an account.
+
+ */
+export type accountModerationNoteDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getAccountModerationNoteDeleteUrl = (
+  accountId: string,
+  moderationNoteId: string,
+) => {
+  return `/accounts/${accountId}/moderation-notes/${moderationNoteId}`;
+};
+
+export const accountModerationNoteDelete = async (
+  accountId: string,
+  moderationNoteId: string,
+  options?: RequestInit,
+): Promise<accountModerationNoteDeleteResponse> => {
+  return fetcher<Promise<accountModerationNoteDeleteResponse>>(
+    getAccountModerationNoteDeleteUrl(accountId, moderationNoteId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
 };
 
 /**

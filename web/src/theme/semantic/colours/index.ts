@@ -23,6 +23,7 @@ export const colours = defineSemanticTokens.colors({
   blue: blue.semanticTokens,
   green: green.semanticTokens,
   red: red.semanticTokens,
+  amber: amber.semanticTokens,
 
   cardBackgroundGradient: {
     value: "linear-gradient(90deg, var(--colors-bg), transparent)",

@@ -1291,6 +1291,52 @@ func HasAuditLogsWith(preds ...predicate.AuditLog) predicate.Account {
 	})
 }
 
+// HasModerationNotes applies the HasEdge predicate on the "moderation_notes" edge.
+func HasModerationNotes() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ModerationNotesTable, ModerationNotesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasModerationNotesWith applies the HasEdge predicate on the "moderation_notes" edge with a given conditions (other predicates).
+func HasModerationNotesWith(preds ...predicate.ModerationNote) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newModerationNotesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAuthoredModerationNotes applies the HasEdge predicate on the "authored_moderation_notes" edge.
+func HasAuthoredModerationNotes() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AuthoredModerationNotesTable, AuthoredModerationNotesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAuthoredModerationNotesWith applies the HasEdge predicate on the "authored_moderation_notes" edge with a given conditions (other predicates).
+func HasAuthoredModerationNotesWith(preds ...predicate.ModerationNote) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newAuthoredModerationNotesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

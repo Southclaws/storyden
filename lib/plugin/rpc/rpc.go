@@ -50,6 +50,8 @@ const (
 	EventEventAccountUpdated         Event = "EventAccountUpdated"
 	EventEventAccountSuspended       Event = "EventAccountSuspended"
 	EventEventAccountUnsuspended     Event = "EventAccountUnsuspended"
+	EventEventModerationNoteCreated  Event = "EventModerationNoteCreated"
+	EventEventModerationNoteDeleted  Event = "EventModerationNoteDeleted"
 	EventEventReportCreated          Event = "EventReportCreated"
 	EventEventReportUpdated          Event = "EventReportUpdated"
 	EventEventActivityCreated        Event = "EventActivityCreated"
@@ -86,6 +88,8 @@ var EventValues = []Event{
 	EventEventAccountUpdated,
 	EventEventAccountSuspended,
 	EventEventAccountUnsuspended,
+	EventEventModerationNoteCreated,
+	EventEventModerationNoteDeleted,
 	EventEventReportCreated,
 	EventEventReportUpdated,
 	EventEventActivityCreated,
@@ -182,6 +186,10 @@ func (w *EventPayload) UnmarshalJSON(data []byte) error {
 		v = &EventAccountSuspended{}
 	case "EventAccountUnsuspended":
 		v = &EventAccountUnsuspended{}
+	case "EventModerationNoteCreated":
+		v = &EventModerationNoteCreated{}
+	case "EventModerationNoteDeleted":
+		v = &EventModerationNoteDeleted{}
 	case "EventReportCreated":
 		v = &EventReportCreated{}
 	case "EventReportUpdated":
@@ -539,6 +547,32 @@ type EventAccountUnsuspended struct {
 func (EventAccountUnsuspended) isEventPayload() {}
 
 func (EventAccountUnsuspended) EventPayloadType() string { return "EventAccountUnsuspended" }
+
+// Emitted when a moderator creates an internal account moderation note.
+type EventModerationNoteCreated struct {
+	// Target account ID
+	AccountID account.AccountID `json:"account_id"`
+	Event     string            `json:"event"`
+	// Moderation note ID
+	NoteID xid.ID `json:"note_id"`
+}
+
+func (EventModerationNoteCreated) isEventPayload() {}
+
+func (EventModerationNoteCreated) EventPayloadType() string { return "EventModerationNoteCreated" }
+
+// Emitted when a moderator deletes an internal account moderation note.
+type EventModerationNoteDeleted struct {
+	// Target account ID
+	AccountID account.AccountID `json:"account_id"`
+	Event     string            `json:"event"`
+	// Moderation note ID
+	NoteID xid.ID `json:"note_id"`
+}
+
+func (EventModerationNoteDeleted) isEventPayload() {}
+
+func (EventModerationNoteDeleted) EventPayloadType() string { return "EventModerationNoteDeleted" }
 
 // Emitted when a new member or system report is created.
 type EventReportCreated struct {
