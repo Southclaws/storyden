@@ -1,4 +1,4 @@
 package config
 
 // Version is set at compile time with ldflags.
-var Version = "v1.26.6-post"
+var Version = "v1.26.7"
