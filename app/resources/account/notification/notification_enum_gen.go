@@ -23,6 +23,7 @@ var (
 	EventAttendeeRemoved      = Event{eventAttendeeRemoved}
 	EventReportSubmitted      = Event{eventReportSubmitted}
 	EventReportUpdated        = Event{eventReportUpdated}
+	EventWarningIssued        = Event{eventWarningIssued}
 )
 
 func (r Event) Format(f fmt.State, verb rune) {
@@ -84,6 +85,8 @@ func NewEvent(__iNpUt__ string) (Event, error) {
 		return EventReportSubmitted, nil
 	case string(eventReportUpdated):
 		return EventReportUpdated, nil
+	case string(eventWarningIssued):
+		return EventWarningIssued, nil
 	default:
 		return Event{}, fmt.Errorf("invalid value for type 'Event': '%s'", __iNpUt__)
 	}

@@ -10,6 +10,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { AuditEventAccountContentPurged } from "./auditEventAccountContentPurged";
 import type { AuditEventAccountSuspended } from "./auditEventAccountSuspended";
 import type { AuditEventAccountUnsuspended } from "./auditEventAccountUnsuspended";
+import type { AuditEventAccountWarned } from "./auditEventAccountWarned";
+import type { AuditEventAccountWarningDeleted } from "./auditEventAccountWarningDeleted";
+import type { AuditEventAccountWarningUpdated } from "./auditEventAccountWarningUpdated";
 import type { AuditEventModerationNoteCreated } from "./auditEventModerationNoteCreated";
 import type { AuditEventModerationNoteDeleted } from "./auditEventModerationNoteDeleted";
 import type { AuditEventThreadDeleted } from "./auditEventThreadDeleted";
@@ -22,4 +25,7 @@ export type AuditEventTypeProps =
   | AuditEventAccountUnsuspended
   | AuditEventAccountContentPurged
   | AuditEventModerationNoteCreated
-  | AuditEventModerationNoteDeleted;
+  | AuditEventModerationNoteDeleted
+  | AuditEventAccountWarned
+  | AuditEventAccountWarningUpdated
+  | AuditEventAccountWarningDeleted;

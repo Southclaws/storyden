@@ -45,6 +45,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/warning"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -138,6 +139,7 @@ func checkColumn(t, c string) error {
 			session.Table:             session.ValidColumn,
 			setting.Table:             setting.ValidColumn,
 			tag.Table:                 tag.ValidColumn,
+			warning.Table:             warning.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

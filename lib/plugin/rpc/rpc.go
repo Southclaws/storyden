@@ -52,6 +52,9 @@ const (
 	EventEventAccountUnsuspended     Event = "EventAccountUnsuspended"
 	EventEventModerationNoteCreated  Event = "EventModerationNoteCreated"
 	EventEventModerationNoteDeleted  Event = "EventModerationNoteDeleted"
+	EventEventAccountWarned          Event = "EventAccountWarned"
+	EventEventAccountWarningUpdated  Event = "EventAccountWarningUpdated"
+	EventEventAccountWarningDeleted  Event = "EventAccountWarningDeleted"
 	EventEventReportCreated          Event = "EventReportCreated"
 	EventEventReportUpdated          Event = "EventReportUpdated"
 	EventEventActivityCreated        Event = "EventActivityCreated"
@@ -90,6 +93,9 @@ var EventValues = []Event{
 	EventEventAccountUnsuspended,
 	EventEventModerationNoteCreated,
 	EventEventModerationNoteDeleted,
+	EventEventAccountWarned,
+	EventEventAccountWarningUpdated,
+	EventEventAccountWarningDeleted,
 	EventEventReportCreated,
 	EventEventReportUpdated,
 	EventEventActivityCreated,
@@ -190,6 +196,12 @@ func (w *EventPayload) UnmarshalJSON(data []byte) error {
 		v = &EventModerationNoteCreated{}
 	case "EventModerationNoteDeleted":
 		v = &EventModerationNoteDeleted{}
+	case "EventAccountWarned":
+		v = &EventAccountWarned{}
+	case "EventAccountWarningUpdated":
+		v = &EventAccountWarningUpdated{}
+	case "EventAccountWarningDeleted":
+		v = &EventAccountWarningDeleted{}
 	case "EventReportCreated":
 		v = &EventReportCreated{}
 	case "EventReportUpdated":
@@ -573,6 +585,55 @@ type EventModerationNoteDeleted struct {
 func (EventModerationNoteDeleted) isEventPayload() {}
 
 func (EventModerationNoteDeleted) EventPayloadType() string { return "EventModerationNoteDeleted" }
+
+// Emitted when a moderation warning is issued to an account.
+type EventAccountWarned struct {
+	// Account ID that received the warning.
+	AccountID account.AccountID `json:"account_id"`
+	// Account ID that issued the warning.
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Warning record ID.
+	WarningID string `json:"warning_id"`
+}
+
+func (EventAccountWarned) isEventPayload() {}
+
+func (EventAccountWarned) EventPayloadType() string { return "EventAccountWarned" }
+
+// Emitted when a moderation warning is edited.
+type EventAccountWarningUpdated struct {
+	// Account ID whose warning was edited.
+	AccountID account.AccountID `json:"account_id"`
+	// Account ID that edited the warning.
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Warning reason before the edit.
+	PreviousReason string `json:"previous_reason"`
+	// Updated warning reason.
+	Reason string `json:"reason"`
+	// Warning record ID.
+	WarningID string `json:"warning_id"`
+}
+
+func (EventAccountWarningUpdated) isEventPayload() {}
+
+func (EventAccountWarningUpdated) EventPayloadType() string { return "EventAccountWarningUpdated" }
+
+// Emitted when a moderation warning is permanently deleted.
+type EventAccountWarningDeleted struct {
+	// Account ID whose warning was deleted.
+	AccountID account.AccountID `json:"account_id"`
+	// Account ID that deleted the warning.
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Warning record ID.
+	WarningID string `json:"warning_id"`
+}
+
+func (EventAccountWarningDeleted) isEventPayload() {}
+
+func (EventAccountWarningDeleted) EventPayloadType() string { return "EventAccountWarningDeleted" }
 
 // Emitted when a new member or system report is created.
 type EventReportCreated struct {

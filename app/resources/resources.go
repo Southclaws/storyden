@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_repo"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/account/token"
+	"github.com/Southclaws/storyden/app/resources/account/warning/warning_repo"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/audit/audit_querier"
@@ -98,6 +99,7 @@ func Build() fx.Option {
 			category_cache.New,
 			notify_querier.New,
 			notify_writer.New,
+			warning_repo.New,
 			tag_querier.New,
 			tag_writer.New,
 			reply_querier.New,

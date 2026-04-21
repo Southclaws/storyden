@@ -612,7 +612,7 @@ var (
 				Symbol:     "moderation_notes_accounts_authored_moderation_notes",
 				Columns:    []*schema.Column{ModerationNotesColumns[4]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -1105,6 +1105,34 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// WarningsColumns holds the columns for the "warnings" table.
+	WarningsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "reason", Type: field.TypeString, Size: 2000},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "author_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// WarningsTable holds the schema information for the "warnings" table.
+	WarningsTable = &schema.Table{
+		Name:       "warnings",
+		Columns:    WarningsColumns,
+		PrimaryKey: []*schema.Column{WarningsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "warnings_accounts_warnings",
+				Columns:    []*schema.Column{WarningsColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "warnings_accounts_authored_warnings",
+				Columns:    []*schema.Column{WarningsColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// AccountTagsColumns holds the columns for the "account_tags" table.
 	AccountTagsColumns = []*schema.Column{
 		{Name: "account_id", Type: field.TypeString, Size: 20},
@@ -1340,6 +1368,7 @@ var (
 		SessionsTable,
 		SettingsTable,
 		TagsTable,
+		WarningsTable,
 		AccountTagsTable,
 		LinkPostContentReferencesTable,
 		LinkNodeContentReferencesTable,
@@ -1408,6 +1437,8 @@ func init() {
 	ReportsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReportsTable.ForeignKeys[1].RefTable = AccountsTable
 	SessionsTable.ForeignKeys[0].RefTable = AccountsTable
+	WarningsTable.ForeignKeys[0].RefTable = AccountsTable
+	WarningsTable.ForeignKeys[1].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	LinkPostContentReferencesTable.ForeignKeys[0].RefTable = LinksTable

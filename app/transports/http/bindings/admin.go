@@ -32,6 +32,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
+	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -45,6 +46,7 @@ type Admin struct {
 	settingsManager  *settings_manager.Manager
 	akr              *access_key.Repository
 	actionDispatcher *action_dispatcher.Service
+	warnings         *warning_manager.Manager
 }
 
 func NewAdmin(
@@ -55,6 +57,7 @@ func NewAdmin(
 	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
 	actionDispatcher *action_dispatcher.Service,
+	warnings *warning_manager.Manager,
 	router *echo.Echo,
 ) Admin {
 	a := Admin{
@@ -65,6 +68,7 @@ func NewAdmin(
 		settingsManager:  settingsManager,
 		akr:              akr,
 		actionDispatcher: actionDispatcher,
+		warnings:         warnings,
 	}
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -636,6 +640,37 @@ func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
 			Type:      openapi.ModerationNoteDeleted,
 			AccountId: openapi.Identifier(accountID),
 			NoteId:    openapi.Identifier(noteID),
+		})
+
+	case audit.EventTypeAccountWarned:
+		accountID := metadataString(in.Metadata, "account_id")
+		warningID := metadataString(in.Metadata, "warning_id")
+		err = out.FromAuditEventAccountWarned(openapi.AuditEventAccountWarned{
+			Type:      openapi.AccountWarned,
+			AccountId: openapi.Identifier(accountID),
+			WarningId: openapi.Identifier(warningID),
+		})
+
+	case audit.EventTypeAccountWarningUpdated:
+		accountID := metadataString(in.Metadata, "account_id")
+		warningID := metadataString(in.Metadata, "warning_id")
+		previousReason := metadataString(in.Metadata, "previous_reason")
+		reason := metadataString(in.Metadata, "reason")
+		err = out.FromAuditEventAccountWarningUpdated(openapi.AuditEventAccountWarningUpdated{
+			Type:           openapi.AccountWarningUpdated,
+			AccountId:      openapi.Identifier(accountID),
+			WarningId:      openapi.Identifier(warningID),
+			PreviousReason: previousReason,
+			Reason:         reason,
+		})
+
+	case audit.EventTypeAccountWarningDeleted:
+		accountID := metadataString(in.Metadata, "account_id")
+		warningID := metadataString(in.Metadata, "warning_id")
+		err = out.FromAuditEventAccountWarningDeleted(openapi.AuditEventAccountWarningDeleted{
+			Type:      openapi.AccountWarningDeleted,
+			AccountId: openapi.Identifier(accountID),
+			WarningId: openapi.Identifier(warningID),
 		})
 	}
 

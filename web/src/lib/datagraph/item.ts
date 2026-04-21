@@ -33,7 +33,6 @@ export function getCommonProperties(item: DatagraphItem) {
     case DatagraphItemKind.profile:
       return {
         name: item.ref.name,
-        description: item.ref.bio,
         slug: item.ref.handle,
         id: item.ref.id,
       };

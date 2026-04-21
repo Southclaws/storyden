@@ -19,6 +19,11 @@ import type {
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
+  AccountWarningCreateBody,
+  AccountWarningCreateOKResponse,
+  AccountWarningListOKResponse,
+  AccountWarningUpdateBody,
+  AccountWarningUpdateOKResponse,
   NoContentResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -92,6 +97,129 @@ export const accountView = async (
     ...options,
     method: "GET",
   });
+};
+
+/**
+ * List internal moderation warnings for an account. Warnings are never
+public. Members may view their own warning history, and staff with the
+`MANAGE_WARNINGS` permission may review warnings for any account.
+
+ */
+export type accountWarningListResponse = {
+  data: AccountWarningListOKResponse;
+  status: number;
+};
+
+export const getAccountWarningListUrl = (accountId: string) => {
+  return `/accounts/${accountId}/warnings`;
+};
+
+export const accountWarningList = async (
+  accountId: string,
+  options?: RequestInit,
+): Promise<accountWarningListResponse> => {
+  return fetcher<Promise<accountWarningListResponse>>(
+    getAccountWarningListUrl(accountId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create an internal moderation warning for an account. Requires the
+`MANAGE_WARNINGS` permission.
+
+ */
+export type accountWarningCreateResponse = {
+  data: AccountWarningCreateOKResponse;
+  status: number;
+};
+
+export const getAccountWarningCreateUrl = (accountId: string) => {
+  return `/accounts/${accountId}/warnings`;
+};
+
+export const accountWarningCreate = async (
+  accountId: string,
+  accountWarningCreateBody: AccountWarningCreateBody,
+  options?: RequestInit,
+): Promise<accountWarningCreateResponse> => {
+  return fetcher<Promise<accountWarningCreateResponse>>(
+    getAccountWarningCreateUrl(accountId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(accountWarningCreateBody),
+    },
+  );
+};
+
+/**
+ * Update the reason text for an existing warning. Requires the
+`MANAGE_WARNINGS` permission.
+
+ */
+export type accountWarningUpdateResponse = {
+  data: AccountWarningUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountWarningUpdateUrl = (
+  accountId: string,
+  warningId: string,
+) => {
+  return `/accounts/${accountId}/warnings/${warningId}`;
+};
+
+export const accountWarningUpdate = async (
+  accountId: string,
+  warningId: string,
+  accountWarningUpdateBody: AccountWarningUpdateBody,
+  options?: RequestInit,
+): Promise<accountWarningUpdateResponse> => {
+  return fetcher<Promise<accountWarningUpdateResponse>>(
+    getAccountWarningUpdateUrl(accountId, warningId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(accountWarningUpdateBody),
+    },
+  );
+};
+
+/**
+ * Permanently delete a warning record. Requires the `MANAGE_WARNINGS`
+permission.
+
+ */
+export type accountWarningDeleteResponse = {
+  data: void;
+  status: number;
+};
+
+export const getAccountWarningDeleteUrl = (
+  accountId: string,
+  warningId: string,
+) => {
+  return `/accounts/${accountId}/warnings/${warningId}`;
+};
+
+export const accountWarningDelete = async (
+  accountId: string,
+  warningId: string,
+  options?: RequestInit,
+): Promise<accountWarningDeleteResponse> => {
+  return fetcher<Promise<accountWarningDeleteResponse>>(
+    getAccountWarningDeleteUrl(accountId, warningId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
 };
 
 /**

@@ -27,7 +27,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/mention/mention_job"
 	"github.com/Southclaws/storyden/app/services/moderation"
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
-	"github.com/Southclaws/storyden/app/services/notification/notify_job"
+	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
+	"github.com/Southclaws/storyden/app/services/notification"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/plugin"
 	"github.com/Southclaws/storyden/app/services/profile/following"
@@ -70,7 +71,7 @@ func Build() fx.Option {
 		library.Build(),
 		comms.Build(),
 		link.Build(),
-		notify_job.Build(),
+		notification.Build(),
 		mention_job.Build(),
 		beacon_listener.Build(),
 		generative.Build(),
@@ -78,6 +79,7 @@ func Build() fx.Option {
 		event.Build(),
 		moderation.Build(),
 		action_dispatcher.Build(),
+		warning_manager.Build(),
 		audit_logger.Build(),
 		plugin.Build(),
 		fx.Provide(avatar_gen.New),

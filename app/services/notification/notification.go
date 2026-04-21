@@ -1,4 +1,4 @@
-package notify_job
+package notification
 
 import (
 	"go.uber.org/fx"
@@ -8,9 +8,6 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(newNotifyConsumer),
-		fx.Invoke(runNotifyConsumer),
-
 		fx.Provide(notify.New),
 	)
 }

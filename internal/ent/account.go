@@ -111,11 +111,15 @@ type AccountEdges struct {
 	ModerationNotes []*ModerationNote `json:"moderation_notes,omitempty"`
 	// AuthoredModerationNotes holds the value of the authored_moderation_notes edge.
 	AuthoredModerationNotes []*ModerationNote `json:"authored_moderation_notes,omitempty"`
+	// Warnings holds the value of the warnings edge.
+	Warnings []*Warning `json:"warnings,omitempty"`
+	// AuthoredWarnings holds the value of the authored_warnings edge.
+	AuthoredWarnings []*Warning `json:"authored_warnings,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [28]bool
+	loadedTypes [30]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -363,10 +367,28 @@ func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) 
 	return nil, &NotLoadedError{edge: "authored_moderation_notes"}
 }
 
+// WarningsOrErr returns the Warnings value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) WarningsOrErr() ([]*Warning, error) {
+	if e.loadedTypes[27] {
+		return e.Warnings, nil
+	}
+	return nil, &NotLoadedError{edge: "warnings"}
+}
+
+// AuthoredWarningsOrErr returns the AuthoredWarnings value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) AuthoredWarningsOrErr() ([]*Warning, error) {
+	if e.loadedTypes[28] {
+		return e.AuthoredWarnings, nil
+	}
+	return nil, &NotLoadedError{edge: "authored_warnings"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[29] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -648,6 +670,16 @@ func (_m *Account) QueryModerationNotes() *ModerationNoteQuery {
 // QueryAuthoredModerationNotes queries the "authored_moderation_notes" edge of the Account entity.
 func (_m *Account) QueryAuthoredModerationNotes() *ModerationNoteQuery {
 	return NewAccountClient(_m.config).QueryAuthoredModerationNotes(_m)
+}
+
+// QueryWarnings queries the "warnings" edge of the Account entity.
+func (_m *Account) QueryWarnings() *WarningQuery {
+	return NewAccountClient(_m.config).QueryWarnings(_m)
+}
+
+// QueryAuthoredWarnings queries the "authored_warnings" edge of the Account entity.
+func (_m *Account) QueryAuthoredWarnings() *WarningQuery {
+	return NewAccountClient(_m.config).QueryAuthoredWarnings(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

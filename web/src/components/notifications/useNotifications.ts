@@ -158,5 +158,10 @@ function getNotificationContent(n: Notification) {
       return { description: "submitted a report", url: `/reports` };
     case "report_updated":
       return { description: "report status updated", url: `/reports` };
+    case "warning_issued":
+      return {
+        description: "issued you a warning",
+        url: p?.slug ? `/m/${p.slug}` : "#",
+      };
   }
 }

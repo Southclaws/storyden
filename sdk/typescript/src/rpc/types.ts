@@ -34,6 +34,9 @@ export type Event =
   | "EventAccountUnsuspended"
   | "EventModerationNoteCreated"
   | "EventModerationNoteDeleted"
+  | "EventAccountWarned"
+  | "EventAccountWarningUpdated"
+  | "EventAccountWarningDeleted"
   | "EventReportCreated"
   | "EventReportUpdated"
   | "EventActivityCreated"
@@ -289,6 +292,43 @@ export interface EventModerationNoteDeleted {
   note_id: string;
 }
 
+// Emitted when a moderation warning is issued to an account.
+export interface EventAccountWarned {
+  event: "EventAccountWarned";
+  // Account ID that received the warning.
+  account_id: string;
+  // Account ID that issued the warning.
+  author_id: string;
+  // Warning record ID.
+  warning_id: string;
+}
+
+// Emitted when a moderation warning is edited.
+export interface EventAccountWarningUpdated {
+  event: "EventAccountWarningUpdated";
+  // Account ID whose warning was edited.
+  account_id: string;
+  // Account ID that edited the warning.
+  author_id: string;
+  // Warning reason before the edit.
+  previous_reason: string;
+  // Updated warning reason.
+  reason: string;
+  // Warning record ID.
+  warning_id: string;
+}
+
+// Emitted when a moderation warning is permanently deleted.
+export interface EventAccountWarningDeleted {
+  event: "EventAccountWarningDeleted";
+  // Account ID whose warning was deleted.
+  account_id: string;
+  // Account ID that deleted the warning.
+  author_id: string;
+  // Warning record ID.
+  warning_id: string;
+}
+
 // Emitted when a new member or system report is created.
 export interface EventReportCreated {
   event: "EventReportCreated";
@@ -379,6 +419,9 @@ export type EventPayload =
   | EventAccountUnsuspended
   | EventModerationNoteCreated
   | EventModerationNoteDeleted
+  | EventAccountWarned
+  | EventAccountWarningUpdated
+  | EventAccountWarningDeleted
   | EventReportCreated
   | EventReportUpdated
   | EventActivityCreated
@@ -497,6 +540,18 @@ export function isEventModerationNoteCreated(value: EventPayload): value is Even
 
 export function isEventModerationNoteDeleted(value: EventPayload): value is EventModerationNoteDeleted {
   return value.event === "EventModerationNoteDeleted";
+}
+
+export function isEventAccountWarned(value: EventPayload): value is EventAccountWarned {
+  return value.event === "EventAccountWarned";
+}
+
+export function isEventAccountWarningUpdated(value: EventPayload): value is EventAccountWarningUpdated {
+  return value.event === "EventAccountWarningUpdated";
+}
+
+export function isEventAccountWarningDeleted(value: EventPayload): value is EventAccountWarningDeleted {
+  return value.event === "EventAccountWarningDeleted";
 }
 
 export function isEventReportCreated(value: EventPayload): value is EventReportCreated {

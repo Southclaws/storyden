@@ -45,6 +45,9 @@ class Event(str, Enum):
     EVENTACCOUNTUNSUSPENDED = "EventAccountUnsuspended"
     EVENTMODERATIONNOTECREATED = "EventModerationNoteCreated"
     EVENTMODERATIONNOTEDELETED = "EventModerationNoteDeleted"
+    EVENTACCOUNTWARNED = "EventAccountWarned"
+    EVENTACCOUNTWARNINGUPDATED = "EventAccountWarningUpdated"
+    EVENTACCOUNTWARNINGDELETED = "EventAccountWarningDeleted"
     EVENTREPORTCREATED = "EventReportCreated"
     EVENTREPORTUPDATED = "EventReportUpdated"
     EVENTACTIVITYCREATED = "EventActivityCreated"
@@ -356,6 +359,49 @@ class EventModerationNoteDeleted(BaseModel):
     note_id: str
 
 
+"""Emitted when a moderation warning is issued to an account."""
+
+class EventAccountWarned(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventAccountWarned"]
+    """Account ID that received the warning."""
+    account_id: str
+    """Account ID that issued the warning."""
+    author_id: str
+    """Warning record ID."""
+    warning_id: str
+
+
+"""Emitted when a moderation warning is edited."""
+
+class EventAccountWarningUpdated(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventAccountWarningUpdated"]
+    """Account ID whose warning was edited."""
+    account_id: str
+    """Account ID that edited the warning."""
+    author_id: str
+    """Warning reason before the edit."""
+    previous_reason: str
+    """Updated warning reason."""
+    reason: str
+    """Warning record ID."""
+    warning_id: str
+
+
+"""Emitted when a moderation warning is permanently deleted."""
+
+class EventAccountWarningDeleted(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventAccountWarningDeleted"]
+    """Account ID whose warning was deleted."""
+    account_id: str
+    """Account ID that deleted the warning."""
+    author_id: str
+    """Warning record ID."""
+    warning_id: str
+
+
 """Emitted when a new member or system report is created."""
 
 class EventReportCreated(BaseModel):
@@ -431,7 +477,7 @@ class EventSettingsUpdated(BaseModel):
     settings: Dict[str, Any]
 
 EventPayload = Annotated[
-    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
+    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventAccountWarned, EventAccountWarningUpdated, EventAccountWarningDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
     Field(discriminator="event"),
 ]
 

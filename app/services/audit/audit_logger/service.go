@@ -59,6 +59,15 @@ func New(
 		if _, err := pubsub.Subscribe(ctx, bus, "audit_logger.moderation_note_deleted", s.onModerationNoteDeleted); err != nil {
 			return err
 		}
+		if _, err := pubsub.Subscribe(ctx, bus, "audit_logger.account_warned", s.onAccountWarned); err != nil {
+			return err
+		}
+		if _, err := pubsub.Subscribe(ctx, bus, "audit_logger.account_warning_updated", s.onAccountWarningUpdated); err != nil {
+			return err
+		}
+		if _, err := pubsub.Subscribe(ctx, bus, "audit_logger.account_warning_deleted", s.onAccountWarningDeleted); err != nil {
+			return err
+		}
 
 		return nil
 	}))
@@ -187,6 +196,77 @@ func (s *Service) onModerationNoteDeleted(ctx context.Context, event *rpc.EventM
 		map[string]any{
 			"account_id": event.AccountID.String(),
 			"note_id":    event.NoteID.String(),
+		},
+	)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *Service) onAccountWarned(ctx context.Context, event *rpc.EventAccountWarned) error {
+	enactedBy := session.GetOptAccountID(ctx)
+
+	_, err := s.writer.Create(
+		ctx,
+		audit.EventTypeAccountWarned,
+		enactedBy,
+		opt.New(datagraph.Ref{
+			ID:   xid.ID(event.AccountID),
+			Kind: datagraph.KindProfile,
+		}),
+		map[string]any{
+			"account_id": event.AccountID.String(),
+			"warning_id": event.WarningID,
+		},
+	)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *Service) onAccountWarningUpdated(ctx context.Context, event *rpc.EventAccountWarningUpdated) error {
+	enactedBy := session.GetOptAccountID(ctx)
+
+	_, err := s.writer.Create(
+		ctx,
+		audit.EventTypeAccountWarningUpdated,
+		enactedBy,
+		opt.New(datagraph.Ref{
+			ID:   xid.ID(event.AccountID),
+			Kind: datagraph.KindProfile,
+		}),
+		map[string]any{
+			"account_id":      event.AccountID.String(),
+			"warning_id":      event.WarningID,
+			"previous_reason": event.PreviousReason,
+			"reason":          event.Reason,
+		},
+	)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *Service) onAccountWarningDeleted(ctx context.Context, event *rpc.EventAccountWarningDeleted) error {
+	enactedBy := session.GetOptAccountID(ctx)
+
+	_, err := s.writer.Create(
+		ctx,
+		audit.EventTypeAccountWarningDeleted,
+		enactedBy,
+		opt.New(datagraph.Ref{
+			ID:   xid.ID(event.AccountID),
+			Kind: datagraph.KindProfile,
+		}),
+		map[string]any{
+			"account_id": event.AccountID.String(),
+			"warning_id": event.WarningID,
 		},
 	)
 	if err != nil {

@@ -47,6 +47,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
 
@@ -92,6 +93,7 @@ const (
 	TypeSession             = "Session"
 	TypeSetting             = "Setting"
 	TypeTag                 = "Tag"
+	TypeWarning             = "Warning"
 )
 
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
@@ -195,6 +197,12 @@ type AccountMutation struct {
 	authored_moderation_notes        map[xid.ID]struct{}
 	removedauthored_moderation_notes map[xid.ID]struct{}
 	clearedauthored_moderation_notes bool
+	warnings                         map[xid.ID]struct{}
+	removedwarnings                  map[xid.ID]struct{}
+	clearedwarnings                  bool
+	authored_warnings                map[xid.ID]struct{}
+	removedauthored_warnings         map[xid.ID]struct{}
+	clearedauthored_warnings         bool
 	account_roles                    map[xid.ID]struct{}
 	removedaccount_roles             map[xid.ID]struct{}
 	clearedaccount_roles             bool
@@ -2349,6 +2357,114 @@ func (m *AccountMutation) ResetAuthoredModerationNotes() {
 	m.removedauthored_moderation_notes = nil
 }
 
+// AddWarningIDs adds the "warnings" edge to the Warning entity by ids.
+func (m *AccountMutation) AddWarningIDs(ids ...xid.ID) {
+	if m.warnings == nil {
+		m.warnings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.warnings[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWarnings clears the "warnings" edge to the Warning entity.
+func (m *AccountMutation) ClearWarnings() {
+	m.clearedwarnings = true
+}
+
+// WarningsCleared reports if the "warnings" edge to the Warning entity was cleared.
+func (m *AccountMutation) WarningsCleared() bool {
+	return m.clearedwarnings
+}
+
+// RemoveWarningIDs removes the "warnings" edge to the Warning entity by IDs.
+func (m *AccountMutation) RemoveWarningIDs(ids ...xid.ID) {
+	if m.removedwarnings == nil {
+		m.removedwarnings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.warnings, ids[i])
+		m.removedwarnings[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWarnings returns the removed IDs of the "warnings" edge to the Warning entity.
+func (m *AccountMutation) RemovedWarningsIDs() (ids []xid.ID) {
+	for id := range m.removedwarnings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WarningsIDs returns the "warnings" edge IDs in the mutation.
+func (m *AccountMutation) WarningsIDs() (ids []xid.ID) {
+	for id := range m.warnings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWarnings resets all changes to the "warnings" edge.
+func (m *AccountMutation) ResetWarnings() {
+	m.warnings = nil
+	m.clearedwarnings = false
+	m.removedwarnings = nil
+}
+
+// AddAuthoredWarningIDs adds the "authored_warnings" edge to the Warning entity by ids.
+func (m *AccountMutation) AddAuthoredWarningIDs(ids ...xid.ID) {
+	if m.authored_warnings == nil {
+		m.authored_warnings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.authored_warnings[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAuthoredWarnings clears the "authored_warnings" edge to the Warning entity.
+func (m *AccountMutation) ClearAuthoredWarnings() {
+	m.clearedauthored_warnings = true
+}
+
+// AuthoredWarningsCleared reports if the "authored_warnings" edge to the Warning entity was cleared.
+func (m *AccountMutation) AuthoredWarningsCleared() bool {
+	return m.clearedauthored_warnings
+}
+
+// RemoveAuthoredWarningIDs removes the "authored_warnings" edge to the Warning entity by IDs.
+func (m *AccountMutation) RemoveAuthoredWarningIDs(ids ...xid.ID) {
+	if m.removedauthored_warnings == nil {
+		m.removedauthored_warnings = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.authored_warnings, ids[i])
+		m.removedauthored_warnings[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAuthoredWarnings returns the removed IDs of the "authored_warnings" edge to the Warning entity.
+func (m *AccountMutation) RemovedAuthoredWarningsIDs() (ids []xid.ID) {
+	for id := range m.removedauthored_warnings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AuthoredWarningsIDs returns the "authored_warnings" edge IDs in the mutation.
+func (m *AccountMutation) AuthoredWarningsIDs() (ids []xid.ID) {
+	for id := range m.authored_warnings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAuthoredWarnings resets all changes to the "authored_warnings" edge.
+func (m *AccountMutation) ResetAuthoredWarnings() {
+	m.authored_warnings = nil
+	m.clearedauthored_warnings = false
+	m.removedauthored_warnings = nil
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
 func (m *AccountMutation) AddAccountRoleIDs(ids ...xid.ID) {
 	if m.account_roles == nil {
@@ -2802,7 +2918,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 28)
+	edges := make([]string, 0, 30)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -2883,6 +2999,12 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.authored_moderation_notes != nil {
 		edges = append(edges, account.EdgeAuthoredModerationNotes)
+	}
+	if m.warnings != nil {
+		edges = append(edges, account.EdgeWarnings)
+	}
+	if m.authored_warnings != nil {
+		edges = append(edges, account.EdgeAuthoredWarnings)
 	}
 	if m.account_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -3054,6 +3176,18 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeWarnings:
+		ids := make([]ent.Value, 0, len(m.warnings))
+		for id := range m.warnings {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeAuthoredWarnings:
+		ids := make([]ent.Value, 0, len(m.authored_warnings))
+		for id := range m.authored_warnings {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.account_roles))
 		for id := range m.account_roles {
@@ -3066,7 +3200,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 28)
+	edges := make([]string, 0, 30)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3144,6 +3278,12 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedauthored_moderation_notes != nil {
 		edges = append(edges, account.EdgeAuthoredModerationNotes)
+	}
+	if m.removedwarnings != nil {
+		edges = append(edges, account.EdgeWarnings)
+	}
+	if m.removedauthored_warnings != nil {
+		edges = append(edges, account.EdgeAuthoredWarnings)
 	}
 	if m.removedaccount_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -3311,6 +3451,18 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeWarnings:
+		ids := make([]ent.Value, 0, len(m.removedwarnings))
+		for id := range m.removedwarnings {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeAuthoredWarnings:
+		ids := make([]ent.Value, 0, len(m.removedauthored_warnings))
+		for id := range m.removedauthored_warnings {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
 		for id := range m.removedaccount_roles {
@@ -3323,7 +3475,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 28)
+	edges := make([]string, 0, 30)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3405,6 +3557,12 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedauthored_moderation_notes {
 		edges = append(edges, account.EdgeAuthoredModerationNotes)
 	}
+	if m.clearedwarnings {
+		edges = append(edges, account.EdgeWarnings)
+	}
+	if m.clearedauthored_warnings {
+		edges = append(edges, account.EdgeAuthoredWarnings)
+	}
 	if m.clearedaccount_roles {
 		edges = append(edges, account.EdgeAccountRoles)
 	}
@@ -3469,6 +3627,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedmoderation_notes
 	case account.EdgeAuthoredModerationNotes:
 		return m.clearedauthored_moderation_notes
+	case account.EdgeWarnings:
+		return m.clearedwarnings
+	case account.EdgeAuthoredWarnings:
+		return m.clearedauthored_warnings
 	case account.EdgeAccountRoles:
 		return m.clearedaccount_roles
 	}
@@ -3570,6 +3732,12 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeAuthoredModerationNotes:
 		m.ResetAuthoredModerationNotes()
+		return nil
+	case account.EdgeWarnings:
+		m.ResetWarnings()
+		return nil
+	case account.EdgeAuthoredWarnings:
+		m.ResetAuthoredWarnings()
 		return nil
 	case account.EdgeAccountRoles:
 		m.ResetAccountRoles()
@@ -31810,4 +31978,620 @@ func (m *TagMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)
+}
+
+// WarningMutation represents an operation that mutates the Warning nodes in the graph.
+type WarningMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	reason         *string
+	clearedFields  map[string]struct{}
+	account        *xid.ID
+	clearedaccount bool
+	author         *xid.ID
+	clearedauthor  bool
+	done           bool
+	oldValue       func(context.Context) (*Warning, error)
+	predicates     []predicate.Warning
+}
+
+var _ ent.Mutation = (*WarningMutation)(nil)
+
+// warningOption allows management of the mutation configuration using functional options.
+type warningOption func(*WarningMutation)
+
+// newWarningMutation creates new mutation for the Warning entity.
+func newWarningMutation(c config, op Op, opts ...warningOption) *WarningMutation {
+	m := &WarningMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeWarning,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withWarningID sets the ID field of the mutation.
+func withWarningID(id xid.ID) warningOption {
+	return func(m *WarningMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Warning
+		)
+		m.oldValue = func(ctx context.Context) (*Warning, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Warning.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWarning sets the old Warning of the mutation.
+func withWarning(node *Warning) warningOption {
+	return func(m *WarningMutation) {
+		m.oldValue = func(context.Context) (*Warning, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m WarningMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m WarningMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Warning entities.
+func (m *WarningMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WarningMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *WarningMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Warning.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *WarningMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *WarningMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Warning entity.
+// If the Warning object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WarningMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *WarningMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *WarningMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *WarningMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the Warning entity.
+// If the Warning object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WarningMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *WarningMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetAuthorID sets the "author_id" field.
+func (m *WarningMutation) SetAuthorID(x xid.ID) {
+	m.author = &x
+}
+
+// AuthorID returns the value of the "author_id" field in the mutation.
+func (m *WarningMutation) AuthorID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorID returns the old "author_id" field's value of the Warning entity.
+// If the Warning object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WarningMutation) OldAuthorID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorID: %w", err)
+	}
+	return oldValue.AuthorID, nil
+}
+
+// ClearAuthorID clears the value of the "author_id" field.
+func (m *WarningMutation) ClearAuthorID() {
+	m.author = nil
+	m.clearedFields[warning.FieldAuthorID] = struct{}{}
+}
+
+// AuthorIDCleared returns if the "author_id" field was cleared in this mutation.
+func (m *WarningMutation) AuthorIDCleared() bool {
+	_, ok := m.clearedFields[warning.FieldAuthorID]
+	return ok
+}
+
+// ResetAuthorID resets all changes to the "author_id" field.
+func (m *WarningMutation) ResetAuthorID() {
+	m.author = nil
+	delete(m.clearedFields, warning.FieldAuthorID)
+}
+
+// SetReason sets the "reason" field.
+func (m *WarningMutation) SetReason(s string) {
+	m.reason = &s
+}
+
+// Reason returns the value of the "reason" field in the mutation.
+func (m *WarningMutation) Reason() (r string, exists bool) {
+	v := m.reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReason returns the old "reason" field's value of the Warning entity.
+// If the Warning object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WarningMutation) OldReason(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReason is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReason requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReason: %w", err)
+	}
+	return oldValue.Reason, nil
+}
+
+// ResetReason resets all changes to the "reason" field.
+func (m *WarningMutation) ResetReason() {
+	m.reason = nil
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *WarningMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[warning.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *WarningMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *WarningMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *WarningMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *WarningMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[warning.FieldAuthorID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *WarningMutation) AuthorCleared() bool {
+	return m.AuthorIDCleared() || m.clearedauthor
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *WarningMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *WarningMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// Where appends a list predicates to the WarningMutation builder.
+func (m *WarningMutation) Where(ps ...predicate.Warning) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the WarningMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WarningMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Warning, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *WarningMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WarningMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Warning).
+func (m *WarningMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *WarningMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, warning.FieldCreatedAt)
+	}
+	if m.account != nil {
+		fields = append(fields, warning.FieldAccountID)
+	}
+	if m.author != nil {
+		fields = append(fields, warning.FieldAuthorID)
+	}
+	if m.reason != nil {
+		fields = append(fields, warning.FieldReason)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *WarningMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case warning.FieldCreatedAt:
+		return m.CreatedAt()
+	case warning.FieldAccountID:
+		return m.AccountID()
+	case warning.FieldAuthorID:
+		return m.AuthorID()
+	case warning.FieldReason:
+		return m.Reason()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *WarningMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case warning.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case warning.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case warning.FieldAuthorID:
+		return m.OldAuthorID(ctx)
+	case warning.FieldReason:
+		return m.OldReason(ctx)
+	}
+	return nil, fmt.Errorf("unknown Warning field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WarningMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case warning.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case warning.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case warning.FieldAuthorID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorID(v)
+		return nil
+	case warning.FieldReason:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReason(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Warning field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *WarningMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *WarningMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WarningMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Warning numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *WarningMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(warning.FieldAuthorID) {
+		fields = append(fields, warning.FieldAuthorID)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *WarningMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *WarningMutation) ClearField(name string) error {
+	switch name {
+	case warning.FieldAuthorID:
+		m.ClearAuthorID()
+		return nil
+	}
+	return fmt.Errorf("unknown Warning nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *WarningMutation) ResetField(name string) error {
+	switch name {
+	case warning.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case warning.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case warning.FieldAuthorID:
+		m.ResetAuthorID()
+		return nil
+	case warning.FieldReason:
+		m.ResetReason()
+		return nil
+	}
+	return fmt.Errorf("unknown Warning field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *WarningMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.account != nil {
+		edges = append(edges, warning.EdgeAccount)
+	}
+	if m.author != nil {
+		edges = append(edges, warning.EdgeAuthor)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *WarningMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case warning.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	case warning.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *WarningMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *WarningMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *WarningMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedaccount {
+		edges = append(edges, warning.EdgeAccount)
+	}
+	if m.clearedauthor {
+		edges = append(edges, warning.EdgeAuthor)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *WarningMutation) EdgeCleared(name string) bool {
+	switch name {
+	case warning.EdgeAccount:
+		return m.clearedaccount
+	case warning.EdgeAuthor:
+		return m.clearedauthor
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *WarningMutation) ClearEdge(name string) error {
+	switch name {
+	case warning.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	case warning.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown Warning unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *WarningMutation) ResetEdge(name string) error {
+	switch name {
+	case warning.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	case warning.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown Warning edge %s", name)
 }

@@ -117,6 +117,11 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "Manage the administrative settings for the Storyden installation.",
   },
+  [Permission.MANAGE_WARNINGS]: {
+    value: Permission.MANAGE_WARNINGS,
+    name: "Manage warnings",
+    description: "Issue member warnings and review their warning history.",
+  },
   [Permission.MANAGE_SUSPENSIONS]: {
     value: Permission.MANAGE_SUSPENSIONS,
     name: "Manage suspensions",

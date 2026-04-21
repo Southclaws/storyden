@@ -1337,6 +1337,52 @@ func HasAuthoredModerationNotesWith(preds ...predicate.ModerationNote) predicate
 	})
 }
 
+// HasWarnings applies the HasEdge predicate on the "warnings" edge.
+func HasWarnings() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WarningsTable, WarningsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWarningsWith applies the HasEdge predicate on the "warnings" edge with a given conditions (other predicates).
+func HasWarningsWith(preds ...predicate.Warning) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newWarningsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAuthoredWarnings applies the HasEdge predicate on the "authored_warnings" edge.
+func HasAuthoredWarnings() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AuthoredWarningsTable, AuthoredWarningsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAuthoredWarningsWith applies the HasEdge predicate on the "authored_warnings" edge with a given conditions (other predicates).
+func HasAuthoredWarningsWith(preds ...predicate.Warning) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newAuthoredWarningsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

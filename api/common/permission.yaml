@@ -25,6 +25,7 @@ oneOf:
   - $ref: "#/$defs/COLLECTION_SUBMIT"
   - $ref: "#/$defs/USE_PERSONAL_ACCESS_KEYS"
   - $ref: "#/$defs/MANAGE_SETTINGS"
+  - $ref: "#/$defs/MANAGE_WARNINGS"
   - $ref: "#/$defs/MANAGE_SUSPENSIONS"
   - $ref: "#/$defs/MANAGE_ROLES"
   - $ref: "#/$defs/MANAGE_REPORTS"
@@ -153,6 +154,12 @@ $defs:
     const: MANAGE_SETTINGS
     title: Manage settings
     description: Manage the administrative settings for the Storyden installation.
+
+  MANAGE_WARNINGS:
+    type: string
+    const: MANAGE_WARNINGS
+    title: Manage warnings
+    description: Issue member warnings and review their warning history.
 
   MANAGE_SUSPENSIONS:
     type: string
