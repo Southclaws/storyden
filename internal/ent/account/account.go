@@ -94,6 +94,10 @@ const (
 	EdgeHandledReports = "handled_reports"
 	// EdgeAuditLogs holds the string denoting the audit_logs edge name in mutations.
 	EdgeAuditLogs = "audit_logs"
+	// EdgeModerationNotes holds the string denoting the moderation_notes edge name in mutations.
+	EdgeModerationNotes = "moderation_notes"
+	// EdgeAuthoredModerationNotes holds the string denoting the authored_moderation_notes edge name in mutations.
+	EdgeAuthoredModerationNotes = "authored_moderation_notes"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -269,6 +273,20 @@ const (
 	AuditLogsInverseTable = "audit_logs"
 	// AuditLogsColumn is the table column denoting the audit_logs relation/edge.
 	AuditLogsColumn = "enacted_by_id"
+	// ModerationNotesTable is the table that holds the moderation_notes relation/edge.
+	ModerationNotesTable = "moderation_notes"
+	// ModerationNotesInverseTable is the table name for the ModerationNote entity.
+	// It exists in this package in order to avoid circular dependency with the "moderationnote" package.
+	ModerationNotesInverseTable = "moderation_notes"
+	// ModerationNotesColumn is the table column denoting the moderation_notes relation/edge.
+	ModerationNotesColumn = "account_id"
+	// AuthoredModerationNotesTable is the table that holds the authored_moderation_notes relation/edge.
+	AuthoredModerationNotesTable = "moderation_notes"
+	// AuthoredModerationNotesInverseTable is the table name for the ModerationNote entity.
+	// It exists in this package in order to avoid circular dependency with the "moderationnote" package.
+	AuthoredModerationNotesInverseTable = "moderation_notes"
+	// AuthoredModerationNotesColumn is the table column denoting the authored_moderation_notes relation/edge.
+	AuthoredModerationNotesColumn = "author_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -798,6 +816,34 @@ func ByAuditLogs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByModerationNotesCount orders the results by moderation_notes count.
+func ByModerationNotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newModerationNotesStep(), opts...)
+	}
+}
+
+// ByModerationNotes orders the results by moderation_notes terms.
+func ByModerationNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newModerationNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAuthoredModerationNotesCount orders the results by authored_moderation_notes count.
+func ByAuthoredModerationNotesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAuthoredModerationNotesStep(), opts...)
+	}
+}
+
+// ByAuthoredModerationNotes orders the results by authored_moderation_notes terms.
+func ByAuthoredModerationNotes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAuthoredModerationNotesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -984,6 +1030,20 @@ func newAuditLogsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuditLogsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AuditLogsTable, AuditLogsColumn),
+	)
+}
+func newModerationNotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ModerationNotesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ModerationNotesTable, ModerationNotesColumn),
+	)
+}
+func newAuthoredModerationNotesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AuthoredModerationNotesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AuthoredModerationNotesTable, AuthoredModerationNotesColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

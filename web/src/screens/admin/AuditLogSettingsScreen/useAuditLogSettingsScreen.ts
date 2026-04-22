@@ -18,6 +18,8 @@ export const EVENT_TYPE_LABELS: Record<AuditEventType, string> = {
   [AuditEventType.account_suspended]: "Account Suspended",
   [AuditEventType.account_unsuspended]: "Account Unsuspended",
   [AuditEventType.account_content_purged]: "Content Purged",
+  [AuditEventType.moderation_note_created]: "Moderation Note Created",
+  [AuditEventType.moderation_note_deleted]: "Moderation Note Deleted",
 };
 
 export const ALL_EVENT_TYPES: MultiSelectPickerItem[] = Object.entries(

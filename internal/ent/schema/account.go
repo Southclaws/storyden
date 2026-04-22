@@ -127,5 +127,10 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("audit_logs", AuditLog.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("moderation_notes", ModerationNote.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+		edge.To("authored_moderation_notes", ModerationNote.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

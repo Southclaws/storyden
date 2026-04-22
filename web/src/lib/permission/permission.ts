@@ -140,6 +140,18 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "View detailed account information including email addresses and verification status for non-administrator accounts.",
   },
+  [Permission.VIEW_MODERATION_NOTES]: {
+    value: Permission.VIEW_MODERATION_NOTES,
+    name: "View moderation notes",
+    description:
+      "Read internal staff-only moderation notes attached to member accounts.",
+  },
+  [Permission.MANAGE_MODERATION_NOTES]: {
+    value: Permission.MANAGE_MODERATION_NOTES,
+    name: "Manage moderation notes",
+    description:
+      "Create and delete internal staff-only moderation notes attached to member accounts.",
+  },
   [Permission.ADMINISTRATOR]: {
     value: Permission.ADMINISTRATOR,
     name: "Administrator",

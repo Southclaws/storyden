@@ -19,12 +19,16 @@ import type {
   AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
+  AccountModerationNoteCreateBody,
+  AccountModerationNoteCreateOKResponse,
+  AccountModerationNoteListOKResponse,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
   BadRequestResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
+  NoContentResponse,
   NotFoundResponse,
   NotModifiedResponse,
   UnauthorisedResponse,
@@ -188,6 +192,206 @@ export const useAccountView = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List internal moderation notes for an account. Notes are never public
+and are only visible to staff with VIEW_MODERATION_NOTES permission.
+
+ */
+export const accountModerationNoteList = (accountId: string) => {
+  return fetcher<AccountModerationNoteListOKResponse>({
+    url: `/accounts/${accountId}/moderation-notes`,
+    method: "GET",
+  });
+};
+
+export const getAccountModerationNoteListKey = (accountId: string) =>
+  [`/accounts/${accountId}/moderation-notes`] as const;
+
+export type AccountModerationNoteListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountModerationNoteList>>
+>;
+export type AccountModerationNoteListQueryError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountModerationNoteList = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof accountModerationNoteList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!accountId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAccountModerationNoteListKey(accountId) : null));
+  const swrFn = () => accountModerationNoteList(accountId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create an internal moderation note for an account. Notes are immutable
+and always include the author and timestamp for auditing.
+
+ */
+export const accountModerationNoteCreate = (
+  accountId: string,
+  accountModerationNoteCreateBody: AccountModerationNoteCreateBody,
+) => {
+  return fetcher<AccountModerationNoteCreateOKResponse>({
+    url: `/accounts/${accountId}/moderation-notes`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accountModerationNoteCreateBody,
+  });
+};
+
+export const getAccountModerationNoteCreateMutationFetcher = (
+  accountId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountModerationNoteCreateBody },
+  ): Promise<AccountModerationNoteCreateOKResponse> => {
+    return accountModerationNoteCreate(accountId, arg);
+  };
+};
+export const getAccountModerationNoteCreateMutationKey = (accountId: string) =>
+  [`/accounts/${accountId}/moderation-notes`] as const;
+
+export type AccountModerationNoteCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountModerationNoteCreate>>
+>;
+export type AccountModerationNoteCreateMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountModerationNoteCreate = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountModerationNoteCreate>>,
+      TError,
+      Key,
+      AccountModerationNoteCreateBody,
+      Awaited<ReturnType<typeof accountModerationNoteCreate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountModerationNoteCreateMutationKey(accountId);
+  const swrFn = getAccountModerationNoteCreateMutationFetcher(accountId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete an internal moderation note for an account.
+
+ */
+export const accountModerationNoteDelete = (
+  accountId: string,
+  moderationNoteId: string,
+) => {
+  return fetcher<NoContentResponse>({
+    url: `/accounts/${accountId}/moderation-notes/${moderationNoteId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAccountModerationNoteDeleteMutationFetcher = (
+  accountId: string,
+  moderationNoteId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return accountModerationNoteDelete(accountId, moderationNoteId);
+  };
+};
+export const getAccountModerationNoteDeleteMutationKey = (
+  accountId: string,
+  moderationNoteId: string,
+) => [`/accounts/${accountId}/moderation-notes/${moderationNoteId}`] as const;
+
+export type AccountModerationNoteDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountModerationNoteDelete>>
+>;
+export type AccountModerationNoteDeleteMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountModerationNoteDelete = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  moderationNoteId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountModerationNoteDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof accountModerationNoteDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountModerationNoteDeleteMutationKey(accountId, moderationNoteId);
+  const swrFn = getAccountModerationNoteDeleteMutationFetcher(
+    accountId,
+    moderationNoteId,
+  );
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

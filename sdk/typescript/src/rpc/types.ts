@@ -32,6 +32,8 @@ export type Event =
   | "EventAccountUpdated"
   | "EventAccountSuspended"
   | "EventAccountUnsuspended"
+  | "EventModerationNoteCreated"
+  | "EventModerationNoteDeleted"
   | "EventReportCreated"
   | "EventReportUpdated"
   | "EventActivityCreated"
@@ -269,6 +271,24 @@ export interface EventAccountUnsuspended {
   id: string;
 }
 
+// Emitted when a moderator creates an internal account moderation note.
+export interface EventModerationNoteCreated {
+  event: "EventModerationNoteCreated";
+  // Target account ID
+  account_id: string;
+  // Moderation note ID
+  note_id: string;
+}
+
+// Emitted when a moderator deletes an internal account moderation note.
+export interface EventModerationNoteDeleted {
+  event: "EventModerationNoteDeleted";
+  // Target account ID
+  account_id: string;
+  // Moderation note ID
+  note_id: string;
+}
+
 // Emitted when a new member or system report is created.
 export interface EventReportCreated {
   event: "EventReportCreated";
@@ -357,6 +377,8 @@ export type EventPayload =
   | EventAccountUpdated
   | EventAccountSuspended
   | EventAccountUnsuspended
+  | EventModerationNoteCreated
+  | EventModerationNoteDeleted
   | EventReportCreated
   | EventReportUpdated
   | EventActivityCreated
@@ -467,6 +489,14 @@ export function isEventAccountSuspended(value: EventPayload): value is EventAcco
 
 export function isEventAccountUnsuspended(value: EventPayload): value is EventAccountUnsuspended {
   return value.event === "EventAccountUnsuspended";
+}
+
+export function isEventModerationNoteCreated(value: EventPayload): value is EventModerationNoteCreated {
+  return value.event === "EventModerationNoteCreated";
+}
+
+export function isEventModerationNoteDeleted(value: EventPayload): value is EventModerationNoteDeleted {
+  return value.event === "EventModerationNoteDeleted";
 }
 
 export function isEventReportCreated(value: EventPayload): value is EventReportCreated {

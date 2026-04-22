@@ -102,6 +102,7 @@ func TestAuditEventList(t *testing.T) {
 				r.NoError(err)
 				r.Equal(http.StatusForbidden, list.StatusCode())
 			})
+
 		}))
 	}))
 }
@@ -345,6 +346,84 @@ func TestAuditLogging(t *testing.T) {
 				unsuspendedEvent, err := event.AsAuditEventAccountUnsuspended()
 				r.NoError(err)
 				a.Equal(openapi.Identifier(member.ID.String()), unsuspendedEvent.AccountId)
+			})
+
+			t.Run("logs_moderation_note_create_and_delete", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				memberCtx, member := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+				_ = sh.WithSession(memberCtx)
+
+				createResp, err := cl.AccountModerationNoteCreateWithResponse(
+					adminCtx,
+					member.ID.String(),
+					openapi.AccountModerationNoteCreateJSONRequestBody{
+						Content: "Moderator audit regression test note",
+					},
+					adminSession,
+				)
+				tests.Ok(t, err, createResp)
+				r.NotNil(createResp.JSON200)
+
+				deleteResp, err := cl.AccountModerationNoteDeleteWithResponse(
+					adminCtx,
+					member.ID.String(),
+					string(createResp.JSON200.Id),
+					adminSession,
+				)
+				r.NoError(err)
+				a.Equal(http.StatusNoContent, deleteResp.StatusCode())
+
+				time.Sleep(100 * time.Millisecond)
+
+				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
+				tests.Ok(t, err, list)
+				r.NotNil(list.JSON200)
+				r.NotNil(list.JSON200.Events)
+
+				createdEvent, foundCreated := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.ModerationNoteCreated {
+						return false
+					}
+
+					evt, err := e.AsAuditEventModerationNoteCreated()
+					if err != nil {
+						return false
+					}
+
+					return evt.AccountId == openapi.Identifier(member.ID.String()) &&
+						evt.NoteId == createResp.JSON200.Id
+				})
+				r.True(foundCreated, "Should find moderation_note_created event in audit log")
+
+				createdTyped, err := createdEvent.AsAuditEventModerationNoteCreated()
+				r.NoError(err)
+				a.Equal(openapi.Identifier(member.ID.String()), createdTyped.AccountId)
+				a.Equal(createResp.JSON200.Id, createdTyped.NoteId)
+
+				deletedEvent, foundDeleted := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+					if e.Type != openapi.ModerationNoteDeleted {
+						return false
+					}
+
+					evt, err := e.AsAuditEventModerationNoteDeleted()
+					if err != nil {
+						return false
+					}
+
+					return evt.AccountId == openapi.Identifier(member.ID.String()) &&
+						evt.NoteId == createResp.JSON200.Id
+				})
+				r.True(foundDeleted, "Should find moderation_note_deleted event in audit log")
+
+				deletedTyped, err := deletedEvent.AsAuditEventModerationNoteDeleted()
+				r.NoError(err)
+				a.Equal(openapi.Identifier(member.ID.String()), deletedTyped.AccountId)
+				a.Equal(createResp.JSON200.Id, deletedTyped.NoteId)
 			})
 		}))
 	}))

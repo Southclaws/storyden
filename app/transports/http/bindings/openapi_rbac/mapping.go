@@ -282,6 +282,18 @@ func (m *Mapping) AccountGetAvatar() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) AccountModerationNoteList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionViewModerationNotes
+}
+
+func (m *Mapping) AccountModerationNoteCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageModerationNotes
+}
+
+func (m *Mapping) AccountModerationNoteDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageModerationNotes
+}
+
 func (m *Mapping) AccountAddRole() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }

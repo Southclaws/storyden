@@ -325,6 +325,30 @@ Payload fields:
 | `event` | `string, const EventAccountUnsuspended` | Yes | - |
 | `id` | `string (accountID)` | Yes | Account ID |
 
+### EventModerationNoteCreated
+
+Emitted when a moderator creates an internal account moderation note.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventModerationNoteCreated` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Target account ID |
+| `note_id` | `string (xid)` | Yes | Moderation note ID |
+
+### EventModerationNoteDeleted
+
+Emitted when a moderator deletes an internal account moderation note.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventModerationNoteDeleted` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Target account ID |
+| `note_id` | `string (xid)` | Yes | Moderation note ID |
+
 ### EventReportCreated
 
 Emitted when a new member or system report is created.

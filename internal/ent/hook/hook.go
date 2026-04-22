@@ -213,6 +213,18 @@ func (f MentionProfileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Val
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MentionProfileMutation", m)
 }
 
+// The ModerationNoteFunc type is an adapter to allow the use of ordinary
+// function as ModerationNote mutator.
+type ModerationNoteFunc func(context.Context, *ent.ModerationNoteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ModerationNoteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ModerationNoteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ModerationNoteMutation", m)
+}
+
 // The NodeFunc type is an adapter to allow the use of ordinary
 // function as Node mutator.
 type NodeFunc func(context.Context, *ent.NodeMutation) (ent.Value, error)

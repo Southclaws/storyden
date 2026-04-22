@@ -242,6 +242,24 @@ func (p *Plugin) OnAccountUnsuspended(handler func(context.Context, *rpc.EventAc
 	})
 }
 
+func (p *Plugin) OnModerationNoteCreated(handler func(context.Context, *rpc.EventModerationNoteCreated) error) {
+	p.On("EventModerationNoteCreated", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventModerationNoteCreated); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnModerationNoteDeleted(handler func(context.Context, *rpc.EventModerationNoteDeleted) error) {
+	p.On("EventModerationNoteDeleted", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventModerationNoteDeleted); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
 func (p *Plugin) OnReportCreated(handler func(context.Context, *rpc.EventReportCreated) error) {
 	p.On("EventReportCreated", func(ctx context.Context, event rpc.EventPayload) error {
 		if e, ok := event.EventPayloadUnion.(*rpc.EventReportCreated); ok {

@@ -57,6 +57,9 @@ type Link func(*sql.Selector)
 // MentionProfile is the predicate function for mentionprofile builders.
 type MentionProfile func(*sql.Selector)
 
+// ModerationNote is the predicate function for moderationnote builders.
+type ModerationNote func(*sql.Selector)
+
 // Node is the predicate function for node builders.
 type Node func(*sql.Selector)
 

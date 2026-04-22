@@ -155,11 +155,13 @@ type AuditEventItemProps = {
 };
 
 function AuditEventItem({ event }: AuditEventItemProps) {
+  const eventLabel = EVENT_TYPE_LABELS[event.type] ?? event.type;
+
   return (
     <li className={cardBox()}>
       <LStack gap="2">
         <WStack gap="2" alignItems="center">
-          <Badge>{EVENT_TYPE_LABELS[event.type]}</Badge>
+          <Badge>{eventLabel}</Badge>
           <styled.time fontSize="xs" color="fg.muted">
             {formatDate(event.timestamp, "PPpp")}
           </styled.time>
@@ -237,6 +239,25 @@ function EventDetails({ event }: { event: AuditEvent }) {
             <code>{event.account_id}</code>
           </Link>
         </styled.p>
+      );
+
+    case AuditEventType.moderation_note_created:
+    case AuditEventType.moderation_note_deleted:
+      return (
+        <LStack gap="1">
+          <styled.p fontSize="sm" color="fg.subtle">
+            Account:{" "}
+            <Link
+              href={`/m/${event.account_id}`}
+              className={css({ textDecoration: "underline" })}
+            >
+              <code>{event.account_id}</code>
+            </Link>
+          </styled.p>
+          <styled.p fontSize="sm" color="fg.subtle">
+            Note: <code>{event.note_id}</code>
+          </styled.p>
+        </LStack>
       );
 
     case AuditEventType.account_content_purged:

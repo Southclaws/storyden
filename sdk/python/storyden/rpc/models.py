@@ -43,6 +43,8 @@ class Event(str, Enum):
     EVENTACCOUNTUPDATED = "EventAccountUpdated"
     EVENTACCOUNTSUSPENDED = "EventAccountSuspended"
     EVENTACCOUNTUNSUSPENDED = "EventAccountUnsuspended"
+    EVENTMODERATIONNOTECREATED = "EventModerationNoteCreated"
+    EVENTMODERATIONNOTEDELETED = "EventModerationNoteDeleted"
     EVENTREPORTCREATED = "EventReportCreated"
     EVENTREPORTUPDATED = "EventReportUpdated"
     EVENTACTIVITYCREATED = "EventActivityCreated"
@@ -332,6 +334,28 @@ class EventAccountUnsuspended(BaseModel):
     id: str
 
 
+"""Emitted when a moderator creates an internal account moderation note."""
+
+class EventModerationNoteCreated(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventModerationNoteCreated"]
+    """Target account ID"""
+    account_id: str
+    """Moderation note ID"""
+    note_id: str
+
+
+"""Emitted when a moderator deletes an internal account moderation note."""
+
+class EventModerationNoteDeleted(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventModerationNoteDeleted"]
+    """Target account ID"""
+    account_id: str
+    """Moderation note ID"""
+    note_id: str
+
+
 """Emitted when a new member or system report is created."""
 
 class EventReportCreated(BaseModel):
@@ -407,7 +431,7 @@ class EventSettingsUpdated(BaseModel):
     settings: Dict[str, Any]
 
 EventPayload = Annotated[
-    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
+    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
     Field(discriminator="event"),
 ]
 

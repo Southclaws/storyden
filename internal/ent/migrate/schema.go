@@ -588,6 +588,34 @@ var (
 			},
 		},
 	}
+	// ModerationNotesColumns holds the columns for the "moderation_notes" table.
+	ModerationNotesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "content", Type: field.TypeString, Size: 2000},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "author_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// ModerationNotesTable holds the schema information for the "moderation_notes" table.
+	ModerationNotesTable = &schema.Table{
+		Name:       "moderation_notes",
+		Columns:    ModerationNotesColumns,
+		PrimaryKey: []*schema.Column{ModerationNotesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "moderation_notes_accounts_moderation_notes",
+				Columns:    []*schema.Column{ModerationNotesColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "moderation_notes_accounts_authored_moderation_notes",
+				Columns:    []*schema.Column{ModerationNotesColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// NodesColumns holds the columns for the "nodes" table.
 	NodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1296,6 +1324,7 @@ var (
 		LikePostsTable,
 		LinksTable,
 		MentionProfilesTable,
+		ModerationNotesTable,
 		NodesTable,
 		NotificationsTable,
 		PluginsTable,
@@ -1352,6 +1381,8 @@ func init() {
 	LinksTable.ForeignKeys[1].RefTable = AssetsTable
 	MentionProfilesTable.ForeignKeys[0].RefTable = AccountsTable
 	MentionProfilesTable.ForeignKeys[1].RefTable = PostsTable
+	ModerationNotesTable.ForeignKeys[0].RefTable = AccountsTable
+	ModerationNotesTable.ForeignKeys[1].RefTable = AccountsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable

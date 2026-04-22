@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -589,21 +590,21 @@ func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
 		})
 
 	case audit.EventTypeAccountSuspended:
-		accountID := in.Metadata["account_id"].(string)
+		accountID := metadataString(in.Metadata, "account_id")
 		err = out.FromAuditEventAccountSuspended(openapi.AuditEventAccountSuspended{
 			Type:      openapi.AccountSuspended,
 			AccountId: openapi.Identifier(accountID),
 		})
 
 	case audit.EventTypeAccountUnsuspended:
-		accountID := in.Metadata["account_id"].(string)
+		accountID := metadataString(in.Metadata, "account_id")
 		err = out.FromAuditEventAccountUnsuspended(openapi.AuditEventAccountUnsuspended{
 			Type:      openapi.AccountUnsuspended,
 			AccountId: openapi.Identifier(accountID),
 		})
 
 	case audit.EventTypeAccountContentPurged:
-		accountID := in.Metadata["account_id"].(string)
+		accountID := metadataString(in.Metadata, "account_id")
 		var included []openapi.ModerationActionPurgeAccountContentType
 		if inc, ok := in.Metadata["included"].([]interface{}); ok {
 			for _, item := range inc {
@@ -617,6 +618,24 @@ func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
 			Type:      openapi.AccountContentPurged,
 			AccountId: openapi.Identifier(accountID),
 			Included:  &included,
+		})
+
+	case audit.EventTypeModerationNoteCreated:
+		accountID := metadataString(in.Metadata, "account_id")
+		noteID := metadataString(in.Metadata, "note_id")
+		err = out.FromAuditEventModerationNoteCreated(openapi.AuditEventModerationNoteCreated{
+			Type:      openapi.ModerationNoteCreated,
+			AccountId: openapi.Identifier(accountID),
+			NoteId:    openapi.Identifier(noteID),
+		})
+
+	case audit.EventTypeModerationNoteDeleted:
+		accountID := metadataString(in.Metadata, "account_id")
+		noteID := metadataString(in.Metadata, "note_id")
+		err = out.FromAuditEventModerationNoteDeleted(openapi.AuditEventModerationNoteDeleted{
+			Type:      openapi.ModerationNoteDeleted,
+			AccountId: openapi.Identifier(accountID),
+			NoteId:    openapi.Identifier(noteID),
 		})
 	}
 
@@ -639,5 +658,25 @@ func serialiseAuditEventProps(in *audit.AuditLog) openapi.AuditEventProps {
 		Type:      openapi.AuditEventType(in.Type.String()),
 		Timestamp: in.CreatedAt,
 		EnactedBy: enactedBy,
+	}
+}
+
+func metadataString(metadata map[string]any, key string) string {
+	if metadata == nil {
+		return ""
+	}
+
+	value, ok := metadata[key]
+	if !ok || value == nil {
+		return ""
+	}
+
+	switch v := value.(type) {
+	case string:
+		return v
+	case fmt.Stringer:
+		return v.String()
+	default:
+		return fmt.Sprint(v)
 	}
 }
