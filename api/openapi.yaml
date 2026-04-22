@@ -1114,6 +1114,69 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
 
+  /accounts/{account_id}/warnings:
+    get:
+      operationId: AccountWarningList
+      description: |
+        List internal moderation warnings for an account. Warnings are never
+        public. Members may view their own warning history, and staff with the
+        `MANAGE_WARNINGS` permission may review warnings for any account.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AccountWarningListOK" }
+    post:
+      operationId: AccountWarningCreate
+      description: |
+        Create an internal moderation warning for an account. Requires the
+        `MANAGE_WARNINGS` permission.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/AccountWarningCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AccountWarningCreateOK" }
+
+  /accounts/{account_id}/warnings/{warning_id}:
+    patch:
+      operationId: AccountWarningUpdate
+      description: |
+        Update the reason text for an existing warning. Requires the
+        `MANAGE_WARNINGS` permission.
+      tags: [accounts]
+      parameters:
+        - { $ref: "#/components/parameters/AccountIDParam" }
+        - { $ref: "#/components/parameters/WarningIDParam" }
+      requestBody: { $ref: "#/components/requestBodies/AccountWarningUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/AccountWarningUpdateOK" }
+    delete:
+      operationId: AccountWarningDelete
+      description: |
+        Permanently delete a warning record. Requires the `MANAGE_WARNINGS`
+        permission.
+      tags: [accounts]
+      parameters:
+        - { $ref: "#/components/parameters/AccountIDParam" }
+        - { $ref: "#/components/parameters/WarningIDParam" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { description: Warning deleted. }
+
   /accounts/{account_id}/moderation-notes:
     get:
       operationId: AccountModerationNoteList
@@ -1135,7 +1198,8 @@ paths:
         and always include the author and timestamp for auditing.
       tags: [accounts]
       parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
-      requestBody: { $ref: "#/components/requestBodies/AccountModerationNoteCreate" }
+      requestBody:
+        { $ref: "#/components/requestBodies/AccountModerationNoteCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -2799,6 +2863,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    WarningIDParam:
+      description: Warning ID.
+      name: warning_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     ModerationNoteIDParam:
       description: Moderation note ID.
       name: moderation_note_id
@@ -3408,6 +3480,16 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/ModerationNoteInitialProps" }
 
+    AccountWarningCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/WarningInitialProps" }
+
+    AccountWarningUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/WarningMutableProps" }
+
     AccountSetAvatar:
       content:
         application/octet-stream:
@@ -3827,6 +3909,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ModerationNote"
+
+    AccountWarningListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/WarningListResult"
+
+    AccountWarningCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Warning"
+
+    AccountWarningUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Warning"
 
     AccountGetAvatar:
       description: OK
@@ -4889,6 +4992,9 @@ components:
         - account_content_purged
         - moderation_note_created
         - moderation_note_deleted
+        - account_warned
+        - account_warning_updated
+        - account_warning_deleted
 
     AuditEventProps:
       required: [id, type, timestamp]
@@ -4913,6 +5019,9 @@ components:
           account_content_purged: "#/components/schemas/AuditEventAccountContentPurged"
           moderation_note_created: "#/components/schemas/AuditEventModerationNoteCreated"
           moderation_note_deleted: "#/components/schemas/AuditEventModerationNoteDeleted"
+          account_warned: "#/components/schemas/AuditEventAccountWarned"
+          account_warning_updated: "#/components/schemas/AuditEventAccountWarningUpdated"
+          account_warning_deleted: "#/components/schemas/AuditEventAccountWarningDeleted"
       oneOf:
         - $ref: "#/components/schemas/AuditEventThreadDeleted"
         - $ref: "#/components/schemas/AuditEventThreadReplyDeleted"
@@ -4921,6 +5030,9 @@ components:
         - $ref: "#/components/schemas/AuditEventAccountContentPurged"
         - $ref: "#/components/schemas/AuditEventModerationNoteCreated"
         - $ref: "#/components/schemas/AuditEventModerationNoteDeleted"
+        - $ref: "#/components/schemas/AuditEventAccountWarned"
+        - $ref: "#/components/schemas/AuditEventAccountWarningUpdated"
+        - $ref: "#/components/schemas/AuditEventAccountWarningDeleted"
 
     AuditEventThreadDeleted:
       type: object
@@ -4974,6 +5086,32 @@ components:
         type: { $ref: "#/components/schemas/AuditEventType" }
         account_id: { $ref: "#/components/schemas/Identifier" }
         note_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountWarned:
+      type: object
+      required: [type, account_id, warning_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        warning_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountWarningUpdated:
+      type: object
+      required: [type, account_id, warning_id, previous_reason, reason]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        warning_id: { $ref: "#/components/schemas/Identifier" }
+        previous_reason: { $ref: "#/components/schemas/WarningReason" }
+        reason: { $ref: "#/components/schemas/WarningReason" }
+
+    AuditEventAccountWarningDeleted:
+      type: object
+      required: [type, account_id, warning_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        warning_id: { $ref: "#/components/schemas/Identifier" }
 
     AuditEventList:
       type: array
@@ -5558,6 +5696,7 @@ components:
         - "USE_PERSONAL_ACCESS_KEYS"
         # Administrative (Settings, bans, etc)
         - "MANAGE_SETTINGS"
+        - "MANAGE_WARNINGS"
         - "MANAGE_SUSPENSIONS"
         - "MANAGE_ROLES"
         - "MANAGE_REPORTS"
@@ -6191,6 +6330,64 @@ components:
         notes:
           $ref: "#/components/schemas/ModerationNoteList"
 
+    Warning:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/WarningMetadata"
+        - $ref: "#/components/schemas/WarningProps"
+
+    WarningProps:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          $ref: "#/components/schemas/WarningReason"
+        issued_by:
+          $ref: "#/components/schemas/ProfileReference"
+
+    WarningMetadata:
+      type: object
+      required: [id, issued_at]
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+        issued_at:
+          type: string
+          format: date-time
+
+    WarningInitialProps:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          $ref: "#/components/schemas/WarningReason"
+
+    WarningMutableProps:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          $ref: "#/components/schemas/WarningReason"
+
+    WarningReason:
+      type: string
+      minLength: 1
+      maxLength: 2000
+
+    WarningList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Warning"
+
+    WarningListResult:
+      type: object
+      required: [warnings, total]
+      properties:
+        warnings:
+          $ref: "#/components/schemas/WarningList"
+        total:
+          type: integer
+
     AccountAuthMethodList:
       type: array
       items: { $ref: "#/components/schemas/AccountAuthMethod" }
@@ -6370,6 +6567,7 @@ components:
         - attendee_removed
         - report_submitted
         - report_updated
+        - warning_issued
 
     NotificationStatus:
       type: string

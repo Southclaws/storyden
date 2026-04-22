@@ -66,6 +66,10 @@ type OperationPermissions interface {
 	AccountGet() (bool, *rbac.Permission)
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountView() (bool, *rbac.Permission)
+	AccountWarningList() (bool, *rbac.Permission)
+	AccountWarningCreate() (bool, *rbac.Permission)
+	AccountWarningUpdate() (bool, *rbac.Permission)
+	AccountWarningDelete() (bool, *rbac.Permission)
 	AccountModerationNoteList() (bool, *rbac.Permission)
 	AccountModerationNoteCreate() (bool, *rbac.Permission)
 	AccountModerationNoteDelete() (bool, *rbac.Permission)
@@ -290,6 +294,14 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountUpdate()
 	case "AccountView":
 		return optable.AccountView()
+	case "AccountWarningList":
+		return optable.AccountWarningList()
+	case "AccountWarningCreate":
+		return optable.AccountWarningCreate()
+	case "AccountWarningUpdate":
+		return optable.AccountWarningUpdate()
+	case "AccountWarningDelete":
+		return optable.AccountWarningDelete()
 	case "AccountModerationNoteList":
 		return optable.AccountModerationNoteList()
 	case "AccountModerationNoteCreate":

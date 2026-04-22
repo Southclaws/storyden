@@ -17,4 +17,5 @@ const (
 	eventAttendeeRemoved      eventEnum = `attendee_removed`
 	eventReportSubmitted      eventEnum = "report_submitted"
 	eventReportUpdated        eventEnum = "report_updated"
+	eventWarningIssued        eventEnum = "warning_issued"
 )

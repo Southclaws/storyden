@@ -349,6 +349,47 @@ Payload fields:
 | `account_id` | `string (accountID)` | Yes | Target account ID |
 | `note_id` | `string (xid)` | Yes | Moderation note ID |
 
+### EventAccountWarned
+
+Emitted when a moderation warning is issued to an account.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventAccountWarned` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Account ID that received the warning. |
+| `author_id` | `string (accountID)` | Yes | Account ID that issued the warning. |
+| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+
+### EventAccountWarningUpdated
+
+Emitted when a moderation warning is edited.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventAccountWarningUpdated` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Account ID whose warning was edited. |
+| `author_id` | `string (accountID)` | Yes | Account ID that edited the warning. |
+| `previous_reason` | `string` | Yes | Warning reason before the edit. |
+| `reason` | `string` | Yes | Updated warning reason. |
+| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+
+### EventAccountWarningDeleted
+
+Emitted when a moderation warning is permanently deleted.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventAccountWarningDeleted` | Yes | - |
+| `account_id` | `string (accountID)` | Yes | Account ID whose warning was deleted. |
+| `author_id` | `string (accountID)` | Yes | Account ID that deleted the warning. |
+| `warning_id` | `string (identifier)` | Yes | Warning record ID. |
+
 ### EventReportCreated
 
 Emitted when a new member or system report is created.

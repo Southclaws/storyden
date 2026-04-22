@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 import { useSession } from "src/auth";
 
-import { ProfileReference } from "@/api/openapi-schema";
+import { Permission, ProfileReference } from "@/api/openapi-schema";
 import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
@@ -15,6 +15,7 @@ import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 import { MemberIdent } from "../MemberBadge/MemberIdent";
 import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
+import { MemberWarningTrigger } from "../MemberWarning/MemberWarningTrigger";
 
 export type Props = {
   profile: ProfileReference;
@@ -33,8 +34,9 @@ export function MemberOptionsMenu({
 
   const isSelf = session?.id === profile.id;
 
-  const isSuspendEnabled =
-    !isSelf && hasPermission(session, "MANAGE_SUSPENSIONS");
+  const canWarn = !isSelf && hasPermission(session, Permission.MANAGE_WARNINGS);
+  const canSuspend =
+    !isSelf && hasPermission(session, Permission.MANAGE_SUSPENSIONS);
 
   const isRoleChangeEnabled = hasPermission(session, "MANAGE_ROLES");
 
@@ -81,7 +83,19 @@ export function MemberOptionsMenu({
 
               {isRoleChangeEnabled && <MemberRoleMenu profile={profile} />}
 
-              {isSuspendEnabled && (
+              {canWarn && (
+                <MemberWarningTrigger profile={profile}>
+                  <Menu.Item
+                    value="warn"
+                    color="fg.warning"
+                    _hover={{ color: "fg.warning", background: "bg.warning" }}
+                  >
+                    Warn member
+                  </Menu.Item>
+                </MemberWarningTrigger>
+              )}
+
+              {canSuspend && (
                 <MemberSuspensionTrigger profile={profile}>
                   <Menu.Item
                     value="suspend"

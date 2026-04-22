@@ -37,6 +37,7 @@ var writePermissions = []Permission{
 	PermissionCollectionSubmit,
 	PermissionUsePersonalAccessKeys,
 	PermissionManageSettings,
+	PermissionManageWarnings,
 	PermissionManageSuspensions,
 	PermissionManageRoles,
 	PermissionViewAccounts,

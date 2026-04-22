@@ -260,6 +260,33 @@ func (p *Plugin) OnModerationNoteDeleted(handler func(context.Context, *rpc.Even
 	})
 }
 
+func (p *Plugin) OnAccountWarned(handler func(context.Context, *rpc.EventAccountWarned) error) {
+	p.On("EventAccountWarned", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventAccountWarned); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnAccountWarningUpdated(handler func(context.Context, *rpc.EventAccountWarningUpdated) error) {
+	p.On("EventAccountWarningUpdated", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventAccountWarningUpdated); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnAccountWarningDeleted(handler func(context.Context, *rpc.EventAccountWarningDeleted) error) {
+	p.On("EventAccountWarningDeleted", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventAccountWarningDeleted); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
 func (p *Plugin) OnReportCreated(handler func(context.Context, *rpc.EventReportCreated) error) {
 	p.On("EventReportCreated", func(ctx context.Context, event rpc.EventPayload) error {
 		if e, ok := event.EventPayloadUnion.(*rpc.EventReportCreated); ok {

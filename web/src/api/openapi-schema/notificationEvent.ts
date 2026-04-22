@@ -29,4 +29,5 @@ export const NotificationEvent = {
   attendee_removed: "attendee_removed",
   report_submitted: "report_submitted",
   report_updated: "report_updated",
+  warning_issued: "warning_issued",
 } as const;

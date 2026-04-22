@@ -130,7 +130,14 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("moderation_notes", ModerationNote.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("authored_moderation_notes", ModerationNote.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("warnings", Warning.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("authored_warnings", Warning.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

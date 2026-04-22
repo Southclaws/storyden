@@ -25,6 +25,11 @@ import type {
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
+  AccountWarningCreateBody,
+  AccountWarningCreateOKResponse,
+  AccountWarningListOKResponse,
+  AccountWarningUpdateBody,
+  AccountWarningUpdateOKResponse,
   BadRequestResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
@@ -192,6 +197,276 @@ export const useAccountView = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List internal moderation warnings for an account. Warnings are never
+public. Members may view their own warning history, and staff with the
+`MANAGE_WARNINGS` permission may review warnings for any account.
+
+ */
+export const accountWarningList = (accountId: string) => {
+  return fetcher<AccountWarningListOKResponse>({
+    url: `/accounts/${accountId}/warnings`,
+    method: "GET",
+  });
+};
+
+export const getAccountWarningListKey = (accountId: string) =>
+  [`/accounts/${accountId}/warnings`] as const;
+
+export type AccountWarningListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountWarningList>>
+>;
+export type AccountWarningListQueryError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountWarningList = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof accountWarningList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!accountId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAccountWarningListKey(accountId) : null));
+  const swrFn = () => accountWarningList(accountId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create an internal moderation warning for an account. Requires the
+`MANAGE_WARNINGS` permission.
+
+ */
+export const accountWarningCreate = (
+  accountId: string,
+  accountWarningCreateBody: AccountWarningCreateBody,
+) => {
+  return fetcher<AccountWarningCreateOKResponse>({
+    url: `/accounts/${accountId}/warnings`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accountWarningCreateBody,
+  });
+};
+
+export const getAccountWarningCreateMutationFetcher = (accountId: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountWarningCreateBody },
+  ): Promise<AccountWarningCreateOKResponse> => {
+    return accountWarningCreate(accountId, arg);
+  };
+};
+export const getAccountWarningCreateMutationKey = (accountId: string) =>
+  [`/accounts/${accountId}/warnings`] as const;
+
+export type AccountWarningCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountWarningCreate>>
+>;
+export type AccountWarningCreateMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountWarningCreate = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountWarningCreate>>,
+      TError,
+      Key,
+      AccountWarningCreateBody,
+      Awaited<ReturnType<typeof accountWarningCreate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountWarningCreateMutationKey(accountId);
+  const swrFn = getAccountWarningCreateMutationFetcher(accountId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the reason text for an existing warning. Requires the
+`MANAGE_WARNINGS` permission.
+
+ */
+export const accountWarningUpdate = (
+  accountId: string,
+  warningId: string,
+  accountWarningUpdateBody: AccountWarningUpdateBody,
+) => {
+  return fetcher<AccountWarningUpdateOKResponse>({
+    url: `/accounts/${accountId}/warnings/${warningId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: accountWarningUpdateBody,
+  });
+};
+
+export const getAccountWarningUpdateMutationFetcher = (
+  accountId: string,
+  warningId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountWarningUpdateBody },
+  ): Promise<AccountWarningUpdateOKResponse> => {
+    return accountWarningUpdate(accountId, warningId, arg);
+  };
+};
+export const getAccountWarningUpdateMutationKey = (
+  accountId: string,
+  warningId: string,
+) => [`/accounts/${accountId}/warnings/${warningId}`] as const;
+
+export type AccountWarningUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountWarningUpdate>>
+>;
+export type AccountWarningUpdateMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountWarningUpdate = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  warningId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountWarningUpdate>>,
+      TError,
+      Key,
+      AccountWarningUpdateBody,
+      Awaited<ReturnType<typeof accountWarningUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountWarningUpdateMutationKey(accountId, warningId);
+  const swrFn = getAccountWarningUpdateMutationFetcher(accountId, warningId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Permanently delete a warning record. Requires the `MANAGE_WARNINGS`
+permission.
+
+ */
+export const accountWarningDelete = (accountId: string, warningId: string) => {
+  return fetcher<void>({
+    url: `/accounts/${accountId}/warnings/${warningId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAccountWarningDeleteMutationFetcher = (
+  accountId: string,
+  warningId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<void> => {
+    return accountWarningDelete(accountId, warningId);
+  };
+};
+export const getAccountWarningDeleteMutationKey = (
+  accountId: string,
+  warningId: string,
+) => [`/accounts/${accountId}/warnings/${warningId}`] as const;
+
+export type AccountWarningDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountWarningDelete>>
+>;
+export type AccountWarningDeleteMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountWarningDelete = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  warningId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountWarningDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof accountWarningDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountWarningDeleteMutationKey(accountId, warningId);
+  const swrFn = getAccountWarningDeleteMutationFetcher(accountId, warningId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

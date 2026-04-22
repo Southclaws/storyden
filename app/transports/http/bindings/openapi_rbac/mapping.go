@@ -282,6 +282,22 @@ func (m *Mapping) AccountGetAvatar() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) AccountWarningList() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) AccountWarningCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageWarnings
+}
+
+func (m *Mapping) AccountWarningUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageWarnings
+}
+
+func (m *Mapping) AccountWarningDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageWarnings
+}
+
 func (m *Mapping) AccountModerationNoteList() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionViewModerationNotes
 }

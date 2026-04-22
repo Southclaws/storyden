@@ -49,6 +49,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/warning"
 
 	stdsql "database/sql"
 )
@@ -124,6 +125,8 @@ type Client struct {
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
+	// Warning is the client for interacting with the Warning builders.
+	Warning *WarningClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -168,6 +171,7 @@ func (c *Client) init() {
 	c.Session = NewSessionClient(c.config)
 	c.Setting = NewSettingClient(c.config)
 	c.Tag = NewTagClient(c.config)
+	c.Warning = NewWarningClient(c.config)
 }
 
 type (
@@ -293,6 +297,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Session:             NewSessionClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tag:                 NewTagClient(cfg),
+		Warning:             NewWarningClient(cfg),
 	}, nil
 }
 
@@ -345,6 +350,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Session:             NewSessionClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tag:                 NewTagClient(cfg),
+		Warning:             NewWarningClient(cfg),
 	}, nil
 }
 
@@ -379,7 +385,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
 		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag,
+		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -394,7 +400,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
 		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag,
+		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -469,6 +475,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Setting.mutate(ctx, m)
 	case *TagMutation:
 		return c.Tag.mutate(ctx, m)
+	case *WarningMutation:
+		return c.Warning.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -1007,6 +1015,38 @@ func (c *AccountClient) QueryAuthoredModerationNotes(_m *Account) *ModerationNot
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(moderationnote.Table, moderationnote.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthoredModerationNotesTable, account.AuthoredModerationNotesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWarnings queries the warnings edge of a Account.
+func (c *AccountClient) QueryWarnings(_m *Account) *WarningQuery {
+	query := (&WarningClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(warning.Table, warning.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.WarningsTable, account.WarningsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthoredWarnings queries the authored_warnings edge of a Account.
+func (c *AccountClient) QueryAuthoredWarnings(_m *Account) *WarningQuery {
+	query := (&WarningClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(warning.Table, warning.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthoredWarningsTable, account.AuthoredWarningsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -6813,6 +6853,171 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 	}
 }
 
+// WarningClient is a client for the Warning schema.
+type WarningClient struct {
+	config
+}
+
+// NewWarningClient returns a client for the Warning from the given config.
+func NewWarningClient(c config) *WarningClient {
+	return &WarningClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `warning.Hooks(f(g(h())))`.
+func (c *WarningClient) Use(hooks ...Hook) {
+	c.hooks.Warning = append(c.hooks.Warning, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `warning.Intercept(f(g(h())))`.
+func (c *WarningClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Warning = append(c.inters.Warning, interceptors...)
+}
+
+// Create returns a builder for creating a Warning entity.
+func (c *WarningClient) Create() *WarningCreate {
+	mutation := newWarningMutation(c.config, OpCreate)
+	return &WarningCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Warning entities.
+func (c *WarningClient) CreateBulk(builders ...*WarningCreate) *WarningCreateBulk {
+	return &WarningCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WarningClient) MapCreateBulk(slice any, setFunc func(*WarningCreate, int)) *WarningCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WarningCreateBulk{err: fmt.Errorf("calling to WarningClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WarningCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WarningCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Warning.
+func (c *WarningClient) Update() *WarningUpdate {
+	mutation := newWarningMutation(c.config, OpUpdate)
+	return &WarningUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WarningClient) UpdateOne(_m *Warning) *WarningUpdateOne {
+	mutation := newWarningMutation(c.config, OpUpdateOne, withWarning(_m))
+	return &WarningUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WarningClient) UpdateOneID(id xid.ID) *WarningUpdateOne {
+	mutation := newWarningMutation(c.config, OpUpdateOne, withWarningID(id))
+	return &WarningUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Warning.
+func (c *WarningClient) Delete() *WarningDelete {
+	mutation := newWarningMutation(c.config, OpDelete)
+	return &WarningDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WarningClient) DeleteOne(_m *Warning) *WarningDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WarningClient) DeleteOneID(id xid.ID) *WarningDeleteOne {
+	builder := c.Delete().Where(warning.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WarningDeleteOne{builder}
+}
+
+// Query returns a query builder for Warning.
+func (c *WarningClient) Query() *WarningQuery {
+	return &WarningQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWarning},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Warning entity by its id.
+func (c *WarningClient) Get(ctx context.Context, id xid.ID) (*Warning, error) {
+	return c.Query().Where(warning.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WarningClient) GetX(ctx context.Context, id xid.ID) *Warning {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a Warning.
+func (c *WarningClient) QueryAccount(_m *Warning) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(warning.Table, warning.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, warning.AccountTable, warning.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthor queries the author edge of a Warning.
+func (c *WarningClient) QueryAuthor(_m *Warning) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(warning.Table, warning.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, warning.AuthorTable, warning.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WarningClient) Hooks() []Hook {
+	return c.hooks.Warning
+}
+
+// Interceptors returns the client interceptors.
+func (c *WarningClient) Interceptors() []Interceptor {
+	return c.inters.Warning
+}
+
+func (c *WarningClient) mutate(ctx context.Context, m *WarningMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WarningCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WarningUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WarningUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WarningDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Warning mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
@@ -6820,14 +7025,14 @@ type (
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
 		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
 		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
-		Question, React, Report, Role, Session, Setting, Tag []ent.Hook
+		Question, React, Report, Role, Session, Setting, Tag, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
 		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
 		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
-		Question, React, Report, Role, Session, Setting, Tag []ent.Interceptor
+		Question, React, Report, Role, Session, Setting, Tag, Warning []ent.Interceptor
 	}
 )
 

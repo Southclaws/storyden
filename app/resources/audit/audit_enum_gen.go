@@ -19,6 +19,9 @@ var (
 	EventTypeAccountContentPurged  = EventType{eventTypeAccountContentPurged}
 	EventTypeModerationNoteCreated = EventType{eventTypeModerationNoteCreated}
 	EventTypeModerationNoteDeleted = EventType{eventTypeModerationNoteDeleted}
+	EventTypeAccountWarned         = EventType{eventTypeAccountWarned}
+	EventTypeAccountWarningUpdated = EventType{eventTypeAccountWarningUpdated}
+	EventTypeAccountWarningDeleted = EventType{eventTypeAccountWarningDeleted}
 )
 
 func (r EventType) Format(f fmt.State, verb rune) {
@@ -72,6 +75,12 @@ func NewEventType(__iNpUt__ string) (EventType, error) {
 		return EventTypeModerationNoteCreated, nil
 	case string(eventTypeModerationNoteDeleted):
 		return EventTypeModerationNoteDeleted, nil
+	case string(eventTypeAccountWarned):
+		return EventTypeAccountWarned, nil
+	case string(eventTypeAccountWarningUpdated):
+		return EventTypeAccountWarningUpdated, nil
+	case string(eventTypeAccountWarningDeleted):
+		return EventTypeAccountWarningDeleted, nil
 	default:
 		return EventType{}, fmt.Errorf("invalid value for type 'EventType': '%s'", __iNpUt__)
 	}

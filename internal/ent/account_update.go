@@ -38,6 +38,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
 
@@ -656,6 +657,36 @@ func (_u *AccountUpdate) AddAuthoredModerationNotes(v ...*ModerationNote) *Accou
 	return _u.AddAuthoredModerationNoteIDs(ids...)
 }
 
+// AddWarningIDs adds the "warnings" edge to the Warning entity by IDs.
+func (_u *AccountUpdate) AddWarningIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddWarningIDs(ids...)
+	return _u
+}
+
+// AddWarnings adds the "warnings" edges to the Warning entity.
+func (_u *AccountUpdate) AddWarnings(v ...*Warning) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddWarningIDs(ids...)
+}
+
+// AddAuthoredWarningIDs adds the "authored_warnings" edge to the Warning entity by IDs.
+func (_u *AccountUpdate) AddAuthoredWarningIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddAuthoredWarningIDs(ids...)
+	return _u
+}
+
+// AddAuthoredWarnings adds the "authored_warnings" edges to the Warning entity.
+func (_u *AccountUpdate) AddAuthoredWarnings(v ...*Warning) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAuthoredWarningIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -1226,6 +1257,48 @@ func (_u *AccountUpdate) RemoveAuthoredModerationNotes(v ...*ModerationNote) *Ac
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthoredModerationNoteIDs(ids...)
+}
+
+// ClearWarnings clears all "warnings" edges to the Warning entity.
+func (_u *AccountUpdate) ClearWarnings() *AccountUpdate {
+	_u.mutation.ClearWarnings()
+	return _u
+}
+
+// RemoveWarningIDs removes the "warnings" edge to Warning entities by IDs.
+func (_u *AccountUpdate) RemoveWarningIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveWarningIDs(ids...)
+	return _u
+}
+
+// RemoveWarnings removes "warnings" edges to Warning entities.
+func (_u *AccountUpdate) RemoveWarnings(v ...*Warning) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveWarningIDs(ids...)
+}
+
+// ClearAuthoredWarnings clears all "authored_warnings" edges to the Warning entity.
+func (_u *AccountUpdate) ClearAuthoredWarnings() *AccountUpdate {
+	_u.mutation.ClearAuthoredWarnings()
+	return _u
+}
+
+// RemoveAuthoredWarningIDs removes the "authored_warnings" edge to Warning entities by IDs.
+func (_u *AccountUpdate) RemoveAuthoredWarningIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveAuthoredWarningIDs(ids...)
+	return _u
+}
+
+// RemoveAuthoredWarnings removes "authored_warnings" edges to Warning entities.
+func (_u *AccountUpdate) RemoveAuthoredWarnings(v ...*Warning) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAuthoredWarningIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -2607,6 +2680,96 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.WarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedWarningsIDs(); len(nodes) > 0 && !_u.mutation.WarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WarningsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AuthoredWarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAuthoredWarningsIDs(); len(nodes) > 0 && !_u.mutation.AuthoredWarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AuthoredWarningsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3275,6 +3438,36 @@ func (_u *AccountUpdateOne) AddAuthoredModerationNotes(v ...*ModerationNote) *Ac
 	return _u.AddAuthoredModerationNoteIDs(ids...)
 }
 
+// AddWarningIDs adds the "warnings" edge to the Warning entity by IDs.
+func (_u *AccountUpdateOne) AddWarningIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddWarningIDs(ids...)
+	return _u
+}
+
+// AddWarnings adds the "warnings" edges to the Warning entity.
+func (_u *AccountUpdateOne) AddWarnings(v ...*Warning) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddWarningIDs(ids...)
+}
+
+// AddAuthoredWarningIDs adds the "authored_warnings" edge to the Warning entity by IDs.
+func (_u *AccountUpdateOne) AddAuthoredWarningIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddAuthoredWarningIDs(ids...)
+	return _u
+}
+
+// AddAuthoredWarnings adds the "authored_warnings" edges to the Warning entity.
+func (_u *AccountUpdateOne) AddAuthoredWarnings(v ...*Warning) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddAuthoredWarningIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -3845,6 +4038,48 @@ func (_u *AccountUpdateOne) RemoveAuthoredModerationNotes(v ...*ModerationNote) 
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthoredModerationNoteIDs(ids...)
+}
+
+// ClearWarnings clears all "warnings" edges to the Warning entity.
+func (_u *AccountUpdateOne) ClearWarnings() *AccountUpdateOne {
+	_u.mutation.ClearWarnings()
+	return _u
+}
+
+// RemoveWarningIDs removes the "warnings" edge to Warning entities by IDs.
+func (_u *AccountUpdateOne) RemoveWarningIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveWarningIDs(ids...)
+	return _u
+}
+
+// RemoveWarnings removes "warnings" edges to Warning entities.
+func (_u *AccountUpdateOne) RemoveWarnings(v ...*Warning) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveWarningIDs(ids...)
+}
+
+// ClearAuthoredWarnings clears all "authored_warnings" edges to the Warning entity.
+func (_u *AccountUpdateOne) ClearAuthoredWarnings() *AccountUpdateOne {
+	_u.mutation.ClearAuthoredWarnings()
+	return _u
+}
+
+// RemoveAuthoredWarningIDs removes the "authored_warnings" edge to Warning entities by IDs.
+func (_u *AccountUpdateOne) RemoveAuthoredWarningIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveAuthoredWarningIDs(ids...)
+	return _u
+}
+
+// RemoveAuthoredWarnings removes "authored_warnings" edges to Warning entities.
+func (_u *AccountUpdateOne) RemoveAuthoredWarnings(v ...*Warning) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveAuthoredWarningIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -5249,6 +5484,96 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(moderationnote.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.WarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedWarningsIDs(); len(nodes) > 0 && !_u.mutation.WarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WarningsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.WarningsTable,
+			Columns: []string{account.WarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.AuthoredWarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedAuthoredWarningsIDs(); len(nodes) > 0 && !_u.mutation.AuthoredWarningsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.AuthoredWarningsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.AuthoredWarningsTable,
+			Columns: []string{account.AuthoredWarningsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(warning.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

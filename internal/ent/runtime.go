@@ -40,6 +40,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/warning"
 	"github.com/rs/xid"
 )
 
@@ -1254,6 +1255,55 @@ func init() {
 	// tag.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	tag.IDValidator = func() func(string) error {
 		validators := tagDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	warningMixin := schema.Warning{}.Mixin()
+	warningMixinFields0 := warningMixin[0].Fields()
+	_ = warningMixinFields0
+	warningMixinFields1 := warningMixin[1].Fields()
+	_ = warningMixinFields1
+	warningFields := schema.Warning{}.Fields()
+	_ = warningFields
+	// warningDescCreatedAt is the schema descriptor for created_at field.
+	warningDescCreatedAt := warningMixinFields1[0].Descriptor()
+	// warning.DefaultCreatedAt holds the default value on creation for the created_at field.
+	warning.DefaultCreatedAt = warningDescCreatedAt.Default.(func() time.Time)
+	// warningDescReason is the schema descriptor for reason field.
+	warningDescReason := warningFields[2].Descriptor()
+	// warning.ReasonValidator is a validator for the "reason" field. It is called by the builders before save.
+	warning.ReasonValidator = func() func(string) error {
+		validators := warningDescReason.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(reason string) error {
+			for _, fn := range fns {
+				if err := fn(reason); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// warningDescID is the schema descriptor for id field.
+	warningDescID := warningMixinFields0[0].Descriptor()
+	// warning.DefaultID holds the default value on creation for the id field.
+	warning.DefaultID = warningDescID.Default.(func() xid.ID)
+	// warning.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	warning.IDValidator = func() func(string) error {
+		validators := warningDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

@@ -20,4 +20,7 @@ export const AuditEventType = {
   account_content_purged: "account_content_purged",
   moderation_note_created: "moderation_note_created",
   moderation_note_deleted: "moderation_note_deleted",
+  account_warned: "account_warned",
+  account_warning_updated: "account_warning_updated",
+  account_warning_deleted: "account_warning_deleted",
 } as const;

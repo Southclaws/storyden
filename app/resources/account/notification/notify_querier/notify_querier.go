@@ -2,6 +2,7 @@ package notify_querier
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -15,19 +16,35 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/internal/ent"
 	entaccount "github.com/Southclaws/storyden/internal/ent/account"
 	entnotification "github.com/Southclaws/storyden/internal/ent/notification"
 )
 
 type Querier struct {
-	db           *ent.Client
-	postSearcher post_search.Repository
-	roleQuerier  *role_hydrate.Hydrator
+	db             *ent.Client
+	postSearcher   post_search.Repository
+	roleQuerier    *role_hydrate.Hydrator
+	profileQuerier *profile_querier.Querier
+	logger         *slog.Logger
 }
 
-func New(db *ent.Client, postSearcher post_search.Repository, roleQuerier *role_hydrate.Hydrator) *Querier {
-	return &Querier{db: db, postSearcher: postSearcher, roleQuerier: roleQuerier}
+func New(
+	db *ent.Client,
+	postSearcher post_search.Repository,
+	roleQuerier *role_hydrate.Hydrator,
+	profileQuerier *profile_querier.Querier,
+	logger *slog.Logger,
+) *Querier {
+	return &Querier{
+		db:             db,
+		postSearcher:   postSearcher,
+		roleQuerier:    roleQuerier,
+		profileQuerier: profileQuerier,
+		logger:         logger,
+	}
 }
 
 func (n *Querier) ListNotifications(ctx context.Context, accountID account.AccountID) (notification.Notifications, error) {
@@ -77,10 +94,30 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 	}
 	pg := lo.KeyBy(posts, func(p *post.Post) post.ID { return p.ID })
 
+	profileIDs := dt.Map(grouped[datagraph.KindProfile], func(n *notification.NotificationRef) account.AccountID {
+		return account.AccountID(n.ItemRef.OrZero().ID)
+	})
+	profiles, err := n.profileQuerier.GetMany(ctx, profileIDs...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	profileLookup := lo.KeyBy(profiles, func(p *profile.Public) account.AccountID { return p.ID })
+
 	ns := dt.Map(refs, func(r *notification.NotificationRef) *notification.Notification {
-		switch r.ItemRef.OrZero().Kind {
+		itemRef, hasItem := r.ItemRef.Get()
+		if !hasItem {
+			return &notification.Notification{
+				ID:     r.ID,
+				Event:  r.Event,
+				Source: r.Source,
+				Time:   r.Time,
+				Read:   r.Read,
+			}
+		}
+
+		switch itemRef.Kind {
 		case datagraph.KindPost:
-			p := pg[post.ID(r.ItemRef.OrZero().ID)]
+			p := pg[post.ID(itemRef.ID)]
 
 			if p == nil {
 				// Post was deleted, skip.
@@ -95,6 +132,25 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				Time:   r.Time,
 				Read:   r.Read,
 			}
+		case datagraph.KindProfile:
+			p := profileLookup[account.AccountID(itemRef.ID)]
+			if p == nil {
+				return nil
+			}
+
+			return &notification.Notification{
+				ID:     r.ID,
+				Event:  r.Event,
+				Item:   p,
+				Source: r.Source,
+				Time:   r.Time,
+				Read:   r.Read,
+			}
+		default:
+			n.logger.Warn("unsupported notification datagraph kind",
+				slog.String("notification_id", r.ID.String()),
+				slog.String("kind", itemRef.Kind.String()),
+			)
 		}
 
 		return &notification.Notification{

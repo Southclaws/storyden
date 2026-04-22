@@ -107,6 +107,78 @@ func TestAuditEventList(t *testing.T) {
 	}))
 }
 
+func TestAccountWarningUpdateAuditEvent(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+		_ *audit_logger.Service,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			memberCtx, member := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			_ = sh.WithSession(memberCtx)
+
+			createResp, err := cl.AccountWarningCreateWithResponse(
+				adminCtx,
+				member.ID.String(),
+				openapi.AccountWarningCreateJSONRequestBody{Reason: "initial warning reason"},
+				adminSession,
+			)
+			tests.Ok(t, err, createResp)
+			r.NotNil(createResp.JSON200)
+
+			updateResp, err := cl.AccountWarningUpdateWithResponse(
+				adminCtx,
+				member.ID.String(),
+				string(createResp.JSON200.Id),
+				openapi.AccountWarningUpdateJSONRequestBody{Reason: "updated warning reason"},
+				adminSession,
+			)
+			tests.Ok(t, err, updateResp)
+			r.NotNil(updateResp.JSON200)
+
+			time.Sleep(100 * time.Millisecond)
+
+			list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
+			tests.Ok(t, err, list)
+			r.NotNil(list.JSON200)
+			r.NotNil(list.JSON200.Events)
+
+			updatedEvent, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				if e.Type != openapi.AccountWarningUpdated {
+					return false
+				}
+
+				evt, err := e.AsAuditEventAccountWarningUpdated()
+				if err != nil {
+					return false
+				}
+
+				return evt.AccountId == openapi.Identifier(member.ID.String()) &&
+					evt.WarningId == createResp.JSON200.Id
+			})
+			r.True(found, "Should find account_warning_updated event in audit log")
+
+			updatedTyped, err := updatedEvent.AsAuditEventAccountWarningUpdated()
+			r.NoError(err)
+			a.Equal(openapi.Identifier(member.ID.String()), updatedTyped.AccountId)
+			a.Equal(createResp.JSON200.Id, updatedTyped.WarningId)
+			a.Equal("initial warning reason", updatedTyped.PreviousReason)
+			a.Equal("updated warning reason", updatedTyped.Reason)
+			}))
+		}))
+	}
+
 func TestAuditEventGet(t *testing.T) {
 	t.Parallel()
 

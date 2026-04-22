@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/moderation_note"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/warning"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
@@ -33,6 +34,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/avatar"
+	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -51,6 +53,7 @@ type Accounts struct {
 	accountModerationNote *account_moderation_note.Manager
 	settingsRepo          *settings.SettingsRepository
 	roleAssign            *account_role_assign.Manager
+	warnings              *warning_manager.Manager
 	webAddress            url.URL
 }
 
@@ -68,6 +71,7 @@ func NewAccounts(
 	accountModerationNote *account_moderation_note.Manager,
 	settingsRepo *settings.SettingsRepository,
 	roleAssign *account_role_assign.Manager,
+	warnings *warning_manager.Manager,
 ) Accounts {
 	return Accounts{
 		profile_cache:         profile_cache,
@@ -82,6 +86,7 @@ func NewAccounts(
 		accountModerationNote: accountModerationNote,
 		settingsRepo:          settingsRepo,
 		roleAssign:            roleAssign,
+		warnings:              warnings,
 		webAddress:            cfg.PublicWebAddress,
 	}
 }
@@ -152,6 +157,124 @@ func (i *Accounts) AccountView(ctx context.Context, request openapi.AccountViewR
 			},
 		},
 	}, nil
+}
+
+func (i *Accounts) AccountWarningList(ctx context.Context, request openapi.AccountWarningListRequestObject) (openapi.AccountWarningListResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	if _, err := i.accountManage.GetByID(ctx, account.AccountID(targetID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	viewerID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if viewerID != account.AccountID(targetID) {
+		if err := session.Authorise(ctx, nil, rbac.PermissionManageWarnings); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+		}
+	}
+
+	records, err := i.warnings.ListForAccount(ctx, account.AccountID(targetID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountWarningList200JSONResponse{
+		AccountWarningListOKJSONResponse: openapi.AccountWarningListOKJSONResponse{
+			Warnings: dt.Map(records, func(rec *warning.Warning) openapi.Warning {
+				return serialiseWarningRecord(*rec)
+			}),
+			Total: len(records),
+		},
+	}, nil
+}
+
+func (i *Accounts) AccountWarningCreate(ctx context.Context, request openapi.AccountWarningCreateRequestObject) (openapi.AccountWarningCreateResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	if _, err := i.accountManage.GetByID(ctx, account.AccountID(targetID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	enactedBy, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	result, err := i.warnings.Issue(ctx, enactedBy, account.AccountID(targetID), request.Body.Reason)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountWarningCreate200JSONResponse{
+		AccountWarningCreateOKJSONResponse: openapi.AccountWarningCreateOKJSONResponse(serialiseWarningRecord(*result)),
+	}, nil
+}
+
+func (i *Accounts) AccountWarningUpdate(ctx context.Context, request openapi.AccountWarningUpdateRequestObject) (openapi.AccountWarningUpdateResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	warningID, err := xid.FromString(request.WarningId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid warning ID", "The warning ID provided is invalid."))
+	}
+
+	if _, err := i.accountManage.GetByID(ctx, account.AccountID(targetID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	updatedBy, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	updated, err := i.warnings.UpdateReason(ctx, updatedBy, account.AccountID(targetID), warning.ID(warningID), request.Body.Reason)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountWarningUpdate200JSONResponse{
+		AccountWarningUpdateOKJSONResponse: openapi.AccountWarningUpdateOKJSONResponse(serialiseWarningRecord(*updated)),
+	}, nil
+}
+
+func (i *Accounts) AccountWarningDelete(ctx context.Context, request openapi.AccountWarningDeleteRequestObject) (openapi.AccountWarningDeleteResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	warningID, err := xid.FromString(request.WarningId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid warning ID", "The warning ID provided is invalid."))
+	}
+
+	if _, err := i.accountManage.GetByID(ctx, account.AccountID(targetID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	deletedBy, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := i.warnings.Delete(ctx, account.AccountID(targetID), warning.ID(warningID), deletedBy); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountWarningDelete204Response{}, nil
 }
 
 func (i *Accounts) AccountModerationNoteList(ctx context.Context, request openapi.AccountModerationNoteListRequestObject) (openapi.AccountModerationNoteListResponseObject, error) {
@@ -278,6 +401,19 @@ func deserialiseExternalLink(l openapi.ProfileExternalLink) (account.ExternalLin
 		Text: string(l.Text),
 		URL:  *u,
 	}, nil
+}
+
+func serialiseWarningRecord(in warning.Warning) openapi.Warning {
+	out := openapi.Warning{
+		Id:       openapi.Identifier(in.ID.String()),
+		IssuedAt: in.IssuedAt,
+		Reason:   in.Reason,
+		IssuedBy: opt.Map(in.IssuedBy, func(acc account.Account) openapi.ProfileReference {
+			return serialiseProfileReferenceFromAccount(acc)
+		}).Ptr(),
+	}
+
+	return out
 }
 
 func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.AccountAuthProviderListRequestObject) (openapi.AccountAuthProviderListResponseObject, error) {

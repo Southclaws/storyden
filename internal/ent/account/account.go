@@ -98,6 +98,10 @@ const (
 	EdgeModerationNotes = "moderation_notes"
 	// EdgeAuthoredModerationNotes holds the string denoting the authored_moderation_notes edge name in mutations.
 	EdgeAuthoredModerationNotes = "authored_moderation_notes"
+	// EdgeWarnings holds the string denoting the warnings edge name in mutations.
+	EdgeWarnings = "warnings"
+	// EdgeAuthoredWarnings holds the string denoting the authored_warnings edge name in mutations.
+	EdgeAuthoredWarnings = "authored_warnings"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -287,6 +291,20 @@ const (
 	AuthoredModerationNotesInverseTable = "moderation_notes"
 	// AuthoredModerationNotesColumn is the table column denoting the authored_moderation_notes relation/edge.
 	AuthoredModerationNotesColumn = "author_id"
+	// WarningsTable is the table that holds the warnings relation/edge.
+	WarningsTable = "warnings"
+	// WarningsInverseTable is the table name for the Warning entity.
+	// It exists in this package in order to avoid circular dependency with the "warning" package.
+	WarningsInverseTable = "warnings"
+	// WarningsColumn is the table column denoting the warnings relation/edge.
+	WarningsColumn = "account_id"
+	// AuthoredWarningsTable is the table that holds the authored_warnings relation/edge.
+	AuthoredWarningsTable = "warnings"
+	// AuthoredWarningsInverseTable is the table name for the Warning entity.
+	// It exists in this package in order to avoid circular dependency with the "warning" package.
+	AuthoredWarningsInverseTable = "warnings"
+	// AuthoredWarningsColumn is the table column denoting the authored_warnings relation/edge.
+	AuthoredWarningsColumn = "author_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -844,6 +862,34 @@ func ByAuthoredModerationNotes(term sql.OrderTerm, terms ...sql.OrderTerm) Order
 	}
 }
 
+// ByWarningsCount orders the results by warnings count.
+func ByWarningsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWarningsStep(), opts...)
+	}
+}
+
+// ByWarnings orders the results by warnings terms.
+func ByWarnings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWarningsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAuthoredWarningsCount orders the results by authored_warnings count.
+func ByAuthoredWarningsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAuthoredWarningsStep(), opts...)
+	}
+}
+
+// ByAuthoredWarnings orders the results by authored_warnings terms.
+func ByAuthoredWarnings(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAuthoredWarningsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1044,6 +1090,20 @@ func newAuthoredModerationNotesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuthoredModerationNotesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AuthoredModerationNotesTable, AuthoredModerationNotesColumn),
+	)
+}
+func newWarningsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WarningsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, WarningsTable, WarningsColumn),
+	)
+}
+func newAuthoredWarningsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AuthoredWarningsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AuthoredWarningsTable, AuthoredWarningsColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

@@ -74,6 +74,7 @@ export const writePermissions = [
   Permission.COLLECTION_SUBMIT,
   Permission.USE_PERSONAL_ACCESS_KEYS,
   Permission.MANAGE_SETTINGS,
+  Permission.MANAGE_WARNINGS,
   Permission.MANAGE_SUSPENSIONS,
   Permission.MANAGE_ROLES,
   Permission.ADMINISTRATOR,

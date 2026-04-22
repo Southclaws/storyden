@@ -35,6 +35,9 @@ $defs:
       - EventAccountUnsuspended
       - EventModerationNoteCreated
       - EventModerationNoteDeleted
+      - EventAccountWarned
+      - EventAccountWarningUpdated
+      - EventAccountWarningDeleted
       - EventReportCreated
       - EventReportUpdated
       - EventActivityCreated
@@ -74,6 +77,9 @@ $defs:
       - $ref: "#/$defs/EventAccountUnsuspended"
       - $ref: "#/$defs/EventModerationNoteCreated"
       - $ref: "#/$defs/EventModerationNoteDeleted"
+      - $ref: "#/$defs/EventAccountWarned"
+      - $ref: "#/$defs/EventAccountWarningUpdated"
+      - $ref: "#/$defs/EventAccountWarningDeleted"
       - $ref: "#/$defs/EventReportCreated"
       - $ref: "#/$defs/EventReportUpdated"
       - $ref: "#/$defs/EventActivityCreated"
@@ -490,6 +496,69 @@ $defs:
         type: string
         format: xid
         description: "Moderation note ID"
+
+  EventAccountWarned:
+    type: object
+    description: "Emitted when a moderation warning is issued to an account."
+    required: ["event", "account_id", "author_id", "warning_id"]
+    properties:
+      event: { type: string, const: "EventAccountWarned" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Account ID that received the warning."
+      author_id:
+        type: string
+        format: accountID
+        description: "Account ID that issued the warning."
+      warning_id:
+        type: string
+        format: identifier
+        description: "Warning record ID."
+
+  EventAccountWarningUpdated:
+    type: object
+    description: "Emitted when a moderation warning is edited."
+    required: ["event", "account_id", "author_id", "warning_id", "previous_reason", "reason"]
+    properties:
+      event: { type: string, const: "EventAccountWarningUpdated" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Account ID whose warning was edited."
+      author_id:
+        type: string
+        format: accountID
+        description: "Account ID that edited the warning."
+      warning_id:
+        type: string
+        format: identifier
+        description: "Warning record ID."
+      previous_reason:
+        type: string
+        description: "Warning reason before the edit."
+      reason:
+        type: string
+        description: "Updated warning reason."
+
+  EventAccountWarningDeleted:
+    type: object
+    description: "Emitted when a moderation warning is permanently deleted."
+    required: ["event", "account_id", "author_id", "warning_id"]
+    properties:
+      event: { type: string, const: "EventAccountWarningDeleted" }
+      account_id:
+        type: string
+        format: accountID
+        description: "Account ID whose warning was deleted."
+      author_id:
+        type: string
+        format: accountID
+        description: "Account ID that deleted the warning."
+      warning_id:
+        type: string
+        format: identifier
+        description: "Warning record ID."
 
   # Report events
 
