@@ -10,7 +10,7 @@ kill_timeout = 5
   PUBLIC_API_ADDRESS = "https://makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
-  EMAIL_PROVIDER          = "resend"
+  EMAIL_PROVIDER          = "smtp"
   LANGUAGE_MODEL_PROVIDER = "openai"
   MCP_ENABLED             = "true"
   PINECONE_CLOUD          = "aws"
