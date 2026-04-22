@@ -7,7 +7,9 @@ import { LoginHandleForm } from "./LoginHandle/LoginHandleForm";
 import { LoginPhoneForm } from "./LoginPhone/LoginPhoneForm";
 
 export async function LoginScreen() {
-  const { data } = await authProviderList();
+  const { data } = await authProviderList({
+    cache: "no-store",
+  });
 
   switch (data.mode) {
     case AuthMode.handle:

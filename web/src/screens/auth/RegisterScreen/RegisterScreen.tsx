@@ -7,7 +7,9 @@ import { RegisterHandleForm } from "./RegisterHandle/RegisterHandleForm";
 import { RegisterPhoneForm } from "./RegisterPhone/RegisterPhoneForm";
 
 export async function RegisterScreen() {
-  const { data } = await authProviderList();
+  const { data } = await authProviderList({
+    cache: "no-store",
+  });
 
   switch (data.mode) {
     case AuthMode.handle:

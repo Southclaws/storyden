@@ -12,7 +12,9 @@ export default async function Page(props: Props) {
   try {
     const searchParams = await props.searchParams;
 
-    const account = await getServerSession();
+    const account = await getServerSession({
+      cache: "no-store",
+    });
 
     return (
       <EmailVerificationScreen

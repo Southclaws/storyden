@@ -11,6 +11,10 @@ import { CardBox, VStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 import { getIconURL } from "@/utils/icon";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 export default async function Layout({ children }: PropsWithChildren) {
   const settings = await getSettings();
 

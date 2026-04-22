@@ -12,13 +12,15 @@ const getSessionCached = cache(async () => {
   });
 });
 
-export async function getServerSession() {
+export async function getServerSession(options?: RequestInit) {
   const session = (await cookies()).get("storyden-session");
 
   if (!session) return;
 
   try {
-    const { data } = await getSessionCached();
+    const { data } = options
+      ? await accountGet(options)
+      : await getSessionCached();
 
     return data;
   } catch (e) {
