@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
@@ -81,6 +82,8 @@ type Client struct {
 	CollectionPost *CollectionPostClient
 	// Email is the client for interacting with the Email builders.
 	Email *EmailClient
+	// EmailQueue is the client for interacting with the EmailQueue builders.
+	EmailQueue *EmailQueueClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
 	// EventParticipant is the client for interacting with the EventParticipant builders.
@@ -149,6 +152,7 @@ func (c *Client) init() {
 	c.CollectionNode = NewCollectionNodeClient(c.config)
 	c.CollectionPost = NewCollectionPostClient(c.config)
 	c.Email = NewEmailClient(c.config)
+	c.EmailQueue = NewEmailQueueClient(c.config)
 	c.Event = NewEventClient(c.config)
 	c.EventParticipant = NewEventParticipantClient(c.config)
 	c.Invitation = NewInvitationClient(c.config)
@@ -275,6 +279,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CollectionNode:      NewCollectionNodeClient(cfg),
 		CollectionPost:      NewCollectionPostClient(cfg),
 		Email:               NewEmailClient(cfg),
+		EmailQueue:          NewEmailQueueClient(cfg),
 		Event:               NewEventClient(cfg),
 		EventParticipant:    NewEventParticipantClient(cfg),
 		Invitation:          NewInvitationClient(cfg),
@@ -328,6 +333,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CollectionNode:      NewCollectionNodeClient(cfg),
 		CollectionPost:      NewCollectionPostClient(cfg),
 		Email:               NewEmailClient(cfg),
+		EmailQueue:          NewEmailQueueClient(cfg),
 		Event:               NewEventClient(cfg),
 		EventParticipant:    NewEventParticipantClient(cfg),
 		Invitation:          NewInvitationClient(cfg),
@@ -382,10 +388,10 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin,
+		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -397,10 +403,10 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
-		c.Email, c.Event, c.EventParticipant, c.Invitation, c.LikePost, c.Link,
-		c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin,
+		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -431,6 +437,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.CollectionPost.mutate(ctx, m)
 	case *EmailMutation:
 		return c.Email.mutate(ctx, m)
+	case *EmailQueueMutation:
+		return c.EmailQueue.mutate(ctx, m)
 	case *EventMutation:
 		return c.Event.mutate(ctx, m)
 	case *EventParticipantMutation:
@@ -2772,6 +2780,139 @@ func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, erro
 		return (&EmailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Email mutation op: %q", m.Op())
+	}
+}
+
+// EmailQueueClient is a client for the EmailQueue schema.
+type EmailQueueClient struct {
+	config
+}
+
+// NewEmailQueueClient returns a client for the EmailQueue from the given config.
+func NewEmailQueueClient(c config) *EmailQueueClient {
+	return &EmailQueueClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `emailqueue.Hooks(f(g(h())))`.
+func (c *EmailQueueClient) Use(hooks ...Hook) {
+	c.hooks.EmailQueue = append(c.hooks.EmailQueue, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `emailqueue.Intercept(f(g(h())))`.
+func (c *EmailQueueClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EmailQueue = append(c.inters.EmailQueue, interceptors...)
+}
+
+// Create returns a builder for creating a EmailQueue entity.
+func (c *EmailQueueClient) Create() *EmailQueueCreate {
+	mutation := newEmailQueueMutation(c.config, OpCreate)
+	return &EmailQueueCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EmailQueue entities.
+func (c *EmailQueueClient) CreateBulk(builders ...*EmailQueueCreate) *EmailQueueCreateBulk {
+	return &EmailQueueCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EmailQueueClient) MapCreateBulk(slice any, setFunc func(*EmailQueueCreate, int)) *EmailQueueCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EmailQueueCreateBulk{err: fmt.Errorf("calling to EmailQueueClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EmailQueueCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EmailQueueCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EmailQueue.
+func (c *EmailQueueClient) Update() *EmailQueueUpdate {
+	mutation := newEmailQueueMutation(c.config, OpUpdate)
+	return &EmailQueueUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EmailQueueClient) UpdateOne(_m *EmailQueue) *EmailQueueUpdateOne {
+	mutation := newEmailQueueMutation(c.config, OpUpdateOne, withEmailQueue(_m))
+	return &EmailQueueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EmailQueueClient) UpdateOneID(id xid.ID) *EmailQueueUpdateOne {
+	mutation := newEmailQueueMutation(c.config, OpUpdateOne, withEmailQueueID(id))
+	return &EmailQueueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EmailQueue.
+func (c *EmailQueueClient) Delete() *EmailQueueDelete {
+	mutation := newEmailQueueMutation(c.config, OpDelete)
+	return &EmailQueueDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EmailQueueClient) DeleteOne(_m *EmailQueue) *EmailQueueDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EmailQueueClient) DeleteOneID(id xid.ID) *EmailQueueDeleteOne {
+	builder := c.Delete().Where(emailqueue.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EmailQueueDeleteOne{builder}
+}
+
+// Query returns a query builder for EmailQueue.
+func (c *EmailQueueClient) Query() *EmailQueueQuery {
+	return &EmailQueueQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEmailQueue},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EmailQueue entity by its id.
+func (c *EmailQueueClient) Get(ctx context.Context, id xid.ID) (*EmailQueue, error) {
+	return c.Query().Where(emailqueue.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EmailQueueClient) GetX(ctx context.Context, id xid.ID) *EmailQueue {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *EmailQueueClient) Hooks() []Hook {
+	return c.hooks.EmailQueue
+}
+
+// Interceptors returns the client interceptors.
+func (c *EmailQueueClient) Interceptors() []Interceptor {
+	return c.inters.EmailQueue
+}
+
+func (c *EmailQueueClient) mutate(ctx context.Context, m *EmailQueueMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EmailQueueCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EmailQueueUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EmailQueueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EmailQueueDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EmailQueue mutation op: %q", m.Op())
 	}
 }
 
@@ -7022,17 +7163,19 @@ func (c *WarningClient) mutate(ctx context.Context, m *WarningMutation) (Value, 
 type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
-		Question, React, Report, Role, Session, Setting, Tag, Warning []ent.Hook
+		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
+		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
+		Node, Notification, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
+		Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, ModerationNote, Node, Notification,
-		Plugin, Post, PostRead, Property, PropertySchema, PropertySchemaField,
-		Question, React, Report, Role, Session, Setting, Tag, Warning []ent.Interceptor
+		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
+		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
+		Node, Notification, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
+		Warning []ent.Interceptor
 	}
 )
 

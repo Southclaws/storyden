@@ -317,6 +317,40 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuditEventListOK" }
 
+  /admin/email-queue:
+    get:
+      operationId: EmailQueueList
+      description: |
+        List durable email queue records for this installation. Shows pending,
+        failed and sent deliveries with attempt history for diagnostics.
+      tags: [admin]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/EmailQueueStatusFilterQuery"
+        - $ref: "#/components/parameters/EmailQueueTimeRangeQuery"
+      responses:
+        "400": { $ref: "#/components/responses/BadRequest" }
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/EmailQueueListOK" }
+
+  /admin/email-queue/{email_id}/attempt:
+    post:
+      operationId: EmailQueueRetry
+      description: |
+        Manually retry a delivery for an email queue record. This is used for
+        failed deliveries. This will create a new delivery attempt and update
+        the email queue record accordingly.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/EmailIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/EmailQueueGetOK" }
+
   /admin/audit-events/{audit_event_id}:
     get:
       operationId: AuditEventGet
@@ -2870,6 +2904,31 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    EmailIDParam:
+      description: Email ID.
+      in: path
+      name: email_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    EmailQueueStatusFilterQuery:
+      description: Email queue status filter query
+      name: statuses
+      in: query
+      explode: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/EmailQueueStatus" }
+
+    EmailQueueTimeRangeQuery:
+      description: Email queue time range query
+      name: range
+      in: query
+      schema:
+        type: string
+        format: iso8601-interval
+
     PluginIDParam:
       description: Plugin ID.
       in: path
@@ -3782,6 +3841,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuditEvent"
+
+    EmailQueueListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailQueueListResult"
+
+    EmailQueueGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailQueueItem"
 
     PluginListOK:
       description: OK
@@ -5185,6 +5258,77 @@ components:
         - type: object
           properties:
             events: { $ref: "#/components/schemas/AuditEventList" }
+
+    EmailQueueItem:
+      type: object
+      required:
+        [
+          id,
+          queued_at,
+          updated_at,
+          recipient_address,
+          recipient_name,
+          subject,
+          status,
+          attempts,
+        ]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        queued_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+        status: { $ref: "#/components/schemas/EmailQueueStatus" }
+        recipient_address:
+          type: string
+          format: email
+        recipient_name:
+          type: string
+        subject:
+          type: string
+        attempts:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmailQueueAttempt"
+
+    EmailQueueStatus:
+      type: string
+      enum: [pending, processing, sent, failed]
+
+    EmailQueueAttemptStatus:
+      type: string
+      enum: [sent, failed]
+
+    EmailQueueAttempt:
+      type: object
+      required: [timestamp, status]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          $ref: "#/components/schemas/EmailQueueAttemptStatus"
+        error:
+          type: string
+
+    EmailQueueList:
+      type: array
+      items:
+        $ref: "#/components/schemas/EmailQueueItem"
+
+    EmailQueueListResult:
+      type: object
+      required: [emails]
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          properties:
+            emails: { $ref: "#/components/schemas/EmailQueueList" }
 
     ModerationActionInitialProps:
       type: object

@@ -4,13 +4,17 @@ import { TabsValueChangeDetails } from "@ark-ui/react";
 import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
+import { Permission } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import * as Tabs from "@/components/ui/tabs";
 import { useCapability } from "@/lib/settings/capabilities";
+import { hasPermission } from "@/utils/permissions";
 
 import { AccessKeySettingsScreen } from "./AccessKeySettingsScreen";
 import { AuditLogSettingsScreen } from "./AuditLogSettingsScreen/AuditLogSettingsScreen";
 import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
 import { BrandSettingsScreen } from "./BrandSettingsScreen";
+import { EmailLogSettingsScreen } from "./EmailLogSettingsScreen/EmailLogSettingsScreen";
 import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
 import { PluginSettingsScreen } from "./PluginSettingsScreen";
@@ -20,6 +24,8 @@ const DEFAULT_TAB = "brand";
 
 export function AdminScreen() {
   const pluginsEnabled = useCapability("plugins");
+  const session = useSession();
+  const canViewEmailLog = hasPermission(session, Permission.ADMINISTRATOR);
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -37,7 +43,11 @@ export function AdminScreen() {
     if (!pluginsEnabled && tab === "plugins") {
       setTab(DEFAULT_TAB);
     }
-  }, [pluginsEnabled, tab, setTab]);
+
+    if (!canViewEmailLog && tab === "email") {
+      setTab(DEFAULT_TAB);
+    }
+  }, [canViewEmailLog, pluginsEnabled, tab, setTab]);
 
   function handleTabChange({ value }: TabsValueChangeDetails) {
     setTab(value);
@@ -58,6 +68,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="moderation">Moderation</Tabs.Trigger>
         <Tabs.Trigger value="system">System</Tabs.Trigger>
         <Tabs.Trigger value="audit">Audit Log</Tabs.Trigger>
+        {canViewEmailLog && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
@@ -80,6 +91,12 @@ export function AdminScreen() {
       <Tabs.Content value="audit">
         <AuditLogSettingsScreen />
       </Tabs.Content>
+
+      {canViewEmailLog && (
+        <Tabs.Content value="email">
+          <EmailLogSettingsScreen />
+        </Tabs.Content>
+      )}
 
       <Tabs.Content value="interface">
         <InterfaceSettingsScreen />

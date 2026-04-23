@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_ref"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
@@ -65,7 +66,12 @@ type CommandSendNotification struct {
 }
 
 type CommandSendEmail struct {
+	ID      xid.ID
 	Message mailer.Message
+}
+
+type CommandAttemptQueuedEmail struct {
+	ID xid.ID
 }
 
 type CommandSendBeacon struct {

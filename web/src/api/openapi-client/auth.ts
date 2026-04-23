@@ -605,7 +605,7 @@ missing the email or a delivery failure. In this sense, the endpoint can
 act as a "resend verification email" operation as well as registration.
 
 In the first case, a 200 response is provided with the session cookie,
-in the second case, a 409 response is provided without a session cookie.
+in the second case, a 422 response is provided without a session cookie.
 
 Given that this is an unauthenticated endpoint that triggers an email to
 be sent to any public address, it MUST be heavily rate limited.
@@ -642,11 +642,11 @@ export type AuthEmailSignupMutationResult = NonNullable<
 >;
 export type AuthEmailSignupMutationError =
   | BadRequestResponse
-  | ConflictResponse
+  | void
   | InternalServerErrorResponse;
 
 export const useAuthEmailSignup = <
-  TError = BadRequestResponse | ConflictResponse | InternalServerErrorResponse,
+  TError = BadRequestResponse | void | InternalServerErrorResponse,
 >(
   params?: AuthEmailSignupParams,
   options?: {

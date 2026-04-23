@@ -36,6 +36,8 @@ type Tx struct {
 	CollectionPost *CollectionPostClient
 	// Email is the client for interacting with the Email builders.
 	Email *EmailClient
+	// EmailQueue is the client for interacting with the EmailQueue builders.
+	EmailQueue *EmailQueueClient
 	// Event is the client for interacting with the Event builders.
 	Event *EventClient
 	// EventParticipant is the client for interacting with the EventParticipant builders.
@@ -224,6 +226,7 @@ func (tx *Tx) init() {
 	tx.CollectionNode = NewCollectionNodeClient(tx.config)
 	tx.CollectionPost = NewCollectionPostClient(tx.config)
 	tx.Email = NewEmailClient(tx.config)
+	tx.EmailQueue = NewEmailQueueClient(tx.config)
 	tx.Event = NewEventClient(tx.config)
 	tx.EventParticipant = NewEventParticipantClient(tx.config)
 	tx.Invitation = NewInvitationClient(tx.config)
