@@ -29,7 +29,7 @@ var (
 )
 
 var (
-	service   = authentication.ServiceWebAuthn
+	service   = authentication.AuthServiceWebAuthn
 	tokenType = authentication.TokenTypeWebAuthn
 )
 
