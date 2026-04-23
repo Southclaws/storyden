@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
@@ -117,6 +118,7 @@ func checkColumn(t, c string) error {
 			collectionnode.Table:      collectionnode.ValidColumn,
 			collectionpost.Table:      collectionpost.ValidColumn,
 			email.Table:               email.ValidColumn,
+			emailqueue.Table:          emailqueue.ValidColumn,
 			event.Table:               event.ValidColumn,
 			eventparticipant.Table:    eventparticipant.ValidColumn,
 			invitation.Table:          invitation.ValidColumn,

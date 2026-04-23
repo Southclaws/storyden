@@ -14,6 +14,9 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	openapi_types "github.com/oapi-codegen/runtime/types"
+	"github.com/rs/xid"
+
 	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -23,6 +26,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/audit"
 	"github.com/Southclaws/storyden/app/resources/audit/audit_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/email_queue"
+	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_querier"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -31,6 +36,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
 	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -39,20 +45,24 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Admin struct {
-	accountQuery     *account_querier.Querier
-	profileQuery     *profile_querier.Querier
-	auditQuerier     *audit_querier.Querier
-	as               account_suspension.Service
-	settingsManager  *settings_manager.Manager
-	akr              *access_key.Repository
-	actionDispatcher *action_dispatcher.Service
-	warnings         *warning_manager.Manager
+	accountQuery      *account_querier.Querier
+	profileQuery      *profile_querier.Querier
+	auditQuerier      *audit_querier.Querier
+	emailQueueQuerier *email_queue_querier.Querier
+	emailQueueService *mailqueue.Queuer
+	as                account_suspension.Service
+	settingsManager   *settings_manager.Manager
+	akr               *access_key.Repository
+	actionDispatcher  *action_dispatcher.Service
+	warnings          *warning_manager.Manager
 }
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
 	profileQuery *profile_querier.Querier,
 	auditQuerier *audit_querier.Querier,
+	emailQueueQuerier *email_queue_querier.Querier,
+	emailQueueService *mailqueue.Queuer,
 	as account_suspension.Service,
 	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
@@ -61,14 +71,16 @@ func NewAdmin(
 	router *echo.Echo,
 ) Admin {
 	a := Admin{
-		accountQuery:     accountQuery,
-		profileQuery:     profileQuery,
-		auditQuerier:     auditQuerier,
-		as:               as,
-		settingsManager:  settingsManager,
-		akr:              akr,
-		actionDispatcher: actionDispatcher,
-		warnings:         warnings,
+		accountQuery:      accountQuery,
+		profileQuery:      profileQuery,
+		auditQuerier:      auditQuerier,
+		emailQueueQuerier: emailQueueQuerier,
+		emailQueueService: emailQueueService,
+		as:                as,
+		settingsManager:   settingsManager,
+		akr:               akr,
+		actionDispatcher:  actionDispatcher,
+		warnings:          warnings,
 	}
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -319,6 +331,82 @@ func (a *Admin) AuditEventList(ctx context.Context, request openapi.AuditEventLi
 			TotalPages:  result.TotalPages,
 		},
 	}, nil
+}
+
+func (a *Admin) EmailQueueList(ctx context.Context, request openapi.EmailQueueListRequestObject) (openapi.EmailQueueListResponseObject, error) {
+	page := opt.NewPtrMap(request.Params.Page, func(pq openapi.PaginationQuery) int {
+		v, err := strconv.ParseInt(pq, 10, 32)
+		if err != nil {
+			return 1
+		}
+		return max(1, int(v))
+	}).Or(1)
+
+	params := pagination.NewPageParams(uint(page), 50)
+
+	result, err := a.emailQueueQuerier.List(ctx, params, email_queue_querier.Filter{})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	emails := dt.Map(result.Items, serialiseEmailQueueItem)
+	emailList := openapi.EmailQueueList(emails)
+
+	return openapi.EmailQueueList200JSONResponse{
+		EmailQueueListOKJSONResponse: openapi.EmailQueueListOKJSONResponse{
+			CurrentPage: result.CurrentPage,
+			Emails:      &emailList,
+			NextPage:    result.NextPage.Ptr(),
+			PageSize:    result.Size,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+		},
+	}, nil
+}
+
+func (a *Admin) EmailQueueRetry(ctx context.Context, request openapi.EmailQueueRetryRequestObject) (openapi.EmailQueueRetryResponseObject, error) {
+	emailID := email_queue.ID(deserialiseID(request.EmailId))
+	if xid.ID(emailID) == xid.NilID() {
+		return nil, fault.New("invalid email ID", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	item, err := a.emailQueueService.RetryNow(ctx, emailID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.EmailQueueRetry200JSONResponse(
+		openapi.EmailQueueRetry200JSONResponse{
+			EmailQueueGetOKJSONResponse: openapi.EmailQueueGetOKJSONResponse(
+				serialiseEmailQueueItem(item),
+			),
+		},
+	), nil
+}
+
+func serialiseEmailQueueItem(in *email_queue.Email) openapi.EmailQueueItem {
+	out := openapi.EmailQueueItem{
+		Id:               openapi.Identifier(xid.ID(in.ID).String()),
+		QueuedAt:         in.CreatedAt,
+		UpdatedAt:        in.UpdatedAt,
+		RecipientAddress: openapi_types.Email(in.RecipientAddress),
+		RecipientName:    in.RecipientName,
+		Subject:          in.Subject,
+		Status:           openapi.EmailQueueStatus(in.Status.String()),
+		Attempts:         dt.Map(in.Attempts, serialiseEmailQueueAttempt),
+		ProcessedAt:      in.ProcessedAt.Ptr(),
+	}
+
+	return out
+}
+
+func serialiseEmailQueueAttempt(in *email_queue.Attempt) openapi.EmailQueueAttempt {
+	out := openapi.EmailQueueAttempt{
+		Timestamp: in.Timestamp,
+		Status:    openapi.EmailQueueAttemptStatus(in.Status.String()),
+		Error:     in.Error.Ptr(),
+	}
+	return out
 }
 
 func (a *Admin) AuditEventGet(ctx context.Context, request openapi.AuditEventGetRequestObject) (openapi.AuditEventGetResponseObject, error) {

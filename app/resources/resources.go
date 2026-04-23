@@ -30,6 +30,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
+	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_querier"
+	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_repo"
 	"github.com/Southclaws/storyden/app/resources/event/event_querier"
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
@@ -94,6 +96,8 @@ func Build() fx.Option {
 			asset_writer.New,
 			audit_querier.New,
 			audit_writer.New,
+			email_queue_repo.New,
+			email_queue_querier.New,
 			authentication.New,
 			category.New,
 			category_cache.New,

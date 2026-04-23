@@ -25,6 +25,8 @@ var (
 	OperationIDAdminSettingsGet                 = OperationID{`AdminSettingsGet`}
 	OperationIDAdminSettingsUpdate              = OperationID{`AdminSettingsUpdate`}
 	OperationIDAuditEventList                   = OperationID{`AuditEventList`}
+	OperationIDEmailQueueList                   = OperationID{`EmailQueueList`}
+	OperationIDEmailQueueRetry                  = OperationID{`EmailQueueRetry`}
 	OperationIDAuditEventGet                    = OperationID{`AuditEventGet`}
 	OperationIDModerationActionCreate           = OperationID{`ModerationActionCreate`}
 	OperationIDAdminAccountBanCreate            = OperationID{`AdminAccountBanCreate`}
@@ -238,6 +240,10 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAdminSettingsUpdate, nil
 	case string(`AuditEventList`):
 		return OperationIDAuditEventList, nil
+	case string(`EmailQueueList`):
+		return OperationIDEmailQueueList, nil
+	case string(`EmailQueueRetry`):
+		return OperationIDEmailQueueRetry, nil
 	case string(`AuditEventGet`):
 		return OperationIDAuditEventGet, nil
 	case string(`ModerationActionCreate`):

@@ -26,12 +26,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <StyledButton disabled={trulyDisabled} ref={ref} {...rest}>
-        {loading && !loadingText ? (
-          <>
-            <Spinner />
-          </>
-        ) : loadingText ? (
-          loadingText
+        {loading ? (
+          loadingText ? (
+            loadingText
+          ) : (
+            <>
+              <Spinner />
+            </>
+          )
         ) : (
           children
         )}

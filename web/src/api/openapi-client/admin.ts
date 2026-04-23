@@ -24,6 +24,9 @@ import type {
   AuditEventListOKResponse,
   AuditEventListParams,
   BadRequestResponse,
+  EmailQueueGetOKResponse,
+  EmailQueueListOKResponse,
+  EmailQueueListParams,
   ForbiddenResponse,
   InternalServerErrorResponse,
   ModerationActionCreateBody,
@@ -189,6 +192,119 @@ export const useAuditEventList = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List durable email queue records for this installation. Shows pending,
+failed and sent deliveries with attempt history for diagnostics.
+
+ */
+export const emailQueueList = (params?: EmailQueueListParams) => {
+  return fetcher<EmailQueueListOKResponse>({
+    url: `/admin/email-queue`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getEmailQueueListKey = (params?: EmailQueueListParams) =>
+  [`/admin/email-queue`, ...(params ? [params] : [])] as const;
+
+export type EmailQueueListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof emailQueueList>>
+>;
+export type EmailQueueListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useEmailQueueList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(
+  params?: EmailQueueListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof emailQueueList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getEmailQueueListKey(params) : null));
+  const swrFn = () => emailQueueList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Manually retry a delivery for an email queue record. This is used for
+failed deliveries. This will create a new delivery attempt and update
+the email queue record accordingly.
+
+ */
+export const emailQueueRetry = (emailId: string) => {
+  return fetcher<EmailQueueGetOKResponse>({
+    url: `/admin/email-queue/${emailId}/attempt`,
+    method: "POST",
+  });
+};
+
+export const getEmailQueueRetryMutationFetcher = (emailId: string) => {
+  return (_: Key, __: { arg: Arguments }): Promise<EmailQueueGetOKResponse> => {
+    return emailQueueRetry(emailId);
+  };
+};
+export const getEmailQueueRetryMutationKey = (emailId: string) =>
+  [`/admin/email-queue/${emailId}/attempt`] as const;
+
+export type EmailQueueRetryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof emailQueueRetry>>
+>;
+export type EmailQueueRetryMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useEmailQueueRetry = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  emailId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof emailQueueRetry>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof emailQueueRetry>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getEmailQueueRetryMutationKey(emailId);
+  const swrFn = getEmailQueueRetryMutationFetcher(emailId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

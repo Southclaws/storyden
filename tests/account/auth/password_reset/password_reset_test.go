@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -59,13 +58,18 @@ func TestPasswordReset(t *testing.T) {
 
 				email := xid.New().String() + "@storyden.org"
 				password := "mysupersecretpasswordwhichissosecretiforgotwhatitwas"
+				signupEmailCount := inbox.Count()
 
 				// Sign up with username + password
 				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: email, Password: password})
 				tests.Ok(t, err, signup)
+				signupSession := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
 
-				// HACK: because I haven't set up proper queue tooling for tests
-				time.Sleep(time.Millisecond * 100)
+				accountGet, err := cl.AccountGetWithResponse(root, signupSession)
+				tests.Ok(t, err, accountGet)
+
+				tests.WaitForNextEmail(t, inbox, signupEmailCount)
+				resetEmailCount := inbox.Count()
 
 				// oh no! I forgot my password :( let's reset it
 				request, err := cl.AuthPasswordResetRequestEmailWithResponse(root, openapi.AuthEmailPasswordReset{
@@ -80,10 +84,9 @@ func TestPasswordReset(t *testing.T) {
 				})
 				tests.Ok(t, err, request)
 
-				// HACK: because I haven't set up proper queue tooling for tests
-				time.Sleep(time.Millisecond * 100)
-
-				resetEmail := inbox.GetLast()
+				resetEmail := tests.WaitForNextEmail(t, inbox, resetEmailCount)
+				a.Equal(accountGet.JSON200.Name, resetEmail.Name)
+				a.Equal(email, resetEmail.Address.Address)
 				token := regexp.MustCompile(`\?token=(.+)`).FindStringSubmatch(resetEmail.Plain)[1]
 
 				reset, err := cl.AuthPasswordResetWithResponse(root, openapi.AuthPasswordResetJSONRequestBody{
@@ -91,11 +94,10 @@ func TestPasswordReset(t *testing.T) {
 					New:   "newpassword",
 				})
 				tests.Ok(t, err, reset)
-				session := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
 
 				r.Equal(signup.JSON200.Id, reset.JSON200.Id)
 
-				get, err := cl.AccountGetWithResponse(root, session)
+				get, err := cl.AccountGetWithResponse(root, signupSession)
 				tests.Ok(t, err, get)
 				a.Equal(signup.JSON200.Id, get.JSON200.Id)
 			})

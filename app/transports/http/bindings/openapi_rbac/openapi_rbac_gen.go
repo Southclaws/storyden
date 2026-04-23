@@ -16,6 +16,8 @@ type OperationPermissions interface {
 	AdminSettingsGet() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
 	AuditEventList() (bool, *rbac.Permission)
+	EmailQueueList() (bool, *rbac.Permission)
+	EmailQueueRetry() (bool, *rbac.Permission)
 	AuditEventGet() (bool, *rbac.Permission)
 	ModerationActionCreate() (bool, *rbac.Permission)
 	AdminAccountBanCreate() (bool, *rbac.Permission)
@@ -194,6 +196,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminSettingsUpdate()
 	case "AuditEventList":
 		return optable.AuditEventList()
+	case "EmailQueueList":
+		return optable.EmailQueueList()
+	case "EmailQueueRetry":
+		return optable.EmailQueueRetry()
 	case "AuditEventGet":
 		return optable.AuditEventGet()
 	case "ModerationActionCreate":
