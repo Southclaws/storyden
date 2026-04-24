@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
@@ -71,6 +72,7 @@ const (
 	TypeCollectionNode      = "CollectionNode"
 	TypeCollectionPost      = "CollectionPost"
 	TypeEmail               = "Email"
+	TypeEmailQueue          = "EmailQueue"
 	TypeEvent               = "Event"
 	TypeEventParticipant    = "EventParticipant"
 	TypeInvitation          = "Invitation"
@@ -11857,6 +11859,916 @@ func (m *EmailMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Email edge %s", name)
+}
+
+// EmailQueueMutation represents an operation that mutates the EmailQueue nodes in the graph.
+type EmailQueueMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *xid.ID
+	created_at        *time.Time
+	updated_at        *time.Time
+	recipient_address *string
+	recipient_name    *string
+	subject           *string
+	content_plain     *string
+	content_html      *string
+	status            *emailqueue.Status
+	attempts          *[]schema.EmailAttempt
+	appendattempts    []schema.EmailAttempt
+	processed_at      *time.Time
+	available_at      *time.Time
+	clearedFields     map[string]struct{}
+	done              bool
+	oldValue          func(context.Context) (*EmailQueue, error)
+	predicates        []predicate.EmailQueue
+}
+
+var _ ent.Mutation = (*EmailQueueMutation)(nil)
+
+// emailqueueOption allows management of the mutation configuration using functional options.
+type emailqueueOption func(*EmailQueueMutation)
+
+// newEmailQueueMutation creates new mutation for the EmailQueue entity.
+func newEmailQueueMutation(c config, op Op, opts ...emailqueueOption) *EmailQueueMutation {
+	m := &EmailQueueMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeEmailQueue,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withEmailQueueID sets the ID field of the mutation.
+func withEmailQueueID(id xid.ID) emailqueueOption {
+	return func(m *EmailQueueMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *EmailQueue
+		)
+		m.oldValue = func(ctx context.Context) (*EmailQueue, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().EmailQueue.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withEmailQueue sets the old EmailQueue of the mutation.
+func withEmailQueue(node *EmailQueue) emailqueueOption {
+	return func(m *EmailQueueMutation) {
+		m.oldValue = func(context.Context) (*EmailQueue, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m EmailQueueMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m EmailQueueMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of EmailQueue entities.
+func (m *EmailQueueMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *EmailQueueMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *EmailQueueMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().EmailQueue.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *EmailQueueMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *EmailQueueMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *EmailQueueMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *EmailQueueMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *EmailQueueMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *EmailQueueMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetRecipientAddress sets the "recipient_address" field.
+func (m *EmailQueueMutation) SetRecipientAddress(s string) {
+	m.recipient_address = &s
+}
+
+// RecipientAddress returns the value of the "recipient_address" field in the mutation.
+func (m *EmailQueueMutation) RecipientAddress() (r string, exists bool) {
+	v := m.recipient_address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecipientAddress returns the old "recipient_address" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldRecipientAddress(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecipientAddress is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecipientAddress requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecipientAddress: %w", err)
+	}
+	return oldValue.RecipientAddress, nil
+}
+
+// ResetRecipientAddress resets all changes to the "recipient_address" field.
+func (m *EmailQueueMutation) ResetRecipientAddress() {
+	m.recipient_address = nil
+}
+
+// SetRecipientName sets the "recipient_name" field.
+func (m *EmailQueueMutation) SetRecipientName(s string) {
+	m.recipient_name = &s
+}
+
+// RecipientName returns the value of the "recipient_name" field in the mutation.
+func (m *EmailQueueMutation) RecipientName() (r string, exists bool) {
+	v := m.recipient_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRecipientName returns the old "recipient_name" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldRecipientName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRecipientName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRecipientName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRecipientName: %w", err)
+	}
+	return oldValue.RecipientName, nil
+}
+
+// ResetRecipientName resets all changes to the "recipient_name" field.
+func (m *EmailQueueMutation) ResetRecipientName() {
+	m.recipient_name = nil
+}
+
+// SetSubject sets the "subject" field.
+func (m *EmailQueueMutation) SetSubject(s string) {
+	m.subject = &s
+}
+
+// Subject returns the value of the "subject" field in the mutation.
+func (m *EmailQueueMutation) Subject() (r string, exists bool) {
+	v := m.subject
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSubject returns the old "subject" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldSubject(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSubject is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSubject requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSubject: %w", err)
+	}
+	return oldValue.Subject, nil
+}
+
+// ResetSubject resets all changes to the "subject" field.
+func (m *EmailQueueMutation) ResetSubject() {
+	m.subject = nil
+}
+
+// SetContentPlain sets the "content_plain" field.
+func (m *EmailQueueMutation) SetContentPlain(s string) {
+	m.content_plain = &s
+}
+
+// ContentPlain returns the value of the "content_plain" field in the mutation.
+func (m *EmailQueueMutation) ContentPlain() (r string, exists bool) {
+	v := m.content_plain
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContentPlain returns the old "content_plain" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldContentPlain(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContentPlain is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContentPlain requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContentPlain: %w", err)
+	}
+	return oldValue.ContentPlain, nil
+}
+
+// ResetContentPlain resets all changes to the "content_plain" field.
+func (m *EmailQueueMutation) ResetContentPlain() {
+	m.content_plain = nil
+}
+
+// SetContentHTML sets the "content_html" field.
+func (m *EmailQueueMutation) SetContentHTML(s string) {
+	m.content_html = &s
+}
+
+// ContentHTML returns the value of the "content_html" field in the mutation.
+func (m *EmailQueueMutation) ContentHTML() (r string, exists bool) {
+	v := m.content_html
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContentHTML returns the old "content_html" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldContentHTML(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContentHTML is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContentHTML requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContentHTML: %w", err)
+	}
+	return oldValue.ContentHTML, nil
+}
+
+// ResetContentHTML resets all changes to the "content_html" field.
+func (m *EmailQueueMutation) ResetContentHTML() {
+	m.content_html = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *EmailQueueMutation) SetStatus(e emailqueue.Status) {
+	m.status = &e
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *EmailQueueMutation) Status() (r emailqueue.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldStatus(ctx context.Context) (v emailqueue.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *EmailQueueMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetAttempts sets the "attempts" field.
+func (m *EmailQueueMutation) SetAttempts(sa []schema.EmailAttempt) {
+	m.attempts = &sa
+	m.appendattempts = nil
+}
+
+// Attempts returns the value of the "attempts" field in the mutation.
+func (m *EmailQueueMutation) Attempts() (r []schema.EmailAttempt, exists bool) {
+	v := m.attempts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAttempts returns the old "attempts" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldAttempts(ctx context.Context) (v []schema.EmailAttempt, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAttempts is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAttempts requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAttempts: %w", err)
+	}
+	return oldValue.Attempts, nil
+}
+
+// AppendAttempts adds sa to the "attempts" field.
+func (m *EmailQueueMutation) AppendAttempts(sa []schema.EmailAttempt) {
+	m.appendattempts = append(m.appendattempts, sa...)
+}
+
+// AppendedAttempts returns the list of values that were appended to the "attempts" field in this mutation.
+func (m *EmailQueueMutation) AppendedAttempts() ([]schema.EmailAttempt, bool) {
+	if len(m.appendattempts) == 0 {
+		return nil, false
+	}
+	return m.appendattempts, true
+}
+
+// ResetAttempts resets all changes to the "attempts" field.
+func (m *EmailQueueMutation) ResetAttempts() {
+	m.attempts = nil
+	m.appendattempts = nil
+}
+
+// SetProcessedAt sets the "processed_at" field.
+func (m *EmailQueueMutation) SetProcessedAt(t time.Time) {
+	m.processed_at = &t
+}
+
+// ProcessedAt returns the value of the "processed_at" field in the mutation.
+func (m *EmailQueueMutation) ProcessedAt() (r time.Time, exists bool) {
+	v := m.processed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProcessedAt returns the old "processed_at" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldProcessedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProcessedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProcessedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProcessedAt: %w", err)
+	}
+	return oldValue.ProcessedAt, nil
+}
+
+// ClearProcessedAt clears the value of the "processed_at" field.
+func (m *EmailQueueMutation) ClearProcessedAt() {
+	m.processed_at = nil
+	m.clearedFields[emailqueue.FieldProcessedAt] = struct{}{}
+}
+
+// ProcessedAtCleared returns if the "processed_at" field was cleared in this mutation.
+func (m *EmailQueueMutation) ProcessedAtCleared() bool {
+	_, ok := m.clearedFields[emailqueue.FieldProcessedAt]
+	return ok
+}
+
+// ResetProcessedAt resets all changes to the "processed_at" field.
+func (m *EmailQueueMutation) ResetProcessedAt() {
+	m.processed_at = nil
+	delete(m.clearedFields, emailqueue.FieldProcessedAt)
+}
+
+// SetAvailableAt sets the "available_at" field.
+func (m *EmailQueueMutation) SetAvailableAt(t time.Time) {
+	m.available_at = &t
+}
+
+// AvailableAt returns the value of the "available_at" field in the mutation.
+func (m *EmailQueueMutation) AvailableAt() (r time.Time, exists bool) {
+	v := m.available_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAvailableAt returns the old "available_at" field's value of the EmailQueue entity.
+// If the EmailQueue object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailQueueMutation) OldAvailableAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAvailableAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAvailableAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAvailableAt: %w", err)
+	}
+	return oldValue.AvailableAt, nil
+}
+
+// ResetAvailableAt resets all changes to the "available_at" field.
+func (m *EmailQueueMutation) ResetAvailableAt() {
+	m.available_at = nil
+}
+
+// Where appends a list predicates to the EmailQueueMutation builder.
+func (m *EmailQueueMutation) Where(ps ...predicate.EmailQueue) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the EmailQueueMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *EmailQueueMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EmailQueue, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *EmailQueueMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *EmailQueueMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (EmailQueue).
+func (m *EmailQueueMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *EmailQueueMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, emailqueue.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, emailqueue.FieldUpdatedAt)
+	}
+	if m.recipient_address != nil {
+		fields = append(fields, emailqueue.FieldRecipientAddress)
+	}
+	if m.recipient_name != nil {
+		fields = append(fields, emailqueue.FieldRecipientName)
+	}
+	if m.subject != nil {
+		fields = append(fields, emailqueue.FieldSubject)
+	}
+	if m.content_plain != nil {
+		fields = append(fields, emailqueue.FieldContentPlain)
+	}
+	if m.content_html != nil {
+		fields = append(fields, emailqueue.FieldContentHTML)
+	}
+	if m.status != nil {
+		fields = append(fields, emailqueue.FieldStatus)
+	}
+	if m.attempts != nil {
+		fields = append(fields, emailqueue.FieldAttempts)
+	}
+	if m.processed_at != nil {
+		fields = append(fields, emailqueue.FieldProcessedAt)
+	}
+	if m.available_at != nil {
+		fields = append(fields, emailqueue.FieldAvailableAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *EmailQueueMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case emailqueue.FieldCreatedAt:
+		return m.CreatedAt()
+	case emailqueue.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case emailqueue.FieldRecipientAddress:
+		return m.RecipientAddress()
+	case emailqueue.FieldRecipientName:
+		return m.RecipientName()
+	case emailqueue.FieldSubject:
+		return m.Subject()
+	case emailqueue.FieldContentPlain:
+		return m.ContentPlain()
+	case emailqueue.FieldContentHTML:
+		return m.ContentHTML()
+	case emailqueue.FieldStatus:
+		return m.Status()
+	case emailqueue.FieldAttempts:
+		return m.Attempts()
+	case emailqueue.FieldProcessedAt:
+		return m.ProcessedAt()
+	case emailqueue.FieldAvailableAt:
+		return m.AvailableAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *EmailQueueMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case emailqueue.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case emailqueue.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case emailqueue.FieldRecipientAddress:
+		return m.OldRecipientAddress(ctx)
+	case emailqueue.FieldRecipientName:
+		return m.OldRecipientName(ctx)
+	case emailqueue.FieldSubject:
+		return m.OldSubject(ctx)
+	case emailqueue.FieldContentPlain:
+		return m.OldContentPlain(ctx)
+	case emailqueue.FieldContentHTML:
+		return m.OldContentHTML(ctx)
+	case emailqueue.FieldStatus:
+		return m.OldStatus(ctx)
+	case emailqueue.FieldAttempts:
+		return m.OldAttempts(ctx)
+	case emailqueue.FieldProcessedAt:
+		return m.OldProcessedAt(ctx)
+	case emailqueue.FieldAvailableAt:
+		return m.OldAvailableAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown EmailQueue field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EmailQueueMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case emailqueue.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case emailqueue.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case emailqueue.FieldRecipientAddress:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecipientAddress(v)
+		return nil
+	case emailqueue.FieldRecipientName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRecipientName(v)
+		return nil
+	case emailqueue.FieldSubject:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSubject(v)
+		return nil
+	case emailqueue.FieldContentPlain:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContentPlain(v)
+		return nil
+	case emailqueue.FieldContentHTML:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContentHTML(v)
+		return nil
+	case emailqueue.FieldStatus:
+		v, ok := value.(emailqueue.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case emailqueue.FieldAttempts:
+		v, ok := value.([]schema.EmailAttempt)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAttempts(v)
+		return nil
+	case emailqueue.FieldProcessedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProcessedAt(v)
+		return nil
+	case emailqueue.FieldAvailableAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAvailableAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown EmailQueue field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *EmailQueueMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *EmailQueueMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EmailQueueMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown EmailQueue numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *EmailQueueMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(emailqueue.FieldProcessedAt) {
+		fields = append(fields, emailqueue.FieldProcessedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *EmailQueueMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EmailQueueMutation) ClearField(name string) error {
+	switch name {
+	case emailqueue.FieldProcessedAt:
+		m.ClearProcessedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown EmailQueue nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *EmailQueueMutation) ResetField(name string) error {
+	switch name {
+	case emailqueue.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case emailqueue.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case emailqueue.FieldRecipientAddress:
+		m.ResetRecipientAddress()
+		return nil
+	case emailqueue.FieldRecipientName:
+		m.ResetRecipientName()
+		return nil
+	case emailqueue.FieldSubject:
+		m.ResetSubject()
+		return nil
+	case emailqueue.FieldContentPlain:
+		m.ResetContentPlain()
+		return nil
+	case emailqueue.FieldContentHTML:
+		m.ResetContentHTML()
+		return nil
+	case emailqueue.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case emailqueue.FieldAttempts:
+		m.ResetAttempts()
+		return nil
+	case emailqueue.FieldProcessedAt:
+		m.ResetProcessedAt()
+		return nil
+	case emailqueue.FieldAvailableAt:
+		m.ResetAvailableAt()
+		return nil
+	}
+	return fmt.Errorf("unknown EmailQueue field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *EmailQueueMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *EmailQueueMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *EmailQueueMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *EmailQueueMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *EmailQueueMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *EmailQueueMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *EmailQueueMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown EmailQueue unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *EmailQueueMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown EmailQueue edge %s", name)
 }
 
 // EventMutation represents an operation that mutates the Event nodes in the graph.

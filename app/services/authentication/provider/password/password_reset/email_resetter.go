@@ -11,6 +11,7 @@ import (
 	"github.com/matcornic/hermes/v2"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
@@ -25,6 +26,7 @@ var (
 
 type EmailResetter struct {
 	tokenProvider *TokenProvider
+	accountQuery  *account_querier.Querier
 	authRepo      authentication.Repository
 	sender        mailer.Sender
 	mailqueue     *mailqueue.Queuer
@@ -33,6 +35,7 @@ type EmailResetter struct {
 
 func NewEmailResetter(
 	tokenProvider *TokenProvider,
+	accountQuery *account_querier.Querier,
 	authRepo authentication.Repository,
 	sender mailer.Sender,
 	mailqueue *mailqueue.Queuer,
@@ -40,6 +43,7 @@ func NewEmailResetter(
 ) *EmailResetter {
 	return &EmailResetter{
 		tokenProvider: tokenProvider,
+		accountQuery:  accountQuery,
 		authRepo:      authRepo,
 		sender:        sender,
 		mailqueue:     mailqueue,
@@ -60,16 +64,20 @@ func (s *EmailResetter) SendPasswordReset(
 
 	link := lt.GetURL(token)
 
-	return s.sendResetEmail(ctx, address, link)
+	acc, err := s.accountQuery.GetRefByID(ctx, accountID)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return s.sendResetEmail(ctx, address, acc.Name, link)
 }
 
-func (s *EmailResetter) sendResetEmail(ctx context.Context, address mail.Address, link string) error {
+func (s *EmailResetter) sendResetEmail(ctx context.Context, address mail.Address, recipientName string, link string) error {
 	set, err := s.settings.Get(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	recipientName := address.Address
 	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Reset your password on %s!", instanceTitle)
 

@@ -141,6 +141,18 @@ func (f EmailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmailMutation", m)
 }
 
+// The EmailQueueFunc type is an adapter to allow the use of ordinary
+// function as EmailQueue mutator.
+type EmailQueueFunc func(context.Context, *ent.EmailQueueMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EmailQueueFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EmailQueueMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmailQueueMutation", m)
+}
+
 // The EventFunc type is an adapter to allow the use of ordinary
 // function as Event mutator.
 type EventFunc func(context.Context, *ent.EventMutation) (ent.Value, error)

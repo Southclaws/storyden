@@ -11,6 +11,7 @@ import (
 	"github.com/matcornic/hermes/v2"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
@@ -22,20 +23,23 @@ var (
 )
 
 type Verifier struct {
-	emailRepo *email.Repository
-	mailqueue *mailqueue.Queuer
-	settings  *settings.SettingsRepository
+	accountQuery *account_querier.Querier
+	emailRepo    *email.Repository
+	mailqueue    *mailqueue.Queuer
+	settings     *settings.SettingsRepository
 }
 
 func New(
+	accountQuery *account_querier.Querier,
 	emailRepo *email.Repository,
 	mailqueue *mailqueue.Queuer,
 	settings *settings.SettingsRepository,
 ) *Verifier {
 	return &Verifier{
-		emailRepo: emailRepo,
-		mailqueue: mailqueue,
-		settings:  settings,
+		accountQuery: accountQuery,
+		emailRepo:    emailRepo,
+		mailqueue:    mailqueue,
+		settings:     settings,
 	}
 }
 
@@ -54,16 +58,20 @@ func (s *Verifier) BeginEmailVerification(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return ae, s.sendVerification(ctx, address, code)
+	recipientName, err := s.getAccountName(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return ae, s.sendVerification(ctx, address, recipientName, code)
 }
 
-func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, code string) error {
+func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, recipientName string, code string) error {
 	set, err := s.settings.Get(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	recipientName := address.Address
 	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Welcome to %s!", instanceTitle)
 
@@ -76,12 +84,20 @@ func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, c
 }
 
 func (s *Verifier) ResendVerification(ctx context.Context, address mail.Address) error {
+	acc, exists, err := s.emailRepo.LookupAccount(ctx, address)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return fault.Wrap(ErrAccountNotFound, fctx.With(ctx))
+	}
+
 	code, err := s.emailRepo.GetCode(ctx, address)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return s.sendVerification(ctx, address, code)
+	return s.sendVerification(ctx, address, acc.Name, code)
 }
 
 func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code string) (*account.Account, error) {
@@ -103,4 +119,13 @@ func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code s
 	}
 
 	return acc, nil
+}
+
+func (s *Verifier) getAccountName(ctx context.Context, accountID account.AccountID) (string, error) {
+	acc, err := s.accountQuery.GetRefByID(ctx, accountID)
+	if err != nil {
+		return "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return acc.Name, nil
 }
