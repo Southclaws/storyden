@@ -203,6 +203,7 @@ export * from "./collectionWithItems";
 export * from "./collectionWithItemsAllOf";
 export * from "./commonProperties";
 export * from "./commonPropertiesMisc";
+export * from "./conflictResponse";
 export * from "./credentialRequestOptions";
 export * from "./datagraphAskOKResponse";
 export * from "./datagraphAskParams";

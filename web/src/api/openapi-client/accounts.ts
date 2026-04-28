@@ -31,6 +31,7 @@ import type {
   AccountWarningUpdateBody,
   AccountWarningUpdateOKResponse,
   BadRequestResponse,
+  ConflictResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
   NoContentResponse,
@@ -811,12 +812,14 @@ export type AccountEmailAddMutationResult = NonNullable<
 export type AccountEmailAddMutationError =
   | BadRequestResponse
   | UnauthorisedResponse
+  | ConflictResponse
   | InternalServerErrorResponse;
 
 export const useAccountEmailAdd = <
   TError =
     | BadRequestResponse
     | UnauthorisedResponse
+    | ConflictResponse
     | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<

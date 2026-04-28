@@ -1263,6 +1263,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
 
@@ -3674,6 +3675,8 @@ components:
       headers: { <<: *cache_response_headers }
     BadRequest:
       description: Bad request
+    Conflict:
+      description: Conflict
     NotFound:
       description: Not found
     Unauthorised:
