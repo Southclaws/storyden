@@ -146,5 +146,6 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		handle,
 		name,
 		*email,
+		u.Verified,
 	)
 }

@@ -30,11 +30,12 @@ var (
 
 // Provider implements OAuthProvider using Keycloak OIDC discovery.
 type Provider struct {
-	config   oauth.Configuration
-	register *register.Registrar
-	ed       endec.EncrypterDecrypter
-	issuer   *oidc.Provider
-	verifier *oidc.IDTokenVerifier
+	config      oauth.Configuration
+	register    *register.Registrar
+	ed          endec.EncrypterDecrypter
+	issuer      *oidc.Provider
+	verifier    *oidc.IDTokenVerifier
+	callbackURL string
 }
 
 // New constructs a Keycloak OAuth provider, running OIDC discovery.
@@ -64,16 +65,20 @@ func New(
 	}
 	verifier := issuer.Verifier(&oidc.Config{ClientID: cfg.KeycloakClientID})
 
+	// Build the OAuth callback URL using the same pattern as other providers
+	callbackURL := oauth.Redirect(cfg.PublicWebAddress, service)
+
 	return &Provider{
 		config: oauth.Configuration{
 			Enabled:      cfg.KeycloakEnabled,
 			ClientID:     cfg.KeycloakClientID,
 			ClientSecret: cfg.KeycloakClientSecret,
 		},
-		register: register,
-		ed:       ed,
-		issuer:   issuer,
-		verifier: verifier,
+		register:    register,
+		ed:          ed,
+		issuer:      issuer,
+		verifier:    verifier,
+		callbackURL: callbackURL.String(), // Call .String() here instead
 	}, nil
 }
 
@@ -100,6 +105,7 @@ func (p *Provider) oauthConfig(redirect string) *oauth2.Config {
 }
 
 // Link returns the URL to redirect a user to Keycloak for authentication.
+// The redirectPath parameter is the OAuth callback URL (not the post-login destination).
 func (p *Provider) Link(redirectPath string) (string, error) {
 	state, err := p.ed.Encrypt(map[string]any{"redirect": redirectPath}, time.Minute*10)
 	if err != nil {
@@ -168,6 +174,39 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	authName := fmt.Sprintf("Keycloak (%s)", emailAddr.Address)
 
 	return p.register.GetOrCreateViaEmail(
-		ctx, service, authName, idToken.Subject, tok.AccessToken, handle, name, *emailAddr,
+		ctx,
+		service,
+		authName,
+		idToken.Subject,
+		tok.AccessToken,
+		handle,
+		name,
+		*emailAddr,
+		claims.EmailVerified,
 	)
+}
+
+// Bootstrap generates OIDC bootstrap values for machine-consumable login flows.
+// The redirectPath parameter is the post-login destination (e.g., "/dashboard"),
+// NOT the OAuth redirect_uri. The OAuth redirect_uri is always the registered callback URL.
+func (p *Provider) Bootstrap(redirectPath string) (map[string]string, error) {
+	// Store the post-login destination in state, NOT the OAuth callback URL
+	state, err := p.ed.Encrypt(map[string]any{
+		"redirect":          p.callbackURL, // OAuth callback URL for token exchange
+		"final_destination": redirectPath,  // Where to send user after login
+	}, time.Minute*10)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	// Use the registered OAuth callback URL, not the user's destination
+	oac := p.oauthConfig(p.callbackURL)
+	authorizeURL := oac.AuthCodeURL(state, oauth2.AccessTypeOffline)
+
+	expiresAt := time.Now().Add(time.Minute * 10).Format(time.RFC3339)
+
+	return map[string]string{
+		"authorize_url": authorizeURL,
+		"expires_at":    expiresAt,
+	}, nil
 }

@@ -145,6 +145,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		handle,
 		name,
 		*email,
+		u.VerifiedEmail != nil && *u.VerifiedEmail,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err,

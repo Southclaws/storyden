@@ -237,6 +237,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 	handle string,
 	name string,
 	email mail.Address,
+	providerEmailVerified bool,
 ) (*account.Account, error) {
 	// Two key pieces of information here can point to an existing account. The
 	// authentication record and the email address. In most cases, either both
@@ -298,6 +299,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 		slog.Bool("auth_method_exists", authMethodExists),
 		slog.Bool("email_exists", emailExists),
 		slog.Bool("email_verified", isVerified),
+		slog.Bool("provider_email_verified", providerEmailVerified),
 	)
 
 	switch {
@@ -321,6 +323,14 @@ func (s *Registrar) GetOrCreateViaEmail(
 			}
 		}
 
+		if providerEmailVerified && !isVerified {
+			if err := s.verifyExistingEmail(ctx, emailOwner.ID, email); err != nil {
+				return nil, fault.Wrap(err,
+					fctx.With(ctx),
+					fmsg.WithDesc("failed to trust provider email verification", "Unable to verify your email address from the identity provider."))
+			}
+		}
+
 		logger.Info("get or create: account already exists")
 
 		return &emailOwner.Account, nil
@@ -330,9 +340,12 @@ func (s *Registrar) GetOrCreateViaEmail(
 		// the email address associated with the authentication method has
 		// not yet been recorded. This may happen if certain auth providers
 		// are enabled at a later date, such as with OAuth providers.
-		// Link the email address to the account and send a verification.
 
-		err = s.linkAndVerifyEmail(ctx, authmethod.Account.ID, email)
+		if providerEmailVerified {
+			err = s.linkVerifiedEmail(ctx, authmethod.Account.ID, email)
+		} else {
+			err = s.linkAndVerifyEmail(ctx, authmethod.Account.ID, email)
+		}
 		if err != nil {
 			return nil, fault.Wrap(err,
 				fctx.With(ctx),
@@ -349,11 +362,19 @@ func (s *Registrar) GetOrCreateViaEmail(
 		// the caller has verified this via OAuth or similar. The email may
 		// have also been added manually via a newsletter list. Link them.
 
-		if !isVerified {
+		if !isVerified && !providerEmailVerified {
 			return nil, fault.Wrap(errEmailNotVerified,
 				fctx.With(ctx),
 				fmsg.WithDesc("email not verified", "Unable to complete sign-in. Please contact support if this issue persists."),
 			)
+		}
+
+		if !isVerified && providerEmailVerified {
+			if err := s.verifyExistingEmail(ctx, emailOwner.ID, email); err != nil {
+				return nil, fault.Wrap(err,
+					fctx.With(ctx),
+					fmsg.WithDesc("failed to trust provider email verification", "Unable to verify your email address from the identity provider."))
+			}
 		}
 
 		_, err = s.authRepo.Create(ctx, emailOwner.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
@@ -373,13 +394,15 @@ func (s *Registrar) GetOrCreateViaEmail(
 			return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 		}
 
-		if !isVerified {
+		if providerEmailVerified {
+			err = s.linkVerifiedEmail(ctx, newAccount.ID, email)
+		} else {
 			err = s.linkAndVerifyEmail(ctx, newAccount.ID, email)
-			if err != nil {
-				return nil, fault.Wrap(err,
-					fctx.With(ctx),
-					fmsg.WithDesc("failed to link and verify email", "Unable to send verification email. Please try again or contact site administration."))
-			}
+		}
+		if err != nil {
+			return nil, fault.Wrap(err,
+				fctx.With(ctx),
+				fmsg.WithDesc("failed to link and verify email", "Unable to send verification email. Please try again or contact site administration."))
 		}
 
 		logger.Info("get or create: no auth record, no email record, creating new account and verifying email")
@@ -586,6 +609,33 @@ func (s *Registrar) ProvisionWithHandle(
 	}
 
 	return newAccount, nil
+}
+
+func (s *Registrar) linkVerifiedEmail(ctx context.Context, accID account.AccountID, email mail.Address) error {
+	_, err := s.emailRepo.Add(ctx, accID, email, "")
+	if err != nil {
+		return fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to link verified email", "Unable to link your verified email address. Please try again."))
+	}
+
+	if err := s.emailRepo.Verify(ctx, accID, email); err != nil {
+		return fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to mark email as verified", "Unable to trust the identity provider email verification state. Please try again."))
+	}
+
+	return nil
+}
+
+func (s *Registrar) verifyExistingEmail(ctx context.Context, accID account.AccountID, email mail.Address) error {
+	if err := s.emailRepo.Verify(ctx, accID, email); err != nil {
+		return fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to verify existing email", "Unable to verify your existing email address from the identity provider."))
+	}
+
+	return nil
 }
 
 func (s *Registrar) linkAndVerifyEmail(ctx context.Context, accID account.AccountID, email mail.Address) error {
