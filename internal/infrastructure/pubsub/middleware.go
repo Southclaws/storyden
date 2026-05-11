@@ -53,7 +53,12 @@ type sessionContextPublisher struct {
 
 func (p *sessionContextPublisher) Publish(topic string, messages ...*message.Message) error {
 	for _, msg := range messages {
-		injectSessionContext(msg.Context(), msg)
+		// Message handlers should inherit caller identity, but not the caller's
+		// cancellation or deadline. Otherwise short-lived HTTP request contexts
+		// can cancel queued work before consumers process it.
+		ctx := context.WithoutCancel(msg.Context())
+		msg.SetContext(ctx)
+		injectSessionContext(ctx, msg)
 	}
 	return p.publisher.Publish(topic, messages...)
 }
