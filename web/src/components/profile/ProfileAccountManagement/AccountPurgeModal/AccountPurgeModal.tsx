@@ -1,4 +1,5 @@
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { useI18n } from "@/i18n/provider";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { AccountPurgeScreen } from "./AccountPurgeScreen";
@@ -11,12 +12,14 @@ export function AccountPurgeModal({
   onOpen,
   isOpen,
 }: UseDisclosureProps & Props) {
+  const { t } = useI18n();
+
   return (
     <ModalDrawer
       onOpen={onOpen}
       isOpen={isOpen}
       onClose={onClose}
-      title={`Purge account content: ${handle}`}
+      title={t("Purge account content: {{handle}}", { handle })}
     >
       <AccountPurgeScreen
         accountId={accountId}

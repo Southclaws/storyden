@@ -2,11 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { Flex, styled } from "@/styled-system/jsx";
 
 import { useLoginHandleForm } from "./useLoginHandleForm";
 
 export function LoginHandleForm() {
+  const { t } = useI18n();
   const {
     form: {
       register,
@@ -33,7 +35,7 @@ export function LoginHandleForm() {
         w="full"
         size="sm"
         textAlign="center"
-        placeholder="username"
+        placeholder={t("username")}
         required
         {...register("identifier")}
       />
@@ -46,7 +48,7 @@ export function LoginHandleForm() {
           w="full"
           size="sm"
           textAlign="center"
-          placeholder="password"
+          placeholder={t("password")}
           autoComplete="current-password"
           {...register("token")}
         />
@@ -55,7 +57,7 @@ export function LoginHandleForm() {
         {errors.token?.message}
       </styled.p>
       <Button type="submit" w="full" onClick={handlePassword}>
-        Login
+        {t("Login")}
       </Button>
       <styled.p color="fg.error" fontSize="sm">
         {errors.root?.message}

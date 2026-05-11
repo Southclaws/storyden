@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -19,6 +20,7 @@ type Props = {
 
 export function AccessKeysSettings({ keys }: Props) {
   const createModal = useDisclosure();
+  const { t } = useI18n();
 
   const totalKeys = keys.length;
   const totalActiveKeys = keys.filter(isKeyActive).length;
@@ -28,13 +30,12 @@ export function AccessKeysSettings({ keys }: Props) {
     <>
       <CardBox className={lstack()} gap="8">
         <LStack>
-          <Heading size="md">Access keys</Heading>
+          <Heading size="md">{t("Access keys")}</Heading>
 
           <p>
-            Access keys allow you to authenticate API requests. They share the
-            same permissions as your account. If your account receives new
-            roles, your access keys will inherit the permissions assigned to
-            those roles.
+            {t(
+              "Access keys allow you to authenticate API requests. They share the same permissions as your account. If your account receives new roles, your access keys will inherit the permissions assigned to those roles.",
+            )}
           </p>
         </LStack>
 
@@ -42,14 +43,19 @@ export function AccessKeysSettings({ keys }: Props) {
           <WStack alignItems="center" color="fg.muted">
             {hasInactive ? (
               <styled.p>
-                {totalKeys} access keys, {totalActiveKeys} active.
+                {t("{{total}} access keys, {{active}} active.", {
+                  total: totalKeys,
+                  active: totalActiveKeys,
+                })}
               </styled.p>
             ) : (
-              <styled.p>{keys.length} access keys.</styled.p>
+              <styled.p>
+                {t("{{count}} access keys.", { count: keys.length })}
+              </styled.p>
             )}
             <Button size="xs" variant="subtle" onClick={createModal.onOpen}>
               <AddIcon />
-              New
+              {t("New")}
             </Button>
           </WStack>
 
@@ -67,11 +73,12 @@ export function AccessKeysSettings({ keys }: Props) {
 
 function AccessKeyItemList({ keys }: Props) {
   const { revokeKey } = useAccessKeySettings();
+  const { t } = useI18n();
 
   if (keys.length === 0) {
     return (
       <p style={{ color: "var(--colors-gray-500)", fontStyle: "italic" }}>
-        No access keys created yet.
+        {t("No access keys created yet.")}
       </p>
     );
   }
@@ -97,14 +104,15 @@ type AccessKeyItemProps = {
 function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
   const { isConfirming, handleConfirmAction, handleCancelAction } =
     useConfirmation(onRevoke);
+  const { t } = useI18n();
 
   const isExpired = isKeyExpired(accessKey);
 
   const inactiveStatus = isExpired
-    ? "Expired"
+    ? t("Expired")
     : accessKey.enabled
       ? undefined
-      : "Revoked";
+      : t("Revoked");
 
   return (
     <li className={cardBox()}>
@@ -122,14 +130,14 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                     bgColor="bg.destructive"
                     onClick={handleConfirmAction}
                   >
-                    Confirm Revoke
+                    {t("Confirm Revoke")}
                   </Button>
                   <Button
                     size="xs"
                     variant="outline"
                     onClick={handleCancelAction}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </>
               ) : (
@@ -139,7 +147,7 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                   bgColor="bg.destructive"
                   onClick={handleConfirmAction}
                 >
-                  Revoke
+                  {t("Revoke")}
                 </Button>
               )}
             </HStack>
@@ -150,12 +158,12 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
 
         <WStack flexWrap="wrap">
           <styled.p fontSize="xs">
-            Created: <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
+            {t("Created")}: <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
           </styled.p>
 
           {accessKey.expires_at && (
             <Badge gap="1">
-              <span>Expiry:</span>
+              <span>{t("Expiry")}:</span>
               <time>{formatDate(accessKey.expires_at, "PPpp")}</time>
             </Badge>
           )}

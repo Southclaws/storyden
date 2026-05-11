@@ -1,10 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDuration, intervalToDuration } from "date-fns";
-import { register } from "node:module";
+import { intervalToDuration } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
+import { useI18n } from "@/i18n/provider";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
 
@@ -19,11 +19,29 @@ export const DEFAULT_RATE_LIMIT_GUEST_COST = 1;
 export const DEFAULT_CLIENT_IP_MODE = "remote_addr";
 export const DEFAULT_CLIENT_IP_HEADER = "X-Real-IP";
 
-export function formatSeconds(seconds: number): string {
-  const duration = intervalToDuration({ start: 0, end: seconds * 1000 });
-  return formatDuration(duration, {
-    format: ["days", "hours", "minutes", "seconds"],
-  });
+export function formatSeconds(
+  seconds: number | undefined,
+  t?: (key: string) => string,
+): string {
+  const safeSeconds =
+    typeof seconds === "number" && Number.isFinite(seconds) ? seconds : 0;
+  const duration = intervalToDuration({ start: 0, end: safeSeconds * 1000 });
+  const translate = t ?? ((key: string) => key);
+  const units = [
+    { value: duration.days, singular: "day", plural: "days" },
+    { value: duration.hours, singular: "hour", plural: "hours" },
+    { value: duration.minutes, singular: "minute", plural: "minutes" },
+    { value: duration.seconds, singular: "second", plural: "seconds" },
+  ];
+
+  const parts = units
+    .filter((unit) => unit.value && unit.value > 0)
+    .map((unit) => {
+      const value = unit.value ?? 0;
+      return `${value} ${translate(value === 1 ? unit.singular : unit.plural)}`;
+    });
+
+  return parts.length > 0 ? parts.join(" ") : `0 ${translate("seconds")}`;
 }
 
 export const FormSchema = z.object({
@@ -71,6 +89,7 @@ export function buildClientIPSettingsPayload(
 }
 
 export function useSystemSettings({ settings }: Props) {
+  const { t } = useI18n();
   const { revalidate, updateSettings } = useSettingsMutation();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -123,8 +142,8 @@ export function useSystemSettings({ settings }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving settings...",
-          success: "Settings saved",
+          loading: t("Saving settings..."),
+          success: t("Settings saved"),
         },
       },
     );

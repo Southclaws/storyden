@@ -4,6 +4,7 @@ import { FormLabel } from "@/components/ui/FormLabel";
 import { Button } from "@/components/ui/button";
 import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -43,19 +44,19 @@ const CONTENT_TYPE_LABELS: Record<
   },
 };
 
-const CONTENT_TYPES = Object.entries(
-  ModerationActionPurgeAccountContentType,
-).map(([_, value]) => ({
-  value,
-  label: CONTENT_TYPE_LABELS[value].name,
-  description: CONTENT_TYPE_LABELS[value].description,
-}));
-
 export function AccountPurgeScreen(props: Props) {
+  const { t } = useI18n();
   const {
     form,
     handlers: { handlePurge },
   } = useAccountPurgeScreen(props);
+  const contentTypes = Object.entries(ModerationActionPurgeAccountContentType).map(
+    ([_, value]) => ({
+      value,
+      label: t(CONTENT_TYPE_LABELS[value].name),
+      description: t(CONTENT_TYPE_LABELS[value].description),
+    }),
+  );
 
   return (
     <styled.form
@@ -76,25 +77,24 @@ export function AccountPurgeScreen(props: Props) {
             <WarningIcon w="5" flexShrink="0" />
             <LStack gap="1">
               <styled.p fontWeight="semibold" fontSize="sm">
-                Destructive Action
+                {t("Destructive Action")}
               </styled.p>
               <styled.p fontSize="xs">
-                This will permanently delete the selected content types from
-                this account. This action cannot be undone.
+                {t("This will permanently delete the selected content types from this account. This action cannot be undone.")}
               </styled.p>
             </LStack>
           </HStack>
         </Box>
 
         <FormControl>
-          <FormLabel>Content Types to Purge</FormLabel>
+          <FormLabel>{t("Content Types to Purge")}</FormLabel>
           <CardGroupSelect
             control={form.control}
             name="contentTypes"
-            items={CONTENT_TYPES}
+            items={contentTypes}
           />
           <styled.p fontSize="xs" color="fg.subtle" mt="1">
-            Select the types of content you want to purge from this account
+            {t("Select the types of content you want to purge from this account")}
           </styled.p>
         </FormControl>
       </LStack>
@@ -107,7 +107,7 @@ export function AccountPurgeScreen(props: Props) {
           loading={form.formState.isSubmitting}
           type="submit"
         >
-          Purge Selected Content
+          {t("Purge Selected Content")}
         </Button>
       </WStack>
     </styled.form>

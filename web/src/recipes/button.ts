@@ -6,10 +6,13 @@ export const button = defineRecipe({
   base: {
     alignItems: "center",
     appearance: "none",
+    borderWidth: "1px",
+    borderColor: "transparent",
     borderRadius: "l2",
+    boxShadow: "xs",
     cursor: "pointer",
     display: "inline-flex",
-    fontWeight: "semibold",
+    fontWeight: "medium",
     minWidth: "0",
     justifyContent: "center",
     outline: "none",
@@ -35,13 +38,14 @@ export const button = defineRecipe({
         color: "bg.default",
         colorPalette: "accent",
         _hover: {
-          background: "colorPalette.default/80",
+          background: "colorPalette.default/90",
           color: "bg.default",
         },
+        _active: {
+          background: "colorPalette.default/90",
+        },
         _focusVisible: {
-          outline: "2px solid",
-          outlineColor: "colorPalette.default",
-          outlineOffset: "2px",
+          boxShadow: "0 0 0 3px var(--colors-border-focus)",
         },
         _disabled: {
           color: "fg.disabled",
@@ -55,12 +59,14 @@ export const button = defineRecipe({
       },
       outline: {
         borderWidth: "1px",
-        borderColor: "colorPalette.a7",
+        borderColor: "border.default",
+        background: "bg.default",
         color: "fg.subtle",
         colorPalette: "gray",
         _hover: {
-          background: "colorPalette.subtle",
-          color: "colorPalette.default",
+          borderColor: "border.strong",
+          background: "bg.subtle",
+          color: "fg.default",
         },
         _disabled: {
           borderColor: "border.disabled",
@@ -73,9 +79,7 @@ export const button = defineRecipe({
           },
         },
         _focusVisible: {
-          outline: "2px solid",
-          outlineColor: "colorPalette.default",
-          outlineOffset: "2px",
+          boxShadow: "0 0 0 3px var(--colors-border-focus)",
         },
         _selected: {
           background: "accent.default",
@@ -91,7 +95,7 @@ export const button = defineRecipe({
         color: "fg.subtle",
         colorPalette: "accent",
         _hover: {
-          background: "colorPalette.subtle",
+          background: "bg.subtle",
           color: "fg.default",
         },
         _selected: {
@@ -106,9 +110,7 @@ export const button = defineRecipe({
           },
         },
         _focusVisible: {
-          outline: "2px solid",
-          outlineColor: "colorPalette.default",
-          outlineOffset: "2px",
+          boxShadow: "0 0 0 3px var(--colors-border-focus)",
         },
       },
       link: {
@@ -126,18 +128,16 @@ export const button = defineRecipe({
       },
       subtle: {
         colorPalette: "accent",
-        background: "bg.muted/80",
+        background: "bg.muted",
+        borderColor: "border.subtle",
         color: "fg.subtle",
-        backdropBlur: "sm",
-        backdropFilter: "auto",
         _hover: {
-          background: "colorPalette.subtle",
+          borderColor: "border.default",
+          background: "bg.subtle",
           color: "fg.default",
         },
         _focusVisible: {
-          outline: "2px solid",
-          outlineColor: "colorPalette.default",
-          outlineOffset: "2px",
+          boxShadow: "0 0 0 3px var(--colors-border-focus)",
         },
         _disabled: {
           background: "bg.disabled",
@@ -169,7 +169,7 @@ export const button = defineRecipe({
         h: "8",
         minW: "8",
         textStyle: "sm",
-        px: "2",
+        px: "3",
         gap: "2",
         "& svg": {
           width: "4",
@@ -177,10 +177,10 @@ export const button = defineRecipe({
         },
       },
       md: {
-        h: "10",
-        minW: "10",
+        h: "9",
+        minW: "9",
         textStyle: "sm",
-        px: "4",
+        px: "3.5",
         gap: "2",
         "& svg": {
           width: "5",
@@ -188,10 +188,10 @@ export const button = defineRecipe({
         },
       },
       lg: {
-        h: "11",
-        minW: "11",
+        h: "10",
+        minW: "10",
         textStyle: "md",
-        px: "4.5",
+        px: "4",
         gap: "2",
         "& svg": {
           width: "5",

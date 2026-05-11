@@ -6,6 +6,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { formatSeconds } from "./useSystemSettings";
@@ -31,6 +32,7 @@ export function OperationCostOverrideAddForm({
   onCostChange,
   onAdd,
 }: OperationCostOverrideAddFormProps) {
+  const { t } = useI18n();
   const { contains } = useFilter({ sensitivity: "base" });
 
   const items = availableOperations.map((op) => ({ label: op, value: op }));
@@ -62,11 +64,11 @@ export function OperationCostOverrideAddForm({
             flex="1"
           >
             <Combobox.Control>
-              <Combobox.Input placeholder="Search operations..." asChild>
+              <Combobox.Input placeholder={t("Search operations...")} asChild>
                 <Input size="sm" />
               </Combobox.Input>
               <Combobox.Trigger asChild>
-                <IconButton variant="link" aria-label="open" size="xs">
+                <IconButton variant="link" aria-label={t("open")} size="xs">
                   <ChevronUpDownIcon />
                 </IconButton>
               </Combobox.Trigger>
@@ -101,11 +103,11 @@ export function OperationCostOverrideAddForm({
         </HStack>
 
         <styled.p fontSize="xs" color="fg.muted">
-          Can be performed{" "}
-          <styled.strong color="fg.info">{effectiveLimit}</styled.strong> times
-          every{" "}
+          {t("Can be performed")}{" "}
+          <styled.strong color="fg.info">{effectiveLimit}</styled.strong>{" "}
+          {t("times every")}{" "}
           <styled.strong color="fg.info">
-            {formatSeconds(rateLimitPeriod)}
+            {formatSeconds(rateLimitPeriod, t)}
           </styled.strong>
         </styled.p>
       </LStack>

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { AccountCommonProps, AuthMode } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
+import { useI18n } from "@/i18n/provider";
 import { Settings } from "@/lib/settings/settings";
 import { Box } from "@/styled-system/jsx";
 
@@ -15,6 +16,7 @@ type Props = {
 
 export function VerificationBanner({ session, settings }: Props) {
   const [visible, setVisible] = useState(true);
+  const { t } = useI18n();
 
   if (!session) {
     return null;
@@ -33,18 +35,18 @@ export function VerificationBanner({ session, settings }: Props) {
       <Admonition
         value={visible}
         kind="failure"
-        title="Email Verification Required"
+        title={t("Email Verification Required")}
         onChange={setVisible}
       >
         <p>
-          Please{" "}
+          {t("Please")}{" "}
           <Link
             href="/settings?tab=email"
             style={{ textDecoration: "underline" }}
           >
-            verify your email in settings
+            {t("verify your email in settings")}
           </Link>{" "}
-          to participate in this community.
+          {t("to participate in this community.")}
         </p>
       </Admonition>
     </Box>

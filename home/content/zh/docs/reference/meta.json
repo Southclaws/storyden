@@ -1,0 +1,20 @@
+{
+    "root": true,
+    "title": "参考",
+    "description": "Storyden 特定功能的参考手册。",
+    "pages": [
+        "---介绍---",
+        "index",
+        "---配置 Storyden---",
+        "configuration",
+        "ssr-client-ip",
+        "email",
+        "settings",
+        "---数据管理---",
+        "database",
+        "search",
+        "---认证---",
+        "oauth",
+        "access-keys"
+    ]
+}

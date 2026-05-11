@@ -1,0 +1,82 @@
+---
+title: Building, Running, and Administrating Modern Forum Software
+date: 2023-02-03
+description: >-
+  Why build a forum in 2023? What role do internet forums play today and what's
+  the future of internet communities in an age of Reddit, WhatsApp and Mastodon?
+---
+
+With a convergeance on large platforms like Reddit and Discord, the main question I've had asked when discussing Storyden is why bother?
+
+Most of the time, that question occurs on Discord, and is asked by a friend who, like me, grew up on internet forums.
+
+And while I'm a lover of Discord (it's my community platform of choice) I'm still bullish on _independent_ and niche-specific bulletin board style sites having a place in the current and next eras of internet culture.
+
+So here it is, Storyden is forum software for the modern age. Inspired by traditional boards like SMF and Discourse but with a focus on the needs and desires of a modern web.
+
+If that piques your interest, please read on...
+
+## State of the Art
+
+You can't talk about forums without mentioning Discourse, the current dominant player in the market. While a great piece of software, its main use-case in the wild appears to be customer support forums. That's a great niche and probably quite a profitable B2B market.
+
+Then the list tails off from there, there's NodeBB, MyBB, phpBB, Invision Pro Boards, Vanilla and Forem boasting a nice mix of JavaScript, PHP and Ruby for the languages of choice.
+
+I've tried all of these, either to evaluate or use in production for a community of my own. They're all great in their own way and have skilled teams of contributors behind them.
+
+## Time for something fresh?
+
+However, some common themes arose:
+
+- complicated to deploy
+- difficult to containerise
+- ageing technologies/languages
+- lacking accessibility features for those with visual impairments
+- resource-intensive
+
+Which, aren't on their own issues at all and I'm definitely not the one to shun software just because it's "old". I've often said I'd be happy if some apps I use never received another new feature and I'm perfectly happy with declaring products "finished" (constantly moving forward can be exhausting!)
+
+But, at the same time, there's a lot of cruft in older software, dated terminology, unused features cluttering up settings pages and generally bits of technical debt that make adopting new ideas more difficult.
+
+Some great friends (who I of course knew from online forums!) decided there was a big enough gap to build something interesting in the open source world.
+
+And after lots of discussion, some hacking around and lots of coffee, [issue #1](https://github.com/Southclaws/storyden/issues/1) was created with a rough plan of action.
+
+## Innovating on a timeless idea
+
+I, and many others would argue that the world doesn't need _yet another_ xyzBB. Another threads-posts-comments feed sorted by most recent reply. Another place to sign up, forget your password and never use because you're more active in Discord anyway.
+
+<Callout type="info" emoji="ℹ️">
+  I would be also very happy to be proven wrong about this biased assumption!
+  [Feedback is massively appreciated.](https://airtable.com/shrLY0jDp9CuXPB2X)
+</Callout>
+
+Most folks I know who are active in "communities" are on either Discord, Slack or WhatsApp. And there's rarely a reason for those people to close one of those apps and open up another just to share a link or ask a question. "You can't replace email" is the adage that comes to mind.
+
+While there's definitely a market for using bulletin boards which Storyden aims to fill with its own unique take, there must be more to it than just threads and posts.
+
+Storyden's north star is facilitating the aggregation of communal knowledge. That may look like a bulletin board to some and a Slack bot to another, but what's most important is that whatever the solution is, it must be:
+
+- Extremely easy to deploy anywhere
+- Built for the next decade(s) of technology
+- Accessible to all, regardless of device specs or ability
+- Cheap to run, energy-efficient and fast
+- Infinitely extensible with plugins or bring-your-own-frontend
+
+### The ingredients
+
+In no particular order, caffeinated and opinionated, this is my shortlist of how we get there:
+
+- Single static binary: Golang wins hands down here
+- Container by default: it's how myself and everyone I know deploys nowadays
+- No complicated dependenies: the bare minimum production setup runs on SQLite
+- Progressively enhanced: the basics should work whether you're connecting from a city, a forest or a ship
+- Accessible to anyone: doesn't just mean the odd aria-role but ensuring things work for everyone
+- API driven: extensions, automations and building your own frontend are easier this way
+- Next.js for the default frontend: it's popular, well supported and I know it well!
+
+## Summary
+
+In summary, I'm aiming to build something that's small, simple but scales well. It's a big task but I'm confident it'll be a rewarding journey! I hope that being a fully open source project not only encourages contributions but also provides a quality codebase for others to learn from.
+
+More posts to come detailing the inner workings and some decisions behind the project!

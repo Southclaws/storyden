@@ -12,6 +12,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { LinkButton } from "@/components/ui/link-button";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import { Center, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
@@ -24,6 +25,7 @@ export type LinkPreviewAttributes = {
 };
 
 function LinkPreviewComponent(props: NodeViewProps) {
+  const { t } = useI18n();
   const href = props.node.attrs["href"] as string;
   const isEditable = props.editor.isEditable;
   // selection is only ever really possible while editable. though prosemirror
@@ -92,9 +94,9 @@ function LinkPreviewComponent(props: NodeViewProps) {
                     size="xs"
                     variant="subtle"
                     onClick={() => trigger({ url: href })}
-                    loading={isMutating}
-                  >
-                    Retry
+                  loading={isMutating}
+                >
+                    {t("Retry")}
                   </Button>
                 </styled.div>
               ) : (
@@ -104,7 +106,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   </LinkButton>
                   <styled.p fontSize="xs" color="fg.muted">
                     <WarningIcon w="3" display="inline" />
-                    &nbsp;<span>Link preview failed to load</span>
+                    &nbsp;<span>{t("Link preview failed to load")}</span>
                   </styled.p>
                 </LStack>
               )

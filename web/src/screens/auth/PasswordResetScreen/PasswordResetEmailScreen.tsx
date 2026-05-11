@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { Input } from "@/components/ui/input";
 import { WEB_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
@@ -49,6 +50,7 @@ export function usePasswordResetEmailScreen() {
 }
 
 export function PasswordResetEmailScreen() {
+  const { t } = useI18n();
   const { form, handlers } = usePasswordResetEmailScreen();
 
   return (
@@ -64,7 +66,7 @@ export function PasswordResetEmailScreen() {
           type="email"
           w="full"
           textAlign="center"
-          placeholder="Email address..."
+          placeholder={t("Email address...")}
           required
           {...form.register("email")}
         />
@@ -74,7 +76,7 @@ export function PasswordResetEmailScreen() {
       </FormControl>
 
       <Button type="submit" size="sm" w="full">
-        Reset
+        {t("Reset")}
       </Button>
 
       <FormErrorText>{form.formState.errors["root"]?.message}</FormErrorText>

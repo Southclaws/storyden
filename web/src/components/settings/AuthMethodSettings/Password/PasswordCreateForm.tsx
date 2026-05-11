@@ -1,6 +1,7 @@
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { usePasswordCreate } from "./usePasswordCreate";
@@ -11,12 +12,14 @@ export function PasswordCreateForm() {
     success,
     handleCloseNotification,
   } = usePasswordCreate();
+  const { t } = useI18n();
 
   return (
     <>
       <p>
-        Your account does not currently have a password. You can add a password
-        here.
+        {t(
+          "Your account does not currently have a password. You can add a password here.",
+        )}
       </p>
       <styled.form
         display="flex"
@@ -29,7 +32,7 @@ export function PasswordCreateForm() {
           maxW="xs"
           type="password"
           autoComplete="new-password"
-          placeholder="new password"
+          placeholder={t("new password")}
           disabled={success}
           {...register("newPassword")}
         />
@@ -40,7 +43,7 @@ export function PasswordCreateForm() {
           maxW="xs"
           type="password"
           autoComplete="new-password"
-          placeholder="confirm new password"
+          placeholder={t("confirm new password")}
           disabled={success}
           {...register("confirmPassword")}
         />
@@ -52,16 +55,17 @@ export function PasswordCreateForm() {
         </styled.p>
         <VStack alignItems="start" w="full">
           <Button type="submit" disabled={success}>
-            Add password
+            {t("Add password")}
           </Button>
           <Admonition
             value={success}
             onChange={handleCloseNotification}
             kind="success"
-            title="Success"
+            title={t("Success")}
           >
-            Your account now has a password! You can now use this to log in, but
-            you can continue to use your other authentication methods as well.
+            {t(
+              "Your account now has a password! You can now use this to log in, but you can continue to use your other authentication methods as well.",
+            )}
           </Admonition>
         </VStack>
       </styled.form>

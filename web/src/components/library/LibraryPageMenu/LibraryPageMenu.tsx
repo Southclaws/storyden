@@ -7,6 +7,7 @@ import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { HStack, styled } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
 
@@ -40,6 +41,7 @@ export function LibraryPageMenu({
   children,
   ...props
 }: LibraryPageMenuProps) {
+  const { t } = useI18n();
   const {
     availableOperations,
     deleteEnabled,
@@ -62,9 +64,9 @@ export function LibraryPageMenu({
 
   const statusText =
     node.visibility === "draft"
-      ? "(draft)"
+      ? t("(draft)")
       : node.visibility === "review"
-        ? "(in review)"
+        ? t("(in review)")
         : "";
 
   return (
@@ -90,7 +92,8 @@ export function LibraryPageMenu({
                 userSelect="none"
               >
                 <styled.span>
-                  {`Created by ${node.owner.name}`} {statusText}
+                  {t("Created by {{name}}", { name: node.owner.name })}{" "}
+                  {statusText}
                 </styled.span>
 
                 <styled.time fontWeight="normal">
@@ -105,7 +108,7 @@ export function LibraryPageMenu({
                   key={op.targetVisibility}
                   value={op.targetVisibility}
                 >
-                  {op.label}
+                  {t(op.label)}
                 </Menu.Item>
               ))}
 
@@ -114,8 +117,8 @@ export function LibraryPageMenu({
               {isManager && (
                 <Menu.Item value="toggle-hide-in-tree">
                   {isChildrenHidden
-                    ? "Show children in tree"
-                    : "Hide children in tree"}
+                    ? t("Show children in tree")
+                    : t("Hide children in tree")}
                 </Menu.Item>
               )}
 
@@ -129,7 +132,7 @@ export function LibraryPageMenu({
                       w="full"
                       closeOnSelect={false}
                     >
-                      Are you sure?
+                      {t("Are you sure?")}
                     </Menu.Item>
 
                     <Menu.Item
@@ -150,7 +153,7 @@ export function LibraryPageMenu({
                     value="delete"
                     closeOnSelect={false}
                   >
-                    Delete
+                    {t("Delete")}
                   </Menu.Item>
                 ))}
             </Menu.ItemGroup>

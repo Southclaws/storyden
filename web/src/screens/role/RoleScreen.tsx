@@ -38,6 +38,7 @@ import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { CardGrid } from "@/components/ui/rich-card";
+import { useI18n } from "@/i18n/provider";
 import { isDefaultRole } from "@/lib/role/defaults";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
@@ -48,6 +49,7 @@ type Props = {
 };
 
 export function RoleScreen(props: Props) {
+  const { t } = useI18n();
   const { data, error } = useRoleList({
     swr: { fallbackData: props.initialRoles },
   });
@@ -60,21 +62,21 @@ export function RoleScreen(props: Props) {
   return (
     <LStack>
       <WStack>
-        <Heading>Roles</Heading>
+        <Heading>{t("Roles")}</Heading>
 
         {canEdit && <RoleCreateModalTrigger />}
       </WStack>
 
       <HStack gap="1">
         <p>
-          Roles provide granular permission control and profile customisation
-          for members.
+          {t(
+            "Roles provide granular permission control and profile customisation for members.",
+          )}
         </p>
-        <InfoTip title="Aesthetic roles and badges">
-          You can also use Roles as a purely aesthetic tool for providing
-          members with ways to express themselves on their profile. Members can
-          choose one role as a &ldquo;Badge&rdquo; which is displayed next to
-          their name around the site.
+        <InfoTip title={t("Aesthetic roles and badges")}>
+          {t(
+            "You can also use Roles as a purely aesthetic tool for providing members with ways to express themselves on their profile. Members can choose one role as a Badge which is displayed next to their name around the site.",
+          )}
         </InfoTip>
       </HStack>
 

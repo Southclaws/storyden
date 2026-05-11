@@ -8,6 +8,7 @@ import {
 
 import { BreadcrumbIcon } from "@/components/ui/icons/Breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
 import { DiscussionRoute } from "../site/Navigation/Anchors/Discussion";
@@ -29,6 +30,7 @@ type Breadcrumb =
     };
 
 export function Breadcrumbs({ thread }: Props) {
+  const { t } = useI18n();
   const category = thread?.category
     ? [
         {
@@ -66,7 +68,7 @@ export function Breadcrumbs({ thread }: Props) {
         minW="min"
         href={DiscussionRoute}
       >
-        Discussion
+        {t("Discussion")}
       </LinkButton>
       {crumbs.map((c) => {
         return (

@@ -7,6 +7,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
@@ -33,6 +34,7 @@ export function LibraryPageDirectoryBlock() {
 }
 
 export function LibraryPageDirectoryBlockContents() {
+  const { t } = useI18n();
   const {
     handleSearch,
     handleTagFilter,
@@ -72,7 +74,7 @@ export function LibraryPageDirectoryBlockContents() {
         <HStack gap="1" alignItems="end" flexWrap="wrap-reverse" justify="end">
           <Input
             variant="ghost"
-            placeholder="Search..."
+            placeholder={t("Search...")}
             size="xs"
             onChange={handleSearchChange}
             minW="20"
@@ -86,7 +88,7 @@ export function LibraryPageDirectoryBlockContents() {
                 <IconButton
                   size="xs"
                   variant="ghost"
-                  title="Add a new property."
+                  title={t("Add a new property.")}
                 >
                   <AddIcon />
                 </IconButton>

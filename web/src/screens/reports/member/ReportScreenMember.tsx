@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { Center, LStack, styled } from "@/styled-system/jsx";
 
 import { useReportsScreenFilters } from "../manager/useReportsScreenFilters";
@@ -45,13 +46,14 @@ function useReportsScreenMember({ initialReportsList }: Props) {
 
 export function ReportScreenMember(props: Props) {
   const { ready, error, data, page } = useReportsScreenMember(props);
+  const { t } = useI18n();
   if (!ready) {
     return <Unready error={error} />;
   }
   const { reports, results, current_page, total_pages, page_size } = data;
   return (
     <LStack gap="4">
-      <Heading>Reports</Heading>
+      <Heading>{t("Reports")}</Heading>
 
       {reports.length > 0 ? (
         <>
@@ -66,7 +68,9 @@ export function ReportScreenMember(props: Props) {
         </>
       ) : (
         <Center w="full">
-          <EmptyState hideContributionLabel>No reports to show.</EmptyState>
+          <EmptyState hideContributionLabel>
+            {t("No reports to show.")}
+          </EmptyState>
         </Center>
       )}
     </LStack>

@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import React from "react";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Item } from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 
 type Props = {
   id: string;
@@ -16,6 +19,7 @@ export type AnchorProps = {
 };
 
 export function Anchor({ id, route, icon, label, hideLabel, ...props }: Props) {
+  const { t } = useI18n();
   const href = typeof route === "function" ? route() : route;
 
   return (
@@ -25,7 +29,7 @@ export function Anchor({ id, route, icon, label, hideLabel, ...props }: Props) {
       } as any)}
       {!hideLabel && (
         <>
-          &nbsp;<span>{label}</span>
+          &nbsp;<span>{t(label)}</span>
         </>
       )}
     </LinkButton>
@@ -40,6 +44,7 @@ export function MenuItem({
   hideLabel,
   ...props
 }: Props) {
+  const { t } = useI18n();
   const href = typeof route === "function" ? route() : route;
 
   return (
@@ -48,7 +53,7 @@ export function MenuItem({
         {icon}
         {!hideLabel && (
           <>
-            &nbsp;<span>{label}</span>
+            &nbsp;<span>{t(label)}</span>
           </>
         )}
       </Item>

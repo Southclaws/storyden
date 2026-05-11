@@ -9,6 +9,7 @@ import {
   MultiSelectPicker,
   MultiSelectPickerItem,
 } from "@/components/ui/MultiSelectPicker";
+import { useI18n } from "@/i18n/provider";
 
 export type Props = {
   editing: boolean;
@@ -17,6 +18,7 @@ export type Props = {
 };
 
 export function ThreadTagList(props: Props) {
+  const { t } = useI18n();
   const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>(
     [],
   );
@@ -55,7 +57,7 @@ export function ThreadTagList(props: Props) {
         onQuery={handleQuery}
         queryResults={queryResults}
         allowNewValues={true}
-        inputPlaceholder="Add tags..."
+        inputPlaceholder={t("Add tags...")}
         autoColour={true}
         size="sm"
       />

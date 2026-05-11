@@ -7,12 +7,15 @@ import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPag
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Card, CardRows } from "@/components/ui/rich-card";
+import { useI18n } from "@/i18n/provider";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
 export function QueueNodeList({ nodes }: { nodes: NodeWithChildren[] }) {
+  const { t } = useI18n();
+
   if (nodes.length === 0) {
-    return <p>Submissions appear here.</p>;
+    return <p>{t("Submissions appear here.")}</p>;
   }
 
   return (

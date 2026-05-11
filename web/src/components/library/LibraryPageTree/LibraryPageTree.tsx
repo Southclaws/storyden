@@ -559,8 +559,7 @@ export function isDescendant(
 }
 
 const ChevronRightIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <title>Chevron Right Icon</title>
+  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
     <path
       fill="none"
       stroke="currentColor"

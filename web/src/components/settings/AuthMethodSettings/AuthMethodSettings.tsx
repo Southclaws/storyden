@@ -1,6 +1,7 @@
 import { Unready } from "src/components/site/Unready";
 
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, LStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -10,6 +11,7 @@ import { useAuthMethodSettings } from "./useAuthMethodSettings";
 
 export function AuthMethodSettings() {
   const { ready, error, data } = useAuthMethodSettings();
+  const { t } = useI18n();
   if (!ready) {
     return <Unready error={error} />;
   }
@@ -19,11 +21,11 @@ export function AuthMethodSettings() {
   return (
     <CardBox className={lstack()} gap="4">
       <LStack>
-        <Heading size="md">Authentication methods</Heading>
+        <Heading size="md">{t("Authentication methods")}</Heading>
         <p>
-          We recommend you add more than one method of authentication to your
-          account. This will help you recover your account if you lose access to
-          one of your devices.
+          {t(
+            "We recommend you add more than one method of authentication to your account. This will help you recover your account if you lose access to one of your devices.",
+          )}
         </p>
       </LStack>
 

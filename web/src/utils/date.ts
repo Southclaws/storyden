@@ -1,4 +1,7 @@
 import { FormatDistanceToNowOptions, formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+
+import { Locale } from "@/i18n/config";
 
 const formatDistanceLocale = {
   lessThanXSeconds: "{{count}}s",
@@ -41,6 +44,21 @@ export function timestamp(date: string | number | Date, short = true) {
       date,
       short ? formatDistanceDefaults : { addSuffix: true },
     );
+  } catch (e: unknown) {
+    throw new Error(`Failed to format date: ${date}: error: ${e}`);
+  }
+}
+
+export function relativeTimestamp(
+  date: string | number | Date,
+  locale: Locale,
+  options: FormatDistanceToNowOptions = { addSuffix: true },
+) {
+  try {
+    return formatDistanceToNow(date, {
+      ...options,
+      locale: locale === "zh" ? zhCN : options.locale,
+    });
   } catch (e: unknown) {
     throw new Error(`Failed to format date: ${date}: error: ${e}`);
   }

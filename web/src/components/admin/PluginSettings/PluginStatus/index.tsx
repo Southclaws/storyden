@@ -8,6 +8,7 @@ import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import * as Tabs from "@/components/ui/tabs";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -26,6 +27,7 @@ type Props = {
 };
 
 export function PluginStatus({ plugin }: Props) {
+  const { t } = useI18n();
   const { data, error } = usePluginGet(plugin);
   const [tab, setTab] = useQueryState("plugin-tab", {
     defaultValue: DEFAULT_PLUGIN_TAB,
@@ -72,14 +74,18 @@ export function PluginStatus({ plugin }: Props) {
         onValueChange={handleTabChange}
       >
         <Tabs.List>
-          <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-          <Tabs.Trigger value="configuration">Configuration</Tabs.Trigger>
-          <Tabs.Trigger value="manifest">Manifest</Tabs.Trigger>
-          {!isExternal && <Tabs.Trigger value="package">Package</Tabs.Trigger>}
+          <Tabs.Trigger value="overview">{t("Overview")}</Tabs.Trigger>
+          <Tabs.Trigger value="configuration">
+            {t("Configuration")}
+          </Tabs.Trigger>
+          <Tabs.Trigger value="manifest">{t("Manifest")}</Tabs.Trigger>
+          {!isExternal && (
+            <Tabs.Trigger value="package">{t("Package")}</Tabs.Trigger>
+          )}
           {isExternal ? (
-            <Tabs.Trigger value="connection">Connection</Tabs.Trigger>
+            <Tabs.Trigger value="connection">{t("Connection")}</Tabs.Trigger>
           ) : (
-            <Tabs.Trigger value="logs">Logs</Tabs.Trigger>
+            <Tabs.Trigger value="logs">{t("Logs")}</Tabs.Trigger>
           )}
           <Tabs.Indicator />
         </Tabs.List>

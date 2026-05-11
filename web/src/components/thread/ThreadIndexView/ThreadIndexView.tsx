@@ -5,12 +5,14 @@ import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { LStack, styled } from "@/styled-system/jsx";
 
 import { Props, useThreadIndexView } from "./useThreadIndexView";
 
 export function ThreadIndexView(props: Props) {
   const { form, data, handlers } = useThreadIndexView(props);
+  const { t } = useI18n();
 
   if (form.formState.isLoading) return <Unready />;
 
@@ -27,7 +29,7 @@ export function ThreadIndexView(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          placeholder="Search discussions"
+          placeholder={t("Search discussions")}
           defaultValue={props.query}
           {...form.register("q")}
         />
@@ -49,7 +51,7 @@ export function ThreadIndexView(props: Props) {
           type="submit"
           width="min"
         >
-          Search
+          {t("Search")}
         </Button>
       </styled.form>
 

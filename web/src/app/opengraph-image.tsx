@@ -1,4 +1,4 @@
-/* eslint-disable jsx-a11y/alt-text, @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 import { ImageResponse } from "next/og";
 
 import { getSettings } from "@/lib/settings/settings-server";

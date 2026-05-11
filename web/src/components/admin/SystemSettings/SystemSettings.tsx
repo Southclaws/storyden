@@ -17,6 +17,7 @@ import { SliderField } from "@/components/ui/form/SliderField";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { API_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
@@ -33,26 +34,26 @@ import {
   useSystemSettings,
 } from "./useSystemSettings";
 
-const CLIENT_IP_MODE_COLLECTION = createListCollection({
-  items: [
-    {
-      label: "Raw IP (default)",
-      value: "remote_addr",
-    },
-    {
-      label: "Single trusted header",
-      value: "single_header",
-    },
-    {
-      label: "X-Forwarded-For with trusted proxy CIDRs",
-      value: "xff_trusted_proxies",
-    },
-  ],
-});
-
 export function SystemSettingsForm(props: Props) {
+  const { t } = useI18n();
   const { control, register, formState, onSubmit } = useSystemSettings(props);
   const [showError, setShowError] = useState(true);
+  const clientIPModeCollection = createListCollection({
+    items: [
+      {
+        label: t("Raw IP (default)"),
+        value: "remote_addr",
+      },
+      {
+        label: t("Single trusted header"),
+        value: "single_header",
+      },
+      {
+        label: t("X-Forwarded-For with trusted proxy CIDRs"),
+        value: "xff_trusted_proxies",
+      },
+    ],
+  });
 
   // Watch form values for live preview
   const rateLimit = useWatch({ control, name: "rate_limit" });
@@ -101,9 +102,9 @@ export function SystemSettingsForm(props: Props) {
     >
       <CardBox className={lstack()} gap="4">
         <WStack>
-          <Heading size="md">System settings</Heading>
+          <Heading size="md">{t("System settings")}</Heading>
           <Button type="submit" loading={formState.isSubmitting}>
-            Save
+            {t("Save")}
           </Button>
         </WStack>
 
@@ -111,52 +112,54 @@ export function SystemSettingsForm(props: Props) {
           <Admonition
             value={true}
             kind="failure"
-            title="Form validation error"
+            title={t("Form validation error")}
             onChange={() => setShowError(false)}
           >
             {errorMessages}
           </Admonition>
         )}
 
-        <Heading>Rate limits</Heading>
+        <Heading>{t("Rate limits")}</Heading>
 
         <p>
-          Rate limits help protect your installation from spam, DDoS attacks and
-          content scraping. This is achieved by limiting the number of{" "}
-          <strong>Operations</strong>{" "}
-          <InfoTip title="What is an operation?">
-            An "Operation" is a request to Storyden's backend. Loading a screen
-            such as Home, a Thread or a Library Page usually involves 10-30
-            request operations.
+          {t(
+            "Rate limits help protect your installation from spam, DDoS attacks and content scraping. This is achieved by limiting the number of",
+          )}{" "}
+          <strong>{t("Operations")}</strong>{" "}
+          <InfoTip title={t("What is an operation?")}>
+            {t(
+              'An "Operation" is a request to Storyden\'s backend. Loading a screen such as Home, a Thread or a Library Page usually involves 10-30 request operations.',
+            )}
           </InfoTip>{" "}
-          in a time period.
+          {t("in a time period.")}
         </p>
 
         <p>
-          Members: <styled.strong color="fg.info">{rateLimit}</styled.strong>{" "}
-          operations every{" "}
+          {t("Members")}:{" "}
+          <styled.strong color="fg.info">{rateLimit}</styled.strong>{" "}
+          {t("operations every")}{" "}
           <styled.strong color="fg.info">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD, t)}
           </styled.strong>{" "}
           (~
           <styled.strong color="fg.info">
             {memberRequestsPerMinute}
           </styled.strong>{" "}
-          requests per minute).
+          {t("requests per minute")}).
         </p>
 
         <p>
-          Guests:{" "}
+          {t("Guests")}:{" "}
           <styled.strong color="fg.info">{guestRateLimit}</styled.strong>{" "}
-          operations every{" "}
+          {t("operations every")}{" "}
           <styled.strong color="fg.info">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD, t)}
           </styled.strong>{" "}
           (~
           <styled.strong color="fg.info">
             {guestRequestsPerMinute}
           </styled.strong>{" "}
-          requests per minute).
+          {t("requests per minute")}).
         </p>
 
         <RateLimitTester />
@@ -165,7 +168,7 @@ export function SystemSettingsForm(props: Props) {
           <SliderField
             control={control}
             name="rate_limit"
-            label={`Rate limit: ${rateLimit} request units`}
+            label={`${t("Rate limit")}: ${rateLimit} ${t("request units")}`}
             min={10}
             max={20000}
             step={10}
@@ -173,13 +176,14 @@ export function SystemSettingsForm(props: Props) {
             marks={[
               {
                 value: DEFAULT_RATE_LIMIT,
-                label: "Default",
+                label: t("Default"),
               },
             ]}
           />
           <FormHelperText>
-            The amount of requests that a user can make within the
-            `rate_limit_period`.
+            {t(
+              "The amount of requests that a user can make within the rate_limit_period.",
+            )}
           </FormHelperText>
         </FormControl>
 
@@ -187,7 +191,10 @@ export function SystemSettingsForm(props: Props) {
           <SliderField
             control={control}
             name="rate_limit_period"
-            label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
+            label={`${t("Rate limit period")}: ${formatSeconds(
+              rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD,
+              t,
+            )}`}
             min={60}
             max={86400}
             step={60}
@@ -195,14 +202,14 @@ export function SystemSettingsForm(props: Props) {
             marks={[
               {
                 value: DEFAULT_RATE_LIMIT_PERIOD,
-                label: "Default",
+                label: t("Default"),
               },
             ]}
           />
           <FormHelperText>
-            The period of time in which the `rate_limit` is applied. This is a
-            sliding window, so the `rate_limit` is applied to the last
-            `rate_limit_period` of requests.
+            {t(
+              "The period of time in which the rate_limit is applied. This is a sliding window, so the rate_limit is applied to the last rate_limit_period of requests.",
+            )}
           </FormHelperText>
         </FormControl>
 
@@ -210,7 +217,9 @@ export function SystemSettingsForm(props: Props) {
           <SliderField
             control={control}
             name="rate_limit_bucket"
-            label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
+            label={`${t("Rate limit bucket size")}: ${rateLimitBucket} ${t(
+              "seconds",
+            )}`}
             min={0}
             max={1200}
             step={60}
@@ -218,15 +227,14 @@ export function SystemSettingsForm(props: Props) {
             marks={[
               {
                 value: DEFAULT_RATE_LIMIT_BUCKET,
-                label: "Default",
+                label: t("Default"),
               },
             ]}
           />
           <FormHelperText>
-            The granularity of rate limit counter buckets. Lower values use more
-            memory but provide more accurate rate limiting. Higher values use
-            less memory but may allow short bursts of traffic above the rate
-            limit.
+            {t(
+              "The granularity of rate limit counter buckets. Lower values use more memory but provide more accurate rate limiting. Higher values use less memory but may allow short bursts of traffic above the rate limit.",
+            )}
           </FormHelperText>
         </FormControl>
 
@@ -234,26 +242,25 @@ export function SystemSettingsForm(props: Props) {
           <SliderField
             control={control}
             name="rate_limit_guest_cost"
-            label="Guest rate limit cost multiplier"
+            label={t("Guest rate limit cost multiplier")}
             min={1}
             max={10}
             step={1}
             sliderDefaultValue={DEFAULT_RATE_LIMIT_GUEST_COST}
           />
           <FormHelperText>
-            The cost multiplier applied to unauthenticated guest visitors. For
-            example, a value of 5 means each operation consumes 5 units from the
-            guest&apos;s rate limit instead of 1, applying stricter limits to
-            non-authenticated traffic.
+            {t(
+              "The cost multiplier applied to unauthenticated guest visitors. For example, a value of 5 means each operation consumes 5 units from the guest's rate limit instead of 1, applying stricter limits to non-authenticated traffic.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Operation cost overrides</FormLabel>
+          <FormLabel>{t("Operation cost overrides")}</FormLabel>
           <FormHelperText>
-            Configure custom cost multipliers for specific API operations.
-            Higher costs reduce the number of requests allowed within the rate
-            limit period.
+            {t(
+              "Configure custom cost multipliers for specific API operations. Higher costs reduce the number of requests allowed within the rate limit period.",
+            )}
           </FormHelperText>
           <OperationCostOverrides
             control={control}
@@ -263,49 +270,46 @@ export function SystemSettingsForm(props: Props) {
           />
         </FormControl>
 
-        <Heading>Client IP strategy</Heading>
+        <Heading>{t("Client IP strategy")}</Heading>
 
         <FormControl>
-          <FormLabel>Client IP mode</FormLabel>
-          <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+          <FormLabel>{t("Client IP mode")}</FormLabel>
+          <SelectField<Form, (typeof clientIPModeCollection.items)[number]>
             control={control}
             name="client_ip_mode"
-            collection={CLIENT_IP_MODE_COLLECTION}
-            placeholder="Select client IP mode"
+            collection={clientIPModeCollection}
+            placeholder={t("Select client IP mode")}
           />
           <FormHelperText>
-            Choose how Storyden resolves client addresses for request context.
-            The default uses only RemoteAddr and does not trust forwarded
-            headers. Header-based modes should only be used when your edge
-            proxy/CDN strips or overwrites client-provided forwarding headers.
+            {t(
+              "Choose how Storyden resolves client addresses for request context. The default uses only RemoteAddr and does not trust forwarded headers. Header-based modes should only be used when your edge proxy/CDN strips or overwrites client-provided forwarding headers.",
+            )}
           </FormHelperText>
         </FormControl>
 
         {clientIPMode === "single_header" && (
           <FormControl>
-            <FormLabel>Client IP header</FormLabel>
+            <FormLabel>{t("Client IP header")}</FormLabel>
             <Input {...register("client_ip_header")} />
             <FormHelperText>
-              Header to trust for the canonical client IP (for example
-              CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
-              unless this header is guaranteed to be injected by trusted
-              infrastructure.
+              {t(
+                "Header to trust for the canonical client IP (for example CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode unless this header is guaranteed to be injected by trusted infrastructure.",
+              )}
             </FormHelperText>
           </FormControl>
         )}
 
         {clientIPMode === "xff_trusted_proxies" && (
           <FormControl>
-            <FormLabel>Trusted proxy CIDRs</FormLabel>
+            <FormLabel>{t("Trusted proxy CIDRs")}</FormLabel>
             <Input
               {...register("trusted_proxy_cidrs")}
               placeholder="10.0.0.0/8, 172.16.0.0/12"
             />
             <FormHelperText>
-              Comma-separated CIDR ranges that are allowed to append XFF hops.
-              Storyden will only trust XFF when RemoteAddr is in these ranges.
-              Include every proxy hop in your chain to avoid collapsing users to
-              a shared proxy IP.
+              {t(
+                "Comma-separated CIDR ranges that are allowed to append XFF hops. Storyden will only trust XFF when RemoteAddr is in these ranges. Include every proxy hop in your chain to avoid collapsing users to a shared proxy IP.",
+              )}
             </FormHelperText>
           </FormControl>
         )}
@@ -327,6 +331,7 @@ type ClientIPTesterProps = {
 function formatNetworkHeaderSample(
   label: string,
   headers: NetworkHeadersSample | null,
+  t: (key: string) => string,
 ) {
   const direct = headers?.headers ?? {};
   const ssr = headers?.headers_ssr ?? {};
@@ -346,7 +351,7 @@ function formatNetworkHeaderSample(
       <>
         {label}
         <br />
-        (none)
+        {t("(none)")}
       </>
     );
   }
@@ -355,14 +360,14 @@ function formatNetworkHeaderSample(
     <>
       {label}
       <br />
-      Raw client address:
+      {t("Raw client address")}:
       <br />
-      {rawClientAddress || "(none)"}
+      {rawClientAddress || t("(none)")}
       <br />
       <br />
-      Browser/API headers:
+      {t("Browser/API headers")}:
       <br />
-      {directEntries.length === 0 && "(none)"}
+      {directEntries.length === 0 && t("(none)")}
       {directEntries.map(([name, value]) => (
         <span key={`${label}-direct-${name}`}>
           {name}: {value}
@@ -370,9 +375,9 @@ function formatNetworkHeaderSample(
         </span>
       ))}
       <br />
-      SSR-forwarded headers:
+      {t("SSR-forwarded headers")}:
       <br />
-      {ssrEntries.length === 0 && "(none)"}
+      {ssrEntries.length === 0 && t("(none)")}
       {ssrEntries.map(([name, value]) => (
         <span key={`${label}-ssr-${name}`}>
           {name}: {value}
@@ -384,6 +389,7 @@ function formatNetworkHeaderSample(
 }
 
 function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ssrClientInfo, setSSRClientInfo] = useState<ClientInfo | null>(null);
@@ -415,7 +421,8 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
           | { message?: string }
           | undefined;
         throw new Error(
-          data?.message ?? `SSR test request failed with ${ssrResp.status}`,
+          data?.message ??
+            `${t("SSR test request failed with")} ${ssrResp.status}`,
         );
       }
 
@@ -444,13 +451,14 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
     })();
   }, []);
 
-  const warnings = getClientIPWarnings(ssrClientInfo, browserClientInfo);
+  const warnings = getClientIPWarnings(ssrClientInfo, browserClientInfo, t);
 
   return (
     <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
       <styled.p>
-        This client IP test runs automatically and compares what Storyden sees
-        from an SSR-origin call and a browser-origin call.
+        {t(
+          "This client IP test runs automatically and compares what Storyden sees from an SSR-origin call and a browser-origin call.",
+        )}
       </styled.p>
 
       {error && <styled.p color="fg.error">{error}</styled.p>}
@@ -458,7 +466,7 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
       {warnings.length > 0 && (
         <Alert.Root>
           <Alert.Content>
-            <Alert.Title>Potential IP config issue</Alert.Title>
+            <Alert.Title>{t("Potential IP config issue")}</Alert.Title>
             <Alert.Description>
               <styled.ul>
                 {warnings.map((warning) => (
@@ -471,28 +479,33 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
       )}
 
       <styled.pre textWrap="wrap">
-        Server HTML Render client.ip_address_ssr = '
-        {ssrClientInfo?.ip_address_ssr ?? ""}'
+        {t("Server HTML Render")} client.ip_address_ssr = {"'"}
+        {ssrClientInfo?.ip_address_ssr ?? ""}
+        {"'"}
         <br />
-        Browser React Render client.ip_address = '
-        {browserClientInfo?.ip_address ?? ""}'
+        {t("Browser React Render")} client.ip_address = {"'"}
+        {browserClientInfo?.ip_address ?? ""}
+        {"'"}
         <br />
         <br />
-        These are sampled network headers seen by Storyden while running the
-        client IP test.
+        {t(
+          "These are sampled network headers seen by Storyden while running the client IP test.",
+        )}
         <br />
-        Use them to configure trusted client IP settings.
+        {t("Use them to configure trusted client IP settings.")}
         <br />
         <br />
         {formatNetworkHeaderSample(
-          "Browser/API sample (admin settings request):",
+          t("Browser/API sample (admin settings request):"),
           browserHeaderSample,
+          t,
         )}
         <br />
         <br />
         {formatNetworkHeaderSample(
-          "SSR/API sample (SSR subrequest):",
+          t("SSR/API sample (SSR subrequest):"),
           ssrHeaderSample,
+          t,
         )}
       </styled.pre>
 
@@ -503,7 +516,7 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
           size="xs"
           onClick={() => {
             if (!canRun) {
-              setError("Save settings before refreshing the client IP test.");
+              setError(t("Save settings before refreshing the client IP test."));
               return;
             }
             void loadClientIPTest();
@@ -511,7 +524,7 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
           loading={loading}
           disabled={!canRun}
         >
-          Refresh Client IP Test
+          {t("Refresh Client IP Test")}
         </Button>
       </HStack>
     </CardBox>
@@ -521,6 +534,7 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
 function getClientIPWarnings(
   ssrClientInfo: ClientInfo | null,
   browserClientInfo: ClientInfo | null,
+  t: (key: string) => string,
 ): string[] {
   const warnings: string[] = [];
 
@@ -529,16 +543,16 @@ function getClientIPWarnings(
 
   if (ssrIP && browserIP && ssrIP !== browserIP) {
     warnings.push(
-      `SSR and browser resolved IPs differ (${ssrIP} vs ${browserIP}).`,
+      `${t("SSR and browser resolved IPs differ")} (${ssrIP} vs ${browserIP}).`,
     );
   }
 
   const ipValues: Array<{ label: string; value: string }> = [
     {
-      label: "SSR request resolved IP",
+      label: t("SSR request resolved IP"),
       value: ssrIP,
     },
-    { label: "Browser resolved IP", value: browserIP },
+    { label: t("Browser resolved IP"), value: browserIP },
   ];
 
   const internalByIP = new Map<string, string[]>();
@@ -553,10 +567,12 @@ function getClientIPWarnings(
 
   for (const [value, labels] of internalByIP) {
     if (labels.length === 1) {
-      warnings.push(`${labels[0]} looks internal/private (${value}).`);
+      warnings.push(`${labels[0]} ${t("looks internal/private")} (${value}).`);
     } else {
       warnings.push(
-        `${labels.join(" and ")} look internal/private (${value}).`,
+        `${labels.join(` ${t("and")} `)} ${t(
+          "look internal/private",
+        )} (${value}).`,
       );
     }
   }
@@ -597,6 +613,7 @@ function isLikelyInternalIP(ip: string): boolean {
 }
 
 function RateLimitTester() {
+  const { t } = useI18n();
   const [xRateLimit, setXRateLimit] = useState<Record<string, any>>({});
 
   async function run(auth: boolean) {
@@ -638,20 +655,31 @@ function RateLimitTester() {
   return (
     <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
       <styled.p>
-        This is your current rate limit status. Click the &quot;Test&quot;
-        button to consume one request.
+        {t(
+          'This is your current rate limit status. Click the "Test" button to consume one request.',
+        )}
       </styled.p>
 
       <styled.pre textWrap="wrap">
-        x-rate-limit-limit = '{rateLimitLimit}'<br />
-        x-rate-limit-remaining = '{rateLimitRemaining}'<br />
+        x-rate-limit-limit = {"'"}
+        {rateLimitLimit}
+        {"'"}
+        <br />
+        x-rate-limit-remaining = {"'"}
+        {rateLimitRemaining}
+        {"'"}
+        <br />
         x-rate-limit-reset ={" "}
-        <styled.span textWrap="nowrap">'{rateLimitReset}'</styled.span>
+        <styled.span textWrap="nowrap">
+          {"'"}
+          {rateLimitReset}
+          {"'"}
+        </styled.span>
         <br />
         {estimatedRequestsPerMinute !== null && (
           <>
-            ~{estimatedRequestsPerMinute} requests per minute until period
-            reset.
+            ~{estimatedRequestsPerMinute}{" "}
+            {t("requests per minute until period reset.")}
           </>
         )}
       </styled.pre>
@@ -663,7 +691,7 @@ function RateLimitTester() {
           size="xs"
           onClick={() => run(true)}
         >
-          Test as Member
+          {t("Test as Member")}
         </Button>
         <Button
           type="button"
@@ -671,7 +699,7 @@ function RateLimitTester() {
           size="xs"
           onClick={() => run(false)}
         >
-          Test as Guest
+          {t("Test as Guest")}
         </Button>
       </HStack>
     </CardBox>

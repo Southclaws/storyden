@@ -4,6 +4,7 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Timestamp } from "@/components/site/Timestamp";
 import * as Table from "@/components/ui/table";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, LStack, VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -11,8 +12,10 @@ type Props = {
 };
 
 export function MemberList({ profiles }: Props) {
+  const { t } = useI18n();
+
   if (profiles.length === 0) {
-    return <EmptyState>no members were found</EmptyState>;
+    return <EmptyState>{t("no members were found")}</EmptyState>;
   }
 
   return (
@@ -22,10 +25,10 @@ export function MemberList({ profiles }: Props) {
         <Table.Root size="sm">
           <Table.Head>
             <Table.Row>
-              <Table.Cell>Member</Table.Cell>
-              <Table.Cell>Invited by</Table.Cell>
-              <Table.Cell>Likes</Table.Cell>
-              <Table.Cell textAlign="right">Joined</Table.Cell>
+              <Table.Cell>{t("Member")}</Table.Cell>
+              <Table.Cell>{t("Invited by")}</Table.Cell>
+              <Table.Cell>{t("Likes")}</Table.Cell>
+              <Table.Cell textAlign="right">{t("Joined")}</Table.Cell>
             </Table.Row>
           </Table.Head>
 
@@ -56,7 +59,7 @@ export function MemberList({ profiles }: Props) {
                       <Timestamp created={profile.createdAt} large />
                       {isBanned && (
                         <styled.p color="fg.destructive">
-                          banned{" "}
+                          {t("banned")}{" "}
                           <Timestamp created={profile.deletedAt!} large />
                         </styled.p>
                       )}
@@ -94,7 +97,7 @@ export function MemberList({ profiles }: Props) {
                       fontSize="sm"
                       fontWeight="medium"
                     >
-                      Joined
+                      {t("Joined")}
                     </styled.span>
                     <Timestamp created={profile.createdAt} large />
                   </HStack>
@@ -105,7 +108,7 @@ export function MemberList({ profiles }: Props) {
                       fontSize="sm"
                       fontWeight="medium"
                     >
-                      Likes
+                      {t("Likes")}
                     </styled.span>
                     <styled.span fontSize="sm">
                       {profile.like_score}
@@ -118,7 +121,7 @@ export function MemberList({ profiles }: Props) {
                       fontSize="sm"
                       fontWeight="medium"
                     >
-                      Invited by
+                      {t("Invited by")}
                     </styled.span>
                     <Box>
                       {profile.invited_by ? (
@@ -152,7 +155,7 @@ export function MemberList({ profiles }: Props) {
                         fontSize="sm"
                         fontWeight="medium"
                       >
-                        Banned <Timestamp created={profile.deletedAt!} large />
+                        {t("Banned")} <Timestamp created={profile.deletedAt!} large />
                       </styled.p>
                     </Box>
                   )}

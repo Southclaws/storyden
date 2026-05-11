@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import {
   CardBox,
@@ -39,6 +40,7 @@ import {
 } from "./useAuditLogSettingsScreen";
 
 export function AuditLogSettingsScreen() {
+  const { t } = useI18n();
   const {
     ready,
     data,
@@ -57,15 +59,25 @@ export function AuditLogSettingsScreen() {
     return <UnreadyBanner error={error} />;
   }
 
-  const filteredEventTypes = ALL_EVENT_TYPES.filter((type) =>
+  const translatedEventTypes = ALL_EVENT_TYPES.map((type) => ({
+    ...type,
+    label: t(type.label),
+  }));
+  const translatedSelectedTypes = selectedTypes.map((type) => ({
+    ...type,
+    label: t(type.label),
+  }));
+  const filteredEventTypes = translatedEventTypes.filter((type) =>
     type.label.toLowerCase().includes(queryInput.toLowerCase()),
   );
 
   return (
     <CardBox className={lstack()} gap="4">
-      <Heading size="md">Audit Log</Heading>
+      <Heading size="md">{t("Audit Log")}</Heading>
       <styled.p>
-        View all moderation actions and administrative events on this site.
+        {t(
+          "View all moderation actions and administrative events on this site.",
+        )}
       </styled.p>
 
       <Flex
@@ -77,11 +89,11 @@ export function AuditLogSettingsScreen() {
         }}
       >
         <MultiSelectPicker
-          value={selectedTypes}
+          value={translatedSelectedTypes}
           onChange={handleTypeFilterChange}
           onQuery={setQueryInput}
           queryResults={filteredEventTypes}
-          inputPlaceholder="Filter by event type..."
+          inputPlaceholder={t("Filter by event type...")}
           size="sm"
         />
 
@@ -107,7 +119,7 @@ export function AuditLogSettingsScreen() {
       <AuditLogEventList
         data={data}
         currentPage={currentPage}
-        selectedTypes={selectedTypes}
+        selectedTypes={translatedSelectedTypes}
       />
     </CardBox>
   );
@@ -122,9 +134,12 @@ function AuditLogEventList({
   currentPage: number;
   selectedTypes: MultiSelectPickerItem[];
 }) {
+  const { t } = useI18n();
   if (data.events.length === 0) {
     return (
-      <EmptyState hideContributionLabel>No audit events found.</EmptyState>
+      <EmptyState hideContributionLabel>
+        {t("No audit events found.")}
+      </EmptyState>
     );
   }
 
@@ -155,7 +170,8 @@ type AuditEventItemProps = {
 };
 
 function AuditEventItem({ event }: AuditEventItemProps) {
-  const eventLabel = EVENT_TYPE_LABELS[event.type] ?? event.type;
+  const { t } = useI18n();
+  const eventLabel = t(EVENT_TYPE_LABELS[event.type] ?? event.type);
 
   return (
     <li className={cardBox()}>
@@ -169,7 +185,7 @@ function AuditEventItem({ event }: AuditEventItemProps) {
 
         <HStack>
           <styled.p fontSize="sm" color="fg.subtle">
-            Enacted by:
+            {t("Enacted by")}:
           </styled.p>
 
           {event.enacted_by && (
@@ -188,11 +204,12 @@ function AuditEventItem({ event }: AuditEventItemProps) {
 }
 
 function EventDetails({ event }: { event: AuditEvent }) {
+  const { t } = useI18n();
   switch (event.type) {
     case AuditEventType.thread_deleted:
       return (
         <styled.p fontSize="sm" color="fg.subtle">
-          Thread:{" "}
+          {t("Thread")}:{" "}
           <Link
             href={`/t/locate?id=${event.thread_id}`}
             className={css({ textDecoration: "underline" })}
@@ -205,7 +222,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
     case AuditEventType.thread_reply_deleted:
       return (
         <styled.p fontSize="sm" color="fg.subtle">
-          Reply:{" "}
+          {t("Reply")}:{" "}
           <Link
             href={`/t/locate?id=${event.reply_id}`}
             className={css({ textDecoration: "underline" })}
@@ -218,7 +235,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
     case AuditEventType.account_suspended:
       return (
         <styled.p fontSize="sm" color="fg.subtle">
-          Account:{" "}
+          {t("Account")}:{" "}
           <Link
             href={`/m/${event.account_id}`}
             className={css({ textDecoration: "underline" })}
@@ -231,7 +248,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
     case AuditEventType.account_unsuspended:
       return (
         <styled.p fontSize="sm" color="fg.subtle">
-          Account:{" "}
+          {t("Account")}:{" "}
           <Link
             href={`/m/${event.account_id}`}
             className={css({ textDecoration: "underline" })}
@@ -246,7 +263,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
       return (
         <LStack gap="1">
           <styled.p fontSize="sm" color="fg.subtle">
-            Account:{" "}
+            {t("Account")}:{" "}
             <Link
               href={`/m/${event.account_id}`}
               className={css({ textDecoration: "underline" })}
@@ -255,7 +272,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
             </Link>
           </styled.p>
           <styled.p fontSize="sm" color="fg.subtle">
-            Note: <code>{event.note_id}</code>
+            {t("Note")}: <code>{event.note_id}</code>
           </styled.p>
         </LStack>
       );
@@ -264,7 +281,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
       return (
         <LStack gap="1">
           <styled.p fontSize="sm" color="fg.subtle">
-            Account:{" "}
+            {t("Account")}:{" "}
             <Link
               href={`/m/${event.account_id}`}
               className={css({ textDecoration: "underline" })}
@@ -275,7 +292,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
           {event.included && event.included.length > 0 && (
             <HStack gap="1" flexWrap="wrap">
               <styled.p fontSize="sm" color="fg.subtle">
-                Purged Content:
+                {t("Purged Content")}:
               </styled.p>
               {event.included.map((type) => (
                 <Badge key={type} size="sm" variant="subtle">

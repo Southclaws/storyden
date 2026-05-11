@@ -4,12 +4,14 @@ import { AssetThumbnail } from "@/components/asset/AssetThumbnail";
 import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
 import { MediaAddIcon } from "@/components/ui/icons/Media";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import { Box, Grid, GridItem, HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageAssetsBlock } from "./useLibraryPageAssetsBlock";
 
 export function LibraryPageAssetsBlock() {
+  const { t } = useI18n();
   const { editing, config, shouldShow, assets, handleUpload, handleRemove } =
     useLibraryPageAssetsBlock();
 
@@ -71,7 +73,7 @@ export function LibraryPageAssetsBlock() {
 
             {editing && (
               <AssetUploadAction
-                title="Upload media"
+                title={t("Upload media")}
                 operation="add"
                 onFinish={handleUpload}
                 hideLabel
@@ -120,7 +122,7 @@ export function LibraryPageAssetsBlock() {
 
           {editing && (
             <AssetUploadAction
-              title="Upload media"
+              title={t("Upload media")}
               operation="add"
               onFinish={handleUpload}
               hideLabel

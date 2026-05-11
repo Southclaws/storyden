@@ -1,13 +1,12 @@
 import { PropsWithChildren } from "react";
 
 import { LinkButton } from "@/components/ui/link-button";
-import { allowsPublicRegistration } from "@/lib/settings/registration";
-import { getSettings } from "@/lib/settings/settings-server";
+import { tServer } from "@/i18n/server";
 import { HStack, VStack } from "@/styled-system/jsx";
 
 export default async function Layout({ children }: PropsWithChildren) {
-  const { registration_mode } = await getSettings();
-  const canRegister = allowsPublicRegistration(registration_mode);
+  const forgotPassword = await tServer("Forgot password");
+  const register = await tServer("Register");
 
   return (
     <VStack w="full">
@@ -15,14 +14,12 @@ export default async function Layout({ children }: PropsWithChildren) {
 
       <HStack>
         <LinkButton size="xs" variant="ghost" href="/password-reset">
-          Forgot password
+          {forgotPassword}
         </LinkButton>
 
-        {canRegister && (
-          <LinkButton size="xs" variant="subtle" href="/register">
-            Register
-          </LinkButton>
-        )}
+        <LinkButton size="xs" variant="subtle" href="/register">
+          {register}
+        </LinkButton>
       </HStack>
     </VStack>
   );

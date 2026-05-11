@@ -1,7 +1,7 @@
 import { AuthMode, RegistrationMode } from "@/api/openapi-schema";
 import { authProviderList } from "@/api/openapi-server/auth";
-import { allowsPublicRegistration } from "@/lib/settings/registration";
-import { VStack, styled } from "@/styled-system/jsx";
+import { tServer } from "@/i18n/server";
+import { VStack } from "@/styled-system/jsx";
 
 import { RegisterEmailForm } from "./RegisterEmail/RegisterEmailForm";
 import { RegisterHandleForm } from "./RegisterHandle/RegisterHandleForm";
@@ -64,7 +64,7 @@ export async function RegisterScreen({
 
       return (
         <VStack>
-          <p>This instance is private.</p>
+          <p>{await tServer("This instance is private.")}</p>
         </VStack>
       );
   }

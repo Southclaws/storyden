@@ -18,12 +18,14 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
 import { getColourVariants } from "@/utils/colour";
 
 const DEMO_ACCENT = "#3b82f6";
 
 export default function Page() {
+  const { t } = useI18n();
   const colours = getColourVariants(DEMO_ACCENT);
   const variables = keys(colours);
   const { flat, dark, other } = groupBy(variables, (v) => {
@@ -56,31 +58,31 @@ export default function Page() {
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
               <Text size="sm" fontWeight="semibold" color="fg.subtle">
-                Navigation
+                {t("Navigation")}
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
                 <User size={16} />
-                Profile
+                {t("Profile")}
               </Button>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
                 <Settings size={16} />
-                Settings
+                {t("Settings")}
               </Button>
               <Button variant="solid" size="sm" justifyContent="start" w="full">
                 <Plus size={16} />
-                Create Post
+                {t("Create Post")}
               </Button>
             </VStack>
 
             <VStack gap="2" alignItems="start" w="full">
               <Text size="sm" fontWeight="semibold" color="fg.subtle">
-                Categories
+                {t("Categories")}
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
-                General Discussion
+                {t("General Discussion")}
               </Button>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
-                Announcements
+                {t("Announcements")}
               </Button>
               <Button
                 variant="outline"
@@ -88,7 +90,7 @@ export default function Page() {
                 justifyContent="start"
                 w="full"
               >
-                Help & Support
+                {t("Help & Support")}
               </Button>
             </VStack>
           </VStack>
@@ -101,7 +103,7 @@ export default function Page() {
             <Box w="full" bg="bg.subtle" borderRadius="lg" p="6" boxShadow="sm">
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  Accent Color Palette
+                  {t("Accent Color Palette")}
                 </Text>
 
                 {other?.map((v) => (
@@ -167,87 +169,87 @@ export default function Page() {
             >
               <VStack gap="6" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  Button Variants
+                  {t("Button Variants")}
                 </Text>
 
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Solid
+                      {t("Solid")}
                     </Text>
                     <Button variant="solid" size="sm">
-                      Small
+                      {t("Small")}
                     </Button>
-                    <Button variant="solid">Medium</Button>
+                    <Button variant="solid">{t("Medium")}</Button>
                     <Button variant="solid" size="lg">
-                      Large
+                      {t("Large")}
                     </Button>
                     <Button variant="solid" disabled>
-                      Disabled
+                      {t("Disabled")}
                     </Button>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Outline
+                      {t("Outline")}
                     </Text>
                     <Button variant="outline" size="sm">
-                      Small
+                      {t("Small")}
                     </Button>
-                    <Button variant="outline">Medium</Button>
+                    <Button variant="outline">{t("Medium")}</Button>
                     <Button variant="outline" size="lg">
-                      Large
+                      {t("Large")}
                     </Button>
                     <Button variant="outline" disabled>
-                      Disabled
+                      {t("Disabled")}
                     </Button>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Ghost
+                      {t("Ghost")}
                     </Text>
                     <Button variant="ghost" size="sm">
-                      Small
+                      {t("Small")}
                     </Button>
-                    <Button variant="ghost">Medium</Button>
+                    <Button variant="ghost">{t("Medium")}</Button>
                     <Button variant="ghost" size="lg">
-                      Large
+                      {t("Large")}
                     </Button>
                     <Button variant="ghost" disabled>
-                      Disabled
+                      {t("Disabled")}
                     </Button>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Subtle
+                      {t("Subtle")}
                     </Text>
                     <Button variant="subtle" size="sm">
-                      Small
+                      {t("Small")}
                     </Button>
-                    <Button variant="subtle">Medium</Button>
+                    <Button variant="subtle">{t("Medium")}</Button>
                     <Button variant="subtle" size="lg">
-                      Large
+                      {t("Large")}
                     </Button>
                     <Button variant="subtle" disabled>
-                      Disabled
+                      {t("Disabled")}
                     </Button>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Link
+                      {t("Link")}
                     </Text>
                     <Button variant="link" size="sm">
-                      Small Link
+                      {t("Small Link")}
                     </Button>
-                    <Button variant="link">Medium Link</Button>
+                    <Button variant="link">{t("Medium Link")}</Button>
                     <Button variant="link" size="lg">
-                      Large Link
+                      {t("Large Link")}
                     </Button>
                     <Button variant="link" disabled>
-                      Disabled Link
+                      {t("Disabled Link")}
                     </Button>
                   </VStack>
                 </HStack>
@@ -255,29 +257,29 @@ export default function Page() {
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Color Palettes
+                      {t("Color Palettes")}
                     </Text>
-                    <Button>Default</Button>
-                    <Button colorPalette="red">Destructive</Button>
-                    <Button colorPalette="green">Success</Button>
-                    <Button colorPalette="amber">Warning</Button>
+                    <Button>{t("Default")}</Button>
+                    <Button colorPalette="red">{t("Destructive")}</Button>
+                    <Button colorPalette="green">{t("Success")}</Button>
+                    <Button colorPalette="amber">{t("Warning")}</Button>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      With Icons
+                      {t("With Icons")}
                     </Text>
                     <Button>
                       <Heart size={16} />
-                      Like
+                      {t("Like")}
                     </Button>
                     <Button variant="outline">
                       <Share size={16} />
-                      Share
+                      {t("Share")}
                     </Button>
                     <Button variant="ghost">
                       <MessageCircle size={16} />
-                      Comment
+                      {t("Comment")}
                     </Button>
                   </VStack>
                 </HStack>
@@ -288,56 +290,56 @@ export default function Page() {
             <Box w="full" bg="bg.subtle" borderRadius="lg" p="6" boxShadow="sm">
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  Typography Scale
+                  {t("Typography Scale")}
                 </Text>
 
                 <VStack gap="3" alignItems="start" w="full">
                   <Text size="7xl" color="fg.default">
-                    7XL Heading
+                    {t("7XL Heading")}
                   </Text>
                   <Text size="6xl" color="fg.default">
-                    6XL Heading
+                    {t("6XL Heading")}
                   </Text>
                   <Text size="5xl" color="fg.default">
-                    5XL Heading
+                    {t("5XL Heading")}
                   </Text>
                   <Text size="4xl" color="fg.default">
-                    4XL Heading
+                    {t("4XL Heading")}
                   </Text>
                   <Text size="3xl" color="fg.default">
-                    3XL Heading
+                    {t("3XL Heading")}
                   </Text>
                   <Text size="2xl" color="fg.default">
-                    2XL Heading
+                    {t("2XL Heading")}
                   </Text>
                   <Text size="xl" color="fg.default">
-                    XL Heading
+                    {t("XL Heading")}
                   </Text>
                   <Text size="lg" color="fg.default">
-                    Large Text
+                    {t("Large Text")}
                   </Text>
                   <Text size="md" color="fg.default">
-                    Medium Text (Body)
+                    {t("Medium Text (Body)")}
                   </Text>
                   <Text size="sm" color="fg.subtle">
-                    Small Text (Secondary)
+                    {t("Small Text (Secondary)")}
                   </Text>
                   <Text size="xs" color="fg.muted">
-                    Extra Small Text (Captions)
+                    {t("Extra Small Text (Captions)")}
                   </Text>
                 </VStack>
 
                 <VStack gap="2" alignItems="start" w="full" mt="4">
                   <Text size="sm" color="fg.subtle">
-                    Color Variants
+                    {t("Color Variants")}
                   </Text>
-                  <Text color="fg.default">Default foreground text</Text>
-                  <Text color="fg.subtle">Subtle foreground text</Text>
-                  <Text color="fg.muted">Muted foreground text</Text>
-                  <Text color="fg.destructive">Destructive text</Text>
-                  <Text color="fg.success">Success text</Text>
-                  <Text color="fg.warning">Warning text</Text>
-                  <Text color="fg.accent">Accent text</Text>
+                  <Text color="fg.default">{t("Default foreground text")}</Text>
+                  <Text color="fg.subtle">{t("Subtle foreground text")}</Text>
+                  <Text color="fg.muted">{t("Muted foreground text")}</Text>
+                  <Text color="fg.destructive">{t("Destructive text")}</Text>
+                  <Text color="fg.success">{t("Success text")}</Text>
+                  <Text color="fg.warning">{t("Warning text")}</Text>
+                  <Text color="fg.accent">{t("Accent text")}</Text>
                 </VStack>
               </VStack>
             </Box>
@@ -361,7 +363,7 @@ export default function Page() {
                           John Doe
                         </Text>
                         <Text size="xs" color="fg.muted">
-                          2 hours ago
+                          {t("2 hours ago")}
                         </Text>
                       </VStack>
                     </HStack>
@@ -372,20 +374,20 @@ export default function Page() {
 
                   <VStack gap="2" alignItems="start">
                     <Text size="lg" fontWeight="semibold">
-                      Sample Forum Post Title
+                      {t("Sample Forum Post Title")}
                     </Text>
                     <Text color="fg.subtle">
-                      This is a sample forum post content that demonstrates how
-                      text appears in cards with proper contrast ratios and
-                      semantic color usage.
+                      {t(
+                        "This is a sample forum post content that demonstrates how text appears in cards with proper contrast ratios and semantic color usage.",
+                      )}
                     </Text>
                   </VStack>
 
                   <HStack gap="2" flexWrap="wrap">
-                    <Badge variant="subtle">Discussion</Badge>
-                    <Badge variant="outline">Frontend</Badge>
+                    <Badge variant="subtle">{t("Discussion")}</Badge>
+                    <Badge variant="outline">{t("Frontend")}</Badge>
                     <Badge variant="solid" colorPalette="green">
-                      Solved
+                      {t("Solved")}
                     </Badge>
                   </HStack>
 
@@ -407,7 +409,7 @@ export default function Page() {
                       </Button>
                       <Button variant="ghost" size="sm">
                         <Share size={16} />
-                        Share
+                        {t("Share")}
                       </Button>
                     </HStack>
                     <Button variant="ghost" size="sm">
@@ -427,7 +429,7 @@ export default function Page() {
               >
                 <VStack gap="3" alignItems="start">
                   <Text size="sm" fontWeight="semibold">
-                    Quick Actions
+                    {t("Quick Actions")}
                   </Text>
                   <VStack gap="2" w="full">
                     <Button
@@ -437,7 +439,7 @@ export default function Page() {
                       justifyContent="start"
                     >
                       <Plus size={16} />
-                      New Post
+                      {t("New Post")}
                     </Button>
                     <Button
                       variant="ghost"
@@ -446,7 +448,7 @@ export default function Page() {
                       justifyContent="start"
                     >
                       <Filter size={16} />
-                      Filter Posts
+                      {t("Filter Posts")}
                     </Button>
                   </VStack>
                 </VStack>
@@ -463,51 +465,56 @@ export default function Page() {
             >
               <VStack gap="6" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  Form Elements
+                  {t("Form Elements")}
                 </Text>
 
                 <HStack gap="8" w="full" alignItems="start">
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
                       <Text size="sm" color="fg.subtle">
-                        Input Fields
+                        {t("Input Fields")}
                       </Text>
-                      <Input placeholder="Default input" />
-                      <Input placeholder="Focused input" value="Sample text" />
-                      <Input placeholder="Disabled input" disabled />
+                      <Input placeholder={t("Default input")} />
+                      <Input
+                        placeholder={t("Focused input")}
+                        value={t("Sample text")}
+                      />
+                      <Input placeholder={t("Disabled input")} disabled />
                     </VStack>
 
                     <VStack gap="2" alignItems="start">
                       <Text size="sm" color="fg.subtle">
-                        Checkboxes
+                        {t("Checkboxes")}
                       </Text>
-                      <Checkbox>Unchecked</Checkbox>
-                      <Checkbox checked>Checked</Checkbox>
-                      <Checkbox checked="indeterminate">Indeterminate</Checkbox>
-                      <Checkbox disabled>Disabled</Checkbox>
+                      <Checkbox>{t("Unchecked")}</Checkbox>
+                      <Checkbox checked>{t("Checked")}</Checkbox>
+                      <Checkbox checked="indeterminate">
+                        {t("Indeterminate")}
+                      </Checkbox>
+                      <Checkbox disabled>{t("Disabled")}</Checkbox>
                     </VStack>
                   </VStack>
 
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
                       <Text size="sm" color="fg.subtle">
-                        Badge Variants
+                        {t("Badge Variants")}
                       </Text>
                       <HStack gap="2" flexWrap="wrap">
-                        <Badge variant="solid">Solid</Badge>
-                        <Badge variant="subtle">Subtle</Badge>
-                        <Badge variant="outline">Outline</Badge>
+                        <Badge variant="solid">{t("Solid")}</Badge>
+                        <Badge variant="subtle">{t("Subtle")}</Badge>
+                        <Badge variant="outline">{t("Outline")}</Badge>
                       </HStack>
                       <HStack gap="2" flexWrap="wrap">
-                        <Badge size="sm">Small</Badge>
-                        <Badge size="md">Medium</Badge>
-                        <Badge size="lg">Large</Badge>
+                        <Badge size="sm">{t("Small")}</Badge>
+                        <Badge size="md">{t("Medium")}</Badge>
+                        <Badge size="lg">{t("Large")}</Badge>
                       </HStack>
                       <HStack gap="2" flexWrap="wrap">
-                        <Badge colorPalette="red">Error</Badge>
-                        <Badge colorPalette="green">Success</Badge>
-                        <Badge colorPalette="amber">Warning</Badge>
-                        <Badge colorPalette="blue">Info</Badge>
+                        <Badge colorPalette="red">{t("Error")}</Badge>
+                        <Badge colorPalette="green">{t("Success")}</Badge>
+                        <Badge colorPalette="amber">{t("Warning")}</Badge>
+                        <Badge colorPalette="blue">{t("Info")}</Badge>
                       </HStack>
                     </VStack>
                   </VStack>
@@ -519,37 +526,37 @@ export default function Page() {
             <Box w="full" bg="bg.muted" borderRadius="lg" p="6" boxShadow="sm">
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  Surface Hierarchy
+                  {t("Surface Hierarchy")}
                 </Text>
 
                 <HStack gap="4" w="full">
                   <VStack gap="2" alignItems="start" flex="1">
                     <Text size="sm" color="fg.subtle">
-                      Default Surface
+                      {t("Default Surface")}
                     </Text>
                     <Box bg="bg.default" p="4" borderRadius="md" w="full">
-                      <Text>Content on default background</Text>
+                      <Text>{t("Content on default background")}</Text>
                       <Button variant="solid" size="sm" mt="2">
-                        Action
+                        {t("Action")}
                       </Button>
                     </Box>
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
                     <Text size="sm" color="fg.subtle">
-                      Subtle Surface
+                      {t("Subtle Surface")}
                     </Text>
                     <Box bg="bg.subtle" p="4" borderRadius="md" w="full">
-                      <Text>Content on subtle background</Text>
+                      <Text>{t("Content on subtle background")}</Text>
                       <Button variant="outline" size="sm" mt="2">
-                        Action
+                        {t("Action")}
                       </Button>
                     </Box>
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
                     <Text size="sm" color="fg.subtle">
-                      Muted Surface
+                      {t("Muted Surface")}
                     </Text>
                     <Box
                       bg="bg.muted"
@@ -559,9 +566,9 @@ export default function Page() {
                       borderWidth="thin"
                       borderColor="border.default"
                     >
-                      <Text>Content on muted background</Text>
+                      <Text>{t("Content on muted background")}</Text>
                       <Button variant="ghost" size="sm" mt="2">
-                        Action
+                        {t("Action")}
                       </Button>
                     </Box>
                   </VStack>
@@ -579,13 +586,13 @@ export default function Page() {
             >
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
-                  State Indicators
+                  {t("State Indicators")}
                 </Text>
 
                 <HStack gap="6" w="full">
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Status Messages
+                      {t("Status Messages")}
                     </Text>
                     <Box
                       bg="bg.success"
@@ -595,7 +602,7 @@ export default function Page() {
                       borderLeftColor="border.success"
                     >
                       <Text size="sm" color="fg.success">
-                        Success: Operation completed
+                        {t("Success: Operation completed")}
                       </Text>
                     </Box>
                     <Box
@@ -606,7 +613,7 @@ export default function Page() {
                       borderLeftColor="border.warning"
                     >
                       <Text size="sm" color="fg.warning">
-                        Warning: Please review
+                        {t("Warning: Please review")}
                       </Text>
                     </Box>
                     <Box
@@ -617,7 +624,7 @@ export default function Page() {
                       borderLeftColor="border.destructive"
                     >
                       <Text size="sm" color="fg.destructive">
-                        Error: Something went wrong
+                        {t("Error: Something went wrong")}
                       </Text>
                     </Box>
                     <Box
@@ -628,14 +635,14 @@ export default function Page() {
                       borderLeftColor="border.info"
                     >
                       <Text size="sm" color="fg.info">
-                        Info: Additional context
+                        {t("Info: Additional context")}
                       </Text>
                     </Box>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
                     <Text size="sm" color="fg.subtle">
-                      Content States
+                      {t("Content States")}
                     </Text>
                     <Box
                       bg="visibility.published.bg"
@@ -645,7 +652,7 @@ export default function Page() {
                       borderColor="visibility.published.border"
                     >
                       <Text size="sm" color="visibility.published.fg">
-                        Published Content
+                        {t("Published Content")}
                       </Text>
                     </Box>
                     <Box
@@ -656,7 +663,7 @@ export default function Page() {
                       borderColor="visibility.draft.border"
                     >
                       <Text size="sm" color="visibility.draft.fg">
-                        Draft Content
+                        {t("Draft Content")}
                       </Text>
                     </Box>
                     <Box
@@ -667,7 +674,7 @@ export default function Page() {
                       borderColor="visibility.review.border"
                     >
                       <Text size="sm" color="visibility.review.fg">
-                        Under Review
+                        {t("Under Review")}
                       </Text>
                     </Box>
                     <Box
@@ -678,7 +685,7 @@ export default function Page() {
                       borderColor="visibility.unlisted.border"
                     >
                       <Text size="sm" color="visibility.unlisted.fg">
-                        Unlisted Content
+                        {t("Unlisted Content")}
                       </Text>
                     </Box>
                   </VStack>
@@ -707,15 +714,17 @@ export default function Page() {
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
               <Text size="sm" fontWeight="semibold" color="fg.subtle">
-                Recent Activity
+                {t("Recent Activity")}
               </Text>
               <VStack gap="2" w="full">
                 {[...Array(5)].map((_, i) => (
                   <Box key={i} p="3" bg="bg.subtle" borderRadius="md" w="full">
                     <Text size="xs" color="fg.muted">
-                      {i + 1}h ago
+                      {t("{{count}}h ago", { count: i + 1 })}
                     </Text>
-                    <Text size="sm">User activity {i + 1}</Text>
+                    <Text size="sm">
+                      {t("User activity {{count}}", { count: i + 1 })}
+                    </Text>
                   </Box>
                 ))}
               </VStack>
@@ -723,7 +732,7 @@ export default function Page() {
 
             <VStack gap="2" alignItems="start" w="full">
               <Text size="sm" fontWeight="semibold" color="fg.subtle">
-                Popular Tags
+                {t("Popular Tags")}
               </Text>
               <HStack gap="1" flexWrap="wrap">
                 <Badge size="sm" variant="subtle">

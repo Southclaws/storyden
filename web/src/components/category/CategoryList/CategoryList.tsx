@@ -30,6 +30,7 @@ import { Unready } from "@/components/site/Unready";
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { ChevronRightIcon } from "@/components/ui/icons/Chevron";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { useI18n } from "@/i18n/provider";
 import { useCategoryEvent } from "@/lib/category/events";
 import {
   CategoryTree,
@@ -85,6 +86,7 @@ export function CategoryListTree({
   currentCategorySlug?: string;
   mutate: KeyedMutator<CategoryListOKResponse>;
 }) {
+  const { t } = useI18n();
   const session = useSession();
 
   const canManageCategories = hasPermission(session, "MANAGE_CATEGORIES");
@@ -159,7 +161,7 @@ export function CategoryListTree({
       >
         <HStack gap="1">
           <DiscussionIcon />
-          Discussion
+          {t("Discussion")}
         </HStack>
       </NavigationHeader>
 

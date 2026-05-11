@@ -1,8 +1,8 @@
 import { AuthProvider } from "@/api/openapi-schema";
 import { LinkButton } from "@/components/ui/link-button";
+import { tServer } from "@/i18n/server";
 import { Text } from "@/components/ui/text";
 import { OAuthProvider, filterWithLink } from "@/lib/auth/oauth";
-import { getProviders } from "@/lib/auth/providers";
 import { Divider, VStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -11,6 +11,7 @@ type Props = {
 
 export async function OAuthProviderList({ providers }: Props) {
   const oauth = filterWithLink(providers);
+  const thirdPartyLabel = await tServer("or via third party");
 
   if (oauth.length === 0) {
     return null;
@@ -24,7 +25,7 @@ export async function OAuthProviderList({ providers }: Props) {
     <VStack w="full">
       <WStack alignItems="center" textWrap="nowrap" color="fg.subtle">
         <Divider />
-        <Text>or via third party</Text>
+        <Text>{thirdPartyLabel}</Text>
         <Divider />
       </WStack>
 

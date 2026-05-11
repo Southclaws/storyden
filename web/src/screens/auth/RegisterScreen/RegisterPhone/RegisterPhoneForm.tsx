@@ -1,3 +1,3 @@
 export function RegisterPhoneForm() {
-  return <>NOT IMPLEMENTED (YET)</>;
+  return null;
 }

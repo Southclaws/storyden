@@ -15,6 +15,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 
 type Props = Omit<
   Combobox.RootProps,
@@ -57,6 +58,7 @@ function LibraryPageSelectCombobox({
   nodes,
   ...rest
 }: Props & { nodes: Node[] }) {
+  const { t } = useI18n();
   const initialCollection = createListCollection({
     items: toItems(nodes),
   });
@@ -103,11 +105,11 @@ function LibraryPageSelectCombobox({
       size="xs"
     >
       <Combobox.Control>
-        <Combobox.Input placeholder="Select a Page" asChild>
+        <Combobox.Input placeholder={t("Select a Page")} asChild>
           <Input size="xs" />
         </Combobox.Input>
         <Combobox.Trigger asChild>
-          <IconButton variant="link" aria-label="open" size="xs">
+          <IconButton variant="link" aria-label={t("open")} size="xs">
             <ChevronUpDownIcon />
           </IconButton>
         </Combobox.Trigger>
@@ -116,7 +118,7 @@ function LibraryPageSelectCombobox({
         <Combobox.Content>
           <Combobox.ItemGroup>
             <Combobox.Item key="unset" item="unset">
-              <Combobox.ItemText>All root level pages</Combobox.ItemText>
+              <Combobox.ItemText>{t("All root level pages")}</Combobox.ItemText>
               <Combobox.ItemIndicator>
                 <CheckIcon />
               </Combobox.ItemIndicator>

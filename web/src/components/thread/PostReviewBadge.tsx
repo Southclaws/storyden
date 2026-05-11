@@ -10,6 +10,7 @@ import { EditIcon } from "@/components/ui/icons/Edit";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import * as Menu from "@/components/ui/menu";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
 
@@ -32,6 +33,8 @@ export function PostReviewBadge({
   isConfirmingDelete,
   onCancelDelete,
 }: Props) {
+  const { t } = useI18n();
+
   if (!isModerator) {
     return (
       <Tooltip.Root
@@ -45,10 +48,10 @@ export function PostReviewBadge({
           <Badge
             variant="subtle"
             cursor="pointer"
-            aria-label="Post is in review"
+            aria-label={t("Post is in review")}
           >
             <WarningIcon />
-            In review
+            {t("In review")}
           </Badge>
         </Tooltip.Trigger>
         <Portal>
@@ -58,8 +61,7 @@ export function PostReviewBadge({
             </Tooltip.Arrow>
 
             <Tooltip.Content p="2" borderRadius="2xl" maxW="xs">
-              Your post has been flagged for review by a moderator. It will be
-              visible to others once approved.
+              {t("Your post has been flagged for review by a moderator. It will be visible to others once approved.")}
             </Tooltip.Content>
           </Tooltip.Positioner>
         </Portal>
@@ -81,10 +83,10 @@ export function PostReviewBadge({
           _hover={{
             borderColor: "colorPalette.6",
           }}
-          aria-label="Post review actions"
+          aria-label={t("Post review actions")}
         >
           <WarningIcon />
-          In review
+          {t("In review")}
         </Badge>
       </Menu.Trigger>
 
@@ -94,20 +96,20 @@ export function PostReviewBadge({
             <Menu.Item
               value="accept"
               onClick={() => onAccept(postId)}
-              aria-label="Accept post"
+              aria-label={t("Accept post")}
             >
               <HStack gap="1">
-                <CheckIcon /> Accept
+                <CheckIcon /> {t("Accept")}
               </HStack>
             </Menu.Item>
 
             <Menu.Item
               value="edit-and-accept"
               onClick={() => onEditAndAccept(postId)}
-              aria-label="Edit and accept post"
+              aria-label={t("Edit and accept post")}
             >
               <HStack gap="1">
-                <EditIcon /> Edit and Accept
+                <EditIcon /> {t("Edit and Accept")}
               </HStack>
             </Menu.Item>
 
@@ -121,16 +123,16 @@ export function PostReviewBadge({
                   w="full"
                   closeOnSelect={false}
                   onClick={() => onDelete(postId)}
-                  aria-label="Confirm delete post"
+                  aria-label={t("Confirm delete post")}
                 >
-                  Are you sure?
+                  {t("Are you sure?")}
                 </Menu.Item>
 
                 <Menu.Item
                   value="cancel-delete"
                   closeOnSelect={false}
                   asChild
-                  aria-label="Cancel delete"
+                  aria-label={t("Cancel delete")}
                 >
                   <CancelAction borderRadius="md" onClick={onCancelDelete} />
                 </Menu.Item>
@@ -141,10 +143,10 @@ export function PostReviewBadge({
                 value="delete"
                 closeOnSelect={false}
                 onClick={() => onDelete(postId)}
-                aria-label="Delete post"
+                aria-label={t("Delete post")}
               >
                 <HStack gap="1">
-                  <DeleteIcon /> Delete
+                  <DeleteIcon /> {t("Delete")}
                 </HStack>
               </Menu.Item>
             )}

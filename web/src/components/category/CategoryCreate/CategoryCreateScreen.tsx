@@ -1,3 +1,5 @@
+"use client";
+
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "src/api/openapi-client/categories";
@@ -11,6 +13,7 @@ import { FormLabel } from "@/components/ui/form/FormLabel";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { Input, InputPrefix } from "@/components/ui/input";
 import { WEB_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import {
   CATEGORY_COVER_HEIGHT,
   CATEGORY_COVER_WIDTH,
@@ -22,6 +25,7 @@ import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
 export type { CategoryCreateProps };
 
 export function CategoryCreateScreen(props: CategoryCreateProps) {
+  const { t } = useI18n();
   const { register, onSubmit, control, handleImageUpload } =
     useCategoryCreate(props);
 
@@ -30,7 +34,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
   const categoryCollection = createListCollection({
     items: [
-      { label: "No parent (root category)", value: "" },
+      { label: t("No parent (root category)"), value: "" },
       ...categories.map((category) => ({
         label: category.name,
         value: category.id,
@@ -43,10 +47,9 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
   return (
     <VStack alignItems="start" gap="4">
       <styled.p>
-        Use categories to organise posts. A post can only have one category,
-        unlike tags. So it&apos;s best to keep categories high-level and
-        different enough so that it&apos;s not easy to get confused between
-        them.
+        {t(
+          "Use categories to organise posts. A post can only have one category, unlike tags. So it's best to keep categories high-level and different enough so that it's not easy to get confused between them.",
+        )}
       </styled.p>
       <styled.form
         display="flex"
@@ -56,25 +59,25 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
         onSubmit={onSubmit}
       >
         <FormControl>
-          <FormLabel>Cover Image</FormLabel>
+          <FormLabel>{t("Cover Image")}</FormLabel>
           <AssetUploadEditor
             width={CATEGORY_COVER_WIDTH}
             height={CATEGORY_COVER_HEIGHT}
             onUpload={handleImageUpload}
           />
           <FormHelperText>
-            Upload a cover image for the category (4:1 aspect ratio)
+            {t("Upload a cover image for the category (4:1 aspect ratio)")}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Name</FormLabel>
+          <FormLabel>{t("Name")}</FormLabel>
           <Input {...register("name")} type="text" />
-          <FormHelperText>The name for your category</FormHelperText>
+          <FormHelperText>{t("The name for your category")}</FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>URL Slug</FormLabel>
+          <FormLabel>{t("URL Slug")}</FormLabel>
           <HStack gap="0" alignItems="stretch" flex="1">
             <InputPrefix
               display={{
@@ -99,45 +102,47 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
             />
           </HStack>
           <FormHelperText>
-            The URL path for your category (e.g., &quot;general&quot;,
-            &quot;announcements&quot;)
+            {t(
+              'The URL path for your category (e.g., "general", "announcements")',
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Description</FormLabel>
+          <FormLabel>{t("Description")}</FormLabel>
 
           {/* TODO: Make a larger textarea component for this. */}
           <Input {...register("description")} type="text" />
-          <FormHelperText>Describe your category</FormHelperText>
+          <FormHelperText>{t("Describe your category")}</FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Parent Category</FormLabel>
+          <FormLabel>{t("Parent Category")}</FormLabel>
           <SelectField
             name="parent"
             control={control}
             collection={categoryCollection}
-            placeholder="Select a parent category"
+            placeholder={t("Select a parent category")}
           />
           <FormHelperText>
-            Choose a parent category to create a subcategory, or leave as root
-            category
+            {t(
+              "Choose a parent category to create a subcategory, or leave as root category",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Colour</FormLabel>
+          <FormLabel>{t("Colour")}</FormLabel>
           <ColourPickerField control={control} name="colour" />
-          <FormHelperText>The colour for the category</FormHelperText>
+          <FormHelperText>{t("The colour for the category")}</FormHelperText>
         </FormControl>
 
         <WStack>
           <Button flexGrow="1" type="button" onClick={props.onClose}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button flexGrow="1" type="submit">
-            Create
+            {t("Create")}
           </Button>
         </WStack>
       </styled.form>

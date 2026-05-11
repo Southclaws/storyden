@@ -11,6 +11,7 @@ import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox as cardBox } from "@/styled-system/patterns";
 
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export function PluginItem({ plugin }: Props) {
+  const { t } = useI18n();
   const [_, setSelectedPlugin] = useSelectedPlugin();
   const { mutate } = useSWRConfig();
 
@@ -73,7 +75,8 @@ export function PluginItem({ plugin }: Props) {
 
         <WStack alignItems="end">
           <styled.p fontSize="xs" color="fg.muted">
-            Installed: <time>{formatDate(plugin.added_at, "PPpp")}</time>
+            {t("Installed")}:{" "}
+            <time>{formatDate(plugin.added_at, "PPpp")}</time>
           </styled.p>
 
           <HStack>
@@ -85,15 +88,15 @@ export function PluginItem({ plugin }: Props) {
                   bgColor="bg.destructive"
                   onClick={handleConfirmAction}
                 >
-                  Confirm Delete
+                  {t("Confirm Delete")}
                 </Button>
                 <Button size="xs" variant="subtle" onClick={handleCancelAction}>
-                  Cancel
+                  {t("Cancel")}
                 </Button>
               </>
             ) : (
               <Button size="xs" variant="subtle" onClick={handleConfirmAction}>
-                Delete
+                {t("Delete")}
               </Button>
             )}
           </HStack>
@@ -101,7 +104,7 @@ export function PluginItem({ plugin }: Props) {
 
         {isError && isPluginStatusError(plugin.status) && (
           <styled.p fontSize="xs" color="fg.error">
-            Error: {plugin.status.message}
+            {t("Error")}: {plugin.status.message}
           </styled.p>
         )}
       </LStack>

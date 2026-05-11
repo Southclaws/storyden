@@ -5,7 +5,29 @@ import Link from "next/link";
 import { cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
 
-export function HeroSection() {
+type Props = {
+  locale?: "en" | "zh";
+};
+
+export function HeroSection({ locale = "en" }: Props) {
+  const copy =
+    locale === "zh"
+      ? {
+          getStarted: "开始使用",
+          liveDemo: "在线演示",
+          docsHref: "/zh/docs/introduction",
+          heroAlt: "阳光照耀的湖泊，远处是覆雪的高山。",
+          logoAlt: "Storyden 标志",
+        }
+      : {
+          getStarted: "Get Started",
+          liveDemo: "Live Demo",
+          docsHref: "/docs/introduction",
+          heroAlt:
+            "A sun-lit lake sitting before tall snow-covered mountains in the distance.",
+          logoAlt: "The Storyden logo",
+        };
+
   return (
     <Grid>
       <GridItem gridRow="1/2" gridColumn="1/2">
@@ -25,7 +47,7 @@ export function HeroSection() {
           <img
             src="wide-nice-lake.webp"
             role="presentation"
-            alt="A sun-lit lake sitting before tall snow-covered mountains in the distance."
+            alt={copy.heroAlt}
             width={3456}
             height={1728}
           />
@@ -47,7 +69,7 @@ export function HeroSection() {
               src="/brand/fullmark_newspaper_vertical_large.png"
               width="1790"
               height="1170"
-              alt="The Storyden logo"
+              alt={copy.logoAlt}
             />
           </Box>
 
@@ -57,9 +79,9 @@ export function HeroSection() {
                 backgroundColor: "white",
                 boxShadow: "xl",
               })}
-              href="/docs/introduction"
+              href={copy.docsHref}
             >
-              Get Started
+              {copy.getStarted}
             </Link>
             <Link
               target="_blank"
@@ -79,7 +101,7 @@ export function HeroSection() {
               )}
               href="https://makeroom.club"
             >
-              Live Demo
+              {copy.liveDemo}
             </Link>
           </HStack>
         </VStack>

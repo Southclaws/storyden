@@ -1,7 +1,9 @@
 import { Plugin, PluginActiveState } from "@/api/openapi-schema";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/i18n/provider";
 
 export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
+  const { t } = useI18n();
   const activeState = plugin.status.active_state;
 
   switch (activeState) {
@@ -13,7 +15,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.success"
           color="fg.success"
         >
-          Active
+          {t("Active")}
         </Badge>
       );
 
@@ -25,7 +27,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.muted"
           color="fg.muted"
         >
-          Inactive
+          {t("Inactive")}
         </Badge>
       );
 
@@ -37,7 +39,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.info"
           color="fg.info"
         >
-          Starting
+          {t("Starting")}
         </Badge>
       );
 
@@ -49,7 +51,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.info"
           color="fg.info"
         >
-          Connecting
+          {t("Connecting")}
         </Badge>
       );
 
@@ -61,7 +63,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.warning"
           color="fg.warning"
         >
-          Restarting
+          {t("Restarting")}
         </Badge>
       );
 
@@ -73,7 +75,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
           backgroundColor="bg.error"
           color="fg.error"
         >
-          Error
+          {t("Error")}
         </Badge>
       );
   }

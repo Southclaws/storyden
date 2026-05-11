@@ -5,6 +5,7 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { Center, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { useWatch } from "../../store";
@@ -29,6 +30,7 @@ export function LibraryPageLinkBlock() {
 }
 
 function LibraryPageLinkBlockEditing() {
+  const { t } = useI18n();
   const { data, handlers } = useLibraryPageLinkBlock();
 
   return (
@@ -39,15 +41,14 @@ function LibraryPageLinkBlockEditing() {
           size="sm"
           variant="ghost"
           color="fg.muted"
-          placeholder="External URL..."
+          placeholder={t("External URL...")}
           onChange={handlers.handleInputValueChange}
           value={data.inputValue}
-          defaultValue={data.defaultLinkURL}
         />
 
         <HStack>
-          <InfoTip title="Generating a page from a URL">
-            Importing a URL will fetch the content and store it in this page.
+          <InfoTip title={t("Generating a page from a URL")}>
+            {t("Importing a URL will fetch the content and store it in this page.")}
           </InfoTip>
           <Button
             type="button"
@@ -57,7 +58,7 @@ function LibraryPageLinkBlockEditing() {
             loading={data.isImporting}
             onClick={handlers.handleImport}
           >
-            Import
+            {t("Import")}
           </Button>
         </HStack>
       </WStack>

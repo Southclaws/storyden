@@ -1,0 +1,43 @@
+---
+title: 欢迎使用 Storyden！
+description: 一个现代社区与内容平台。
+---
+
+Storyden 是一个用于管理社区与内容的平台。你可以用它运行论坛、博客、新闻发布、链接收藏、目录、知识库等社区空间。[了解更多。](/zh/docs/introduction/what-is-storyden)
+
+<Callout>
+  Storyden 仍处在早期研发阶段，我们希望尽可能收集反馈。欢迎在
+  [GitHub](https://github.com/Southclaws/storyden) 或通过这个表单分享你的想法、
+  使用体验、问题或建议：
+  https://airtable.com/shrLY0jDp9CuXPB2X
+</Callout>
+
+## 快速开始
+
+准备好计时器，我们来快速启动一个社区。
+
+Storyden 重视现代化和简单性。最快的体验方式是用 Docker 启动一个本地实例：
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+启动后，你可以在 `http://localhost:8000` 访问 Storyden 并进行体验。
+
+![Storyden web UI](/docs/introduction/local/browser_home.png)
+
+接下来，你可以注册一个新账户并探索平台。
+
+## 部署
+
+Storyden 可以运行在任何支持 Docker 容器的环境中。你可以把它部署到自己的硬件、VPS 或 Fly.io：
+
+<Cards>
+<Card href="/zh/docs/introduction/vps" title="Docker">
+  使用 Docker 镜像快速启动
+</Card>
+
+<Card href="/zh/docs/introduction/fly" title="Fly.io">
+  将 Storyden 部署到 Fly.io
+</Card>
+</Cards>

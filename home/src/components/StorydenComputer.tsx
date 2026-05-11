@@ -21,30 +21,22 @@ import {
 
 type label = "l1" | "l2" | "l3" | "l4" | "l5" | "l6";
 
-const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
-  l1: {
-    n: 1,
-    h: "SQLITE OR POSTGRESQL",
-    p: (
-      <>
-        <p>Production-ready whichever you choose.</p>
-      </>
-    ),
-  },
-  l2: {
-    n: 2,
-    h: "FILESYSTEM OR S3",
-    p: (
-      <>
-        <p>Keep it simple or make it scalable.</p>
-      </>
-    ),
-  },
-  l3: {
-    n: 3,
-    h: "STATE OF THE ART SECURITY",
-    p: (
-      <>
+const labelCopy = {
+  en: {
+    l1: {
+      n: 1,
+      h: "SQLITE OR POSTGRESQL",
+      p: <p>Production-ready whichever you choose.</p>,
+    },
+    l2: {
+      n: 2,
+      h: "FILESYSTEM OR S3",
+      p: <p>Keep it simple or make it scalable.</p>,
+    },
+    l3: {
+      n: 3,
+      h: "STATE OF THE ART SECURITY",
+      p: (
         <p>
           This ain't no PHP spaghetti.
           <br />
@@ -56,43 +48,78 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
           <br />
           We do things properly.
         </p>
-      </>
-    ),
-  },
-  l4: {
-    n: 4,
-    h: "CONTAINERISED",
-    p: (
-      <>
+      ),
+    },
+    l4: {
+      n: 4,
+      h: "CONTAINERISED",
+      p: (
         <p>
           No thousand line bash install scripts. Throw on your VPS, Fly.io or if
           you're feeling over-engineery, Kubernetes!
         </p>
-      </>
-    ),
-  },
-  l5: {
-    n: 5,
-    h: "HEADLESS OPTION",
-    p: (
-      <>
-        <p>Despise our design? Build your own frontend WordPress style.</p>
-      </>
-    ),
-  },
-  l6: {
-    n: 6,
-    h: "OPENAPI SPEC",
-    p: (
-      <>
+      ),
+    },
+    l5: {
+      n: 5,
+      h: "HEADLESS OPTION",
+      p: <p>Despise our design? Build your own frontend WordPress style.</p>,
+    },
+    l6: {
+      n: 6,
+      h: "OPENAPI SPEC",
+      p: (
         <p>
           Fully documented API with a hand-crafted (with love) OpenAPI
           specification.
         </p>
-      </>
-    ),
+      ),
+    },
   },
-};
+  zh: {
+    l1: {
+      n: 1,
+      h: "SQLITE 或 POSTGRESQL",
+      p: <p>无论选哪个，都能用于生产环境。</p>,
+    },
+    l2: {
+      n: 2,
+      h: "文件系统或 S3",
+      p: <p>可以保持简单，也可以按需扩展。</p>,
+    },
+    l3: {
+      n: 3,
+      h: "现代安全实践",
+      p: (
+        <p>
+          不是老派 PHP 糊成一团。
+          <br />
+          <strong aria-hidden="true">'); DROP TABLE accounts;</strong>
+          <br />
+          关键路径都认真处理。
+        </p>
+      ),
+    },
+    l4: {
+      n: 4,
+      h: "容器化",
+      p: <p>不用千行安装脚本。VPS、Fly.io 或 Kubernetes 都能跑。</p>,
+    },
+    l5: {
+      n: 5,
+      h: "无头模式",
+      p: <p>不喜欢默认设计？像 WordPress 一样接上自己的前端。</p>,
+    },
+    l6: {
+      n: 6,
+      h: "OPENAPI 规范",
+      p: <p>完整记录的 API，并配有精心维护的 OpenAPI 规范。</p>,
+    },
+  },
+} satisfies Record<
+  "en" | "zh",
+  Record<label, { n: number; h: string; p: ReactElement }>
+>;
 
 function getSvgPoint(svgEl: SVGSVGElement, clientX: number, clientY: number) {
   const pt = svgEl.createSVGPoint();
@@ -106,9 +133,15 @@ type labelCoords = Record<label, { x: number; y: number }>;
 
 const initial = { x: 0, y: 0 };
 
-export function StorydenComputer() {
+type Props = {
+  locale?: "en" | "zh";
+};
+
+export function StorydenComputer({ locale = "en" }: Props) {
   const [ready, setReady] = useState(false);
   const [modal, setModal] = useState<label | null>(null);
+  const copy = labelCopy[locale];
+  const zh = locale === "zh";
 
   const svgRef = useRef<SVGSVGElement>(null);
   const l1ref = useRef<HTMLDivElement>(null);
@@ -239,40 +272,64 @@ export function StorydenComputer() {
       >
         <Center gridRow="1">
           <Label ref={l1ref} onClick={() => setModal("l1")}>
-            SQLITE&nbsp;OR
-            <br />
-            POSTGRESQL
+            {zh ? (
+              <>SQLITE 或 POSTGRESQL</>
+            ) : (
+              <>
+                SQLITE&nbsp;OR
+                <br />
+                POSTGRESQL
+              </>
+            )}
           </Label>
         </Center>
         <Center gridRow="2">
           <Label ref={l2ref} onClick={() => setModal("l2")}>
-            FILESYSTEM
-            <br />
-            OR&nbsp;S3
+            {zh ? (
+              <>文件系统或 S3</>
+            ) : (
+              <>
+                FILESYSTEM
+                <br />
+                OR&nbsp;S3
+              </>
+            )}
           </Label>
         </Center>
         <Center gridRow="3">
           <Label ref={l3ref} onClick={() => setModal("l3")}>
-            STATE&nbsp;OF&nbsp;THE
-            <br />
-            ART&nbsp;SECURITY
+            {zh ? (
+              <>现代安全实践</>
+            ) : (
+              <>
+                STATE&nbsp;OF&nbsp;THE
+                <br />
+                ART&nbsp;SECURITY
+              </>
+            )}
           </Label>
         </Center>
         <Center gridRow="1" gridColumn="3">
           <Label ref={l4ref} onClick={() => setModal("l4")}>
-            CONTAINERISED
+            {zh ? "容器化" : "CONTAINERISED"}
           </Label>
         </Center>
         <Center gridRow="2" gridColumn="3">
           <Label ref={l5ref} onClick={() => setModal("l5")}>
-            HEADLESS OPTION
+            {zh ? "无头模式" : "HEADLESS OPTION"}
           </Label>
         </Center>
         <Center gridRow="3" gridColumn="3">
           <Label ref={l6ref} onClick={() => setModal("l6")}>
-            OPENAPI
-            <br />
-            SPEC
+            {zh ? (
+              <>OPENAPI 规范</>
+            ) : (
+              <>
+                OPENAPI
+                <br />
+                SPEC
+              </>
+            )}
           </Label>
         </Center>
       </Grid>
@@ -351,7 +408,12 @@ export function StorydenComputer() {
 
       {modal && (
         <Box position="absolute" w="full" h="full">
-          <Modal label={modal} onClick={() => setModal(null)} />
+          <Modal
+            label={modal}
+            locale={locale}
+            copy={copy}
+            onClick={() => setModal(null)}
+          />
         </Box>
       )}
     </Center>
@@ -385,7 +447,17 @@ const Label = forwardRef<
 
 const cellStyle = { border: "1px solid currentColor", padding: "4px" };
 
-function Modal({ label, onClick }: { label: label; onClick: () => void }) {
+function Modal({
+  label,
+  locale,
+  copy,
+  onClick,
+}: {
+  label: label;
+  locale: "en" | "zh";
+  copy: Record<label, { n: number; h: string; p: ReactElement }>;
+  onClick: () => void;
+}) {
   return (
     <Box bgColor="Mono.ink/85" h="full" onClick={onClick}>
       <Center h="full">
@@ -406,7 +478,9 @@ function Modal({ label, onClick }: { label: label; onClick: () => void }) {
                     md: "sm",
                   }}
                 >
-                  SPEC SHEET {labelCopy[label].n} of 6
+                  {locale === "zh"
+                    ? `规格表 ${copy[label].n} / 6`
+                    : `SPEC SHEET ${copy[label].n} of 6`}
                 </styled.aside>
               </td>
             </tr>
@@ -423,7 +497,7 @@ function Modal({ label, onClick }: { label: label; onClick: () => void }) {
                   textAlign="center"
                   fontFamily="gorton"
                 >
-                  {labelCopy[label].h}
+                  {copy[label].h}
                 </styled.h1>
               </td>
             </tr>
@@ -440,7 +514,7 @@ function Modal({ label, onClick }: { label: label; onClick: () => void }) {
                   }}
                   textWrap="balance"
                 >
-                  {labelCopy[label].p}
+                  {copy[label].p}
                 </styled.p>
               </td>
             </tr>

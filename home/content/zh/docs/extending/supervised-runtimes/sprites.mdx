@@ -1,0 +1,58 @@
+---
+title: Sprites
+---
+
+The Sprites runtime runs supervised plugins in remote isolated runtimes managed by [Sprites](https://sprites.dev/), instead of running plugin processes on your Storyden host.
+
+## Why use Sprites
+
+- stronger runtime isolation for supervised plugins
+- no plugin process execution on your Storyden machine
+- useful when you want tighter risk boundaries for third-party plugins
+
+## Configuration
+
+Set:
+
+```bash
+PLUGIN_RUNTIME_PROVIDER=sprites
+SPRITES_API_KEY=...
+```
+
+`SPRITES_API_KEY` is required when using the Sprites provider.
+
+Also ensure your `PUBLIC_API_ADDRESS` is publicly reachable from Sprites, since supervised plugins need to connect back to Storyden RPC at `/rpc`.
+
+See [Configuration Reference](/docs/reference/configuration) for environment variable details.
+
+## Billing and rough cost estimate
+
+Sprites is a separate billed service. It is billed by Sprites, not by your VPS/hosting provider.
+
+<Callout type="warning">
+  Storyden plugins are background services that do not go to sleep. This means
+  you will not benefit from scale-to-zero semantics or granular hourly billing.
+</Callout>
+
+Pricing source: [Sprites billing](https://sprites.dev/#billing). (Checked February 22, 2026.)
+
+Using their posted rates and minimum active usage floors, a plugin that runs 24/7 for a typical month (~730 hours) comes out roughly to:
+
+- CPU floor: `0.0625 vCPU * 730h * $0.07` = about `$3.19/month`
+- Memory floor: `0.25 GB * 730h * $0.04375` = about `$7.98/month`
+- Total compute floor per always-on plugin: about `$11.18/month`
+
+Storage is extra (but usually small for typical plugin workloads):
+
+- 1 GB hot NVMe cache for the month: about `$0.50`
+- 1 GB stored state for the month: about `$0.02`
+
+So a practical ballpark for one always-on lightweight plugin is about $12/month, plus whatever storage and additional runtime usage you may add on top.
+
+Rates can change, so treat this as an estimate, not a quote.
+
+## Notes
+
+- Storyden still manages supervised lifecycle (start/stop/restart/logging).
+- External plugins do not use supervised runtime providers.
+- Security model details: [Security -> Runtime boundaries](/docs/extending/security#runtime-boundaries).

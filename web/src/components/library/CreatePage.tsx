@@ -3,6 +3,7 @@ import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { useLibraryMutation } from "@/lib/library/library";
 
 type Props = ButtonProps & {
@@ -23,6 +24,7 @@ export function CreatePageAction({
   onComplete,
   ...props
 }: Props) {
+  const { t } = useI18n();
   const { createNode, revalidate } = useLibraryMutation();
 
   async function handleCreate() {
@@ -32,8 +34,8 @@ export function CreatePageAction({
       },
       {
         promiseToast: {
-          loading: "Creating page...",
-          success: "Page created!",
+          loading: t("Creating page..."),
+          success: t("Page created!"),
         },
         cleanup: async () => {
           await revalidate();
@@ -55,7 +57,7 @@ export function CreatePageAction({
       {CreatePageIcon}
       {!hideLabel && (
         <>
-          <span>{CreatePageLabel}</span>
+          <span>{t(CreatePageLabel)}</span>
         </>
       )}
     </IconButton>
@@ -63,12 +65,14 @@ export function CreatePageAction({
 }
 
 export function CreatePageMenuItem({ hideLabel }: Props) {
+  const { t } = useI18n();
+
   return (
     <Item value={CreatePageID}>
       {CreatePageIcon}
       {!hideLabel && (
         <>
-          &nbsp;<span>{CreatePageLabel}</span>
+          &nbsp;<span>{t(CreatePageLabel)}</span>
         </>
       )}
     </Item>

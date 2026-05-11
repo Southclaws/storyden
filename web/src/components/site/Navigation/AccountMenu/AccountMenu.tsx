@@ -1,9 +1,12 @@
+"use client";
+
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 
 import { Account } from "@/api/openapi-schema";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { hasPermission } from "@/utils/permissions";
 
 import { AdminMenuItem } from "../Anchors/Admin";
@@ -20,6 +23,7 @@ type Props = {
 };
 
 export function AccountMenu({ account, size = "md" }: Props) {
+  const { t } = useI18n();
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
 
   return (
@@ -32,7 +36,7 @@ export function AccountMenu({ account, size = "md" }: Props) {
         shift: size === "md" ? 24 : 0,
       }}
     >
-      <Menu.Trigger cursor="pointer" aria-label="Account menu">
+      <Menu.Trigger cursor="pointer" aria-label={t("Account menu")}>
         <MemberAvatar profile={account} size={size} />
       </Menu.Trigger>
 

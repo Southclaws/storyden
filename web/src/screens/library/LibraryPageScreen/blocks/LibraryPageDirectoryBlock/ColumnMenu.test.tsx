@@ -85,7 +85,7 @@ describe("ColumnMenu", () => {
 
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByRole("menuitem", { name: /Delete/ })).toBeNull();
-    expect(screen.getByRole("menuitem", { name: /Hide column/ })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: /Show column/ })).toBeInTheDocument();
   });
 
   it("stays closed when edit mode is disabled", async () => {

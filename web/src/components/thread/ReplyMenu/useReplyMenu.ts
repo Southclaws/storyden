@@ -5,6 +5,7 @@ import { useSession } from "src/auth";
 import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
+import { useI18n } from "@/i18n/provider";
 import { useReportContext } from "@/lib/report/useReportContext";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
@@ -21,6 +22,7 @@ export type Props = {
 };
 
 export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
+  const { t } = useI18n();
   const { revalidate, deleteReply } = useThreadMutations(thread, currentPage);
   const { resolveReport } = useReportContext();
 
@@ -55,7 +57,7 @@ export function useReplyMenu({ thread, reply, currentPage, onEdit }: Props) {
     await handle(
       async () => {
         await withUndo({
-          message: "Message deleted",
+          message: t("Message deleted"),
           duration: 5000,
           toastId: `reply-${reply.id}`,
           action: async () => {

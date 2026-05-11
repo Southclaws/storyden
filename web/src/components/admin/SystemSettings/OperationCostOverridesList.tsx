@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getSpec } from "@/api/openapi-client/misc";
 import { Unready } from "@/components/site/Unready";
 import { Admonition } from "@/components/ui/admonition";
+import { useI18n } from "@/i18n/provider";
 import { Stack } from "@/styled-system/jsx";
 
 import { OperationCostOverrideAddForm } from "./OperationCostOverrideAddForm";
@@ -26,6 +27,7 @@ export function OperationCostOverridesList({
   rateLimitPeriod,
   onChange,
 }: OperationCostOverridesListProps) {
+  const { t } = useI18n();
   const [operations, setOperations] = useState<string[] | null>(null);
   const [selectedOperation, setSelectedOperation] = useState<string>("");
   const [costValue, setCostValue] = useState<number>(1);
@@ -50,11 +52,11 @@ export function OperationCostOverridesList({
       })
       .catch(() => {
         setError(
-          "Failed to load API operations. Please refresh the page to try again.",
+          t("Failed to load API operations. Please refresh the page to try again."),
         );
         setOperations([]);
       });
-  }, []);
+  }, [t]);
 
   const overrides = value || {};
   const overridesList: OperationOverride[] = Object.entries(overrides).map(
@@ -99,7 +101,7 @@ export function OperationCostOverridesList({
         <Admonition
           value={true}
           kind="failure"
-          title="Error loading operations"
+          title={t("Error loading operations")}
           onChange={() => setError(null)}
         >
           {error}

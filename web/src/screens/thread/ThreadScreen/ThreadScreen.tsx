@@ -32,11 +32,13 @@ import {
 } from "@/components/ui/icons/Discussion";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
 import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
+import { useI18n } from "@/i18n/provider";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
 export function ThreadScreen(props: Props) {
+  const { t } = useI18n();
   const {
     ready,
     error,
@@ -81,10 +83,10 @@ export function ThreadScreen(props: Props) {
                     type="button"
                     onClick={handlers.handleDiscardChanges}
                   >
-                    Discard
+                    {t("Discard")}
                   </CancelAction>
                   <SaveAction type="submit" disabled={isEmpty}>
-                    Save
+                    {t("Save")}
                   </SaveAction>
                 </>
               )}
@@ -206,6 +208,8 @@ export function ThreadScreen(props: Props) {
 type TitleInputProps = Omit<ControllerProps<Form>, "render">;
 
 export function TitleInput({ control }: TitleInputProps) {
+  const { t } = useI18n();
+
   return (
     <Controller<Form>
       render={({ field: { onChange, ...field }, formState, fieldState }) => {
@@ -213,7 +217,7 @@ export function TitleInput({ control }: TitleInputProps) {
           <>
             <HeadingInput
               id="title-input"
-              placeholder="Thread title..."
+              placeholder={t("Thread title...")}
               onValueChange={onChange}
               defaultValue={formState.defaultValues?.["title"]}
               {...field}
@@ -267,10 +271,11 @@ function ThreadBodyInput({
 }
 
 function ThreadStats({ thread }: { thread: Thread }) {
+  const { t } = useI18n();
   const likeCount = thread.likes.likes;
-  const likeLabel = likeCount === 1 ? "like" : "likes";
+  const likeLabel = likeCount === 1 ? t("like") : t("likes");
   const replyCount = thread.reply_status.replies;
-  const replyLabel = replyCount === 1 ? "reply" : "replies";
+  const replyLabel = replyCount === 1 ? t("reply") : t("replies");
 
   return (
     <HStack gap="4" color="fg.muted">
@@ -278,7 +283,7 @@ function ThreadStats({ thread }: { thread: Thread }) {
         display="flex"
         gap="1"
         alignItems="center"
-        title={thread.likes.liked ? "You liked this thread" : undefined}
+        title={thread.likes.liked ? t("You liked this thread") : undefined}
       >
         <span>
           {thread.likes.liked ? (
@@ -298,7 +303,7 @@ function ThreadStats({ thread }: { thread: Thread }) {
         alignItems="center"
         title={
           thread.reply_status.replied
-            ? "You have replied to this thread"
+            ? t("You have replied to this thread")
             : undefined
         }
       >

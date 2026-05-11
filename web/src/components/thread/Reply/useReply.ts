@@ -8,16 +8,19 @@ import { Account, Permission, Reply, Thread } from "src/api/openapi-schema";
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { useI18n } from "@/i18n/provider";
 import { useReportContext } from "@/lib/report/useReportContext";
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { withUndo } from "@/lib/thread/undo";
 import { hasPermission } from "@/utils/permissions";
 
-export const FormSchema = z.object({
-  body: z.string().min(1, "Reply is empty."),
-});
-export type Form = z.infer<typeof FormSchema>;
+function getFormSchema(t: (key: string) => string) {
+  return z.object({
+    body: z.string().min(1, t("Reply is empty.")),
+  });
+}
+export type Form = z.infer<ReturnType<typeof getFormSchema>>;
 
 export type Props = {
   initialSession?: Account;
@@ -33,6 +36,7 @@ export function useReply({
   reply,
   currentPage,
 }: Props) {
+  const { t } = useI18n();
   const session = useSession(initialSession);
   const { resolveReport } = useReportContext();
   const { revalidate, updateReply, deleteReply } = useThreadMutations(
@@ -45,7 +49,7 @@ export function useReply({
   const [isEditingInReview, setEditingInReview] = useState(false);
   const [isEmpty, setEmpty] = useState(true);
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: {
       body: reply.body,
     },
@@ -99,8 +103,8 @@ export function useReply({
       },
       {
         promiseToast: {
-          loading: "Saving...",
-          success: isEditingInReview ? "Saved and published!" : "Saved!",
+          loading: t("Saving..."),
+          success: isEditingInReview ? t("Saved and published!") : t("Saved!"),
         },
         cleanup: async () => {
           await revalidate();
@@ -117,8 +121,8 @@ export function useReply({
       },
       {
         promiseToast: {
-          loading: "Accepting...",
-          success: "Reply accepted!",
+          loading: t("Accepting..."),
+          success: t("Reply accepted!"),
         },
         cleanup: async () => {
           await revalidate();
@@ -131,7 +135,7 @@ export function useReply({
     await handle(
       async () => {
         await withUndo({
-          message: "Reply deleted",
+          message: t("Reply deleted"),
           duration: 5000,
           toastId: `reply-${reply.id}`,
           action: async () => {

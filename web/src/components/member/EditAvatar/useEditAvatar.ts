@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useAccountGetAvatar } from "@/api/openapi-client/accounts";
 import { ProfileReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { useI18n } from "@/i18n/provider";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
@@ -13,6 +14,7 @@ export type Props = UseDisclosureProps & {
 
 export function useEditAvatar(props: Props) {
   const session = useSession();
+  const { t } = useI18n();
   const { revalidate } = useProfileMutations(props.profile.handle);
 
   const { data, error } = useAccountGetAvatar(session?.handle ?? "");
@@ -38,8 +40,8 @@ export function useEditAvatar(props: Props) {
   function handleSave() {
     revalidate();
     props.onClose?.();
-    toast.success("Avatar updated!", {
-      description: "It may take a while to update across the site.",
+    toast.success(t("Avatar updated!"), {
+      description: t("It may take a while to update across the site."),
     });
   }
   return {

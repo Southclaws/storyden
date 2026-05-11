@@ -16,6 +16,7 @@ import {
 } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n/provider";
 import { deriveError } from "@/utils/error";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -24,6 +25,7 @@ type Props = {
 };
 
 export function ConfigurationTab({ pluginID }: Props) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const { data: schema } = usePluginGetConfigurationSchema(pluginID);
   const { data: configuration } = usePluginGetConfiguration(pluginID);
@@ -87,7 +89,7 @@ export function ConfigurationTab({ pluginID }: Props) {
     return (
       <Box minH="12">
         <styled.p fontSize="sm" color="fg.muted">
-          This plugin has no configurable fields.
+          {t("This plugin has no configurable fields.")}
         </styled.p>
       </Box>
     );
@@ -102,7 +104,7 @@ export function ConfigurationTab({ pluginID }: Props) {
       w="full"
     >
       <styled.p fontSize="sm" color="fg.muted">
-        Configure the plugin&apos;s settings below.
+        {t("Configure the plugin's settings below.")}
       </styled.p>
 
       <LStack gap="3">
@@ -124,14 +126,14 @@ export function ConfigurationTab({ pluginID }: Props) {
           disabled={!dirty || isSaving}
           loading={isSaving}
         >
-          Save Configuration
+          {t("Save Configuration")}
         </Button>
       </WStack>
 
       <Admonition
         value={!!error}
         kind="failure"
-        title="Configuration Error"
+        title={t("Configuration Error")}
         onChange={() => setError(null)}
       >
         {error && <styled.p fontSize="sm">{error}</styled.p>}

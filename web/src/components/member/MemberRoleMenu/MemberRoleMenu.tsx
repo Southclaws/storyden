@@ -10,12 +10,14 @@ import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { RemoveCircleIcon } from "@/components/ui/icons/Remove";
 import { SubmenuIcon } from "@/components/ui/icons/Submenu";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 
 import { Props, useMemberRoleMenu } from "./useMemberRoleMenu";
 
 export function MemberRoleMenu(props: Props) {
   const { ready, error, data, handlers, isUpdating } = useMemberRoleMenu(props);
+  const { t } = useI18n();
   if (!ready) {
     return <Unready error={error} />;
   }
@@ -32,7 +34,7 @@ export function MemberRoleMenu(props: Props) {
       onSelect={handleSelect}
     >
       <Menu.TriggerItem justifyContent="space-between">
-        <HStack gap="2">Roles</HStack>
+        <HStack gap="2">{t("Roles")}</HStack>
         <SubmenuIcon />
       </Menu.TriggerItem>
 

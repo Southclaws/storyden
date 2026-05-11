@@ -14,6 +14,7 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
+import { useI18n } from "@/i18n/provider";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -46,6 +47,7 @@ export function ReportModal({
   loadingMessage = "Sending report...",
   ...disclosure
 }: ReportModalProps) {
+  const { t } = useI18n();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -64,8 +66,8 @@ export function ReportModal({
       },
       {
         promiseToast: {
-          loading: loadingMessage,
-          success: successMessage,
+          loading: t(loadingMessage),
+          success: t(successMessage),
         },
       },
     );
@@ -80,7 +82,7 @@ export function ReportModal({
   }
 
   return (
-    <ModalDrawer title={title} {...disclosure}>
+    <ModalDrawer title={t(title)} {...disclosure}>
       <styled.form
         as="form"
         gap="4"
@@ -88,7 +90,9 @@ export function ReportModal({
         onSubmit={handleSubmit}
         className={lstack()}
       >
-        <styled.div color="fg.muted">{description}</styled.div>
+        <styled.div color="fg.muted">
+          {typeof description === "string" ? t(description) : description}
+        </styled.div>
 
         {subject && (
           <styled.div
@@ -103,15 +107,17 @@ export function ReportModal({
         )}
 
         <FormControl>
-          <FormLabel>Additional details</FormLabel>
+          <FormLabel>{t("Additional details")}</FormLabel>
           <Input
             {...form.register("comment")}
-            placeholder="Optional context for moderators"
+            placeholder={t("Optional context for moderators")}
             maxLength={1000}
             resize="vertical"
           />
           <FormHelperText>
-            Optional additional context to help moderators resolve this matter.
+            {t(
+              "Optional additional context to help moderators resolve this matter.",
+            )}
           </FormHelperText>
           <FormErrorText>
             {form.formState.errors.comment?.message}
@@ -120,14 +126,14 @@ export function ReportModal({
 
         <WStack gap="2">
           <Button type="button" variant="outline" onClick={handleCancel}>
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             type="submit"
             colorPalette="red"
             loading={form.formState.isSubmitting}
           >
-            {submitLabel}
+            {t(submitLabel)}
           </Button>
         </WStack>
       </styled.form>

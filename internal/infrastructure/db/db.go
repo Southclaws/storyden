@@ -52,6 +52,11 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 		return nil, nil, fault.Wrap(err)
 	}
 
+	if driver == "sqlite" {
+		sqliteOpenLock.Lock()
+		defer sqliteOpenLock.Unlock()
+	}
+
 	d, err := sql.Open(driver, path)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fmsg.With("failed to open driver"))
@@ -75,6 +80,8 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 // This is only used in tests to allow simple concurrent tests without needing
 // to write too much test-specific code for DB stuff. We should use enttest tbh.
 var schemaLock = sync.Mutex{}
+
+var sqliteOpenLock = sync.Mutex{}
 
 func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())

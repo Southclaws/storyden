@@ -1,0 +1,18 @@
+{
+    "root": true,
+    "title": "扩展",
+    "description": "了解如何使用自定义插件扩展 Storyden。",
+    "defaultOpen": false,
+    "pages": [
+        "index",
+        "---快速开始---",
+        "model",
+        "tutorials",
+        "---参考---",
+        "supervised-runtimes",
+        "manifest",
+        "capabilities",
+        "security",
+        "api"
+    ]
+}

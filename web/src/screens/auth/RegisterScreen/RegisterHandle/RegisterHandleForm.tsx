@@ -3,11 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { Flex, styled } from "@/styled-system/jsx";
 
 import { Props, useRegisterHandleForm } from "./useRegisterHandleForm";
 
 export function RegisterHandleForm(props: Props) {
+  const { t } = useI18n();
   const {
     form: {
       register,
@@ -34,7 +36,7 @@ export function RegisterHandleForm(props: Props) {
         w="full"
         size="sm"
         textAlign="center"
-        placeholder="username"
+        placeholder={t("username")}
         required
         {...register("identifier")}
       />
@@ -47,13 +49,13 @@ export function RegisterHandleForm(props: Props) {
           w="full"
           size="sm"
           textAlign="center"
-          placeholder="password"
+          placeholder={t("password")}
           autoComplete="new-password"
           {...register("token")}
         />
         {props.webauthn && isWebauthnEnabled && (
           <>
-            <styled.span>or</styled.span>
+            <styled.span>{t("or")}</styled.span>
 
             <Button
               w="full"
@@ -63,7 +65,7 @@ export function RegisterHandleForm(props: Props) {
               onClick={handleWebauthn}
             >
               <styled.span display="flex" gap="1" alignItems="center" px="4">
-                device
+                {t("device")}
                 <BiometricIcon />
               </styled.span>
             </Button>
@@ -74,7 +76,7 @@ export function RegisterHandleForm(props: Props) {
         {errors.token?.message}
       </styled.p>
       <Button type="submit" w="full" onClick={handlePassword}>
-        Register
+        {t("Register")}
       </Button>
       <styled.p color="fg.error" fontSize="sm">
         {errors.root?.message}

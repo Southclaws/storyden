@@ -1,5 +1,6 @@
 import { Permission } from "@/api/openapi-schema";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useI18n } from "@/i18n/provider";
 import { PermissionDetails } from "@/lib/permission/permission";
 
 import { Badge } from "../ui/badge";
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function PermissionBadge(props: Props) {
+  const { t } = useI18n();
   const p = PermissionDetails[props.permission];
 
   return (
@@ -20,7 +22,7 @@ export function PermissionBadge(props: Props) {
       }}
     >
       <Tooltip.Trigger asChild>
-        <Badge cursor="pointer">{p.name}</Badge>
+        <Badge cursor="pointer">{t(p.name)}</Badge>
       </Tooltip.Trigger>
       <Tooltip.Positioner>
         <Tooltip.Arrow>
@@ -28,7 +30,7 @@ export function PermissionBadge(props: Props) {
         </Tooltip.Arrow>
 
         <Tooltip.Content p="2" borderRadius="2xl">
-          {p.description}
+          {t(p.description)}
         </Tooltip.Content>
       </Tooltip.Positioner>
     </Tooltip.Root>

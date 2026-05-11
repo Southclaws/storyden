@@ -9,6 +9,7 @@ import { Permission, ProfileReference } from "@/api/openapi-schema";
 import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { hasPermission } from "@/utils/permissions";
 import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
@@ -29,6 +30,7 @@ export function MemberOptionsMenu({
 }: PropsWithChildren<Props>) {
   const session = useSession();
   const [_, copy] = useCopyToClipboard();
+  const { t } = useI18n();
 
   const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
 
@@ -44,7 +46,7 @@ export function MemberOptionsMenu({
     switch (value.value) {
       case "copy-link":
         copy(permalink);
-        toast("Link copied to clipboard");
+        toast(t("Link copied to clipboard"));
         break;
     }
   }
@@ -73,11 +75,11 @@ export function MemberOptionsMenu({
 
               <Menu.ItemGroup>
                 <Link href={permalink}>
-                  <Menu.Item value="view">View profile</Menu.Item>
+                  <Menu.Item value="view">{t("View profile")}</Menu.Item>
                 </Link>
               </Menu.ItemGroup>
 
-              <Menu.Item value="copy-link">Copy link</Menu.Item>
+              <Menu.Item value="copy-link">{t("Copy link")}</Menu.Item>
 
               <ReportMemberMenuItem profile={profile} />
 
@@ -90,7 +92,7 @@ export function MemberOptionsMenu({
                     color="fg.warning"
                     _hover={{ color: "fg.warning", background: "bg.warning" }}
                   >
-                    Warn member
+                    {t("Warn member")}
                   </Menu.Item>
                 </MemberWarningTrigger>
               )}
@@ -105,7 +107,7 @@ export function MemberOptionsMenu({
                       background: "bg.destructive",
                     }}
                   >
-                    {profile.suspended ? "Reinstate" : "Suspend"}
+                    {profile.suspended ? t("Reinstate") : t("Suspend")}
                   </Menu.Item>
                 </MemberSuspensionTrigger>
               )}

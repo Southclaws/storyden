@@ -46,8 +46,6 @@ func TestIsDisallowedAddr(t *testing.T) {
 }
 
 func TestValidateResolvedHostRejectsPrivateDNSResolution(t *testing.T) {
-	t.Parallel()
-
 	origLookup := lookupNetIP
 	t.Cleanup(func() { lookupNetIP = origLookup })
 
@@ -61,8 +59,6 @@ func TestValidateResolvedHostRejectsPrivateDNSResolution(t *testing.T) {
 }
 
 func TestValidateResolvedHostAllowsPublicDNSResolution(t *testing.T) {
-	t.Parallel()
-
 	origLookup := lookupNetIP
 	t.Cleanup(func() { lookupNetIP = origLookup })
 

@@ -6,7 +6,7 @@ export const DEFAULT_WEB_ADDRESS = "http://localhost:3000";
 export const ConfigSchema = z.object({
   API_ADDRESS: z.string(),
   WEB_ADDRESS: z.string(),
-  source: z.union([z.literal("server"), z.literal("script")]),
+  source: z.union([z.literal("server"), z.literal("meta")]),
 });
 export type Config = z.infer<typeof ConfigSchema>;
 
@@ -26,17 +26,29 @@ export function serverEnvironment() {
 
 function isomorphicEnvironment(): Config {
   if (typeof window !== "undefined") {
-    const parsed = ConfigSchema.safeParse((window as any).__storyden__);
+    const browserConfig = document
+      .querySelector<HTMLMetaElement>('meta[name="storyden-browser-config"]')
+      ?.content;
+    let parsed = ConfigSchema.safeParse(undefined);
+
+    if (browserConfig) {
+      try {
+        parsed = ConfigSchema.safeParse(
+          JSON.parse(decodeURIComponent(browserConfig)),
+        );
+      } catch (error) {
+        console.warn("Unable to parse browser config meta JSON.", error);
+      }
+    }
 
     // Don't bail out if the config is invalid, just log it and use the default.
     // This is a rare occurrance but it does happen when Next.js renders either
-    // not-found.tsx or error.tsx as it does not load the <script> tag for some
-    // weird unknown reason. This seems like a bug in Next.js and not Storyden.
+    // not-found.tsx or error.tsx as it may not include the config meta tag.
     // Either way, the config isn't necessary on either of those pages as they
     // don't make client side API calls, they just render a basic error page.
     if (!parsed.success) {
-      console.error(
-        `Invalid config loaded from \`window.__storyden__\`, this indicates a problem running the root layout <script> tag on the server render which should inject the API_ADDRESS and WEB_ADDRESS environment variables.
+      console.warn(
+        `Invalid config loaded from the root layout config <meta>, this indicates a problem injecting the API_ADDRESS and WEB_ADDRESS environment variables during the server render.
 
 A default configuration will be used, however this configuration will most likely not work correctly in most production environments.
 
@@ -52,9 +64,7 @@ If you see this, please open an issue at https://github.com/Southclaws/storyden/
       };
     }
 
-    const config = parsed.data;
-    console.log("loaded window config", config);
-    return config;
+    return parsed.data;
   } else {
     const config = serverEnvironment();
     return config;

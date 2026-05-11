@@ -5,6 +5,7 @@ import { useSession } from "@/auth";
 import { MoreAction } from "@/components/site/Action/More";
 import { Heading } from "@/components/ui/heading";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { WEB_ADDRESS } from "@/config";
 import { styled } from "@/styled-system/jsx";
 import { useShare } from "@/utils/client";
@@ -75,6 +76,7 @@ export function useCategoryMenu({ category }: Props) {
 export function CategoryMenu(props: Props) {
   const { isSharingEnabled, isEditingEnabled, handlers } =
     useCategoryMenu(props);
+  const { t } = useI18n();
 
   const { category } = props;
 
@@ -90,13 +92,17 @@ export function CategoryMenu(props: Props) {
             <Menu.ItemGroup id="account">
               <Menu.ItemGroupLabel>
                 <Heading size="sm">{category.name}</Heading>
-                <styled.span color="fg.subtle">discussion category</styled.span>
+                <styled.span color="fg.subtle">
+                  {t("discussion category")}
+                </styled.span>
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
 
-              <Menu.Item value="copy-link">Copy link</Menu.Item>
-              {isSharingEnabled && <Menu.Item value="share">Share</Menu.Item>}
+              <Menu.Item value="copy-link">{t("Copy link")}</Menu.Item>
+              {isSharingEnabled && (
+                <Menu.Item value="share">{t("Share")}</Menu.Item>
+              )}
             </Menu.ItemGroup>
 
             {isEditingEnabled && (

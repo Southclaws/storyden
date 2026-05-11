@@ -12,6 +12,7 @@ import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { useI18n } from "@/i18n/provider";
 import { useLibraryMutation } from "@/lib/library/library";
 import { hasPermission } from "@/utils/permissions";
 
@@ -23,6 +24,7 @@ export type Props = {
 };
 
 export function useLibraryPageMenu(props: Props) {
+  const { t } = useI18n();
   const account = useSession();
   const {
     deleteNode,
@@ -57,10 +59,10 @@ export function useLibraryPageMenu(props: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving...",
+          loading: t("Saving..."),
           success: match(!isChildrenHidden)
-            .with(true, () => "Children hidden from sidebar")
-            .with(false, () => "Children visible in sidebar")
+            .with(true, () => t("Children hidden from sidebar"))
+            .with(false, () => t("Children visible in sidebar"))
             .exhaustive(),
         },
       },
@@ -85,12 +87,12 @@ export function useLibraryPageMenu(props: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving...",
+          loading: t("Saving..."),
           success: match(visibility)
-            .with(Visibility.published, () => "Published")
-            .with(Visibility.draft, () => "Set to draft")
-            .with(Visibility.review, () => "Submitted for review")
-            .with(Visibility.unlisted, () => "Set to unlisted")
+            .with(Visibility.published, () => t("Published"))
+            .with(Visibility.draft, () => t("Set to draft"))
+            .with(Visibility.review, () => t("Submitted for review"))
+            .with(Visibility.unlisted, () => t("Set to unlisted"))
             .exhaustive(),
         },
         cleanup: () => revalidate(),

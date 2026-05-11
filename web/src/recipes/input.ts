@@ -5,10 +5,11 @@ export const input = defineRecipe({
   jsx: ["Input", "Field.Input"],
   base: {
     appearance: "none",
-    background: "none",
-    borderColor: "border.default",
+    background: "bg.default",
+    borderColor: "border.subtle",
     borderRadius: "l2",
     borderWidth: "1px",
+    boxShadow: "xs",
     colorPalette: "accent",
     color: "fg.default",
     outline: 0,
@@ -23,14 +24,14 @@ export const input = defineRecipe({
     },
     _focus: {
       outline: "0",
-      borderColor: "none",
-      boxShadow: "none",
+      borderColor: "border.focus",
+      boxShadow: "0 0 0 3px var(--colors-border-focus)",
     },
     _invalid: {
       borderColor: "fg.error",
       _focus: {
-        borderColor: "fg.error",
-        boxShadow: "0 0 0 1px var(--colors-border-error)",
+        borderColor: "border.error",
+        boxShadow: "0 0 0 3px var(--colors-border-error)",
       },
     },
     _placeholder: {

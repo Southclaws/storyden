@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { EditAction } from "@/components/site/Action/Edit";
+import { useI18n } from "@/i18n/provider";
 import { isSlugReady, processMarkInput } from "@/lib/mark/mark";
 import { HStack, WStack } from "@/styled-system/jsx";
 
@@ -69,7 +70,6 @@ export function LibraryPageControls() {
         libraryPath={libraryPath}
         visibility={visibility}
         create={editing ? "edit" : "show"}
-        defaultValue={slug}
         value={slug}
         invalid={isSlugInvalid}
         onChange={handleSlugChange}
@@ -83,12 +83,13 @@ export function LibraryPageControls() {
 }
 
 function EditControls() {
+  const { t } = useI18n();
   const { editing, saving, handleToggleEditMode } = useEditState();
 
   if (!editing) {
     return (
       <EditAction type="button" onClick={handleToggleEditMode}>
-        Edit
+        {t("Edit")}
       </EditAction>
     );
   }
@@ -101,7 +102,7 @@ function EditControls() {
         disabled={saving}
         onClick={handleToggleEditMode}
       >
-        View
+        {t("View")}
       </CancelAction>
     </>
   );

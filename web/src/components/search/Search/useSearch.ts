@@ -5,9 +5,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const FormSchema = z.object({
-  q: z.string().min(1, { message: "Please enter a search term" }),
-});
+import { useI18n } from "@/i18n/provider";
+
+const getFormSchema = (t: (key: string) => string) =>
+  z.object({
+    q: z.string().min(1, { message: t("Please enter a search term") }),
+  });
+export const FormSchema = getFormSchema((key) => key);
 export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
@@ -17,6 +21,7 @@ export type Props = {
 
 export function useSearch(props: Props) {
   const [query, setQuery] = useSearchQueryState();
+  const { t } = useI18n();
 
   // NOTE: This is done via a useEffect because we don't want this to be present
   // on a server-render, only for client side search interactions.
@@ -26,7 +31,7 @@ export function useSearch(props: Props) {
   }, [props.isLoading]);
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: {
       q: props.query,
     },

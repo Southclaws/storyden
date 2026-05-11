@@ -12,6 +12,7 @@ import { CardGroupRadio } from "@/components/ui/form/CardGroupRadio";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import {
   AuthenticationModeDetail,
   AuthenticationModeList,
@@ -40,6 +41,7 @@ type AuthenticationModeDetailEnabled = AuthenticationModeDetail & {
 };
 
 export function useAuthenticationSettingsForm(props: Props) {
+  const { t } = useI18n();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -59,8 +61,8 @@ export function useAuthenticationSettingsForm(props: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving...",
-          success: "Authentication settings updated",
+          loading: t("Saving..."),
+          success: t("Authentication settings updated"),
         },
       },
     );
@@ -92,6 +94,7 @@ export function useAuthenticationSettingsForm(props: Props) {
 }
 
 export function AuthenticationSettingsForm(props: Props) {
+  const { t } = useI18n();
   const { form, availableModes, handleSubmit } =
     useAuthenticationSettingsForm(props);
 
@@ -99,21 +102,21 @@ export function AuthenticationSettingsForm(props: Props) {
     <CardBox>
       <styled.form className={lstack()} onSubmit={handleSubmit}>
         <WStack>
-          <Heading size="md">Authentication settings</Heading>
+          <Heading size="md">{t("Authentication settings")}</Heading>
           <Button type="submit" loading={form.formState.isSubmitting}>
-            Save
+            {t("Save")}
           </Button>
         </WStack>
 
         <FormControl>
-          <FormLabel>Authentication mode</FormLabel>
+          <FormLabel>{t("Authentication mode")}</FormLabel>
           <CardGroupRadio
             control={form.control}
             name="authentication_mode"
             items={availableModes.map((m) => ({
               value: m.value,
-              label: m.name,
-              description: m.description,
+              label: t(m.name),
+              description: t(m.description),
               disabled: !m.enabled,
             }))}
           />
@@ -142,7 +145,7 @@ export function AuthenticationSettingsForm(props: Props) {
 
         <WStack justifyContent="end">
           <Button type="submit" loading={form.formState.isSubmitting}>
-            Save
+            {t("Save")}
           </Button>
         </WStack>
       </styled.form>

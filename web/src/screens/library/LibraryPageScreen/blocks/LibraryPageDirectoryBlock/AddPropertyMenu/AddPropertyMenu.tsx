@@ -6,6 +6,7 @@ import { nodeUpdateChildrenPropertySchema } from "@/api/openapi-client/nodes";
 import { PropertyType } from "@/api/openapi-schema";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { styled } from "@/styled-system/jsx";
 import { useClickAway } from "@/utils/useClickAway";
 
@@ -21,6 +22,7 @@ export function AddPropertyMenu({
   children,
   unavailable = false,
 }: AddPropertyMenuProps) {
+  const { t } = useI18n();
   const { nodeID, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
   const { addChildProperty } = store.getState();
@@ -120,7 +122,7 @@ export function AddPropertyMenu({
         <Menu.Positioner ref={ref}>
           <Menu.Content minW="36">
             <Menu.ItemGroup pl="2" py="1">
-              <Menu.ItemGroupLabel>New property</Menu.ItemGroupLabel>
+              <Menu.ItemGroupLabel>{t("New property")}</Menu.ItemGroupLabel>
               <Input
                 size="sm"
                 value={name}
@@ -131,13 +133,13 @@ export function AddPropertyMenu({
 
             <Menu.ItemGroup pl="2" py="1">
               <Menu.Item value="create" disabled={unavailable}>
-                Create
+                {t("Create")}
               </Menu.Item>
 
               {unavailable && (
                 <Menu.ItemGroup>
                   <styled.p fontSize="xs" color="fg.muted">
-                    Properties require at least one sub-page.
+                    {t("Properties require at least one sub-page.")}
                   </styled.p>
                 </Menu.ItemGroup>
               )}

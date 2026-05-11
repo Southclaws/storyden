@@ -1,5 +1,8 @@
+"use client";
+
 import { PropsWithChildren } from "react";
 
+import { useI18n } from "@/i18n/provider";
 import {
   Box,
   CardBox,
@@ -21,6 +24,8 @@ type Props = {
 };
 
 export function Unready({ error }: Props) {
+  const { t } = useI18n();
+
   if (!error) {
     return (
       <Center
@@ -29,7 +34,7 @@ export function Unready({ error }: Props) {
         role="status"
         aria-busy="true"
         aria-live="polite"
-        aria-label="Loading"
+        aria-label={t("Loading")}
       >
         <div aria-hidden="true">
           <Spinner />
@@ -57,6 +62,8 @@ export function Unready({ error }: Props) {
 }
 
 export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
+  const { t } = useI18n();
+
   if (!error) {
     return (
       <Center
@@ -65,7 +72,7 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
         role="status"
         aria-busy="true"
         aria-live="polite"
-        aria-label="Loading"
+        aria-label={t("Loading")}
       >
         <Spinner aria-hidden="true" />
       </Center>
@@ -86,7 +93,7 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
           <HStack id="error__heading" gap="2" alignItems="center">
             <WarningIcon aria-hidden />
             <styled.h1 fontSize="md" fontWeight="bold" my="0">
-              Something went wrong
+              {t("Something went wrong")}
             </styled.h1>
           </HStack>
 
@@ -101,23 +108,17 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
   );
 }
 
-export function UnauthenticatedBanner({
-  initialSettings,
-}: {
-  initialSettings?: Settings;
-}) {
-  const canRegister = usePublicRegistration(initialSettings);
+export function UnauthenticatedBanner() {
+  const { t } = useI18n();
 
   return (
-    <UnreadyBanner error="Please log in to see this page.">
+    <UnreadyBanner error={t("Please log in to see this page.")}>
       <HStack w="full">
-        {canRegister && (
-          <LinkButton w="full" size="xs" href="/register">
-            Register
-          </LinkButton>
-        )}
+        <LinkButton w="full" size="xs" href="/register">
+          {t("Register")}
+        </LinkButton>
         <LinkButton w="full" size="xs" variant="outline" href="/login">
-          Login
+          {t("Login")}
         </LinkButton>
       </HStack>
     </UnreadyBanner>

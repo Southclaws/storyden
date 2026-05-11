@@ -1,0 +1,13 @@
+---
+title: Security
+description: Never trust the client!
+---
+
+The HTML content is sanitized on the server to prevent XSS attacks using the [microcosm-cc/bluemonday](https://github.com/microcosm-cc/bluemonday) package. The only exceptions to the built in policy are:
+
+- `data` attributes
+- `sdr:` scheme for anchor tags
+
+It also means frontend implementations (webapps, mobile apps) are free to include any custom data attributes in the HTML content. This can be useful for adding custom styling or functionality.
+
+`class` attributes are not allowed and will be removed.

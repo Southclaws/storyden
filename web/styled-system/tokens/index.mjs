@@ -3307,6 +3307,10 @@ const tokens = {
     "value": "var(--colors-bg-muted)",
     "variable": "var(--colors-bg-muted)"
   },
+  "colors.bg.raised": {
+    "value": "var(--colors-bg-raised)",
+    "variable": "var(--colors-bg-raised)"
+  },
   "colors.bg.selected": {
     "value": "var(--colors-bg-selected)",
     "variable": "var(--colors-bg-selected)"
@@ -3395,6 +3399,14 @@ const tokens = {
     "value": "var(--colors-fg-info)",
     "variable": "var(--colors-fg-info)"
   },
+  "colors.fg.link": {
+    "value": "var(--colors-fg-link)",
+    "variable": "var(--colors-fg-link)"
+  },
+  "colors.fg.link-hover": {
+    "value": "var(--colors-fg-link-hover)",
+    "variable": "var(--colors-fg-link-hover)"
+  },
   "colors.fg.accent": {
     "value": "var(--colors-fg-accent)",
     "variable": "var(--colors-fg-accent)"
@@ -3414,6 +3426,10 @@ const tokens = {
   "colors.border.muted": {
     "value": "var(--colors-border-muted)",
     "variable": "var(--colors-border-muted)"
+  },
+  "colors.border.strong": {
+    "value": "var(--colors-border-strong)",
+    "variable": "var(--colors-border-strong)"
   },
   "colors.border.destructive": {
     "value": "var(--colors-border-destructive)",
@@ -3446,6 +3462,10 @@ const tokens = {
   "colors.border.outline": {
     "value": "var(--colors-border-outline)",
     "variable": "var(--colors-border-outline)"
+  },
+  "colors.border.focus": {
+    "value": "var(--colors-border-focus)",
+    "variable": "var(--colors-border-focus)"
   },
   "colors.visibility.published.bg": {
     "value": "var(--colors-visibility-published-bg)",
@@ -4423,6 +4443,10 @@ const tokens = {
     "value": "var(--colors-color-palette-muted)",
     "variable": "var(--colors-color-palette-muted)"
   },
+  "colors.colorPalette.raised": {
+    "value": "var(--colors-color-palette-raised)",
+    "variable": "var(--colors-color-palette-raised)"
+  },
   "colors.colorPalette.selected": {
     "value": "var(--colors-color-palette-selected)",
     "variable": "var(--colors-color-palette-selected)"
@@ -4467,9 +4491,25 @@ const tokens = {
     "value": "var(--colors-color-palette-opaque)",
     "variable": "var(--colors-color-palette-opaque)"
   },
+  "colors.colorPalette.link": {
+    "value": "var(--colors-color-palette-link)",
+    "variable": "var(--colors-color-palette-link)"
+  },
+  "colors.colorPalette.link-hover": {
+    "value": "var(--colors-color-palette-link-hover)",
+    "variable": "var(--colors-color-palette-link-hover)"
+  },
+  "colors.colorPalette.strong": {
+    "value": "var(--colors-color-palette-strong)",
+    "variable": "var(--colors-color-palette-strong)"
+  },
   "colors.colorPalette.outline": {
     "value": "var(--colors-color-palette-outline)",
     "variable": "var(--colors-color-palette-outline)"
+  },
+  "colors.colorPalette.focus": {
+    "value": "var(--colors-color-palette-focus)",
+    "variable": "var(--colors-color-palette-focus)"
   },
   "colors.colorPalette.published.bg": {
     "value": "var(--colors-color-palette-published-bg)",

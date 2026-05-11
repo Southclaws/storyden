@@ -7,6 +7,7 @@ import { useSession } from "src/auth";
 
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
+import { useI18n } from "@/i18n/provider";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { Box, HStack } from "@/styled-system/jsx";
 
@@ -20,7 +21,6 @@ type Props = {
   create: "hide" | "show" | "edit";
   value?: string;
   invalid?: boolean;
-  defaultValue?: string;
   onChange?: FormEventHandler<HTMLInputElement>;
 };
 
@@ -31,12 +31,12 @@ export const Breadcrumbs_ = (
     create,
     value,
     invalid,
-    defaultValue,
     onChange,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLInputElement>,
 ) => {
+  const { t } = useI18n();
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
 
@@ -62,7 +62,7 @@ export const Breadcrumbs_ = (
         minW="min"
         href="/l"
       >
-        Library
+        {t("Library")}
       </LinkButton>
       {paths.map((p) => {
         const isCurrent = p === current && create === "show";
@@ -130,8 +130,7 @@ export const Breadcrumbs_ = (
             size="xs"
             height="6" // TODO: Make this default for size="xs"
             borderRadius="sm"
-            placeholder="URL slug"
-            defaultValue={defaultValue}
+            placeholder={t("URL slug")}
             value={value}
             {...(invalid ? { "aria-invalid": "true" } : {})}
             onChange={onChange}

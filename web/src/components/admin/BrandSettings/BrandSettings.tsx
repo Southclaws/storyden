@@ -12,6 +12,7 @@ import { FormLabel } from "@/components/ui/form/FormLabel";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import {
   Box,
   CardBox,
@@ -26,15 +27,15 @@ import { BannerEditor } from "./BannerEditor/BannerEditor";
 import { IconEditor } from "./IconEditor/IconEditor";
 import { Form, Props, useBrandSettings } from "./useBrandSettings";
 
-const MOTD_TYPE_COLLECTION = createListCollection({
-  items: [
-    { label: "Celebration", value: "celebration" },
-    { label: "Information", value: "information" },
-    { label: "Alert", value: "alert" },
-  ],
-});
-
 export function BrandSettingsForm(props: Props) {
+  const { t } = useI18n();
+  const motdTypeCollection = createListCollection({
+    items: [
+      { label: t("Celebration"), value: "celebration" },
+      { label: t("Information"), value: "information" },
+      { label: t("Alert"), value: "alert" },
+    ],
+  });
   const {
     register,
     control,
@@ -60,8 +61,8 @@ export function BrandSettingsForm(props: Props) {
         onSubmit={onSubmit}
       >
         <WStack>
-          <Heading size="md">Brand settings</Heading>
-          <Button type="submit">Save</Button>
+          <Heading size="md">{t("Brand settings")}</Heading>
+          <Button type="submit">{t("Save")}</Button>
         </WStack>
 
         <Stack
@@ -72,65 +73,68 @@ export function BrandSettingsForm(props: Props) {
           }}
         >
           <FormControl>
-            <FormLabel>Community name</FormLabel>
+            <FormLabel>{t("Community name")}</FormLabel>
             <Input {...register("title")} />
             <FormHelperText>
-              The name of your community. This appears in the sidebar, Google
-              indexing and tab titles.
+              {t(
+                "The name of your community. This appears in the sidebar, Google indexing and tab titles.",
+              )}
             </FormHelperText>
           </FormControl>
         </Stack>
 
         <FormControl display="flex" flexDirection="column">
-          <FormLabel>Icon</FormLabel>
+          <FormLabel>{t("Icon")}</FormLabel>
 
           <IconEditor initialValue={currentIcon} onSave={onSaveIcon} />
 
           <FormHelperText>
-            Your icon will be automatically resized and optimised for various
-            devices. It is used for the website favicon and a PWA app icon for
-            iOS and Android devices.
+            {t(
+              "Your icon will be automatically resized and optimised for various devices. It is used for the website favicon and a PWA app icon for iOS and Android devices.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl display="flex" flexDirection="column">
-          <FormLabel>Banner</FormLabel>
+          <FormLabel>{t("Banner")}</FormLabel>
 
           <BannerEditor />
           <FormHelperText>
-            Your banner will be used for link previews on other platforms.
+            {t("Your banner will be used for link previews on other platforms.")}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Description</FormLabel>
+          <FormLabel>{t("Description")}</FormLabel>
           <Input {...register("description")} />
           <FormHelperText>
-            Describe your community with a few words here. This will be used for
-            Google indexing, social previews and the PWA manifest.
+            {t(
+              "Describe your community with a few words here. This will be used for Google indexing, social previews and the PWA manifest.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>About</FormLabel>
+          <FormLabel>{t("About")}</FormLabel>
           <CardBox>
             <ContentFormField
               control={control}
               name="content"
               // NOTE: Does not update if sidebar is changed. Doesn't matter...
               initialValue={props.settings.content}
-              placeholder="About your community..."
+              placeholder={t("About your community...")}
             />
             <FormErrorText>{formState.errors.content?.message}</FormErrorText>
           </CardBox>
           <FormHelperText>
-            You can write a longer description about your community here. You
-            can use rich text formatting and include links and images.
+            {t(
+              "You can write a longer description about your community here. You can use rich text formatting and include links and images.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Colour</FormLabel>
+          <FormLabel>{t("Colour")}</FormLabel>
           <HStack>
             <Box>
               <ColourField
@@ -143,29 +147,29 @@ export function BrandSettingsForm(props: Props) {
           </HStack>
 
           <FormHelperText>
-            Pick a colour that best represents your community or brand. It will
-            be used throughout the site for accenting certain elements such as
-            buttons, mobile browser borders, PWA theme, etc.
+            {t(
+              "Pick a colour that best represents your community or brand. It will be used throughout the site for accenting certain elements such as buttons, mobile browser borders, PWA theme, etc.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <WStack mt="2">
-          <Heading size="sm">Message of the Day</Heading>
+          <Heading size="sm">{t("Message of the Day")}</Heading>
           <Button type="submit" size="sm">
-            Save
+            {t("Save")}
           </Button>
         </WStack>
 
         <FormControl>
           <WStack alignItems="center">
-            <FormLabel>MOTD content</FormLabel>
+            <FormLabel>{t("MOTD content")}</FormLabel>
             <Button
               type="button"
               size="xs"
               variant="outline"
               onClick={onClearMotd}
             >
-              Clear MOTD
+              {t("Clear MOTD")}
             </Button>
           </WStack>
           <CardBox>
@@ -174,13 +178,13 @@ export function BrandSettingsForm(props: Props) {
               name="motdContent"
               initialValue={motdContentInitialValue}
               resetKey={motdContentResetKey}
-              placeholder="Optional site-wide announcement..."
+              placeholder={t("Optional site-wide announcement...")}
             />
             <FormErrorText>
               {formState.errors.motdContent?.message}
             </FormErrorText>
           </CardBox>
-          <FormHelperText>Banner message content.</FormHelperText>
+          <FormHelperText>{t("Banner message content.")}</FormHelperText>
         </FormControl>
 
         <Stack
@@ -192,7 +196,7 @@ export function BrandSettingsForm(props: Props) {
           width="full"
         >
           <FormControl>
-            <FormLabel>MOTD starts at</FormLabel>
+            <FormLabel>{t("MOTD starts at")}</FormLabel>
             <DatePickerInputField<Form> name="motdStartAt" control={control} />
             <FormErrorText>
               {formState.errors.motdStartAt?.message}
@@ -200,9 +204,13 @@ export function BrandSettingsForm(props: Props) {
           </FormControl>
 
           <FormControl>
-            <FormLabel>MOTD ends at</FormLabel>
+            <FormLabel>{t("MOTD ends at")}</FormLabel>
             <DatePickerInputField<Form> name="motdEndAt" control={control} />
-            <FormErrorText>{formState.errors.motdEndAt?.message}</FormErrorText>
+            <FormErrorText>
+              {formState.errors.motdEndAt?.message
+                ? t(formState.errors.motdEndAt.message)
+                : undefined}
+            </FormErrorText>
           </FormControl>
         </Stack>
         <Button
@@ -211,25 +219,25 @@ export function BrandSettingsForm(props: Props) {
           variant="outline"
           onClick={onClearMotdDates}
         >
-          Clear dates
+          {t("Clear dates")}
         </Button>
 
         <FormControl>
-          <FormLabel>MOTD alert type</FormLabel>
-          <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
+          <FormLabel>{t("MOTD alert type")}</FormLabel>
+          <SelectField<Form, (typeof motdTypeCollection.items)[number]>
             control={control}
             name="motdType"
-            collection={MOTD_TYPE_COLLECTION}
-            placeholder="Select alert type"
+            collection={motdTypeCollection}
+            placeholder={t("Select alert type")}
           />
           <FormErrorText>{formState.errors.motdType?.message}</FormErrorText>
           <FormHelperText>
-            Choose how the banner message is styled.
+            {t("Choose how the banner message is styled.")}
           </FormHelperText>
         </FormControl>
 
         <WStack justifyContent="end">
-          <Button type="submit">Save</Button>
+          <Button type="submit">{t("Save")}</Button>
         </WStack>
       </styled.form>
     </CardBox>

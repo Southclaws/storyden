@@ -8,12 +8,14 @@ import { FormLabel } from "@/components/ui/form/FormLabel";
 import { NumberInputField } from "@/components/ui/form/NumberInputField";
 import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useInterfaceSettings } from "./useInterfaceSettings";
 
 export function InterfaceSettingsForm(props: Props) {
+  const { t } = useI18n();
   const { control, signaturesEnabled, formState, onSubmit } =
     useInterfaceSettings(props);
 
@@ -27,45 +29,48 @@ export function InterfaceSettingsForm(props: Props) {
     >
       <CardBox className={lstack()}>
         <WStack>
-          <Heading size="md">Interface settings</Heading>
+          <Heading size="md">{t("Interface settings")}</Heading>
           <Button type="submit" loading={formState.isSubmitting}>
-            Save
+            {t("Save")}
           </Button>
         </WStack>
 
         <FormControl>
-          <FormLabel>Default editor</FormLabel>
+          <FormLabel>{t("Default editor")}</FormLabel>
           <RadioGroupField
             control={control}
             name="editorMode"
             items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
+              { label: t("Rich text"), value: "richtext" },
+              { label: t("Markdown"), value: "markdown" },
             ]}
           />
           <FormHelperText>
-            Choose the default editor for composing threads, replies and pages.
+            {t(
+              "Choose the default editor for composing threads, replies and pages.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Default sidebar state</FormLabel>
+          <FormLabel>{t("Default sidebar state")}</FormLabel>
           <RadioGroupField
             control={control}
             name="sidebarDefaultState"
             items={[
-              { label: "Open", value: "open" },
-              { label: "Closed", value: "closed" },
+              { label: t("Open"), value: "open" },
+              { label: t("Closed"), value: "closed" },
             ]}
           />
           <FormHelperText>
-            Choose the default state for the sidebar when members first visit or
-            when they haven't set a preference.
+            {t(
+              "Choose the default state for the sidebar when members first visit or when they haven't set a preference.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Signatures</FormLabel>
+          <FormLabel>{t("Signatures")}</FormLabel>
           <Controller
             control={control}
             name="signaturesEnabled"
@@ -77,17 +82,19 @@ export function InterfaceSettingsForm(props: Props) {
                   field.onChange(checked === true);
                 }}
               >
-                Enable member signatures
+                {t("Enable member signatures")}
               </Checkbox>
             )}
           />
           <FormHelperText>
-            When disabled, signatures are hidden under posts and on profiles.
+            {t(
+              "When disabled, signatures are hidden under posts and on profiles.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Signature max height (px)</FormLabel>
+          <FormLabel>{t("Signature max height (px)")}</FormLabel>
           <NumberInputField
             control={control}
             name="signatureMaxHeight"
@@ -96,12 +103,12 @@ export function InterfaceSettingsForm(props: Props) {
             disabled={!signaturesEnabled}
           />
           <FormHelperText>
-            Limits how tall member signatures can appear below posts.
+            {t("Limits how tall member signatures can appear below posts.")}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Signature max characters</FormLabel>
+          <FormLabel>{t("Signature max characters")}</FormLabel>
           <NumberInputField
             control={control}
             name="signatureMaxChars"
@@ -110,7 +117,7 @@ export function InterfaceSettingsForm(props: Props) {
             disabled={!signaturesEnabled}
           />
           <FormHelperText>
-            Visible characters, not including HTML tags.
+            {t("Visible characters, not including HTML tags.")}
           </FormHelperText>
         </FormControl>
       </CardBox>

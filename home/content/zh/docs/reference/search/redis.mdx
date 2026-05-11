@@ -1,0 +1,125 @@
+---
+title: Redis
+description: Fast search indexing via Redis full-text capabilities.
+---
+
+Redis Search leverages the full-text search capabilities in Redis 8+ to provide distributed, high-performance search capabilities. This provider is recommended for larger deployments and environments where you're already using external services.
+
+```bash
+SEARCH_PROVIDER=redis
+REDIS_URL=redis://username:password@redis.example.com:6379
+REDIS_SEARCH_INDEX_NAME=storyden
+SEARCH_INDEX_CHUNK_SIZE=1000
+```
+
+<Callout title="When to use Redis">
+  A medium to large forum with hundreds of thousands of
+  [Threads](/docs/introduction/discussion/threads) and millions of
+  [Replies](/docs/introduction/discussion/replies) and lots of search usage.
+</Callout>
+
+Redis Search provides the same query capabilities as [Bleve](./bleve) but stores indexes in Redis, making it suitable for distributed deployments with multiple Storyden replicas. It uses the same language-agnostic configuration for consistent cross-language search behavior.
+
+Redis indexes content for fast term-based search. Storyden uses a language-agnostic configuration that works for many languages:
+
+- All Latin-based languages (English, Spanish, French, German, Italian, Portuguese, Dutch, etc.)
+- Slavic languages (Russian, Ukrainian, Polish, Czech, Slovak, Serbian, Croatian, Bulgarian)
+- Greek, Turkish, Georgian, Armenian
+- Hebrew, Arabic, Persian
+- Urdu, Hindi, Punjab, Nepali
+- Yoruba, Igbo, Hausa, Akan, Swahili
+- Chinese, Japanese, Korean, Thai, Khmer, Burmese
+
+Upsides:
+
+- Fast and efficient search capabilities
+- Allows the Storyden process to run and scale in ephemeral/stateless environments such as cloud/containers
+
+Considerations:
+
+- Requires an external service to be maintained
+- Redis instance requires the `FT` command family, either via Redis v8 or [RediSearch](https://github.com/RediSearch/RediSearch) module.
+- Large corpuses of data will require adequate amounts of memory
+
+See the [configuration reference](/docs/operation/configuration#search-features) for all available settings.
+
+If you choose Redis as your search provider, you also may as well set it as your cache provider. The Redis URL via `REDIS_URL` is the same, see [Cache configuration](/docs/operation/configuration#cache) for more information.
+
+## Indexing
+
+Storyden will automatically create the index if it does not exist. The index name is controlled by [`REDIS_SEARCH_INDEX_NAME`](/docs/operation/configuration#redis_search_index_name).
+
+In order to trigger a full re-index of content, see [reindexing](./reindexing).
+
+Redis indexes Storyden content at around 100x faster than [Bleve](./bleve). Our testing on a 12 core machine results in around 10 minutes for 1 million documents. This may be improved in future versions.
+
+## Examples
+
+These are minimal examples for different deployment scenarios. These are not production-ready and purely for illustrative purposes.
+
+### Multi-instance Kubernetes deployment with Redis
+
+Large-scale deployment with multiple replicas and external services. This configuration example is for a fully stateless Storyden instance (or instances) allowing you to deploy without any persistent disk storage.
+
+```bash
+# Database
+DATABASE_URL=postgresql://user:pass@postgres.namespace.svc.cluster.local:5432/storyden
+
+# Cache and search
+CACHE_PROVIDER=redis
+SEARCH_PROVIDER=redis
+REDIS_URL=redis://redis.namespace.svc.cluster.local:6379
+REDIS_SEARCH_INDEX_NAME=storyden-prod
+
+# Re-indexing chunk size
+SEARCH_INDEX_CHUNK_SIZE=2000
+
+# Asset storage
+ASSET_STORAGE_TYPE=s3
+S3_ENDPOINT=s3.amazonaws.com
+S3_BUCKET=storyden-assets-prod
+S3_REGION=us-east-1
+S3_ACCESS_KEY=<your-access-key>
+S3_SECRET_KEY=<your-secret-key>
+```
+
+### Docker Compose with Redis
+
+Development or small production setup using Docker Compose:
+
+```yaml
+version: "3.8"
+services:
+  storyden:
+    image: ghcr.io/southclaws/storyden:latest
+    environment:
+      DATABASE_URL: postgresql://storyden:password@db:5432/storyden
+      CACHE_PROVIDER: redis
+      SEARCH_PROVIDER: redis
+      REDIS_URL: redis://redis:6379
+      REDIS_SEARCH_INDEX_NAME: storyden
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - assets:/data/assets
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: storyden
+      POSTGRES_USER: storyden
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
+  assets:
+```

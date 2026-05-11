@@ -4,6 +4,7 @@ import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -44,33 +45,36 @@ export function useEmailSettings({ account }: Props) {
 
 export function EmailSettings(props: Props) {
   const { data, handlers } = useEmailSettings(props);
+  const { t } = useI18n();
 
   return (
     <CardBox className={lstack()} gap="4">
       <LStack>
-        <Heading size="md">Email settings</Heading>
+        <Heading size="md">{t("Email settings")}</Heading>
         <p>
-          Manage your email addresses here. You can add multiple email addresses
-          and use them to log in to your account. Emails are also used for
-          newsletters, notifications and other communications.
+          {t(
+            "Manage your email addresses here. You can add multiple email addresses and use them to log in to your account. Emails are also used for newsletters, notifications and other communications.",
+          )}
         </p>
       </LStack>
 
       <LStack>
         <WStack>
-          <Heading size="sm">Email addresses</Heading>
+          <Heading size="sm">{t("Email addresses")}</Heading>
           <Button
             size="xs"
             variant="subtle"
             onClick={handlers.handleStartNewEmail}
           >
-            <AddIcon /> new email address
+            <AddIcon /> {t("new email address")}
           </Button>
         </WStack>
 
         {data.emails.length === 0 ? (
           <styled.p color="fg.muted">
-            You do not have any email addresses associated with your account.
+            {t(
+              "You do not have any email addresses associated with your account.",
+            )}
           </styled.p>
         ) : (
           data.emails.map((email) => <EmailCard key={email.id} email={email} />)

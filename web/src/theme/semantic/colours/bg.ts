@@ -18,6 +18,12 @@ export const bg = {
       _osDark: "{colors.slate.dark.4}",
     },
   },
+  raised: {
+    value: {
+      _osLight: "{colors.neutral.light.1}",
+      _osDark: "{colors.slate.dark.1}",
+    },
+  },
 
   // Contextual colours for states etc.
   selected: {

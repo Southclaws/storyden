@@ -5,6 +5,7 @@ import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
 import * as Tabs from "@/components/ui/tabs";
+import { useI18n } from "@/i18n/provider";
 import { useCapability } from "@/lib/settings/capabilities";
 
 import { AccessKeySettingsScreen } from "./AccessKeySettingsScreen";
@@ -19,6 +20,7 @@ import { SystemSettingsScreen } from "./SystemSettingsScreen";
 const DEFAULT_TAB = "brand";
 
 export function AdminScreen() {
+  const { t } = useI18n();
   const pluginsEnabled = useCapability("plugins");
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
@@ -54,14 +56,16 @@ export function AdminScreen() {
       onValueChange={handleTabChange}
     >
       <Tabs.List>
-        <Tabs.Trigger value="brand">Brand</Tabs.Trigger>
-        <Tabs.Trigger value="moderation">Moderation</Tabs.Trigger>
-        <Tabs.Trigger value="system">System</Tabs.Trigger>
-        <Tabs.Trigger value="audit">Audit Log</Tabs.Trigger>
-        <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
-        <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
-        <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
-        {pluginsEnabled && <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>}
+        <Tabs.Trigger value="brand">{t("Brand")}</Tabs.Trigger>
+        <Tabs.Trigger value="moderation">{t("Moderation")}</Tabs.Trigger>
+        <Tabs.Trigger value="system">{t("System")}</Tabs.Trigger>
+        <Tabs.Trigger value="audit">{t("Audit Log")}</Tabs.Trigger>
+        <Tabs.Trigger value="interface">{t("Interface")}</Tabs.Trigger>
+        <Tabs.Trigger value="authentication">{t("Authentication")}</Tabs.Trigger>
+        <Tabs.Trigger value="access_keys">{t("Access keys")}</Tabs.Trigger>
+        {pluginsEnabled && (
+          <Tabs.Trigger value="plugins">{t("Plugins")}</Tabs.Trigger>
+        )}
         <Tabs.Indicator />
       </Tabs.List>
 

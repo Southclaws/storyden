@@ -1,5 +1,6 @@
 import { PluginActiveState, PluginList } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function PluginSettingsIndex({ plugins }: Props) {
+  const { t } = useI18n();
   const totalPlugins = plugins.length;
   const activePlugins = plugins.filter(
     (plugin) => getPluginActiveState(plugin) === PluginActiveState.active,
@@ -21,7 +23,7 @@ export function PluginSettingsIndex({ plugins }: Props) {
   return (
     <CardBox className={lstack()}>
       <WStack justifyContent="space-between">
-        <Heading size="md">Plugins</Heading>
+        <Heading size="md">{t("Plugins")}</Heading>
 
         <PluginAddTrigger />
       </WStack>
@@ -29,10 +31,12 @@ export function PluginSettingsIndex({ plugins }: Props) {
       <styled.p color="fg.muted">
         {hasInactive ? (
           <span>
-            {totalPlugins} plugins, {activePlugins} active.
+            {totalPlugins} {t("plugins")}, {activePlugins} {t("active")}.
           </span>
         ) : (
-          <span>{plugins.length} plugins.</span>
+          <span>
+            {plugins.length} {t("plugins")}.
+          </span>
         )}
       </styled.p>
 

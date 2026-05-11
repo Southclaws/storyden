@@ -1,6 +1,7 @@
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { NumberInput } from "@/components/ui/number-input";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -23,6 +24,7 @@ export function OperationCostOverrideItem({
   onCostChange,
   onRemove,
 }: OperationCostOverrideItemProps) {
+  const { t } = useI18n();
   const effectiveLimit = Math.floor(rateLimit / cost);
 
   return (
@@ -56,11 +58,11 @@ export function OperationCostOverrideItem({
         </HStack>
       </WStack>
       <styled.p fontSize="xs" color="fg.muted" lineHeight="tight">
-        Can be performed{" "}
-        <styled.strong color="fg.info">{effectiveLimit}</styled.strong> times
-        every{" "}
+        {t("Can be performed")}{" "}
+        <styled.strong color="fg.info">{effectiveLimit}</styled.strong>{" "}
+        {t("times every")}{" "}
         <styled.strong color="fg.info">
-          {formatSeconds(rateLimitPeriod)}
+          {formatSeconds(rateLimitPeriod, t)}
         </styled.strong>
       </styled.p>
     </CardBox>

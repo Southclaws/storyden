@@ -1,0 +1,9 @@
+{
+    "pages": [
+        "introduction",
+        "extending",
+        "cookbook",
+        "reference",
+        "api"
+    ]
+}

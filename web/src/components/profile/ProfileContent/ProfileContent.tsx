@@ -5,12 +5,14 @@ import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/C
 import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { CardGrid } from "@/components/ui/rich-card";
 import * as Tabs from "@/components/ui/tabs";
+import { useI18n } from "@/i18n/provider";
 import { HStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useProfileContent } from "./useProfileContent";
 
 export function ProfileContent(props: Props) {
+  const { t } = useI18n();
   const { ready, error, data, isSelf } = useProfileContent(props);
 
   if (!ready) {
@@ -23,8 +25,8 @@ export function ProfileContent(props: Props) {
     <VStack alignItems="start" w="full">
       <Tabs.Root width="full" variant="enclosed" defaultValue="threads">
         <Tabs.List>
-          <Tabs.Trigger value="threads">Threads</Tabs.Trigger>
-          <Tabs.Trigger value="collections">Collections</Tabs.Trigger>
+          <Tabs.Trigger value="threads">{t("Threads")}</Tabs.Trigger>
+          <Tabs.Trigger value="collections">{t("Collections")}</Tabs.Trigger>
           <Tabs.Indicator />
         </Tabs.List>
 

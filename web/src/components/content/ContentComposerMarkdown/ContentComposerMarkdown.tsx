@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import { Switch } from "@/components/ui/switch";
+import { useI18n } from "@/i18n/provider";
 import { LStack, styled } from "@/styled-system/jsx";
 import { remarkLooseLists } from "@/utils/markdown";
 
@@ -13,6 +14,7 @@ import { ContentComposerProps } from "../composer-props";
 import { useContentComposerMarkdown } from "./useContentComposerMarkdown";
 
 export function ContentComposerMarkdown(props: ContentComposerProps) {
+  const { t } = useI18n();
   const {
     value,
     previewHTML,
@@ -56,7 +58,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
         workingCount={uploadingCount}
       >
         <Switch size="sm" checked={showPreview} onClick={handleTogglePreview}>
-          Preview
+          {t("Preview")}
         </Switch>
       </ComposerTools>
 
@@ -69,7 +71,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
             />
           ) : (
             <styled.p height="14" color="fg.muted" fontStyle="italic">
-              empty...
+              {t("empty...")}
             </styled.p>
           )}
         </>
@@ -103,7 +105,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
               transitionProperty: "border-color, border-width",
               overflow: "hidden",
             }}
-            placeholder="Write your heart out..."
+            placeholder={props.placeholder ?? t("Write your heart out...")}
           />
           {isDragging && (
             <ContentDragOverlay

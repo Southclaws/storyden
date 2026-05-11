@@ -3,6 +3,7 @@ import { FormProvider } from "react-hook-form";
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
 import { TagListField } from "@/components/thread/ThreadTagList";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n/provider";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 
 import { BodyInput } from "../BodyInput/BodyInput";
@@ -11,6 +12,7 @@ import { TitleInput } from "../TitleInput/TitleInput";
 import { Props, useComposeForm } from "./useComposeForm";
 
 export function ComposeForm(props: Props) {
+  const { t } = useI18n();
   const { form, state, handlers } = useComposeForm(props);
 
   return (
@@ -51,7 +53,7 @@ export function ComposeForm(props: Props) {
               onClick={handlers.handleSaveDraft}
               loading={state.isSavingDraft}
             >
-              Save draft
+              {t("Save draft")}
             </Button>
 
             <Button
@@ -61,7 +63,7 @@ export function ComposeForm(props: Props) {
               disabled={!form.formState.isValid || state.isPublishing}
               loading={state.isPublishing}
             >
-              Post
+              {t("Publish post")}
             </Button>
           </HStack>
         </WStack>

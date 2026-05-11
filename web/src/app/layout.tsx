@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
 import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
+import { I18N_COOKIE_NAME, normalizeLocale } from "@/i18n/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
 
@@ -15,20 +17,33 @@ import { Providers } from "./providers";
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get(I18N_COOKIE_NAME)?.value);
+  const browserConfig = JSON.stringify({
+    API_ADDRESS,
+    WEB_ADDRESS,
+    source: "meta",
+  });
+
   return (
-    <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
+    <html
+      lang={locale}
+      className={`${inter.variable} ${interDisplay.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/*
           NOTE: Because the browser side does not support dynamic environment
           variables (obviously, it's a browser script) we hack around Next.js'
-          build-time variables by providing a direct reference to these inside
-          the window object. This allows us to set the API/frontend addresses
-          without rebuilding the entire app.
+          build-time variables by embedding the public config in the document.
+          This allows us to set the API/frontend addresses without rebuilding
+          the entire app.
         */}
-        <script>{`
-          window.__storyden__ = {"API_ADDRESS":"${API_ADDRESS}", "WEB_ADDRESS":"${WEB_ADDRESS}", "source": "script"};
-          console.log("set up window config", window.__storyden__);
-        `}</script>
+        <meta
+          id="storyden-browser-config"
+          name="storyden-browser-config"
+          content={encodeURIComponent(browserConfig)}
+        />
 
         {/*
             NOTE: This stylesheet is fully server-side rendered but it's not
@@ -40,7 +55,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       </head>
 
       <body>
-        <Providers>{children}</Providers>
+        <Providers initialLocale={locale}>{children}</Providers>
       </body>
     </html>
   );

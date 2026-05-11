@@ -11,6 +11,7 @@ import {
 } from "@/api/openapi-schema";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { ColorPalette } from "@/styled-system/tokens";
+import { useI18n } from "@/i18n/provider";
 import { getAssetURL } from "@/utils/asset";
 import { htmlToMarkdown } from "@/utils/markdown";
 
@@ -162,6 +163,7 @@ export function DatagraphItemProfileCard({
 }
 
 export function DatagraphItemBadge({ kind }: { kind: DatagraphItemKind }) {
+  const { t } = useI18n();
   const label = getDatagraphKindLabel(kind);
   const colour = getDatagraphKindColour(kind);
 
@@ -174,7 +176,7 @@ export function DatagraphItemBadge({ kind }: { kind: DatagraphItemKind }) {
       borderColor="var(--colors-color-palette-bo)"
       color="var(--colors-color-palette-fg)"
     >
-      {label}
+      {t(label)}
     </Badge>
   );
 }

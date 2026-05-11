@@ -11,6 +11,7 @@ import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -29,6 +30,7 @@ type PackageTabSuccess = {
 };
 
 export function PackageTab({ plugin }: Props) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -94,10 +96,10 @@ export function PackageTab({ plugin }: Props) {
   return (
     <LStack gap="4">
       <styled.p fontSize="sm" color="fg.muted">
-        Upload a replacement plugin package.{" "}
+        {t("Upload a replacement plugin package.")}{" "}
         {plugin.status.active_state === "active"
-          ? "This will restart the plugin with the new version."
-          : "The new version will be used when the plugin is enabled."}
+          ? t("This will restart the plugin with the new version.")
+          : t("The new version will be used when the plugin is enabled.")}
       </styled.p>
 
       <Alert.Root>
@@ -105,21 +107,22 @@ export function PackageTab({ plugin }: Props) {
           <WarningIcon />
         </Alert.Icon>
         <Alert.Content>
-          <Alert.Title>Upgrade notice</Alert.Title>
+          <Alert.Title>{t("Upgrade notice")}</Alert.Title>
           <Alert.Description>
-            The uploaded manifest must match this plugin&apos;s manifest ID.
-            Only upload trusted plugin packages.
+            {t(
+              "The uploaded manifest must match this plugin's manifest ID. Only upload trusted plugin packages.",
+            )}
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>
 
       <PluginArchiveUpload
         disabled={isUploading}
-        buttonLabel={isUploading ? "Uploading..." : "Select File"}
+        buttonLabel={isUploading ? t("Uploading...") : t("Select File")}
         onFileChange={handleFileChange}
         onError={(details) =>
           setError({
-            overview: "Upload rejected",
+            overview: t("Upload rejected"),
             details,
           })
         }
@@ -135,7 +138,7 @@ export function PackageTab({ plugin }: Props) {
               disabled={!selectedFile || isUploading}
               loading={isUploading}
             >
-              Confirm upgrade
+              {t("Confirm upgrade")}
             </Button>
             <Button
               size="sm"
@@ -143,7 +146,7 @@ export function PackageTab({ plugin }: Props) {
               onClick={handleCancelAction}
               disabled={isUploading}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </HStack>
         ) : (
@@ -153,7 +156,7 @@ export function PackageTab({ plugin }: Props) {
             onClick={handleConfirmAction}
             disabled={!selectedFile || isUploading}
           >
-            Upgrade package
+            {t("Upgrade package")}
           </Button>
         )}
       </WStack>
@@ -161,24 +164,24 @@ export function PackageTab({ plugin }: Props) {
       <Admonition
         value={!!success}
         kind="success"
-        title="Package updated"
+        title={t("Package updated")}
         onChange={() => setSuccess(null)}
       >
         {success && (
           <LStack gap="1">
             <styled.p fontSize="sm">
-              Uploaded <styled.code>{success.fileName}</styled.code>.
+              {t("Uploaded")} <styled.code>{success.fileName}</styled.code>.
             </styled.p>
             {success.previousVersion || success.newVersion ? (
               <styled.p fontSize="sm">
-                Version:{" "}
+                {t("Version")}:{" "}
                 <styled.code>
                   {success.previousVersion ?? "-"} → {success.newVersion ?? "-"}
                 </styled.code>
               </styled.p>
             ) : (
               <styled.p fontSize="sm">
-                The plugin package was replaced successfully.
+                {t("The plugin package was replaced successfully.")}
               </styled.p>
             )}
           </LStack>
@@ -188,7 +191,7 @@ export function PackageTab({ plugin }: Props) {
       <Admonition
         value={!!error}
         kind="failure"
-        title="Package Upgrade Error"
+        title={t("Package Upgrade Error")}
         onChange={() => setError(null)}
       >
         {error && (

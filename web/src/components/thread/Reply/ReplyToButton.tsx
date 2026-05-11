@@ -1,6 +1,7 @@
 import { Reply, Thread } from "@/api/openapi-schema";
 import { IconButton } from "@/components/ui/icon-button";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
+import { useI18n } from "@/i18n/provider";
 
 import { useReplyContext } from "../ReplyContext";
 
@@ -11,6 +12,7 @@ type Props = {
 
 export function ReplyToButton(props: Props) {
   const { setReplyTo } = useReplyContext();
+  const { t } = useI18n();
 
   function handleClick() {
     setReplyTo(props.thread, props.reply);
@@ -21,7 +23,7 @@ export function ReplyToButton(props: Props) {
       type="button"
       size="xs"
       variant="ghost"
-      aria-label="Reply to this"
+      aria-label={t("Reply to this")}
       onClick={handleClick}
     >
       <ReplyIcon />

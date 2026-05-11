@@ -2,6 +2,7 @@ import { useDisclosure } from "src/utils/useDisclosure";
 
 import { ProfileReference } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 
 import { ReportIcon } from "../ui/icons/Report";
 
@@ -24,6 +25,7 @@ export function ReportPostMenuItem({
   body,
   menuLabel,
 }: Props) {
+  const { t } = useI18n();
   const disclosure = useDisclosure();
 
   return (
@@ -31,7 +33,7 @@ export function ReportPostMenuItem({
       <Menu.Item value={`report-${targetKind}`} onClick={disclosure.onOpen}>
         <ReportIcon />
         &nbsp;
-        {menuLabel}
+        {t(menuLabel)}
       </Menu.Item>
 
       <ReportPostModal

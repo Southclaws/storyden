@@ -8,6 +8,7 @@ import * as FileUpload from "@/components/ui/file-upload";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DeleteSmallIcon } from "@/components/ui/icons/Delete";
+import { useI18n } from "@/i18n/provider";
 import { VStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -19,15 +20,16 @@ type Props = {
 
 export function PluginArchiveUpload({
   disabled,
-  buttonLabel = "Select File",
+  buttonLabel,
   onFileChange,
   onError,
 }: Props) {
+  const { t } = useI18n();
   function handleFileChange(details: FileUploadFileChangeDetails) {
     const file = details.acceptedFiles[0] ?? null;
     onFileChange(file);
 
-    const rejectionError = mapPluginArchiveRejectionToError(details);
+    const rejectionError = mapPluginArchiveRejectionToError(details, t);
     if (rejectionError) {
       onError?.(rejectionError);
     }
@@ -45,16 +47,16 @@ export function PluginArchiveUpload({
         <VStack>
           <VStack gap="1" textAlign="center">
             <styled.p fontWeight="medium">
-              Drop your plugin file here or click to browse
+              {t("Drop your plugin file here or click to browse")}
             </styled.p>
             <styled.p fontSize="sm" color="fg.muted">
-              Plugin files only (.zip or .sdx), max 50MB
+              {t("Plugin files only (.zip or .sdx), max 50MB")}
             </styled.p>
           </VStack>
           <FileUpload.Trigger asChild>
             <Button variant="outline" disabled={disabled}>
               <AddIcon />
-              {buttonLabel}
+              {buttonLabel ?? t("Select File")}
             </Button>
           </FileUpload.Trigger>
         </VStack>
@@ -85,13 +87,14 @@ export function PluginArchiveUpload({
 
 function mapPluginArchiveRejectionToError(
   details: FileUploadFileChangeDetails,
+  t: (key: string) => string,
 ): string | undefined {
   const file = details.rejectedFiles[0];
   if (!file) {
     return undefined;
   }
 
-  const messages = file.errors.map(mapFileError).filter(Boolean);
+  const messages = file.errors.map((error) => mapFileError(error, t)).filter(Boolean);
   if (messages.length === 0) {
     return undefined;
   }
@@ -99,21 +102,21 @@ function mapPluginArchiveRejectionToError(
   return messages.join(", ");
 }
 
-function mapFileError(error: FileError): string {
+function mapFileError(error: FileError, t: (key: string) => string): string {
   switch (error) {
     case "FILE_INVALID":
-      return "Invalid file.";
+      return t("Invalid file.");
     case "FILE_TOO_LARGE":
-      return "Plugin file is too large. Maximum size is 50MB.";
+      return t("Plugin file is too large. Maximum size is 50MB.");
     case "FILE_INVALID_TYPE":
-      return "File must be a .zip or .sdx archive.";
+      return t("File must be a .zip or .sdx archive.");
     case "FILE_TOO_SMALL":
-      return "File is too small.";
+      return t("File is too small.");
     case "TOO_MANY_FILES":
-      return "Only one plugin file can be uploaded at a time.";
+      return t("Only one plugin file can be uploaded at a time.");
     case "FILE_EXISTS":
-      return "A file with this name has already been selected.";
+      return t("A file with this name has already been selected.");
     default:
-      return "An unexpected error occurred while reading the file.";
+      return t("An unexpected error occurred while reading the file.");
   }
 }

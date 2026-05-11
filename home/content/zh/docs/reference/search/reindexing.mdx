@@ -1,0 +1,32 @@
+---
+title: Re-indexing
+description: Re-build Storyden's search index manually.
+---
+
+In certain cases you may need to re-index all content on your Storyden instance. This may be required in situations such as disk failure, [Redis](./redis)/[Bleve](./bleve) file corruption or changing from one search provider to another.
+
+Reindexing happens automatically when Storyden boots up, however it only indexes content where the `indexed_at` timestamp on posts and pages is older than the `updated_at` time (with a 2 second grace period.)
+
+Items are indexed in batches, the default batch size is 1,000 and you can configure this batch size:
+
+```sh
+SEARCH_INDEX_CHUNK_SIZE=20000
+```
+
+In order to force a full re-index, you must manually run this query on the database to reset the `indexed_at` column for `posts` and `nodes` tables:
+
+```sql
+update posts set indexed_at = null;
+update nodes set indexed_at = null;
+```
+
+Then, restart Storyden.
+
+<Callout type="warn">
+  Re-indexing is currently not multi-instance aware. If you are performing a
+  re-index and you are running multiple ephemeral instances of Storyden, such as
+  in a Kubernetes cluster, you should ensure only a single instance reboots and
+  runs the re-index process. Nothing bad will happen if multiple instances try
+  to re-index, it'll just be a lot slower and result in unnecessary database
+  reads and index writes.
+</Callout>

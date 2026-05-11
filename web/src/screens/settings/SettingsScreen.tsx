@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { useI18n } from "@/i18n/provider";
 import * as Tabs from "@/components/ui/tabs";
 import { Settings } from "@/lib/settings/settings";
 import { hasPermission } from "@/utils/permissions";
@@ -23,6 +24,7 @@ type Props = {
 
 export function SettingsScreen({ initialSettings }: Props) {
   const session = useSession();
+  const { t } = useI18n();
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -57,11 +59,11 @@ export function SettingsScreen({ initialSettings }: Props) {
       onValueChange={handleTabChange}
     >
       <Tabs.List>
-        <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
-        <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
-        {emailEnabled && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
+        <Tabs.Trigger value="interface">{t("Interface")}</Tabs.Trigger>
+        <Tabs.Trigger value="authentication">{t("Authentication")}</Tabs.Trigger>
+        {emailEnabled && <Tabs.Trigger value="email">{t("Email")}</Tabs.Trigger>}
         {accessKeysEnabled && (
-          <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
+          <Tabs.Trigger value="access_keys">{t("Access keys")}</Tabs.Trigger>
         )}
         <Tabs.Indicator />
       </Tabs.List>

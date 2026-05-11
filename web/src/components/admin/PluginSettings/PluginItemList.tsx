@@ -1,5 +1,6 @@
 import { PluginList } from "@/api/openapi-schema";
 import { EmptyState } from "@/components/site/EmptyState";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import { Center } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -25,10 +26,11 @@ export function PluginItemList({ plugins }: Props) {
 }
 
 function PluginsEmptyState() {
+  const { t } = useI18n();
   return (
     <Center w="full" h="64">
       <EmptyState hideContributionLabel>
-        No plugins have been installed yet.
+        {t("No plugins have been installed yet.")}
         <span>
           <a
             className={css({
@@ -37,9 +39,9 @@ function PluginsEmptyState() {
             })}
             href="https://www.storyden.org/docs/introduction/plugins"
           >
-            Learn more
+            {t("Learn more")}
           </a>{" "}
-          about Storyden plugins.
+          {t("about Storyden plugins.")}
         </span>
       </EmptyState>
     </Center>

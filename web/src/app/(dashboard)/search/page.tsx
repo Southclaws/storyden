@@ -64,7 +64,7 @@ export default async function Page(props: Props) {
 
     const params = QuerySchema.parse(searchParams);
 
-    let categoryIDs: string[] = [];
+    const categoryIDs: string[] = [];
     if (params.categories?.length) {
       const { data } = await categoryList();
       const bySlug = keyBy("slug", data.categories);

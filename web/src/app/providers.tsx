@@ -6,28 +6,38 @@ import { SWRConfig } from "swr";
 
 import { AuthProvider } from "src/auth/AuthProvider";
 
+import { NextDevtoolsI18n } from "@/components/site/NextDevtoolsI18n";
+import { Locale } from "@/i18n/config";
+import { I18nProvider } from "@/i18n/provider";
 import { useCacheProvider } from "@/lib/cache/swr-cache";
 import { DndProvider } from "@/lib/dragdrop/provider";
 
-export function Providers({ children }: PropsWithChildren) {
+type Props = PropsWithChildren<{
+  initialLocale: Locale;
+}>;
+
+export function Providers({ children, initialLocale }: Props) {
   const provider = useCacheProvider();
 
   return (
-    <AuthProvider>
-      <SWRConfig
-        value={{
-          keepPreviousData: true,
-          // provider: provider,
-        }}
-      >
-        <DndProvider>
-          <Toaster />
+    <I18nProvider initialLocale={initialLocale}>
+      <AuthProvider>
+        <SWRConfig
+          value={{
+            keepPreviousData: true,
+            // provider: provider,
+          }}
+        >
+          <DndProvider>
+            <Toaster />
+            <NextDevtoolsI18n />
 
-          {/* -- */}
-          {children}
-          {/* -- */}
-        </DndProvider>
-      </SWRConfig>
-    </AuthProvider>
+            {/* -- */}
+            {children}
+            {/* -- */}
+          </DndProvider>
+        </SWRConfig>
+      </AuthProvider>
+    </I18nProvider>
   );
 }

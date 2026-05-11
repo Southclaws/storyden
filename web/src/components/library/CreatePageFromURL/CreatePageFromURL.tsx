@@ -13,6 +13,7 @@ import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
 import { Item } from "@/components/ui/menu";
 import * as Popover from "@/components/ui/popover";
+import { useI18n } from "@/i18n/provider";
 import { useCapability } from "@/lib/settings/capabilities";
 import { HStack, styled } from "@/styled-system/jsx";
 import { UtilityValues } from "@/styled-system/types/prop-type";
@@ -43,6 +44,7 @@ export function CreatePageFromURLAction({
   onComplete,
   ...props
 }: Props) {
+  const { t } = useI18n();
   const genaiAvailable = useCapability("gen_ai");
   const [url, setUrl] = useState({
     valid: false,
@@ -103,7 +105,7 @@ export function CreatePageFromURLAction({
 
       for await (const state of generator) {
         if (state.step === "failed") {
-          throw new Error(state.error || "Import failed");
+          throw new Error(state.error || t("Import failed"));
         }
 
         setImportState(state);
@@ -124,7 +126,7 @@ export function CreatePageFromURLAction({
       }
     } catch (error) {
       const derived = deriveError(error);
-      toast.error(`Failed to import from URL: ${derived}`);
+      toast.error(t("Failed to import from URL: {{error}}", { error: derived }));
       setImportState({
         step: "failed",
         error: derived,
@@ -150,7 +152,7 @@ export function CreatePageFromURLAction({
           {CreatePageFromURLIcon}
           {!hideLabel && (
             <>
-              <span>{CreatePageFromURLLabel}</span>
+              <span>{t(CreatePageFromURLLabel)}</span>
             </>
           )}
         </IconButton>
@@ -162,7 +164,7 @@ export function CreatePageFromURLAction({
               <Input
                 w="64"
                 size="xs"
-                placeholder="Enter URL to import..."
+                placeholder={t("Enter URL to import...")}
                 value={url.value}
                 onChange={handleInputChange}
               />
@@ -172,7 +174,7 @@ export function CreatePageFromURLAction({
                 disabled={!url.valid || isImporting}
                 loading={isImporting}
               >
-                Import
+                {t("Import")}
               </Button>
             </HStack>
           ) : (
@@ -199,7 +201,7 @@ export function CreatePageFromURLAction({
                     color={getImportStateColor(importState.step)}
                     px="2"
                   >
-                    {importStateLabel[importState.step]}
+                    {t(importStateLabel[importState.step])}
                   </styled.span>
                 </motion.div>
               </AnimatePresence>
@@ -212,12 +214,14 @@ export function CreatePageFromURLAction({
 }
 
 export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
+  const { t } = useI18n();
+
   return (
     <Item value={CreatePageFromURLID}>
       {CreatePageFromURLIcon}
       {!hideLabel && (
         <>
-          &nbsp;<span>{CreatePageFromURLLabel}</span>
+          &nbsp;<span>{t(CreatePageFromURLLabel)}</span>
         </>
       )}
     </Item>

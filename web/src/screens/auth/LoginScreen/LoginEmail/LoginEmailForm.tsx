@@ -4,12 +4,14 @@ import { FormControl } from "@/components/ui/FormControl";
 import { Button } from "@/components/ui/button";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { useLoginEmailForm } from "./useLoginEmailForm";
 
 export function LoginEmailForm() {
+  const { t } = useI18n();
   const { form, handlers } = useLoginEmailForm();
 
   return (
@@ -29,7 +31,7 @@ export function LoginEmailForm() {
           w="full"
           size="sm"
           textAlign="center"
-          placeholder="username or email address"
+          placeholder={t("username or email address")}
           required
           {...form.register("identifier")}
         />
@@ -44,7 +46,7 @@ export function LoginEmailForm() {
           w="full"
           size="sm"
           textAlign="center"
-          placeholder="password"
+          placeholder={t("password")}
           autoComplete="current-password"
           {...form.register("password")}
         />
@@ -55,7 +57,7 @@ export function LoginEmailForm() {
       </FormControl>
 
       <Button type="submit" w="full">
-        Login
+        {t("Login")}
       </Button>
 
       <FormErrorText>{form.formState.errors["root"]?.message}</FormErrorText>

@@ -1,6 +1,9 @@
+"use client";
+
 import { LogoutIcon } from "@/components/ui/icons/Logout";
 import { Item } from "@/components/ui/menu";
 import { API_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 
 // NOTE:
 //
@@ -32,15 +35,18 @@ export const LogoutLabel = "Logout";
 const LogoutMenuFormID = "account-menu-logout-form";
 
 export function LogoutMenuItem() {
+  const { t } = useI18n();
+  const label = t(LogoutLabel);
+
   return (
     <>
       {/* NOTE: we use hidden form for proper HTML POST+redirect semantics. */}
       <form id={LogoutMenuFormID} action={LogoutAction} method="POST" hidden />
 
       <Item value={LogoutID} asChild>
-        <button type="submit" form={LogoutMenuFormID} title={LogoutLabel}>
+        <button type="submit" form={LogoutMenuFormID} title={label}>
           <LogoutIcon />
-          &nbsp;<span>{LogoutLabel}</span>
+          &nbsp;<span>{label}</span>
         </button>
       </Item>
     </>

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { moderationActionCreate } from "@/api/openapi-client/admin";
 import { ModerationActionPurgeAccountContentType } from "@/api/openapi-schema";
+import { useI18n } from "@/i18n/provider";
 
 export type Props = {
   accountId: string;
@@ -12,17 +13,20 @@ export type Props = {
   onSave?: () => void;
 };
 
-const schema = z.object({
-  contentTypes: z
-    .array(z.nativeEnum(ModerationActionPurgeAccountContentType))
-    .min(1, "Select at least one content type to purge"),
-});
+function getSchema(t: (key: string) => string) {
+  return z.object({
+    contentTypes: z
+      .array(z.nativeEnum(ModerationActionPurgeAccountContentType))
+      .min(1, t("Select at least one content type to purge")),
+  });
+}
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof getSchema>>;
 
 export function useAccountPurgeScreen({ accountId, onSave }: Props) {
+  const { t } = useI18n();
   const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(getSchema(t)),
     defaultValues: {
       contentTypes: [],
     },
@@ -41,8 +45,8 @@ export function useAccountPurgeScreen({ accountId, onSave }: Props) {
       },
       {
         promiseToast: {
-          loading: "Purging account content...",
-          success: "Account content purged successfully",
+          loading: t("Purging account content..."),
+          success: t("Account content purged successfully"),
         },
       },
     );

@@ -15,6 +15,7 @@ import {
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
+import { useI18n } from "@/i18n/provider";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { hasPermissionOr } from "@/utils/permissions";
@@ -26,27 +27,32 @@ export type Props = {
   initialSignatureConfig: SignatureConfig;
 };
 
-export const FormSchema = z.object({
-  name: z.string().min(1, "Please enter a name."),
-  handle: z
-    .string()
-    .min(1, "Please enter a handle")
-    .max(30, "Handle must be 30 characters or less")
-    .refine(isSlug, {
-      message:
-        "Handle can only contain letters, numbers, hyphens, and underscores",
-    }),
+function getFormSchema(t: (key: string) => string) {
+  return z.object({
+    name: z.string().min(1, t("Please enter a name.")),
+    handle: z
+      .string()
+      .min(1, t("Please enter a handle"))
+      .max(30, t("Handle must be 30 characters or less"))
+      .refine(isSlug, {
+        message: t(
+          "Handle can only contain letters, numbers, hyphens, and underscores",
+        ),
+      }),
 
-  bio: z.string(),
-  signature: z.string(),
-});
-export type Form = z.infer<typeof FormSchema>;
+    bio: z.string(),
+    signature: z.string(),
+  });
+}
+
+export type Form = z.infer<ReturnType<typeof getFormSchema>>;
 
 export function useProfileScreen({
   initialSession,
   profile,
   initialSignatureConfig,
 }: Props) {
+  const { t } = useI18n();
   const router = useRouter();
   const session = useSession(initialSession);
   const signaturesEnabled = initialSignatureConfig.enabled;
@@ -57,7 +63,7 @@ export function useProfileScreen({
   });
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: {
       name: profile.name,
       handle: profile.handle,
@@ -100,8 +106,8 @@ export function useProfileScreen({
       {
         cleanup: async () => await revalidate(),
         promiseToast: {
-          loading: "Updating profile...",
-          success: "Profile updated",
+          loading: t("Updating profile..."),
+          success: t("Profile updated"),
         },
       },
     );

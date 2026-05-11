@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 import { ButtonProps } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
@@ -27,6 +28,7 @@ type Props = {
 type AllProps = PropsWithChildren<Props & ButtonProps>;
 
 export function BlockMenu({ children, open, block, index }: AllProps) {
+  const { t } = useI18n();
   const emit = useEmitLibraryBlockEvent();
 
   const currentMetadata = useWatch((s) => s.draft.meta);
@@ -71,14 +73,14 @@ export function BlockMenu({ children, open, block, index }: AllProps) {
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>{LibraryPageBlockName[block.type]}</styled.span>
+                <styled.span>{t(LibraryPageBlockName[block.type])}</styled.span>
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
 
               <Menu.Item value="delete">
                 <DeleteIcon />
-                &nbsp;Delete
+                &nbsp;{t("Delete")}
               </Menu.Item>
               <BlockConfigMenu index={index} block={block} />
               {newBlocksAvailable && <CreateBlockMenu />}

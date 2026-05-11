@@ -9,6 +9,7 @@ import { Thread, ThreadInitialProps, Visibility } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
+import { useI18n } from "@/i18n/provider";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -23,6 +24,7 @@ export type FormShape = z.infer<typeof FormShapeSchema>;
 
 export function useComposeForm({ initialDraft, editing }: Props) {
   const router = useRouter();
+  const { t } = useI18n();
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
@@ -65,7 +67,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   const publish = async ({ title, body, category, tags, url }: FormShape) => {
     if (title.length < 1) {
       form.setError("title", {
-        message: "Your post must have a title to be published",
+        message: t("Your post must have a title to be published"),
       });
       return;
     }
@@ -101,8 +103,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving draft...",
-          success: "Draft saved!",
+          loading: t("Saving draft..."),
+          success: t("Draft saved!"),
         },
         cleanup: async () => {
           setIsSavingDraft(false);
@@ -119,8 +121,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       },
       {
         promiseToast: {
-          loading: "Publishing post...",
-          success: "Post published!",
+          loading: t("Publishing post..."),
+          success: t("Post published!"),
         },
         cleanup: async () => {
           setIsPublishing(false);
@@ -138,8 +140,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving draft...",
-          success: "Draft saved!",
+          loading: t("Saving draft..."),
+          success: t("Draft saved!"),
         },
         cleanup: async () => {
           setIsSavingDraft(false);
@@ -157,8 +159,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving draft...",
-          success: "Draft saved!",
+          loading: t("Saving draft..."),
+          success: t("Draft saved!"),
         },
         cleanup: async () => {
           setIsSavingDraft(false);

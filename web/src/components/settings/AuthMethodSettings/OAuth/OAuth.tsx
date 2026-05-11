@@ -3,6 +3,7 @@ import { AccountAuthMethod, AuthProvider } from "src/api/openapi-schema";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
+import { useI18n } from "@/i18n/provider";
 import { OAuthProvider } from "@/lib/auth/oauth";
 import { CardBox, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -13,17 +14,20 @@ type Props = {
 };
 
 export function OAuth({ active, available }: Props) {
+  const { t } = useI18n();
+
   return (
     <LStack>
-      <Heading size="sm">Linked accounts</Heading>
+      <Heading size="sm">{t("Linked accounts")}</Heading>
 
       <styled.p>
-        You can link as many accounts as you want to. Linked accounts allow you
-        to log in easily and may also provide additional features.
+        {t(
+          "You can link as many accounts as you want to. Linked accounts allow you to log in easily and may also provide additional features.",
+        )}
       </styled.p>
 
       <Heading size="sm" color="fg.subtle">
-        Active
+        {t("Active")}
       </Heading>
 
       {active.length ? (
@@ -35,7 +39,7 @@ export function OAuth({ active, available }: Props) {
 
                 <WStack color="fg.muted" alignItems="end">
                   <styled.span>
-                    Added&nbsp;
+                    {t("Added")}&nbsp;
                     <Timestamp created={v.created_at} large />
                   </styled.span>
 
@@ -47,12 +51,12 @@ export function OAuth({ active, available }: Props) {
         </styled.ul>
       ) : (
         <styled.p color="fg.muted">
-          You currently have no linked accounts.
+          {t("You currently have no linked accounts.")}
         </styled.p>
       )}
 
       <Heading size="sm" color="fg.subtle">
-        Available
+        {t("Available")}
       </Heading>
 
       {available.length ? (
@@ -64,7 +68,7 @@ export function OAuth({ active, available }: Props) {
                   <Heading size="sm">{v.name}</Heading>
 
                   <LinkButton href={v.link} variant="subtle" size="sm">
-                    Link with {v.name}
+                    {t("Link with {{name}}", { name: v.name })}
                   </LinkButton>
                 </WStack>
               </CardBox>
@@ -74,8 +78,8 @@ export function OAuth({ active, available }: Props) {
       ) : (
         <styled.p color="fg.muted">
           {active.length > 0
-            ? "There are no more authentication providers available."
-            : "There are currently no authentication providers available."}
+            ? t("There are no more authentication providers available.")
+            : t("There are currently no authentication providers available.")}
         </styled.p>
       )}
     </LStack>

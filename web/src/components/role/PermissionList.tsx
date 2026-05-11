@@ -1,5 +1,6 @@
 import { PermissionList } from "@/api/openapi-schema";
 import * as Popover from "@/components/ui/popover";
+import { useI18n } from "@/i18n/provider";
 import { Box, LStack } from "@/styled-system/jsx";
 
 import { Button } from "../ui/button";
@@ -11,10 +12,11 @@ type Props = {
 };
 
 export function PermissionSummary({ permissions }: Props) {
+  const { t } = useI18n();
   const permissionCount = permissions.length;
 
   const permissionCountLabel =
-    permissionCount === 1 ? "permission" : "permissions";
+    permissionCount === 1 ? t("permission") : t("permissions");
 
   const permissionLabel = `${permissionCount} ${permissionCountLabel}`;
 
@@ -43,7 +45,7 @@ export function PermissionSummary({ permissions }: Props) {
                 ))
               ) : (
                 <Box pl="4">
-                  <p>No permissions.</p>
+                  <p>{t("No permissions.")}</p>
                 </Box>
               )}
             </LStack>

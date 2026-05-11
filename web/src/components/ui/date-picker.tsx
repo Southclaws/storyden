@@ -8,6 +8,7 @@ import {
 import { type DatePickerVariantProps, datePicker } from "styled-system/recipes";
 import type { ComponentProps, HTMLStyledProps } from "styled-system/types";
 
+import { useI18n } from "@/i18n/provider";
 import { createStyleContext } from "@/utils/create-style-context";
 
 import { Button } from "./button";
@@ -153,6 +154,8 @@ export const YearSelect = withContext<
 >(ArkDatePicker.YearSelect, "yearSelect");
 
 export const DatePicker = (props: ArkDatePicker.RootBaseProps) => {
+  const { t } = useI18n();
+
   return (
     <Root
       positioning={{ sameWidth: true }}
@@ -170,7 +173,7 @@ export const DatePicker = (props: ArkDatePicker.RootBaseProps) => {
           <IconButton
             type="button"
             variant="outline"
-            aria-label="Open date picker"
+            aria-label={t("Open date picker")}
           >
             <CalendarIcon />
           </IconButton>
@@ -331,6 +334,8 @@ export const DateRangePicker = ({
   hideInputs,
   ...props
 }: DateRangePickerProps) => {
+  const { t } = useI18n();
+
   return (
     <Root
       positioning={{ sameWidth: true }}
@@ -356,7 +361,7 @@ export const DateRangePicker = ({
             size="sm"
             type="button"
             variant={active ? "solid" : "subtle"}
-            aria-label="Open date picker"
+            aria-label={t("Open date picker")}
             className={triggerClassName}
           >
             <CalendarIcon />

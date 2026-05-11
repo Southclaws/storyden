@@ -5,6 +5,7 @@ import {
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
 import * as ColorPicker from "@/components/ui/color-picker";
+import { useI18n } from "@/i18n/provider";
 import { HStack, Stack } from "@/styled-system/jsx";
 
 import { IconButton } from "./icon-button";
@@ -30,6 +31,8 @@ export type Props<T extends FieldValues> = {
 };
 
 export function ColourPickerField<T extends FieldValues>(props: Props<T>) {
+  const { t } = useI18n();
+
   return (
     <Controller<T>
       control={props.control}
@@ -68,7 +71,7 @@ export function ColourPickerField<T extends FieldValues>(props: Props<T>) {
                             <IconButton
                               size="xs"
                               variant="outline"
-                              aria-label="Pick a color"
+                              aria-label={t("Pick a color")}
                             >
                               <ColourPipetteIcon />
                             </IconButton>

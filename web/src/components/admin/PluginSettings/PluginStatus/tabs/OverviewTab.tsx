@@ -5,6 +5,7 @@ import { Plugin, PluginStatusError } from "@/api/openapi-schema";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function OverviewTab({ plugin }: Props) {
+  const { t } = useI18n();
   const [, setTab] = useQueryState("plugin-tab");
   const manifestID = manifestString(plugin.manifest, "id");
   const author = manifestString(plugin.manifest, "author");
@@ -32,7 +34,7 @@ export function OverviewTab({ plugin }: Props) {
           </Alert.Icon>
           <Alert.Content w="full">
             <WStack>
-              <Alert.Title>Plugin error</Alert.Title>
+              <Alert.Title>{t("Plugin error")}</Alert.Title>
               {canViewLogs && (
                 <HStack>
                   <Button
@@ -40,7 +42,7 @@ export function OverviewTab({ plugin }: Props) {
                     variant="subtle"
                     onClick={() => setTab("logs")}
                   >
-                    View logs
+                    {t("View logs")}
                   </Button>
                 </HStack>
               )}
@@ -49,7 +51,9 @@ export function OverviewTab({ plugin }: Props) {
 
             {hasStatusErrorDetails && (
               <styled.details>
-                <styled.summary fontSize="sm">Technical details</styled.summary>
+                <styled.summary fontSize="sm">
+                  {t("Technical details")}
+                </styled.summary>
                 <styled.pre
                   mt="2"
                   p="2"
@@ -68,27 +72,27 @@ export function OverviewTab({ plugin }: Props) {
       )}
 
       <styled.p fontSize="sm" color="fg.default">
-        {plugin.description || "No description provided."}
+        {plugin.description || t("No description provided.")}
       </styled.p>
 
       <LStack gap="2">
-        <OverviewField label="Plugin ID" value={manifestID || "-"} monospace />
-        <OverviewField label="Author" value={author || "-"} monospace />
+        <OverviewField label={t("Plugin ID")} value={manifestID || "-"} monospace />
+        <OverviewField label={t("Author")} value={author || "-"} monospace />
         <OverviewField
-          label="Version"
+          label={t("Version")}
           value={plugin.version || "-"}
           monospace
         />
 
-        <OverviewField label="Mode" value={plugin.connection.mode} monospace />
+        <OverviewField label={t("Mode")} value={plugin.connection.mode} monospace />
 
-        <SubsectionTitle>Command</SubsectionTitle>
+        <SubsectionTitle>{t("Command")}</SubsectionTitle>
         <CommandLine command={command} args={args} />
 
-        <SubsectionTitle>Events consumed</SubsectionTitle>
+        <SubsectionTitle>{t("Events consumed")}</SubsectionTitle>
         {events.length === 0 ? (
           <styled.p fontSize="sm" color="fg.muted">
-            This plugin does not consume any events.
+            {t("This plugin does not consume any events.")}
           </styled.p>
         ) : (
           <LStack gap="1" maxH="64" overflowY="auto">
@@ -110,7 +114,7 @@ export function OverviewTab({ plugin }: Props) {
 
       <WStack>
         <styled.p fontSize="xs" color="fg.subtle">
-          installed:&nbsp;
+          {t("installed")}:&nbsp;
           <styled.code color="fg.muted">
             {formatDate(plugin.added_at, "PPp")}
           </styled.code>

@@ -1,0 +1,35 @@
+---
+title: Discord OAuth
+description: Enable Discord authentication for gaming and community platforms
+---
+
+Discord OAuth allows members to sign in using their Discord accounts. This is ideal for gaming communities, Discord server-integrated forums, and communities where members already use Discord.
+
+## Configuration
+
+Set these environment variables to enable Discord OAuth:
+
+```bash
+JWT_SECRET=your-random-secret-here
+OAUTH_DISCORD_ENABLED=true
+OAUTH_DISCORD_CLIENT_ID=your-client-id
+OAUTH_DISCORD_CLIENT_SECRET=your-client-secret
+```
+
+## Setting Up Discord OAuth
+
+Create a new application in the [Discord Developer Portal](https://discord.com/developers/applications) and configure OAuth2 settings:
+
+- **Redirect URI**: `https://your-domain.com/auth/oauth_discord/callback`
+
+Copy the Client ID and Client Secret from the OAuth2 settings.
+
+## Local Development
+
+For local development, add this redirect URL to your Discord Application:
+
+```
+http://localhost:3000/auth/oauth_discord/callback
+```
+
+Make sure `PUBLIC_WEB_ADDRESS` is set to `http://localhost:3000`.

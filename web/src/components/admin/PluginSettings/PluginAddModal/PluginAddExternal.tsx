@@ -12,6 +12,7 @@ import {
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
@@ -27,6 +28,7 @@ const defaultPayload = `{
 }`;
 
 export function PluginAddExternal({ onClose }: UseDisclosureProps) {
+  const { t } = useI18n();
   const [payload, setPayload] = useState(defaultPayload);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +41,7 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
     let jsonPayload: PluginInitialExternal;
 
     try {
-      jsonPayload = parseExternalPayload(payload);
+      jsonPayload = parseExternalPayload(payload, t);
     } catch (err) {
       setError(deriveError(err));
       setIsSubmitting(false);
@@ -79,8 +81,9 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
   return (
     <form className={lstack({ gap: "4" })} onSubmit={handleSubmit}>
       <styled.p color="fg.muted">
-        Register an external plugin that connects to Storyden over authenticated
-        RPC. Storyden will not manage this plugin process.
+        {t(
+          "Register an external plugin that connects to Storyden over authenticated RPC. Storyden will not manage this plugin process.",
+        )}
       </styled.p>
 
       <Alert.Root>
@@ -88,16 +91,17 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
           <WarningIcon />
         </Alert.Icon>
         <Alert.Content>
-          <Alert.Title>Security notice</Alert.Title>
+          <Alert.Title>{t("Security notice")}</Alert.Title>
           <Alert.Description>
-            External plugin tokens grant full access over RPC. Keep them secret
-            and only run plugins from trusted sources.
+            {t(
+              "External plugin tokens grant full access over RPC. Keep them secret and only run plugins from trusted sources.",
+            )}
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>
 
       <styled.label fontSize="sm" fontWeight="medium">
-        Manifest (YAML or JSON)
+        {t("Manifest (YAML or JSON)")}
       </styled.label>
 
       <styled.textarea
@@ -125,7 +129,7 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
             <WarningIcon />
           </Alert.Icon>
           <Alert.Content>
-            <Alert.Title>Configuration Error</Alert.Title>
+            <Alert.Title>{t("Configuration Error")}</Alert.Title>
             <Alert.Description>{error}</Alert.Description>
           </Alert.Content>
         </Alert.Root>
@@ -138,17 +142,20 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
           onClick={handleClose}
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Adding..." : "Cancel"}
+          {isSubmitting ? t("Adding...") : t("Cancel")}
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Adding..." : "Add External Plugin"}
+          {isSubmitting ? t("Adding...") : t("Add External Plugin")}
         </Button>
       </WStack>
     </form>
   );
 }
 
-function parseExternalPayload(raw: string): PluginInitialExternal {
+function parseExternalPayload(
+  raw: string,
+  t: (key: string) => string,
+): PluginInitialExternal {
   const value = raw.trim();
   let parsed: unknown;
 
@@ -159,7 +166,7 @@ function parseExternalPayload(raw: string): PluginInitialExternal {
   }
 
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("Manifest payload must be an object");
+    throw new Error(t("Manifest payload must be an object"));
   }
 
   return {

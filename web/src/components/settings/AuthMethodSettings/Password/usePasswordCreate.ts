@@ -11,6 +11,7 @@ import { APIError } from "src/api/openapi-schema";
 import { deriveError } from "src/utils/error";
 
 import { PasswordSchema } from "@/lib/auth/schemas";
+import { useI18n } from "@/i18n/provider";
 
 const FormSchema = z.object({
   newPassword: PasswordSchema,
@@ -19,6 +20,7 @@ const FormSchema = z.object({
 type Form = z.infer<typeof FormSchema>;
 
 export function usePasswordCreate() {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -33,7 +35,7 @@ export function usePasswordCreate() {
   async function handlePasswordCreate(payload: Form) {
     if (payload.newPassword !== payload.confirmPassword) {
       setError("confirmPassword", {
-        message: "Passwords do not match",
+        message: t("Passwords do not match"),
       });
       return;
     }

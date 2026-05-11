@@ -15,6 +15,7 @@ import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
@@ -23,6 +24,7 @@ import { Props, useSearchScreen } from "./useSearch";
 export function SearchScreen(props: Props) {
   const { ready, form, error, isLoading, data, handlers, filters } =
     useSearchScreen(props);
+  const { t } = useI18n();
 
   const { query, page, results } = data;
 
@@ -42,7 +44,7 @@ export function SearchScreen(props: Props) {
           borderRightRadius="none"
           type="search"
           background="bg.default"
-          placeholder={`Search...`}
+          placeholder={t("Search...")}
           _focus={{
             // NOTE: This disables the default focus behaviour styles for inputs.
             boxShadow: "none" as any, // TODO: Fix types at Park-UI or Panda level
@@ -85,21 +87,20 @@ export function SearchScreen(props: Props) {
           name="kind"
           items={[
             {
-              label: "Threads",
-              description: "Include discussion threads in the search.",
+              label: t("Threads"),
+              description: t("Include discussion threads in the search."),
               icon: <DiscussionIcon />,
               value: DatagraphItemKind.thread,
             },
             {
-              label: "Replies",
-              description:
-                "Include replies to discussion threads in the search.",
+              label: t("Replies"),
+              description: t("Include replies to discussion threads in the search."),
               icon: <ReplyIcon />,
               value: DatagraphItemKind.reply,
             },
             {
-              label: "Library",
-              description: "Include library pages in the search.",
+              label: t("Library"),
+              description: t("Include library pages in the search."),
               icon: <LibraryIcon />,
               value: DatagraphItemKind.node,
             },
@@ -120,7 +121,7 @@ export function SearchScreen(props: Props) {
             onQuery={handlers.handleQueryAuthors}
             queryResults={filters.authorsResults}
             queryError={filters.authorsError}
-            inputPlaceholder="Authors..."
+            inputPlaceholder={t("Authors...")}
             size="sm"
             triggerProps={{
               width: "full",
@@ -136,7 +137,7 @@ export function SearchScreen(props: Props) {
               onQuery={handlers.handleQueryCategories}
               queryResults={filters.categoriesResults}
               queryError={filters.categoriesError}
-              inputPlaceholder="Categories..."
+              inputPlaceholder={t("Categories...")}
               size="sm"
               triggerProps={{
                 width: "full",
@@ -153,7 +154,7 @@ export function SearchScreen(props: Props) {
               onQuery={handlers.handleQueryTags}
               queryResults={filters.tagsResults}
               queryError={filters.tagsError}
-              inputPlaceholder="Tags..."
+              inputPlaceholder={t("Tags...")}
               size="sm"
               triggerProps={{
                 width: "full",
@@ -182,9 +183,9 @@ export function SearchScreen(props: Props) {
         <EmptyState hideContributionLabel>
           {query
             ? results && page > results?.total_pages
-              ? "You've gone past the last page! Nothing to see here."
-              : "No search results."
-            : "Go forth, seek far and wide."}
+              ? t("You've gone past the last page! Nothing to see here.")
+              : t("No search results.")
+            : t("Go forth, seek far and wide.")}
         </EmptyState>
       )}
     </styled.form>

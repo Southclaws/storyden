@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
+import { useI18n } from "@/i18n/provider";
 import { EditorModeSchema } from "@/lib/settings/editor";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
@@ -22,6 +23,7 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useInterfaceSettings({ settings }: Props) {
+  const { t } = useI18n();
   const { revalidate, updateSettings } = useSettingsMutation();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -63,8 +65,8 @@ export function useInterfaceSettings({ settings }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving settings...",
-          success: "Settings saved",
+          loading: t("Saving settings..."),
+          success: t("Settings saved"),
         },
         cleanup: async () => {
           await revalidate();

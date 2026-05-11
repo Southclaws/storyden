@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
+import { useI18n } from "@/i18n/provider";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import { Member } from "@/lib/settings/member-settings";
 
@@ -19,6 +20,7 @@ export type Props = {
 
 export function useMemberInterfaceSettings({ session }: Props) {
   const { update, revalidate } = useProfileMutations(session.handle);
+  const { t } = useI18n();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -44,8 +46,8 @@ export function useMemberInterfaceSettings({ session }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving settings...",
-          success: "Settings saved",
+          loading: t("Saving settings..."),
+          success: t("Settings saved"),
         },
         cleanup: async () => {
           await revalidate();

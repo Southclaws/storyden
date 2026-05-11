@@ -1,0 +1,31 @@
+{
+    "root": true,
+    "title": "介绍",
+    "description": "开始使用 Storyden。",
+    "defaultOpen": true,
+    "pages": [
+        "---介绍---",
+        "index",
+        "what-is-storyden",
+        "---部署---",
+        "vps",
+        "fly",
+        "local-dev",
+        "---概念---",
+        "discussion",
+        "library",
+        "semdex",
+        "autofill",
+        "collections",
+        "links",
+        "members",
+        "marks",
+        "content",
+        "datagraph",
+        "---扩展---",
+        "mcp",
+        "api",
+        "plugins",
+        "custom-frontend"
+    ]
+}

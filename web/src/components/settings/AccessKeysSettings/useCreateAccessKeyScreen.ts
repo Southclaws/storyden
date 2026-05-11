@@ -12,12 +12,15 @@ import {
   getAccessKeyListKey,
 } from "@/api/openapi-client/auth";
 import { AccessKeyCreateBody } from "@/api/openapi-schema";
+import { useI18n } from "@/i18n/provider";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
-export const FormSchema = z.object({
-  name: z.string().min(1, "Name is required").max(50, "Name is too long"),
-  expires_at: z.string().optional(),
-});
+const getFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(1, t("Name is required")).max(50, t("Name is too long")),
+    expires_at: z.string().optional(),
+  });
+export const FormSchema = getFormSchema((key) => key);
 export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
@@ -28,11 +31,12 @@ export type WithDisclosure<T> = UseDisclosureProps & T;
 
 export function useCreateAccessKeyScreen(props: WithDisclosure<Props>) {
   const { mutate } = useSWRConfig();
+  const { t } = useI18n();
 
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: {
       name: "",
       expires_at: "",
@@ -56,8 +60,8 @@ export function useCreateAccessKeyScreen(props: WithDisclosure<Props>) {
       },
       {
         promiseToast: {
-          loading: "Creating access key...",
-          success: "Access key created successfully",
+          loading: t("Creating access key..."),
+          success: t("Access key created successfully"),
         },
       },
     );

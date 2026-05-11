@@ -70,6 +70,18 @@ export const fg = {
       _osDark: "{colors.blue.dark.11}",
     },
   },
+  link: {
+    value: {
+      _osLight: "{colors.accent.light.9}",
+      _osDark: "{colors.accent.dark.9}",
+    },
+  },
+  "link-hover": {
+    value: {
+      _osLight: "{colors.accent.light.10}",
+      _osDark: "{colors.accent.dark.10}",
+    },
+  },
   accent: {
     value: {
       _osLight: "{colors.accent.light.text.6}",

@@ -7,6 +7,7 @@ import { Unready } from "@/components/site/Unready";
 import { CategoryIcon } from "@/components/ui/icons/Category";
 import { SubmenuIcon } from "@/components/ui/icons/Submenu";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { HStack } from "@/styled-system/jsx";
 
@@ -23,6 +24,7 @@ type Props = {
 
 export function useCategoryMoveMenu({ thread }: Props) {
   const { revalidate, updateCategory } = useThreadMutations(thread);
+  const { t } = useI18n();
 
   async function handleSelect({ value }: MenuSelectionDetails) {
     // If the user clicked the create category prompt, only present when there
@@ -37,8 +39,8 @@ export function useCategoryMoveMenu({ thread }: Props) {
       },
       {
         promiseToast: {
-          loading: "Moving thread...",
-          success: "Moved!",
+          loading: t("Moving thread..."),
+          success: t("Moved!"),
         },
         async cleanup() {
           await revalidate();
@@ -56,6 +58,7 @@ export function useCategoryMoveMenu({ thread }: Props) {
 
 export function CategoryMoveMenu(props: Props) {
   const { handlers } = useCategoryMoveMenu(props);
+  const { t } = useI18n();
 
   return (
     <Menu.Root
@@ -67,7 +70,7 @@ export function CategoryMoveMenu(props: Props) {
       <Menu.TriggerItem justifyContent="space-between">
         <HStack gap="1">
           <CategoryIcon />
-          Move
+          {t("Move")}
         </HStack>
         <SubmenuIcon />
       </Menu.TriggerItem>
@@ -82,6 +85,7 @@ export function CategoryMoveMenu(props: Props) {
 }
 
 function LazyLoadedCategoryMoveMenuContent() {
+  const { t } = useI18n();
   const { data, error } = useCategoryList();
   if (!data) {
     return <Unready error={error} />;
@@ -94,7 +98,9 @@ function LazyLoadedCategoryMoveMenuContent() {
     return (
       <Menu.Content minW="48" userSelect="none">
         <Menu.ItemGroup id="move-no-categories">
-          <Menu.ItemGroupLabel>No categories to move to</Menu.ItemGroupLabel>
+          <Menu.ItemGroupLabel>
+            {t("No categories to move to")}
+          </Menu.ItemGroupLabel>
 
           <CreateCategoryMenuItem />
         </Menu.ItemGroup>
@@ -105,7 +111,7 @@ function LazyLoadedCategoryMoveMenuContent() {
   return (
     <Menu.Content minW="48" userSelect="none">
       <Menu.ItemGroup id="move">
-        <Menu.ItemGroupLabel>Move thread</Menu.ItemGroupLabel>
+        <Menu.ItemGroupLabel>{t("Move thread")}</Menu.ItemGroupLabel>
 
         <Menu.Separator />
 

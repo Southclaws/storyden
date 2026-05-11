@@ -9,6 +9,8 @@ import { handle } from "@/api/client";
 import { Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Editing, EditingSchema } from "@/components/site/editing";
+import type { Translate } from "@/i18n/format";
+import { useI18n } from "@/i18n/provider";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -21,13 +23,23 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  title: z.string().min(1, "Please write a title."),
-  description: z.string().min(1, "Please write a short description."),
+  title: z.string().min(1),
+  description: z.string().min(1),
   content: z.string().optional(),
 });
+
+function getFormSchema(t: Translate) {
+  return z.object({
+    title: z.string().min(1, t("Please write a title.")),
+    description: z.string().min(1, t("Please write a short description.")),
+    content: z.string().optional(),
+  });
+}
+
 export type Form = z.infer<typeof FormSchema>;
 
 export function useSiteContextPane({ session, initialSettings }: Props) {
+  const { t } = useI18n();
   session = useSession(session);
   const [editing, setEditing] = useQueryState<null | Editing>("editing", {
     defaultValue: null,
@@ -36,7 +48,7 @@ export function useSiteContextPane({ session, initialSettings }: Props) {
   });
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: initialSettings,
   });
 
@@ -67,8 +79,8 @@ export function useSiteContextPane({ session, initialSettings }: Props) {
       },
       {
         promiseToast: {
-          loading: "Saving settings...",
-          success: "Settings saved",
+          loading: t("Saving settings..."),
+          success: t("Settings saved"),
         },
         cleanup: async () => {
           await revalidate();

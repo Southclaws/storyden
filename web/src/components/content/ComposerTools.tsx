@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
 import { Spinner } from "../ui/Spinner";
@@ -38,6 +39,7 @@ export function ComposerTools({
 }: PropsWithChildren<Props>) {
   const [isExpanded, setIsExpanded] = useState(false);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     return () => {
@@ -214,7 +216,7 @@ export function ComposerTools({
               variant="ghost"
               size="xs"
               onClick={handleClick}
-              aria-label="Show editor tools"
+              aria-label={t("Show editor tools")}
               aria-expanded={isExpanded}
             >
               {expandedIcon ? <>{isExpanded ? expandedIcon : icon}</> : icon}

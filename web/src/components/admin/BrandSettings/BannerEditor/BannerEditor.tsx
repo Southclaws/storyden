@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";
 import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { SaveIcon } from "@/components/ui/icons/Save";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import { Box, HStack, LStack } from "@/styled-system/jsx";
 import { getBannerURL } from "@/utils/icon";
@@ -28,6 +29,7 @@ export const CROP_STENCIL_HEIGHT = 630;
 const ACCEPTED_BANNER_MIMES = ["image/png", "image/jpeg"] as const;
 
 export function BannerEditor() {
+  const { t } = useI18n();
   const [bannerURL, setBannerURL] = useState<string | undefined>(
     getBannerURL(),
   );
@@ -41,20 +43,22 @@ export function BannerEditor() {
 
     const canvas = cropperRef.current.getCanvas();
     if (!canvas) {
-      throw new Error("An unexpected error occurred with the image editor.");
+      throw new Error(t("An unexpected error occurred with the image editor."));
     }
 
     const coordinates = cropperRef.current.getCoordinates();
     if (!coordinates) {
       throw new Error(
-        "An unexpected error occurred with the image editor: unable to get crop coordinates.",
+        t(
+          "An unexpected error occurred with the image editor: unable to get crop coordinates.",
+        ),
       );
     }
 
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((blob) => {
         if (blob == null) {
-          reject("An unexpected error occurred with the image editor.");
+          reject(t("An unexpected error occurred with the image editor."));
           return;
         }
 
@@ -64,7 +68,7 @@ export function BannerEditor() {
 
     await bannerUpload(blob);
 
-    toast.success("Banner saved!");
+    toast.success(t("Banner saved!"));
   };
 
   async function handleFile({ files }: FileUploadFileAcceptDetails) {
@@ -81,14 +85,14 @@ export function BannerEditor() {
         reader.onload = () => {
           const result = reader.result;
           if (typeof result !== "string") {
-            reject("An unexpected error occurred while reading the file.");
+            reject(t("An unexpected error occurred while reading the file."));
             return;
           }
 
           resolve(result);
         };
         reader.onerror = () => {
-          reject("An unexpected error occurred while reading the file.");
+          reject(t("An unexpected error occurred while reading the file."));
         };
 
         reader.readAsDataURL(file);
@@ -120,17 +124,17 @@ export function BannerEditor() {
       .map((error) => {
         switch (error) {
           case "FILE_INVALID":
-            return "Invalid file.";
+            return t("Invalid file.");
           case "FILE_TOO_LARGE":
-            return "File is too large.";
+            return t("File is too large.");
           case "FILE_INVALID_TYPE":
-            return `File must be of type ${acceptedList}`;
+            return `${t("File must be of type")} ${acceptedList}`;
           case "FILE_TOO_SMALL":
-            return "File is too small.";
+            return t("File is too small.");
           case "TOO_MANY_FILES":
-            return "Too many files.";
+            return t("Too many files.");
           default:
-            return "An unexpected error occurred while reading the file.";
+            return t("An unexpected error occurred while reading the file.");
         }
       })
       .join(", ");
@@ -150,7 +154,7 @@ export function BannerEditor() {
         >
           <FileUpload.Trigger w="min" asChild>
             <Button type="button" size="xs" variant="outline">
-              <MediaAddIcon /> Upload banner
+              <MediaAddIcon /> {t("Upload banner")}
             </Button>
           </FileUpload.Trigger>
           <FileUpload.HiddenInput data-testid="input" />
@@ -162,7 +166,7 @@ export function BannerEditor() {
           variant="solid"
           onClick={handleSaveCurrentCrop}
         >
-          <SaveIcon /> Save banner
+          <SaveIcon /> {t("Save banner")}
         </Button>
       </HStack>
 

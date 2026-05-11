@@ -8,6 +8,7 @@ import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { LinkIcon } from "@/components/ui/icons/Typography";
 import { Input } from "@/components/ui/input";
 import * as Popover from "@/components/ui/popover";
+import { useI18n } from "@/i18n/provider";
 import { isValidLinkLike, normalizeLink } from "@/lib/link/validation";
 import { HStack } from "@/styled-system/jsx";
 
@@ -16,6 +17,7 @@ type LinkButtonProps = {
 };
 
 export function LinkButton({ editor }: LinkButtonProps) {
+  const { t } = useI18n();
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
@@ -92,7 +94,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
           type="button"
           size="xs"
           variant={isActive ? "subtle" : "ghost"}
-          title={isActive ? "Edit link" : "Add link"}
+          title={isActive ? t("Edit link") : t("Add link")}
           onClick={handleOpen}
         >
           <LinkIcon />
@@ -107,7 +109,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
               size="xs"
               value={url}
               onChange={handleChangeURL}
-              placeholder="Enter or paste URL"
+              placeholder={t("Enter or paste URL")}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
@@ -118,7 +120,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
                 }
               }}
               autoFocus
-              aria-label="Link URL"
+              aria-label={t("Link URL")}
             />
             <HStack gap="2" justifyContent="flex-end">
               {isActive && (
@@ -127,13 +129,13 @@ export function LinkButton({ editor }: LinkButtonProps) {
                   size="xs"
                   variant="ghost"
                   onClick={handleRemoveLink}
-                  title="Remove link"
+                  title={t("Remove link")}
                 >
                   <DeleteIcon />
                 </Button>
               )}
               <Button type="button" size="xs" onClick={handleSetLink}>
-                {isActive ? "Update" : "Add"}
+                {isActive ? t("Update") : t("Add")}
               </Button>
             </HStack>
           </HStack>

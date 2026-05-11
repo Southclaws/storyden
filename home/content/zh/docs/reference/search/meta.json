@@ -1,0 +1,10 @@
+{
+    "title": "Search",
+    "description": "Storyden search providers.",
+    "pages": [
+        "database",
+        "bleve",
+        "redis",
+        "reindexing"
+    ]
+}

@@ -13,6 +13,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useI18n } from "@/i18n/provider";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
@@ -34,6 +35,7 @@ import { LibraryPageTagsBlock } from "./LibraryPageTagsBlock/LibraryPageTagsBloc
 import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleBlock";
 
 export function LibraryPageBlocks() {
+  const { t } = useI18n();
   const { store } = useLibraryPageContext();
   const { moveBlock, addBlock, removeBlock } = store.getState();
   const { editing } = useEditState();
@@ -104,7 +106,7 @@ export function LibraryPageBlocks() {
           trigger={
             <Button variant="outline" size="xs" w="full">
               <AddIcon />
-              &nbsp;Add Block
+              &nbsp;{t("Add Block")}
             </Button>
           }
           positioning={{
@@ -152,6 +154,7 @@ function LibraryPageBlockEditable({
   block: LibraryPageBlock;
   index: number;
 }) {
+  const { t } = useI18n();
   const { initialNode } = useLibraryPageContext();
   const {
     attributes,
@@ -289,12 +292,14 @@ function LibraryPageBlockEditable({
 
                 <Tooltip.Content p="1" borderRadius="sm">
                   <p>
-                    <styled.span fontWeight="semibold">Click</styled.span>&nbsp;
-                    <styled.span fontWeight="normal">to open menu</styled.span>
+                    <styled.span fontWeight="semibold">{t("Click")}</styled.span>
+                    &nbsp;
+                    <styled.span fontWeight="normal">{t("to open menu")}</styled.span>
                   </p>
                   <p>
-                    <styled.span fontWeight="semibold">Drag</styled.span>&nbsp;
-                    <styled.span fontWeight="normal">to move</styled.span>
+                    <styled.span fontWeight="semibold">{t("Drag")}</styled.span>
+                    &nbsp;
+                    <styled.span fontWeight="normal">{t("to move")}</styled.span>
                   </p>
                 </Tooltip.Content>
               </Tooltip.Positioner>

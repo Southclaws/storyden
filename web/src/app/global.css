@@ -115,14 +115,15 @@ body {
   }
 
   a:not([data-no-typography] *) {
-    color: var(--colors-blue-9);
+    color: var(--colors-fg-link);
+    text-underline-offset: 0.2em;
   }
   a:not([data-no-typography] *):hover {
-    color: var(--colors-blue-10);
+    color: var(--colors-fg-link-hover);
     text-decoration: underline;
   }
   a:not([data-no-typography] *):visited {
-    color: var(--colors-blue-11);
+    color: var(--colors-fg-link);
   }
 
   img:not([data-no-typography] *) {
@@ -191,10 +192,10 @@ body {
   }
 
   blockquote:not([data-no-typography] *) {
-    background: var(--colors-gray-50);
-    border-left: var(--spacing-2) solid var(--colors-gray-200);
+    background: var(--colors-bg-subtle);
+    border-left: var(--spacing-1) solid var(--colors-border-default);
     margin: var(--spacing-4) var(--spacing-2);
-    padding: var(--spacing-2);
+    padding: var(--spacing-3);
     border-radius: var(--radii-lg);
   }
   blockquote:not([data-no-typography] *) p {

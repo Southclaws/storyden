@@ -39,8 +39,15 @@ export const richCard = defineSlotRecipe({
       gap: "0",
       overflow: "hidden",
       borderRadius: "var(--card-border-radius)",
-      boxShadow: "sm",
+      borderWidth: "1px",
+      borderColor: "border.subtle",
+      boxShadow: "xs",
       backgroundColor: "bg.default",
+      transition: "box-shadow 120ms ease, border-color 120ms ease",
+      _hover: {
+        boxShadow: "sm",
+        borderColor: "border.default",
+      },
     },
 
     headerContainer: {
@@ -193,7 +200,7 @@ export const richCard = defineSlotRecipe({
         mediaBackdropContainer: {
           gridColumn: "edge-start / edge-end",
           gridRow: "edge-start / edge-end",
-          background: "backgroundGradientH",
+          background: "linear-gradient(90deg, transparent, var(--colors-bg-default))",
         },
 
         // -
@@ -284,7 +291,7 @@ export const richCard = defineSlotRecipe({
         mediaBackdropContainer: {
           gridColumn: "edge-start / edge-end",
           gridRow: "edge-start / edge-end",
-          background: "backgroundGradientH",
+          background: "linear-gradient(90deg, transparent, var(--colors-bg-default))",
         },
 
         // -

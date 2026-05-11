@@ -1,0 +1,14 @@
+---
+title: Content
+description: Enhanced HTML structured content for handling @mentions, cross references and more.
+---
+
+Within Storyden, there are two primary resource types that hold rich text content: [Posts](/docs/introduction/discussion) (threads, replies, etc.) and [Library Pages](/docs/introduction/library/pages).
+
+All content is stored as [sanitised](/docs/introduction/content/security) HTML, which is also validated by a HTML parser before being stored. As a result, there are no custom tags. This allows Storyden to be used as a headless CMS with any front-end framework.
+
+Content may [reference](/docs/introduction/content/references) other resources such as profiles, posts and library pages. These references are stored as `<a>` tags where the `href` attribute uses the `sdr` scheme. Clients/frontends are responsible for hydrating these anchors into a relevant UI component for the resource type. The official Storyden web frontend does this by default.
+
+## LLM First
+
+The internal Content data type is ready for use with large language models. The [Semdex](/docs/introduction/semdex) uses this to chunk content into small pieces efficiently for indexing/embedding into a vector database, if you have such features enabled.

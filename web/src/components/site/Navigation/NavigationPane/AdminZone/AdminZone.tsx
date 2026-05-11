@@ -24,6 +24,7 @@ import { LayoutListIcon } from "@/components/ui/icons/LayoutList";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
+import { useI18n } from "@/i18n/provider";
 import { type FeedConfig } from "@/lib/settings/feed";
 import {
   useFeedConfig,
@@ -53,6 +54,7 @@ type Props = {
 type UpdateFeed = (feed: FeedConfig) => Promise<void>;
 
 export function AdminZone({ initialSession, initialSettings }: Props) {
+  const { t } = useI18n();
   const feed = useFeedConfig(initialSettings, false);
   const { updateFeed } = useFeedMutation();
   const { isEditingEnabled, isEditing, handleToggleEditing } =
@@ -85,7 +87,9 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
               exit={{ opacity: 0, y: -2 }}
               transition={{ duration: 0.15 }}
             >
-              {isEditing && route ? `Editing ${route.label}` : "Admin"}
+              {isEditing && route
+                ? t("Editing {{label}}", { label: t(route.label) })
+                : t("Admin")}
             </MotionSpan>
           </AnimatePresence>
         </HStack>
@@ -97,9 +101,13 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
               variant="ghost"
               onClick={handleToggleEditing}
               type="button"
-              aria-label={isEditing ? "Close feed editor" : "Open feed editor"}
+              aria-label={
+                isEditing ? t("Close feed editor") : t("Open feed editor")
+              }
               aria-pressed={isEditing}
-              title={isEditing ? "Close feed editor" : "Open feed editor"}
+              title={
+                isEditing ? t("Close feed editor") : t("Open feed editor")
+              }
             >
               <EditIcon w="4" />
             </IconButton>
@@ -182,8 +190,17 @@ export function FeedConfig({
   feed: FeedConfig;
   updateFeed: UpdateFeed;
 }) {
-  const sourceCollection = createListCollection({ items: sources });
-  const layoutCollection = createListCollection({ items: layouts });
+  const { t } = useI18n();
+  const translatedSources = sources.map((item) => ({
+    ...item,
+    label: t(item.label),
+  }));
+  const translatedLayouts = layouts.map((item) => ({
+    ...item,
+    label: t(item.label),
+  }));
+  const sourceCollection = createListCollection({ items: translatedSources });
+  const layoutCollection = createListCollection({ items: translatedLayouts });
 
   const canUpdateLayout =
     feed.source.type === "categories" ||
@@ -247,24 +264,23 @@ export function FeedConfig({
         onValueChange={handleSourceTypeChange}
       >
         <WStack alignItems="center">
-          <Select.Label>Source</Select.Label>
+          <Select.Label>{t("Source")}</Select.Label>
 
-          <InfoTip title="Pick what is displayed on the home page">
-            Change what the home page displays. For social use-cases, you can
-            use Threads for a discussion feed. For a knowledge-base, curated
-            directory or database, select Library and for a more traditional
-            discussion board style, select Categories.
+          <InfoTip title={t("Pick what is displayed on the home page")}>
+            {t(
+              "Change what the home page displays. For social use-cases, you can use Threads for a discussion feed. For a knowledge-base, curated directory or database, select Library and for a more traditional discussion board style, select Categories.",
+            )}
           </InfoTip>
         </WStack>
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText placeholder="Select a source" />
+            <Select.ValueText placeholder={t("Select a source")} />
             <SelectIcon />
           </Select.Trigger>
         </Select.Control>
         <Select.Positioner>
           <Select.Content>
-            {sources.map((item) => (
+            {translatedSources.map((item) => (
               <Select.Item key={item.value} item={item}>
                 <Select.ItemText mr="2">
                   <HStack gap="1">
@@ -290,21 +306,18 @@ export function FeedConfig({
           onValueChange={handleLayoutTypeChange}
         >
           <WStack alignItems="center">
-            <Select.Label>Layout</Select.Label>
+            <Select.Label>{t("Layout")}</Select.Label>
 
-            {/* <InfoTip title="Choose a layout">
-            List views work best for discussions, grid views work best for directories and curated content.
-          </InfoTip> */}
           </WStack>
           <Select.Control>
             <Select.Trigger>
-              <Select.ValueText placeholder="Select a layout" />
+              <Select.ValueText placeholder={t("Select a layout")} />
               <SelectIcon />
             </Select.Trigger>
           </Select.Control>
           <Select.Positioner>
             <Select.Content>
-              {layouts.map((item) => (
+              {translatedLayouts.map((item) => (
                 <Select.Item key={item.value} item={item}>
                   <Select.ItemText mr="2">
                     <HStack gap="1">
@@ -353,6 +366,8 @@ function SourceThreadsConfig({
   feed: FeedConfig;
   updateFeed: UpdateFeed;
 }) {
+  const { t } = useI18n();
+
   if (feed.source.type !== "threads") {
     return null;
   }
@@ -373,12 +388,13 @@ function SourceThreadsConfig({
     <LStack gap="1">
       <WStack alignItems="center">
         <Heading fontWeight="medium" size="xs">
-          Quick Share
+          {t("Quick Share")}
         </Heading>
 
-        <InfoTip title="Show quick share box">
-          Display a quick share box at the top of the thread list to allow users
-          to quickly create new threads.
+        <InfoTip title={t("Show quick share box")}>
+          {t(
+            "Display a quick share box at the top of the thread list to allow users to quickly create new threads.",
+          )}
         </InfoTip>
       </WStack>
 
@@ -392,7 +408,7 @@ function SourceThreadsConfig({
             <CheckIcon />
           </Checkbox.Indicator>
         </Checkbox.Control>
-        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.Label>{t("Show Quick Share")}</Checkbox.Label>
         <Checkbox.HiddenInput />
       </Checkbox.Root>
     </LStack>
@@ -406,6 +422,8 @@ function SourceLibraryConfig({
   feed: FeedConfig;
   updateFeed: UpdateFeed;
 }) {
+  const { t } = useI18n();
+
   if (feed.source.type !== "library") {
     return null;
   }
@@ -424,14 +442,13 @@ function SourceLibraryConfig({
     <LStack gap="1">
       <WStack alignItems="center">
         <Heading fontWeight="medium" size="xs">
-          Use a Page (optional)
+          {t("Use a Page (optional)")}
         </Heading>
 
-        <InfoTip title="Use a Page as the home screen">
-          This allows you to pick a page from the library to use as the home
-          page of your site. This is useful for directories if you want to
-          showcase a set of child pages on the home page or for simply
-          customising the home screen with layout blocks and rich content.
+        <InfoTip title={t("Use a Page as the home screen")}>
+          {t(
+            "This allows you to pick a page from the library to use as the home page of your site. This is useful for directories if you want to showcase a set of child pages on the home page or for simply customising the home screen with layout blocks and rich content.",
+          )}
         </InfoTip>
       </WStack>
       <LibraryPageSelect
@@ -465,6 +482,7 @@ function SourceCategoriesConfig({
   feed: FeedConfig;
   updateFeed: UpdateFeed;
 }) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
 
   if (feed.source.type !== "categories") {
@@ -472,7 +490,7 @@ function SourceCategoriesConfig({
   }
 
   const threadListModeCollection = createListCollection({
-    items: threadListModes,
+    items: threadListModes.map((item) => ({ ...item, label: t(item.label) })),
   });
 
   async function handleThreadListModeChange({
@@ -520,14 +538,13 @@ function SourceCategoriesConfig({
     <LStack gap="1">
       <WStack alignItems="center">
         <Heading fontWeight="medium" size="xs">
-          Thread list display
+          {t("Thread list display")}
         </Heading>
 
-        <InfoTip title="Choose what threads to show">
-          Control which threads are displayed below the categories. Select
-          &quot;None&quot; to only show categories, &quot;All threads&quot; to
-          show threads from all categories, or &quot;Uncategorised only&quot; to
-          show only threads without a category.
+        <InfoTip title={t("Choose what threads to show")}>
+          {t(
+            'Control which threads are displayed below the categories. Select "None" to only show categories, "All threads" to show threads from all categories, or "Uncategorised only" to show only threads without a category.',
+          )}
         </InfoTip>
       </WStack>
 
@@ -540,13 +557,13 @@ function SourceCategoriesConfig({
       >
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText placeholder="Select thread list mode" />
+            <Select.ValueText placeholder={t("Select thread list mode")} />
             <SelectIcon />
           </Select.Trigger>
         </Select.Control>
         <Select.Positioner>
           <Select.Content>
-            {threadListModes.map((item) => (
+            {threadListModeCollection.items.map((item) => (
               <Select.Item key={item.value} item={item}>
                 <Select.ItemText>{item.label}</Select.ItemText>
                 <Select.ItemIndicator>
@@ -560,12 +577,13 @@ function SourceCategoriesConfig({
 
       <WStack alignItems="center">
         <Heading fontWeight="medium" size="xs">
-          Quick Share
+          {t("Quick Share")}
         </Heading>
 
-        <InfoTip title="Show quick share box">
-          Display a quick share box at the top of the thread list to allow users
-          to quickly create new threads.
+        <InfoTip title={t("Show quick share box")}>
+          {t(
+            "Display a quick share box at the top of the thread list to allow users to quickly create new threads.",
+          )}
         </InfoTip>
       </WStack>
 
@@ -579,7 +597,7 @@ function SourceCategoriesConfig({
             <CheckIcon />
           </Checkbox.Indicator>
         </Checkbox.Control>
-        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.Label>{t("Show Quick Share")}</Checkbox.Label>
         <Checkbox.HiddenInput />
       </Checkbox.Root>
     </LStack>

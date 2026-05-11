@@ -1,0 +1,64 @@
+---
+title: Database
+description: Configure database storage for your Storyden deployment.
+---
+
+Storyden supports multiple database backends, from lightweight embedded SQLite to distributed PostgreSQL-compatible systems. Each option offers different trade-offs between simplicity, performance, and operational requirements.
+
+## Configuration
+
+Database configuration is controlled via the [`DATABASE_URL`](/docs/reference/configuration#core-configuration) environment variable. The URL scheme determines which database driver Storyden uses.
+
+### Database Options
+
+<Cards>
+  <Card title="SQLite" href="./database/sqlite">
+    Embedded, zero-config, production-ready.
+  </Card>
+  <Card title="PostgreSQL" href="./database/postgresql">
+    Robust, scalable, industry standard.
+  </Card>
+  <Card title="Turso" href="./database/turso">
+    Distributed SQLite with global replication.
+  </Card>
+</Cards>
+
+The comparison table below summarizes the key differences:
+
+| Feature               | SQLite          | PostgreSQL       | Turso                |
+| --------------------- | --------------- | ---------------- | -------------------- |
+| **Infrastructure**    | None required   | Separate service | Managed service      |
+| **Setup complexity**  | None            | Medium           | Low                  |
+| **Write scalability** | Single writer   | High             | High                 |
+| **Read scalability**  | Excellent       | Excellent        | Global edge replicas |
+| **Multi-instance**    | With Litestream | Yes              | Yes                  |
+| **Disk usage**        | Local file      | Separate volume  | Managed              |
+| **Backups**           | File copy       | pg_dump/WAL      | Automatic            |
+
+## Schema Management
+
+Storyden handles database schema migrations automatically. On startup, the application compares the current schema against the expected schema and applies any necessary migrations. This means you never need to run manual migration commands.
+
+The migration system is transactional and safe. If a migration fails, the database remains in its previous consistent state. Schema changes are versioned and tracked in the codebase, making it easy to understand what changed between versions.
+
+## Quick Reference
+
+### Environment Variables
+
+See full configuration docs [here](/docs/reference/configuration#database_url).
+
+| Variable       | Required | Default                                         | Description             |
+| -------------- | -------- | ----------------------------------------------- | ----------------------- |
+| `DATABASE_URL` | No       | `sqlite://data/data.db?_pragma=foreign_keys(1)` | Database connection URL |
+
+### Supported URL Schemes
+
+- `sqlite://` or `sqlite3://` - SQLite database (local file)
+- `postgres://` or `postgresql://` - PostgreSQL and CockroachDB.
+- `libsql://` - Turso remote SQLite
+
+## Related Reading
+
+- [Search configuration](/docs/reference/search) - Database provider affects search performance
+- [Rate limiting](/docs/reference/configuration#rate-limiting) - Rate limiting access if you are seeing database performance issues due to unexpected read-heavy traffic
+- [Cache configuration](/docs/reference/configuration#cache) - Reduces database load for read-heavy workloads

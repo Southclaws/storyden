@@ -5,6 +5,7 @@ import {
   SelectField,
   SelectFieldProps,
 } from "@/components/ui/form/SelectField";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 
 import { useCategorySelect } from "./useCategorySelect";
@@ -12,6 +13,7 @@ import { useCategorySelect } from "./useCategorySelect";
 export function CategorySelect<T extends FieldValues>(
   props: Omit<SelectFieldProps<T, any>, "collection" | "placeholder">,
 ) {
+  const { t } = useI18n();
   const result = useCategorySelect();
   const { ready, collection, error } = result;
 
@@ -21,7 +23,7 @@ export function CategorySelect<T extends FieldValues>(
         control={props.control}
         name={props.name}
         disabled={!ready}
-        placeholder={ready ? "Category" : "Loading categories..."}
+        placeholder={ready ? t("Category") : t("Loading categories...")}
         collection={collection}
       />
       <ErrorTooltip error={error} />

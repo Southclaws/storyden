@@ -8,6 +8,7 @@ import { Permission, ThreadReference } from "src/api/openapi-schema";
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { useI18n } from "@/i18n/provider";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import { useReportContext } from "@/lib/report/useReportContext";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
@@ -29,6 +30,7 @@ export function useThreadMenu({
   editingEnabled,
   movingEnabled,
 }: Props) {
+  const { t } = useI18n();
   const router = useRouter();
   const account = useSession();
   const { resolveReport } = useReportContext();
@@ -78,7 +80,7 @@ export function useThreadMenu({
     await handle(
       async () => {
         await withUndo({
-          message: "Thread deleted",
+          message: t("Thread deleted"),
           duration: 5000,
           toastId: `thread-${thread.id}`,
           action: async () => {

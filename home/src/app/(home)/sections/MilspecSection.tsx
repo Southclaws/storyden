@@ -26,9 +26,12 @@ const cellFonts = css({
 
 type Props = {
   stats: HomeStats;
+  locale?: "en" | "zh";
 };
 
-export function MilspecSection({ stats }: Props) {
+export function MilspecSection({ stats, locale = "en" }: Props) {
+  const zh = locale === "zh";
+
   return (
     <VStack
       bgColor="Mono.ink"
@@ -70,7 +73,7 @@ export function MilspecSection({ stats }: Props) {
                 textAlign="end"
                 p="2"
               >
-                CHART 1 of 2
+                {zh ? "图表 1 / 2" : "CHART 1 of 2"}
               </styled.p>
             </td>
           </styled.tr>
@@ -79,9 +82,9 @@ export function MilspecSection({ stats }: Props) {
             <td colSpan={6}>
               <Center w="full" py="8">
                 <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
-                  STORYDEN&nbsp;HUMAN&nbsp;COMPUTER
+                  {zh ? "STORYDEN 人本计算机" : "STORYDEN\u00a0HUMAN\u00a0COMPUTER"}
                   <br />
-                  KNOWLEDGE&nbsp;SYSTEM
+                  {zh ? "知识系统" : "KNOWLEDGE\u00a0SYSTEM"}
                 </styled.h2>
               </Center>
             </td>
@@ -89,21 +92,31 @@ export function MilspecSection({ stats }: Props) {
 
           <styled.tr>
             <td colSpan={6}>
-              <StorydenComputer />
+              <StorydenComputer locale={locale} />
             </td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              GITHUB STARS
+              {zh ? "GITHUB 星标" : "GITHUB STARS"}
             </td>
             <td style={cellStyle}>{stats.stars}</td>
             <td style={cellStyle} rowSpan={3} colSpan={2}>
-              SUPPORTED
-              <br />
-              OPERATING
-              <br />
-              SYSTEMS
+              {zh ? (
+                <>
+                  支持的
+                  <br />
+                  操作系统
+                </>
+              ) : (
+                <>
+                  SUPPORTED
+                  <br />
+                  OPERATING
+                  <br />
+                  SYSTEMS
+                </>
+              )}
             </td>
             <td style={cellStyle} rowSpan={3} colSpan={2}>
               WINDOWS
@@ -116,36 +129,36 @@ export function MilspecSection({ stats }: Props) {
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              GIT COMMITS
+              {zh ? "GIT 提交" : "GIT COMMITS"}
             </td>
             <td style={cellStyle}>{stats.commits}</td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              API ENDPOINTS
+              {zh ? "API 端点" : "API ENDPOINTS"}
             </td>
             <td style={cellStyle}>89</td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              CONTRIBUTORS
+              {zh ? "贡献者" : "CONTRIBUTORS"}
             </td>
             <td style={cellStyle}>{stats.contributors}</td>
             <td style={cellStyle} colSpan={2}>
-              MIN MEMORY
+              {zh ? "最低内存" : "MIN MEMORY"}
             </td>
             <td style={cellStyle}>100 MB</td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              LINES OF CODE
+              {zh ? "代码行数" : "LINES OF CODE"}
             </td>
             <td style={cellStyle}>{stats.loc}</td>
             <td style={cellStyle} colSpan={2}>
-              MIN CORES
+              {zh ? "最低核心数" : "MIN CORES"}
             </td>
             <td style={cellStyle}>1 CPU</td>
           </styled.tr>
@@ -171,7 +184,7 @@ export function MilspecSection({ stats }: Props) {
                 textAlign="end"
                 p="2"
               >
-                CHART 2 of 2
+                {zh ? "图表 2 / 2" : "CHART 2 of 2"}
               </styled.p>
             </td>
           </styled.tr>
@@ -180,9 +193,15 @@ export function MilspecSection({ stats }: Props) {
             <td colSpan={5}>
               <Center w="full" pt="4" pb="8">
                 <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
-                  Up&nbsp;and&nbsp;running&nbsp;before
-                  <wbr />
-                  your&nbsp;coffee&nbsp;gets&nbsp;cold
+                  {zh ? (
+                    "咖啡变凉之前就能跑起来"
+                  ) : (
+                    <>
+                      Up&nbsp;and&nbsp;running&nbsp;before
+                      <wbr />
+                      your&nbsp;coffee&nbsp;gets&nbsp;cold
+                    </>
+                  )}
                 </styled.h2>
               </Center>
             </td>
@@ -203,9 +222,11 @@ export function MilspecSection({ stats }: Props) {
 
           <styled.tr>
             <styled.td style={cellStyle} colSpan={2}>
-              <Link href="/docs/introduction">
+              <Link href={zh ? "/zh/docs/introduction" : "/docs/introduction"}>
                 <styled.p p="2" textAlign="center">
-                  PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS
+                  {zh
+                    ? "请参阅随附手册了解操作说明"
+                    : "PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS"}
                 </styled.p>
               </Link>
             </styled.td>
@@ -215,8 +236,9 @@ export function MilspecSection({ stats }: Props) {
                 target="_blank"
               >
                 <styled.p p="2" textAlign="center">
-                  OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
-                  LICENSE
+                  {zh
+                    ? "根据 MIT 许可证向公众发布的开源软件"
+                    : "OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT LICENSE"}
                 </styled.p>
               </Link>
             </styled.td>

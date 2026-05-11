@@ -1,0 +1,42 @@
+---
+title: configure
+description: Host to Plugin RPC method.
+---
+
+`configure` is a **Host to Plugin** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/host-to-plugin/configure.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestConfigure`
+- Response type: `RPCResponseConfigure`
+
+## Request contract
+
+Request sent by the host to the plugin to provide configuration settings. The params object can contain any key-value pairs defined by the plugin in its manifest `configuration_schema` field and the plugin should validate and apply these settings to its internal state.
+If configuration changes require a plugin to restart, the plugin should cleanly shut down with a zero exit code so that the host can restart it if it is a supervised plugin. If it is an external plugin, the plugin itself is responsible for this behavior based on the plugin's lifecycle design.
+
+
+Required fields:
+- `method`
+- `params`
+
+
+
+## Response contract
+
+Confirms that the configuration was received and applied correctly.
+
+
+Required fields:
+- `ok`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

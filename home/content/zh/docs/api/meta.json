@@ -1,0 +1,30 @@
+{
+  "root": true,
+  "title": "API 参考",
+  "description": "Storyden RESTful API。",
+  "pages": [
+    "index",
+    "misc",
+    "admin",
+    "plugins",
+    "roles",
+    "auth",
+    "accounts",
+    "invitations",
+    "notifications",
+    "reports",
+    "profiles",
+    "categories",
+    "tags",
+    "posts",
+    "threads",
+    "replies",
+    "assets",
+    "likes",
+    "collections",
+    "nodes",
+    "links",
+    "datagraph",
+    "events"
+  ]
+}

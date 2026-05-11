@@ -4,13 +4,14 @@ import { match } from "ts-pattern";
 
 import { RequestError } from "@/api/common";
 import { useAccountView } from "@/api/openapi-client/accounts";
-import { Account, Permission, ProfileReference } from "@/api/openapi-schema";
+import { Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Badge } from "@/components/ui/badge";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import * as Tabs from "@/components/ui/tabs";
+import { useI18n } from "@/i18n/provider";
 import {
   Box,
   CardBox,
@@ -31,6 +32,7 @@ type Props = {
 };
 
 function useProfileAccountManagement({ accountId }: Props) {
+  const { t } = useI18n();
   const { data: account, error } = useAccountView(accountId);
   if (!account) {
     if (
@@ -41,7 +43,7 @@ function useProfileAccountManagement({ accountId }: Props) {
       return {
         ready: false as const,
         error:
-          "You do not have permission to view additional details for an administrator account.",
+          t("You do not have permission to view additional details for an administrator account."),
       };
     }
 
@@ -66,6 +68,7 @@ function useProfileAccountManagement({ accountId }: Props) {
 }
 
 export function ProfileAccountManagement({ accountId }: Props) {
+  const { t } = useI18n();
   const { ready, error, account, emailVerifiedStatus } =
     useProfileAccountManagement({ accountId });
 
@@ -110,7 +113,7 @@ export function ProfileAccountManagement({ accountId }: Props) {
         >
           <HStack gap="1">
             <AdminIcon w="4" />
-            <p>Account information</p>
+            <p>{t("Account information")}</p>
           </HStack>
           <AccountPurgeTrigger accountId={account.id} handle={account.handle} />
         </HStack>
@@ -131,6 +134,7 @@ function ProfileAccountManagementTabs({
   account: Account;
   emailVerifiedStatus: string;
 }) {
+  const { t } = useI18n();
   const session = useSession();
   const canManageWarnings = hasPermission(session, Permission.MANAGE_WARNINGS);
   const isSelf = session?.id === account.id;
@@ -148,10 +152,10 @@ function ProfileAccountManagementTabs({
 
   const emailVerifiedStatusBadge = match(emailVerifiedStatus)
     .with("not_applicable", () => (
-      <Badge colorPalette="gray">No emails to verify</Badge>
+      <Badge colorPalette="gray">{t("No emails to verify")}</Badge>
     ))
-    .with("verified", () => <Badge colorPalette="green">Verified</Badge>)
-    .with("not_verified", () => <Badge colorPalette="gray">Unverified</Badge>);
+    .with("verified", () => <Badge colorPalette="green">{t("Verified")}</Badge>)
+    .with("not_verified", () => <Badge colorPalette="gray">{t("Unverified")}</Badge>);
 
   return (
     <Tabs.Root
@@ -164,12 +168,12 @@ function ProfileAccountManagementTabs({
       lazyMount={true}
     >
       <Tabs.List>
-        <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+        <Tabs.Trigger value="overview">{t("Overview")}</Tabs.Trigger>
         {canViewWarnings && (
-          <Tabs.Trigger value="warnings">Warnings</Tabs.Trigger>
+          <Tabs.Trigger value="warnings">{t("Warnings")}</Tabs.Trigger>
         )}
         {hasModerationNotesAccess && (
-          <Tabs.Trigger value="moderator_notes">Moderator Notes</Tabs.Trigger>
+          <Tabs.Trigger value="moderator_notes">{t("Moderator Notes")}</Tabs.Trigger>
         )}
         <Tabs.Indicator />
       </Tabs.List>
@@ -183,14 +187,14 @@ function ProfileAccountManagementTabs({
           <LStack flex="1" gap="4" flexShrink="1" flexGrow="1" minW="0">
             <LStack gap="1">
               <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
-                Account Status
+                {t("Account Status")}
               </styled.p>
               <Box fontSize="sm">{emailVerifiedStatusBadge.run()}</Box>
             </LStack>
 
             <LStack gap="1">
               <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
-                Joined at
+                {t("Joined at")}
               </styled.p>
               <styled.p fontSize="sm">
                 {formatDate(new Date(account.joined), "PPPppp")}
@@ -200,7 +204,7 @@ function ProfileAccountManagementTabs({
             {account.suspended && (
               <LStack gap="1">
                 <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
-                  Suspended
+                  {t("Suspended")}
                 </styled.p>
                 <styled.p fontSize="sm" color="fg.destructive">
                   {formatDate(new Date(account.suspended), "PPPppp")}
@@ -211,7 +215,7 @@ function ProfileAccountManagementTabs({
             {account.invited_by && (
               <LStack gap="1">
                 <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
-                  Invited By
+                  {t("Invited By")}
                 </styled.p>
                 <MemberIdent
                   size="sm"
@@ -224,7 +228,7 @@ function ProfileAccountManagementTabs({
 
           <LStack flex="1" gap="2" flexShrink="1" flexGrow="1" minW="0">
             <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
-              Email Addresses
+              {t("Email Addresses")}
             </styled.p>
             {account.email_addresses.length > 0 ? (
               <LStack gap="2" minW="0">
@@ -248,11 +252,11 @@ function ProfileAccountManagementTabs({
                     </styled.code>
                     {email.verified ? (
                       <Badge colorPalette="green" size="sm">
-                        Verified
+                        {t("Verified")}
                       </Badge>
                     ) : (
                       <Badge colorPalette="gray" size="sm">
-                        Unverified
+                        {t("Unverified")}
                       </Badge>
                     )}
                   </HStack>
@@ -260,7 +264,7 @@ function ProfileAccountManagementTabs({
               </LStack>
             ) : (
               <styled.p fontSize="sm" color="fg.subtle">
-                No email addresses
+                {t("No email addresses")}
               </styled.p>
             )}
           </LStack>

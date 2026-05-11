@@ -18,6 +18,7 @@ import { CheckIcon } from "@/components/ui/icons/Check";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
 import { API_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export function ConnectionTab({ plugin }: Props) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const { trigger: cycleToken } = usePluginCycleToken(plugin.id);
   const envURL = `STORYDEN_RPC_URL=${buildRPCURL(plugin.connection.token)}`;
@@ -62,13 +64,14 @@ export function ConnectionTab({ plugin }: Props) {
   return (
     <LStack gap="4">
       <styled.p fontSize="sm" color="fg.muted">
-        This plugin is an External plugin. This means Storyden does not manage
-        its process lifecycle and cannot provide connection information. Use
-        this token to connect the plugin to Storyden via RPC.
+        {t(
+          "This plugin is an External plugin. This means Storyden does not manage its process lifecycle and cannot provide connection information. Use this token to connect the plugin to Storyden via RPC.",
+        )}
       </styled.p>
       <styled.p fontSize="sm" color="fg.muted">
-        External plugins are responsible for handling its own restarting and
-        reconnection.
+        {t(
+          "External plugins are responsible for handling their own restarting and reconnection.",
+        )}
       </styled.p>
 
       <Alert.Root>
@@ -76,17 +79,18 @@ export function ConnectionTab({ plugin }: Props) {
           <WarningIcon />
         </Alert.Icon>
         <Alert.Content>
-          <Alert.Title>Security notice</Alert.Title>
+          <Alert.Title>{t("Security notice")}</Alert.Title>
           <Alert.Description>
-            External plugin tokens grant full access over RPC. Keep them secret
-            and only run plugins from trusted sources.
+            {t(
+              "External plugin tokens grant full access over RPC. Keep them secret and only run plugins from trusted sources.",
+            )}
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>
 
       <LStack gap="1">
         <styled.p fontSize="xs" color="fg.muted">
-          Plugin token
+          {t("Plugin token")}
         </styled.p>
 
         <Clipboard.Root w="full" value={plugin.connection.token}>
@@ -107,7 +111,7 @@ export function ConnectionTab({ plugin }: Props) {
 
       <LStack gap="1">
         <styled.p fontSize="xs" color="fg.muted">
-          Development environment variable
+          {t("Development environment variable")}
         </styled.p>
         <Clipboard.Root w="full" value={envURL}>
           <Clipboard.Control gap="0">
@@ -126,20 +130,21 @@ export function ConnectionTab({ plugin }: Props) {
       </LStack>
 
       <HStack w="full" justify="end">
-        <InfoTip title="Regenerating Plugin Token">
+        <InfoTip title={t("Regenerating Plugin Token")}>
           <styled.p fontSize="sm" color="fg.muted">
-            This will immediately invalidate the old token and force the plugin
-            to disconnect if it&apos;s currently connected.
+            {t(
+              "This will immediately invalidate the old token and force the plugin to disconnect if it's currently connected.",
+            )}
           </styled.p>
         </InfoTip>
 
         {isConfirming ? (
           <HStack gap="2">
             <Button size="sm" variant="subtle" onClick={handleConfirmAction}>
-              Confirm regenerate
+              {t("Confirm regenerate")}
             </Button>
             <Button size="sm" variant="outline" onClick={handleCancelAction}>
-              Cancel
+              {t("Cancel")}
             </Button>
           </HStack>
         ) : (
@@ -149,7 +154,7 @@ export function ConnectionTab({ plugin }: Props) {
             flexShrink="0"
             onClick={handleConfirmAction}
           >
-            Regenerate token
+            {t("Regenerate token")}
           </Button>
         )}
       </HStack>

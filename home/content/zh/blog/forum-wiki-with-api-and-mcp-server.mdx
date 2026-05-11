@@ -1,0 +1,65 @@
+---
+title: A forum and wiki with API access and an MCP server!?
+date: 2025-06-28
+description: >-
+  What a crazy concept! But it's not that crazy, it's reality. Storyden now
+  supports API access tokens and, the most exciting part, MCP is coming!
+---
+
+> TL;DR: Access Keys for easier API integration, fully integrated and secure MCP server on the way soon!
+
+It took me a while to explore the latest trend. I usually sit back a bit when something new makes the rounds on X, Hacker News and all the other usual places.
+
+To be fair, this may have been my downfall, I attempted to build a GPT-3 powered SaaS with a friend way back in 2020, ultimately we lost interest and I collosally failed to predict the explosion of GPTs in the coming years.
+
+That being said, [there was an attempt](https://github.com/Southclaws/storyden/tree/model-context-protocol) a few months ago to experiment with MCP. Back then, there were very few actual tools to work with MCP so I've revisited it this week and I'm quite excited!
+
+## Guess we're doin AI now?
+
+Not quite. Storyden always aims to support the most minimal production-ready deployment possible. You can run it right now on your server with zero external dependencies. No OpenAI API keys, no PostgreSQL, no Redis. Everything is baked in, sane defaults, get going and enhance as you wish:
+
+```
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+If you're not interested in AI at all, no worries! It'll never grace your Storyden deployment unless you ask it to. (and provide an OpenAI API key of course...)
+
+## The `Bearer` of Good News
+
+In short: Storyden finally gets `Authorization: Bearer` support! This has been on the list since almost the beginning. Until now, the only way to talk to the API was with a `Cookie` header (which was recently reworked to be a much more secure stateful token, rather than a JWT-esque stateless token)
+
+### Access Keys
+
+These work like most other SaaS apps. You can create a "Personal access key" which gives you a token. It can be revoked, expire and all that good stuff.
+
+![Access keys UI](/blog/access-keys.png)
+
+Not every member of a Storyden instance may do this, administrators must first issue a role [with the permission `USE_PERSONAL_ACCESS_KEYS`](/docs/introduction/members/permissions) in order for a member to be able to issue keys for their account.
+
+Access Keys are essentially just another authentication method for an account. This means they inherit all the roles and permissions of the owner.
+
+Which may have you asking, how do I implement a principle of least privilege?
+
+### Bot Accounts
+
+Since permissions are simply bound to an account, and access keys simply provide access on behalf of an account, then creating scoped access is as simple as just creating another account!
+
+"Accounts" in Storyden are lightweight, not bound to an identity such as an email or phone number. It was a conscious decision to use the word "Account" and not "User" for this reason.
+
+In a future version, members with sufficient permissions will be able to create bot accounts with access keys. This feature will power new agentic workflows such as:
+
+- Automated content moderators
+- Shared link indexing from community platforms such as Discord
+- Organising bots for tidying up wiki pages
+
+And pretty much anything you can think of by composing together MCP servers with your favourite agentic framework like Pydantic AI or workflow engine such as n8n.
+
+## Go forth and build!
+
+This marks an exciting near-future for Storyden. Access keys provide a secure and easy way to build integrations.
+
+Bot accounts prepare the platform for an agentic future.
+
+What's next?
+
+I'm not sure but I've heard it involves WebAssembly sandboxed plugins... 👀

@@ -5,15 +5,19 @@ import { HeroSection } from "./sections/HeroSection";
 import { MilspecSection, type HomeStats } from "./sections/MilspecSection";
 import { ScreenshotSection } from "./sections/ScreenshotSection";
 
-export default async function Home() {
+type Props = {
+  locale?: "en" | "zh";
+};
+
+export default async function Home({ locale = "en" }: Props = {}) {
   const stats = await getStats();
 
   return (
     <Box>
-      <HeroSection />
+      <HeroSection locale={locale} />
       <ScreenshotSection />
-      <CollectiveMemorySection />
-      <MilspecSection stats={stats} />
+      <CollectiveMemorySection locale={locale} />
+      <MilspecSection stats={stats} locale={locale} />
     </Box>
   );
 }

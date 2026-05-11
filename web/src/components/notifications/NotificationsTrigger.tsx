@@ -1,6 +1,7 @@
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { NotificationIcon } from "@/components/ui/icons/Notification";
+import { useI18n } from "@/i18n/provider";
 import { Box } from "@/styled-system/jsx";
 
 import { AnchorProps, MenuItem } from "../site/Navigation/Anchors/Anchor";
@@ -19,12 +20,14 @@ export function NotificationsTrigger({
   unread,
   ...props
 }: AnchorProps & ButtonProps & Props) {
+  const { t } = useI18n();
+
   return (
-    <IconButton size="sm" aria-label="Notifications" {...props}>
+    <IconButton size="sm" aria-label={t("Notifications")} {...props}>
       {NotificationsIcon}
       {!hideLabel && (
         <>
-          &nbsp;<span>{NotificationsLabel}</span>
+          &nbsp;<span>{t(NotificationsLabel)}</span>
         </>
       )}
 

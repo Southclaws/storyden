@@ -4,6 +4,7 @@ import { keyBy } from "lodash";
 
 import { AddIcon } from "@/components/ui/icons/Add";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { BlockIcon } from "@/lib/library/blockIcons";
 import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
@@ -12,12 +13,7 @@ import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 import { useWatch } from "../store";
 
 export function CreateBlockMenu({
-  trigger = (
-    <Menu.Item value="add">
-      <AddIcon />
-      &nbsp;Add Block
-    </Menu.Item>
-  ),
+  trigger,
   positioning = undefined,
   index = undefined,
 }: {
@@ -25,7 +21,14 @@ export function CreateBlockMenu({
   positioning?: PositioningOptions;
   index?: number;
 }) {
+  const { t } = useI18n();
   const emit = useEmitLibraryBlockEvent();
+  const menuTrigger = trigger ?? (
+    <Menu.Item value="add">
+      <AddIcon />
+      &nbsp;{t("Add Block")}
+    </Menu.Item>
+  );
 
   const currentMetadata = useWatch((s) => s.draft.meta);
 
@@ -42,7 +45,7 @@ export function CreateBlockMenu({
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
-      <Menu.Trigger asChild>{trigger}</Menu.Trigger>
+      <Menu.Trigger asChild>{menuTrigger}</Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>
@@ -52,7 +55,7 @@ export function CreateBlockMenu({
                 <Menu.Item key={block} value={block}>
                   <BlockIcon blockType={block} />
                   &nbsp;
-                  {LibraryPageBlockName[block]}
+                  {t(LibraryPageBlockName[block])}
                 </Menu.Item>
               );
             })}

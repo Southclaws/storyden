@@ -1,0 +1,13 @@
+---
+title: With Weaviate
+---
+
+For production use, one option is [Weaviate](https://weaviate.io/) which is a self-hosted or cloud-hosted vector database with built-in embedding features.
+
+Currently, the class name of the Weaviate instance is tightly bound to the OpenAI configuration within Storyden. This will be made more flexible in the future.
+
+This means that Storyden only supports two Weaviate modules: `text2vec-transformers` for locally hosted (GPU-required) or `text2vec-openai` for OpenAI (API key required).
+
+See configuration details [here](/docs/operation/configuration#semdex).
+
+<Callout type="warn">This documentation is incomplete.</Callout>

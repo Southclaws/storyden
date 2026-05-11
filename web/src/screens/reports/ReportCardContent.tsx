@@ -14,6 +14,7 @@ import {
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 function getItemPath(
@@ -41,13 +42,14 @@ type Props = {
 };
 
 export function ReportCardContent({ report }: Props) {
+  const { t } = useI18n();
   const item = report.item as DatagraphItem | undefined;
 
   if (!item) {
     return (
       <Box p="3" borderRadius="md" bg="bg.muted">
         <styled.p color="fg.muted" fontStyle="italic">
-          Content no longer available
+          {t("Content no longer available")}
         </styled.p>
       </Box>
     );
@@ -65,7 +67,7 @@ export function ReportCardContent({ report }: Props) {
     default:
       return (
         <Box p="3" borderRadius="md" bg="bg.muted">
-          <styled.p color="fg.muted">Unknown content type</styled.p>
+          <styled.p color="fg.muted">{t("Unknown content type")}</styled.p>
         </Box>
       );
   }
@@ -77,6 +79,7 @@ type PostContentProps = {
 };
 
 function PostContent({ reportID, item }: PostContentProps) {
+  const { t } = useI18n();
   const { ref } = item;
   const path = getItemPath(reportID, item);
 
@@ -87,12 +90,12 @@ function PostContent({ reportID, item }: PostContentProps) {
           {path ? (
             <Link href={path}>
               <styled.h3 fontWeight="medium" fontSize="md" lineClamp={1}>
-                {ref.title || "(Untitled post)"}
+                {ref.title || t("(Untitled post)")}
               </styled.h3>
             </Link>
           ) : (
             <styled.h3 fontWeight="medium" fontSize="md" lineClamp={2}>
-              {ref.title || "(Untitled post)"}
+              {ref.title || t("(Untitled post)")}
             </styled.h3>
           )}
           <Timestamp created={ref.createdAt} color="fg.subtle" large />
@@ -191,13 +194,15 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
 }
 
 function ContentDeletedBadge() {
+  const { t } = useI18n();
+
   return (
     <Badge
       bg="bg.destructive"
       color="fg.destructive"
       borderColor="border.destructive"
     >
-      Content deleted
+      {t("Content deleted")}
     </Badge>
   );
 }

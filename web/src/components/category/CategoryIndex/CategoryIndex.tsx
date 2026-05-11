@@ -4,6 +4,7 @@ import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
 import { CategoryTree } from "@/lib/category/tree";
+import { useI18n } from "@/i18n/provider";
 import { Settings } from "@/lib/settings/settings";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
@@ -37,13 +38,14 @@ export function CategoryIndex({
   categories,
   paginationBasePath,
 }: Props) {
+  const { t } = useI18n();
   const categoryCount = categories.length;
 
   return (
     <LStack gap="8">
       <LStack>
         <WStack>
-          <Heading>Discussion categories</Heading>
+          <Heading>{t("Discussion categories")}</Heading>
 
           <CategoryCreateTrigger />
         </WStack>
@@ -54,7 +56,7 @@ export function CategoryIndex({
               (c) => c === 0,
               () => (
                 <styled.p color="fg.muted">
-                  No categories yet. Create one?
+                  {t("No categories yet. Create one?")}
                 </styled.p>
               ),
             )
@@ -62,15 +64,15 @@ export function CategoryIndex({
               (c) => c === 1,
               () => (
                 <styled.p color="fg.muted">
-                  There is {categoryCount} category available to start a
-                  discussion.
+                  {categoryCount}{" "}
+                  {t("category available to start a discussion.")}
                 </styled.p>
               ),
             )
             .otherwise(() => (
               <styled.p color="fg.muted">
-                There are {categoryCount} categories available to start
-                discussions.
+                {categoryCount}{" "}
+                {t("categories available to start discussions.")}
               </styled.p>
             ))}
 
@@ -114,14 +116,15 @@ function ThreadListSection({
   showQuickShare: boolean;
   paginationBasePath: string;
 }) {
+  const { t } = useI18n();
   if (mode === "none") {
     return null;
   }
 
   const heading =
     mode === "all"
-      ? "All discussion threads"
-      : "Uncategorised discussion threads";
+      ? t("All discussion threads")
+      : t("Uncategorised discussion threads");
 
   // Only show the category select when showing all threads, not uncategorised.
   const showCategorySelect = mode === "all";

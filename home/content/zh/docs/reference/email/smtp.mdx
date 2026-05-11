@@ -1,0 +1,50 @@
+---
+title: SMTP
+description: Configure Storyden to send emails through an SMTP server.
+---
+
+SMTP is the most flexible email option in Storyden. Use it if you already run mail infrastructure or prefer a provider that exposes standard SMTP credentials.
+
+## Configuration
+
+Set these environment variables:
+
+- `EMAIL_PROVIDER=smtp`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_FROM_ADDRESS`
+- `JWT_SECRET` (this is required for generating password reset links)
+- `SMTP_FROM_NAME` (your community name)
+- `SMTP_USERNAME` and `SMTP_PASSWORD` (both together, or neither)
+- `SMTP_USE_TLS` (defaults to `true`)
+
+Use the [Configuration reference](/docs/reference/configuration) for full definitions and defaults.
+
+## Example
+
+```bash
+EMAIL_PROVIDER=smtp
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USERNAME=mailer@example.com
+SMTP_PASSWORD=replace-me
+SMTP_FROM_NAME="My Community"
+SMTP_FROM_ADDRESS=no-reply@example.com
+SMTP_USE_TLS=true
+JWT_SECRET=replace-with-a-long-random-secret
+```
+
+<Callout type="info">
+  You can generate a JWT secret with `openssl rand -hex 32`.
+</Callout>
+
+## TLS Behaviour
+
+With `SMTP_USE_TLS=true`:
+
+- Port `465` uses implicit TLS.
+- Other ports use STARTTLS and require STARTTLS support on the server.
+
+With `SMTP_USE_TLS=false`, Storyden sends without TLS, which is only suitable for local development or trusted networks.
+
+If `SMTP_USERNAME` and `SMTP_PASSWORD` are set while TLS is disabled, Storyden rejects the SMTP configuration at startup instead of attempting plaintext authentication.

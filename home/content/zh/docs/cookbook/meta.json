@@ -1,0 +1,10 @@
+{
+    "root": true,
+    "title": "实用手册",
+    "description": "不只是静态论坛：组合功能，构建更多能力。",
+    "defaultOpen": false,
+    "pages": [
+        "index",
+        "discord-integration-plugin"
+    ]
+}

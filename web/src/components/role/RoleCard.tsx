@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 
 import { Role } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
 import { CardBox, HStack, WStack } from "@/styled-system/jsx";
@@ -19,6 +20,7 @@ type Props = {
 };
 
 export function RoleCard({ role, editable, dragHandle }: Props) {
+  const { t } = useI18n();
   const cssVars = badgeColourCSS(role.colour);
 
   const isDefault = isDefaultRole(role);
@@ -44,9 +46,9 @@ export function RoleCard({ role, editable, dragHandle }: Props) {
           {isDefault && (
             <>
               {isCustomDefault ? (
-                <Badge size="sm">Default + Custom</Badge>
+                <Badge size="sm">{t("Default + Custom")}</Badge>
               ) : (
-                <Badge size="sm">Default</Badge>
+                <Badge size="sm">{t("Default")}</Badge>
               )}
             </>
           )}

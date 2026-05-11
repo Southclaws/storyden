@@ -23,6 +23,12 @@ export const border = {
       _osDark: "{colors.neutral.dark.5}",
     },
   },
+  strong: {
+    value: {
+      _osLight: "{colors.neutral.light.8}",
+      _osDark: "{colors.neutral.dark.7}",
+    },
+  },
   destructive: {
     value: {
       _osLight: "{colors.tomato.light.6}",
@@ -69,6 +75,12 @@ export const border = {
     value: {
       _osLight: "{colors.neutral.light.5}",
       _osDark: "{colors.neutral.dark.6}",
+    },
+  },
+  focus: {
+    value: {
+      _osLight: "{colors.accent.light.8}",
+      _osDark: "{colors.accent.dark.8}",
     },
   },
 };

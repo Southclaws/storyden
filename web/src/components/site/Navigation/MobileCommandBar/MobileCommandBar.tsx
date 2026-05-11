@@ -5,6 +5,7 @@ import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import { SiteIcon } from "@/components/ui/icons/Site";
+import { useI18n } from "@/i18n/provider";
 import { WStack } from "@/styled-system/jsx";
 
 import { Search } from "../../../search/Search/Search";
@@ -15,6 +16,7 @@ import { HomeAnchor } from "../Anchors/Home";
 import { LibraryAnchor } from "../Anchors/Library";
 import { LoginAnchor } from "../Anchors/Login";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
+import { LanguageSwitcher } from "../LanguageSwitcher";
 
 import { useMobileCommandBar } from "./useMobileCommandBar";
 
@@ -38,6 +40,7 @@ export function MobileCommandBar() {
               <SiteIcon borderRadius="md" w="8" h="8" />
             )}
             <Search />
+            <LanguageSwitcher />
             <CloseAction onClick={onClose} size="sm" />
           </>
         ) : (
@@ -50,6 +53,7 @@ export function MobileCommandBar() {
             <HomeAnchor hideLabel size="sm" />
             {account ? <ComposeAnchor hideLabel size="sm" /> : <LoginAnchor />}
             <LibraryAnchor hideLabel size="sm" />
+            <LanguageSwitcher />
             <ExpandTrigger onClick={onExpand} />
           </>
         )}
@@ -59,9 +63,11 @@ export function MobileCommandBar() {
 }
 
 function ExpandTrigger(props: ButtonProps) {
+  const { t } = useI18n();
+
   return (
     <IconButton
-      title="Main navigation menu"
+      title={t("Main navigation menu")}
       variant="ghost"
       size="sm"
       {...props}

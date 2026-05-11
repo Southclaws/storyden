@@ -1,6 +1,7 @@
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { MultiSelectPicker } from "@/components/ui/MultiSelectPicker";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
@@ -22,6 +23,7 @@ export function LibraryPageTagsBlock() {
 }
 
 export function LibraryPageTagsBlockEditing() {
+  const { t } = useI18n();
   const {
     currentTagItems,
     queryResults,
@@ -40,13 +42,13 @@ export function LibraryPageTagsBlockEditing() {
         onQuery={handleQuery}
         queryResults={queryResults}
         allowNewValues={true}
-        inputPlaceholder="Add tags..."
+        inputPlaceholder={t("Add tags...")}
         autoColour={true}
         size="sm"
       />
       {isSuggestEnabled && (
         <IntelligenceAction
-          title="Suggest tags for this page"
+          title={t("Suggest tags for this page")}
           onClick={handleSuggestTags}
           variant="subtle"
           loading={loadingTags}

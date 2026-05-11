@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { API_ADDRESS, WEB_ADDRESS } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { useCapability } from "@/lib/settings/capabilities";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import type { Settings } from "@/lib/settings/settings";
@@ -46,12 +47,14 @@ type Props = {
   initialSettings?: Settings;
 };
 
-export function AskScreen({ session, initialSettings }: Props) {
-  const canRegister = usePublicRegistration(initialSettings);
+export function AskScreen({ session }: Props) {
+  const { t } = useI18n();
 
   if (!session) {
     return (
-      <UnreadyBanner error="You must be logged in to use the knowledgebase Ask tool.">
+      <UnreadyBanner
+        error={t("You must be logged in to use the knowledgebase Ask tool.")}
+      >
         <WStack>
           {canRegister && <RegisterAnchor />}
           <LoginAnchor />
@@ -69,6 +72,7 @@ type References = {
 };
 
 export function Ask() {
+  const { t } = useI18n();
   const [question, setQuestion] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -172,7 +176,7 @@ export function Ask() {
 
   if (!isEnabled) {
     return (
-      <UnreadyBanner error="Ask mode is not enabled for this installation." />
+      <UnreadyBanner error={t("Ask mode is not enabled for this installation.")} />
     );
   }
 
@@ -187,7 +191,7 @@ export function Ask() {
           w="full"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Wisdom begins in wonder..."
+          placeholder={t("Wisdom begins in wonder...")}
           disabled={isLoading}
           borderRightRadius="none"
         />
@@ -197,7 +201,7 @@ export function Ask() {
           loading={isLoading}
           borderLeftRadius="none"
         >
-          Ask
+          {t("Ask")}
         </Button>
       </styled.form>
       <LStack>
@@ -207,7 +211,7 @@ export function Ask() {
 
         {sources.refs.length > 0 && (
           <LStack>
-            <Heading>Sources from the community</Heading>
+            <Heading>{t("Sources from the community")}</Heading>
             {sources.refs.map((source) => (
               <SourceCard key={source.id} kind={source.kind} id={source.id} />
             ))}
@@ -216,7 +220,7 @@ export function Ask() {
 
         {sources.urls.length > 0 && (
           <LStack>
-            <Heading>Sources from the web</Heading>
+            <Heading>{t("Sources from the web")}</Heading>
             <div className="typography">
               <ul>
                 {sources.urls.map((url) => (

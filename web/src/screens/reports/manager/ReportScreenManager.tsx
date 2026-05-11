@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { Center, LStack, styled } from "@/styled-system/jsx";
 
 import { ReportFilters } from "./ReportFilters";
@@ -63,6 +64,7 @@ function useReportsScreen(props: Props) {
 export function ReportScreenManager(props: Props) {
   const { page, setPage } = useReportsScreenFilters();
   const { ready, error, data, filters } = useReportsScreen(props);
+  const { t } = useI18n();
 
   if (!ready) {
     return <UnreadyBanner error={error} />;
@@ -80,7 +82,7 @@ export function ReportScreenManager(props: Props) {
 
   return (
     <LStack gap="4">
-      <Heading>Reports</Heading>
+      <Heading>{t("Reports")}</Heading>
 
       <ReportFilters />
 
@@ -99,7 +101,9 @@ export function ReportScreenManager(props: Props) {
         </>
       ) : (
         <Center w="full">
-          <EmptyState hideContributionLabel>No reports to show.</EmptyState>
+          <EmptyState hideContributionLabel>
+            {t("No reports to show.")}
+          </EmptyState>
         </Center>
       )}
     </LStack>

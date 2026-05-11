@@ -10,6 +10,7 @@ import {
 } from "@/api/openapi-client/plugins";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/i18n/provider";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -24,10 +25,11 @@ type ManifestError = {
 };
 
 export function ManifestTab({ pluginID, manifest, editable }: Props) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const { trigger: updateManifest } = usePluginUpdateManifest(pluginID);
 
-  const initialYAML = useMemo(() => toYAML(manifest), [manifest]);
+  const initialYAML = useMemo(() => toYAML(manifest, t), [manifest, t]);
   const [yaml, setYAML] = useState(initialYAML);
   const [dirty, setDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -50,7 +52,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
 
     await handle(
       async () => {
-        const parsedManifest = parseManifest(yaml);
+        const parsedManifest = parseManifest(yaml, t);
 
         await mutateTransaction(
           mutate,
@@ -83,7 +85,9 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
   return (
     <LStack gap="2" w="full">
       <styled.p fontSize="sm" color="fg.muted">
-        Defines plugin metadata and which features the plugin has access to.
+        {t(
+          "Defines plugin metadata and which features the plugin has access to.",
+        )}
       </styled.p>
 
       <Box
@@ -115,7 +119,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
       {editable && (
         <WStack justifyContent="space-between">
           <styled.p fontSize="xs" color="fg.muted">
-            Updating the manifest will force the plugin to disconnect.
+            {t("Updating the manifest will force the plugin to disconnect.")}
           </styled.p>
           <Button
             size="sm"
@@ -124,7 +128,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
             disabled={!dirty || isSaving}
             loading={isSaving}
           >
-            Save Manifest
+            {t("Save Manifest")}
           </Button>
         </WStack>
       )}
@@ -132,7 +136,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
       <Admonition
         value={!!error}
         kind="failure"
-        title="Manifest Update Error"
+        title={t("Manifest Update Error")}
         onChange={() => setError(null)}
       >
         {error && (
@@ -186,18 +190,24 @@ function toStringOrNull(input: unknown): string | null {
   return v === "" ? null : v;
 }
 
-function parseManifest(raw: string): Record<string, unknown> {
+function parseManifest(
+  raw: string,
+  t: (key: string) => string,
+): Record<string, unknown> {
   const parsed = parse(raw) as unknown;
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("Manifest payload must be an object");
+    throw new Error(t("Manifest payload must be an object"));
   }
   return parsed as Record<string, unknown>;
 }
 
-function toYAML(manifest: Record<string, unknown>): string {
+function toYAML(
+  manifest: Record<string, unknown>,
+  t: (key: string) => string,
+): string {
   try {
     return stringify(manifest);
   } catch {
-    return "# Failed to render manifest";
+    return `# ${t("Failed to render manifest")}`;
   }
 }

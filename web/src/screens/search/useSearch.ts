@@ -19,6 +19,7 @@ import {
 } from "@/api/openapi-schema";
 import { useSearchQueryState } from "@/components/search/Search/useSearch";
 import { MultiSelectPickerItem } from "@/components/ui/MultiSelectPicker";
+import { useI18n } from "@/i18n/provider";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
 import { deriveError } from "@/utils/error";
 
@@ -33,12 +34,13 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  q: z.string().min(1, { message: "Please enter a search term" }),
+  q: z.string().min(1),
   kind: z.array(DatagraphKindSchema).optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useSearchScreen(props: Props) {
+  const { t } = useI18n();
   const [query, setQuery] = useSearchQueryState();
   const [page, setPage] = useQueryState("page", {
     ...parseAsInteger,
@@ -214,7 +216,12 @@ export function useSearchScreen(props: Props) {
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(
+      z.object({
+        q: z.string().min(1, { message: t("Please enter a search term") }),
+        kind: z.array(DatagraphKindSchema).optional(),
+      }),
+    ),
     defaultValues: {
       q: props.initialQuery,
       kind: props.initialKind,

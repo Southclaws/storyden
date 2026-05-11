@@ -11,6 +11,7 @@ import { PaginationControls } from "src/components/site/PaginationControls/Pagin
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { VStack, styled } from "@/styled-system/jsx";
 
 export type Props = {
@@ -86,6 +87,7 @@ export function usePaginatedSearch({ initialQuery, initialPage, index }: Props) 
 export function PaginatedSearch(props: Props) {
   const { form, query, page, currentParams, handlers } =
     usePaginatedSearch(props);
+  const { t } = useI18n();
 
   return (
     <VStack w="full">
@@ -100,7 +102,7 @@ export function PaginatedSearch(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          placeholder="Search for members"
+          placeholder={t("Search for members")}
           defaultValue={props.initialQuery}
           {...form.register("q")}
         />
@@ -122,7 +124,7 @@ export function PaginatedSearch(props: Props) {
           type="submit"
           width="min"
         >
-          Search
+          {t("Search")}
         </Button>
       </styled.form>
 

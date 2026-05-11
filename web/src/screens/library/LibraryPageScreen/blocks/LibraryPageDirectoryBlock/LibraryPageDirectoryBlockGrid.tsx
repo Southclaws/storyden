@@ -23,6 +23,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { EmptyIcon } from "@/components/ui/icons/Empty";
 import * as Tooltip from "@/components/ui/tooltip";
+import { useI18n } from "@/i18n/provider";
 import { DragItemNode } from "@/lib/dragdrop/provider";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";
@@ -62,6 +63,7 @@ export function LibraryPageDirectoryBlockGrid({
   block,
   currentChildPropertySchema,
 }: Props) {
+  const { t } = useI18n();
   const { nodeID, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
@@ -107,7 +109,7 @@ export function LibraryPageDirectoryBlockGrid({
   if (nodes.length === 0) {
     return (
       <Center w="full">
-        <EmptyState hideContributionLabel>There are no pages here.</EmptyState>
+        <EmptyState hideContributionLabel>{t("There are no pages here.")}</EmptyState>
       </Center>
     );
   }
@@ -202,6 +204,7 @@ function GridCard({
   handleSort,
   onFieldValueChange,
 }: GridCardProps) {
+  const { t } = useI18n();
   const {
     attributes,
     listeners,
@@ -308,14 +311,14 @@ function GridCard({
 
                 <Tooltip.Content p="1" borderRadius="sm">
                   <p>
-                    <styled.span fontWeight="semibold">Click</styled.span>
+                    <styled.span fontWeight="semibold">{t("Click")}</styled.span>
                     &nbsp;
-                    <styled.span fontWeight="normal">to open menu</styled.span>
+                    <styled.span fontWeight="normal">{t("to open menu")}</styled.span>
                   </p>
                   <p>
-                    <styled.span fontWeight="semibold">Drag</styled.span>
+                    <styled.span fontWeight="semibold">{t("Drag")}</styled.span>
                     &nbsp;
-                    <styled.span fontWeight="normal">to move</styled.span>
+                    <styled.span fontWeight="normal">{t("to move")}</styled.span>
                   </p>
                 </Tooltip.Content>
               </Tooltip.Positioner>
@@ -408,7 +411,7 @@ function GridCard({
             (editing ? (
               <styled.input
                 w="full"
-                placeholder="Description..."
+                placeholder={t("Description...")}
                 _placeholder={{
                   color: "fg.subtle",
                 }}
@@ -442,7 +445,7 @@ function GridCard({
             (editing ? (
               <styled.input
                 w="full"
-                placeholder="Link..."
+                placeholder={t("Link...")}
                 _placeholder={{
                   color: "fg.subtle",
                 }}

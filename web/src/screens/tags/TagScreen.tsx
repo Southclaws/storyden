@@ -6,6 +6,7 @@ import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { Unready } from "@/components/site/Unready";
 import { TagBadge } from "@/components/tag/TagBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { useI18n } from "@/i18n/provider";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 type Props = {
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function TagScreen(props: Props) {
+  const { t } = useI18n();
   const { data, error } = useTagGet(props.slug, {
     swr: { fallbackData: props.initialTag },
   });
@@ -28,7 +30,7 @@ export function TagScreen(props: Props) {
       <LStack gap="1">
         <Breadcrumbs
           index={{
-            label: "Tags",
+            label: t("Tags"),
             href: "/tags",
           }}
           crumbs={[
@@ -40,7 +42,7 @@ export function TagScreen(props: Props) {
         />
 
         <HStack gap="1">
-          <p>Threads and library pages tagged with</p>
+          <p>{t("Threads and library pages tagged with")}</p>
           <TagBadge tag={tag} />
         </HStack>
       </LStack>

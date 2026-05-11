@@ -4,6 +4,7 @@ import { Unready } from "src/components/site/Unready";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { LinkCard } from "../LinkCard";
@@ -12,6 +13,7 @@ import { LinkResultList } from "./LinkResultList";
 import { IndexingState, Props, useLinkIndexView } from "./useLinkIndexView";
 
 export function LinkIndexView(props: Props) {
+  const { t } = useI18n();
   const { form, data, handlers } = useLinkIndexView(props);
 
   if (form.formState.isLoading) return <Unready />;
@@ -29,7 +31,7 @@ export function LinkIndexView(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          placeholder="Search or paste a new link"
+          placeholder={t("Search or paste a new link")}
           defaultValue={props.query}
           {...form.register("q")}
         />
@@ -51,7 +53,7 @@ export function LinkIndexView(props: Props) {
           type="submit"
           width="min"
         >
-          Search
+          {t("Search")}
         </Button>
       </styled.form>
 

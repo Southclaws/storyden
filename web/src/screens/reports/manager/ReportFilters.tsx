@@ -5,6 +5,7 @@ import { DatagraphItemKind, ReportStatus } from "@/api/openapi-schema";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
+import { useI18n } from "@/i18n/provider";
 import { DatagraphKindTable } from "@/lib/datagraph/schema";
 import { WStack } from "@/styled-system/jsx";
 
@@ -27,27 +28,34 @@ const REPORT_KIND_OPTIONS = Object.entries(DatagraphKindTable).map(
 
 export function ReportFilters() {
   const { status, setStatus, kind, setKind } = useReportsScreenFilters();
+  const { t } = useI18n();
 
   const statusCollection = useMemo(
     () =>
       createListCollection({
         items: [
-          { label: "All statuses", value: "__all" },
+          { label: t("All statuses"), value: "__all" },
           ...REPORT_STATUS_VALUES.map((value) => ({
-            label: REPORT_STATUS_LABEL[value],
+            label: t(REPORT_STATUS_LABEL[value]),
             value,
           })),
         ],
       }),
-    [],
+    [t],
   );
 
   const kindCollection = useMemo(
     () =>
       createListCollection({
-        items: [{ label: "All items", value: "__all" }, ...REPORT_KIND_OPTIONS],
+        items: [
+          { label: t("All items"), value: "__all" },
+          ...REPORT_KIND_OPTIONS.map((option) => ({
+            ...option,
+            label: t(option.label),
+          })),
+        ],
       }),
-    [],
+    [t],
   );
 
   const statusValue = status;
@@ -82,7 +90,7 @@ export function ReportFilters() {
       >
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText placeholder="Filter by status" />
+            <Select.ValueText placeholder={t("Filter by status")} />
             <SelectIcon />
           </Select.Trigger>
         </Select.Control>
@@ -109,7 +117,7 @@ export function ReportFilters() {
       >
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText placeholder="Filter by item type" />
+            <Select.ValueText placeholder={t("Filter by item type")} />
             <SelectIcon />
           </Select.Trigger>
         </Select.Control>

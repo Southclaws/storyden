@@ -13,6 +13,7 @@ import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 import { Asset } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
+import { useI18n } from "@/i18n/provider";
 import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 
@@ -27,11 +28,13 @@ import { ImageExtended, uploadPositionsKey } from "./plugins/ImagePlugin";
 import { LinkPasteMenuPlugin } from "./plugins/LinkPasteMenuPlugin";
 import { LinkPreview } from "./plugins/LinkPreviewPlugin";
 
-const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
-
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 export function useContentComposer(props: ContentComposerProps) {
+  const { t } = useI18n();
+  const ERROR_UNSUPPORTED_FILE_TYPE = t("File type not supported");
+  const placeholder = props.placeholder ?? t("Write your heart out...");
+  const placeholderRef = useRef(placeholder);
   const { uploadWithProgress } = useImageUpload();
   const [uploadingCount, setUploadingCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -131,7 +134,7 @@ export function useContentComposer(props: ContentComposerProps) {
       handleCancel,
     }),
     Placeholder.configure({
-      placeholder: props.placeholder ?? "Write your heart out...",
+      placeholder: () => placeholderRef.current,
       includeChildren: true,
       showOnlyCurrent: false,
     }),
@@ -180,6 +183,11 @@ export function useContentComposer(props: ContentComposerProps) {
       props.onChange?.(html, editor.isEmpty);
     },
   });
+
+  useEffect(() => {
+    placeholderRef.current = placeholder;
+    editor?.view.dispatch(editor.state.tr);
+  }, [editor, placeholder]);
 
   // This is a huge hack but it means the composer doesn't need to be made into
   // a controlled component. Baiscally, if the resetKey changes, we reset the
@@ -256,7 +264,7 @@ export function useContentComposer(props: ContentComposerProps) {
     const errorTransaction = currentState.tr.setNodeMarkup(pos, undefined, {
       ...currentState.doc.nodeAt(pos)?.attrs,
       "data-uploading": null,
-      "data-upload-error": "Upload failed",
+      "data-upload-error": t("Upload failed"),
     });
 
     view.dispatch(errorTransaction);
@@ -570,8 +578,8 @@ export function useContentComposer(props: ContentComposerProps) {
       return dragErrorMessage;
     }
     return dragFileCount === 1
-      ? "Drop 1 file to upload"
-      : `Drop ${dragFileCount} files to upload`;
+      ? t("Drop 1 file to upload")
+      : t("Drop {{count}} files to upload", { count: dragFileCount });
   }
 
   function handleDragOver(e: React.DragEvent) {

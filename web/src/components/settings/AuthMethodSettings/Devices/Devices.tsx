@@ -1,24 +1,24 @@
-import { formatDistanceToNow } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { relativeTimestamp } from "@/utils/date";
 
 import { DeleteDeviceTrigger } from "./DeleteDevice/DeleteDeviceTrigger";
 import { Props, useDevices } from "./useDevices";
 
 export function Devices(props: Props) {
   const { handleDeviceRegister } = useDevices();
+  const { t, locale } = useI18n();
 
   return (
     <VStack w="full" alignItems="start">
-      <Heading size="sm">Devices</Heading>
+      <Heading size="sm">{t("Devices")}</Heading>
 
       <p>
-        You can use certain support devices with biometric authentication. You
-        can add as many as you want here. It&apos;s recommended that you also
-        add at least one extra device or other authentication method in case you
-        lose your device.
+        {t(
+          "You can use certain support devices with biometric authentication. You can add as many as you want here. It's recommended that you also add at least one extra device or other authentication method in case you lose your device.",
+        )}
       </p>
 
       <styled.ul w="full" display="flex" flexDir="column" gap="2">
@@ -45,14 +45,14 @@ export function Devices(props: Props) {
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              Device ID:{" "}
+              {t("Device ID")}:{" "}
               <styled.code title={v.identifier}> {v.identifier}</styled.code>
             </styled.p>
 
             <HStack justify="space-between">
               <styled.p>
-                Created{" "}
-                <time>{formatDistanceToNow(new Date(v.created_at))}</time> ago
+                {t("Created")}{" "}
+                <time>{relativeTimestamp(v.created_at, locale)}</time>
               </styled.p>
 
               <DeleteDeviceTrigger id={v.id} />
@@ -62,7 +62,7 @@ export function Devices(props: Props) {
       </styled.ul>
 
       <Button variant="subtle" onClick={handleDeviceRegister}>
-        Register this device
+        {t("Register this device")}
       </Button>
     </VStack>
   );

@@ -21,6 +21,7 @@ import {
   TextIcon,
   TextQuoteIcon,
 } from "@/components/ui/icons/Typography";
+import { useI18n } from "@/i18n/provider";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
@@ -35,6 +36,8 @@ export type Props = {
 };
 
 export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
+  const { t } = useI18n();
+
   return (
     <HStack gap="1">
       <Menu.Root
@@ -46,7 +49,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
             type="button"
             size="xs"
             variant="ghost"
-            title="Change the kind of text"
+            title={t("Change the kind of text")}
           >
             {match(format.text.active)
               .with("p", () => <TextIcon />)
@@ -72,32 +75,32 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
             >
               <Menu.Item value="p">
                 <TextIcon />
-                &nbsp;Paragraph
+                &nbsp;{t("Paragraph")}
               </Menu.Item>
 
               <Menu.Item value="h1" fontSize="lg" fontWeight="extrabold">
                 <Heading1Icon />
-                &nbsp;Heading 1
+                &nbsp;{t("Heading 1")}
               </Menu.Item>
               <Menu.Item value="h2" fontSize="md" fontWeight="extrabold">
                 <Heading2Icon />
-                &nbsp;Heading 2
+                &nbsp;{t("Heading 2")}
               </Menu.Item>
               <Menu.Item value="h3" fontSize="md" fontWeight="bold">
                 <Heading3Icon />
-                &nbsp;Heading 3
+                &nbsp;{t("Heading 3")}
               </Menu.Item>
               <Menu.Item value="h4" fontSize="md" fontWeight="medium">
                 <Heading4Icon />
-                &nbsp;Heading 4
+                &nbsp;{t("Heading 4")}
               </Menu.Item>
               <Menu.Item value="h5" fontSize="sm" fontWeight="normal">
                 <Heading5Icon />
-                &nbsp;Heading 5
+                &nbsp;{t("Heading 5")}
               </Menu.Item>
               <Menu.Item value="h6" fontSize="sm" fontWeight="light">
                 <Heading6Icon />
-                &nbsp;Heading 6
+                &nbsp;{t("Heading 6")}
               </Menu.Item>
             </Menu.Content>
           </Menu.Positioner>
@@ -107,7 +110,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.bold.isActive ? "subtle" : "ghost"}
-        title="Toggle bold text"
+        title={t("Toggle bold text")}
         onClick={format.bold.toggle}
       >
         <BoldIcon />
@@ -116,7 +119,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.italic.isActive ? "subtle" : "ghost"}
-        title="Toggle italic text"
+        title={t("Toggle italic text")}
         onClick={format.italic.toggle}
       >
         <ItalicIcon />
@@ -125,7 +128,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.strike.isActive ? "subtle" : "ghost"}
-        title="Toggle strikeout text"
+        title={t("Toggle strikeout text")}
         onClick={format.strike.toggle}
       >
         <StrikethroughIcon />
@@ -134,7 +137,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.code.isActive ? "subtle" : "ghost"}
-        title="Toggle inline code snippet"
+        title={t("Toggle inline code snippet")}
         onClick={format.code.toggle}
       >
         <CodeIcon />
@@ -146,7 +149,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.blockquote.isActive ? "subtle" : "ghost"}
-        title="Toggle quote"
+        title={t("Toggle quote")}
         onClick={format.blockquote.toggle}
       >
         <TextQuoteIcon />
@@ -156,7 +159,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.pre.isActive ? "subtle" : "ghost"}
-        title="Toggle code block"
+        title={t("Toggle code block")}
         onClick={format.pre.toggle}
       >
         <CodeSquareIcon />
@@ -166,7 +169,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.bulletList.isActive ? "subtle" : "ghost"}
-        title="Toggle bullet points"
+        title={t("Toggle bullet points")}
         onClick={format.bulletList.toggle}
       >
         <ListIcon />
@@ -176,7 +179,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         type="button"
         size="xs"
         variant={format.orderedList.isActive ? "subtle" : "ghost"}
-        title="Toggle numbered list"
+        title={t("Toggle numbered list")}
         onClick={format.orderedList.toggle}
       >
         <ListOrderedIcon />
@@ -188,7 +191,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
           variant: "ghost",
         })}
         htmlFor={`filepicker-${uniqueID}`}
-        title="Insert an image"
+        title={t("Insert an image")}
       >
         <ImageIcon />
       </label>

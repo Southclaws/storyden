@@ -110,6 +110,24 @@ func (s *Settings) Merge(updated Settings) error {
 	return nil
 }
 
+func (s *Settings) Clone() (*Settings, error) {
+	if s == nil {
+		return nil, nil
+	}
+
+	b, err := json.Marshal(s)
+	if err != nil {
+		return nil, err
+	}
+
+	var clone Settings
+	if err := json.Unmarshal(b, &clone); err != nil {
+		return nil, err
+	}
+
+	return &clone, nil
+}
+
 func mapSettings(in *ent.Setting) (*Settings, error) {
 	if in.ID != StorydenPrimarySettingsKey {
 		return nil, fault.New("mapSettings was passed a non-system settings row")

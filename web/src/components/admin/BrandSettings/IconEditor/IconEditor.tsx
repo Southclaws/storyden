@@ -3,6 +3,7 @@ import AvatarEditor from "react-avatar-editor";
 import { Button } from "@/components/ui/button";
 import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { SaveIcon } from "@/components/ui/icons/Save";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
@@ -11,6 +12,7 @@ import { Props, useIconEditor } from "./useIconEditor";
 const editorStyle = { backgroundColor: "var(--colors-gray-100)" };
 
 export function IconEditor(props: Props) {
+  const { t } = useI18n();
   const { ref, position, setPosition, onFileChange, onSave, saving, file } =
     useIconEditor(props);
 
@@ -33,7 +35,7 @@ export function IconEditor(props: Props) {
             w="full"
             className={button({ size: "xs", variant: "outline" })}
           >
-            <MediaAddIcon /> Upload icon
+            <MediaAddIcon /> {t("Upload icon")}
           </styled.label>
           <Button
             size="xs"
@@ -42,7 +44,7 @@ export function IconEditor(props: Props) {
             onClick={onSave}
             disabled={saving}
           >
-            <SaveIcon /> Save icon
+            <SaveIcon /> {t("Save icon")}
           </Button>
         </HStack>
       </>

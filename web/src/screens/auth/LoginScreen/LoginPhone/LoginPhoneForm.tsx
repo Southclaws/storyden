@@ -1,3 +1,3 @@
 export function LoginPhoneForm() {
-  return <>NOT IMPLEMENTED (YET)</>;
+  return null;
 }

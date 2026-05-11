@@ -2,10 +2,12 @@ import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
 import { ListCollectionItem } from "@/components/ui/form/SelectField";
+import { useI18n } from "@/i18n/provider";
 
 export const NO_CATEGORY_VALUE = "__none__";
 
 export function useCategorySelect() {
+  const { t } = useI18n();
   const { data, error } = useCategoryList();
 
   if (!data) {
@@ -25,7 +27,7 @@ export function useCategorySelect() {
 
   const collection = createListCollection({
     items: [
-      { label: "No category", value: NO_CATEGORY_VALUE },
+      { label: t("No category"), value: NO_CATEGORY_VALUE },
       ...data.categories.map((category) => ({
         label: category.name,
         value: category.id,

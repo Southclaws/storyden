@@ -11,6 +11,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { Input } from "@/components/ui/input";
 import { getAPIAddress } from "@/config";
+import { useI18n } from "@/i18n/provider";
 import { LStack, WStack } from "@/styled-system/jsx";
 
 import {
@@ -23,17 +24,18 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
   const { form, createdSecret, handleSubmit } = useCreateAccessKeyScreen({
     onClose,
   });
+  const { t } = useI18n();
 
   if (createdSecret) {
     return (
       <LStack h="full" gap="8" justifyContent="space-between">
         <LStack>
-          <Heading>Access Key Created</Heading>
+          <Heading>{t("Access Key Created")}</Heading>
           <p>
             <strong>
-              This is the only time you&apos;ll see this access key.
+              {t("This is the only time you'll see this access key.")}
             </strong>{" "}
-            Make sure to copy and store it securely.
+            {t("Make sure to copy and store it securely.")}
           </p>
 
           <WStack>
@@ -55,18 +57,19 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
 
           <LStack>
             <p>
-              To use your new access key with this site, include it as an
-              Authorization header with requests to the API.
+              {t(
+                "To use your new access key with this site, include it as an Authorization header with requests to the API.",
+              )}
             </p>
 
             <Heading size="sm" color="fg.muted">
-              Header format:
+              {t("Header format:")}
             </Heading>
 
             <pre>Authorization: Bearer {createdSecret}</pre>
 
             <Heading size="sm" color="fg.muted">
-              API and MCP endpoints:
+              {t("API and MCP endpoints:")}
             </Heading>
 
             <pre>
@@ -79,7 +82,7 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
 
         <WStack>
           <Button onClick={onClose} style={{ width: "100%" }}>
-            Done
+            {t("Done")}
           </Button>
         </WStack>
       </LStack>
@@ -91,25 +94,26 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
       <LStack gap="4">
         <div>
           <h3 style={{ marginBottom: "0.5rem", fontWeight: "600" }}>
-            Create Access Key
+            {t("Create Access Key")}
           </h3>
           <p style={{ fontSize: "0.875rem", color: "var(--colors-gray-600)" }}>
-            Access keys allow you to authenticate API requests. They share the
-            same permissions as your account.
+            {t(
+              "Access keys allow you to authenticate API requests. They share the same permissions as your account.",
+            )}
           </p>
         </div>
 
         <FormControl>
-          <FormLabel>Name</FormLabel>
+          <FormLabel>{t("Name")}</FormLabel>
           <Input
             {...form.register("name")}
-            placeholder="e.g., Mobile App, CI/CD Pipeline"
+            placeholder={t("e.g., Mobile App, CI/CD Pipeline")}
           />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Expiry Date (Optional)</FormLabel>
+          <FormLabel>{t("Expiry Date (Optional)")}</FormLabel>
           <DatePickerInputField<Form>
             name="expires_at"
             control={form.control}
@@ -120,7 +124,7 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
             {form.formState.errors.expires_at?.message}
           </FormErrorText>
           <p style={{ fontSize: "0.75rem", color: "var(--colors-gray-500)" }}>
-            Leave empty for no expiry
+            {t("Leave empty for no expiry")}
           </p>
         </FormControl>
 
@@ -131,14 +135,14 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
             onClick={onClose}
             style={{ flex: 1 }}
           >
-            Cancel
+            {t("Cancel")}
           </Button>
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}
             style={{ flex: 1 }}
           >
-            Create Key
+            {t("Create Key")}
           </Button>
         </WStack>
       </LStack>

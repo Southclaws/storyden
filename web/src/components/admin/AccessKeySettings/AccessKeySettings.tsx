@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { PermissionDetails } from "@/lib/permission/permission";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
@@ -23,13 +24,14 @@ type Props = {
 };
 
 export function AccessKeySettings({ keys }: Props) {
+  const { t } = useI18n();
   const { revokeKey } = useAdminAccessKeyList();
 
   if (keys.length === 0) {
     return (
       <CardBox className={lstack()}>
-        <Heading size="md">Access keys</Heading>
-        <p>No access keys have been created yet.</p>
+        <Heading size="md">{t("Access keys")}</Heading>
+        <p>{t("No access keys have been created yet.")}</p>
       </CardBox>
     );
   }
@@ -40,25 +42,29 @@ export function AccessKeySettings({ keys }: Props) {
 
   return (
     <CardBox className={lstack()}>
-      <Heading size="md">Access keys</Heading>
-      <p>All access keys created by members of this site.</p>
+      <Heading size="md">{t("Access keys")}</Heading>
+      <p>{t("All access keys created by members of this site.")}</p>
       <div>
         <span>
-          <WarningIcon display="inline" width="4" /> <strong>Note:</strong> if
-          you revoke the ability to use access keys from a role or member (by
-          removing the{" "}
+          <WarningIcon display="inline" width="4" />{" "}
+          <strong>{t("Note:")}</strong>{" "}
+          {t(
+            "If you revoke the ability to use access keys from a role or member (by removing the",
+          )}{" "}
           {<PermissionBadge permission={Permission.USE_PERSONAL_ACCESS_KEYS} />}{" "}
-          permission), this will not revoke their existing access keys.
+          {t("permission), this will not revoke their existing access keys.")}
         </span>
       </div>
 
       <WStack alignItems="center" color="fg.muted">
         {hasInactive ? (
           <styled.p>
-            {totalKeys} access keys, {totalActiveKeys} active.
+            {totalKeys} {t("access keys")}, {totalActiveKeys} {t("active")}.
           </styled.p>
         ) : (
-          <styled.p>{keys.length} access keys.</styled.p>
+          <styled.p>
+            {keys.length} {t("access keys")}.
+          </styled.p>
         )}
       </WStack>
 
@@ -81,6 +87,7 @@ type AccessKeyItemProps = {
 };
 
 function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
+  const { t } = useI18n();
   const { isConfirming, handleConfirmAction, handleCancelAction } =
     useConfirmation(onRevoke);
 
@@ -108,14 +115,14 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                     bgColor="bg.destructive"
                     onClick={handleConfirmAction}
                   >
-                    Confirm Revoke
+                    {t("Confirm Revoke")}
                   </Button>
                   <Button
                     size="xs"
                     variant="outline"
                     onClick={handleCancelAction}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </>
               ) : (
@@ -125,23 +132,24 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                   bgColor="bg.destructive"
                   onClick={handleConfirmAction}
                 >
-                  Revoke
+                  {t("Revoke")}
                 </Button>
               )}
             </HStack>
           ) : (
-            <Badge>{inactiveStatus}</Badge>
+            <Badge>{t(inactiveStatus)}</Badge>
           )}
         </WStack>
 
         <WStack flexWrap="wrap">
           <styled.p fontSize="xs">
-            Created: <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
+            {t("Created")}:{" "}
+            <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
           </styled.p>
 
           {accessKey.expires_at && (
             <Badge gap="1">
-              <span>Expiry:</span>
+              <span>{t("Expiry")}:</span>
               <time>{formatDate(accessKey.expires_at, "PPpp")}</time>
             </Badge>
           )}

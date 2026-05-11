@@ -1,9 +1,12 @@
 import Link from "next/link";
 
 import { Node } from "@/api/openapi-schema";
+import { useI18n } from "@/i18n/provider";
 import { styled } from "@/styled-system/jsx";
 
 export function LibraryBadge() {
+  const { t } = useI18n();
+
   return (
     <styled.span
       position="relative"
@@ -12,7 +15,7 @@ export function LibraryBadge() {
       px="1"
       borderRadius="md"
     >
-      <Link href="/l">library</Link>
+      <Link href="/l">{t("library")}</Link>
     </styled.span>
   );
 }
@@ -35,6 +38,8 @@ export function LibraryPageBadge(props: Node) {
 
 // TODO: Make this a recipe component.
 export function NewBadge() {
+  const { t } = useI18n();
+
   return (
     <styled.span
       fontSize="xs"
@@ -45,7 +50,7 @@ export function NewBadge() {
       py="0.5"
       borderRadius="sm"
     >
-      New
+      {t("New")}
     </styled.span>
   );
 }

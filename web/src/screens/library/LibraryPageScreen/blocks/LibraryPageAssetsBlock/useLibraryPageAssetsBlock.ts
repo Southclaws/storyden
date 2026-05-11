@@ -1,6 +1,7 @@
 import { handle } from "@/api/client";
 import { nodeAddAsset, nodeRemoveAsset } from "@/api/openapi-client/nodes";
 import { Asset } from "@/api/openapi-schema";
+import { useI18n } from "@/i18n/provider";
 import { useLibraryMutation } from "@/lib/library/library";
 
 import { useLibraryPageContext } from "../../Context";
@@ -9,6 +10,7 @@ import { useEditState } from "../../useEditState";
 import { useBlock } from "../useBlock";
 
 export function useLibraryPageAssetsBlock() {
+  const { t } = useI18n();
   const { editing } = useEditState();
   const { nodeID, store } = useLibraryPageContext();
   const block = useBlock("assets");
@@ -36,8 +38,8 @@ export function useLibraryPageAssetsBlock() {
       },
       {
         promiseToast: {
-          loading: "Uploading...",
-          success: "Added new media",
+          loading: t("Uploading..."),
+          success: t("Added new media"),
         },
         cleanup: async () => await revalidate(),
       },
@@ -52,8 +54,8 @@ export function useLibraryPageAssetsBlock() {
       },
       {
         promiseToast: {
-          loading: "Removing...",
-          success: "Removed media",
+          loading: t("Removing..."),
+          success: t("Removed media"),
         },
         cleanup: async () => await revalidate(),
       },

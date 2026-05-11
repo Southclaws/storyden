@@ -1,7 +1,5 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
-
 import { Unready } from "src/components/site/Unready";
 
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
@@ -18,6 +16,7 @@ import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import {
   Box,
   CardBox,
@@ -27,10 +26,12 @@ import {
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
+import { relativeTimestamp } from "@/utils/date";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
 
 export function ProfileScreen(props: Props) {
+  const { locale, t } = useI18n();
   const { ready, error, form, state, data, handlers } = useProfileScreen(props);
 
   if (!ready) {
@@ -99,14 +100,14 @@ export function ProfileScreen(props: Props) {
             <HStack justify="end">
               {isSelf &&
                 (isEditing ? (
-                  <SaveAction size="sm">Save</SaveAction>
+                  <SaveAction size="sm">{t("Save")}</SaveAction>
                 ) : (
                   <EditAction
                     size="sm"
                     variant="ghost"
                     onClick={handlers.handleSetEditing}
                   >
-                    Edit
+                    {t("Edit")}
                   </EditAction>
                 ))}
               <MemberOptionsMenu profile={profile} asChild>
@@ -117,11 +118,9 @@ export function ProfileScreen(props: Props) {
 
           <HStack gap="1">
             <styled.p color="fg.muted" wordBreak="keep-all">
-              Joined{" "}
+              {t("Joined")}{" "}
               <styled.time textWrap="nowrap">
-                {formatDistanceToNow(new Date(profile.createdAt), {
-                  addSuffix: true,
-                })}
+                {relativeTimestamp(new Date(profile.createdAt), locale)}
               </styled.time>
             </styled.p>
             <DotSeparator />
@@ -134,13 +133,15 @@ export function ProfileScreen(props: Props) {
               <Box flexShrink="0">
                 <LikeIcon w="4" />
               </Box>
-              <span>{profile.like_score} likes</span>
+              <span>
+                {t("{{count}} likes", { count: profile.like_score })}
+              </span>
             </HStack>
           </HStack>
 
           {isEmpty && !isEditing ? (
             <styled.p color="fg.subtle" fontStyle="italic">
-              This profile has no bio yet...
+              {t("This profile has no bio yet...")}
             </styled.p>
           ) : (
             <ContentFormField<Form>
@@ -148,14 +149,14 @@ export function ProfileScreen(props: Props) {
               name="bio"
               initialValue={profile.bio}
               disabled={!isEditing}
-              placeholder="This profile has no bio yet..."
+              placeholder={t("This profile has no bio yet...")}
             />
           )}
 
           {signaturesEnabled &&
             (isSignatureEmpty && !isEditing ? (
               <styled.p color="fg.subtle" fontStyle="italic">
-                This profile has no signature yet...
+                {t("This profile has no signature yet...")}
               </styled.p>
             ) : (
               <ContentFormField<Form>
@@ -163,7 +164,7 @@ export function ProfileScreen(props: Props) {
                 name="signature"
                 initialValue={profile.signature ?? ""}
                 disabled={!isEditing}
-                placeholder="This profile has no signature yet..."
+                placeholder={t("This profile has no signature yet...")}
               />
             ))}
         </styled.form>

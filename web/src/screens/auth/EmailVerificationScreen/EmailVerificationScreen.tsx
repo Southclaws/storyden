@@ -15,12 +15,15 @@ import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { PinInputField } from "@/components/ui/form/PinInputField";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import { vstack } from "@/styled-system/patterns";
 
-export const FormSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  code: z.string().length(6, "Please enter the 6 digit code from your email."),
-});
+const getFormSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().email(t("Please enter a valid email address")),
+    code: z.string().length(6, t("Please enter the 6 digit code from your email.")),
+  });
+export const FormSchema = getFormSchema((key) => key);
 export type Form = z.infer<typeof FormSchema>;
 
 type Props = {
@@ -30,12 +33,13 @@ type Props = {
 
 export function EmailVerificationScreen(props: Props) {
   const router = useRouter();
+  const { t } = useI18n();
   const probablyEmail = props.initialAccount?.email_addresses.find(
     (e) => e.verified === false,
   );
 
   const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(getFormSchema(t)),
     defaultValues: {
       email: probablyEmail?.email_address,
     },
@@ -55,7 +59,7 @@ export function EmailVerificationScreen(props: Props) {
         errorToast: false,
         async onError(e) {
           form.setError("root", {
-            message: "Invalid email or code.",
+            message: t("Invalid email or code."),
           });
         },
       },
@@ -64,13 +68,13 @@ export function EmailVerificationScreen(props: Props) {
 
   return (
     <form className={vstack()} onSubmit={handleSubmit}>
-      <Heading>Verify your email address.</Heading>
-      <p>Check your email for a 6 digit code.</p>
+      <Heading>{t("Verify your email address.")}</Heading>
+      <p>{t("Check your email for a 6 digit code.")}</p>
 
       <FormControl>
         <Input
           type="email"
-          placeholder="Email address..."
+          placeholder={t("Email address...")}
           {...form.register("email")}
         />
         <FormErrorText>{form.formState.errors["email"]?.message}</FormErrorText>
@@ -86,14 +90,14 @@ export function EmailVerificationScreen(props: Props) {
         loading={form.formState.isSubmitting}
         disabled={!form.formState.isValid}
       >
-        Verify
+        {t("Verify")}
       </Button>
 
       <FormErrorText>{form.formState.errors["root"]?.message}</FormErrorText>
 
       {props.returnURL && (
         <Link className="link" href={props.returnURL}>
-          Back to previous page
+          {t("Back to previous page")}
         </Link>
       )}
     </form>

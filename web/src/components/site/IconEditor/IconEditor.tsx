@@ -4,12 +4,14 @@ import AvatarEditor from "react-avatar-editor";
 import { avatarSize } from "@/components/member/MemberBadge/MemberAvatar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
+import { useI18n } from "@/i18n/provider";
 import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 import { Props, useIconEditor } from "./useIconEditor";
 
 export function IconEditor(props: Props) {
+  const { t } = useI18n();
   const {
     ref,
     pinchCaptureRef,
@@ -48,7 +50,7 @@ export function IconEditor(props: Props) {
             onPositionChange={onPositionChange}
           />
           <ArrowLeftIcon width="4" />
-          <p>How it&apos;ll look on posts</p>
+          <p>{t("How it'll look on posts")}</p>
         </HStack>
       )}
 
@@ -92,7 +94,7 @@ export function IconEditor(props: Props) {
             })}
             htmlFor="icon-editor__file-input"
           >
-            Edit
+            {t("Edit")}
           </styled.label>
           <Button
             flexGrow="1"
@@ -102,7 +104,7 @@ export function IconEditor(props: Props) {
             onClick={onSave}
             disabled={!isDirty || saving}
           >
-            Save
+            {t("Save")}
           </Button>
         </Flex>
       </LStack>

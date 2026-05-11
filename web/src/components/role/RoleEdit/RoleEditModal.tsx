@@ -10,6 +10,7 @@ import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { EditIcon } from "@/components/ui/icons/Edit";
+import { useI18n } from "@/i18n/provider";
 import { isDefaultRole, isEditableDefaultRole } from "@/lib/role/defaults";
 import { DefaultRoleMetadata } from "@/lib/role/metadata";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
@@ -23,12 +24,14 @@ export function RoleEditModal({
   onOpen,
   isOpen,
 }: UseDisclosureProps & Props) {
+  const { t } = useI18n();
+
   return (
     <ModalDrawer
       onOpen={onOpen}
       isOpen={isOpen}
       onClose={onClose}
-      title={`Edit role: ${role.name}`}
+      title={t("Edit role: {{name}}", { name: t(role.name) })}
     >
       <RoleEditScreen role={role} onSave={onClose} />
     </ModalDrawer>
@@ -36,13 +39,16 @@ export function RoleEditModal({
 }
 
 export function RoleEditModalTrigger({ role }: Props) {
+  const { t } = useI18n();
   const disclosure = useDisclosure();
 
   const isDefault = isDefaultRole(role);
   const isEditable = isEditableDefaultRole(role);
   const cannotEdit = isDefault && !isEditable;
 
-  const titleLabel = cannotEdit ? "You cannot edit this role" : "Edit role";
+  const titleLabel = cannotEdit
+    ? t("You cannot edit this role")
+    : t("Edit role");
 
   return (
     <>
@@ -67,6 +73,7 @@ export function RoleEditModalTrigger({ role }: Props) {
 }
 
 export function RoleCreateModalTrigger() {
+  const { t } = useI18n();
   const [newRole, setNewRole] = useState<Role | null>(null);
   const disclosure = useDisclosure();
   const { mutate } = useSWRConfig();
@@ -93,8 +100,8 @@ export function RoleCreateModalTrigger() {
       },
       {
         promiseToast: {
-          loading: "Creating role...",
-          success: "New role created",
+          loading: t("Creating role..."),
+          success: t("New role created"),
         },
       },
     );
@@ -103,7 +110,7 @@ export function RoleCreateModalTrigger() {
   return (
     <>
       <IconButton px="2" variant="subtle" size="xs" onClick={handleCreate}>
-        <CreateIcon /> Create role
+        <CreateIcon /> {t("Create role")}
       </IconButton>
 
       {newRole && <RoleEditModal {...disclosure} role={newRole} />}

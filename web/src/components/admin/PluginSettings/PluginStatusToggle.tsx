@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RunningAnimatedIcon } from "@/components/ui/icons/RunningAnimatedIcon";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 
 import { isPluginStatusActive } from "./utils";
@@ -20,6 +21,7 @@ import { isPluginStatusActive } from "./utils";
 type Props = { plugin: Plugin };
 
 export function PluginStatusToggle({ plugin }: Props) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const [transitioningTo, setTransitioningTo] =
     useState<PluginActiveState | null>(null);
@@ -69,8 +71,8 @@ export function PluginStatusToggle({ plugin }: Props) {
 
   const displayState = transitioningTo ?? activeState;
   const statusLabel = isTransitioning
-    ? getTransitionLabel(activeState, transitioningTo!)
-    : getStatusLabel(displayState);
+    ? getTransitionLabel(activeState, transitioningTo!, t)
+    : getStatusLabel(displayState, t);
 
   const icon = (() => {
     switch (displayState) {
@@ -88,13 +90,13 @@ export function PluginStatusToggle({ plugin }: Props) {
   const actionLabel = (() => {
     switch (activeState) {
       case PluginActiveState.active:
-        return "Disable";
+        return t("Disable");
       case PluginActiveState.inactive:
-        return "Enable";
+        return t("Enable");
       case PluginActiveState.error:
-        return "Retry";
+        return t("Retry");
       default:
-        return "Unknown";
+        return t("Unknown");
     }
   })();
 
@@ -166,36 +168,37 @@ export function PluginStatusToggle({ plugin }: Props) {
   );
 }
 
-function getStatusLabel(activeState: PluginActiveState) {
+function getStatusLabel(activeState: PluginActiveState, t: (key: string) => string) {
   switch (activeState) {
     case PluginActiveState.active:
-      return "Running";
+      return t("Running");
     case PluginActiveState.inactive:
-      return "Disabled";
+      return t("Disabled");
     case PluginActiveState.error:
-      return "Error";
+      return t("Error");
     default:
-      return "Unknown";
+      return t("Unknown");
   }
 }
 
 function getTransitionLabel(
   fromState: PluginActiveState,
   toState: PluginActiveState,
+  t: (key: string) => string,
 ) {
   if (
     fromState === PluginActiveState.active &&
     toState === PluginActiveState.inactive
   ) {
-    return "Disabling";
+    return t("Disabling");
   }
 
   if (
     fromState === PluginActiveState.inactive &&
     toState === PluginActiveState.active
   ) {
-    return "Enabling";
+    return t("Enabling");
   }
 
-  return `Pending`;
+  return t("Pending");
 }

@@ -2,6 +2,7 @@ import { Portal } from "@ark-ui/react";
 import { useEffect, useRef, useState } from "react";
 
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { Box, HStack, WStack } from "@/styled-system/jsx";
 import {
   ButtonVariantProps,
@@ -58,6 +59,7 @@ export function MultiSelectPicker({
   menuVariantProps,
   inputVariantProps,
 }: Props) {
+  const { t } = useI18n();
   const [queryInput, setQueryInput] = useState("");
   const [hiddenCount, setHiddenCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -262,7 +264,7 @@ export function MultiSelectPicker({
             </>
           ) : (
             <Text size="sm" color="fg.muted">
-              {inputPlaceholder || "Select items..."}
+              {inputPlaceholder || t("Select items...")}
             </Text>
           )}
         </HStack>
@@ -275,8 +277,8 @@ export function MultiSelectPicker({
               <Input
                 size={size}
                 value={queryInput}
-                placeholder="Search..."
-                aria-label="Search for items"
+                placeholder={t("Search...")}
+                aria-label={t("Search for items")}
                 {...inputVariantProps}
                 onChange={handleQuery}
                 onKeyDown={handleKeyDown}
@@ -285,7 +287,7 @@ export function MultiSelectPicker({
 
             {value.length > 0 && (
               <Menu.ItemGroup>
-                <Menu.ItemGroupLabel>Selected</Menu.ItemGroupLabel>
+                <Menu.ItemGroupLabel>{t("Selected")}</Menu.ItemGroupLabel>
                 {value.map((item) => {
                   return (
                     <Menu.Item
@@ -316,7 +318,7 @@ export function MultiSelectPicker({
               <>
                 {filteredQueryResults && filteredQueryResults.length > 0 && (
                   <Menu.ItemGroup>
-                    <Menu.ItemGroupLabel>Results</Menu.ItemGroupLabel>
+                    <Menu.ItemGroupLabel>{t("Results")}</Menu.ItemGroupLabel>
                     {filteredQueryResults.map((item) => {
                       return (
                         <Menu.Item
@@ -334,13 +336,13 @@ export function MultiSelectPicker({
 
                 {showCreateNew && (
                   <Menu.ItemGroup>
-                    <Menu.ItemGroupLabel>Create new</Menu.ItemGroupLabel>
+                    <Menu.ItemGroupLabel>{t("Create new")}</Menu.ItemGroupLabel>
                     <Menu.Item
                       value={`new-${queryInput}`}
                       closeOnSelect={false}
                       onSelect={handleAddNewValue}
                     >
-                      Create "{queryInput}"
+                      {t("Create {{value}}", { value: `"${queryInput}"` })}
                     </Menu.Item>
                   </Menu.ItemGroup>
                 )}
@@ -351,7 +353,7 @@ export function MultiSelectPicker({
                   !showCreateNew && (
                     <Menu.ItemGroup p="2">
                       <Text size="sm" color="fg.subtle">
-                        No results found
+                        {t("No results found")}
                       </Text>
                     </Menu.ItemGroup>
                   )}

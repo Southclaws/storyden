@@ -32,9 +32,10 @@ type SettingsRepository struct {
 	// cached stores the most recent copy of all the settings from the database.
 	// Directly changing settings via external database queries will result in
 	// settings not immediately updating so it's advised to always go via API.
-	cachedSettings *xsync.Map[string, any]
+	cachedSettings *xsync.Map[string, *Settings]
 
-	// mutex protects access to cacheLastFetch
+	settingsMu sync.Mutex
+
 	cacheMu        sync.RWMutex
 	cacheLastFetch time.Time
 }
@@ -44,7 +45,7 @@ func New(ctx context.Context, lc fx.Lifecycle, logger *slog.Logger, db *ent.Clie
 		logger:         logger,
 		db:             db,
 		config:         cfg,
-		cachedSettings: xsync.NewMap[string, any](),
+		cachedSettings: xsync.NewMap[string, *Settings](),
 	}
 
 	lc.Append(fx.StartHook(func() error {
@@ -75,7 +76,22 @@ func (d *SettingsRepository) initDefaults(ctx context.Context) error {
 }
 
 func (d *SettingsRepository) Get(ctx context.Context) (*Settings, error) {
-	s, ok := d.tryCached()
+	s, ok, err := d.tryCached()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if ok {
+		go d.recache(ctx)
+		return s, nil
+	}
+
+	d.settingsMu.Lock()
+	defer d.settingsMu.Unlock()
+
+	s, ok, err = d.tryCached()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	if ok {
 		go d.recache(ctx)
 		return s, nil
@@ -86,16 +102,27 @@ func (d *SettingsRepository) Get(ctx context.Context) (*Settings, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	d.cache(settings)
+	if err := d.cache(settings); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return settings, nil
 }
 
 // Set will merge a partial update into the current settings and save new data.
 func (d *SettingsRepository) Set(ctx context.Context, s Settings) (*Settings, error) {
-	current, err := d.Get(ctx)
+	d.settingsMu.Lock()
+	defer d.settingsMu.Unlock()
+
+	current, ok, err := d.tryCached()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !ok {
+		current, err = d.get(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	err = current.Merge(s)
@@ -121,7 +148,9 @@ func (d *SettingsRepository) Set(ctx context.Context, s Settings) (*Settings, er
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	d.cache(settings)
+	if err := d.cache(settings); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return settings, nil
 }
@@ -162,29 +191,39 @@ func (d *SettingsRepository) get(ctx context.Context) (*Settings, error) {
 	return settings, nil
 }
 
-func (d *SettingsRepository) tryCached() (*Settings, bool) {
-	v, ok := d.cachedSettings.Load(StorydenPrimarySettingsKey)
+func (d *SettingsRepository) tryCached() (*Settings, bool, error) {
+	s, ok := d.cachedSettings.Load(StorydenPrimarySettingsKey)
 	if !ok {
-		return nil, false
+		return nil, false, nil
 	}
 
-	s, ok := v.(*Settings)
-	if !ok {
-		return nil, false
+	clone, err := s.Clone()
+	if err != nil {
+		return nil, false, err
 	}
 
-	return s, true
+	return clone, true, nil
 }
 
-func (d *SettingsRepository) cache(s *Settings) {
-	d.cachedSettings.Store(StorydenPrimarySettingsKey, s)
+func (d *SettingsRepository) cache(s *Settings) error {
+	clone, err := s.Clone()
+	if err != nil {
+		return err
+	}
+
+	d.cachedSettings.Store(StorydenPrimarySettingsKey, clone)
 
 	d.cacheMu.Lock()
 	d.cacheLastFetch = time.Now()
 	d.cacheMu.Unlock()
+
+	return nil
 }
 
 func (d *SettingsRepository) recache(ctx context.Context) {
+	d.settingsMu.Lock()
+	defer d.settingsMu.Unlock()
+
 	d.cacheMu.RLock()
 	timeSinceLastFetch := time.Since(d.cacheLastFetch)
 	d.cacheMu.RUnlock()
@@ -203,11 +242,9 @@ func (d *SettingsRepository) recache(ctx context.Context) {
 		return
 	}
 
-	// NOTE: There's a small chance of stale data here if an update occurs since
-	// recache was called (via goroutine) but before the cache is updated. This
-	// should be resolved at some point via a database key staleness timestamp.
-
-	d.cache(settings)
+	if err := d.cache(settings); err != nil {
+		d.logger.Error("failed to cache settings", slog.String("error", err.Error()))
+	}
 }
 
 // NOTE: There's currently no way to reset/delete or work with non-system data.

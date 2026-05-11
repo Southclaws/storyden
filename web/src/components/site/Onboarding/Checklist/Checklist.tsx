@@ -6,6 +6,7 @@ import { CategoryCreateModal } from "src/components/category/CategoryCreate/Cate
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
+import { useI18n } from "@/i18n/provider";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { ChecklistItem } from "./ChecklistItem";
@@ -17,15 +18,16 @@ type Props = {
 };
 
 export function Checklist({ onboardingStatus, onFinish }: Props) {
+  const { t } = useI18n();
   const { onOpen, isOpen, onClose, isLoggedIn } = useChecklist();
 
   return (
     <VStack width="full" height="full" justify="start" pt="4" pb="16">
-      <Heading size="lg">Welcome to Storyden!</Heading>
+      <Heading size="lg">{t("Welcome to Storyden!")}</Heading>
       <styled.p p="2" textAlign="center">
-        Get your community set up
+        {t("Get your community set up")}
         <br />
-        with the following steps:
+        {t("with the following steps:")}
       </styled.p>
       <styled.ol
         display="flex"
@@ -37,24 +39,26 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
         <ChecklistItem
           step={1}
           current={onboardingStatus}
-          title="Create an account"
+          title={t("Create an account")}
           url="/register"
         >
           <styled.p>
-            Start by creating an account. The first registration is
-            automatically given administrator rights!
+            {t(
+              "Start by creating an account. The first registration is automatically given administrator rights!",
+            )}
           </styled.p>
         </ChecklistItem>
 
         <ChecklistItem
           step={2}
           current={onboardingStatus}
-          title="Create a category"
+          title={t("Create a category")}
           onClick={onOpen}
         >
           <styled.p>
-            Posts need to live somewhere! So create your first category, give it
-            a name and set it up just how you like!
+            {t(
+              "Posts need to live somewhere! So create your first category, give it a name and set it up just how you like!",
+            )}
           </styled.p>
           <CategoryCreateModal onClose={onClose} isOpen={isOpen} />
         </ChecklistItem>
@@ -62,19 +66,22 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
         <ChecklistItem
           step={3}
           current={onboardingStatus}
-          title="Write your first post"
+          title={t("Write your first post")}
           url="/new"
         >
           <styled.p>
-            An intro, a thesis, a manifesto, a set of rules or just a hi! Get
-            started on your first post in your new category!
+            {t(
+              "An intro, a thesis, a manifesto, a set of rules or just a hi! Get started on your first post in your new category!",
+            )}
           </styled.p>
         </ChecklistItem>
 
         <VStack textAlign="center" px="2">
-          <Heading size="md">Invite your people</Heading>
+          <Heading size="md">{t("Invite your people")}</Heading>
           <styled.p>
-            And you&apos;re ready to go! Spread the word and let the posts flow.
+            {t(
+              "And you're ready to go! Spread the word and let the posts flow.",
+            )}
           </styled.p>
 
           <styled.p>
@@ -83,14 +90,14 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
               colorPalette="accent"
               href="https://www.storyden.org/docs"
             >
-              Visit the docs
+              {t("Visit the docs")}
             </LinkButton>{" "}
-            for more info if you get stuck.
+            {t("for more info if you get stuck.")}
           </styled.p>
 
           {isLoggedIn && (
             <Button onClick={onFinish}>
-              {isComplete(3, onboardingStatus) ? "Finish" : "Skip"}
+              {isComplete(3, onboardingStatus) ? t("Finish") : t("Skip")}
             </Button>
           )}
         </VStack>
@@ -99,13 +106,15 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
       <hr />
 
       <VStack>
-        <Heading size="sm">Not an admin?</Heading>
+        <Heading size="sm">{t("Not an admin?")}</Heading>
 
         <p>
-          This site is not quite ready to use but you can still browse around!
+          {t(
+            "This site is not quite ready to use but you can still browse around!",
+          )}
         </p>
 
-        <Button onClick={onFinish}>Hide this message</Button>
+        <Button onClick={onFinish}>{t("Hide this message")}</Button>
       </VStack>
     </VStack>
   );

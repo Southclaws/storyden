@@ -5,6 +5,7 @@ import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
 import { Heading } from "@/components/ui/heading";
+import { useI18n } from "@/i18n/provider";
 import { CardBox, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -15,6 +16,7 @@ import {
 
 export function MemberInterfaceSettings(props: Props) {
   const result = useMemberInterfaceSettings(props);
+  const { t } = useI18n();
 
   if (!result.ready) {
     return <Unready />;
@@ -32,41 +34,43 @@ export function MemberInterfaceSettings(props: Props) {
     >
       <CardBox className={lstack()}>
         <WStack>
-          <Heading size="md">Interface settings</Heading>
+          <Heading size="md">{t("Interface settings")}</Heading>
           <Button type="submit" loading={formState.isSubmitting}>
-            Save
+            {t("Save")}
           </Button>
         </WStack>
 
         <FormControl>
-          <FormLabel>Text editor style</FormLabel>
+          <FormLabel>{t("Text editor style")}</FormLabel>
           <RadioGroupField
             control={control}
             name="editorMode"
             items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
+              { label: t("Rich text"), value: "richtext" },
+              { label: t("Markdown"), value: "markdown" },
             ]}
           />
           <FormHelperText>
-            Choose your preferred editor style for composing threads, replies
-            and pages.
+            {t(
+              "Choose your preferred editor style for composing threads, replies and pages.",
+            )}
           </FormHelperText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Sidebar default state</FormLabel>
+          <FormLabel>{t("Sidebar default state")}</FormLabel>
           <RadioGroupField
             control={control}
             name="sidebarDefaultState"
             items={[
-              { label: "Open", value: "open" },
-              { label: "Closed", value: "closed" },
+              { label: t("Open"), value: "open" },
+              { label: t("Closed"), value: "closed" },
             ]}
           />
           <FormHelperText>
-            Choose your preferred default state for the sidebar when you visit
-            the site.
+            {t(
+              "Choose your preferred default state for the sidebar when you visit the site.",
+            )}
           </FormHelperText>
         </FormControl>
       </CardBox>

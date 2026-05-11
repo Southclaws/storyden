@@ -9,6 +9,7 @@ import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { HideIcon } from "@/components/ui/icons/HideIcon";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 
 import { useLibraryPageContext } from "../../Context";
 import { useEditState } from "../../useEditState";
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
+  const { t } = useI18n();
   const { store } = useLibraryPageContext();
   const {
     setChildPropertyHiddenState,
@@ -101,13 +103,13 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
             <Menu.ItemGroup>
               <Menu.Item value="hide-show">
                 <HideIcon />
-                &nbsp;Hide column
+                &nbsp;{column.hidden ? t("Show column") : t("Hide column")}
               </Menu.Item>
 
               {!column.fixed && (
                 <Menu.Item value="delete">
                   <DeleteIcon />
-                  &nbsp;Delete
+                  &nbsp;{t("Delete")}
                 </Menu.Item>
               )}
 

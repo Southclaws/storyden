@@ -2,6 +2,7 @@ import { LoginScreen } from "src/screens/auth/LoginScreen/LoginScreen";
 
 import { OAuthProviderList } from "@/components/auth/OAuthProviderList";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { tServer } from "@/i18n/server";
 import { getProviders } from "@/lib/auth/providers";
 import { getSettings } from "@/lib/settings/settings-server";
 
@@ -22,8 +23,11 @@ export default async function Page() {
 
 export async function generateMetadata() {
   const settings = await getSettings();
+  const login = await tServer("Login");
+  const register = await tServer("Register");
+
   return {
-    title: `Login to ${settings.title}`,
-    description: `Log in or sign up to ${settings.title} - powered by Storyden`,
+    title: `${login} ${settings.title}`,
+    description: `${login} / ${register} ${settings.title} - Storyden`,
   };
 }

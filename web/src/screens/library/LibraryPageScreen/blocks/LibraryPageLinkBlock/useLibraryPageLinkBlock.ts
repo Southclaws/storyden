@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { handle } from "@/api/client";
 import { linkCreate } from "@/api/openapi-client/links";
 import { LinkReference } from "@/api/openapi-schema";
+import { useI18n } from "@/i18n/provider";
 import { isContentEmpty } from "@/lib/content/content";
 import { useLibraryMutation } from "@/lib/library/library";
 
@@ -16,6 +17,7 @@ import { useEmitLibraryContentEvent } from "../LibraryPageContentBlock/events";
 import { useEmitLibraryCoverEvent } from "../LibraryPageCoverBlock/events";
 
 export function useLibraryPageLinkBlock() {
+  const { t } = useI18n();
   const { nodeID, store } = useLibraryPageContext();
   const { setLink, removeLink, setName, setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
@@ -131,7 +133,7 @@ export function useLibraryPageLinkBlock() {
 
   async function handleImport() {
     if (!resolvedLink) {
-      toast.error("No link available to import.");
+      toast.error(t("No link available to import."));
       return;
     }
 
@@ -144,7 +146,6 @@ export function useLibraryPageLinkBlock() {
     data: {
       inputValue,
       resolvedLink,
-      defaultLinkURL,
       isImporting,
     },
     handlers: {

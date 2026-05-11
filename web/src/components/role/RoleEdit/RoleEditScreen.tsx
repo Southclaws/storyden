@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import { Input } from "@/components/ui/input";
+import { useI18n } from "@/i18n/provider";
 import {
   PermissionList,
   buildPermissionList,
@@ -29,6 +30,7 @@ import { lstack } from "@/styled-system/patterns";
 import { Props, useRoleEditScreen } from "./useRoleEdit";
 
 export function RoleEditScreen(props: Props) {
+  const { t } = useI18n();
   const {
     form,
     handlers: { handleSave, handleDelete, handleReset },
@@ -76,19 +78,19 @@ export function RoleEditScreen(props: Props) {
     >
       <LStack px="0.5" maxH="full" pb="1" overflowY="scroll">
         <FormControl>
-          <FormLabel>Name</FormLabel>
+          <FormLabel>{t("Name")}</FormLabel>
           <Input {...form.register("name")} />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Colour</FormLabel>
+          <FormLabel>{t("Colour")}</FormLabel>
           <ColourPickerField control={form.control} name="colour" />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
         <FormControl>
-          <FormLabel>Name Decorations</FormLabel>
+          <FormLabel>{t("Name Decorations")}</FormLabel>
 
           <LStack gap="1">
             <Controller
@@ -102,7 +104,7 @@ export function RoleEditScreen(props: Props) {
                     field.onChange(checked === true);
                   }}
                 >
-                  Bold name
+                  {t("Bold name")}
                 </Checkbox>
               )}
             />
@@ -118,7 +120,7 @@ export function RoleEditScreen(props: Props) {
                     field.onChange(checked === true);
                   }}
                 >
-                  Italic name
+                  {t("Italic name")}
                 </Checkbox>
               )}
             />
@@ -134,11 +136,11 @@ export function RoleEditScreen(props: Props) {
                     field.onChange(checked === true);
                   }}
                 >
-                  Coloured name{" "}
-                  <InfoTip title="Name colour">
-                    Roles are ordered by priority, and the highest priority role
-                    with coloured name enabled will determine the colour of the
-                    member's name.
+                  {t("Coloured name")}{" "}
+                  <InfoTip title={t("Name colour")}>
+                    {t(
+                      "Roles are ordered by priority, and the highest priority role with coloured name enabled will determine the colour of the member's name.",
+                    )}
                   </InfoTip>
                 </Checkbox>
               )}
@@ -147,7 +149,7 @@ export function RoleEditScreen(props: Props) {
         </FormControl>
 
         <FormControl>
-          <FormLabel>Name Preview</FormLabel>
+          <FormLabel>{t("Name Preview")}</FormLabel>
           <LStack gap="1.5">
             <RoleNamePreview
               mode="light"
@@ -166,22 +168,24 @@ export function RoleEditScreen(props: Props) {
         </FormControl>
 
         <FormControl>
-          <FormLabel>Permissions</FormLabel>
+          <FormLabel>{t("Permissions")}</FormLabel>
           {canEditPermissions ? (
             <CardGroupSelect
               control={form.control}
               name="permissions"
               items={permissionList.map((p) => ({
                 value: p.value,
-                label: p.name,
-                description: p.description,
+                label: t(p.name),
+                description: t(p.description),
               }))}
             />
           ) : (
             <styled.p color="fg.muted" fontSize="sm">
               <InfoIcon display="inline" w="4" />
-              &nbsp;You cannot change the permissions granted to the default
-              Admin role. This role implicitly holds all permissions.
+              &nbsp;
+              {t(
+                "You cannot change the permissions granted to the default Admin role. This role implicitly holds all permissions.",
+              )}
             </styled.p>
           )}
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
@@ -197,7 +201,7 @@ export function RoleEditScreen(props: Props) {
                 flexGrow="1"
                 onDelete={handleReset}
               >
-                Reset
+                {t("Reset")}
               </DeleteWithConfirmationButton>
             ) : null}
           </>
@@ -213,7 +217,7 @@ export function RoleEditScreen(props: Props) {
           variant="outline"
           disabled={!form.formState.isDirty}
         >
-          Save
+          {t("Save")}
         </Button>
       </WStack>
     </styled.form>

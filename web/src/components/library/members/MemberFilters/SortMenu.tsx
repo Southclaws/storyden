@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { SortIcon } from "@/components/ui/icons/Sort";
 import * as Menu from "@/components/ui/menu";
+import { useI18n } from "@/i18n/provider";
 import { HStack } from "@/styled-system/jsx";
 
 const SORT_OPTIONS = [
@@ -19,6 +20,7 @@ const SORT_OPTIONS = [
 
 export function SortMenu() {
   const [sort, setSort] = useQueryState("sort", parseAsString);
+  const { t } = useI18n();
 
   const handleSortChange = async (value: string) => {
     await setSort(value);
@@ -26,14 +28,15 @@ export function SortMenu() {
 
   const currentLabel =
     SORT_OPTIONS.find((opt) => opt.value === sort)?.label || "Sort by...";
+  const currentLabelText = t(currentLabel);
 
   return (
     <Menu.Root positioning={{ placement: "bottom-start" }} lazyMount>
       <Menu.Trigger asChild>
-        <Button variant="subtle" size="sm" aria-label="Sort options">
+        <Button variant="subtle" size="sm" aria-label={t("Sort options")}>
           <HStack gap="1">
             <SortIcon />
-            {currentLabel}
+            {currentLabelText}
           </HStack>
         </Button>
       </Menu.Trigger>
@@ -46,10 +49,10 @@ export function SortMenu() {
                 key={option.value}
                 value={option.value}
                 onClick={() => handleSortChange(option.value)}
-                aria-label={option.label}
+                aria-label={t(option.label)}
               >
                 <HStack gap="2" justify="space-between" w="full">
-                  <span>{option.label}</span>
+                  <span>{t(option.label)}</span>
                   {sort === option.value && <CheckIcon />}
                 </HStack>
               </Menu.Item>

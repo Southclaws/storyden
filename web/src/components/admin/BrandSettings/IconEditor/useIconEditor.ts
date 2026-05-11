@@ -1,12 +1,15 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import AvatarEditor from "react-avatar-editor";
 
+import { useI18n } from "@/i18n/provider";
+
 export type Props = {
   initialValue: File | undefined;
   onSave: (f: Blob | null) => Promise<void>;
 };
 
 export function useIconEditor(props: Props) {
+  const { t } = useI18n();
   const ref = useRef<AvatarEditor>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [file, setFile] = useState<File | string>(props.initialValue ?? "");
@@ -21,7 +24,7 @@ export function useIconEditor(props: Props) {
     const file = e.target.files?.[0];
 
     if (!file) {
-      throw new Error("Unexpected problem: File is missing from uploader.");
+      throw new Error(t("Unexpected problem: File is missing from uploader."));
     }
 
     setFile(file);

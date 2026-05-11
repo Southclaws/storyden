@@ -6,6 +6,7 @@ import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { useI18n } from "@/i18n/provider";
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
@@ -24,6 +25,7 @@ export function DeleteWithConfirmationButton({
 }: PropsWithChildren<Props>) {
   const { isConfirming, handleConfirmAction, handleCancelAction } =
     useConfirmation(onDelete);
+  const { t } = useI18n();
 
   if (isConfirming) {
     return (
@@ -41,16 +43,16 @@ export function DeleteWithConfirmationButton({
           className={menuItemColorPalette({ colorPalette: "tomato" })}
           pl="20"
           w="full"
-          title="Confirm delete"
+          title={t("Confirm delete")}
           onClick={onDelete}
         >
-          Are you sure?
+          {t("Are you sure?")}
         </Button>
 
         <IconButton
           type="button"
           variant="ghost"
-          title="Cancel delete"
+          title={t("Cancel delete")}
           onClick={handleCancelAction}
         >
           <CancelIcon />
@@ -64,11 +66,11 @@ export function DeleteWithConfirmationButton({
       {...props}
       type="button"
       className={menuItemColorPalette({ colorPalette: "red" })}
-      title="Delete"
+      title={t("Delete")}
       onClick={handleConfirmAction}
     >
       <HStack gap="1">
-        <DeleteIcon /> {children ?? "Delete"}
+        <DeleteIcon /> {children ?? t("Delete")}
       </HStack>
     </Button>
   );

@@ -1,0 +1,37 @@
+---
+title: Local
+---
+
+The Local runtime runs supervised plugins as normal child processes on the same machine as Storyden.
+
+## Why use Local
+
+- simplest setup
+- no third-party runtime account required
+- easiest option for self-hosted instances where you fully trust your plugins
+
+## Important boundary
+
+Local runtime means local trust.
+
+If you install a supervised plugin from someone else, that code runs on your machine with your machine's network and filesystem visibility.
+
+Read [Security](/docs/extending/security#runtime-boundaries) before installing third-party plugins.
+
+## Configuration
+
+Set:
+
+```bash
+PLUGIN_RUNTIME_PROVIDER=local
+```
+
+This is the default provider if you don't set anything.
+
+Runtime provider configuration is documented in [Configuration Reference](/docs/reference/configuration).
+
+## Notes
+
+- Supervised plugin logs are available in the plugin Logs tab.
+- Storyden manages start/stop/restart for supervised plugins.
+- External plugins are unaffected by runtime provider choice.

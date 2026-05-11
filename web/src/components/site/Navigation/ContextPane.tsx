@@ -1,9 +1,12 @@
 import { PropsWithChildren } from "react";
 
+import { tServer } from "@/i18n/server";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
-export function ContextPane({ children }: PropsWithChildren) {
+export async function ContextPane({ children }: PropsWithChildren) {
+  const poweredBy = await tServer("powered by storyden");
+
   return (
     <styled.nav
       display="flex"
@@ -30,7 +33,7 @@ export function ContextPane({ children }: PropsWithChildren) {
         {/* TODO: Provide links to privacy/terms/etc custom pages */}
         {/* <p>copyright {settings.owner}</p> */}
         {/* <a href={PrivacyRoute}>privacy</a> */}
-        <p>powered by storyden</p>
+        <p>{poweredBy}</p>
       </HStack>
     </styled.nav>
   );

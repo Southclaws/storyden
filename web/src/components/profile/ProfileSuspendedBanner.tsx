@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from "date-fns";
-
+import { useI18n } from "@/i18n/provider";
 import { Box, CardBox, Flex, HStack, styled } from "@/styled-system/jsx";
+import { relativeTimestamp } from "@/utils/date";
 
 import { BanIcon } from "../ui/icons/BanIcon";
 
@@ -9,6 +9,8 @@ type Props = {
 };
 
 export function ProfileSuspendedBanner({ date }: Props) {
+  const { locale, t } = useI18n();
+
   return (
     <CardBox
       p="0"
@@ -19,7 +21,7 @@ export function ProfileSuspendedBanner({ date }: Props) {
       <Box bgColor="bg.error" borderTopRadius="md" pl="3" pr="2" py="1">
         <HStack gap="1" color="fg.error" fontSize="xs">
           <BanIcon w="4" />
-          <p>Suspended</p>
+          <p>{t("Suspended")}</p>
         </HStack>
       </Box>
 
@@ -30,11 +32,9 @@ export function ProfileSuspendedBanner({ date }: Props) {
         alignItems="start"
       >
         <styled.p color="fg.destructive" wordBreak="keep-all">
-          This member was suspended&nbsp;
+          {t("This member was suspended")}{" "}
           <styled.time textWrap="nowrap">
-            {formatDistanceToNow(date, {
-              addSuffix: true,
-            })}
+            {relativeTimestamp(date, locale)}
           </styled.time>
         </styled.p>
       </Flex>

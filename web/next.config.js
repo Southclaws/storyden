@@ -15,9 +15,6 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  experimental: {
-    turbopackFileSystemCacheForDev: true,
-  },
 };
 
 module.exports = nextConfig;

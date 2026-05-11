@@ -1,0 +1,29 @@
+---
+title: libSQL/Turso
+description: Distributed SQLite with global edge replication
+---
+
+[Turso](https://turso.tech/) is a managed service built on libSQL that provides globally distributed SQLite-compatible databases with edge replication.
+
+```bash
+DATABASE_URL=libsql://your-database.turso.io?authToken=your_auth_token
+```
+
+<Callout title="When to use libSQL/Turso">
+  If you're already deploying your Storyden instance to a globally replicated
+  infrastructure platform such as Fly.io or Cloudflare. Turso replicates your
+  SQLite database to edge locations worldwide, providing fast reads from the
+  nearest region. Also useful when you want SQLite's simplicity with the ability
+  to run multiple application instances.
+</Callout>
+
+Turso brings the operational simplicity of SQLite to distributed environments. You get SQLite's developer experience with the scaling capabilities typically requiring PostgreSQL.
+
+## Turso Managed Service
+
+Turso is the easiest way to use libSQL. It handles replication, backups, and infrastructure automatically:
+
+1. Sign up at [turso.tech](https://turso.tech/)
+2. Create a database via the Turso CLI or dashboard
+3. Get your database URL and auth token
+4. Configure Storyden with the connection details

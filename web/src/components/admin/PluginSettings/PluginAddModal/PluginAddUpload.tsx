@@ -7,11 +7,13 @@ import { PluginArchiveUpload } from "@/components/admin/PluginSettings/PluginArc
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { useI18n } from "@/i18n/provider";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export function PluginAddUpload({ onClose }: UseDisclosureProps) {
+  const { t } = useI18n();
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,8 +57,9 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
   return (
     <LStack gap="4">
       <styled.p color="fg.muted">
-        Upload a Storyden Plugin (.sdx or .zip) file to extend Storyden's
-        functionality.
+        {t(
+          "Upload a Storyden Plugin (.sdx or .zip) file to extend Storyden's functionality.",
+        )}
       </styled.p>
 
       <Alert.Root>
@@ -64,17 +67,18 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
           <WarningIcon />
         </Alert.Icon>
         <Alert.Content>
-          <Alert.Title>Security notice</Alert.Title>
+          <Alert.Title>{t("Security notice")}</Alert.Title>
           <Alert.Description>
-            Only upload plugins from trusted sources. Malicious plugins can
-            compromise the security of your data and system.
+            {t(
+              "Only upload plugins from trusted sources. Malicious plugins can compromise the security of your data and system.",
+            )}
           </Alert.Description>
         </Alert.Content>
       </Alert.Root>
 
       <PluginArchiveUpload
         disabled={isUploading}
-        buttonLabel={isUploading ? "Uploading..." : "Select File"}
+        buttonLabel={isUploading ? t("Uploading...") : t("Select File")}
         onFileChange={handleFileChange}
         onError={setError}
       />
@@ -85,7 +89,7 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
             <WarningIcon />
           </Alert.Icon>
           <Alert.Content>
-            <Alert.Title>Upload Error</Alert.Title>
+            <Alert.Title>{t("Upload Error")}</Alert.Title>
             <Alert.Description>{error}</Alert.Description>
           </Alert.Content>
         </Alert.Root>
@@ -93,7 +97,7 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
 
       <WStack justifyContent="end" gap="2">
         <Button variant="outline" onClick={handleClose} disabled={isUploading}>
-          {isUploading ? "Uploading..." : "Cancel"}
+          {isUploading ? t("Uploading...") : t("Cancel")}
         </Button>
       </WStack>
     </LStack>

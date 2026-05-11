@@ -8,13 +8,15 @@ import { ComposeField } from "@/components/ui/form/ComposeField";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Card } from "@/components/ui/rich-card";
-import { CardBox, Flex, HStack, WStack } from "@/styled-system/jsx";
+import { useI18n } from "@/i18n/provider";
+import { CardBox, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
 import { Props, useQuickShare } from "./useQuickShare";
 
 export function QuickShare(props: Props) {
+  const { t } = useI18n();
   const {
     form,
     state: { formRef, hydratedLink, resetKey },
@@ -39,7 +41,7 @@ export function QuickShare(props: Props) {
         <ComposeField
           control={form.control}
           name="body"
-          placeholder="Share a thought, a link, something cool..."
+          placeholder={t("Share a thought, a link, something cool...")}
           resetKey={resetKey}
         />
 
@@ -66,7 +68,7 @@ export function QuickShare(props: Props) {
             loading={form.formState.isSubmitting}
           >
             <CreateIcon />
-            Share
+            {t("Share")}
           </Button>
         </WStack>
       </form>
@@ -78,8 +80,8 @@ export function QuickShare(props: Props) {
           <Card
             id={link.slug}
             shape="row"
-            title={link.title || "(No site title found)"}
-            text={link.description || "(No site description found)"}
+            title={link.title || t("(No site title found)")}
+            text={link.description || t("(No site description found)")}
             image={getAssetURL(link.primary_image?.path)}
             url={link.url}
           />

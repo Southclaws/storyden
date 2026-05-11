@@ -23,6 +23,7 @@ import { Unready } from "@/components/site/Unready";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { useI18n } from "@/i18n/provider";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type WarningsPanelProps = {
@@ -36,6 +37,7 @@ export function WarningsPanel({
   profile,
   canManageWarnings = false,
 }: WarningsPanelProps) {
+  const { t } = useI18n();
   const { data, error } = useAccountWarningList(accountId);
   if (!data) {
     return <Unready error={error} />;
@@ -46,7 +48,7 @@ export function WarningsPanel({
       {data.total === 0 || data.warnings.length === 0 ? (
         <Box borderWidth="thin" borderRadius="sm" p="2">
           <styled.p fontSize="sm" color="fg.subtle">
-            No warning history for this account yet.
+            {t("No warning history for this account yet.")}
           </styled.p>
         </Box>
       ) : (
@@ -66,7 +68,7 @@ export function WarningsPanel({
         <WStack justifyContent="flex-end">
           <MemberWarningTrigger profile={profile}>
             <Button size="xs" colorPalette="orange" variant="subtle">
-              Issue warning
+              {t("Issue warning")}
             </Button>
           </MemberWarningTrigger>
         </WStack>
@@ -84,6 +86,7 @@ function WarningRecordCard({
   warning: Warning;
   canManageWarnings: boolean;
 }) {
+  const { t } = useI18n();
   const { mutate } = useSWRConfig();
   const [isEditing, setIsEditing] = useState(false);
   const [reasonDraft, setReasonDraft] = useState(warning.reason ?? "");
@@ -129,8 +132,8 @@ function WarningRecordCard({
         },
         {
           promiseToast: {
-            loading: "Deleting warning...",
-            success: "Warning deleted.",
+            loading: t("Deleting warning..."),
+            success: t("Warning deleted."),
           },
         },
       );
@@ -139,7 +142,7 @@ function WarningRecordCard({
   async function handleSave() {
     const trimmed = reasonDraft.trim();
     if (!trimmed) {
-      toast.error("Reason cannot be empty.");
+      toast.error(t("Reason cannot be empty."));
       return;
     }
 
@@ -176,8 +179,8 @@ function WarningRecordCard({
       },
       {
         promiseToast: {
-          loading: "Saving warning...",
-          success: "Warning updated.",
+          loading: t("Saving warning..."),
+          success: t("Warning updated."),
         },
       },
     );
@@ -232,7 +235,7 @@ function WarningRecordCard({
                     onClick={handleSave}
                     loading={isUpdating}
                   >
-                    Save
+                    {t("Save")}
                   </Button>
                   <Button
                     size="xs"
@@ -240,7 +243,7 @@ function WarningRecordCard({
                     onClick={cancelEditing}
                     disabled={isUpdating}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </>
               ) : (
@@ -249,7 +252,7 @@ function WarningRecordCard({
                   variant="ghost"
                   onClick={() => setIsEditing(true)}
                 >
-                  Edit
+                  {t("Edit")}
                 </Button>
               )}
 
@@ -262,7 +265,7 @@ function WarningRecordCard({
                     onClick={handleConfirmAction}
                     loading={isDeleting}
                   >
-                    Confirm delete
+                    {t("Confirm delete")}
                   </Button>
                   <Button
                     size="xs"
@@ -270,15 +273,15 @@ function WarningRecordCard({
                     onClick={handleCancelAction}
                     disabled={isDeleting}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </HStack>
               ) : (
                 <Button
                   size="xs"
                   variant="ghost"
-                  aria-label="Delete warning"
-                  title="Delete warning"
+                  aria-label={t("Delete warning")}
+                  title={t("Delete warning")}
                   onClick={handleConfirmAction}
                 >
                   <DeleteIcon />
@@ -303,7 +306,7 @@ function WarningRecordCard({
         />
       ) : (
         <styled.p fontSize="sm" whiteSpace="pre-wrap">
-          {warning.reason?.trim() || "No reason recorded."}
+          {warning.reason?.trim() || t("No reason recorded.")}
         </styled.p>
       )}
     </Box>
