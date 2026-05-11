@@ -62,6 +62,14 @@ func (m *Mapping) AuditEventGet() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
 
+func (m *Mapping) EmailQueueList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) EmailQueueRetry() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) ModerationActionCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }

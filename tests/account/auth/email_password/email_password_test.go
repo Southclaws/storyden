@@ -6,7 +6,6 @@ import (
 	"regexp"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -96,6 +95,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 				address := xid.New().String() + "@storyden.org"
 				handle := xid.New().String()
 				password := "password"
+				emailCount := inbox.Count()
 
 				// Sign up with email
 				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
@@ -105,13 +105,8 @@ func TestEmailPasswordAuth(t *testing.T) {
 				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
-				// Get code from email, verify account.
-				var verification mailer.MockEmail
-				r.Eventually(func() bool {
-					var ok bool
-					verification, ok = inbox.GetLastTo(address)
-					return ok
-				}, 5*time.Second, 20*time.Millisecond)
+				// Get code from email, verify account
+				verification := tests.WaitForNextEmail(t, inbox, emailCount)
 				code := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)[1]
 				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: code}, session)
 				tests.Ok(t, err, verify)

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/emailqueue"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/invitation"
@@ -524,6 +525,61 @@ func init() {
 	// email.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	email.IDValidator = func() func(string) error {
 		validators := emailDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	emailqueueMixin := schema.EmailQueue{}.Mixin()
+	emailqueueMixinFields0 := emailqueueMixin[0].Fields()
+	_ = emailqueueMixinFields0
+	emailqueueMixinFields1 := emailqueueMixin[1].Fields()
+	_ = emailqueueMixinFields1
+	emailqueueMixinFields2 := emailqueueMixin[2].Fields()
+	_ = emailqueueMixinFields2
+	emailqueueFields := schema.EmailQueue{}.Fields()
+	_ = emailqueueFields
+	// emailqueueDescCreatedAt is the schema descriptor for created_at field.
+	emailqueueDescCreatedAt := emailqueueMixinFields1[0].Descriptor()
+	// emailqueue.DefaultCreatedAt holds the default value on creation for the created_at field.
+	emailqueue.DefaultCreatedAt = emailqueueDescCreatedAt.Default.(func() time.Time)
+	// emailqueueDescUpdatedAt is the schema descriptor for updated_at field.
+	emailqueueDescUpdatedAt := emailqueueMixinFields2[0].Descriptor()
+	// emailqueue.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	emailqueue.DefaultUpdatedAt = emailqueueDescUpdatedAt.Default.(func() time.Time)
+	// emailqueue.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	emailqueue.UpdateDefaultUpdatedAt = emailqueueDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// emailqueueDescContentPlain is the schema descriptor for content_plain field.
+	emailqueueDescContentPlain := emailqueueFields[3].Descriptor()
+	// emailqueue.DefaultContentPlain holds the default value on creation for the content_plain field.
+	emailqueue.DefaultContentPlain = emailqueueDescContentPlain.Default.(string)
+	// emailqueueDescContentHTML is the schema descriptor for content_html field.
+	emailqueueDescContentHTML := emailqueueFields[4].Descriptor()
+	// emailqueue.DefaultContentHTML holds the default value on creation for the content_html field.
+	emailqueue.DefaultContentHTML = emailqueueDescContentHTML.Default.(string)
+	// emailqueueDescAttempts is the schema descriptor for attempts field.
+	emailqueueDescAttempts := emailqueueFields[6].Descriptor()
+	// emailqueue.DefaultAttempts holds the default value on creation for the attempts field.
+	emailqueue.DefaultAttempts = emailqueueDescAttempts.Default.([]schema.EmailAttempt)
+	// emailqueueDescAvailableAt is the schema descriptor for available_at field.
+	emailqueueDescAvailableAt := emailqueueFields[8].Descriptor()
+	// emailqueue.DefaultAvailableAt holds the default value on creation for the available_at field.
+	emailqueue.DefaultAvailableAt = emailqueueDescAvailableAt.Default.(func() time.Time)
+	// emailqueueDescID is the schema descriptor for id field.
+	emailqueueDescID := emailqueueMixinFields0[0].Descriptor()
+	// emailqueue.DefaultID holds the default value on creation for the id field.
+	emailqueue.DefaultID = emailqueueDescID.Default.(func() xid.ID)
+	// emailqueue.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	emailqueue.IDValidator = func() func(string) error {
+		validators := emailqueueDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

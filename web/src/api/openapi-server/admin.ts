@@ -17,6 +17,9 @@ import type {
   AuditEventGetOKResponse,
   AuditEventListOKResponse,
   AuditEventListParams,
+  EmailQueueGetOKResponse,
+  EmailQueueListOKResponse,
+  EmailQueueListParams,
   ModerationActionCreateBody,
   NoContentResponse,
 } from "../openapi-schema";
@@ -118,6 +121,80 @@ export const auditEventList = async (
     {
       ...options,
       method: "GET",
+    },
+  );
+};
+
+/**
+ * List durable email queue records for this installation. Shows pending,
+failed and sent deliveries with attempt history for diagnostics.
+
+ */
+export type emailQueueListResponse = {
+  data: EmailQueueListOKResponse;
+  status: number;
+};
+
+export const getEmailQueueListUrl = (params?: EmailQueueListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["statuses"];
+
+    if (value instanceof Array && explodeParameters.includes(key)) {
+      value.forEach((v) =>
+        normalizedParams.append(key, v === null ? "null" : v.toString()),
+      );
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/admin/email-queue?${normalizedParams.toString()}`
+    : `/admin/email-queue`;
+};
+
+export const emailQueueList = async (
+  params?: EmailQueueListParams,
+  options?: RequestInit,
+): Promise<emailQueueListResponse> => {
+  return fetcher<Promise<emailQueueListResponse>>(
+    getEmailQueueListUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Manually retry a delivery for an email queue record. This is used for
+failed deliveries. This will create a new delivery attempt and update
+the email queue record accordingly.
+
+ */
+export type emailQueueRetryResponse = {
+  data: EmailQueueGetOKResponse;
+  status: number;
+};
+
+export const getEmailQueueRetryUrl = (emailId: string) => {
+  return `/admin/email-queue/${emailId}/attempt`;
+};
+
+export const emailQueueRetry = async (
+  emailId: string,
+  options?: RequestInit,
+): Promise<emailQueueRetryResponse> => {
+  return fetcher<Promise<emailQueueRetryResponse>>(
+    getEmailQueueRetryUrl(emailId),
+    {
+      ...options,
+      method: "POST",
     },
   );
 };

@@ -377,6 +377,34 @@ var (
 			},
 		},
 	}
+	// EmailQueuesColumns holds the columns for the "email_queues" table.
+	EmailQueuesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "recipient_address", Type: field.TypeString},
+		{Name: "recipient_name", Type: field.TypeString},
+		{Name: "subject", Type: field.TypeString},
+		{Name: "content_plain", Type: field.TypeString, Default: ""},
+		{Name: "content_html", Type: field.TypeString, Default: ""},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "processing", "sent", "failed"}, Default: "pending"},
+		{Name: "attempts", Type: field.TypeJSON},
+		{Name: "processed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "available_at", Type: field.TypeTime},
+	}
+	// EmailQueuesTable holds the schema information for the "email_queues" table.
+	EmailQueuesTable = &schema.Table{
+		Name:       "email_queues",
+		Columns:    EmailQueuesColumns,
+		PrimaryKey: []*schema.Column{EmailQueuesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "emailqueue_status_available_at",
+				Unique:  false,
+				Columns: []*schema.Column{EmailQueuesColumns[8], EmailQueuesColumns[11]},
+			},
+		},
+	}
 	// EventsColumns holds the columns for the "events" table.
 	EventsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1346,6 +1374,7 @@ var (
 		CollectionNodesTable,
 		CollectionPostsTable,
 		EmailsTable,
+		EmailQueuesTable,
 		EventsTable,
 		EventParticipantsTable,
 		InvitationsTable,

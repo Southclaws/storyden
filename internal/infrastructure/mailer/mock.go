@@ -17,8 +17,9 @@ type MockEmail struct {
 }
 
 type Mock struct {
-	mu   sync.Mutex
-	sent []MockEmail
+	mu      sync.Mutex
+	sent    []MockEmail
+	sendErr error
 }
 
 func (m *Mock) Send(
@@ -27,6 +28,10 @@ func (m *Mock) Send(
 ) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	if m.sendErr != nil {
+		return m.sendErr
+	}
 
 	fmt.Printf(`Mock email sent to: %s <%s> '%s'
 %s
@@ -72,4 +77,30 @@ func (m *Mock) GetLastWhere(match func(MockEmail) bool) (MockEmail, bool) {
 	}
 
 	return MockEmail{}, false
+}
+
+func (m *Mock) Count() int {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	return len(m.sent)
+}
+
+func (m *Mock) Reset() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.sent = nil
+	m.sendErr = nil
+}
+
+func (m *Mock) SetSendError(err error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.sendErr = err
+}
+
+func (m *Mock) ClearSendError() {
+	m.SetSendError(nil)
 }

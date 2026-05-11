@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -40,6 +39,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a := assert.New(t)
 
 				address := xid.New().String() + "@storyden.org"
+				emailCount := inbox.Count()
 
 				// Sign up with email
 				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
@@ -57,13 +57,10 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
 
-				// Get code from email, verify account.
-				var verification mailer.MockEmail
-				r.Eventually(func() bool {
-					var ok bool
-					verification, ok = inbox.GetLastTo(address)
-					return ok
-				}, 5*time.Second, 20*time.Millisecond)
+				// Get code from email, verify account
+				verification := tests.WaitForNextEmail(t, inbox, emailCount)
+				a.Equal(unverified.JSON200.Name, verification.Name)
+				a.Equal(address, verification.Address.Address)
 				code := regexp.MustCompile(`verify your account: ([0-9]{6})`).FindStringSubmatch(verification.Plain)[1]
 				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: code}, session)
 				tests.Ok(t, err, verify)
