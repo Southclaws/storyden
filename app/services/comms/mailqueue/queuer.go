@@ -2,13 +2,17 @@ package mailqueue
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log/slog"
 	"net/mail"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/swirl"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
@@ -99,6 +103,18 @@ func (q *Queuer) Queue(ctx context.Context, address mail.Address, name string, s
 
 	err := q.limiter.Check(ctx, address.Address, 1)
 	if err != nil {
+		var status *swirl.Status
+		if errors.As(err, &status) {
+			reset := status.Reset.Local().Format("15:04")
+			return fault.Wrap(err,
+				fctx.With(ctx),
+				fmsg.WithDesc(
+					"email rate limit exceeded",
+					fmt.Sprintf("Too many emails have been requested for this address. Please wait until %s before trying again.", reset),
+				),
+			)
+		}
+
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
