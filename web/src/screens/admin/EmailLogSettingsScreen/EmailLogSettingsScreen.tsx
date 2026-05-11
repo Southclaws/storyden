@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { formatDate } from "date-fns";
+import { useState } from "react";
 
 import { EmailQueueItem, EmailQueueListResult } from "@/api/openapi-schema";
 import { CancelAction } from "@/components/site/Action/Cancel";
@@ -160,7 +160,7 @@ function EmailLogList({
 
   if (data.emails.length === 0) {
     return (
-      <EmptyState hideContributionLabel>
+      <EmptyState w="full" hideContributionLabel>
         {hasActiveFilters
           ? "No emails match the current filters."
           : "No emails found."}
