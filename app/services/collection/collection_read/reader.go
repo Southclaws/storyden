@@ -39,7 +39,7 @@ func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*
 	}
 
 	// The owner and admins can always read the unlisted collection items
-	canReadUnlisted := session.GetRoles(ctx).Permissions().HasAny(rbac.PermissionAdministrator) || acc.ID == col.Owner.ID
+	canReadUnlisted := session.Authorise(ctx, nil, rbac.PermissionAdministrator) == nil || acc.ID == col.Owner.ID
 
 	col.Items = dt.Filter(col.Items, func(i *collection.CollectionItem) bool {
 		if canReadUnlisted {

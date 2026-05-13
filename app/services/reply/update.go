@@ -45,8 +45,7 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 	// Check if user is trying to change visibility - only post managers can do this
 	userSetVisibility := false
 	if _, ok := partial.Visibility.Get(); ok {
-		roles := session.GetRoles(ctx)
-		if !roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+		if session.Authorise(ctx, nil, rbac.PermissionManagePosts) != nil {
 			return nil, fault.Wrap(rbac.ErrPermissions,
 				fctx.With(ctx),
 				fmsg.WithDesc("visibility change denied", "Only users with Manage Posts permission can change post visibility."))

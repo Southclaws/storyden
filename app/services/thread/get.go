@@ -70,7 +70,7 @@ func (s *service) Get(
 }
 
 func (s *service) filterRepliesByVisibility(ctx context.Context, replies []*reply.Reply, accountID opt.Optional[account.AccountID]) []*reply.Reply {
-	if accountID.Ok() && session.GetRoles(ctx).Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+	if accountID.Ok() && session.Authorise(ctx, nil, rbac.PermissionManagePosts) == nil {
 		return replies
 	}
 
