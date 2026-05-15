@@ -7,17 +7,21 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 const (
 	accountIDKey      = "storyden-account-id"
-	rolesKey          = "storyden-roles"
+	permissionsKey    = "storyden-permissions"
 	securitySchemeKey = "storyden-security-scheme"
 )
 
@@ -33,7 +37,7 @@ func newSessionContextMiddleware(logger *slog.Logger) message.HandlerMiddleware 
 			ctx, err := m.extractSessionContext(msg.Context(), msg)
 			if err != nil {
 				m.logger.Error("failed to extract session context", slog.String("error", err.Error()))
-				ctx = session.WithInternal(msg.Context())
+				return nil, err
 			}
 			msg.SetContext(ctx)
 			return h(msg)
@@ -58,7 +62,9 @@ func (p *sessionContextPublisher) Publish(topic string, messages ...*message.Mes
 		// can cancel queued work before consumers process it.
 		ctx := context.WithoutCancel(msg.Context())
 		msg.SetContext(ctx)
-		injectSessionContext(ctx, msg)
+		if err := injectSessionContext(ctx, msg); err != nil {
+			return err
+		}
 	}
 	return p.publisher.Publish(topic, messages...)
 }
@@ -69,22 +75,30 @@ func (p *sessionContextPublisher) Close() error {
 
 func (m *sessionContextMiddleware) extractSessionContext(ctx context.Context, msg *message.Message) (context.Context, error) {
 	accountIDStr := msg.Metadata.Get(accountIDKey)
-	rolesStr := msg.Metadata.Get(rolesKey)
+	permissionsStr := msg.Metadata.Get(permissionsKey)
 	securityScheme := msg.Metadata.Get(securitySchemeKey)
 
-	if accountIDStr == "" && rolesStr == "" {
+	if accountIDStr == "" && permissionsStr == "" {
 		return session.WithInternal(ctx), nil
 	}
 
-	var roles role.Roles
-	if rolesStr != "" {
-		if err := json.Unmarshal([]byte(rolesStr), &roles); err != nil {
-			return nil, err
+	permissions := rbac.NewList()
+	if permissionsStr != "" {
+		var list rbac.PermissionList
+		if err := json.Unmarshal([]byte(permissionsStr), &list); err != nil {
+			return nil, fault.Wrap(
+				err,
+				fctx.With(ctx),
+				fmsg.With("invalid permissions metadata"),
+				ftag.With(ftag.Unauthenticated),
+			)
 		}
+
+		permissions = rbac.NewList(list...)
 	}
 
 	if accountIDStr == "" {
-		return session.WithGuest(ctx, roles), nil
+		return session.WithGuestPermissions(ctx, permissions), nil
 	}
 
 	xidID, err := xid.FromString(accountIDStr)
@@ -98,30 +112,46 @@ func (m *sessionContextMiddleware) extractSessionContext(ctx context.Context, ms
 	}
 
 	if securityScheme == "access_key" {
-		return session.WithAccessKey(ctx, acc, roles), nil
+		return session.WithAccessKeyPermissions(ctx, acc, permissions), nil
 	}
 
-	return session.WithAccount(ctx, acc, roles), nil
+	return session.WithAccountPermissions(ctx, acc, permissions), nil
 }
 
-func injectSessionContext(ctx context.Context, msg *message.Message) {
+func injectSessionContext(ctx context.Context, msg *message.Message) error {
+	if !session.HasContext(ctx) {
+		return nil
+	}
+
+	permissions, err := session.GetPermissions(ctx)
+	if err != nil {
+		return err
+	}
+
+	permissionsJSON, err := json.Marshal(permissions.List())
+	if err != nil {
+		return fault.Wrap(
+			err,
+			fctx.With(ctx),
+			fmsg.With("failed to marshal permissions metadata"),
+		)
+	}
+	msg.Metadata.Set(permissionsKey, string(permissionsJSON))
+
 	optAccountID := session.GetOptAccountID(ctx)
 
 	accountID, ok := optAccountID.Get()
 	if !ok {
-		return
+		return nil
 	}
 
 	msg.Metadata.Set(accountIDKey, accountID.String())
 
-	roles := session.GetRoles(ctx)
-	if rolesJSON, err := json.Marshal(roles); err == nil {
-		msg.Metadata.Set(rolesKey, string(rolesJSON))
-	}
-
 	if scheme, err := session.GetSecurityScheme(ctx); err == nil {
 		msg.Metadata.Set(securitySchemeKey, scheme)
 	}
+
+	return nil
 }
 
 func newChaosDelayMiddleware(maxDelay time.Duration, logger *slog.Logger) message.HandlerMiddleware {

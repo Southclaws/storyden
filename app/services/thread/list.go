@@ -65,8 +65,7 @@ func (s *service) List(ctx context.Context,
 			// members will just see published posts.
 			isModerator := false
 			if accountID.Ok() {
-				roles := session.GetRoles(ctx)
-				isModerator = roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator)
+				isModerator = session.Authorise(ctx, nil, rbac.PermissionManagePosts) == nil
 			}
 			return thread_querier.HasPublishedOrOwnInReview(accountID, isModerator)
 		}
@@ -80,8 +79,7 @@ func (s *service) List(ctx context.Context,
 		if !ok {
 			// Not filtering by specific account - check if user has permission to see all review threads
 			if accountID.Ok() {
-				roles := session.GetRoles(ctx)
-				if roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+				if session.Authorise(ctx, nil, rbac.PermissionManagePosts) == nil {
 					return thread_querier.HasStatus(v...)
 				}
 			}
@@ -98,8 +96,7 @@ func (s *service) List(ctx context.Context,
 
 		if !requestingOwnThreads {
 			// Viewing someone else's threads - check if user has permission
-			roles := session.GetRoles(ctx)
-			if roles.Permissions().HasAny(rbac.PermissionManagePosts, rbac.PermissionAdministrator) {
+			if session.Authorise(ctx, nil, rbac.PermissionManagePosts) == nil {
 				return thread_querier.HasStatus(v...)
 			}
 

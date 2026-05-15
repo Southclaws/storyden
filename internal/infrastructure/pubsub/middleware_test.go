@@ -1,14 +1,68 @@
 package pubsub
 
 import (
+	"io"
 	"log/slog"
 	"testing"
 	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
+
+func TestInjectSessionContext_IncludesGuestPermissions(t *testing.T) {
+	msg := message.NewMessage("test-uuid", []byte("test payload"))
+	ctx := session.WithGuestPermissions(t.Context(), rbac.NewList(rbac.PermissionListProfiles))
+
+	err := injectSessionContext(ctx, msg)
+
+	require.NoError(t, err)
+	assert.Empty(t, msg.Metadata.Get(accountIDKey))
+	assert.JSONEq(t, `["LIST_PROFILES"]`, msg.Metadata.Get(permissionsKey))
+}
+
+func TestInjectSessionContext_IncludesPermissionsWithAccount(t *testing.T) {
+	msg := message.NewMessage("test-uuid", []byte("test payload"))
+	accountID := account.AccountID(xid.New())
+	ctx := session.WithAccountPermissions(
+		t.Context(),
+		account.Account{ID: accountID},
+		rbac.NewList(rbac.PermissionReadPublishedThreads),
+	)
+
+	err := injectSessionContext(ctx, msg)
+
+	require.NoError(t, err)
+	assert.Equal(t, accountID.String(), msg.Metadata.Get(accountIDKey))
+	assert.JSONEq(t, `["READ_PUBLISHED_THREADS"]`, msg.Metadata.Get(permissionsKey))
+}
+
+func TestSessionContextMiddleware_MalformedPermissionsRejectsMessage(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	handlerCalled := false
+
+	mockHandler := func(msg *message.Message) ([]*message.Message, error) {
+		handlerCalled = true
+		return nil, nil
+	}
+
+	middleware := newSessionContextMiddleware(logger)
+	wrappedHandler := middleware(mockHandler)
+
+	msg := message.NewMessage("test-uuid", []byte("test payload"))
+	msg.Metadata.Set(permissionsKey, "{")
+
+	_, err := wrappedHandler(msg)
+
+	require.Error(t, err)
+	assert.False(t, handlerCalled)
+}
 
 func TestChaosDelayMiddleware_ZeroDelay(t *testing.T) {
 	logger := slog.Default()

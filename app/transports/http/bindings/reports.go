@@ -63,12 +63,9 @@ func (h *Reports) ReportCreate(ctx context.Context, request openapi.ReportCreate
 }
 
 func (h *Reports) ReportList(ctx context.Context, request openapi.ReportListRequestObject) (openapi.ReportListResponseObject, error) {
-	roles := session.GetRoles(ctx)
-	permissions := roles.Permissions()
-
 	page := deserialisePageParams(request.Params.Page, 10)
 
-	canManageReports := permissions.HasAny(rbac.PermissionManageReports, rbac.PermissionAdministrator)
+	canManageReports := session.Authorise(ctx, nil, rbac.PermissionManageReports) == nil
 
 	var result pagination.Result[*report.Report]
 	var err error
@@ -113,15 +110,12 @@ func (h *Reports) ReportList(ctx context.Context, request openapi.ReportListRequ
 }
 
 func (h *Reports) ReportUpdate(ctx context.Context, request openapi.ReportUpdateRequestObject) (openapi.ReportUpdateResponseObject, error) {
-	roles := session.GetRoles(ctx)
-	permissions := roles.Permissions()
-
 	reportID, err := xid.FromString(request.ReportId)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	canManageReports := permissions.HasAny(rbac.PermissionManageReports, rbac.PermissionAdministrator)
+	canManageReports := session.Authorise(ctx, nil, rbac.PermissionManageReports) == nil
 
 	var r *report.Report
 
