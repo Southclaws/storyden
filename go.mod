@@ -61,7 +61,7 @@ require (
 	github.com/google/jsonschema-go v0.4.2
 	github.com/iancoleman/strcase v0.3.0
 	github.com/invopop/jsonschema v0.13.0
-	github.com/jackc/pgx/v5 v5.9.0
+	github.com/jackc/pgx/v5 v5.9.2
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/klippa-app/go-pdfium v1.17.2
 	github.com/mark3labs/mcp-go v0.41.1
