@@ -1,14 +1,11 @@
 import Image from "next/image";
 
-import { getAccountGetAvatarKey } from "@/api/openapi-client/accounts";
 import { Identifier, ProfileReference } from "@/api/openapi-schema";
-import { Button } from "@/components/ui/button";
-import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { API_ADDRESS } from "@/config";
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
 
-import { EditAvatarTrigger } from "../EditAvatar/EditAvatarModal";
+import { MemberAvatarEditable } from "./MemberAvatarEditable";
 
 const avatarStyles = css({
   borderRadius: "full",
@@ -27,26 +24,7 @@ export function MemberAvatar({ profile, size, editable }: Props) {
 
   return (
     <Box position="relative" flexShrink="0">
-      {editable && (
-        <Box position="absolute" w="full" h="full">
-          <EditAvatarTrigger profile={profile} asChild>
-            <Button
-              type="button"
-              position="absolute"
-              top="0"
-              left="0"
-              w="full"
-              h="full"
-              borderRadius="full"
-              variant="subtle"
-              color="bg.default"
-              size="2xl"
-            >
-              <MediaAddIcon />
-            </Button>
-          </EditAvatarTrigger>
-        </Box>
-      )}
+      {editable && <MemberAvatarEditable profile={profile} />}
       <Image
         className={avatarStyles}
         src={avatarURL}
@@ -59,7 +37,7 @@ export function MemberAvatar({ profile, size, editable }: Props) {
 }
 
 export function getAvatarURL(id: Identifier): string {
-  const [path] = getAccountGetAvatarKey(id);
+  const [path] = [`/accounts/${id}/avatar`] as const;
 
   return `${API_ADDRESS}/api${path}`;
 }

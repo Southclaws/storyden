@@ -1,6 +1,5 @@
 import { AuthMode, RegistrationMode } from "@/api/openapi-schema";
 import { authProviderList } from "@/api/openapi-server/auth";
-import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { RegisterEmailForm } from "./RegisterEmail/RegisterEmailForm";
@@ -21,7 +20,7 @@ export async function RegisterScreen({
   });
 
   const isInviteOnly = registrationMode === RegistrationMode.invitation;
-  if (isInviteOnly) {
+  if (isInviteOnly && !invitationID) {
     return (
       <VStack textAlign="center">
         <styled.h1 fontWeight="bold">Registration is invite-only.</styled.h1>
