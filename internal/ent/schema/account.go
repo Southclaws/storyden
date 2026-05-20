@@ -34,7 +34,7 @@ func (Account) Fields() []ent.Field {
 				entsql.Default("human"),
 			),
 		field.Enum("verified_status").
-			Values("none", "email").
+			Values("none", "email", "manual").
 			Default("none").
 			Annotations(
 				entsql.Default("none"),

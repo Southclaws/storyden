@@ -11,6 +11,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -164,6 +165,68 @@ func TestAccountEmails(t *testing.T) {
 				r.Len(acc.JSON200.EmailAddresses, 1)
 				a.Equal(email, acc.JSON200.EmailAddresses[0].EmailAddress)
 				a.Equal(em.EmailAddress, acc.JSON200.EmailAddresses[0].EmailAddress)
+			})
+
+			t.Run("manage_accounts_can_update_email_verified_status", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				adminCtx, _ := e2e.WithAccount(root, accountWrite, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				handle := xid.New().String()
+				password := "password"
+
+				signup, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPasswordSignupJSONRequestBody{
+					Identifier: handle,
+					Token:      password,
+				})
+				tests.Ok(t, err, signup)
+				session := e2e.WithSessionFromHeader(t, root, signup.HTTPResponse.Header)
+
+				email := xid.New().String() + "@example.com"
+
+				add, err := cl.AccountEmailAddWithResponse(root, openapi.AccountEmailInitialProps{
+					EmailAddress: email,
+				}, session)
+				tests.Ok(t, err, add)
+				r.NotNil(add.JSON200)
+				a.False(add.JSON200.Verified)
+
+				acc, err := cl.AccountGetWithResponse(root, session)
+				tests.Ok(t, err, acc)
+				a.Equal(openapi.AccountVerifiedStatusNone, acc.JSON200.VerifiedStatus)
+
+				verified := true
+				forbidden, err := cl.AccountManageUpdateEmailVerifiedStatusWithResponse(root, acc.JSON200.Id, add.JSON200.Id, openapi.AccountEmailVerifiedStatusMutableProps{
+					Verified: verified,
+				}, session)
+				tests.Status(t, err, forbidden, http.StatusForbidden)
+
+				updated := tests.AssertRequest(
+					cl.AccountManageUpdateEmailVerifiedStatusWithResponse(root, acc.JSON200.Id, add.JSON200.Id, openapi.AccountEmailVerifiedStatusMutableProps{
+						Verified: verified,
+					}, adminSession),
+				)(t, http.StatusOK)
+				r.NotNil(updated.JSON200)
+				a.True(updated.JSON200.Verified)
+
+				acc, err = cl.AccountGetWithResponse(root, session)
+				tests.Ok(t, err, acc)
+				a.Equal(openapi.AccountVerifiedStatusVerifiedEmail, acc.JSON200.VerifiedStatus)
+
+				verified = false
+				updated = tests.AssertRequest(
+					cl.AccountManageUpdateEmailVerifiedStatusWithResponse(root, acc.JSON200.Id, add.JSON200.Id, openapi.AccountEmailVerifiedStatusMutableProps{
+						Verified: verified,
+					}, adminSession),
+				)(t, http.StatusOK)
+				r.NotNil(updated.JSON200)
+				a.False(updated.JSON200.Verified)
+
+				acc, err = cl.AccountGetWithResponse(root, session)
+				tests.Ok(t, err, acc)
+				a.Equal(openapi.AccountVerifiedStatusNone, acc.JSON200.VerifiedStatus)
 			})
 		}))
 	}))

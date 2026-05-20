@@ -1186,6 +1186,28 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
 
+  /accounts/{account_id}/emails/{email_address_id}/verified:
+    patch:
+      operationId: AccountManageUpdateEmailVerifiedStatus
+      description: |
+        Override the verified status of an email address. This is intended for
+        admin and integration driven account management and is not intended to
+        be used for normal verification flows. Changing the verified status of
+        an email address here will not trigger any verification emails or other
+        side effects, it will simply set the field to the provided value.
+      tags: [accounts]
+      parameters:
+        - { $ref: "#/components/parameters/AccountIDParam" }
+        - { $ref: "#/components/parameters/EmailAddressIDParam" }
+      requestBody:
+        $ref: "#/components/requestBodies/AccountEmailVerifiedStatusUpdate"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
+
   /accounts/{account_id}/warnings:
     get:
       operationId: AccountWarningList
@@ -3582,6 +3604,12 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/AccountEmailInitialProps" }
+
+    AccountEmailVerifiedStatusUpdate:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountEmailVerifiedStatusMutableProps"
 
     AccountModerationNoteCreate:
       content:
@@ -6499,14 +6527,15 @@ components:
 
     AccountManageInitialProps:
       type: object
-      required: [handle]
-      properties:
-        handle:
-          $ref: "#/components/schemas/AccountHandle"
-        name:
-          $ref: "#/components/schemas/AccountName"
-        email_address:
-          $ref: "#/components/schemas/EmailAddress"
+      allOf:
+        - required: [handle]
+          properties:
+            handle:
+              $ref: "#/components/schemas/AccountHandle"
+            email_address:
+              $ref: "#/components/schemas/EmailAddress"
+        - $ref: "#/components/schemas/AccountMutableProps"
+        - $ref: "#/components/schemas/AccountMutablePropsAsAdmin"
 
     AccountManageMutableProps:
       allOf:
@@ -6518,6 +6547,8 @@ components:
       properties:
         admin:
           type: boolean
+        verified_status:
+          $ref: "#/components/schemas/AccountVerifiedStatus"
 
     AccountAuthMethods:
       type: object
@@ -6662,7 +6693,7 @@ components:
 
     AccountVerifiedStatus:
       type: string
-      enum: [none, verified_email]
+      enum: [none, verified_email, manual]
 
     AccountEmailAddressList:
       description: |
@@ -6686,6 +6717,13 @@ components:
       required: [email_address]
       properties:
         email_address: { $ref: "#/components/schemas/EmailAddress" }
+
+    AccountEmailVerifiedStatusMutableProps:
+      type: object
+      required: [verified]
+      properties:
+        verified:
+          type: boolean
 
     #
     # 8888888                   d8b 888             888    d8b

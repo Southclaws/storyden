@@ -15,4 +15,5 @@ export type AccountVerifiedStatus =
 export const AccountVerifiedStatus = {
   none: "none",
   verified_email: "verified_email",
+  manual: "manual",
 } as const;

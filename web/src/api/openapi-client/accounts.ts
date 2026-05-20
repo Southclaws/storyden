@@ -17,6 +17,7 @@ import type {
   AccountAuthProviderListOKResponse,
   AccountEmailAddBody,
   AccountEmailUpdateOKResponse,
+  AccountEmailVerifiedStatusUpdateBody,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountManageCreateBody,
@@ -328,6 +329,95 @@ export const useAccountManageUpdate = <
   const swrKey =
     swrOptions?.swrKey ?? getAccountManageUpdateMutationKey(accountId);
   const swrFn = getAccountManageUpdateMutationFetcher(accountId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Override the verified status of an email address. This is intended for
+admin and integration driven account management and is not intended to
+be used for normal verification flows. Changing the verified status of
+an email address here will not trigger any verification emails or other
+side effects, it will simply set the field to the provided value.
+
+ */
+export const accountManageUpdateEmailVerifiedStatus = (
+  accountId: string,
+  emailAddressId: string,
+  accountEmailVerifiedStatusUpdateBody: AccountEmailVerifiedStatusUpdateBody,
+) => {
+  return fetcher<AccountEmailUpdateOKResponse>({
+    url: `/accounts/${accountId}/emails/${emailAddressId}/verified`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: accountEmailVerifiedStatusUpdateBody,
+  });
+};
+
+export const getAccountManageUpdateEmailVerifiedStatusMutationFetcher = (
+  accountId: string,
+  emailAddressId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountEmailVerifiedStatusUpdateBody },
+  ): Promise<AccountEmailUpdateOKResponse> => {
+    return accountManageUpdateEmailVerifiedStatus(
+      accountId,
+      emailAddressId,
+      arg,
+    );
+  };
+};
+export const getAccountManageUpdateEmailVerifiedStatusMutationKey = (
+  accountId: string,
+  emailAddressId: string,
+) => [`/accounts/${accountId}/emails/${emailAddressId}/verified`] as const;
+
+export type AccountManageUpdateEmailVerifiedStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountManageUpdateEmailVerifiedStatus>>
+>;
+export type AccountManageUpdateEmailVerifiedStatusMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountManageUpdateEmailVerifiedStatus = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  emailAddressId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountManageUpdateEmailVerifiedStatus>>,
+      TError,
+      Key,
+      AccountEmailVerifiedStatusUpdateBody,
+      Awaited<ReturnType<typeof accountManageUpdateEmailVerifiedStatus>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountManageUpdateEmailVerifiedStatusMutationKey(
+      accountId,
+      emailAddressId,
+    );
+  const swrFn = getAccountManageUpdateEmailVerifiedStatusMutationFetcher(
+    accountId,
+    emailAddressId,
+  );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

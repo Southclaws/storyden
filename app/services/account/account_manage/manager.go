@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -41,9 +42,16 @@ func New(
 }
 
 type InitialProps struct {
-	Handle       string
-	Name         opt.Optional[string]
-	EmailAddress opt.Optional[mail.Address]
+	Handle         string
+	Name           opt.Optional[string]
+	Bio            opt.Optional[string]
+	Signature      opt.Optional[string]
+	Interests      opt.Optional[[]xid.ID]
+	Links          opt.Optional[[]account.ExternalLink]
+	Admin          opt.Optional[bool]
+	EmailAddress   opt.Optional[mail.Address]
+	VerifiedStatus opt.Optional[account.VerifiedStatus]
+	Meta           opt.Optional[map[string]any]
 }
 
 func (m *Manager) Create(ctx context.Context, props InitialProps) (*account.AccountWithEdges, error) {
@@ -55,9 +63,36 @@ func (m *Manager) Create(ctx context.Context, props InitialProps) (*account.Acco
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if admin, ok := props.Admin.Get(); ok && admin {
+		if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+		}
+	}
+
 	options := []account_writer.Option{}
 	if name, ok := props.Name.Get(); ok {
 		options = append(options, account_writer.WithName(name))
+	}
+	if bio, ok := props.Bio.Get(); ok {
+		options = append(options, account_writer.WithBioString(bio))
+	}
+	if signature, ok := props.Signature.Get(); ok {
+		options = append(options, account_writer.WithSignatureString(signature))
+	}
+	if interests, ok := props.Interests.Get(); ok {
+		options = append(options, account_writer.WithInterests(interests))
+	}
+	if links, ok := props.Links.Get(); ok {
+		options = append(options, account_writer.WithLinks(links))
+	}
+	if admin, ok := props.Admin.Get(); ok {
+		options = append(options, account_writer.WithAdmin(admin))
+	}
+	if status, ok := props.VerifiedStatus.Get(); ok {
+		options = append(options, account_writer.WithVerifiedStatus(status))
+	}
+	if meta, ok := props.Meta.Get(); ok {
+		options = append(options, account_writer.WithMetadata(meta))
 	}
 
 	acc, err := m.accountWrite.Create(ctx, props.Handle, options...)

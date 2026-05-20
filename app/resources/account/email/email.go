@@ -143,6 +143,26 @@ func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, em
 	return nil
 }
 
+func (r *Repository) SetVerifiedStatus(ctx context.Context, accountID account.AccountID, emailID xid.ID, verified bool) (*account.EmailAddress, error) {
+	result, err := r.db.Email.UpdateOneID(emailID).
+		Where(email_ent.AccountID(xid.ID(accountID))).
+		SetVerified(verified).
+		Save(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := r.syncVerifiedStatus(ctx, accountID); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return account.MapEmail(result), nil
+}
+
 func (r *Repository) lookupEmail(ctx context.Context, emailAddress mail.Address) (*ent.Email, bool, error) {
 	result, err := r.db.Email.Query().
 		Where(email_ent.EmailAddress(emailAddress.Address)).
@@ -213,6 +233,14 @@ func (r *Repository) syncVerifiedStatus(ctx context.Context, accountID account.A
 	status := account.VerifiedStatusNone
 	if verified {
 		status = account.VerifiedStatusVerifiedEmail
+	} else {
+		acc, err := r.accountRepo.GetByID(ctx, accountID)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		if acc.VerifiedStatus == account.VerifiedStatusManual {
+			return nil
+		}
 	}
 
 	_, err = r.accountRepo.Update(ctx, accountID, account_repo.SetVerifiedStatus(status))

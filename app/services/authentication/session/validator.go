@@ -58,7 +58,7 @@ func (v *Validator) resolveRolesForAccount(ctx context.Context, acc *account.Acc
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if requiresEmailVerification && acc.VerifiedStatus != account.VerifiedStatusVerifiedEmail {
+	if requiresEmailVerification && acc.VerifiedStatus == account.VerifiedStatusNone {
 		span.Event("account forced to guest role due to unverified email")
 		guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 		if err != nil {

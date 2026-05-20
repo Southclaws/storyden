@@ -405,8 +405,9 @@ const DefaultVerifiedStatus = VerifiedStatusNone
 
 // VerifiedStatus values.
 const (
-	VerifiedStatusNone  VerifiedStatus = "none"
-	VerifiedStatusEmail VerifiedStatus = "email"
+	VerifiedStatusNone   VerifiedStatus = "none"
+	VerifiedStatusEmail  VerifiedStatus = "email"
+	VerifiedStatusManual VerifiedStatus = "manual"
 )
 
 func (vs VerifiedStatus) String() string {
@@ -416,7 +417,7 @@ func (vs VerifiedStatus) String() string {
 // VerifiedStatusValidator is a validator for the "verified_status" field enum values. It is called by the builders before save.
 func VerifiedStatusValidator(vs VerifiedStatus) error {
 	switch vs {
-	case VerifiedStatusNone, VerifiedStatusEmail:
+	case VerifiedStatusNone, VerifiedStatusEmail, VerifiedStatusManual:
 		return nil
 	default:
 		return fmt.Errorf("account: invalid enum value for verified_status field: %q", vs)

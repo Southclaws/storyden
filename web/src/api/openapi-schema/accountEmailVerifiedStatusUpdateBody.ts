@@ -7,10 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.7-post
  */
-import type { AccountManageInitialPropsAllOf } from "./accountManageInitialPropsAllOf";
-import type { AccountMutableProps } from "./accountMutableProps";
-import type { AccountMutablePropsAsAdmin } from "./accountMutablePropsAsAdmin";
+import type { AccountEmailVerifiedStatusMutableProps } from "./accountEmailVerifiedStatusMutableProps";
 
-export type AccountManageInitialProps = AccountManageInitialPropsAllOf &
-  AccountMutableProps &
-  AccountMutablePropsAsAdmin;
+export type AccountEmailVerifiedStatusUpdateBody =
+  AccountEmailVerifiedStatusMutableProps;
