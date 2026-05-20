@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -52,4 +54,29 @@ func (h *Accounts) AccountEmailRemove(ctx context.Context, request openapi.Accou
 	}
 
 	return openapi.AccountEmailRemove200Response{}, nil
+}
+
+func (h *Accounts) AccountManageUpdateEmailVerifiedStatus(ctx context.Context, request openapi.AccountManageUpdateEmailVerifiedStatusRequestObject) (openapi.AccountManageUpdateEmailVerifiedStatusResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionManageAccounts); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+	}
+
+	accountID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	emailAddressID, err := xid.FromString(request.EmailAddressId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	ae, err := h.accountEmail.SetVerifiedStatus(ctx, account.AccountID(accountID), emailAddressID, request.Body.Verified)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountManageUpdateEmailVerifiedStatus200JSONResponse{
+		AccountEmailUpdateOKJSONResponse: openapi.AccountEmailUpdateOKJSONResponse(serialiseEmailAddressPtr(ae)),
+	}, nil
 }

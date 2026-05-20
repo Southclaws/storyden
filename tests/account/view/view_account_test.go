@@ -158,15 +158,18 @@ func TestAccountView(t *testing.T) {
 
 			t.Run("manage_accounts_can_update_profile_fields", func(t *testing.T) {
 				name := "Managed Name " + xid.New().String()
+				verifiedStatus := openapi.AccountVerifiedStatusManual
 
 				acc := tests.AssertRequest(
 					cl.AccountManageUpdateWithResponse(root, member.ID.String(), openapi.AccountManageUpdateJSONRequestBody{
-						Name: &name,
+						Name:           &name,
+						VerifiedStatus: &verifiedStatus,
 					}, managerSession),
 				)(t, http.StatusOK)
 
 				require.NotNil(t, acc.JSON200)
 				assert.Equal(t, name, acc.JSON200.Name)
+				assert.Equal(t, openapi.AccountVerifiedStatusManual, acc.JSON200.VerifiedStatus)
 			})
 
 			t.Run("manage_accounts_cannot_update_admin_field_without_administrator", func(t *testing.T) {

@@ -69,6 +69,7 @@ type VerifiedStatus struct {
 var (
 	VerifiedStatusNone          = VerifiedStatus{verifiedStatusNone}
 	VerifiedStatusVerifiedEmail = VerifiedStatus{verifiedStatusVerifiedEmail}
+	VerifiedStatusManual        = VerifiedStatus{verifiedStatusManual}
 )
 
 func (r VerifiedStatus) Format(f fmt.State, verb rune) {
@@ -112,6 +113,8 @@ func NewVerifiedStatus(__iNpUt__ string) (VerifiedStatus, error) {
 		return VerifiedStatusNone, nil
 	case string(verifiedStatusVerifiedEmail):
 		return VerifiedStatusVerifiedEmail, nil
+	case string(verifiedStatusManual):
+		return VerifiedStatusManual, nil
 	default:
 		return VerifiedStatus{}, fmt.Errorf("invalid value for type 'VerifiedStatus': '%s'", __iNpUt__)
 	}

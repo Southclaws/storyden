@@ -20,7 +20,7 @@ var (
 		{Name: "bio", Type: field.TypeString, Nullable: true},
 		{Name: "signature", Type: field.TypeString, Nullable: true},
 		{Name: "kind", Type: field.TypeEnum, Enums: []string{"human", "bot"}, Default: "human"},
-		{Name: "verified_status", Type: field.TypeEnum, Enums: []string{"none", "email"}, Default: "none"},
+		{Name: "verified_status", Type: field.TypeEnum, Enums: []string{"none", "email", "manual"}, Default: "none"},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},

@@ -36,7 +36,7 @@ func TestAccountCreateProvisioning(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
-			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			memberCtx, member := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			memberSession := sh.WithSession(memberCtx)
 
 			accessKey := tests.AssertRequest(
@@ -56,6 +56,8 @@ func TestAccountCreateProvisioning(t *testing.T) {
 			}, memberSession)
 			tests.Status(t, err, forbidden, http.StatusForbidden)
 
+			grant(t, cl, adminSession, member.Handle, openapi.PermissionList{openapi.MANAGEACCOUNTS})
+
 			registrationMode := openapi.RegistrationModeDisabled
 			tests.AssertRequest(
 				cl.AdminSettingsUpdateWithResponse(root, openapi.AdminSettingsUpdateJSONRequestBody{
@@ -65,20 +67,51 @@ func TestAccountCreateProvisioning(t *testing.T) {
 
 			email := openapi.EmailAddress(fmt.Sprintf("%s@example.com", xid.New().String()))
 			name := openapi.AccountName("Provisioned Account")
+			bio := openapi.AccountBio("<p>Provisioned bio</p>")
+			signature := openapi.AccountSignature("<p>Provisioned signature</p>")
+			meta := openapi.Metadata{"source": "provisioning-test"}
+			links := openapi.ProfileExternalLinkList{
+				{
+					Text: "Website",
+					Url:  "https://example.com",
+				},
+			}
 			handle := openapi.AccountHandle(xid.New().String())
+			verifiedStatus := openapi.AccountVerifiedStatusManual
 
 			created := tests.AssertRequest(
 				cl.AccountManageCreateWithResponse(root, openapi.AccountManageCreateJSONRequestBody{
-					Handle:       handle,
-					Name:         &name,
-					EmailAddress: &email,
+					Handle:         handle,
+					Name:           &name,
+					Bio:            &bio,
+					Signature:      &signature,
+					Meta:           &meta,
+					Links:          &links,
+					EmailAddress:   &email,
+					VerifiedStatus: &verifiedStatus,
 				}, accessKeySession),
 			)(t, http.StatusOK)
 			require.NotNil(t, created.JSON200)
 			assert.Equal(t, name, created.JSON200.Name)
+			assert.Equal(t, "<body>"+string(bio)+"</body>", created.JSON200.Bio)
+			require.NotNil(t, created.JSON200.Signature)
+			assert.Equal(t, "<body>"+string(signature)+"</body>", *created.JSON200.Signature)
+			assert.Equal(t, meta, created.JSON200.Meta)
+			assert.Equal(t, links, created.JSON200.Links)
+			assert.Equal(t, openapi.AccountVerifiedStatusManual, created.JSON200.VerifiedStatus)
 			require.Len(t, created.JSON200.EmailAddresses, 1)
 			assert.Equal(t, email, created.JSON200.EmailAddresses[0].EmailAddress)
 			assert.False(t, created.JSON200.EmailAddresses[0].Verified)
+
+			admin := false
+			nonAdminCreated := tests.AssertRequest(
+				cl.AccountManageCreateWithResponse(root, openapi.AccountManageCreateJSONRequestBody{
+					Handle: openapi.AccountHandle(xid.New().String()),
+					Admin:  &admin,
+				}, memberSession),
+			)(t, http.StatusOK)
+			require.NotNil(t, nonAdminCreated.JSON200)
+			assert.False(t, nonAdminCreated.JSON200.Admin)
 
 			duplicateHandle, err := cl.AccountManageCreateWithResponse(root, openapi.AccountManageCreateJSONRequestBody{
 				Handle: handle,
@@ -102,4 +135,35 @@ func createAccessKeyAuth(accessKeyToken string) openapi.RequestEditorFn {
 		req.Header.Set("Authorization", authHeader)
 		return nil
 	}
+}
+
+func grant(
+	t *testing.T,
+	cl *openapi.ClientWithResponses,
+	adminSession openapi.RequestEditorFn,
+	targetHandle openapi.AccountHandle,
+	permissions openapi.PermissionList,
+) {
+	t.Helper()
+
+	name := "role-account-provisioning-" + xid.New().String()
+	colour := "blue"
+
+	role := tests.AssertRequest(
+		cl.RoleCreateWithResponse(
+			t.Context(),
+			openapi.RoleCreateJSONRequestBody{
+				Name:        name,
+				Colour:      colour,
+				Permissions: permissions,
+			}, adminSession),
+	)(t, http.StatusOK)
+
+	tests.AssertRequest(
+		cl.AccountAddRoleWithResponse(
+			t.Context(),
+			targetHandle,
+			role.JSON200.Id,
+			adminSession),
+	)(t, http.StatusOK)
 }

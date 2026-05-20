@@ -70,6 +70,7 @@ type OperationPermissions interface {
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountView() (bool, *rbac.Permission)
 	AccountManageUpdate() (bool, *rbac.Permission)
+	AccountManageUpdateEmailVerifiedStatus() (bool, *rbac.Permission)
 	AccountWarningList() (bool, *rbac.Permission)
 	AccountWarningCreate() (bool, *rbac.Permission)
 	AccountWarningUpdate() (bool, *rbac.Permission)
@@ -306,6 +307,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountView()
 	case "AccountManageUpdate":
 		return optable.AccountManageUpdate()
+	case "AccountManageUpdateEmailVerifiedStatus":
+		return optable.AccountManageUpdateEmailVerifiedStatus()
 	case "AccountWarningList":
 		return optable.AccountWarningList()
 	case "AccountWarningCreate":

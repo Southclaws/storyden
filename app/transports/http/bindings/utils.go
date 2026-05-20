@@ -62,8 +62,21 @@ func serialiseAccountVerifiedStatus(in account.VerifiedStatus) openapi.AccountVe
 	switch in {
 	case account.VerifiedStatusVerifiedEmail:
 		return openapi.AccountVerifiedStatusVerifiedEmail
+	case account.VerifiedStatusManual:
+		return openapi.AccountVerifiedStatusManual
 	default:
 		return openapi.AccountVerifiedStatusNone
+	}
+}
+
+func deserialiseAccountVerifiedStatus(in openapi.AccountVerifiedStatus) account.VerifiedStatus {
+	switch in {
+	case openapi.AccountVerifiedStatusVerifiedEmail:
+		return account.VerifiedStatusVerifiedEmail
+	case openapi.AccountVerifiedStatusManual:
+		return account.VerifiedStatusManual
+	default:
+		return account.VerifiedStatusNone
 	}
 }
 

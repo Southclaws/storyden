@@ -41,9 +41,27 @@ func WithName(name string) Option {
 	}
 }
 
+func WithBioString(bio string) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetBio(bio)
+	}
+}
+
+func WithSignatureString(signature string) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetSignature(signature)
+	}
+}
+
 func WithKind(kind account.AccountKind) Option {
 	return func(a *ent.AccountMutation) {
 		a.SetKind(ent_account.Kind(kind.String()))
+	}
+}
+
+func WithVerifiedStatus(status account.VerifiedStatus) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetVerifiedStatus(ent_account.VerifiedStatus(status.String()))
 	}
 }
 
@@ -62,6 +80,24 @@ func WithSignature(v datagraph.Content) Option {
 func WithInvitedBy(id xid.ID) Option {
 	return func(a *ent.AccountMutation) {
 		a.SetInvitedByID(id)
+	}
+}
+
+func WithInterests(interests []xid.ID) Option {
+	return func(a *ent.AccountMutation) {
+		a.AddTagIDs(interests...)
+	}
+}
+
+func WithLinks(links []account.ExternalLink) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetLinks(mapExternalLinks(links))
+	}
+}
+
+func WithMetadata(m map[string]any) Option {
+	return func(a *ent.AccountMutation) {
+		a.SetMetadata(m)
 	}
 }
 
@@ -111,12 +147,7 @@ func SetInterests(interests []xid.ID) Mutation {
 
 func SetLinks(links []account.ExternalLink) Mutation {
 	return func(u *ent.AccountUpdateOne) {
-		u.SetLinks(dt.Map(links, func(i account.ExternalLink) schema.ExternalLink {
-			return schema.ExternalLink{
-				Text: i.Text,
-				URL:  i.URL.String(),
-			}
-		}))
+		u.SetLinks(mapExternalLinks(links))
 	}
 }
 
@@ -134,6 +165,15 @@ func SetDeleted(t opt.Optional[time.Time]) Mutation {
 			u.ClearDeletedAt()
 		}
 	}
+}
+
+func mapExternalLinks(links []account.ExternalLink) []schema.ExternalLink {
+	return dt.Map(links, func(i account.ExternalLink) schema.ExternalLink {
+		return schema.ExternalLink{
+			Text: i.Text,
+			URL:  i.URL.String(),
+		}
+	})
 }
 
 func (r *Repository) Create(ctx context.Context, handle string, opts ...Option) (*account.AccountWithEdges, error) {

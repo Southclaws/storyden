@@ -12,13 +12,19 @@ type (
 )
 
 var (
-	WithID        = account_repo.WithID
-	WithAdmin     = account_repo.WithAdmin
-	WithName      = account_repo.WithName
-	WithKind      = account_repo.WithKind
-	WithBio       = account_repo.WithBio
-	WithSignature = account_repo.WithSignature
-	WithInvitedBy = account_repo.WithInvitedBy
+	WithID              = account_repo.WithID
+	WithAdmin           = account_repo.WithAdmin
+	WithName            = account_repo.WithName
+	WithBioString       = account_repo.WithBioString
+	WithSignatureString = account_repo.WithSignatureString
+	WithKind            = account_repo.WithKind
+	WithVerifiedStatus  = account_repo.WithVerifiedStatus
+	WithBio             = account_repo.WithBio
+	WithSignature       = account_repo.WithSignature
+	WithInvitedBy       = account_repo.WithInvitedBy
+	WithInterests       = account_repo.WithInterests
+	WithLinks           = account_repo.WithLinks
+	WithMetadata        = account_repo.WithMetadata
 
 	SetHandle         = account_repo.SetHandle
 	SetName           = account_repo.SetName

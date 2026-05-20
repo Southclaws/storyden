@@ -11,6 +11,7 @@ import type {
   AccountAuthProviderListOKResponse,
   AccountEmailAddBody,
   AccountEmailUpdateOKResponse,
+  AccountEmailVerifiedStatusUpdateBody,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountManageCreateBody,
@@ -154,6 +155,43 @@ export const accountManageUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(accountManageUpdateBody),
+    },
+  );
+};
+
+/**
+ * Override the verified status of an email address. This is intended for
+admin and integration driven account management and is not intended to
+be used for normal verification flows. Changing the verified status of
+an email address here will not trigger any verification emails or other
+side effects, it will simply set the field to the provided value.
+
+ */
+export type accountManageUpdateEmailVerifiedStatusResponse = {
+  data: AccountEmailUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountManageUpdateEmailVerifiedStatusUrl = (
+  accountId: string,
+  emailAddressId: string,
+) => {
+  return `/accounts/${accountId}/emails/${emailAddressId}/verified`;
+};
+
+export const accountManageUpdateEmailVerifiedStatus = async (
+  accountId: string,
+  emailAddressId: string,
+  accountEmailVerifiedStatusUpdateBody: AccountEmailVerifiedStatusUpdateBody,
+  options?: RequestInit,
+): Promise<accountManageUpdateEmailVerifiedStatusResponse> => {
+  return fetcher<Promise<accountManageUpdateEmailVerifiedStatusResponse>>(
+    getAccountManageUpdateEmailVerifiedStatusUrl(accountId, emailAddressId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(accountEmailVerifiedStatusUpdateBody),
     },
   );
 };
