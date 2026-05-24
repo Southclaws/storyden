@@ -7,6 +7,105 @@ import (
 	"fmt"
 )
 
+type BuiltInService struct {
+	v builtInServiceEnum
+}
+
+var (
+	ServicePassword      = BuiltInService{servicePassword}
+	ServiceEmailVerify   = BuiltInService{serviceEmailVerify}
+	ServicePhoneVerify   = BuiltInService{servicePhoneVerify}
+	ServiceWebAuthn      = BuiltInService{serviceWebAuthn}
+	ServiceAccessKey     = BuiltInService{serviceAccessKey}
+	ServiceOAuthGoogle   = BuiltInService{serviceOAuthGoogle}
+	ServiceOAuthGitHub   = BuiltInService{serviceOAuthGitHub}
+	ServiceOAuthDiscord  = BuiltInService{serviceOAuthDiscord}
+	ServiceOAuthKeycloak = BuiltInService{serviceOAuthKeycloak}
+)
+
+func (r BuiltInService) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	case 'v':
+		switch r {
+		case ServicePassword:
+			fmt.Fprint(f, "Password + either username or email")
+		case ServiceEmailVerify:
+			fmt.Fprint(f, "Email + verification code")
+		case ServicePhoneVerify:
+			fmt.Fprint(f, "Phone number + verification code")
+		case ServiceWebAuthn:
+			fmt.Fprint(f, "WebAuthn/Passkey")
+		case ServiceAccessKey:
+			fmt.Fprint(f, "API access key")
+		case ServiceOAuthGoogle:
+			fmt.Fprint(f, "Google")
+		case ServiceOAuthGitHub:
+			fmt.Fprint(f, "GitHub")
+		case ServiceOAuthDiscord:
+			fmt.Fprint(f, "Discord")
+		case ServiceOAuthKeycloak:
+			fmt.Fprint(f, "Keycloak")
+		default:
+			fmt.Fprint(f, "")
+		}
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r BuiltInService) String() string {
+	return string(r.v)
+}
+func (r BuiltInService) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *BuiltInService) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewBuiltInService(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r BuiltInService) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *BuiltInService) Scan(__iNpUt__ any) error {
+	s, err := NewBuiltInService(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewBuiltInService(__iNpUt__ string) (BuiltInService, error) {
+	switch __iNpUt__ {
+	case string(servicePassword):
+		return ServicePassword, nil
+	case string(serviceEmailVerify):
+		return ServiceEmailVerify, nil
+	case string(servicePhoneVerify):
+		return ServicePhoneVerify, nil
+	case string(serviceWebAuthn):
+		return ServiceWebAuthn, nil
+	case string(serviceAccessKey):
+		return ServiceAccessKey, nil
+	case string(serviceOAuthGoogle):
+		return ServiceOAuthGoogle, nil
+	case string(serviceOAuthGitHub):
+		return ServiceOAuthGitHub, nil
+	case string(serviceOAuthDiscord):
+		return ServiceOAuthDiscord, nil
+	case string(serviceOAuthKeycloak):
+		return ServiceOAuthKeycloak, nil
+	default:
+		return BuiltInService{}, fmt.Errorf("invalid value for type 'BuiltInService': '%s'", __iNpUt__)
+	}
+}
+
 type Mode struct {
 	v modeEnum
 }
@@ -73,105 +172,6 @@ func NewMode(__iNpUt__ string) (Mode, error) {
 		return ModePhone, nil
 	default:
 		return Mode{}, fmt.Errorf("invalid value for type 'Mode': '%s'", __iNpUt__)
-	}
-}
-
-type Service struct {
-	v serviceEnum
-}
-
-var (
-	ServicePassword      = Service{servicePassword}
-	ServiceEmailVerify   = Service{serviceEmailVerify}
-	ServicePhoneVerify   = Service{servicePhoneVerify}
-	ServiceWebAuthn      = Service{serviceWebAuthn}
-	ServiceAccessKey     = Service{serviceAccessKey}
-	ServiceOAuthGoogle   = Service{serviceOAuthGoogle}
-	ServiceOAuthGitHub   = Service{serviceOAuthGitHub}
-	ServiceOAuthDiscord  = Service{serviceOAuthDiscord}
-	ServiceOAuthKeycloak = Service{serviceOAuthKeycloak}
-)
-
-func (r Service) Format(f fmt.State, verb rune) {
-	switch verb {
-	case 's':
-		fmt.Fprint(f, r.v)
-	case 'q':
-		fmt.Fprintf(f, "%q", r.String())
-	case 'v':
-		switch r {
-		case ServicePassword:
-			fmt.Fprint(f, "Password + either username or email")
-		case ServiceEmailVerify:
-			fmt.Fprint(f, "Email + verification code")
-		case ServicePhoneVerify:
-			fmt.Fprint(f, "Phone number + verification code")
-		case ServiceWebAuthn:
-			fmt.Fprint(f, "WebAuthn/Passkey")
-		case ServiceAccessKey:
-			fmt.Fprint(f, "API access key")
-		case ServiceOAuthGoogle:
-			fmt.Fprint(f, "Google")
-		case ServiceOAuthGitHub:
-			fmt.Fprint(f, "GitHub")
-		case ServiceOAuthDiscord:
-			fmt.Fprint(f, "Discord")
-		case ServiceOAuthKeycloak:
-			fmt.Fprint(f, "Keycloak")
-		default:
-			fmt.Fprint(f, "")
-		}
-	default:
-		fmt.Fprint(f, r.v)
-	}
-}
-func (r Service) String() string {
-	return string(r.v)
-}
-func (r Service) MarshalText() ([]byte, error) {
-	return []byte(r.v), nil
-}
-func (r *Service) UnmarshalText(__iNpUt__ []byte) error {
-	s, err := NewService(string(__iNpUt__))
-	if err != nil {
-		return err
-	}
-	*r = s
-	return nil
-}
-func (r Service) Value() (driver.Value, error) {
-	return r.v, nil
-}
-func (r *Service) Scan(__iNpUt__ any) error {
-	s, err := NewService(fmt.Sprint(__iNpUt__))
-	if err != nil {
-		return err
-	}
-	*r = s
-	return nil
-}
-func NewService(__iNpUt__ string) (Service, error) {
-	switch __iNpUt__ {
-	case string(servicePassword):
-		return ServicePassword, nil
-	case string(serviceEmailVerify):
-		return ServiceEmailVerify, nil
-	case string(servicePhoneVerify):
-		return ServicePhoneVerify, nil
-	case string(serviceWebAuthn):
-		return ServiceWebAuthn, nil
-	case string(serviceAccessKey):
-		return ServiceAccessKey, nil
-	case string(serviceOAuthGoogle):
-		return ServiceOAuthGoogle, nil
-	case string(serviceOAuthGitHub):
-		return ServiceOAuthGitHub, nil
-	case string(serviceOAuthDiscord):
-		return ServiceOAuthDiscord, nil
-	case string(serviceOAuthKeycloak):
-		return ServiceOAuthKeycloak, nil
-	default:
-		return Service{}, fmt.Errorf("invalid value for type 'Service': '%s'", __iNpUt__)
 	}
 }
 
