@@ -24,6 +24,7 @@ oneOf:
   - $ref: "#/$defs/MANAGE_COLLECTIONS"
   - $ref: "#/$defs/COLLECTION_SUBMIT"
   - $ref: "#/$defs/USE_PERSONAL_ACCESS_KEYS"
+  - $ref: "#/$defs/USE_OAUTH_CLIENTS"
   - $ref: "#/$defs/MANAGE_SETTINGS"
   - $ref: "#/$defs/MANAGE_ACCOUNTS"
   - $ref: "#/$defs/MANAGE_WARNINGS"
@@ -149,6 +150,12 @@ $defs:
     const: USE_PERSONAL_ACCESS_KEYS
     title: Use personal access keys
     description: Use personal access keys to authenticate with the Storyden API and MCP server.
+
+  USE_OAUTH_CLIENTS:
+    type: string
+    const: USE_OAUTH_CLIENTS
+    title: Authorize OAuth applications
+    description: Authorize OAuth and OIDC applications to access Storyden as this account.
 
   MANAGE_SETTINGS:
     type: string

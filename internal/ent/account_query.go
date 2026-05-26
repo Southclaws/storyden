@@ -27,6 +27,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
+	"github.com/Southclaws/storyden/internal/ent/oauthclient"
+	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -44,41 +49,47 @@ import (
 // AccountQuery is the builder for querying Account entities.
 type AccountQuery struct {
 	config
-	ctx                         *QueryContext
-	order                       []account.OrderOption
-	inters                      []Interceptor
-	predicates                  []predicate.Account
-	withSessions                *SessionQuery
-	withPlugins                 *PluginQuery
-	withEmails                  *EmailQuery
-	withNotifications           *NotificationQuery
-	withTriggeredNotifications  *NotificationQuery
-	withFollowing               *AccountFollowQuery
-	withFollowedBy              *AccountFollowQuery
-	withInvitations             *InvitationQuery
-	withInvitedBy               *InvitationQuery
-	withPosts                   *PostQuery
-	withQuestions               *QuestionQuery
-	withReacts                  *ReactQuery
-	withLikes                   *LikePostQuery
-	withMentions                *MentionProfileQuery
-	withRoles                   *RoleQuery
-	withAuthentication          *AuthenticationQuery
-	withTags                    *TagQuery
-	withCollections             *CollectionQuery
-	withNodes                   *NodeQuery
-	withAssets                  *AssetQuery
-	withEvents                  *EventParticipantQuery
-	withPostReads               *PostReadQuery
-	withReports                 *ReportQuery
-	withHandledReports          *ReportQuery
-	withAuditLogs               *AuditLogQuery
-	withModerationNotes         *ModerationNoteQuery
-	withAuthoredModerationNotes *ModerationNoteQuery
-	withWarnings                *WarningQuery
-	withAuthoredWarnings        *WarningQuery
-	withAccountRoles            *AccountRolesQuery
-	modifiers                   []func(*sql.Selector)
+	ctx                                   *QueryContext
+	order                                 []account.OrderOption
+	inters                                []Interceptor
+	predicates                            []predicate.Account
+	withSessions                          *SessionQuery
+	withPlugins                           *PluginQuery
+	withEmails                            *EmailQuery
+	withNotifications                     *NotificationQuery
+	withTriggeredNotifications            *NotificationQuery
+	withFollowing                         *AccountFollowQuery
+	withFollowedBy                        *AccountFollowQuery
+	withInvitations                       *InvitationQuery
+	withInvitedBy                         *InvitationQuery
+	withPosts                             *PostQuery
+	withQuestions                         *QuestionQuery
+	withReacts                            *ReactQuery
+	withLikes                             *LikePostQuery
+	withMentions                          *MentionProfileQuery
+	withRoles                             *RoleQuery
+	withAuthentication                    *AuthenticationQuery
+	withOauthClients                      *OAuthClientQuery
+	withOauthAuthorisationCodes           *OAuthAuthorisationCodeQuery
+	withOauthAuthorisationRequests        *OAuthAuthorisationRequestQuery
+	withOauthRefreshTokens                *OAuthRefreshTokenQuery
+	withClaimedOauthDeviceAuthorisations  *OAuthDeviceAuthorisationQuery
+	withApprovedOauthDeviceAuthorisations *OAuthDeviceAuthorisationQuery
+	withTags                              *TagQuery
+	withCollections                       *CollectionQuery
+	withNodes                             *NodeQuery
+	withAssets                            *AssetQuery
+	withEvents                            *EventParticipantQuery
+	withPostReads                         *PostReadQuery
+	withReports                           *ReportQuery
+	withHandledReports                    *ReportQuery
+	withAuditLogs                         *AuditLogQuery
+	withModerationNotes                   *ModerationNoteQuery
+	withAuthoredModerationNotes           *ModerationNoteQuery
+	withWarnings                          *WarningQuery
+	withAuthoredWarnings                  *WarningQuery
+	withAccountRoles                      *AccountRolesQuery
+	modifiers                             []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -460,6 +471,138 @@ func (_q *AccountQuery) QueryAuthentication() *AuthenticationQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(authentication.Table, authentication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthClients chains the current query on the "oauth_clients" edge.
+func (_q *AccountQuery) QueryOauthClients() *OAuthClientQuery {
+	query := (&OAuthClientClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthClientsTable, account.OauthClientsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthAuthorisationCodes chains the current query on the "oauth_authorisation_codes" edge.
+func (_q *AccountQuery) QueryOauthAuthorisationCodes() *OAuthAuthorisationCodeQuery {
+	query := (&OAuthAuthorisationCodeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthauthorisationcode.Table, oauthauthorisationcode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthAuthorisationCodesTable, account.OauthAuthorisationCodesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthAuthorisationRequests chains the current query on the "oauth_authorisation_requests" edge.
+func (_q *AccountQuery) QueryOauthAuthorisationRequests() *OAuthAuthorisationRequestQuery {
+	query := (&OAuthAuthorisationRequestClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthauthorisationrequest.Table, oauthauthorisationrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthAuthorisationRequestsTable, account.OauthAuthorisationRequestsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOauthRefreshTokens chains the current query on the "oauth_refresh_tokens" edge.
+func (_q *AccountQuery) QueryOauthRefreshTokens() *OAuthRefreshTokenQuery {
+	query := (&OAuthRefreshTokenClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthRefreshTokensTable, account.OauthRefreshTokensColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryClaimedOauthDeviceAuthorisations chains the current query on the "claimed_oauth_device_authorisations" edge.
+func (_q *AccountQuery) QueryClaimedOauthDeviceAuthorisations() *OAuthDeviceAuthorisationQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ClaimedOauthDeviceAuthorisationsTable, account.ClaimedOauthDeviceAuthorisationsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryApprovedOauthDeviceAuthorisations chains the current query on the "approved_oauth_device_authorisations" edge.
+func (_q *AccountQuery) QueryApprovedOauthDeviceAuthorisations() *OAuthDeviceAuthorisationQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ApprovedOauthDeviceAuthorisationsTable, account.ApprovedOauthDeviceAuthorisationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -962,41 +1105,47 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:                      _q.config,
-		ctx:                         _q.ctx.Clone(),
-		order:                       append([]account.OrderOption{}, _q.order...),
-		inters:                      append([]Interceptor{}, _q.inters...),
-		predicates:                  append([]predicate.Account{}, _q.predicates...),
-		withSessions:                _q.withSessions.Clone(),
-		withPlugins:                 _q.withPlugins.Clone(),
-		withEmails:                  _q.withEmails.Clone(),
-		withNotifications:           _q.withNotifications.Clone(),
-		withTriggeredNotifications:  _q.withTriggeredNotifications.Clone(),
-		withFollowing:               _q.withFollowing.Clone(),
-		withFollowedBy:              _q.withFollowedBy.Clone(),
-		withInvitations:             _q.withInvitations.Clone(),
-		withInvitedBy:               _q.withInvitedBy.Clone(),
-		withPosts:                   _q.withPosts.Clone(),
-		withQuestions:               _q.withQuestions.Clone(),
-		withReacts:                  _q.withReacts.Clone(),
-		withLikes:                   _q.withLikes.Clone(),
-		withMentions:                _q.withMentions.Clone(),
-		withRoles:                   _q.withRoles.Clone(),
-		withAuthentication:          _q.withAuthentication.Clone(),
-		withTags:                    _q.withTags.Clone(),
-		withCollections:             _q.withCollections.Clone(),
-		withNodes:                   _q.withNodes.Clone(),
-		withAssets:                  _q.withAssets.Clone(),
-		withEvents:                  _q.withEvents.Clone(),
-		withPostReads:               _q.withPostReads.Clone(),
-		withReports:                 _q.withReports.Clone(),
-		withHandledReports:          _q.withHandledReports.Clone(),
-		withAuditLogs:               _q.withAuditLogs.Clone(),
-		withModerationNotes:         _q.withModerationNotes.Clone(),
-		withAuthoredModerationNotes: _q.withAuthoredModerationNotes.Clone(),
-		withWarnings:                _q.withWarnings.Clone(),
-		withAuthoredWarnings:        _q.withAuthoredWarnings.Clone(),
-		withAccountRoles:            _q.withAccountRoles.Clone(),
+		config:                                _q.config,
+		ctx:                                   _q.ctx.Clone(),
+		order:                                 append([]account.OrderOption{}, _q.order...),
+		inters:                                append([]Interceptor{}, _q.inters...),
+		predicates:                            append([]predicate.Account{}, _q.predicates...),
+		withSessions:                          _q.withSessions.Clone(),
+		withPlugins:                           _q.withPlugins.Clone(),
+		withEmails:                            _q.withEmails.Clone(),
+		withNotifications:                     _q.withNotifications.Clone(),
+		withTriggeredNotifications:            _q.withTriggeredNotifications.Clone(),
+		withFollowing:                         _q.withFollowing.Clone(),
+		withFollowedBy:                        _q.withFollowedBy.Clone(),
+		withInvitations:                       _q.withInvitations.Clone(),
+		withInvitedBy:                         _q.withInvitedBy.Clone(),
+		withPosts:                             _q.withPosts.Clone(),
+		withQuestions:                         _q.withQuestions.Clone(),
+		withReacts:                            _q.withReacts.Clone(),
+		withLikes:                             _q.withLikes.Clone(),
+		withMentions:                          _q.withMentions.Clone(),
+		withRoles:                             _q.withRoles.Clone(),
+		withAuthentication:                    _q.withAuthentication.Clone(),
+		withOauthClients:                      _q.withOauthClients.Clone(),
+		withOauthAuthorisationCodes:           _q.withOauthAuthorisationCodes.Clone(),
+		withOauthAuthorisationRequests:        _q.withOauthAuthorisationRequests.Clone(),
+		withOauthRefreshTokens:                _q.withOauthRefreshTokens.Clone(),
+		withClaimedOauthDeviceAuthorisations:  _q.withClaimedOauthDeviceAuthorisations.Clone(),
+		withApprovedOauthDeviceAuthorisations: _q.withApprovedOauthDeviceAuthorisations.Clone(),
+		withTags:                              _q.withTags.Clone(),
+		withCollections:                       _q.withCollections.Clone(),
+		withNodes:                             _q.withNodes.Clone(),
+		withAssets:                            _q.withAssets.Clone(),
+		withEvents:                            _q.withEvents.Clone(),
+		withPostReads:                         _q.withPostReads.Clone(),
+		withReports:                           _q.withReports.Clone(),
+		withHandledReports:                    _q.withHandledReports.Clone(),
+		withAuditLogs:                         _q.withAuditLogs.Clone(),
+		withModerationNotes:                   _q.withModerationNotes.Clone(),
+		withAuthoredModerationNotes:           _q.withAuthoredModerationNotes.Clone(),
+		withWarnings:                          _q.withWarnings.Clone(),
+		withAuthoredWarnings:                  _q.withAuthoredWarnings.Clone(),
+		withAccountRoles:                      _q.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -1177,6 +1326,72 @@ func (_q *AccountQuery) WithAuthentication(opts ...func(*AuthenticationQuery)) *
 		opt(query)
 	}
 	_q.withAuthentication = query
+	return _q
+}
+
+// WithOauthClients tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_clients" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthClients(opts ...func(*OAuthClientQuery)) *AccountQuery {
+	query := (&OAuthClientClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthClients = query
+	return _q
+}
+
+// WithOauthAuthorisationCodes tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_authorisation_codes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthAuthorisationCodes(opts ...func(*OAuthAuthorisationCodeQuery)) *AccountQuery {
+	query := (&OAuthAuthorisationCodeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthAuthorisationCodes = query
+	return _q
+}
+
+// WithOauthAuthorisationRequests tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_authorisation_requests" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthAuthorisationRequests(opts ...func(*OAuthAuthorisationRequestQuery)) *AccountQuery {
+	query := (&OAuthAuthorisationRequestClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthAuthorisationRequests = query
+	return _q
+}
+
+// WithOauthRefreshTokens tells the query-builder to eager-load the nodes that are connected to
+// the "oauth_refresh_tokens" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithOauthRefreshTokens(opts ...func(*OAuthRefreshTokenQuery)) *AccountQuery {
+	query := (&OAuthRefreshTokenClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withOauthRefreshTokens = query
+	return _q
+}
+
+// WithClaimedOauthDeviceAuthorisations tells the query-builder to eager-load the nodes that are connected to
+// the "claimed_oauth_device_authorisations" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithClaimedOauthDeviceAuthorisations(opts ...func(*OAuthDeviceAuthorisationQuery)) *AccountQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withClaimedOauthDeviceAuthorisations = query
+	return _q
+}
+
+// WithApprovedOauthDeviceAuthorisations tells the query-builder to eager-load the nodes that are connected to
+// the "approved_oauth_device_authorisations" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithApprovedOauthDeviceAuthorisations(opts ...func(*OAuthDeviceAuthorisationQuery)) *AccountQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withApprovedOauthDeviceAuthorisations = query
 	return _q
 }
 
@@ -1412,7 +1627,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [30]bool{
+		loadedTypes = [36]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -1429,6 +1644,12 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withMentions != nil,
 			_q.withRoles != nil,
 			_q.withAuthentication != nil,
+			_q.withOauthClients != nil,
+			_q.withOauthAuthorisationCodes != nil,
+			_q.withOauthAuthorisationRequests != nil,
+			_q.withOauthRefreshTokens != nil,
+			_q.withClaimedOauthDeviceAuthorisations != nil,
+			_q.withApprovedOauthDeviceAuthorisations != nil,
 			_q.withTags != nil,
 			_q.withCollections != nil,
 			_q.withNodes != nil,
@@ -1576,6 +1797,58 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadAuthentication(ctx, query, nodes,
 			func(n *Account) { n.Edges.Authentication = []*Authentication{} },
 			func(n *Account, e *Authentication) { n.Edges.Authentication = append(n.Edges.Authentication, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthClients; query != nil {
+		if err := _q.loadOauthClients(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthClients = []*OAuthClient{} },
+			func(n *Account, e *OAuthClient) { n.Edges.OauthClients = append(n.Edges.OauthClients, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthAuthorisationCodes; query != nil {
+		if err := _q.loadOauthAuthorisationCodes(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthAuthorisationCodes = []*OAuthAuthorisationCode{} },
+			func(n *Account, e *OAuthAuthorisationCode) {
+				n.Edges.OauthAuthorisationCodes = append(n.Edges.OauthAuthorisationCodes, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthAuthorisationRequests; query != nil {
+		if err := _q.loadOauthAuthorisationRequests(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthAuthorisationRequests = []*OAuthAuthorisationRequest{} },
+			func(n *Account, e *OAuthAuthorisationRequest) {
+				n.Edges.OauthAuthorisationRequests = append(n.Edges.OauthAuthorisationRequests, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withOauthRefreshTokens; query != nil {
+		if err := _q.loadOauthRefreshTokens(ctx, query, nodes,
+			func(n *Account) { n.Edges.OauthRefreshTokens = []*OAuthRefreshToken{} },
+			func(n *Account, e *OAuthRefreshToken) {
+				n.Edges.OauthRefreshTokens = append(n.Edges.OauthRefreshTokens, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withClaimedOauthDeviceAuthorisations; query != nil {
+		if err := _q.loadClaimedOauthDeviceAuthorisations(ctx, query, nodes,
+			func(n *Account) { n.Edges.ClaimedOauthDeviceAuthorisations = []*OAuthDeviceAuthorisation{} },
+			func(n *Account, e *OAuthDeviceAuthorisation) {
+				n.Edges.ClaimedOauthDeviceAuthorisations = append(n.Edges.ClaimedOauthDeviceAuthorisations, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withApprovedOauthDeviceAuthorisations; query != nil {
+		if err := _q.loadApprovedOauthDeviceAuthorisations(ctx, query, nodes,
+			func(n *Account) { n.Edges.ApprovedOauthDeviceAuthorisations = []*OAuthDeviceAuthorisation{} },
+			func(n *Account, e *OAuthDeviceAuthorisation) {
+				n.Edges.ApprovedOauthDeviceAuthorisations = append(n.Edges.ApprovedOauthDeviceAuthorisations, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -2196,6 +2469,195 @@ func (_q *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_authentication" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthClients(ctx context.Context, query *OAuthClientQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthClient)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthclient.FieldAccountID)
+	}
+	query.Where(predicate.OAuthClient(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthClientsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthAuthorisationCodes(ctx context.Context, query *OAuthAuthorisationCodeQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthAuthorisationCode)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthauthorisationcode.FieldAccountID)
+	}
+	query.Where(predicate.OAuthAuthorisationCode(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthAuthorisationCodesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthAuthorisationRequests(ctx context.Context, query *OAuthAuthorisationRequestQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthAuthorisationRequest)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthauthorisationrequest.FieldAccountID)
+	}
+	query.Where(predicate.OAuthAuthorisationRequest(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthAuthorisationRequestsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadOauthRefreshTokens(ctx context.Context, query *OAuthRefreshTokenQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthRefreshToken)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthrefreshtoken.FieldAccountID)
+	}
+	query.Where(predicate.OAuthRefreshToken(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.OauthRefreshTokensColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadClaimedOauthDeviceAuthorisations(ctx context.Context, query *OAuthDeviceAuthorisationQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthDeviceAuthorisation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthdeviceauthorisation.FieldClaimedByAccountID)
+	}
+	query.Where(predicate.OAuthDeviceAuthorisation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.ClaimedOauthDeviceAuthorisationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ClaimedByAccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "claimed_by_account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "claimed_by_account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadApprovedOauthDeviceAuthorisations(ctx context.Context, query *OAuthDeviceAuthorisationQuery, nodes []*Account, init func(*Account), assign func(*Account, *OAuthDeviceAuthorisation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(oauthdeviceauthorisation.FieldApprovedByAccountID)
+	}
+	query.Where(predicate.OAuthDeviceAuthorisation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.ApprovedOauthDeviceAuthorisationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ApprovedByAccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "approved_by_account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "approved_by_account_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

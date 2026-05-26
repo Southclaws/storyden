@@ -76,6 +76,18 @@ const (
 	EdgeRoles = "roles"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
 	EdgeAuthentication = "authentication"
+	// EdgeOauthClients holds the string denoting the oauth_clients edge name in mutations.
+	EdgeOauthClients = "oauth_clients"
+	// EdgeOauthAuthorisationCodes holds the string denoting the oauth_authorisation_codes edge name in mutations.
+	EdgeOauthAuthorisationCodes = "oauth_authorisation_codes"
+	// EdgeOauthAuthorisationRequests holds the string denoting the oauth_authorisation_requests edge name in mutations.
+	EdgeOauthAuthorisationRequests = "oauth_authorisation_requests"
+	// EdgeOauthRefreshTokens holds the string denoting the oauth_refresh_tokens edge name in mutations.
+	EdgeOauthRefreshTokens = "oauth_refresh_tokens"
+	// EdgeClaimedOauthDeviceAuthorisations holds the string denoting the claimed_oauth_device_authorisations edge name in mutations.
+	EdgeClaimedOauthDeviceAuthorisations = "claimed_oauth_device_authorisations"
+	// EdgeApprovedOauthDeviceAuthorisations holds the string denoting the approved_oauth_device_authorisations edge name in mutations.
+	EdgeApprovedOauthDeviceAuthorisations = "approved_oauth_device_authorisations"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
@@ -216,6 +228,48 @@ const (
 	AuthenticationInverseTable = "authentications"
 	// AuthenticationColumn is the table column denoting the authentication relation/edge.
 	AuthenticationColumn = "account_authentication"
+	// OauthClientsTable is the table that holds the oauth_clients relation/edge.
+	OauthClientsTable = "oauth_clients"
+	// OauthClientsInverseTable is the table name for the OAuthClient entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthclient" package.
+	OauthClientsInverseTable = "oauth_clients"
+	// OauthClientsColumn is the table column denoting the oauth_clients relation/edge.
+	OauthClientsColumn = "account_id"
+	// OauthAuthorisationCodesTable is the table that holds the oauth_authorisation_codes relation/edge.
+	OauthAuthorisationCodesTable = "oauth_authorisation_codes"
+	// OauthAuthorisationCodesInverseTable is the table name for the OAuthAuthorisationCode entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthauthorisationcode" package.
+	OauthAuthorisationCodesInverseTable = "oauth_authorisation_codes"
+	// OauthAuthorisationCodesColumn is the table column denoting the oauth_authorisation_codes relation/edge.
+	OauthAuthorisationCodesColumn = "account_id"
+	// OauthAuthorisationRequestsTable is the table that holds the oauth_authorisation_requests relation/edge.
+	OauthAuthorisationRequestsTable = "oauth_authorisation_requests"
+	// OauthAuthorisationRequestsInverseTable is the table name for the OAuthAuthorisationRequest entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthauthorisationrequest" package.
+	OauthAuthorisationRequestsInverseTable = "oauth_authorisation_requests"
+	// OauthAuthorisationRequestsColumn is the table column denoting the oauth_authorisation_requests relation/edge.
+	OauthAuthorisationRequestsColumn = "account_id"
+	// OauthRefreshTokensTable is the table that holds the oauth_refresh_tokens relation/edge.
+	OauthRefreshTokensTable = "oauth_refresh_tokens"
+	// OauthRefreshTokensInverseTable is the table name for the OAuthRefreshToken entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthrefreshtoken" package.
+	OauthRefreshTokensInverseTable = "oauth_refresh_tokens"
+	// OauthRefreshTokensColumn is the table column denoting the oauth_refresh_tokens relation/edge.
+	OauthRefreshTokensColumn = "account_id"
+	// ClaimedOauthDeviceAuthorisationsTable is the table that holds the claimed_oauth_device_authorisations relation/edge.
+	ClaimedOauthDeviceAuthorisationsTable = "oauth_device_authorisations"
+	// ClaimedOauthDeviceAuthorisationsInverseTable is the table name for the OAuthDeviceAuthorisation entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthdeviceauthorisation" package.
+	ClaimedOauthDeviceAuthorisationsInverseTable = "oauth_device_authorisations"
+	// ClaimedOauthDeviceAuthorisationsColumn is the table column denoting the claimed_oauth_device_authorisations relation/edge.
+	ClaimedOauthDeviceAuthorisationsColumn = "claimed_by_account_id"
+	// ApprovedOauthDeviceAuthorisationsTable is the table that holds the approved_oauth_device_authorisations relation/edge.
+	ApprovedOauthDeviceAuthorisationsTable = "oauth_device_authorisations"
+	// ApprovedOauthDeviceAuthorisationsInverseTable is the table name for the OAuthDeviceAuthorisation entity.
+	// It exists in this package in order to avoid circular dependency with the "oauthdeviceauthorisation" package.
+	ApprovedOauthDeviceAuthorisationsInverseTable = "oauth_device_authorisations"
+	// ApprovedOauthDeviceAuthorisationsColumn is the table column denoting the approved_oauth_device_authorisations relation/edge.
+	ApprovedOauthDeviceAuthorisationsColumn = "approved_by_account_id"
 	// TagsTable is the table that holds the tags relation/edge. The primary key declared below.
 	TagsTable = "account_tags"
 	// TagsInverseTable is the table name for the Tag entity.
@@ -709,6 +763,90 @@ func ByAuthentication(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByOauthClientsCount orders the results by oauth_clients count.
+func ByOauthClientsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthClientsStep(), opts...)
+	}
+}
+
+// ByOauthClients orders the results by oauth_clients terms.
+func ByOauthClients(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthClientsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOauthAuthorisationCodesCount orders the results by oauth_authorisation_codes count.
+func ByOauthAuthorisationCodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthAuthorisationCodesStep(), opts...)
+	}
+}
+
+// ByOauthAuthorisationCodes orders the results by oauth_authorisation_codes terms.
+func ByOauthAuthorisationCodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthAuthorisationCodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOauthAuthorisationRequestsCount orders the results by oauth_authorisation_requests count.
+func ByOauthAuthorisationRequestsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthAuthorisationRequestsStep(), opts...)
+	}
+}
+
+// ByOauthAuthorisationRequests orders the results by oauth_authorisation_requests terms.
+func ByOauthAuthorisationRequests(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthAuthorisationRequestsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOauthRefreshTokensCount orders the results by oauth_refresh_tokens count.
+func ByOauthRefreshTokensCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOauthRefreshTokensStep(), opts...)
+	}
+}
+
+// ByOauthRefreshTokens orders the results by oauth_refresh_tokens terms.
+func ByOauthRefreshTokens(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOauthRefreshTokensStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByClaimedOauthDeviceAuthorisationsCount orders the results by claimed_oauth_device_authorisations count.
+func ByClaimedOauthDeviceAuthorisationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClaimedOauthDeviceAuthorisationsStep(), opts...)
+	}
+}
+
+// ByClaimedOauthDeviceAuthorisations orders the results by claimed_oauth_device_authorisations terms.
+func ByClaimedOauthDeviceAuthorisations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClaimedOauthDeviceAuthorisationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByApprovedOauthDeviceAuthorisationsCount orders the results by approved_oauth_device_authorisations count.
+func ByApprovedOauthDeviceAuthorisationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newApprovedOauthDeviceAuthorisationsStep(), opts...)
+	}
+}
+
+// ByApprovedOauthDeviceAuthorisations orders the results by approved_oauth_device_authorisations terms.
+func ByApprovedOauthDeviceAuthorisations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newApprovedOauthDeviceAuthorisationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByTagsCount orders the results by tags count.
 func ByTagsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1014,6 +1152,48 @@ func newAuthenticationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuthenticationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AuthenticationTable, AuthenticationColumn),
+	)
+}
+func newOauthClientsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthClientsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthClientsTable, OauthClientsColumn),
+	)
+}
+func newOauthAuthorisationCodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthAuthorisationCodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthAuthorisationCodesTable, OauthAuthorisationCodesColumn),
+	)
+}
+func newOauthAuthorisationRequestsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthAuthorisationRequestsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthAuthorisationRequestsTable, OauthAuthorisationRequestsColumn),
+	)
+}
+func newOauthRefreshTokensStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OauthRefreshTokensInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OauthRefreshTokensTable, OauthRefreshTokensColumn),
+	)
+}
+func newClaimedOauthDeviceAuthorisationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClaimedOauthDeviceAuthorisationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ClaimedOauthDeviceAuthorisationsTable, ClaimedOauthDeviceAuthorisationsColumn),
+	)
+}
+func newApprovedOauthDeviceAuthorisationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ApprovedOauthDeviceAuthorisationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ApprovedOauthDeviceAuthorisationsTable, ApprovedOauthDeviceAuthorisationsColumn),
 	)
 }
 func newTagsStep() *sqlgraph.Step {

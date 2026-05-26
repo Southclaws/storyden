@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -41,6 +41,8 @@ export function useLoginHandleForm() {
     resolver: zodResolver(FormSchema),
   });
   const { push } = useRouter();
+  const searchParams = useSearchParams();
+  const returnURL = searchParams.get("return_url") ?? "/";
   const { mutate } = useAccountGet();
 
   const isWebauthnEnabled = isWebauthnAvailable();
@@ -76,7 +78,7 @@ export function useLoginHandleForm() {
 
     await authPasswordSignin(parsed.data)
       .then(() => {
-        push("/");
+        push(returnURL);
         mutate();
       })
       .catch((e: APIError) => setError("root", { message: deriveError(e) }));
@@ -85,7 +87,7 @@ export function useLoginHandleForm() {
   async function handleWebauthn(payload: Form) {
     try {
       await passkeyLogin(payload.identifier);
-      push("/");
+      push(returnURL);
       mutate();
     } catch (error) {
       setError("root", { message: deriveError(error) });

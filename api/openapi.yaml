@@ -428,6 +428,139 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "204": { $ref: "#/components/responses/NoContent" }
 
+  /admin/oauth/clients:
+    get:
+      operationId: AdminOAuthClientList
+      description: |
+        List OAuth clients registered for this instance.
+
+        This admin view includes both member-created third-party clients and
+        built-in first-party clients. Built-in clients will not be owned by an
+        account; their grants and refresh tokens are owned by the approving
+        account instead.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthClientListOK" }
+    post:
+      operationId: AdminOAuthClientCreate
+      description: |
+        Create an OAuth client.
+
+        Confidential clients receive a generated secret once at creation time
+        and must authenticate to `/oauth/token` when using confidential grants.
+        Public clients do not receive or use a client secret.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/OAuthClientCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthClientOK" }
+
+  /admin/oauth/clients/{oauth_client_id}:
+    get:
+      operationId: AdminOAuthClientGet
+      description: |
+        Read an OAuth client.
+
+        OAuth clients represent application/software identity. They are not the
+        same thing as a user authorisation; user-owned authorisations are
+        represented by device authorisations, authorisation requests, and
+        refresh tokens.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/OAuthClientOK" }
+    patch:
+      operationId: AdminOAuthClientUpdate
+      description: |
+        Update an OAuth client.
+
+        Changing allowed grants or scopes only affects future authorisation and
+        refresh operations. Already-issued JWT access tokens remain valid until
+        their expiry unless their signing key is rotated.
+
+        For account-owned clients, allowed permission scopes must be grantable
+        by the owning account. An account with `ADMINISTRATOR` may configure any
+        Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+        permissions.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/OAuthClientUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/OAuthClientOK" }
+    delete:
+      operationId: AdminOAuthClientDelete
+      description: |
+        Delete an OAuth client.
+
+        Deleting a client also removes its pending OAuth records and refresh
+        tokens, preventing existing grants from being renewed. Existing JWT
+        access tokens are self-contained and remain valid until expiry.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /admin/oauth/device-authorizations:
+    get:
+      operationId: AdminOAuthDeviceAuthorisationList
+      description: |
+        List OAuth device authorisation records.
+
+        Device authorisation records are short-lived records created by the
+        OAuth 2.0 Device Authorization Grant. They are not owned by an account
+        until a signed-in user claims and approves or denies the user code.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthDeviceAuthorisationListOK" }
+
+  /admin/oauth/refresh-tokens:
+    get:
+      operationId: AdminOAuthRefreshTokenList
+      description: |
+        List OAuth refresh tokens.
+
+        Refresh tokens are account-owned grants for an OAuth client. Revoking a
+        refresh token prevents future token renewal, but does not immediately
+        invalidate already-issued JWT access tokens.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthRefreshTokenListOK" }
+
+  /admin/oauth/refresh-tokens/{oauth_refresh_token_id}:
+    delete:
+      operationId: AdminOAuthRefreshTokenDelete
+      description: |
+        Revoke an OAuth refresh token.
+
+        This prevents future refresh-token use. Because Storyden OAuth access
+        tokens are JWTs, any access token already issued from this grant remains
+        valid until its normal expiry.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/OAuthRefreshTokenIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
   #
   #          888                   d8b
   #          888                   Y8P
@@ -943,6 +1076,226 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /oauth/jwks:
+    get:
+      operationId: OAuthJWKS
+      description: |
+        List public JSON Web Keys that clients can use to validate Storyden
+        OAuth access tokens and OpenID Connect ID tokens.
+
+        This is advertised by `/.well-known/openid-configuration` as `jwks_uri`.
+        Storyden serves this under the API mount because the key set is an API
+        resource; the well-known discovery document itself is mounted at the
+        instance root and is intentionally not part of this OpenAPI document.
+      tags: [auth]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/OAuthJWKSOK" }
+
+  /oauth/device_authorization:
+    post:
+      operationId: OAuthDeviceAuthorisation
+      description: |
+        Start the OAuth 2.0 Device Authorization Grant for clients that cannot
+        receive a browser redirect directly, such as CLIs, terminals, and
+        desktop tools.
+
+        The `scope` parameter follows OAuth 2.0 and is optional. Storyden
+        applies additional client policy after parsing the request:
+
+        - Built-in first-party device clients, such as the default Storyden CLI
+          client, must request exactly `openid profile offline_access`. On
+          approval Storyden expands the issued scope to the approving account's
+          current permissions.
+        - Third-party explicit-scope clients may omit `scope`; omitted scope
+          means no requested scopes.
+
+        `verification_uri` and `verification_uri_complete` point at the
+        configured frontend consent page, not at an API-rendered HTML page.
+        Custom frontends can change this URL with
+        `OAUTH_DEVICE_AUTHORISATION_CONSENT_URL`.
+      tags: [auth]
+      security: []
+      requestBody:
+        { $ref: "#/components/requestBodies/OAuthDeviceAuthorisation" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "200": { $ref: "#/components/responses/OAuthDeviceAuthorisationOK" }
+
+  /oauth/device/consent:
+    get:
+      operationId: OAuthDeviceConsent
+      description: |
+        Read a pending OAuth device authorisation request for a signed-in user
+        before they approve or deny consent in the frontend.
+
+        This is a Storyden frontend/API integration endpoint, not an OAuth
+        protocol endpoint. The API never renders the consent UI directly. A
+        frontend reads this JSON, displays the client and scopes, then submits
+        the user's decision.
+
+        Reading consent claims the user code for the signed-in account. This
+        prevents another account from approving the same code after it has been
+        displayed.
+      tags: [auth]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/OAuthUserCodeQuery" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthDeviceConsentOK" }
+    post:
+      operationId: OAuthDeviceConsentSubmit
+      description: |
+        Approve or deny a pending OAuth device authorisation request for the
+        currently signed-in account.
+
+        On approval Storyden recomputes the granted scope from the current
+        account permissions and client policy. For first-party inherited clients
+        this means the final token scope may include Storyden permission scopes
+        that were not present in the original device authorisation request.
+      tags: [auth]
+      security: [browser: []]
+      requestBody:
+        $ref: "#/components/requestBodies/OAuthDeviceConsentSubmit"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthDeviceConsentSubmitOK" }
+
+  /oauth/authorize:
+    get:
+      operationId: OAuthAuthorise
+      description: |
+        Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+
+        This endpoint requires a browser session. If the account is not signed
+        in, Storyden redirects to the frontend login route instead of returning
+        a protocol redirect to the client application.
+
+        Unlike many OAuth servers, Storyden does not render a consent page from
+        this API endpoint. A valid request creates a short-lived pending
+        authorisation request and redirects the browser to the configured
+        frontend authorisation-code consent URL. Custom frontends can change
+        this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+
+        The `scope` parameter follows OAuth 2.0 and is optional. Empty or
+        omitted scope means no requested scopes. Storyden permission scopes are
+        granted only when allowed by the client and by the signed-in account's
+        current permissions.
+      tags: [auth]
+      security: [browser: []]
+      parameters:
+        - { $ref: "#/components/parameters/OAuthResponseTypeQuery" }
+        - { $ref: "#/components/parameters/OAuthClientIDQuery" }
+        - { $ref: "#/components/parameters/OAuthRedirectURIQuery" }
+        - { $ref: "#/components/parameters/OAuthScopeQuery" }
+        - { $ref: "#/components/parameters/OAuthStateQuery" }
+        - { $ref: "#/components/parameters/OAuthCodeChallengeQuery" }
+        - { $ref: "#/components/parameters/OAuthCodeChallengeMethodQuery" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/OAuthAuthoriseOK" }
+        "302": { $ref: "#/components/responses/OAuthAuthoriseFound" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+
+  /oauth/authorize/consent:
+    get:
+      operationId: OAuthAuthoriseConsent
+      description: |
+        Read a pending OAuth authorisation code request for a signed-in user
+        before they approve or deny consent in the frontend.
+
+        This is a Storyden frontend/API integration endpoint, not an OAuth
+        protocol endpoint. It returns the client, redirect URI, requested
+        scopes, and currently grantable scopes so the frontend can render a
+        consent screen.
+      tags: [auth]
+      security: [browser: []]
+      parameters:
+        - $ref: "#/components/parameters/OAuthAuthorizationRequestIDQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthAuthoriseConsentOK" }
+    post:
+      operationId: OAuthAuthoriseConsentSubmit
+      description: |
+        Approve or deny a pending OAuth authorisation code request for the
+        currently signed-in account.
+
+        On approval this creates a short-lived authorisation code and returns
+        the client redirect URI containing `code` and optional `state`. On
+        denial the returned redirect URI contains `error=access_denied`.
+
+        Storyden recomputes the granted scope at approval time from current
+        account permissions and client policy.
+      tags: [auth]
+      security: [browser: []]
+      requestBody:
+        $ref: "#/components/requestBodies/OAuthAuthoriseConsentSubmit"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthAuthoriseConsentSubmitOK" }
+
+  /oauth/token:
+    post:
+      operationId: OAuthToken
+      description: |
+        Exchange an OAuth authorisation code, device code, refresh token, or
+        client credentials grant for tokens.
+
+        Supported grants are advertised by `/.well-known/openid-configuration`.
+        Public clients authenticate with `client_id` only and must use grants
+        suitable for public clients, such as device code or authorisation code
+        with PKCE. Confidential clients must provide `client_secret` for
+        authorisation-code, refresh-token, and client-credentials exchanges.
+
+        Storyden access tokens are short-lived JWTs containing the issued
+        `scope`. Revoking a refresh token or changing account permissions does
+        not revoke an already-issued access token; permission changes are
+        applied on the next token issuance or refresh.
+
+        Device-code polling returns OAuth-compatible errors such as
+        `authorization_pending`, `slow_down`, `expired_token`,
+        `access_denied`, and `invalid_grant`.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/OAuthToken" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/OAuthTokenOK" }
+        "400": { $ref: "#/components/responses/OAuthTokenError" }
+
+  /oauth/userinfo:
+    get:
+      operationId: OAuthUserInfo
+      description: |
+        Return OpenID Connect UserInfo claims for the account represented by a
+        valid bearer access token.
+
+        Claims are scope-gated:
+
+        - `openid` identifies the subject.
+        - `profile` enables profile claims such as display name.
+        - `email` enables email claims when the account has an email address.
+
+        Storyden accounts do not always have email addresses, so email claims
+        may be absent even when the `email` scope is present.
+      tags: [auth]
+      security: [oauth_token: []]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthUserInfoOK" }
+
   /auth/webauthn/make/{account_handle}:
     get:
       operationId: WebAuthnRequestCredential
@@ -1073,6 +1426,137 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "403": { $ref: "#/components/responses/Forbidden" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /auth/oauth/tokens:
+    get:
+      operationId: OAuthRefreshTokenList
+      description: |
+        List OAuth refresh tokens issued to the authenticated account.
+
+        This is the member-facing "authorised applications" view: it lists apps
+        the signed-in account has authorised and can revoke. In OAuth terms,
+        these rows are grants/tokens, not application definitions.
+
+        This may include grants for built-in first-party clients such as the
+        default Storyden CLI. Those clients are not created by the member and
+        therefore do not appear in the member OAuth client list.
+      tags: [auth]
+      security: [browser: []]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthRefreshTokenListOK" }
+
+  /auth/oauth/tokens/{oauth_refresh_token_id}:
+    delete:
+      operationId: OAuthRefreshTokenDelete
+      description: |
+        Revoke one OAuth refresh token issued to the authenticated account.
+
+        This prevents future refresh-token use for the selected grant. Existing
+        JWT access tokens remain valid until their expiry.
+      tags: [auth]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/OAuthRefreshTokenIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /auth/oauth/clients:
+    get:
+      operationId: OAuthClientList
+      description: |
+        List OAuth clients created by the authenticated account.
+
+        This is the member-facing "apps I created" view. OAuth clients are
+        application definitions: client ID, client type, redirect URIs, allowed
+        scopes, and allowed grants.
+
+        This does not list built-in first-party clients or third-party apps the
+        member has merely authorised. Use `/auth/oauth/tokens` for the
+        "apps I have authorised" view.
+      tags: [auth]
+      security: [browser: []]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthClientListOK" }
+    post:
+      operationId: OAuthClientCreate
+      description: |
+        Create an OAuth client owned by the authenticated account.
+
+        Member-created clients are third-party explicit-scope clients. The
+        requested allowed scopes must be a subset of the authenticated account's
+        current permissions.
+      tags: [auth]
+      security: [browser: []]
+      requestBody: { $ref: "#/components/requestBodies/OAuthClientSelfCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthClientIssuedOK" }
+
+  /auth/oauth/clients/{oauth_client_id}:
+    get:
+      operationId: OAuthClientGet
+      description: |
+        Read an OAuth client created by the authenticated account.
+
+        Member-created clients are third-party application identities. They may
+        be public or confidential but are never first-party inherited-permission
+        clients.
+      tags: [auth]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/OAuthClientOK" }
+    patch:
+      operationId: OAuthClientUpdate
+      description: |
+        Update an OAuth client created by the authenticated account.
+
+        Allowed scopes must remain within the authenticated account's current
+        permissions. If the account has `ADMINISTRATOR`, it may configure any
+        Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+        permissions.
+
+        Changing allowed scopes affects future grants and refreshes but does
+        not immediately invalidate already-issued JWT access tokens.
+      tags: [auth]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/OAuthClientSelfUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthClientOK" }
+    delete:
+      operationId: OAuthClientDelete
+      description: |
+        Delete an OAuth client created by the authenticated account.
+
+        This prevents new OAuth flows for the client and removes associated
+        pending OAuth records and refresh tokens, preventing existing grants
+        from being renewed. Existing JWT access tokens remain valid until
+        expiry.
+      tags: [auth]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/OAuthClientIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/OAuthError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
         "204": { $ref: "#/components/responses/NoContent" }
 
   /auth/logout:
@@ -2975,6 +3459,22 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    OAuthClientIDParam:
+      description: OAuth client ID.
+      in: path
+      name: oauth_client_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    OAuthRefreshTokenIDParam:
+      description: OAuth refresh token ID.
+      in: path
+      name: oauth_refresh_token_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     AccountIDParam:
       description: Account ID.
       name: account_id
@@ -3162,6 +3662,81 @@ components:
       example: twitter
       schema:
         type: string
+
+    OAuthUserCodeQuery:
+      description: OAuth device authorisation user code.
+      name: user_code
+      in: query
+      required: false
+      schema:
+        type: string
+
+    OAuthAuthorizationRequestIDQuery:
+      description: OAuth authorisation request identifier.
+      name: request_id
+      in: query
+      required: false
+      schema:
+        type: string
+
+    OAuthResponseTypeQuery:
+      description: OAuth response type. Storyden currently supports authorisation code.
+      name: response_type
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [code]
+
+    OAuthClientIDQuery:
+      description: OAuth client identifier.
+      name: client_id
+      in: query
+      required: true
+      schema:
+        type: string
+
+    OAuthRedirectURIQuery:
+      description: Registered redirect URI for the OAuth client.
+      name: redirect_uri
+      in: query
+      required: true
+      schema:
+        type: string
+        format: uri
+
+    OAuthScopeQuery:
+      description: Space-separated OAuth scopes requested by the client.
+      name: scope
+      in: query
+      required: false
+      schema:
+        type: string
+
+    OAuthStateQuery:
+      description: Client-provided opaque state returned to the redirect URI.
+      name: state
+      in: query
+      required: false
+      schema:
+        type: string
+
+    OAuthCodeChallengeQuery:
+      description: PKCE code challenge.
+      name: code_challenge
+      in: query
+      required: true
+      schema:
+        type: string
+
+    OAuthCodeChallengeMethodQuery:
+      description: PKCE code challenge method.
+      name: code_challenge_method
+      in: query
+      required: true
+      schema:
+        type: string
+        enum: [S256]
 
     SearchQuery:
       description: Search query string.
@@ -3559,6 +4134,55 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/OAuthCallback" }
+
+    OAuthDeviceAuthorisation:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/OAuthDeviceAuthorisationProps" }
+
+    OAuthDeviceConsentSubmit:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthDeviceConsentSubmitProps" }
+
+    OAuthAuthoriseConsentSubmit:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthAuthoriseConsentSubmitProps"
+
+    OAuthToken:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: "#/components/schemas/OAuthTokenProps" }
+
+    OAuthClientCreate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthClientCreateProps" }
+
+    OAuthClientUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthClientUpdateProps" }
+
+    OAuthClientSelfCreate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthClientSelfCreateProps" }
+
+    OAuthClientSelfUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthClientSelfUpdateProps" }
 
     WebAuthnMakeCredential:
       content:
@@ -3975,6 +4599,125 @@ components:
             properties:
               providers: { $ref: "#/components/schemas/AuthProviderList" }
               mode: { $ref: "#/components/schemas/AuthMode" }
+
+    OAuthJWKSOK:
+      description: JSON Web Key Set.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthJWKS"
+
+    OAuthDeviceAuthorisationOK:
+      description: Device authorisation response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthDeviceAuthorisation"
+
+    OAuthDeviceConsentOK:
+      description: Device consent details.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthDeviceConsent"
+
+    OAuthDeviceConsentSubmitOK:
+      description: Device consent decision result.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthDeviceConsentResult"
+
+    OAuthAuthoriseConsentOK:
+      description: Authorization code consent details.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthAuthoriseConsent"
+
+    OAuthAuthoriseConsentSubmitOK:
+      description: Authorization code consent decision result.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthAuthoriseConsentResult"
+
+    OAuthAuthoriseOK:
+      description: OAuth authorisation page.
+      content:
+        text/html:
+          schema:
+            type: string
+
+    OAuthAuthoriseFound:
+      description: Redirect to client callback.
+      headers:
+        Location:
+          schema:
+            type: string
+
+    OAuthError:
+      description: OAuth-compatible error response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthError"
+
+    OAuthTokenOK:
+      description: Token response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthToken"
+
+    OAuthTokenError:
+      description: OAuth token error response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthError"
+
+    OAuthUserInfoOK:
+      description: User info claims.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthUserInfo"
+
+    OAuthClientOK:
+      description: OAuth client.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthClient"
+
+    OAuthClientListOK:
+      description: OAuth clients.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthClientListResult"
+
+    OAuthClientIssuedOK:
+      description: OAuth client and one-time client secret.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthClientIssued"
+
+    OAuthDeviceAuthorisationListOK:
+      description: OAuth device authorisations.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthDeviceAuthorisationListResult"
+
+    OAuthRefreshTokenListOK:
+      description: OAuth refresh tokens.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRefreshTokenListResult"
 
     WebAuthnRequestCredentialOK:
       description: OK
@@ -4697,6 +5440,7 @@ components:
         - semdex
         - email_client
         - sms_client
+        - oauth
 
     InstanceCapabilityList:
       type: array
@@ -4757,6 +5501,16 @@ components:
         misc:
           type: object
           description: Arbitrary extra data stored with the resource.
+
+    CreatedAt:
+      type: string
+      format: date-time
+      description: The time the resource was created.
+
+    UpdatedAt:
+      type: string
+      format: date-time
+      description: The time the resource was updated.
 
     APIError:
       type: object
@@ -5923,8 +6677,9 @@ components:
         - "READ_COLLECTION"
         - "MANAGE_COLLECTIONS"
         - "COLLECTION_SUBMIT"
-        # Personal access keys for automation/MCP
+        # External automation and application authorisation
         - "USE_PERSONAL_ACCESS_KEYS"
+        - "USE_OAUTH_CLIENTS"
         # Administrative (Settings, bans, etc)
         - "MANAGE_SETTINGS"
         - "MANAGE_ACCOUNTS"
@@ -6107,6 +6862,424 @@ components:
           type: string
         code:
           type: string
+
+    OAuthJWK:
+      description: JSON Web Key used to validate OAuth tokens.
+      type: object
+      required: [kty, use, alg, kid, n, e]
+      properties:
+        kty: { type: string }
+        use: { type: string }
+        alg: { type: string }
+        kid: { type: string }
+        n: { type: string }
+        e: { type: string }
+
+    OAuthJWKS:
+      description: JSON Web Key Set.
+      type: object
+      required: [keys]
+      properties:
+        keys:
+          type: array
+          items: { $ref: "#/components/schemas/OAuthJWK" }
+
+    OAuthError:
+      description: OAuth-compatible error object.
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+
+    OAuthDeviceAuthorisationProps:
+      type: object
+      required: [client_id]
+      properties:
+        client_id:
+          type: string
+        scope:
+          type: string
+
+    OAuthDeviceAuthorisation:
+      type: object
+      properties:
+        device_code:
+          type: string
+        user_code:
+          type: string
+        verification_uri:
+          type: string
+          format: uri
+        verification_uri_complete:
+          type: string
+          format: uri
+        expires_in:
+          type: integer
+        interval:
+          type: integer
+        error:
+          type: string
+
+    OAuthDeviceDecision:
+      type: string
+      enum: [approve, deny]
+
+    OAuthAuthoriseDecision:
+      type: string
+      enum: [approve, deny]
+
+    OAuthDeviceConsent:
+      type: object
+      required:
+        - user_code
+        - client_id
+        - client_name
+        - expires_at
+        - requested_scopes
+        - granted_scopes
+        - inherits_user_permissions
+      properties:
+        user_code:
+          type: string
+        client_id:
+          type: string
+        client_name:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        requested_scopes:
+          type: array
+          items: { type: string }
+        granted_scopes:
+          type: array
+          items: { type: string }
+        inherits_user_permissions:
+          type: boolean
+
+    OAuthDeviceConsentResult:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [approved, denied]
+
+    OAuthDeviceConsentSubmitProps:
+      type: object
+      required: [user_code, decision]
+      properties:
+        user_code:
+          type: string
+        decision:
+          $ref: "#/components/schemas/OAuthDeviceDecision"
+
+    OAuthAuthoriseConsent:
+      type: object
+      required:
+        - request_id
+        - client_id
+        - client_name
+        - redirect_uri
+        - expires_at
+        - requested_scopes
+        - granted_scopes
+        - inherits_user_permissions
+      properties:
+        request_id:
+          type: string
+        client_id:
+          type: string
+        client_name:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+        expires_at:
+          type: string
+          format: date-time
+        requested_scopes:
+          type: array
+          items: { type: string }
+        granted_scopes:
+          type: array
+          items: { type: string }
+        inherits_user_permissions:
+          type: boolean
+
+    OAuthAuthoriseConsentResult:
+      type: object
+      required: [status, location]
+      properties:
+        status:
+          type: string
+          enum: [approved, denied]
+        location:
+          type: string
+          format: uri
+
+    OAuthAuthoriseConsentSubmitProps:
+      type: object
+      required: [request_id, decision]
+      properties:
+        request_id:
+          type: string
+        decision:
+          $ref: "#/components/schemas/OAuthAuthoriseDecision"
+
+    OAuthTokenProps:
+      type: object
+      required: [grant_type, client_id]
+      properties:
+        grant_type:
+          type: string
+        client_id:
+          type: string
+        client_secret:
+          type: string
+        scope:
+          type: string
+        device_code:
+          type: string
+        code:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+        code_verifier:
+          type: string
+        refresh_token:
+          type: string
+
+    OAuthToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+        scope:
+          type: string
+        id_token:
+          type: string
+        refresh_token:
+          type: string
+        error:
+          type: string
+
+    OAuthUserInfo:
+      type: object
+      properties:
+        sub:
+          type: string
+        email:
+          type: string
+        email_verified:
+          type: boolean
+        name:
+          type: string
+        preferred_username:
+          type: string
+        error:
+          type: string
+
+    OAuthClientType:
+      type: string
+      enum: [public, confidential]
+
+    OAuthClientScopePolicy:
+      type: string
+      enum: [explicit, inherit]
+
+    OAuthClient:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - client_id
+        - name
+        - type
+        - scope_policy
+        - redirect_uris
+        - allowed_scopes
+        - allowed_grants
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        createdAt: { $ref: "#/components/schemas/CreatedAt" }
+        updatedAt: { $ref: "#/components/schemas/UpdatedAt" }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        client_id: { type: string }
+        name: { type: string }
+        type: { $ref: "#/components/schemas/OAuthClientType" }
+        scope_policy: { $ref: "#/components/schemas/OAuthClientScopePolicy" }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        allowed_scopes:
+          type: array
+          items: { type: string }
+        allowed_grants:
+          type: array
+          items: { type: string }
+
+    OAuthClientCreateProps:
+      type: object
+      required:
+        - account_id
+        - client_id
+        - name
+        - type
+        - redirect_uris
+        - allowed_scopes
+        - allowed_grants
+      properties:
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        client_id: { type: string }
+        client_secret_hash: { type: string }
+        name: { type: string }
+        type: { $ref: "#/components/schemas/OAuthClientType" }
+        scope_policy: { $ref: "#/components/schemas/OAuthClientScopePolicy" }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        allowed_scopes:
+          type: array
+          items: { type: string }
+        allowed_grants:
+          type: array
+          items: { type: string }
+
+    OAuthClientUpdateProps:
+      type: object
+      properties:
+        client_secret_hash: { type: string }
+        name: { type: string }
+        scope_policy: { $ref: "#/components/schemas/OAuthClientScopePolicy" }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        allowed_scopes:
+          type: array
+          items: { type: string }
+        allowed_grants:
+          type: array
+          items: { type: string }
+
+    OAuthClientSelfCreateProps:
+      type: object
+      required: [name, allowed_scopes]
+      properties:
+        name: { type: string }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        allowed_scopes:
+          type: array
+          items: { type: string }
+
+    OAuthClientSelfUpdateProps:
+      type: object
+      properties:
+        name: { type: string }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        allowed_scopes:
+          type: array
+          items: { type: string }
+
+    OAuthClientIssued:
+      type: object
+      required: [client]
+      properties:
+        client: { $ref: "#/components/schemas/OAuthClient" }
+        client_secret:
+          type: string
+
+    OAuthClientList:
+      type: array
+      items: { $ref: "#/components/schemas/OAuthClient" }
+
+    OAuthClientListResult:
+      type: object
+      required: [clients]
+      properties:
+        clients: { $ref: "#/components/schemas/OAuthClientList" }
+
+    OAuthDeviceAuthorisationRecord:
+      type: object
+      required:
+        - id
+        - createdAt
+        - client_id
+        - user_code
+        - scope
+        - expires_at
+        - poll_interval_seconds
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        createdAt: { $ref: "#/components/schemas/CreatedAt" }
+        client_id: { $ref: "#/components/schemas/Identifier" }
+        user_code: { type: string }
+        scope: { type: string }
+        expires_at: { type: string, format: date-time }
+        poll_interval_seconds: { type: integer }
+        last_polled_at: { type: string, format: date-time }
+        approved_by_account_id: { $ref: "#/components/schemas/Identifier" }
+        approved_at: { type: string, format: date-time }
+        denied_at: { type: string, format: date-time }
+        consumed_at: { type: string, format: date-time }
+
+    OAuthDeviceAuthorisationList:
+      type: array
+      items: { $ref: "#/components/schemas/OAuthDeviceAuthorisationRecord" }
+
+    OAuthDeviceAuthorisationListResult:
+      type: object
+      required: [device_authorisations]
+      properties:
+        device_authorisations:
+          $ref: "#/components/schemas/OAuthDeviceAuthorisationList"
+
+    OAuthRefreshToken:
+      type: object
+      required:
+        - id
+        - createdAt
+        - oauth_client_id
+        - client_id
+        - client_name
+        - account_id
+        - scope
+        - expires_at
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        createdAt: { $ref: "#/components/schemas/CreatedAt" }
+        oauth_client_id: { $ref: "#/components/schemas/Identifier" }
+        client_id: { type: string }
+        client_name: { type: string }
+        account_id: { $ref: "#/components/schemas/Identifier" }
+        scope: { type: string }
+        expires_at: { type: string, format: date-time }
+        revoked_at: { type: string, format: date-time }
+        replaced_by_token_id: { $ref: "#/components/schemas/Identifier" }
+        last_used_at: { type: string, format: date-time }
+
+    OAuthRefreshTokenList:
+      type: array
+      items: { $ref: "#/components/schemas/OAuthRefreshToken" }
+
+    OAuthRefreshTokenListResult:
+      type: object
+      required: [tokens]
+      properties:
+        tokens: { $ref: "#/components/schemas/OAuthRefreshTokenList" }
 
     WebAuthnPublicKeyCreationOptions:
       description: |
@@ -8620,6 +9793,9 @@ components:
       in: cookie
       name: storyden-session
     access_key:
+      type: http
+      scheme: bearer
+    oauth_token:
       type: http
       scheme: bearer
     webauthn:

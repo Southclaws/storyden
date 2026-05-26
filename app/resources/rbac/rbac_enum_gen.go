@@ -31,6 +31,7 @@ var (
 	PermissionManageCollections     = Permission{`MANAGE_COLLECTIONS`}
 	PermissionCollectionSubmit      = Permission{`COLLECTION_SUBMIT`}
 	PermissionUsePersonalAccessKeys = Permission{`USE_PERSONAL_ACCESS_KEYS`}
+	PermissionUseOauthClients       = Permission{`USE_OAUTH_CLIENTS`}
 	PermissionManageSettings        = Permission{`MANAGE_SETTINGS`}
 	PermissionManageAccounts        = Permission{`MANAGE_ACCOUNTS`}
 	PermissionManageWarnings        = Permission{`MANAGE_WARNINGS`}
@@ -118,6 +119,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionCollectionSubmit, nil
 	case string(`USE_PERSONAL_ACCESS_KEYS`):
 		return PermissionUsePersonalAccessKeys, nil
+	case string(`USE_OAUTH_CLIENTS`):
+		return PermissionUseOauthClients, nil
 	case string(`MANAGE_SETTINGS`):
 		return PermissionManageSettings, nil
 	case string(`MANAGE_ACCOUNTS`):

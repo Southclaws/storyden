@@ -22,6 +22,12 @@ import type {
   EmailQueueListParams,
   ModerationActionCreateBody,
   NoContentResponse,
+  OAuthClientCreateBody,
+  OAuthClientListOKResponse,
+  OAuthClientOKResponse,
+  OAuthClientUpdateBody,
+  OAuthDeviceAuthorisationListOKResponse,
+  OAuthRefreshTokenListOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -351,6 +357,257 @@ export const adminAccessKeyDelete = async (
 ): Promise<adminAccessKeyDeleteResponse> => {
   return fetcher<Promise<adminAccessKeyDeleteResponse>>(
     getAdminAccessKeyDeleteUrl(accessKeyId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * List OAuth clients registered for this instance.
+
+This admin view includes both member-created third-party clients and
+built-in first-party clients. Built-in clients will not be owned by an
+account; their grants and refresh tokens are owned by the approving
+account instead.
+
+ */
+export type adminOAuthClientListResponse = {
+  data: OAuthClientListOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthClientListUrl = () => {
+  return `/admin/oauth/clients`;
+};
+
+export const adminOAuthClientList = async (
+  options?: RequestInit,
+): Promise<adminOAuthClientListResponse> => {
+  return fetcher<Promise<adminOAuthClientListResponse>>(
+    getAdminOAuthClientListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create an OAuth client.
+
+Confidential clients receive a generated secret once at creation time
+and must authenticate to `/oauth/token` when using confidential grants.
+Public clients do not receive or use a client secret.
+
+ */
+export type adminOAuthClientCreateResponse = {
+  data: OAuthClientOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthClientCreateUrl = () => {
+  return `/admin/oauth/clients`;
+};
+
+export const adminOAuthClientCreate = async (
+  oAuthClientCreateBody: OAuthClientCreateBody,
+  options?: RequestInit,
+): Promise<adminOAuthClientCreateResponse> => {
+  return fetcher<Promise<adminOAuthClientCreateResponse>>(
+    getAdminOAuthClientCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthClientCreateBody),
+    },
+  );
+};
+
+/**
+ * Read an OAuth client.
+
+OAuth clients represent application/software identity. They are not the
+same thing as a user authorisation; user-owned authorisations are
+represented by device authorisations, authorisation requests, and
+refresh tokens.
+
+ */
+export type adminOAuthClientGetResponse = {
+  data: OAuthClientOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthClientGetUrl = (oauthClientId: string) => {
+  return `/admin/oauth/clients/${oauthClientId}`;
+};
+
+export const adminOAuthClientGet = async (
+  oauthClientId: string,
+  options?: RequestInit,
+): Promise<adminOAuthClientGetResponse> => {
+  return fetcher<Promise<adminOAuthClientGetResponse>>(
+    getAdminOAuthClientGetUrl(oauthClientId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Update an OAuth client.
+
+Changing allowed grants or scopes only affects future authorisation and
+refresh operations. Already-issued JWT access tokens remain valid until
+their expiry unless their signing key is rotated.
+
+For account-owned clients, allowed permission scopes must be grantable
+by the owning account. An account with `ADMINISTRATOR` may configure any
+Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+permissions.
+
+ */
+export type adminOAuthClientUpdateResponse = {
+  data: OAuthClientOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthClientUpdateUrl = (oauthClientId: string) => {
+  return `/admin/oauth/clients/${oauthClientId}`;
+};
+
+export const adminOAuthClientUpdate = async (
+  oauthClientId: string,
+  oAuthClientUpdateBody: OAuthClientUpdateBody,
+  options?: RequestInit,
+): Promise<adminOAuthClientUpdateResponse> => {
+  return fetcher<Promise<adminOAuthClientUpdateResponse>>(
+    getAdminOAuthClientUpdateUrl(oauthClientId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthClientUpdateBody),
+    },
+  );
+};
+
+/**
+ * Delete an OAuth client.
+
+Deleting a client also removes its pending OAuth records and refresh
+tokens, preventing existing grants from being renewed. Existing JWT
+access tokens are self-contained and remain valid until expiry.
+
+ */
+export type adminOAuthClientDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getAdminOAuthClientDeleteUrl = (oauthClientId: string) => {
+  return `/admin/oauth/clients/${oauthClientId}`;
+};
+
+export const adminOAuthClientDelete = async (
+  oauthClientId: string,
+  options?: RequestInit,
+): Promise<adminOAuthClientDeleteResponse> => {
+  return fetcher<Promise<adminOAuthClientDeleteResponse>>(
+    getAdminOAuthClientDeleteUrl(oauthClientId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * List OAuth device authorisation records.
+
+Device authorisation records are short-lived records created by the
+OAuth 2.0 Device Authorization Grant. They are not owned by an account
+until a signed-in user claims and approves or denies the user code.
+
+ */
+export type adminOAuthDeviceAuthorisationListResponse = {
+  data: OAuthDeviceAuthorisationListOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthDeviceAuthorisationListUrl = () => {
+  return `/admin/oauth/device-authorizations`;
+};
+
+export const adminOAuthDeviceAuthorisationList = async (
+  options?: RequestInit,
+): Promise<adminOAuthDeviceAuthorisationListResponse> => {
+  return fetcher<Promise<adminOAuthDeviceAuthorisationListResponse>>(
+    getAdminOAuthDeviceAuthorisationListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * List OAuth refresh tokens.
+
+Refresh tokens are account-owned grants for an OAuth client. Revoking a
+refresh token prevents future token renewal, but does not immediately
+invalidate already-issued JWT access tokens.
+
+ */
+export type adminOAuthRefreshTokenListResponse = {
+  data: OAuthRefreshTokenListOKResponse;
+  status: number;
+};
+
+export const getAdminOAuthRefreshTokenListUrl = () => {
+  return `/admin/oauth/refresh-tokens`;
+};
+
+export const adminOAuthRefreshTokenList = async (
+  options?: RequestInit,
+): Promise<adminOAuthRefreshTokenListResponse> => {
+  return fetcher<Promise<adminOAuthRefreshTokenListResponse>>(
+    getAdminOAuthRefreshTokenListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Revoke an OAuth refresh token.
+
+This prevents future refresh-token use. Because Storyden OAuth access
+tokens are JWTs, any access token already issued from this grant remains
+valid until its normal expiry.
+
+ */
+export type adminOAuthRefreshTokenDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getAdminOAuthRefreshTokenDeleteUrl = (
+  oauthRefreshTokenId: string,
+) => {
+  return `/admin/oauth/refresh-tokens/${oauthRefreshTokenId}`;
+};
+
+export const adminOAuthRefreshTokenDelete = async (
+  oauthRefreshTokenId: string,
+  options?: RequestInit,
+): Promise<adminOAuthRefreshTokenDeleteResponse> => {
+  return fetcher<Promise<adminOAuthRefreshTokenDeleteResponse>>(
+    getAdminOAuthRefreshTokenDeleteUrl(oauthRefreshTokenId),
     {
       ...options,
       method: "DELETE",

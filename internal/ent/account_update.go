@@ -27,6 +27,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
+	"github.com/Southclaws/storyden/internal/ent/oauthclient"
+	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -490,6 +495,96 @@ func (_u *AccountUpdate) AddAuthentication(v ...*Authentication) *AccountUpdate 
 		ids[i] = v[i].ID
 	}
 	return _u.AddAuthenticationIDs(ids...)
+}
+
+// AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
+func (_u *AccountUpdate) AddOauthClientIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthClientIDs(ids...)
+	return _u
+}
+
+// AddOauthClients adds the "oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdate) AddOauthClients(v ...*OAuthClient) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthClientIDs(ids...)
+}
+
+// AddOauthAuthorisationCodeIDs adds the "oauth_authorisation_codes" edge to the OAuthAuthorisationCode entity by IDs.
+func (_u *AccountUpdate) AddOauthAuthorisationCodeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthAuthorisationCodeIDs(ids...)
+	return _u
+}
+
+// AddOauthAuthorisationCodes adds the "oauth_authorisation_codes" edges to the OAuthAuthorisationCode entity.
+func (_u *AccountUpdate) AddOauthAuthorisationCodes(v ...*OAuthAuthorisationCode) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthAuthorisationCodeIDs(ids...)
+}
+
+// AddOauthAuthorisationRequestIDs adds the "oauth_authorisation_requests" edge to the OAuthAuthorisationRequest entity by IDs.
+func (_u *AccountUpdate) AddOauthAuthorisationRequestIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthAuthorisationRequestIDs(ids...)
+	return _u
+}
+
+// AddOauthAuthorisationRequests adds the "oauth_authorisation_requests" edges to the OAuthAuthorisationRequest entity.
+func (_u *AccountUpdate) AddOauthAuthorisationRequests(v ...*OAuthAuthorisationRequest) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthAuthorisationRequestIDs(ids...)
+}
+
+// AddOauthRefreshTokenIDs adds the "oauth_refresh_tokens" edge to the OAuthRefreshToken entity by IDs.
+func (_u *AccountUpdate) AddOauthRefreshTokenIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddOauthRefreshTokenIDs(ids...)
+	return _u
+}
+
+// AddOauthRefreshTokens adds the "oauth_refresh_tokens" edges to the OAuthRefreshToken entity.
+func (_u *AccountUpdate) AddOauthRefreshTokens(v ...*OAuthRefreshToken) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthRefreshTokenIDs(ids...)
+}
+
+// AddClaimedOauthDeviceAuthorisationIDs adds the "claimed_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_u *AccountUpdate) AddClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// AddClaimedOauthDeviceAuthorisations adds the "claimed_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdate) AddClaimedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+}
+
+// AddApprovedOauthDeviceAuthorisationIDs adds the "approved_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_u *AccountUpdate) AddApprovedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddApprovedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// AddApprovedOauthDeviceAuthorisations adds the "approved_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdate) AddApprovedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddApprovedOauthDeviceAuthorisationIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -1026,6 +1121,132 @@ func (_u *AccountUpdate) RemoveAuthentication(v ...*Authentication) *AccountUpda
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthenticationIDs(ids...)
+}
+
+// ClearOauthClients clears all "oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdate) ClearOauthClients() *AccountUpdate {
+	_u.mutation.ClearOauthClients()
+	return _u
+}
+
+// RemoveOauthClientIDs removes the "oauth_clients" edge to OAuthClient entities by IDs.
+func (_u *AccountUpdate) RemoveOauthClientIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthClientIDs(ids...)
+	return _u
+}
+
+// RemoveOauthClients removes "oauth_clients" edges to OAuthClient entities.
+func (_u *AccountUpdate) RemoveOauthClients(v ...*OAuthClient) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthClientIDs(ids...)
+}
+
+// ClearOauthAuthorisationCodes clears all "oauth_authorisation_codes" edges to the OAuthAuthorisationCode entity.
+func (_u *AccountUpdate) ClearOauthAuthorisationCodes() *AccountUpdate {
+	_u.mutation.ClearOauthAuthorisationCodes()
+	return _u
+}
+
+// RemoveOauthAuthorisationCodeIDs removes the "oauth_authorisation_codes" edge to OAuthAuthorisationCode entities by IDs.
+func (_u *AccountUpdate) RemoveOauthAuthorisationCodeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthAuthorisationCodeIDs(ids...)
+	return _u
+}
+
+// RemoveOauthAuthorisationCodes removes "oauth_authorisation_codes" edges to OAuthAuthorisationCode entities.
+func (_u *AccountUpdate) RemoveOauthAuthorisationCodes(v ...*OAuthAuthorisationCode) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthAuthorisationCodeIDs(ids...)
+}
+
+// ClearOauthAuthorisationRequests clears all "oauth_authorisation_requests" edges to the OAuthAuthorisationRequest entity.
+func (_u *AccountUpdate) ClearOauthAuthorisationRequests() *AccountUpdate {
+	_u.mutation.ClearOauthAuthorisationRequests()
+	return _u
+}
+
+// RemoveOauthAuthorisationRequestIDs removes the "oauth_authorisation_requests" edge to OAuthAuthorisationRequest entities by IDs.
+func (_u *AccountUpdate) RemoveOauthAuthorisationRequestIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthAuthorisationRequestIDs(ids...)
+	return _u
+}
+
+// RemoveOauthAuthorisationRequests removes "oauth_authorisation_requests" edges to OAuthAuthorisationRequest entities.
+func (_u *AccountUpdate) RemoveOauthAuthorisationRequests(v ...*OAuthAuthorisationRequest) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthAuthorisationRequestIDs(ids...)
+}
+
+// ClearOauthRefreshTokens clears all "oauth_refresh_tokens" edges to the OAuthRefreshToken entity.
+func (_u *AccountUpdate) ClearOauthRefreshTokens() *AccountUpdate {
+	_u.mutation.ClearOauthRefreshTokens()
+	return _u
+}
+
+// RemoveOauthRefreshTokenIDs removes the "oauth_refresh_tokens" edge to OAuthRefreshToken entities by IDs.
+func (_u *AccountUpdate) RemoveOauthRefreshTokenIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveOauthRefreshTokenIDs(ids...)
+	return _u
+}
+
+// RemoveOauthRefreshTokens removes "oauth_refresh_tokens" edges to OAuthRefreshToken entities.
+func (_u *AccountUpdate) RemoveOauthRefreshTokens(v ...*OAuthRefreshToken) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthRefreshTokenIDs(ids...)
+}
+
+// ClearClaimedOauthDeviceAuthorisations clears all "claimed_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdate) ClearClaimedOauthDeviceAuthorisations() *AccountUpdate {
+	_u.mutation.ClearClaimedOauthDeviceAuthorisations()
+	return _u
+}
+
+// RemoveClaimedOauthDeviceAuthorisationIDs removes the "claimed_oauth_device_authorisations" edge to OAuthDeviceAuthorisation entities by IDs.
+func (_u *AccountUpdate) RemoveClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveClaimedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// RemoveClaimedOauthDeviceAuthorisations removes "claimed_oauth_device_authorisations" edges to OAuthDeviceAuthorisation entities.
+func (_u *AccountUpdate) RemoveClaimedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveClaimedOauthDeviceAuthorisationIDs(ids...)
+}
+
+// ClearApprovedOauthDeviceAuthorisations clears all "approved_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdate) ClearApprovedOauthDeviceAuthorisations() *AccountUpdate {
+	_u.mutation.ClearApprovedOauthDeviceAuthorisations()
+	return _u
+}
+
+// RemoveApprovedOauthDeviceAuthorisationIDs removes the "approved_oauth_device_authorisations" edge to OAuthDeviceAuthorisation entities by IDs.
+func (_u *AccountUpdate) RemoveApprovedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveApprovedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// RemoveApprovedOauthDeviceAuthorisations removes "approved_oauth_device_authorisations" edges to OAuthDeviceAuthorisation entities.
+func (_u *AccountUpdate) RemoveApprovedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveApprovedOauthDeviceAuthorisationIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -2185,6 +2406,276 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.OauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthClientsIDs(); len(nodes) > 0 && !_u.mutation.OauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthAuthorisationCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthAuthorisationCodesIDs(); len(nodes) > 0 && !_u.mutation.OauthAuthorisationCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthAuthorisationCodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthAuthorisationRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthAuthorisationRequestsIDs(); len(nodes) > 0 && !_u.mutation.OauthAuthorisationRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthAuthorisationRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthRefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthRefreshTokensIDs(); len(nodes) > 0 && !_u.mutation.OauthRefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthRefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ClaimedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedClaimedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 && !_u.mutation.ClaimedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ClaimedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ApprovedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedApprovedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 && !_u.mutation.ApprovedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ApprovedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -3273,6 +3764,96 @@ func (_u *AccountUpdateOne) AddAuthentication(v ...*Authentication) *AccountUpda
 	return _u.AddAuthenticationIDs(ids...)
 }
 
+// AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
+func (_u *AccountUpdateOne) AddOauthClientIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthClientIDs(ids...)
+	return _u
+}
+
+// AddOauthClients adds the "oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdateOne) AddOauthClients(v ...*OAuthClient) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthClientIDs(ids...)
+}
+
+// AddOauthAuthorisationCodeIDs adds the "oauth_authorisation_codes" edge to the OAuthAuthorisationCode entity by IDs.
+func (_u *AccountUpdateOne) AddOauthAuthorisationCodeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthAuthorisationCodeIDs(ids...)
+	return _u
+}
+
+// AddOauthAuthorisationCodes adds the "oauth_authorisation_codes" edges to the OAuthAuthorisationCode entity.
+func (_u *AccountUpdateOne) AddOauthAuthorisationCodes(v ...*OAuthAuthorisationCode) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthAuthorisationCodeIDs(ids...)
+}
+
+// AddOauthAuthorisationRequestIDs adds the "oauth_authorisation_requests" edge to the OAuthAuthorisationRequest entity by IDs.
+func (_u *AccountUpdateOne) AddOauthAuthorisationRequestIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthAuthorisationRequestIDs(ids...)
+	return _u
+}
+
+// AddOauthAuthorisationRequests adds the "oauth_authorisation_requests" edges to the OAuthAuthorisationRequest entity.
+func (_u *AccountUpdateOne) AddOauthAuthorisationRequests(v ...*OAuthAuthorisationRequest) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthAuthorisationRequestIDs(ids...)
+}
+
+// AddOauthRefreshTokenIDs adds the "oauth_refresh_tokens" edge to the OAuthRefreshToken entity by IDs.
+func (_u *AccountUpdateOne) AddOauthRefreshTokenIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddOauthRefreshTokenIDs(ids...)
+	return _u
+}
+
+// AddOauthRefreshTokens adds the "oauth_refresh_tokens" edges to the OAuthRefreshToken entity.
+func (_u *AccountUpdateOne) AddOauthRefreshTokens(v ...*OAuthRefreshToken) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddOauthRefreshTokenIDs(ids...)
+}
+
+// AddClaimedOauthDeviceAuthorisationIDs adds the "claimed_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_u *AccountUpdateOne) AddClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// AddClaimedOauthDeviceAuthorisations adds the "claimed_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdateOne) AddClaimedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+}
+
+// AddApprovedOauthDeviceAuthorisationIDs adds the "approved_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_u *AccountUpdateOne) AddApprovedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddApprovedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// AddApprovedOauthDeviceAuthorisations adds the "approved_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdateOne) AddApprovedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddApprovedOauthDeviceAuthorisationIDs(ids...)
+}
+
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
 func (_u *AccountUpdateOne) AddTagIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddTagIDs(ids...)
@@ -3807,6 +4388,132 @@ func (_u *AccountUpdateOne) RemoveAuthentication(v ...*Authentication) *AccountU
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveAuthenticationIDs(ids...)
+}
+
+// ClearOauthClients clears all "oauth_clients" edges to the OAuthClient entity.
+func (_u *AccountUpdateOne) ClearOauthClients() *AccountUpdateOne {
+	_u.mutation.ClearOauthClients()
+	return _u
+}
+
+// RemoveOauthClientIDs removes the "oauth_clients" edge to OAuthClient entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthClientIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthClientIDs(ids...)
+	return _u
+}
+
+// RemoveOauthClients removes "oauth_clients" edges to OAuthClient entities.
+func (_u *AccountUpdateOne) RemoveOauthClients(v ...*OAuthClient) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthClientIDs(ids...)
+}
+
+// ClearOauthAuthorisationCodes clears all "oauth_authorisation_codes" edges to the OAuthAuthorisationCode entity.
+func (_u *AccountUpdateOne) ClearOauthAuthorisationCodes() *AccountUpdateOne {
+	_u.mutation.ClearOauthAuthorisationCodes()
+	return _u
+}
+
+// RemoveOauthAuthorisationCodeIDs removes the "oauth_authorisation_codes" edge to OAuthAuthorisationCode entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthAuthorisationCodeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthAuthorisationCodeIDs(ids...)
+	return _u
+}
+
+// RemoveOauthAuthorisationCodes removes "oauth_authorisation_codes" edges to OAuthAuthorisationCode entities.
+func (_u *AccountUpdateOne) RemoveOauthAuthorisationCodes(v ...*OAuthAuthorisationCode) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthAuthorisationCodeIDs(ids...)
+}
+
+// ClearOauthAuthorisationRequests clears all "oauth_authorisation_requests" edges to the OAuthAuthorisationRequest entity.
+func (_u *AccountUpdateOne) ClearOauthAuthorisationRequests() *AccountUpdateOne {
+	_u.mutation.ClearOauthAuthorisationRequests()
+	return _u
+}
+
+// RemoveOauthAuthorisationRequestIDs removes the "oauth_authorisation_requests" edge to OAuthAuthorisationRequest entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthAuthorisationRequestIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthAuthorisationRequestIDs(ids...)
+	return _u
+}
+
+// RemoveOauthAuthorisationRequests removes "oauth_authorisation_requests" edges to OAuthAuthorisationRequest entities.
+func (_u *AccountUpdateOne) RemoveOauthAuthorisationRequests(v ...*OAuthAuthorisationRequest) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthAuthorisationRequestIDs(ids...)
+}
+
+// ClearOauthRefreshTokens clears all "oauth_refresh_tokens" edges to the OAuthRefreshToken entity.
+func (_u *AccountUpdateOne) ClearOauthRefreshTokens() *AccountUpdateOne {
+	_u.mutation.ClearOauthRefreshTokens()
+	return _u
+}
+
+// RemoveOauthRefreshTokenIDs removes the "oauth_refresh_tokens" edge to OAuthRefreshToken entities by IDs.
+func (_u *AccountUpdateOne) RemoveOauthRefreshTokenIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveOauthRefreshTokenIDs(ids...)
+	return _u
+}
+
+// RemoveOauthRefreshTokens removes "oauth_refresh_tokens" edges to OAuthRefreshToken entities.
+func (_u *AccountUpdateOne) RemoveOauthRefreshTokens(v ...*OAuthRefreshToken) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveOauthRefreshTokenIDs(ids...)
+}
+
+// ClearClaimedOauthDeviceAuthorisations clears all "claimed_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdateOne) ClearClaimedOauthDeviceAuthorisations() *AccountUpdateOne {
+	_u.mutation.ClearClaimedOauthDeviceAuthorisations()
+	return _u
+}
+
+// RemoveClaimedOauthDeviceAuthorisationIDs removes the "claimed_oauth_device_authorisations" edge to OAuthDeviceAuthorisation entities by IDs.
+func (_u *AccountUpdateOne) RemoveClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveClaimedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// RemoveClaimedOauthDeviceAuthorisations removes "claimed_oauth_device_authorisations" edges to OAuthDeviceAuthorisation entities.
+func (_u *AccountUpdateOne) RemoveClaimedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveClaimedOauthDeviceAuthorisationIDs(ids...)
+}
+
+// ClearApprovedOauthDeviceAuthorisations clears all "approved_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_u *AccountUpdateOne) ClearApprovedOauthDeviceAuthorisations() *AccountUpdateOne {
+	_u.mutation.ClearApprovedOauthDeviceAuthorisations()
+	return _u
+}
+
+// RemoveApprovedOauthDeviceAuthorisationIDs removes the "approved_oauth_device_authorisations" edge to OAuthDeviceAuthorisation entities by IDs.
+func (_u *AccountUpdateOne) RemoveApprovedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveApprovedOauthDeviceAuthorisationIDs(ids...)
+	return _u
+}
+
+// RemoveApprovedOauthDeviceAuthorisations removes "approved_oauth_device_authorisations" edges to OAuthDeviceAuthorisation entities.
+func (_u *AccountUpdateOne) RemoveApprovedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveApprovedOauthDeviceAuthorisationIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
@@ -4989,6 +5696,276 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthClientsIDs(); len(nodes) > 0 && !_u.mutation.OauthClientsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthAuthorisationCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthAuthorisationCodesIDs(); len(nodes) > 0 && !_u.mutation.OauthAuthorisationCodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthAuthorisationCodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthAuthorisationRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthAuthorisationRequestsIDs(); len(nodes) > 0 && !_u.mutation.OauthAuthorisationRequestsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthAuthorisationRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.OauthRefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedOauthRefreshTokensIDs(); len(nodes) > 0 && !_u.mutation.OauthRefreshTokensCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.OauthRefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ClaimedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedClaimedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 && !_u.mutation.ClaimedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ClaimedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ApprovedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedApprovedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 && !_u.mutation.ApprovedOauthDeviceAuthorisationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ApprovedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

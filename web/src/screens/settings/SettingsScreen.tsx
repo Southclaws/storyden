@@ -14,6 +14,7 @@ import { MemberAccessKeysSettingsScreen } from "./MemberAccessKeysSettingsScreen
 import { MemberAuthenticationSettingsScreen } from "./MemberAuthenticationSettingsScreen";
 import { MemberEmailSettingsScreen } from "./MemberEmailSettingsScreen";
 import { MemberInterfaceSettingsScreen } from "./MemberInterfaceSettingsScreen";
+import { MemberOAuthSettingsScreen } from "./MemberOAuthSettingsScreen";
 
 const DEFAULT_TAB = "interface";
 
@@ -42,18 +43,23 @@ export function SettingsScreen({ initialSettings }: Props) {
   }
 
   const emailEnabled = initialSettings.capabilities.includes("email_client");
+  const oauthCapabilityEnabled = initialSettings.capabilities.includes("oauth");
 
   const accessKeysEnabled = hasPermission(
     session,
     Permission.USE_PERSONAL_ACCESS_KEYS,
   );
+  const oauthEnabled =
+    oauthCapabilityEnabled && hasPermission(session, Permission.ADMINISTRATOR);
+
+  const activeTab = !oauthEnabled && tab === "oauth" ? DEFAULT_TAB : tab;
 
   return (
     <Tabs.Root
       width="full"
       variant="enclosed"
       defaultValue={DEFAULT_TAB}
-      value={tab}
+      value={activeTab}
       onValueChange={handleTabChange}
     >
       <Tabs.List>
@@ -63,6 +69,7 @@ export function SettingsScreen({ initialSettings }: Props) {
         {accessKeysEnabled && (
           <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
         )}
+        {oauthEnabled && <Tabs.Trigger value="oauth">OAuth</Tabs.Trigger>}
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -83,6 +90,12 @@ export function SettingsScreen({ initialSettings }: Props) {
       {accessKeysEnabled && (
         <Tabs.Content value="access_keys">
           <MemberAccessKeysSettingsScreen />
+        </Tabs.Content>
+      )}
+
+      {oauthEnabled && (
+        <Tabs.Content value="oauth">
+          <MemberOAuthSettingsScreen />
         </Tabs.Content>
       )}
     </Tabs.Root>

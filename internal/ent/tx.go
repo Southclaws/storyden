@@ -56,6 +56,16 @@ type Tx struct {
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
+	OAuthAuthorisationCode *OAuthAuthorisationCodeClient
+	// OAuthAuthorisationRequest is the client for interacting with the OAuthAuthorisationRequest builders.
+	OAuthAuthorisationRequest *OAuthAuthorisationRequestClient
+	// OAuthClient is the client for interacting with the OAuthClient builders.
+	OAuthClient *OAuthClientClient
+	// OAuthDeviceAuthorisation is the client for interacting with the OAuthDeviceAuthorisation builders.
+	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
+	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
+	OAuthRefreshToken *OAuthRefreshTokenClient
 	// Plugin is the client for interacting with the Plugin builders.
 	Plugin *PluginClient
 	// Post is the client for interacting with the Post builders.
@@ -236,6 +246,11 @@ func (tx *Tx) init() {
 	tx.ModerationNote = NewModerationNoteClient(tx.config)
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
+	tx.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(tx.config)
+	tx.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(tx.config)
+	tx.OAuthClient = NewOAuthClientClient(tx.config)
+	tx.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(tx.config)
+	tx.OAuthRefreshToken = NewOAuthRefreshTokenClient(tx.config)
 	tx.Plugin = NewPluginClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.PostRead = NewPostReadClient(tx.config)

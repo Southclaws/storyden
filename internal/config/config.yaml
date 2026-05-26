@@ -421,6 +421,64 @@
       description: |-
         The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
 
+    - env: OAUTH_ENABLED
+      name: OAuthEnabled
+      type: bool
+      description: |-
+        Enable Storyden's built-in OAuth2/OIDC authorization server endpoints.
+
+    - env: OAUTH_ACCESS_TOKEN_TTL
+      name: OAuthAccessTokenTTL
+      type: time.Duration
+      default: 15m
+      description: |-
+        Access token lifetime for Storyden OAuth tokens.
+
+    - env: OAUTH_REFRESH_TOKEN_TTL
+      name: OAuthRefreshTokenTTL
+      type: time.Duration
+      default: 720h
+      description: |-
+        Refresh token lifetime for Storyden OAuth tokens.
+
+    - env: OAUTH_DEVICE_CODE_TTL
+      name: OAuthDeviceCodeTTL
+      type: time.Duration
+      default: 10m
+      description: |-
+        Device code lifetime for the OAuth Device Authorization Grant.
+
+    - env: OAUTH_DEVICE_POLL_EVERY
+      name: OAuthDevicePollEvery
+      type: time.Duration
+      default: 5s
+      description: |-
+        Poll interval used by device flow responses.
+
+    - env: OAUTH_DEVICE_AUTHORISATION_CONSENT_URL
+      name: OAuthDeviceAuthorisationConsentURL
+      type: net/url.URL
+      description: |-
+        Frontend URL used by OAuth Device Authorization Grant users to approve or deny consent.
+
+    - env: OAUTH_AUTHORISATION_CODE_CONSENT_URL
+      name: OAuthAuthorisationCodeConsentURL
+      type: net/url.URL
+      description: |-
+        Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
+
+    - env: OAUTH_SIGNING_KEY_BASE64
+      name: OAuthSigningKeyBase64
+      type: string
+      description: |-
+        Base64-encoded PEM private signing key used for OAuth2/OIDC JWT signing.
+
+    - env: OAUTH_SIGNING_KEY_ID
+      name: OAuthSigningKeyID
+      type: string
+      description: |-
+        Optional JWT key ID (kid) for OAuth signing keys.
+
 - section: SMS
   description: |-
     SMS sending configuration. This must be enabled in order to support SMS-based authentication.

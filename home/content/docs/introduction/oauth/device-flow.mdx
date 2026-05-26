@@ -1,0 +1,246 @@
+---
+title: Device Authorization Flow
+description: Let CLI tools, headless apps, and other input-limited devices authenticate as Storyden members.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+
+The Device Authorization Grant ([RFC 8628](https://datatracker.ietf.org/doc/html/rfc8628)) solves a specific problem: how does an application that can't open a browser authenticate a user? CLI tools, terminal applications, TVs, and other "input-limited" devices all face this. The answer is to separate the device that needs access from the device the user approves the request on.
+
+This is the flow used by the built-in **Storyden CLI** client (`storyden-cli`). A CLI or terminal application starts the device authorisation flow, prints a browser URL, and polls Storyden until the member approves or denies the request.
+
+## How it works
+
+<Steps>
+<Step>
+
+### Application requests a device code
+
+The application calls the device authorisation endpoint with its client ID and the scopes it needs:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/oauth/device_authorization" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "client_id=storyden-cli&scope=openid+profile+offline_access"
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/device_authorization \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'client_id=storyden-cli' \
+  --data-urlencode 'scope=openid profile offline_access'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/device_authorization \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'client_id=storyden-cli' \
+  --data-urlencode 'scope=openid profile offline_access'
+```
+
+</Tab>
+</Tabs>
+
+Storyden responds with a short user code, a verification URL, and a device code (which only the application sees):
+
+```json
+{
+  "device_code": "gquxHwL...",
+  "user_code": "AICN-NQCT",
+  "verification_uri": "https://your-storyden.example/oauth/consent",
+  "verification_uri_complete": "https://your-storyden.example/oauth/consent?user_code=AICN-NQCT",
+  "expires_in": 600,
+  "interval": 5
+}
+```
+
+</Step>
+<Step>
+
+### Application tells the user what to do
+
+The application shows the user the `verification_uri_complete` (or the `verification_uri` and the `user_code` separately if it can't open URLs). For a CLI this typically looks like:
+
+```
+Visit https://your-storyden.example/oauth/consent?user_code=AICN-NQCT
+to approve this request, or open https://your-storyden.example/oauth/consent
+and enter code: AICN-NQCT
+```
+
+</Step>
+<Step>
+
+### Application polls for the token
+
+While the user is going through the consent screen, the application polls the token endpoint every `interval` seconds using the device code:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/oauth/token" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&client_id=storyden-cli&device_code=gquxHwL..."
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=urn:ietf:params:oauth:grant-type:device_code' \
+  --data 'client_id=storyden-cli' \
+  --data 'device_code=gquxHwL...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=urn:ietf:params:oauth:grant-type:device_code' \
+  --data 'client_id=storyden-cli' \
+  --data 'device_code=gquxHwL...'
+```
+
+</Tab>
+</Tabs>
+
+Until the user approves, the response will be:
+
+```json
+{ "error": "authorization_pending" }
+```
+
+If the application polls too fast, it will receive `slow_down`, which means it should increase its polling interval:
+
+```json
+{ "error": "slow_down" }
+```
+
+</Step>
+<Step>
+
+### User approves in the browser
+
+The user opens the verification URL in their browser and is directed to the consent screen. If they aren't signed in, they'll be asked to sign in first and then redirected back to consent.
+
+The consent screen shows:
+
+- The name of the application requesting access
+- The **user code**: the user must confirm it matches what the application displayed
+- The permissions the application will receive
+
+The user clicks **Approve** or **Deny**.
+
+</Step>
+<Step>
+
+### Application receives the token
+
+On the next poll after the user approves, the token endpoint responds with the access token. A refresh token is included only when `offline_access` was granted and the client is allowed to use the `refresh_token` grant:
+
+```json
+{
+  "access_token": "eyJ...",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "scope": "openid profile offline_access CREATE_POST READ_PUBLISHED_THREADS",
+  "id_token": "eyJ...",
+  "refresh_token": "kP3x..."
+}
+```
+
+The exact `scope` value depends on the client policy and the approving member's permissions. The application stores these tokens and uses the `access_token` as a `Bearer` header for API requests. See [Scopes](/docs/introduction/oauth/scopes) for what each token type carries.
+
+</Step>
+</Steps>
+
+## Polling errors
+
+The token endpoint returns OAuth error codes during polling. Applications must handle all of these:
+
+| Error                   | Meaning                                                          |
+| ----------------------- | ---------------------------------------------------------------- |
+| `authorization_pending` | User hasn't acted yet. Keep polling.                             |
+| `slow_down`             | Polling too fast. Increase interval and keep polling.            |
+| `access_denied`         | User denied the request. Stop polling and notify the user.       |
+| `expired_token`         | The device code expired before the user acted. Restart the flow. |
+| `invalid_grant`         | Something went wrong. Restart the flow.                          |
+
+## The Storyden CLI client
+
+Storyden automatically provisions a built-in client with `client_id: storyden-cli` the first time any device flow is initiated. This client:
+
+- Is a **public** client (no client secret required)
+- Uses the `inherit` scope policy
+- Is allowed to use the device-code and refresh-token grants
+- Must request exactly `openid profile offline_access`
+
+This means the issued token inherits the approving member's current Storyden permissions. The CLI client doesn't request a subset of permission scopes explicitly. See [Scopes](/docs/introduction/oauth/scopes#inherited-permission-clients) for how this works.
+
+## Refreshing an access token
+
+If your application holds a refresh token, it can exchange it for a new access token without user interaction:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/oauth/token" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "grant_type=refresh_token&client_id=your-client-id&refresh_token=kP3x..."
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=refresh_token' \
+  --data 'client_id=your-client-id' \
+  --data 'refresh_token=kP3x...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=refresh_token' \
+  --data 'client_id=your-client-id' \
+  --data 'refresh_token=kP3x...'
+```
+
+</Tab>
+</Tabs>
+
+Refresh tokens are single-use. A new one is issued on each refresh when the scope still includes `offline_access` and the client is still allowed to use the `refresh_token` grant. The old refresh token is consumed. If a refresh token is used twice, the response is `invalid_grant`.
+
+Members with OAuth management access can see and revoke refresh tokens from settings. Revoking a refresh token prevents future renewal, but any already-issued JWT access token remains valid until its normal expiry.
+
+## Security considerations
+
+The user code comparison step matters. Users should only approve if the code shown in their browser matches the code shown by the application. This prevents an attacker from tricking a user into approving a request the attacker initiated on a different device.
+
+The short-lived device code window (default 10 minutes) limits the window for this attack. Applications should surface the user code prominently and instruct users to verify it before approving.

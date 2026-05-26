@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
@@ -25,6 +25,8 @@ type Form = z.infer<typeof FormSchema>;
 
 export function useLoginEmailForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnURL = searchParams.get("return_url") ?? "/";
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -49,7 +51,7 @@ export function useLoginEmailForm() {
 
       mutate();
       refreshFeed();
-      router.push("/");
+      router.push(returnURL);
     });
   });
 

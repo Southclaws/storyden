@@ -37,6 +37,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
+	"github.com/Southclaws/storyden/internal/ent/oauthclient"
+	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -102,6 +107,16 @@ type Client struct {
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
+	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
+	OAuthAuthorisationCode *OAuthAuthorisationCodeClient
+	// OAuthAuthorisationRequest is the client for interacting with the OAuthAuthorisationRequest builders.
+	OAuthAuthorisationRequest *OAuthAuthorisationRequestClient
+	// OAuthClient is the client for interacting with the OAuthClient builders.
+	OAuthClient *OAuthClientClient
+	// OAuthDeviceAuthorisation is the client for interacting with the OAuthDeviceAuthorisation builders.
+	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
+	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
+	OAuthRefreshToken *OAuthRefreshTokenClient
 	// Plugin is the client for interacting with the Plugin builders.
 	Plugin *PluginClient
 	// Post is the client for interacting with the Post builders.
@@ -162,6 +177,11 @@ func (c *Client) init() {
 	c.ModerationNote = NewModerationNoteClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
+	c.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(c.config)
+	c.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(c.config)
+	c.OAuthClient = NewOAuthClientClient(c.config)
+	c.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(c.config)
+	c.OAuthRefreshToken = NewOAuthRefreshTokenClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.PostRead = NewPostReadClient(c.config)
@@ -266,43 +286,48 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                 ctx,
-		config:              cfg,
-		Account:             NewAccountClient(cfg),
-		AccountFollow:       NewAccountFollowClient(cfg),
-		AccountRoles:        NewAccountRolesClient(cfg),
-		Asset:               NewAssetClient(cfg),
-		AuditLog:            NewAuditLogClient(cfg),
-		Authentication:      NewAuthenticationClient(cfg),
-		Category:            NewCategoryClient(cfg),
-		Collection:          NewCollectionClient(cfg),
-		CollectionNode:      NewCollectionNodeClient(cfg),
-		CollectionPost:      NewCollectionPostClient(cfg),
-		Email:               NewEmailClient(cfg),
-		EmailQueue:          NewEmailQueueClient(cfg),
-		Event:               NewEventClient(cfg),
-		EventParticipant:    NewEventParticipantClient(cfg),
-		Invitation:          NewInvitationClient(cfg),
-		LikePost:            NewLikePostClient(cfg),
-		Link:                NewLinkClient(cfg),
-		MentionProfile:      NewMentionProfileClient(cfg),
-		ModerationNote:      NewModerationNoteClient(cfg),
-		Node:                NewNodeClient(cfg),
-		Notification:        NewNotificationClient(cfg),
-		Plugin:              NewPluginClient(cfg),
-		Post:                NewPostClient(cfg),
-		PostRead:            NewPostReadClient(cfg),
-		Property:            NewPropertyClient(cfg),
-		PropertySchema:      NewPropertySchemaClient(cfg),
-		PropertySchemaField: NewPropertySchemaFieldClient(cfg),
-		Question:            NewQuestionClient(cfg),
-		React:               NewReactClient(cfg),
-		Report:              NewReportClient(cfg),
-		Role:                NewRoleClient(cfg),
-		Session:             NewSessionClient(cfg),
-		Setting:             NewSettingClient(cfg),
-		Tag:                 NewTagClient(cfg),
-		Warning:             NewWarningClient(cfg),
+		ctx:                       ctx,
+		config:                    cfg,
+		Account:                   NewAccountClient(cfg),
+		AccountFollow:             NewAccountFollowClient(cfg),
+		AccountRoles:              NewAccountRolesClient(cfg),
+		Asset:                     NewAssetClient(cfg),
+		AuditLog:                  NewAuditLogClient(cfg),
+		Authentication:            NewAuthenticationClient(cfg),
+		Category:                  NewCategoryClient(cfg),
+		Collection:                NewCollectionClient(cfg),
+		CollectionNode:            NewCollectionNodeClient(cfg),
+		CollectionPost:            NewCollectionPostClient(cfg),
+		Email:                     NewEmailClient(cfg),
+		EmailQueue:                NewEmailQueueClient(cfg),
+		Event:                     NewEventClient(cfg),
+		EventParticipant:          NewEventParticipantClient(cfg),
+		Invitation:                NewInvitationClient(cfg),
+		LikePost:                  NewLikePostClient(cfg),
+		Link:                      NewLinkClient(cfg),
+		MentionProfile:            NewMentionProfileClient(cfg),
+		ModerationNote:            NewModerationNoteClient(cfg),
+		Node:                      NewNodeClient(cfg),
+		Notification:              NewNotificationClient(cfg),
+		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:               NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:  NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthRefreshToken:         NewOAuthRefreshTokenClient(cfg),
+		Plugin:                    NewPluginClient(cfg),
+		Post:                      NewPostClient(cfg),
+		PostRead:                  NewPostReadClient(cfg),
+		Property:                  NewPropertyClient(cfg),
+		PropertySchema:            NewPropertySchemaClient(cfg),
+		PropertySchemaField:       NewPropertySchemaFieldClient(cfg),
+		Question:                  NewQuestionClient(cfg),
+		React:                     NewReactClient(cfg),
+		Report:                    NewReportClient(cfg),
+		Role:                      NewRoleClient(cfg),
+		Session:                   NewSessionClient(cfg),
+		Setting:                   NewSettingClient(cfg),
+		Tag:                       NewTagClient(cfg),
+		Warning:                   NewWarningClient(cfg),
 	}, nil
 }
 
@@ -320,43 +345,48 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:                 ctx,
-		config:              cfg,
-		Account:             NewAccountClient(cfg),
-		AccountFollow:       NewAccountFollowClient(cfg),
-		AccountRoles:        NewAccountRolesClient(cfg),
-		Asset:               NewAssetClient(cfg),
-		AuditLog:            NewAuditLogClient(cfg),
-		Authentication:      NewAuthenticationClient(cfg),
-		Category:            NewCategoryClient(cfg),
-		Collection:          NewCollectionClient(cfg),
-		CollectionNode:      NewCollectionNodeClient(cfg),
-		CollectionPost:      NewCollectionPostClient(cfg),
-		Email:               NewEmailClient(cfg),
-		EmailQueue:          NewEmailQueueClient(cfg),
-		Event:               NewEventClient(cfg),
-		EventParticipant:    NewEventParticipantClient(cfg),
-		Invitation:          NewInvitationClient(cfg),
-		LikePost:            NewLikePostClient(cfg),
-		Link:                NewLinkClient(cfg),
-		MentionProfile:      NewMentionProfileClient(cfg),
-		ModerationNote:      NewModerationNoteClient(cfg),
-		Node:                NewNodeClient(cfg),
-		Notification:        NewNotificationClient(cfg),
-		Plugin:              NewPluginClient(cfg),
-		Post:                NewPostClient(cfg),
-		PostRead:            NewPostReadClient(cfg),
-		Property:            NewPropertyClient(cfg),
-		PropertySchema:      NewPropertySchemaClient(cfg),
-		PropertySchemaField: NewPropertySchemaFieldClient(cfg),
-		Question:            NewQuestionClient(cfg),
-		React:               NewReactClient(cfg),
-		Report:              NewReportClient(cfg),
-		Role:                NewRoleClient(cfg),
-		Session:             NewSessionClient(cfg),
-		Setting:             NewSettingClient(cfg),
-		Tag:                 NewTagClient(cfg),
-		Warning:             NewWarningClient(cfg),
+		ctx:                       ctx,
+		config:                    cfg,
+		Account:                   NewAccountClient(cfg),
+		AccountFollow:             NewAccountFollowClient(cfg),
+		AccountRoles:              NewAccountRolesClient(cfg),
+		Asset:                     NewAssetClient(cfg),
+		AuditLog:                  NewAuditLogClient(cfg),
+		Authentication:            NewAuthenticationClient(cfg),
+		Category:                  NewCategoryClient(cfg),
+		Collection:                NewCollectionClient(cfg),
+		CollectionNode:            NewCollectionNodeClient(cfg),
+		CollectionPost:            NewCollectionPostClient(cfg),
+		Email:                     NewEmailClient(cfg),
+		EmailQueue:                NewEmailQueueClient(cfg),
+		Event:                     NewEventClient(cfg),
+		EventParticipant:          NewEventParticipantClient(cfg),
+		Invitation:                NewInvitationClient(cfg),
+		LikePost:                  NewLikePostClient(cfg),
+		Link:                      NewLinkClient(cfg),
+		MentionProfile:            NewMentionProfileClient(cfg),
+		ModerationNote:            NewModerationNoteClient(cfg),
+		Node:                      NewNodeClient(cfg),
+		Notification:              NewNotificationClient(cfg),
+		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:               NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:  NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthRefreshToken:         NewOAuthRefreshTokenClient(cfg),
+		Plugin:                    NewPluginClient(cfg),
+		Post:                      NewPostClient(cfg),
+		PostRead:                  NewPostReadClient(cfg),
+		Property:                  NewPropertyClient(cfg),
+		PropertySchema:            NewPropertySchemaClient(cfg),
+		PropertySchemaField:       NewPropertySchemaFieldClient(cfg),
+		Question:                  NewQuestionClient(cfg),
+		React:                     NewReactClient(cfg),
+		Report:                    NewReportClient(cfg),
+		Role:                      NewRoleClient(cfg),
+		Session:                   NewSessionClient(cfg),
+		Setting:                   NewSettingClient(cfg),
+		Tag:                       NewTagClient(cfg),
+		Warning:                   NewWarningClient(cfg),
 	}, nil
 }
 
@@ -389,9 +419,11 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin,
-		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification,
+		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
+		c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin, c.Post, c.PostRead,
+		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
+		c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -404,9 +436,11 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification, c.Plugin,
-		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification,
+		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
+		c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin, c.Post, c.PostRead,
+		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
+		c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -457,6 +491,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Node.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
+	case *OAuthAuthorisationCodeMutation:
+		return c.OAuthAuthorisationCode.mutate(ctx, m)
+	case *OAuthAuthorisationRequestMutation:
+		return c.OAuthAuthorisationRequest.mutate(ctx, m)
+	case *OAuthClientMutation:
+		return c.OAuthClient.mutate(ctx, m)
+	case *OAuthDeviceAuthorisationMutation:
+		return c.OAuthDeviceAuthorisation.mutate(ctx, m)
+	case *OAuthRefreshTokenMutation:
+		return c.OAuthRefreshToken.mutate(ctx, m)
 	case *PluginMutation:
 		return c.Plugin.mutate(ctx, m)
 	case *PostMutation:
@@ -847,6 +891,102 @@ func (c *AccountClient) QueryAuthentication(_m *Account) *AuthenticationQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(authentication.Table, authentication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthClients queries the oauth_clients edge of a Account.
+func (c *AccountClient) QueryOauthClients(_m *Account) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthClientsTable, account.OauthClientsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthAuthorisationCodes queries the oauth_authorisation_codes edge of a Account.
+func (c *AccountClient) QueryOauthAuthorisationCodes(_m *Account) *OAuthAuthorisationCodeQuery {
+	query := (&OAuthAuthorisationCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthauthorisationcode.Table, oauthauthorisationcode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthAuthorisationCodesTable, account.OauthAuthorisationCodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthAuthorisationRequests queries the oauth_authorisation_requests edge of a Account.
+func (c *AccountClient) QueryOauthAuthorisationRequests(_m *Account) *OAuthAuthorisationRequestQuery {
+	query := (&OAuthAuthorisationRequestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthauthorisationrequest.Table, oauthauthorisationrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthAuthorisationRequestsTable, account.OauthAuthorisationRequestsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthRefreshTokens queries the oauth_refresh_tokens edge of a Account.
+func (c *AccountClient) QueryOauthRefreshTokens(_m *Account) *OAuthRefreshTokenQuery {
+	query := (&OAuthRefreshTokenClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthRefreshTokensTable, account.OauthRefreshTokensColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClaimedOauthDeviceAuthorisations queries the claimed_oauth_device_authorisations edge of a Account.
+func (c *AccountClient) QueryClaimedOauthDeviceAuthorisations(_m *Account) *OAuthDeviceAuthorisationQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ClaimedOauthDeviceAuthorisationsTable, account.ClaimedOauthDeviceAuthorisationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryApprovedOauthDeviceAuthorisations queries the approved_oauth_device_authorisations edge of a Account.
+func (c *AccountClient) QueryApprovedOauthDeviceAuthorisations(_m *Account) *OAuthDeviceAuthorisationQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.ApprovedOauthDeviceAuthorisationsTable, account.ApprovedOauthDeviceAuthorisationsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4657,6 +4797,927 @@ func (c *NotificationClient) mutate(ctx context.Context, m *NotificationMutation
 	}
 }
 
+// OAuthAuthorisationCodeClient is a client for the OAuthAuthorisationCode schema.
+type OAuthAuthorisationCodeClient struct {
+	config
+}
+
+// NewOAuthAuthorisationCodeClient returns a client for the OAuthAuthorisationCode from the given config.
+func NewOAuthAuthorisationCodeClient(c config) *OAuthAuthorisationCodeClient {
+	return &OAuthAuthorisationCodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthauthorisationcode.Hooks(f(g(h())))`.
+func (c *OAuthAuthorisationCodeClient) Use(hooks ...Hook) {
+	c.hooks.OAuthAuthorisationCode = append(c.hooks.OAuthAuthorisationCode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthauthorisationcode.Intercept(f(g(h())))`.
+func (c *OAuthAuthorisationCodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthAuthorisationCode = append(c.inters.OAuthAuthorisationCode, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthAuthorisationCode entity.
+func (c *OAuthAuthorisationCodeClient) Create() *OAuthAuthorisationCodeCreate {
+	mutation := newOAuthAuthorisationCodeMutation(c.config, OpCreate)
+	return &OAuthAuthorisationCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthAuthorisationCode entities.
+func (c *OAuthAuthorisationCodeClient) CreateBulk(builders ...*OAuthAuthorisationCodeCreate) *OAuthAuthorisationCodeCreateBulk {
+	return &OAuthAuthorisationCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthAuthorisationCodeClient) MapCreateBulk(slice any, setFunc func(*OAuthAuthorisationCodeCreate, int)) *OAuthAuthorisationCodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthAuthorisationCodeCreateBulk{err: fmt.Errorf("calling to OAuthAuthorisationCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthAuthorisationCodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthAuthorisationCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthAuthorisationCode.
+func (c *OAuthAuthorisationCodeClient) Update() *OAuthAuthorisationCodeUpdate {
+	mutation := newOAuthAuthorisationCodeMutation(c.config, OpUpdate)
+	return &OAuthAuthorisationCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthAuthorisationCodeClient) UpdateOne(_m *OAuthAuthorisationCode) *OAuthAuthorisationCodeUpdateOne {
+	mutation := newOAuthAuthorisationCodeMutation(c.config, OpUpdateOne, withOAuthAuthorisationCode(_m))
+	return &OAuthAuthorisationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthAuthorisationCodeClient) UpdateOneID(id xid.ID) *OAuthAuthorisationCodeUpdateOne {
+	mutation := newOAuthAuthorisationCodeMutation(c.config, OpUpdateOne, withOAuthAuthorisationCodeID(id))
+	return &OAuthAuthorisationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthAuthorisationCode.
+func (c *OAuthAuthorisationCodeClient) Delete() *OAuthAuthorisationCodeDelete {
+	mutation := newOAuthAuthorisationCodeMutation(c.config, OpDelete)
+	return &OAuthAuthorisationCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthAuthorisationCodeClient) DeleteOne(_m *OAuthAuthorisationCode) *OAuthAuthorisationCodeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthAuthorisationCodeClient) DeleteOneID(id xid.ID) *OAuthAuthorisationCodeDeleteOne {
+	builder := c.Delete().Where(oauthauthorisationcode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthAuthorisationCodeDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthAuthorisationCode.
+func (c *OAuthAuthorisationCodeClient) Query() *OAuthAuthorisationCodeQuery {
+	return &OAuthAuthorisationCodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthAuthorisationCode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthAuthorisationCode entity by its id.
+func (c *OAuthAuthorisationCodeClient) Get(ctx context.Context, id xid.ID) (*OAuthAuthorisationCode, error) {
+	return c.Query().Where(oauthauthorisationcode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthAuthorisationCodeClient) GetX(ctx context.Context, id xid.ID) *OAuthAuthorisationCode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryClient queries the client edge of a OAuthAuthorisationCode.
+func (c *OAuthAuthorisationCodeClient) QueryClient(_m *OAuthAuthorisationCode) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthauthorisationcode.Table, oauthauthorisationcode.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthauthorisationcode.ClientTable, oauthauthorisationcode.ClientColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a OAuthAuthorisationCode.
+func (c *OAuthAuthorisationCodeClient) QueryAccount(_m *OAuthAuthorisationCode) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthauthorisationcode.Table, oauthauthorisationcode.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthauthorisationcode.AccountTable, oauthauthorisationcode.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthAuthorisationCodeClient) Hooks() []Hook {
+	return c.hooks.OAuthAuthorisationCode
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthAuthorisationCodeClient) Interceptors() []Interceptor {
+	return c.inters.OAuthAuthorisationCode
+}
+
+func (c *OAuthAuthorisationCodeClient) mutate(ctx context.Context, m *OAuthAuthorisationCodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthAuthorisationCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthAuthorisationCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthAuthorisationCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthAuthorisationCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthAuthorisationCode mutation op: %q", m.Op())
+	}
+}
+
+// OAuthAuthorisationRequestClient is a client for the OAuthAuthorisationRequest schema.
+type OAuthAuthorisationRequestClient struct {
+	config
+}
+
+// NewOAuthAuthorisationRequestClient returns a client for the OAuthAuthorisationRequest from the given config.
+func NewOAuthAuthorisationRequestClient(c config) *OAuthAuthorisationRequestClient {
+	return &OAuthAuthorisationRequestClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthauthorisationrequest.Hooks(f(g(h())))`.
+func (c *OAuthAuthorisationRequestClient) Use(hooks ...Hook) {
+	c.hooks.OAuthAuthorisationRequest = append(c.hooks.OAuthAuthorisationRequest, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthauthorisationrequest.Intercept(f(g(h())))`.
+func (c *OAuthAuthorisationRequestClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthAuthorisationRequest = append(c.inters.OAuthAuthorisationRequest, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthAuthorisationRequest entity.
+func (c *OAuthAuthorisationRequestClient) Create() *OAuthAuthorisationRequestCreate {
+	mutation := newOAuthAuthorisationRequestMutation(c.config, OpCreate)
+	return &OAuthAuthorisationRequestCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthAuthorisationRequest entities.
+func (c *OAuthAuthorisationRequestClient) CreateBulk(builders ...*OAuthAuthorisationRequestCreate) *OAuthAuthorisationRequestCreateBulk {
+	return &OAuthAuthorisationRequestCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthAuthorisationRequestClient) MapCreateBulk(slice any, setFunc func(*OAuthAuthorisationRequestCreate, int)) *OAuthAuthorisationRequestCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthAuthorisationRequestCreateBulk{err: fmt.Errorf("calling to OAuthAuthorisationRequestClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthAuthorisationRequestCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthAuthorisationRequestCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthAuthorisationRequest.
+func (c *OAuthAuthorisationRequestClient) Update() *OAuthAuthorisationRequestUpdate {
+	mutation := newOAuthAuthorisationRequestMutation(c.config, OpUpdate)
+	return &OAuthAuthorisationRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthAuthorisationRequestClient) UpdateOne(_m *OAuthAuthorisationRequest) *OAuthAuthorisationRequestUpdateOne {
+	mutation := newOAuthAuthorisationRequestMutation(c.config, OpUpdateOne, withOAuthAuthorisationRequest(_m))
+	return &OAuthAuthorisationRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthAuthorisationRequestClient) UpdateOneID(id xid.ID) *OAuthAuthorisationRequestUpdateOne {
+	mutation := newOAuthAuthorisationRequestMutation(c.config, OpUpdateOne, withOAuthAuthorisationRequestID(id))
+	return &OAuthAuthorisationRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthAuthorisationRequest.
+func (c *OAuthAuthorisationRequestClient) Delete() *OAuthAuthorisationRequestDelete {
+	mutation := newOAuthAuthorisationRequestMutation(c.config, OpDelete)
+	return &OAuthAuthorisationRequestDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthAuthorisationRequestClient) DeleteOne(_m *OAuthAuthorisationRequest) *OAuthAuthorisationRequestDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthAuthorisationRequestClient) DeleteOneID(id xid.ID) *OAuthAuthorisationRequestDeleteOne {
+	builder := c.Delete().Where(oauthauthorisationrequest.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthAuthorisationRequestDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthAuthorisationRequest.
+func (c *OAuthAuthorisationRequestClient) Query() *OAuthAuthorisationRequestQuery {
+	return &OAuthAuthorisationRequestQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthAuthorisationRequest},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthAuthorisationRequest entity by its id.
+func (c *OAuthAuthorisationRequestClient) Get(ctx context.Context, id xid.ID) (*OAuthAuthorisationRequest, error) {
+	return c.Query().Where(oauthauthorisationrequest.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthAuthorisationRequestClient) GetX(ctx context.Context, id xid.ID) *OAuthAuthorisationRequest {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryClient queries the client edge of a OAuthAuthorisationRequest.
+func (c *OAuthAuthorisationRequestClient) QueryClient(_m *OAuthAuthorisationRequest) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthauthorisationrequest.Table, oauthauthorisationrequest.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthauthorisationrequest.ClientTable, oauthauthorisationrequest.ClientColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a OAuthAuthorisationRequest.
+func (c *OAuthAuthorisationRequestClient) QueryAccount(_m *OAuthAuthorisationRequest) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthauthorisationrequest.Table, oauthauthorisationrequest.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthauthorisationrequest.AccountTable, oauthauthorisationrequest.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthAuthorisationRequestClient) Hooks() []Hook {
+	return c.hooks.OAuthAuthorisationRequest
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthAuthorisationRequestClient) Interceptors() []Interceptor {
+	return c.inters.OAuthAuthorisationRequest
+}
+
+func (c *OAuthAuthorisationRequestClient) mutate(ctx context.Context, m *OAuthAuthorisationRequestMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthAuthorisationRequestCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthAuthorisationRequestUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthAuthorisationRequestUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthAuthorisationRequestDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthAuthorisationRequest mutation op: %q", m.Op())
+	}
+}
+
+// OAuthClientClient is a client for the OAuthClient schema.
+type OAuthClientClient struct {
+	config
+}
+
+// NewOAuthClientClient returns a client for the OAuthClient from the given config.
+func NewOAuthClientClient(c config) *OAuthClientClient {
+	return &OAuthClientClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthclient.Hooks(f(g(h())))`.
+func (c *OAuthClientClient) Use(hooks ...Hook) {
+	c.hooks.OAuthClient = append(c.hooks.OAuthClient, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthclient.Intercept(f(g(h())))`.
+func (c *OAuthClientClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthClient = append(c.inters.OAuthClient, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthClient entity.
+func (c *OAuthClientClient) Create() *OAuthClientCreate {
+	mutation := newOAuthClientMutation(c.config, OpCreate)
+	return &OAuthClientCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthClient entities.
+func (c *OAuthClientClient) CreateBulk(builders ...*OAuthClientCreate) *OAuthClientCreateBulk {
+	return &OAuthClientCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthClientClient) MapCreateBulk(slice any, setFunc func(*OAuthClientCreate, int)) *OAuthClientCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthClientCreateBulk{err: fmt.Errorf("calling to OAuthClientClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthClientCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthClientCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthClient.
+func (c *OAuthClientClient) Update() *OAuthClientUpdate {
+	mutation := newOAuthClientMutation(c.config, OpUpdate)
+	return &OAuthClientUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthClientClient) UpdateOne(_m *OAuthClient) *OAuthClientUpdateOne {
+	mutation := newOAuthClientMutation(c.config, OpUpdateOne, withOAuthClient(_m))
+	return &OAuthClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthClientClient) UpdateOneID(id xid.ID) *OAuthClientUpdateOne {
+	mutation := newOAuthClientMutation(c.config, OpUpdateOne, withOAuthClientID(id))
+	return &OAuthClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthClient.
+func (c *OAuthClientClient) Delete() *OAuthClientDelete {
+	mutation := newOAuthClientMutation(c.config, OpDelete)
+	return &OAuthClientDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthClientClient) DeleteOne(_m *OAuthClient) *OAuthClientDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthClientClient) DeleteOneID(id xid.ID) *OAuthClientDeleteOne {
+	builder := c.Delete().Where(oauthclient.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthClientDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthClient.
+func (c *OAuthClientClient) Query() *OAuthClientQuery {
+	return &OAuthClientQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthClient},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthClient entity by its id.
+func (c *OAuthClientClient) Get(ctx context.Context, id xid.ID) (*OAuthClient, error) {
+	return c.Query().Where(oauthclient.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthClientClient) GetX(ctx context.Context, id xid.ID) *OAuthClient {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a OAuthClient.
+func (c *OAuthClientClient) QueryAccount(_m *OAuthClient) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthclient.AccountTable, oauthclient.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthorisationCodes queries the authorisation_codes edge of a OAuthClient.
+func (c *OAuthClientClient) QueryAuthorisationCodes(_m *OAuthClient) *OAuthAuthorisationCodeQuery {
+	query := (&OAuthAuthorisationCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(oauthauthorisationcode.Table, oauthauthorisationcode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthclient.AuthorisationCodesTable, oauthclient.AuthorisationCodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthorisationRequests queries the authorisation_requests edge of a OAuthClient.
+func (c *OAuthClientClient) QueryAuthorisationRequests(_m *OAuthClient) *OAuthAuthorisationRequestQuery {
+	query := (&OAuthAuthorisationRequestClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(oauthauthorisationrequest.Table, oauthauthorisationrequest.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthclient.AuthorisationRequestsTable, oauthclient.AuthorisationRequestsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceAuthorisations queries the device_authorisations edge of a OAuthClient.
+func (c *OAuthClientClient) QueryDeviceAuthorisations(_m *OAuthClient) *OAuthDeviceAuthorisationQuery {
+	query := (&OAuthDeviceAuthorisationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthclient.DeviceAuthorisationsTable, oauthclient.DeviceAuthorisationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRefreshTokens queries the refresh_tokens edge of a OAuthClient.
+func (c *OAuthClientClient) QueryRefreshTokens(_m *OAuthClient) *OAuthRefreshTokenQuery {
+	query := (&OAuthRefreshTokenClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthclient.Table, oauthclient.FieldID, id),
+			sqlgraph.To(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthclient.RefreshTokensTable, oauthclient.RefreshTokensColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthClientClient) Hooks() []Hook {
+	return c.hooks.OAuthClient
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthClientClient) Interceptors() []Interceptor {
+	return c.inters.OAuthClient
+}
+
+func (c *OAuthClientClient) mutate(ctx context.Context, m *OAuthClientMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthClientCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthClientUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthClientUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthClientDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthClient mutation op: %q", m.Op())
+	}
+}
+
+// OAuthDeviceAuthorisationClient is a client for the OAuthDeviceAuthorisation schema.
+type OAuthDeviceAuthorisationClient struct {
+	config
+}
+
+// NewOAuthDeviceAuthorisationClient returns a client for the OAuthDeviceAuthorisation from the given config.
+func NewOAuthDeviceAuthorisationClient(c config) *OAuthDeviceAuthorisationClient {
+	return &OAuthDeviceAuthorisationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthdeviceauthorisation.Hooks(f(g(h())))`.
+func (c *OAuthDeviceAuthorisationClient) Use(hooks ...Hook) {
+	c.hooks.OAuthDeviceAuthorisation = append(c.hooks.OAuthDeviceAuthorisation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthdeviceauthorisation.Intercept(f(g(h())))`.
+func (c *OAuthDeviceAuthorisationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthDeviceAuthorisation = append(c.inters.OAuthDeviceAuthorisation, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthDeviceAuthorisation entity.
+func (c *OAuthDeviceAuthorisationClient) Create() *OAuthDeviceAuthorisationCreate {
+	mutation := newOAuthDeviceAuthorisationMutation(c.config, OpCreate)
+	return &OAuthDeviceAuthorisationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthDeviceAuthorisation entities.
+func (c *OAuthDeviceAuthorisationClient) CreateBulk(builders ...*OAuthDeviceAuthorisationCreate) *OAuthDeviceAuthorisationCreateBulk {
+	return &OAuthDeviceAuthorisationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthDeviceAuthorisationClient) MapCreateBulk(slice any, setFunc func(*OAuthDeviceAuthorisationCreate, int)) *OAuthDeviceAuthorisationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthDeviceAuthorisationCreateBulk{err: fmt.Errorf("calling to OAuthDeviceAuthorisationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthDeviceAuthorisationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthDeviceAuthorisationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) Update() *OAuthDeviceAuthorisationUpdate {
+	mutation := newOAuthDeviceAuthorisationMutation(c.config, OpUpdate)
+	return &OAuthDeviceAuthorisationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthDeviceAuthorisationClient) UpdateOne(_m *OAuthDeviceAuthorisation) *OAuthDeviceAuthorisationUpdateOne {
+	mutation := newOAuthDeviceAuthorisationMutation(c.config, OpUpdateOne, withOAuthDeviceAuthorisation(_m))
+	return &OAuthDeviceAuthorisationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthDeviceAuthorisationClient) UpdateOneID(id xid.ID) *OAuthDeviceAuthorisationUpdateOne {
+	mutation := newOAuthDeviceAuthorisationMutation(c.config, OpUpdateOne, withOAuthDeviceAuthorisationID(id))
+	return &OAuthDeviceAuthorisationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) Delete() *OAuthDeviceAuthorisationDelete {
+	mutation := newOAuthDeviceAuthorisationMutation(c.config, OpDelete)
+	return &OAuthDeviceAuthorisationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthDeviceAuthorisationClient) DeleteOne(_m *OAuthDeviceAuthorisation) *OAuthDeviceAuthorisationDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthDeviceAuthorisationClient) DeleteOneID(id xid.ID) *OAuthDeviceAuthorisationDeleteOne {
+	builder := c.Delete().Where(oauthdeviceauthorisation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthDeviceAuthorisationDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) Query() *OAuthDeviceAuthorisationQuery {
+	return &OAuthDeviceAuthorisationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthDeviceAuthorisation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthDeviceAuthorisation entity by its id.
+func (c *OAuthDeviceAuthorisationClient) Get(ctx context.Context, id xid.ID) (*OAuthDeviceAuthorisation, error) {
+	return c.Query().Where(oauthdeviceauthorisation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthDeviceAuthorisationClient) GetX(ctx context.Context, id xid.ID) *OAuthDeviceAuthorisation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryClient queries the client edge of a OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) QueryClient(_m *OAuthDeviceAuthorisation) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthdeviceauthorisation.ClientTable, oauthdeviceauthorisation.ClientColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClaimedByAccount queries the claimed_by_account edge of a OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) QueryClaimedByAccount(_m *OAuthDeviceAuthorisation) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthdeviceauthorisation.ClaimedByAccountTable, oauthdeviceauthorisation.ClaimedByAccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryApprovedByAccount queries the approved_by_account edge of a OAuthDeviceAuthorisation.
+func (c *OAuthDeviceAuthorisationClient) QueryApprovedByAccount(_m *OAuthDeviceAuthorisation) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthdeviceauthorisation.Table, oauthdeviceauthorisation.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthdeviceauthorisation.ApprovedByAccountTable, oauthdeviceauthorisation.ApprovedByAccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthDeviceAuthorisationClient) Hooks() []Hook {
+	return c.hooks.OAuthDeviceAuthorisation
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthDeviceAuthorisationClient) Interceptors() []Interceptor {
+	return c.inters.OAuthDeviceAuthorisation
+}
+
+func (c *OAuthDeviceAuthorisationClient) mutate(ctx context.Context, m *OAuthDeviceAuthorisationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthDeviceAuthorisationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthDeviceAuthorisationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthDeviceAuthorisationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthDeviceAuthorisationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthDeviceAuthorisation mutation op: %q", m.Op())
+	}
+}
+
+// OAuthRefreshTokenClient is a client for the OAuthRefreshToken schema.
+type OAuthRefreshTokenClient struct {
+	config
+}
+
+// NewOAuthRefreshTokenClient returns a client for the OAuthRefreshToken from the given config.
+func NewOAuthRefreshTokenClient(c config) *OAuthRefreshTokenClient {
+	return &OAuthRefreshTokenClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthrefreshtoken.Hooks(f(g(h())))`.
+func (c *OAuthRefreshTokenClient) Use(hooks ...Hook) {
+	c.hooks.OAuthRefreshToken = append(c.hooks.OAuthRefreshToken, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthrefreshtoken.Intercept(f(g(h())))`.
+func (c *OAuthRefreshTokenClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthRefreshToken = append(c.inters.OAuthRefreshToken, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthRefreshToken entity.
+func (c *OAuthRefreshTokenClient) Create() *OAuthRefreshTokenCreate {
+	mutation := newOAuthRefreshTokenMutation(c.config, OpCreate)
+	return &OAuthRefreshTokenCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthRefreshToken entities.
+func (c *OAuthRefreshTokenClient) CreateBulk(builders ...*OAuthRefreshTokenCreate) *OAuthRefreshTokenCreateBulk {
+	return &OAuthRefreshTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthRefreshTokenClient) MapCreateBulk(slice any, setFunc func(*OAuthRefreshTokenCreate, int)) *OAuthRefreshTokenCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthRefreshTokenCreateBulk{err: fmt.Errorf("calling to OAuthRefreshTokenClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthRefreshTokenCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthRefreshTokenCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) Update() *OAuthRefreshTokenUpdate {
+	mutation := newOAuthRefreshTokenMutation(c.config, OpUpdate)
+	return &OAuthRefreshTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthRefreshTokenClient) UpdateOne(_m *OAuthRefreshToken) *OAuthRefreshTokenUpdateOne {
+	mutation := newOAuthRefreshTokenMutation(c.config, OpUpdateOne, withOAuthRefreshToken(_m))
+	return &OAuthRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthRefreshTokenClient) UpdateOneID(id xid.ID) *OAuthRefreshTokenUpdateOne {
+	mutation := newOAuthRefreshTokenMutation(c.config, OpUpdateOne, withOAuthRefreshTokenID(id))
+	return &OAuthRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) Delete() *OAuthRefreshTokenDelete {
+	mutation := newOAuthRefreshTokenMutation(c.config, OpDelete)
+	return &OAuthRefreshTokenDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthRefreshTokenClient) DeleteOne(_m *OAuthRefreshToken) *OAuthRefreshTokenDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthRefreshTokenClient) DeleteOneID(id xid.ID) *OAuthRefreshTokenDeleteOne {
+	builder := c.Delete().Where(oauthrefreshtoken.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthRefreshTokenDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) Query() *OAuthRefreshTokenQuery {
+	return &OAuthRefreshTokenQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthRefreshToken},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthRefreshToken entity by its id.
+func (c *OAuthRefreshTokenClient) Get(ctx context.Context, id xid.ID) (*OAuthRefreshToken, error) {
+	return c.Query().Where(oauthrefreshtoken.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthRefreshTokenClient) GetX(ctx context.Context, id xid.ID) *OAuthRefreshToken {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryClient queries the client edge of a OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) QueryClient(_m *OAuthRefreshToken) *OAuthClientQuery {
+	query := (&OAuthClientClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID, id),
+			sqlgraph.To(oauthclient.Table, oauthclient.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthrefreshtoken.ClientTable, oauthrefreshtoken.ClientColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) QueryAccount(_m *OAuthRefreshToken) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthrefreshtoken.AccountTable, oauthrefreshtoken.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReplaces queries the replaces edge of a OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) QueryReplaces(_m *OAuthRefreshToken) *OAuthRefreshTokenQuery {
+	query := (&OAuthRefreshTokenClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID, id),
+			sqlgraph.To(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthrefreshtoken.ReplacesTable, oauthrefreshtoken.ReplacesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryReplacedBy queries the replaced_by edge of a OAuthRefreshToken.
+func (c *OAuthRefreshTokenClient) QueryReplacedBy(_m *OAuthRefreshToken) *OAuthRefreshTokenQuery {
+	query := (&OAuthRefreshTokenClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID, id),
+			sqlgraph.To(oauthrefreshtoken.Table, oauthrefreshtoken.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthrefreshtoken.ReplacedByTable, oauthrefreshtoken.ReplacedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthRefreshTokenClient) Hooks() []Hook {
+	return c.hooks.OAuthRefreshToken
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthRefreshTokenClient) Interceptors() []Interceptor {
+	return c.inters.OAuthRefreshToken
+}
+
+func (c *OAuthRefreshTokenClient) mutate(ctx context.Context, m *OAuthRefreshTokenMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthRefreshTokenCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthRefreshTokenUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthRefreshTokenUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthRefreshTokenDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthRefreshToken mutation op: %q", m.Op())
+	}
+}
+
 // PluginClient is a client for the Plugin schema.
 type PluginClient struct {
 	config
@@ -7165,17 +8226,19 @@ type (
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, Notification, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
-		Warning []ent.Hook
+		Node, Notification, OAuthAuthorisationCode, OAuthAuthorisationRequest,
+		OAuthClient, OAuthDeviceAuthorisation, OAuthRefreshToken, Plugin, Post,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, Notification, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
-		Warning []ent.Interceptor
+		Node, Notification, OAuthAuthorisationCode, OAuthAuthorisationRequest,
+		OAuthClient, OAuthDeviceAuthorisation, OAuthRefreshToken, Plugin, Post,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag, Warning []ent.Interceptor
 	}
 )
 

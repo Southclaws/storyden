@@ -77,6 +77,10 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		caps = append(caps, CapabilitySMSClient)
 	}
 
+	if p.config.OAuthEnabled {
+		caps = append(caps, CapabilityOAuth)
+	}
+
 	if p.config.PluginRuntimeProvider != plugin_runner.RuntimeProviderNone.String() {
 		caps = append(caps, CapabilityPlugins)
 	}

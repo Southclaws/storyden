@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
+	"github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/discord"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
@@ -47,7 +48,7 @@ func Build() fx.Option {
 		),
 		fx.Provide(email_verify.New),
 		fx.Provide(password_reset.NewTokenProvider, password_reset.NewEmailResetter),
-		fx.Provide(New, session.NewValidator, session.NewIssuer),
+		fx.Provide(New, oauth.New, session.NewValidator, session.NewIssuer),
 	)
 }
 

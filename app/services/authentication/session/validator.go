@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/settings"
+	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
@@ -24,17 +25,19 @@ type Validator struct {
 	accountQuerier *account_querier.Querier
 	roleQuerier    *role_querier.Querier
 	akRepo         *access_key.Repository
+	oauth          *oauthservice.Service
 	settings       *settings.SettingsRepository
 }
 
 // NewValidator creates a new session validator with the required dependencies.
-func NewValidator(ins spanner.Builder, tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository, settings *settings.SettingsRepository) *Validator {
+func NewValidator(ins spanner.Builder, tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository, oauth *oauthservice.Service, settings *settings.SettingsRepository) *Validator {
 	return &Validator{
 		ins:            ins.Build(),
 		tokenRepo:      tokenRepo,
 		accountQuerier: accountQuerier,
 		roleQuerier:    roleQuerier,
 		akRepo:         akRepo,
+		oauth:          oauth,
 		settings:       settings,
 	}
 }
@@ -148,6 +151,24 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 	}
 
 	return WithAccessKey(ctx, *acc, roles), nil
+}
+
+// ValidateOAuthToken validates an OAuth access token and returns a context with account info.
+func (v *Validator) ValidateOAuthToken(ctx context.Context, raw string) (context.Context, error) {
+	ctx, span := v.ins.Instrument(ctx)
+	defer span.End()
+
+	result, err := v.oauth.ValidateAccessToken(ctx, raw)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := v.accountQuerier.GetRefByID(ctx, result.AccountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithOAuthToken(ctx, *acc, result.Permissions, result.Scopes), nil
 }
 
 // WithUnauthenticatedRoles returns a context with guest role permissions.

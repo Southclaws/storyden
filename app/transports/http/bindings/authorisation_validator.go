@@ -47,6 +47,9 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 			return lo.HasKey(sr, requestSecurityScheme)
 		})
 		if !matchSecurityScheme {
+			if requestSecurityScheme == "browser" {
+				return fault.New("session required for operation", fctx.With(ctx), ftag.With(ftag.Unauthenticated))
+			}
 			return fault.New("invalid security scheme for operation", fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 		}
 	}
@@ -63,6 +66,8 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 	case "access_key":
 	case "browser":
 		// TODO: Validate which session type is being used
+	case "oauth_token":
+		// Exhaustive.
 	case "webauthn":
 		if sessionRequired {
 			// TODO: Handle more gracefully

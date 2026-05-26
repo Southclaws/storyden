@@ -27,9 +27,10 @@ import (
 )
 
 const (
-	Access_keyScopes = "access_key.Scopes"
-	BrowserScopes    = "browser.Scopes"
-	WebauthnScopes   = "webauthn.Scopes"
+	Access_keyScopes  = "access_key.Scopes"
+	BrowserScopes     = "browser.Scopes"
+	Oauth_tokenScopes = "oauth_token.Scopes"
+	WebauthnScopes    = "webauthn.Scopes"
 )
 
 // Defines values for AccountVerifiedStatus.
@@ -144,6 +145,7 @@ const (
 const (
 	EmailClient InstanceCapability = "email_client"
 	GenAi       InstanceCapability = "gen_ai"
+	Oauth       InstanceCapability = "oauth"
 	Plugins     InstanceCapability = "plugins"
 	Semdex      InstanceCapability = "semdex"
 	SmsClient   InstanceCapability = "sms_client"
@@ -187,6 +189,42 @@ const (
 	Unread NotificationStatus = "unread"
 )
 
+// Defines values for OAuthAuthoriseConsentResultStatus.
+const (
+	OAuthAuthoriseConsentResultStatusApproved OAuthAuthoriseConsentResultStatus = "approved"
+	OAuthAuthoriseConsentResultStatusDenied   OAuthAuthoriseConsentResultStatus = "denied"
+)
+
+// Defines values for OAuthAuthoriseDecision.
+const (
+	OAuthAuthoriseDecisionApprove OAuthAuthoriseDecision = "approve"
+	OAuthAuthoriseDecisionDeny    OAuthAuthoriseDecision = "deny"
+)
+
+// Defines values for OAuthClientScopePolicy.
+const (
+	Explicit OAuthClientScopePolicy = "explicit"
+	Inherit  OAuthClientScopePolicy = "inherit"
+)
+
+// Defines values for OAuthClientType.
+const (
+	OAuthClientTypeConfidential OAuthClientType = "confidential"
+	OAuthClientTypePublic       OAuthClientType = "public"
+)
+
+// Defines values for OAuthDeviceConsentResultStatus.
+const (
+	OAuthDeviceConsentResultStatusApproved OAuthDeviceConsentResultStatus = "approved"
+	OAuthDeviceConsentResultStatusDenied   OAuthDeviceConsentResultStatus = "denied"
+)
+
+// Defines values for OAuthDeviceDecision.
+const (
+	OAuthDeviceDecisionApprove OAuthDeviceDecision = "approve"
+	OAuthDeviceDecisionDeny    OAuthDeviceDecision = "deny"
+)
+
 // Defines values for OnboardingStatus.
 const (
 	Complete             OnboardingStatus = "complete"
@@ -224,6 +262,7 @@ const (
 	READPUBLISHEDTHREADS  Permission = "READ_PUBLISHED_THREADS"
 	SUBMITLIBRARYNODE     Permission = "SUBMIT_LIBRARY_NODE"
 	UPLOADASSET           Permission = "UPLOAD_ASSET"
+	USEOAUTHCLIENTS       Permission = "USE_OAUTH_CLIENTS"
 	USEPERSONALACCESSKEYS Permission = "USE_PERSONAL_ACCESS_KEYS"
 	VIEWACCOUNTS          Permission = "VIEW_ACCOUNTS"
 	VIEWMODERATIONNOTES   Permission = "VIEW_MODERATION_NOTES"
@@ -378,6 +417,16 @@ const (
 	NodeListFormatParamTree NodeListFormatParam = "tree"
 )
 
+// Defines values for OAuthCodeChallengeMethodQuery.
+const (
+	OAuthCodeChallengeMethodQueryS256 OAuthCodeChallengeMethodQuery = "S256"
+)
+
+// Defines values for OAuthResponseTypeQuery.
+const (
+	OAuthResponseTypeQueryCode OAuthResponseTypeQuery = "code"
+)
+
 // Defines values for IconGetParamsIconSize.
 const (
 	IconGetParamsIconSizeN120x120 IconGetParamsIconSize = "120x120"
@@ -392,6 +441,16 @@ const (
 const (
 	NodeListParamsFormatFlat NodeListParamsFormat = "flat"
 	NodeListParamsFormatTree NodeListParamsFormat = "tree"
+)
+
+// Defines values for OAuthAuthoriseParamsResponseType.
+const (
+	OAuthAuthoriseParamsResponseTypeCode OAuthAuthoriseParamsResponseType = "code"
+)
+
+// Defines values for OAuthAuthoriseParamsCodeChallengeMethod.
+const (
+	OAuthAuthoriseParamsCodeChallengeMethodS256 OAuthAuthoriseParamsCodeChallengeMethod = "S256"
 )
 
 // APIError A description of an error including a human readable message and any
@@ -1676,6 +1735,9 @@ type CommonProperties struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// CreatedAt The time the resource was created.
+type CreatedAt = time.Time
+
 // CredentialRequestOptions https://www.w3.org/TR/webauthn-2/#sctn-credentialrequestoptions-extension
 type CredentialRequestOptions struct {
 	// PublicKey https://www.w3.org/TR/webauthn-2/#dictdef-publickeycredentialrequestoptions
@@ -2874,10 +2936,284 @@ type NotificationWithID struct {
 // NullableIdentifier A unique identifier for this resource.
 type NullableIdentifier = string
 
+// OAuthAuthoriseConsent defines model for OAuthAuthoriseConsent.
+type OAuthAuthoriseConsent struct {
+	ClientId                string    `json:"client_id"`
+	ClientName              string    `json:"client_name"`
+	ExpiresAt               time.Time `json:"expires_at"`
+	GrantedScopes           []string  `json:"granted_scopes"`
+	InheritsUserPermissions bool      `json:"inherits_user_permissions"`
+	RedirectUri             string    `json:"redirect_uri"`
+	RequestId               string    `json:"request_id"`
+	RequestedScopes         []string  `json:"requested_scopes"`
+}
+
+// OAuthAuthoriseConsentResult defines model for OAuthAuthoriseConsentResult.
+type OAuthAuthoriseConsentResult struct {
+	Location string                            `json:"location"`
+	Status   OAuthAuthoriseConsentResultStatus `json:"status"`
+}
+
+// OAuthAuthoriseConsentResultStatus defines model for OAuthAuthoriseConsentResult.Status.
+type OAuthAuthoriseConsentResultStatus string
+
+// OAuthAuthoriseConsentSubmitProps defines model for OAuthAuthoriseConsentSubmitProps.
+type OAuthAuthoriseConsentSubmitProps struct {
+	Decision  OAuthAuthoriseDecision `json:"decision"`
+	RequestId string                 `json:"request_id"`
+}
+
+// OAuthAuthoriseDecision defines model for OAuthAuthoriseDecision.
+type OAuthAuthoriseDecision string
+
 // OAuthCallback defines model for OAuthCallback.
 type OAuthCallback struct {
 	Code  string `json:"code"`
 	State string `json:"state"`
+}
+
+// OAuthClient defines model for OAuthClient.
+type OAuthClient struct {
+	// AccountId A unique identifier for this resource.
+	AccountId     *Identifier `json:"account_id,omitempty"`
+	AllowedGrants []string    `json:"allowed_grants"`
+	AllowedScopes []string    `json:"allowed_scopes"`
+	ClientId      string      `json:"client_id"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt CreatedAt `json:"createdAt"`
+
+	// Id A unique identifier for this resource.
+	Id           Identifier             `json:"id"`
+	Name         string                 `json:"name"`
+	RedirectUris []string               `json:"redirect_uris"`
+	ScopePolicy  OAuthClientScopePolicy `json:"scope_policy"`
+	Type         OAuthClientType        `json:"type"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt UpdatedAt `json:"updatedAt"`
+}
+
+// OAuthClientCreateProps defines model for OAuthClientCreateProps.
+type OAuthClientCreateProps struct {
+	// AccountId A unique identifier for this resource.
+	AccountId        Identifier              `json:"account_id"`
+	AllowedGrants    []string                `json:"allowed_grants"`
+	AllowedScopes    []string                `json:"allowed_scopes"`
+	ClientId         string                  `json:"client_id"`
+	ClientSecretHash *string                 `json:"client_secret_hash,omitempty"`
+	Name             string                  `json:"name"`
+	RedirectUris     []string                `json:"redirect_uris"`
+	ScopePolicy      *OAuthClientScopePolicy `json:"scope_policy,omitempty"`
+	Type             OAuthClientType         `json:"type"`
+}
+
+// OAuthClientIssued defines model for OAuthClientIssued.
+type OAuthClientIssued struct {
+	Client       OAuthClient `json:"client"`
+	ClientSecret *string     `json:"client_secret,omitempty"`
+}
+
+// OAuthClientList defines model for OAuthClientList.
+type OAuthClientList = []OAuthClient
+
+// OAuthClientListResult defines model for OAuthClientListResult.
+type OAuthClientListResult struct {
+	Clients OAuthClientList `json:"clients"`
+}
+
+// OAuthClientScopePolicy defines model for OAuthClientScopePolicy.
+type OAuthClientScopePolicy string
+
+// OAuthClientSelfCreateProps defines model for OAuthClientSelfCreateProps.
+type OAuthClientSelfCreateProps struct {
+	AllowedScopes []string  `json:"allowed_scopes"`
+	Name          string    `json:"name"`
+	RedirectUris  *[]string `json:"redirect_uris,omitempty"`
+}
+
+// OAuthClientSelfUpdateProps defines model for OAuthClientSelfUpdateProps.
+type OAuthClientSelfUpdateProps struct {
+	AllowedScopes *[]string `json:"allowed_scopes,omitempty"`
+	Name          *string   `json:"name,omitempty"`
+	RedirectUris  *[]string `json:"redirect_uris,omitempty"`
+}
+
+// OAuthClientType defines model for OAuthClientType.
+type OAuthClientType string
+
+// OAuthClientUpdateProps defines model for OAuthClientUpdateProps.
+type OAuthClientUpdateProps struct {
+	AllowedGrants    *[]string               `json:"allowed_grants,omitempty"`
+	AllowedScopes    *[]string               `json:"allowed_scopes,omitempty"`
+	ClientSecretHash *string                 `json:"client_secret_hash,omitempty"`
+	Name             *string                 `json:"name,omitempty"`
+	RedirectUris     *[]string               `json:"redirect_uris,omitempty"`
+	ScopePolicy      *OAuthClientScopePolicy `json:"scope_policy,omitempty"`
+}
+
+// OAuthDeviceAuthorisation defines model for OAuthDeviceAuthorisation.
+type OAuthDeviceAuthorisation struct {
+	DeviceCode              *string `json:"device_code,omitempty"`
+	Error                   *string `json:"error,omitempty"`
+	ExpiresIn               *int    `json:"expires_in,omitempty"`
+	Interval                *int    `json:"interval,omitempty"`
+	UserCode                *string `json:"user_code,omitempty"`
+	VerificationUri         *string `json:"verification_uri,omitempty"`
+	VerificationUriComplete *string `json:"verification_uri_complete,omitempty"`
+}
+
+// OAuthDeviceAuthorisationList defines model for OAuthDeviceAuthorisationList.
+type OAuthDeviceAuthorisationList = []OAuthDeviceAuthorisationRecord
+
+// OAuthDeviceAuthorisationListResult defines model for OAuthDeviceAuthorisationListResult.
+type OAuthDeviceAuthorisationListResult struct {
+	DeviceAuthorisations OAuthDeviceAuthorisationList `json:"device_authorisations"`
+}
+
+// OAuthDeviceAuthorisationProps defines model for OAuthDeviceAuthorisationProps.
+type OAuthDeviceAuthorisationProps struct {
+	ClientId string  `json:"client_id"`
+	Scope    *string `json:"scope,omitempty"`
+}
+
+// OAuthDeviceAuthorisationRecord defines model for OAuthDeviceAuthorisationRecord.
+type OAuthDeviceAuthorisationRecord struct {
+	ApprovedAt *time.Time `json:"approved_at,omitempty"`
+
+	// ApprovedByAccountId A unique identifier for this resource.
+	ApprovedByAccountId *Identifier `json:"approved_by_account_id,omitempty"`
+
+	// ClientId A unique identifier for this resource.
+	ClientId   Identifier `json:"client_id"`
+	ConsumedAt *time.Time `json:"consumed_at,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt CreatedAt  `json:"createdAt"`
+	DeniedAt  *time.Time `json:"denied_at,omitempty"`
+	ExpiresAt time.Time  `json:"expires_at"`
+
+	// Id A unique identifier for this resource.
+	Id                  Identifier `json:"id"`
+	LastPolledAt        *time.Time `json:"last_polled_at,omitempty"`
+	PollIntervalSeconds int        `json:"poll_interval_seconds"`
+	Scope               string     `json:"scope"`
+	UserCode            string     `json:"user_code"`
+}
+
+// OAuthDeviceConsent defines model for OAuthDeviceConsent.
+type OAuthDeviceConsent struct {
+	ClientId                string    `json:"client_id"`
+	ClientName              string    `json:"client_name"`
+	ExpiresAt               time.Time `json:"expires_at"`
+	GrantedScopes           []string  `json:"granted_scopes"`
+	InheritsUserPermissions bool      `json:"inherits_user_permissions"`
+	RequestedScopes         []string  `json:"requested_scopes"`
+	UserCode                string    `json:"user_code"`
+}
+
+// OAuthDeviceConsentResult defines model for OAuthDeviceConsentResult.
+type OAuthDeviceConsentResult struct {
+	Status OAuthDeviceConsentResultStatus `json:"status"`
+}
+
+// OAuthDeviceConsentResultStatus defines model for OAuthDeviceConsentResult.Status.
+type OAuthDeviceConsentResultStatus string
+
+// OAuthDeviceConsentSubmitProps defines model for OAuthDeviceConsentSubmitProps.
+type OAuthDeviceConsentSubmitProps struct {
+	Decision OAuthDeviceDecision `json:"decision"`
+	UserCode string              `json:"user_code"`
+}
+
+// OAuthDeviceDecision defines model for OAuthDeviceDecision.
+type OAuthDeviceDecision string
+
+// OAuthError OAuth-compatible error object.
+type OAuthError struct {
+	Error            string  `json:"error"`
+	ErrorDescription *string `json:"error_description,omitempty"`
+}
+
+// OAuthJWK JSON Web Key used to validate OAuth tokens.
+type OAuthJWK struct {
+	Alg string `json:"alg"`
+	E   string `json:"e"`
+	Kid string `json:"kid"`
+	Kty string `json:"kty"`
+	N   string `json:"n"`
+	Use string `json:"use"`
+}
+
+// OAuthJWKS JSON Web Key Set.
+type OAuthJWKS struct {
+	Keys []OAuthJWK `json:"keys"`
+}
+
+// OAuthRefreshToken defines model for OAuthRefreshToken.
+type OAuthRefreshToken struct {
+	// AccountId A unique identifier for this resource.
+	AccountId  Identifier `json:"account_id"`
+	ClientId   string     `json:"client_id"`
+	ClientName string     `json:"client_name"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt CreatedAt `json:"createdAt"`
+	ExpiresAt time.Time `json:"expires_at"`
+
+	// Id A unique identifier for this resource.
+	Id         Identifier `json:"id"`
+	LastUsedAt *time.Time `json:"last_used_at,omitempty"`
+
+	// OauthClientId A unique identifier for this resource.
+	OauthClientId Identifier `json:"oauth_client_id"`
+
+	// ReplacedByTokenId A unique identifier for this resource.
+	ReplacedByTokenId *Identifier `json:"replaced_by_token_id,omitempty"`
+	RevokedAt         *time.Time  `json:"revoked_at,omitempty"`
+	Scope             string      `json:"scope"`
+}
+
+// OAuthRefreshTokenList defines model for OAuthRefreshTokenList.
+type OAuthRefreshTokenList = []OAuthRefreshToken
+
+// OAuthRefreshTokenListResult defines model for OAuthRefreshTokenListResult.
+type OAuthRefreshTokenListResult struct {
+	Tokens OAuthRefreshTokenList `json:"tokens"`
+}
+
+// OAuthToken defines model for OAuthToken.
+type OAuthToken struct {
+	AccessToken  *string `json:"access_token,omitempty"`
+	Error        *string `json:"error,omitempty"`
+	ExpiresIn    *int    `json:"expires_in,omitempty"`
+	IdToken      *string `json:"id_token,omitempty"`
+	RefreshToken *string `json:"refresh_token,omitempty"`
+	Scope        *string `json:"scope,omitempty"`
+	TokenType    *string `json:"token_type,omitempty"`
+}
+
+// OAuthTokenProps defines model for OAuthTokenProps.
+type OAuthTokenProps struct {
+	ClientId     string  `json:"client_id"`
+	ClientSecret *string `json:"client_secret,omitempty"`
+	Code         *string `json:"code,omitempty"`
+	CodeVerifier *string `json:"code_verifier,omitempty"`
+	DeviceCode   *string `json:"device_code,omitempty"`
+	GrantType    string  `json:"grant_type"`
+	RedirectUri  *string `json:"redirect_uri,omitempty"`
+	RefreshToken *string `json:"refresh_token,omitempty"`
+	Scope        *string `json:"scope,omitempty"`
+}
+
+// OAuthUserInfo defines model for OAuthUserInfo.
+type OAuthUserInfo struct {
+	Email             *string `json:"email,omitempty"`
+	EmailVerified     *bool   `json:"email_verified,omitempty"`
+	Error             *string `json:"error,omitempty"`
+	Name              *string `json:"name,omitempty"`
+	PreferredUsername *string `json:"preferred_username,omitempty"`
+	Sub               *string `json:"sub,omitempty"`
 }
 
 // OnboardingStatus Derived from data state, indicates what stage in the onboarding process
@@ -4544,6 +4880,9 @@ type ThreadTitle = string
 // URL A web address
 type URL = string
 
+// UpdatedAt The time the resource was updated.
+type UpdatedAt = time.Time
+
 // UserVerificationRequirement https://www.w3.org/TR/webauthn-2/#enumdef-userverificationrequirement
 type UserVerificationRequirement string
 
@@ -4746,8 +5085,41 @@ type NotificationIDParam = Identifier
 // NotificationStatusQuery defines model for NotificationStatusQuery.
 type NotificationStatusQuery = NotificationStatusList
 
+// OAuthAuthorizationRequestIDQuery defines model for OAuthAuthorizationRequestIDQuery.
+type OAuthAuthorizationRequestIDQuery = string
+
+// OAuthClientIDParam A unique identifier for this resource.
+type OAuthClientIDParam = Identifier
+
+// OAuthClientIDQuery defines model for OAuthClientIDQuery.
+type OAuthClientIDQuery = string
+
+// OAuthCodeChallengeMethodQuery defines model for OAuthCodeChallengeMethodQuery.
+type OAuthCodeChallengeMethodQuery string
+
+// OAuthCodeChallengeQuery defines model for OAuthCodeChallengeQuery.
+type OAuthCodeChallengeQuery = string
+
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider = string
+
+// OAuthRedirectURIQuery defines model for OAuthRedirectURIQuery.
+type OAuthRedirectURIQuery = string
+
+// OAuthRefreshTokenIDParam A unique identifier for this resource.
+type OAuthRefreshTokenIDParam = Identifier
+
+// OAuthResponseTypeQuery defines model for OAuthResponseTypeQuery.
+type OAuthResponseTypeQuery string
+
+// OAuthScopeQuery defines model for OAuthScopeQuery.
+type OAuthScopeQuery = string
+
+// OAuthStateQuery defines model for OAuthStateQuery.
+type OAuthStateQuery = string
+
+// OAuthUserCodeQuery defines model for OAuthUserCodeQuery.
+type OAuthUserCodeQuery = string
 
 // PaginationQuery defines model for PaginationQuery.
 type PaginationQuery = string
@@ -5083,6 +5455,48 @@ type NotificationUpdateManyOK = NotificationListResult
 // NotificationUpdateOK defines model for NotificationUpdateOK.
 type NotificationUpdateOK = Notification
 
+// OAuthAuthoriseConsentOK defines model for OAuthAuthoriseConsentOK.
+type OAuthAuthoriseConsentOK = OAuthAuthoriseConsent
+
+// OAuthAuthoriseConsentSubmitOK defines model for OAuthAuthoriseConsentSubmitOK.
+type OAuthAuthoriseConsentSubmitOK = OAuthAuthoriseConsentResult
+
+// OAuthClientIssuedOK defines model for OAuthClientIssuedOK.
+type OAuthClientIssuedOK = OAuthClientIssued
+
+// OAuthClientListOK defines model for OAuthClientListOK.
+type OAuthClientListOK = OAuthClientListResult
+
+// OAuthClientOK defines model for OAuthClientOK.
+type OAuthClientOK = OAuthClient
+
+// OAuthDeviceAuthorisationListOK defines model for OAuthDeviceAuthorisationListOK.
+type OAuthDeviceAuthorisationListOK = OAuthDeviceAuthorisationListResult
+
+// OAuthDeviceAuthorisationOK defines model for OAuthDeviceAuthorisationOK.
+type OAuthDeviceAuthorisationOK = OAuthDeviceAuthorisation
+
+// OAuthDeviceConsentOK defines model for OAuthDeviceConsentOK.
+type OAuthDeviceConsentOK = OAuthDeviceConsent
+
+// OAuthDeviceConsentSubmitOK defines model for OAuthDeviceConsentSubmitOK.
+type OAuthDeviceConsentSubmitOK = OAuthDeviceConsentResult
+
+// OAuthJWKSOK JSON Web Key Set.
+type OAuthJWKSOK = OAuthJWKS
+
+// OAuthRefreshTokenListOK defines model for OAuthRefreshTokenListOK.
+type OAuthRefreshTokenListOK = OAuthRefreshTokenListResult
+
+// OAuthTokenError OAuth-compatible error object.
+type OAuthTokenError = OAuthError
+
+// OAuthTokenOK defines model for OAuthTokenOK.
+type OAuthTokenOK = OAuthToken
+
+// OAuthUserInfoOK defines model for OAuthUserInfoOK.
+type OAuthUserInfoOK = OAuthUserInfo
+
 // PluginCycleTokenOK defines model for PluginCycleTokenOK.
 type PluginCycleTokenOK = PluginCycleToken
 
@@ -5312,6 +5726,24 @@ type NotificationUpdate = NotificationMutableProps
 
 // NotificationUpdateMany defines model for NotificationUpdateMany.
 type NotificationUpdateMany = NotificationListUpdate
+
+// OAuthAuthoriseConsentSubmit defines model for OAuthAuthoriseConsentSubmit.
+type OAuthAuthoriseConsentSubmit = OAuthAuthoriseConsentSubmitProps
+
+// OAuthClientCreate defines model for OAuthClientCreate.
+type OAuthClientCreate = OAuthClientCreateProps
+
+// OAuthClientSelfCreate defines model for OAuthClientSelfCreate.
+type OAuthClientSelfCreate = OAuthClientSelfCreateProps
+
+// OAuthClientSelfUpdate defines model for OAuthClientSelfUpdate.
+type OAuthClientSelfUpdate = OAuthClientSelfUpdateProps
+
+// OAuthClientUpdate defines model for OAuthClientUpdate.
+type OAuthClientUpdate = OAuthClientUpdateProps
+
+// OAuthDeviceConsentSubmit defines model for OAuthDeviceConsentSubmit.
+type OAuthDeviceConsentSubmit = OAuthDeviceConsentSubmitProps
 
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
@@ -5647,6 +6079,48 @@ type NotificationListParams struct {
 	Status *NotificationStatusQuery `form:"status,omitempty" json:"status,omitempty"`
 }
 
+// OAuthAuthoriseParams defines parameters for OAuthAuthorise.
+type OAuthAuthoriseParams struct {
+	// ResponseType OAuth response type. Storyden currently supports authorisation code.
+	ResponseType OAuthAuthoriseParamsResponseType `form:"response_type" json:"response_type"`
+
+	// ClientId OAuth client identifier.
+	ClientId OAuthClientIDQuery `form:"client_id" json:"client_id"`
+
+	// RedirectUri Registered redirect URI for the OAuth client.
+	RedirectUri OAuthRedirectURIQuery `form:"redirect_uri" json:"redirect_uri"`
+
+	// Scope Space-separated OAuth scopes requested by the client.
+	Scope *OAuthScopeQuery `form:"scope,omitempty" json:"scope,omitempty"`
+
+	// State Client-provided opaque state returned to the redirect URI.
+	State *OAuthStateQuery `form:"state,omitempty" json:"state,omitempty"`
+
+	// CodeChallenge PKCE code challenge.
+	CodeChallenge OAuthCodeChallengeQuery `form:"code_challenge" json:"code_challenge"`
+
+	// CodeChallengeMethod PKCE code challenge method.
+	CodeChallengeMethod OAuthAuthoriseParamsCodeChallengeMethod `form:"code_challenge_method" json:"code_challenge_method"`
+}
+
+// OAuthAuthoriseParamsResponseType defines parameters for OAuthAuthorise.
+type OAuthAuthoriseParamsResponseType string
+
+// OAuthAuthoriseParamsCodeChallengeMethod defines parameters for OAuthAuthorise.
+type OAuthAuthoriseParamsCodeChallengeMethod string
+
+// OAuthAuthoriseConsentParams defines parameters for OAuthAuthoriseConsent.
+type OAuthAuthoriseConsentParams struct {
+	// RequestId OAuth authorisation request identifier.
+	RequestId *OAuthAuthorizationRequestIDQuery `form:"request_id,omitempty" json:"request_id,omitempty"`
+}
+
+// OAuthDeviceConsentParams defines parameters for OAuthDeviceConsent.
+type OAuthDeviceConsentParams struct {
+	// UserCode OAuth device authorisation user code.
+	UserCode *OAuthUserCodeQuery `form:"user_code,omitempty" json:"user_code,omitempty"`
+}
+
 // PostLocationGetParams defines parameters for PostLocationGet.
 type PostLocationGetParams struct {
 	// Id The post ID to locate
@@ -5776,6 +6250,12 @@ type AdminSettingsUpdateJSONRequestBody = AdminSettingsMutableProps
 // ModerationActionCreateJSONRequestBody defines body for ModerationActionCreate for application/json ContentType.
 type ModerationActionCreateJSONRequestBody = ModerationActionInitialProps
 
+// AdminOAuthClientCreateJSONRequestBody defines body for AdminOAuthClientCreate for application/json ContentType.
+type AdminOAuthClientCreateJSONRequestBody = OAuthClientCreateProps
+
+// AdminOAuthClientUpdateJSONRequestBody defines body for AdminOAuthClientUpdate for application/json ContentType.
+type AdminOAuthClientUpdateJSONRequestBody = OAuthClientUpdateProps
+
 // AccessKeyCreateJSONRequestBody defines body for AccessKeyCreate for application/json ContentType.
 type AccessKeyCreateJSONRequestBody = AccessKeyInitialProps
 
@@ -5796,6 +6276,12 @@ type AuthEmailSignupJSONRequestBody = AuthEmailInitialProps
 
 // AuthEmailVerifyJSONRequestBody defines body for AuthEmailVerify for application/json ContentType.
 type AuthEmailVerifyJSONRequestBody = AuthEmailVerifyProps
+
+// OAuthClientCreateJSONRequestBody defines body for OAuthClientCreate for application/json ContentType.
+type OAuthClientCreateJSONRequestBody = OAuthClientSelfCreateProps
+
+// OAuthClientUpdateJSONRequestBody defines body for OAuthClientUpdate for application/json ContentType.
+type OAuthClientUpdateJSONRequestBody = OAuthClientSelfUpdateProps
 
 // OAuthProviderCallbackJSONRequestBody defines body for OAuthProviderCallback for application/json ContentType.
 type OAuthProviderCallbackJSONRequestBody = OAuthCallback
@@ -5898,6 +6384,18 @@ type NotificationUpdateManyJSONRequestBody = NotificationListUpdate
 
 // NotificationUpdateJSONRequestBody defines body for NotificationUpdate for application/json ContentType.
 type NotificationUpdateJSONRequestBody = NotificationMutableProps
+
+// OAuthAuthoriseConsentSubmitJSONRequestBody defines body for OAuthAuthoriseConsentSubmit for application/json ContentType.
+type OAuthAuthoriseConsentSubmitJSONRequestBody = OAuthAuthoriseConsentSubmitProps
+
+// OAuthDeviceConsentSubmitJSONRequestBody defines body for OAuthDeviceConsentSubmit for application/json ContentType.
+type OAuthDeviceConsentSubmitJSONRequestBody = OAuthDeviceConsentSubmitProps
+
+// OAuthDeviceAuthorisationFormdataRequestBody defines body for OAuthDeviceAuthorisation for application/x-www-form-urlencoded ContentType.
+type OAuthDeviceAuthorisationFormdataRequestBody = OAuthDeviceAuthorisationProps
+
+// OAuthTokenFormdataRequestBody defines body for OAuthToken for application/x-www-form-urlencoded ContentType.
+type OAuthTokenFormdataRequestBody = OAuthTokenProps
 
 // PluginAddJSONRequestBody defines body for PluginAdd for application/json ContentType.
 type PluginAddJSONRequestBody = PluginInitialProps
@@ -7789,6 +8287,34 @@ type ClientInterface interface {
 	// EmailQueueRetry request
 	EmailQueueRetry(ctx context.Context, emailId EmailIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// AdminOAuthClientList request
+	AdminOAuthClientList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthClientCreateWithBody request with any body
+	AdminOAuthClientCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminOAuthClientCreate(ctx context.Context, body AdminOAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthClientDelete request
+	AdminOAuthClientDelete(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthClientGet request
+	AdminOAuthClientGet(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthClientUpdateWithBody request with any body
+	AdminOAuthClientUpdateWithBody(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	AdminOAuthClientUpdate(ctx context.Context, oauthClientId OAuthClientIDParam, body AdminOAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthDeviceAuthorisationList request
+	AdminOAuthDeviceAuthorisationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthRefreshTokenList request
+	AdminOAuthRefreshTokenList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AdminOAuthRefreshTokenDelete request
+	AdminOAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// AssetUploadWithBody request with any body
 	AssetUploadWithBody(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -7841,6 +8367,31 @@ type ClientInterface interface {
 
 	// AuthProviderLogout request
 	AuthProviderLogout(ctx context.Context, params *AuthProviderLogoutParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthClientList request
+	OAuthClientList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthClientCreateWithBody request with any body
+	OAuthClientCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthClientCreate(ctx context.Context, body OAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthClientDelete request
+	OAuthClientDelete(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthClientGet request
+	OAuthClientGet(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthClientUpdateWithBody request with any body
+	OAuthClientUpdateWithBody(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthClientUpdate(ctx context.Context, oauthClientId OAuthClientIDParam, body OAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRefreshTokenList request
+	OAuthRefreshTokenList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRefreshTokenDelete request
+	OAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// OAuthProviderCallbackWithBody request with any body
 	OAuthProviderCallbackWithBody(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -8137,6 +8688,41 @@ type ClientInterface interface {
 	NotificationUpdateWithBody(ctx context.Context, notificationId NotificationIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	NotificationUpdate(ctx context.Context, notificationId NotificationIDParam, body NotificationUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthAuthorise request
+	OAuthAuthorise(ctx context.Context, params *OAuthAuthoriseParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthAuthoriseConsent request
+	OAuthAuthoriseConsent(ctx context.Context, params *OAuthAuthoriseConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthAuthoriseConsentSubmitWithBody request with any body
+	OAuthAuthoriseConsentSubmitWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthAuthoriseConsentSubmit(ctx context.Context, body OAuthAuthoriseConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthDeviceConsent request
+	OAuthDeviceConsent(ctx context.Context, params *OAuthDeviceConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthDeviceConsentSubmitWithBody request with any body
+	OAuthDeviceConsentSubmitWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthDeviceConsentSubmit(ctx context.Context, body OAuthDeviceConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthDeviceAuthorisationWithBody request with any body
+	OAuthDeviceAuthorisationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthDeviceAuthorisationWithFormdataBody(ctx context.Context, body OAuthDeviceAuthorisationFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthJWKS request
+	OAuthJWKS(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthTokenWithBody request with any body
+	OAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthTokenWithFormdataBody(ctx context.Context, body OAuthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthUserInfo request
+	OAuthUserInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSpec request
 	GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -8824,6 +9410,126 @@ func (c *Client) EmailQueueRetry(ctx context.Context, emailId EmailIDParam, reqE
 	return c.Client.Do(req)
 }
 
+func (c *Client) AdminOAuthClientList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientCreate(ctx context.Context, body AdminOAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientDelete(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientDeleteRequest(c.Server, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientGet(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientGetRequest(c.Server, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientUpdateWithBody(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientUpdateRequestWithBody(c.Server, oauthClientId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthClientUpdate(ctx context.Context, oauthClientId OAuthClientIDParam, body AdminOAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthClientUpdateRequest(c.Server, oauthClientId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthDeviceAuthorisationList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthDeviceAuthorisationListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthRefreshTokenList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthRefreshTokenListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AdminOAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAdminOAuthRefreshTokenDeleteRequest(c.Server, oauthRefreshTokenId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) AssetUploadWithBody(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAssetUploadRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
@@ -9054,6 +9760,114 @@ func (c *Client) AuthEmailVerify(ctx context.Context, body AuthEmailVerifyJSONRe
 
 func (c *Client) AuthProviderLogout(ctx context.Context, params *AuthProviderLogoutParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAuthProviderLogoutRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientCreate(ctx context.Context, body OAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientDelete(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientDeleteRequest(c.Server, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientGet(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientGetRequest(c.Server, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientUpdateWithBody(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientUpdateRequestWithBody(c.Server, oauthClientId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthClientUpdate(ctx context.Context, oauthClientId OAuthClientIDParam, body OAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthClientUpdateRequest(c.Server, oauthClientId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRefreshTokenList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRefreshTokenListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRefreshTokenDeleteRequest(c.Server, oauthRefreshTokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -10374,6 +11188,162 @@ func (c *Client) NotificationUpdateWithBody(ctx context.Context, notificationId 
 
 func (c *Client) NotificationUpdate(ctx context.Context, notificationId NotificationIDParam, body NotificationUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewNotificationUpdateRequest(c.Server, notificationId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthAuthorise(ctx context.Context, params *OAuthAuthoriseParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthAuthoriseRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthAuthoriseConsent(ctx context.Context, params *OAuthAuthoriseConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthAuthoriseConsentRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthAuthoriseConsentSubmitWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthAuthoriseConsentSubmitRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthAuthoriseConsentSubmit(ctx context.Context, body OAuthAuthoriseConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthAuthoriseConsentSubmitRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthDeviceConsent(ctx context.Context, params *OAuthDeviceConsentParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthDeviceConsentRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthDeviceConsentSubmitWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthDeviceConsentSubmitRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthDeviceConsentSubmit(ctx context.Context, body OAuthDeviceConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthDeviceConsentSubmitRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthDeviceAuthorisationWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthDeviceAuthorisationRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthDeviceAuthorisationWithFormdataBody(ctx context.Context, body OAuthDeviceAuthorisationFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthDeviceAuthorisationRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthJWKS(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthJWKSRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthTokenRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthTokenWithFormdataBody(ctx context.Context, body OAuthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthTokenRequestWithFormdataBody(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthUserInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthUserInfoRequest(c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -12465,6 +13435,276 @@ func NewEmailQueueRetryRequest(server string, emailId EmailIDParam) (*http.Reque
 	return req, nil
 }
 
+// NewAdminOAuthClientListRequest generates requests for AdminOAuthClientList
+func NewAdminOAuthClientListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/clients")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminOAuthClientCreateRequest calls the generic AdminOAuthClientCreate builder with application/json body
+func NewAdminOAuthClientCreateRequest(server string, body AdminOAuthClientCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminOAuthClientCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewAdminOAuthClientCreateRequestWithBody generates requests for AdminOAuthClientCreate with any type of body
+func NewAdminOAuthClientCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/clients")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAdminOAuthClientDeleteRequest generates requests for AdminOAuthClientDelete
+func NewAdminOAuthClientDeleteRequest(server string, oauthClientId OAuthClientIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminOAuthClientGetRequest generates requests for AdminOAuthClientGet
+func NewAdminOAuthClientGetRequest(server string, oauthClientId OAuthClientIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminOAuthClientUpdateRequest calls the generic AdminOAuthClientUpdate builder with application/json body
+func NewAdminOAuthClientUpdateRequest(server string, oauthClientId OAuthClientIDParam, body AdminOAuthClientUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewAdminOAuthClientUpdateRequestWithBody(server, oauthClientId, "application/json", bodyReader)
+}
+
+// NewAdminOAuthClientUpdateRequestWithBody generates requests for AdminOAuthClientUpdate with any type of body
+func NewAdminOAuthClientUpdateRequestWithBody(server string, oauthClientId OAuthClientIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewAdminOAuthDeviceAuthorisationListRequest generates requests for AdminOAuthDeviceAuthorisationList
+func NewAdminOAuthDeviceAuthorisationListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/device-authorizations")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminOAuthRefreshTokenListRequest generates requests for AdminOAuthRefreshTokenList
+func NewAdminOAuthRefreshTokenListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/refresh-tokens")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAdminOAuthRefreshTokenDeleteRequest generates requests for AdminOAuthRefreshTokenDelete
+func NewAdminOAuthRefreshTokenDeleteRequest(server string, oauthRefreshTokenId OAuthRefreshTokenIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_refresh_token_id", runtime.ParamLocationPath, oauthRefreshTokenId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/refresh-tokens/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewAssetUploadRequestWithBody generates requests for AssetUpload with any type of body
 func NewAssetUploadRequestWithBody(server string, params *AssetUploadParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
@@ -13033,6 +14273,249 @@ func NewAuthProviderLogoutRequest(server string, params *AuthProviderLogoutParam
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthClientListRequest generates requests for OAuthClientList
+func NewOAuthClientListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/clients")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthClientCreateRequest calls the generic OAuthClientCreate builder with application/json body
+func NewOAuthClientCreateRequest(server string, body OAuthClientCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthClientCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewOAuthClientCreateRequestWithBody generates requests for OAuthClientCreate with any type of body
+func NewOAuthClientCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/clients")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthClientDeleteRequest generates requests for OAuthClientDelete
+func NewOAuthClientDeleteRequest(server string, oauthClientId OAuthClientIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthClientGetRequest generates requests for OAuthClientGet
+func NewOAuthClientGetRequest(server string, oauthClientId OAuthClientIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthClientUpdateRequest calls the generic OAuthClientUpdate builder with application/json body
+func NewOAuthClientUpdateRequest(server string, oauthClientId OAuthClientIDParam, body OAuthClientUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthClientUpdateRequestWithBody(server, oauthClientId, "application/json", bodyReader)
+}
+
+// NewOAuthClientUpdateRequestWithBody generates requests for OAuthClientUpdate with any type of body
+func NewOAuthClientUpdateRequestWithBody(server string, oauthClientId OAuthClientIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_client_id", runtime.ParamLocationPath, oauthClientId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/clients/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthRefreshTokenListRequest generates requests for OAuthRefreshTokenList
+func NewOAuthRefreshTokenListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/tokens")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthRefreshTokenDeleteRequest generates requests for OAuthRefreshTokenDelete
+func NewOAuthRefreshTokenDeleteRequest(server string, oauthRefreshTokenId OAuthRefreshTokenIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_refresh_token_id", runtime.ParamLocationPath, oauthRefreshTokenId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/auth/oauth/tokens/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -16595,6 +18078,443 @@ func NewNotificationUpdateRequestWithBody(server string, notificationId Notifica
 	return req, nil
 }
 
+// NewOAuthAuthoriseRequest generates requests for OAuthAuthorise
+func NewOAuthAuthoriseRequest(server string, params *OAuthAuthoriseParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/authorize")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "response_type", runtime.ParamLocationQuery, params.ResponseType); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "client_id", runtime.ParamLocationQuery, params.ClientId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "redirect_uri", runtime.ParamLocationQuery, params.RedirectUri); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if params.Scope != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "scope", runtime.ParamLocationQuery, *params.Scope); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.State != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "state", runtime.ParamLocationQuery, *params.State); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code_challenge", runtime.ParamLocationQuery, params.CodeChallenge); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code_challenge_method", runtime.ParamLocationQuery, params.CodeChallengeMethod); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthAuthoriseConsentRequest generates requests for OAuthAuthoriseConsent
+func NewOAuthAuthoriseConsentRequest(server string, params *OAuthAuthoriseConsentParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/authorize/consent")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.RequestId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "request_id", runtime.ParamLocationQuery, *params.RequestId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthAuthoriseConsentSubmitRequest calls the generic OAuthAuthoriseConsentSubmit builder with application/json body
+func NewOAuthAuthoriseConsentSubmitRequest(server string, body OAuthAuthoriseConsentSubmitJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthAuthoriseConsentSubmitRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewOAuthAuthoriseConsentSubmitRequestWithBody generates requests for OAuthAuthoriseConsentSubmit with any type of body
+func NewOAuthAuthoriseConsentSubmitRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/authorize/consent")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthDeviceConsentRequest generates requests for OAuthDeviceConsent
+func NewOAuthDeviceConsentRequest(server string, params *OAuthDeviceConsentParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/device/consent")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.UserCode != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "user_code", runtime.ParamLocationQuery, *params.UserCode); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthDeviceConsentSubmitRequest calls the generic OAuthDeviceConsentSubmit builder with application/json body
+func NewOAuthDeviceConsentSubmitRequest(server string, body OAuthDeviceConsentSubmitJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthDeviceConsentSubmitRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewOAuthDeviceConsentSubmitRequestWithBody generates requests for OAuthDeviceConsentSubmit with any type of body
+func NewOAuthDeviceConsentSubmitRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/device/consent")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthDeviceAuthorisationRequestWithFormdataBody calls the generic OAuthDeviceAuthorisation builder with application/x-www-form-urlencoded body
+func NewOAuthDeviceAuthorisationRequestWithFormdataBody(server string, body OAuthDeviceAuthorisationFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewOAuthDeviceAuthorisationRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewOAuthDeviceAuthorisationRequestWithBody generates requests for OAuthDeviceAuthorisation with any type of body
+func NewOAuthDeviceAuthorisationRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/device_authorization")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthJWKSRequest generates requests for OAuthJWKS
+func NewOAuthJWKSRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/jwks")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthTokenRequestWithFormdataBody calls the generic OAuthToken builder with application/x-www-form-urlencoded body
+func NewOAuthTokenRequestWithFormdataBody(server string, body OAuthTokenFormdataRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	bodyStr, err := runtime.MarshalForm(body, nil)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = strings.NewReader(bodyStr.Encode())
+	return NewOAuthTokenRequestWithBody(server, "application/x-www-form-urlencoded", bodyReader)
+}
+
+// NewOAuthTokenRequestWithBody generates requests for OAuthToken with any type of body
+func NewOAuthTokenRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/token")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthUserInfoRequest generates requests for OAuthUserInfo
+func NewOAuthUserInfoRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/userinfo")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetSpecRequest generates requests for GetSpec
 func NewGetSpecRequest(server string) (*http.Request, error) {
 	var err error
@@ -18688,6 +20608,34 @@ type ClientWithResponsesInterface interface {
 	// EmailQueueRetryWithResponse request
 	EmailQueueRetryWithResponse(ctx context.Context, emailId EmailIDParam, reqEditors ...RequestEditorFn) (*EmailQueueRetryResponse, error)
 
+	// AdminOAuthClientListWithResponse request
+	AdminOAuthClientListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthClientListResponse, error)
+
+	// AdminOAuthClientCreateWithBodyWithResponse request with any body
+	AdminOAuthClientCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminOAuthClientCreateResponse, error)
+
+	AdminOAuthClientCreateWithResponse(ctx context.Context, body AdminOAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminOAuthClientCreateResponse, error)
+
+	// AdminOAuthClientDeleteWithResponse request
+	AdminOAuthClientDeleteWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthClientDeleteResponse, error)
+
+	// AdminOAuthClientGetWithResponse request
+	AdminOAuthClientGetWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthClientGetResponse, error)
+
+	// AdminOAuthClientUpdateWithBodyWithResponse request with any body
+	AdminOAuthClientUpdateWithBodyWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminOAuthClientUpdateResponse, error)
+
+	AdminOAuthClientUpdateWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, body AdminOAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminOAuthClientUpdateResponse, error)
+
+	// AdminOAuthDeviceAuthorisationListWithResponse request
+	AdminOAuthDeviceAuthorisationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthDeviceAuthorisationListResponse, error)
+
+	// AdminOAuthRefreshTokenListWithResponse request
+	AdminOAuthRefreshTokenListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthRefreshTokenListResponse, error)
+
+	// AdminOAuthRefreshTokenDeleteWithResponse request
+	AdminOAuthRefreshTokenDeleteWithResponse(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthRefreshTokenDeleteResponse, error)
+
 	// AssetUploadWithBodyWithResponse request with any body
 	AssetUploadWithBodyWithResponse(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssetUploadResponse, error)
 
@@ -18740,6 +20688,31 @@ type ClientWithResponsesInterface interface {
 
 	// AuthProviderLogoutWithResponse request
 	AuthProviderLogoutWithResponse(ctx context.Context, params *AuthProviderLogoutParams, reqEditors ...RequestEditorFn) (*AuthProviderLogoutResponse, error)
+
+	// OAuthClientListWithResponse request
+	OAuthClientListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthClientListResponse, error)
+
+	// OAuthClientCreateWithBodyWithResponse request with any body
+	OAuthClientCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthClientCreateResponse, error)
+
+	OAuthClientCreateWithResponse(ctx context.Context, body OAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthClientCreateResponse, error)
+
+	// OAuthClientDeleteWithResponse request
+	OAuthClientDeleteWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*OAuthClientDeleteResponse, error)
+
+	// OAuthClientGetWithResponse request
+	OAuthClientGetWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*OAuthClientGetResponse, error)
+
+	// OAuthClientUpdateWithBodyWithResponse request with any body
+	OAuthClientUpdateWithBodyWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthClientUpdateResponse, error)
+
+	OAuthClientUpdateWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, body OAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthClientUpdateResponse, error)
+
+	// OAuthRefreshTokenListWithResponse request
+	OAuthRefreshTokenListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthRefreshTokenListResponse, error)
+
+	// OAuthRefreshTokenDeleteWithResponse request
+	OAuthRefreshTokenDeleteWithResponse(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*OAuthRefreshTokenDeleteResponse, error)
 
 	// OAuthProviderCallbackWithBodyWithResponse request with any body
 	OAuthProviderCallbackWithBodyWithResponse(ctx context.Context, oauthProvider OAuthProvider, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthProviderCallbackResponse, error)
@@ -19036,6 +21009,41 @@ type ClientWithResponsesInterface interface {
 	NotificationUpdateWithBodyWithResponse(ctx context.Context, notificationId NotificationIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*NotificationUpdateResponse, error)
 
 	NotificationUpdateWithResponse(ctx context.Context, notificationId NotificationIDParam, body NotificationUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*NotificationUpdateResponse, error)
+
+	// OAuthAuthoriseWithResponse request
+	OAuthAuthoriseWithResponse(ctx context.Context, params *OAuthAuthoriseParams, reqEditors ...RequestEditorFn) (*OAuthAuthoriseResponse, error)
+
+	// OAuthAuthoriseConsentWithResponse request
+	OAuthAuthoriseConsentWithResponse(ctx context.Context, params *OAuthAuthoriseConsentParams, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentResponse, error)
+
+	// OAuthAuthoriseConsentSubmitWithBodyWithResponse request with any body
+	OAuthAuthoriseConsentSubmitWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentSubmitResponse, error)
+
+	OAuthAuthoriseConsentSubmitWithResponse(ctx context.Context, body OAuthAuthoriseConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentSubmitResponse, error)
+
+	// OAuthDeviceConsentWithResponse request
+	OAuthDeviceConsentWithResponse(ctx context.Context, params *OAuthDeviceConsentParams, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentResponse, error)
+
+	// OAuthDeviceConsentSubmitWithBodyWithResponse request with any body
+	OAuthDeviceConsentSubmitWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentSubmitResponse, error)
+
+	OAuthDeviceConsentSubmitWithResponse(ctx context.Context, body OAuthDeviceConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentSubmitResponse, error)
+
+	// OAuthDeviceAuthorisationWithBodyWithResponse request with any body
+	OAuthDeviceAuthorisationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthDeviceAuthorisationResponse, error)
+
+	OAuthDeviceAuthorisationWithFormdataBodyWithResponse(ctx context.Context, body OAuthDeviceAuthorisationFormdataRequestBody, reqEditors ...RequestEditorFn) (*OAuthDeviceAuthorisationResponse, error)
+
+	// OAuthJWKSWithResponse request
+	OAuthJWKSWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthJWKSResponse, error)
+
+	// OAuthTokenWithBodyWithResponse request with any body
+	OAuthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error)
+
+	OAuthTokenWithFormdataBodyWithResponse(ctx context.Context, body OAuthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error)
+
+	// OAuthUserInfoWithResponse request
+	OAuthUserInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthUserInfoResponse, error)
 
 	// GetSpecWithResponse request
 	GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error)
@@ -19971,6 +21979,188 @@ func (r EmailQueueRetryResponse) StatusCode() int {
 	return 0
 }
 
+type AdminOAuthClientListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthClientListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthClientListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthClientCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthClientCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthClientCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthClientDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthClientDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthClientDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthClientGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthClientGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthClientGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthClientUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthClientUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthClientUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthDeviceAuthorisationListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthDeviceAuthorisationListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthDeviceAuthorisationListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthDeviceAuthorisationListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthRefreshTokenListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRefreshTokenListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthRefreshTokenListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthRefreshTokenListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AdminOAuthRefreshTokenDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AdminOAuthRefreshTokenDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AdminOAuthRefreshTokenDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type AssetUploadResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -20259,6 +22449,168 @@ func (r AuthProviderLogoutResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AuthProviderLogoutResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthClientListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthClientListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthClientListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthClientCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientIssuedOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthClientCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthClientCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthClientDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthClientDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthClientDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthClientGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthClientGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthClientGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthClientUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthClientOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthClientUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthClientUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRefreshTokenListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRefreshTokenListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRefreshTokenListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRefreshTokenListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRefreshTokenDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRefreshTokenDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRefreshTokenDeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -21999,6 +24351,219 @@ func (r NotificationUpdateResponse) StatusCode() int {
 	return 0
 }
 
+type OAuthAuthoriseResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthAuthoriseResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthAuthoriseResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthAuthoriseConsentResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthAuthoriseConsentOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthAuthoriseConsentResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthAuthoriseConsentResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthAuthoriseConsentSubmitResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthAuthoriseConsentSubmitOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthAuthoriseConsentSubmitResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthAuthoriseConsentSubmitResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthDeviceConsentResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthDeviceConsentOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthDeviceConsentResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthDeviceConsentResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthDeviceConsentSubmitResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthDeviceConsentSubmitOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthDeviceConsentSubmitResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthDeviceConsentSubmitResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthDeviceAuthorisationResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthDeviceAuthorisationOK
+	JSON400      *OAuthError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthDeviceAuthorisationResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthDeviceAuthorisationResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthJWKSResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthJWKSOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthJWKSResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthJWKSResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthTokenResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthTokenOK
+	JSON400      *OAuthTokenError
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthTokenResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthTokenResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthUserInfoResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthUserInfoOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthUserInfoResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthUserInfoResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetSpecResponse struct {
 	Body                                      []byte
 	HTTPResponse                              *http.Response
@@ -23365,6 +25930,94 @@ func (c *ClientWithResponses) EmailQueueRetryWithResponse(ctx context.Context, e
 	return ParseEmailQueueRetryResponse(rsp)
 }
 
+// AdminOAuthClientListWithResponse request returning *AdminOAuthClientListResponse
+func (c *ClientWithResponses) AdminOAuthClientListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthClientListResponse, error) {
+	rsp, err := c.AdminOAuthClientList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientListResponse(rsp)
+}
+
+// AdminOAuthClientCreateWithBodyWithResponse request with arbitrary body returning *AdminOAuthClientCreateResponse
+func (c *ClientWithResponses) AdminOAuthClientCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminOAuthClientCreateResponse, error) {
+	rsp, err := c.AdminOAuthClientCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminOAuthClientCreateWithResponse(ctx context.Context, body AdminOAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminOAuthClientCreateResponse, error) {
+	rsp, err := c.AdminOAuthClientCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientCreateResponse(rsp)
+}
+
+// AdminOAuthClientDeleteWithResponse request returning *AdminOAuthClientDeleteResponse
+func (c *ClientWithResponses) AdminOAuthClientDeleteWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthClientDeleteResponse, error) {
+	rsp, err := c.AdminOAuthClientDelete(ctx, oauthClientId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientDeleteResponse(rsp)
+}
+
+// AdminOAuthClientGetWithResponse request returning *AdminOAuthClientGetResponse
+func (c *ClientWithResponses) AdminOAuthClientGetWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthClientGetResponse, error) {
+	rsp, err := c.AdminOAuthClientGet(ctx, oauthClientId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientGetResponse(rsp)
+}
+
+// AdminOAuthClientUpdateWithBodyWithResponse request with arbitrary body returning *AdminOAuthClientUpdateResponse
+func (c *ClientWithResponses) AdminOAuthClientUpdateWithBodyWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminOAuthClientUpdateResponse, error) {
+	rsp, err := c.AdminOAuthClientUpdateWithBody(ctx, oauthClientId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) AdminOAuthClientUpdateWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, body AdminOAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*AdminOAuthClientUpdateResponse, error) {
+	rsp, err := c.AdminOAuthClientUpdate(ctx, oauthClientId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthClientUpdateResponse(rsp)
+}
+
+// AdminOAuthDeviceAuthorisationListWithResponse request returning *AdminOAuthDeviceAuthorisationListResponse
+func (c *ClientWithResponses) AdminOAuthDeviceAuthorisationListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthDeviceAuthorisationListResponse, error) {
+	rsp, err := c.AdminOAuthDeviceAuthorisationList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthDeviceAuthorisationListResponse(rsp)
+}
+
+// AdminOAuthRefreshTokenListWithResponse request returning *AdminOAuthRefreshTokenListResponse
+func (c *ClientWithResponses) AdminOAuthRefreshTokenListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AdminOAuthRefreshTokenListResponse, error) {
+	rsp, err := c.AdminOAuthRefreshTokenList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthRefreshTokenListResponse(rsp)
+}
+
+// AdminOAuthRefreshTokenDeleteWithResponse request returning *AdminOAuthRefreshTokenDeleteResponse
+func (c *ClientWithResponses) AdminOAuthRefreshTokenDeleteWithResponse(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthRefreshTokenDeleteResponse, error) {
+	rsp, err := c.AdminOAuthRefreshTokenDelete(ctx, oauthRefreshTokenId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAdminOAuthRefreshTokenDeleteResponse(rsp)
+}
+
 // AssetUploadWithBodyWithResponse request with arbitrary body returning *AssetUploadResponse
 func (c *ClientWithResponses) AssetUploadWithBodyWithResponse(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssetUploadResponse, error) {
 	rsp, err := c.AssetUploadWithBody(ctx, params, contentType, body, reqEditors...)
@@ -23536,6 +26189,85 @@ func (c *ClientWithResponses) AuthProviderLogoutWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseAuthProviderLogoutResponse(rsp)
+}
+
+// OAuthClientListWithResponse request returning *OAuthClientListResponse
+func (c *ClientWithResponses) OAuthClientListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthClientListResponse, error) {
+	rsp, err := c.OAuthClientList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientListResponse(rsp)
+}
+
+// OAuthClientCreateWithBodyWithResponse request with arbitrary body returning *OAuthClientCreateResponse
+func (c *ClientWithResponses) OAuthClientCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthClientCreateResponse, error) {
+	rsp, err := c.OAuthClientCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthClientCreateWithResponse(ctx context.Context, body OAuthClientCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthClientCreateResponse, error) {
+	rsp, err := c.OAuthClientCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientCreateResponse(rsp)
+}
+
+// OAuthClientDeleteWithResponse request returning *OAuthClientDeleteResponse
+func (c *ClientWithResponses) OAuthClientDeleteWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*OAuthClientDeleteResponse, error) {
+	rsp, err := c.OAuthClientDelete(ctx, oauthClientId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientDeleteResponse(rsp)
+}
+
+// OAuthClientGetWithResponse request returning *OAuthClientGetResponse
+func (c *ClientWithResponses) OAuthClientGetWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, reqEditors ...RequestEditorFn) (*OAuthClientGetResponse, error) {
+	rsp, err := c.OAuthClientGet(ctx, oauthClientId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientGetResponse(rsp)
+}
+
+// OAuthClientUpdateWithBodyWithResponse request with arbitrary body returning *OAuthClientUpdateResponse
+func (c *ClientWithResponses) OAuthClientUpdateWithBodyWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthClientUpdateResponse, error) {
+	rsp, err := c.OAuthClientUpdateWithBody(ctx, oauthClientId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthClientUpdateWithResponse(ctx context.Context, oauthClientId OAuthClientIDParam, body OAuthClientUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthClientUpdateResponse, error) {
+	rsp, err := c.OAuthClientUpdate(ctx, oauthClientId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthClientUpdateResponse(rsp)
+}
+
+// OAuthRefreshTokenListWithResponse request returning *OAuthRefreshTokenListResponse
+func (c *ClientWithResponses) OAuthRefreshTokenListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthRefreshTokenListResponse, error) {
+	rsp, err := c.OAuthRefreshTokenList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRefreshTokenListResponse(rsp)
+}
+
+// OAuthRefreshTokenDeleteWithResponse request returning *OAuthRefreshTokenDeleteResponse
+func (c *ClientWithResponses) OAuthRefreshTokenDeleteWithResponse(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*OAuthRefreshTokenDeleteResponse, error) {
+	rsp, err := c.OAuthRefreshTokenDelete(ctx, oauthRefreshTokenId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRefreshTokenDeleteResponse(rsp)
 }
 
 // OAuthProviderCallbackWithBodyWithResponse request with arbitrary body returning *OAuthProviderCallbackResponse
@@ -24492,6 +27224,119 @@ func (c *ClientWithResponses) NotificationUpdateWithResponse(ctx context.Context
 		return nil, err
 	}
 	return ParseNotificationUpdateResponse(rsp)
+}
+
+// OAuthAuthoriseWithResponse request returning *OAuthAuthoriseResponse
+func (c *ClientWithResponses) OAuthAuthoriseWithResponse(ctx context.Context, params *OAuthAuthoriseParams, reqEditors ...RequestEditorFn) (*OAuthAuthoriseResponse, error) {
+	rsp, err := c.OAuthAuthorise(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthAuthoriseResponse(rsp)
+}
+
+// OAuthAuthoriseConsentWithResponse request returning *OAuthAuthoriseConsentResponse
+func (c *ClientWithResponses) OAuthAuthoriseConsentWithResponse(ctx context.Context, params *OAuthAuthoriseConsentParams, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentResponse, error) {
+	rsp, err := c.OAuthAuthoriseConsent(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthAuthoriseConsentResponse(rsp)
+}
+
+// OAuthAuthoriseConsentSubmitWithBodyWithResponse request with arbitrary body returning *OAuthAuthoriseConsentSubmitResponse
+func (c *ClientWithResponses) OAuthAuthoriseConsentSubmitWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentSubmitResponse, error) {
+	rsp, err := c.OAuthAuthoriseConsentSubmitWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthAuthoriseConsentSubmitResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthAuthoriseConsentSubmitWithResponse(ctx context.Context, body OAuthAuthoriseConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthAuthoriseConsentSubmitResponse, error) {
+	rsp, err := c.OAuthAuthoriseConsentSubmit(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthAuthoriseConsentSubmitResponse(rsp)
+}
+
+// OAuthDeviceConsentWithResponse request returning *OAuthDeviceConsentResponse
+func (c *ClientWithResponses) OAuthDeviceConsentWithResponse(ctx context.Context, params *OAuthDeviceConsentParams, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentResponse, error) {
+	rsp, err := c.OAuthDeviceConsent(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthDeviceConsentResponse(rsp)
+}
+
+// OAuthDeviceConsentSubmitWithBodyWithResponse request with arbitrary body returning *OAuthDeviceConsentSubmitResponse
+func (c *ClientWithResponses) OAuthDeviceConsentSubmitWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentSubmitResponse, error) {
+	rsp, err := c.OAuthDeviceConsentSubmitWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthDeviceConsentSubmitResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthDeviceConsentSubmitWithResponse(ctx context.Context, body OAuthDeviceConsentSubmitJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthDeviceConsentSubmitResponse, error) {
+	rsp, err := c.OAuthDeviceConsentSubmit(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthDeviceConsentSubmitResponse(rsp)
+}
+
+// OAuthDeviceAuthorisationWithBodyWithResponse request with arbitrary body returning *OAuthDeviceAuthorisationResponse
+func (c *ClientWithResponses) OAuthDeviceAuthorisationWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthDeviceAuthorisationResponse, error) {
+	rsp, err := c.OAuthDeviceAuthorisationWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthDeviceAuthorisationResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthDeviceAuthorisationWithFormdataBodyWithResponse(ctx context.Context, body OAuthDeviceAuthorisationFormdataRequestBody, reqEditors ...RequestEditorFn) (*OAuthDeviceAuthorisationResponse, error) {
+	rsp, err := c.OAuthDeviceAuthorisationWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthDeviceAuthorisationResponse(rsp)
+}
+
+// OAuthJWKSWithResponse request returning *OAuthJWKSResponse
+func (c *ClientWithResponses) OAuthJWKSWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthJWKSResponse, error) {
+	rsp, err := c.OAuthJWKS(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthJWKSResponse(rsp)
+}
+
+// OAuthTokenWithBodyWithResponse request with arbitrary body returning *OAuthTokenResponse
+func (c *ClientWithResponses) OAuthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error) {
+	rsp, err := c.OAuthTokenWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthTokenResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthTokenWithFormdataBodyWithResponse(ctx context.Context, body OAuthTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error) {
+	rsp, err := c.OAuthTokenWithFormdataBody(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthTokenResponse(rsp)
+}
+
+// OAuthUserInfoWithResponse request returning *OAuthUserInfoResponse
+func (c *ClientWithResponses) OAuthUserInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthUserInfoResponse, error) {
+	rsp, err := c.OAuthUserInfo(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthUserInfoResponse(rsp)
 }
 
 // GetSpecWithResponse request returning *GetSpecResponse
@@ -26073,6 +28918,256 @@ func ParseEmailQueueRetryResponse(rsp *http.Response) (*EmailQueueRetryResponse,
 	return response, nil
 }
 
+// ParseAdminOAuthClientListResponse parses an HTTP response from a AdminOAuthClientListWithResponse call
+func ParseAdminOAuthClientListResponse(rsp *http.Response) (*AdminOAuthClientListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthClientListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthClientCreateResponse parses an HTTP response from a AdminOAuthClientCreateWithResponse call
+func ParseAdminOAuthClientCreateResponse(rsp *http.Response) (*AdminOAuthClientCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthClientCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthClientDeleteResponse parses an HTTP response from a AdminOAuthClientDeleteWithResponse call
+func ParseAdminOAuthClientDeleteResponse(rsp *http.Response) (*AdminOAuthClientDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthClientDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthClientGetResponse parses an HTTP response from a AdminOAuthClientGetWithResponse call
+func ParseAdminOAuthClientGetResponse(rsp *http.Response) (*AdminOAuthClientGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthClientGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthClientUpdateResponse parses an HTTP response from a AdminOAuthClientUpdateWithResponse call
+func ParseAdminOAuthClientUpdateResponse(rsp *http.Response) (*AdminOAuthClientUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthClientUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthDeviceAuthorisationListResponse parses an HTTP response from a AdminOAuthDeviceAuthorisationListWithResponse call
+func ParseAdminOAuthDeviceAuthorisationListResponse(rsp *http.Response) (*AdminOAuthDeviceAuthorisationListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthDeviceAuthorisationListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthDeviceAuthorisationListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthRefreshTokenListResponse parses an HTTP response from a AdminOAuthRefreshTokenListWithResponse call
+func ParseAdminOAuthRefreshTokenListResponse(rsp *http.Response) (*AdminOAuthRefreshTokenListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthRefreshTokenListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRefreshTokenListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAdminOAuthRefreshTokenDeleteResponse parses an HTTP response from a AdminOAuthRefreshTokenDeleteWithResponse call
+func ParseAdminOAuthRefreshTokenDeleteResponse(rsp *http.Response) (*AdminOAuthRefreshTokenDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AdminOAuthRefreshTokenDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseAssetUploadResponse parses an HTTP response from a AssetUploadWithResponse call
 func ParseAssetUploadResponse(rsp *http.Response) (*AssetUploadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -26459,6 +29554,244 @@ func ParseAuthProviderLogoutResponse(rsp *http.Response) (*AuthProviderLogoutRes
 	response := &AuthProviderLogoutResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseOAuthClientListResponse parses an HTTP response from a OAuthClientListWithResponse call
+func ParseOAuthClientListResponse(rsp *http.Response) (*OAuthClientListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthClientListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthClientCreateResponse parses an HTTP response from a OAuthClientCreateWithResponse call
+func ParseOAuthClientCreateResponse(rsp *http.Response) (*OAuthClientCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthClientCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientIssuedOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthClientDeleteResponse parses an HTTP response from a OAuthClientDeleteWithResponse call
+func ParseOAuthClientDeleteResponse(rsp *http.Response) (*OAuthClientDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthClientDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthClientGetResponse parses an HTTP response from a OAuthClientGetWithResponse call
+func ParseOAuthClientGetResponse(rsp *http.Response) (*OAuthClientGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthClientGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthClientUpdateResponse parses an HTTP response from a OAuthClientUpdateWithResponse call
+func ParseOAuthClientUpdateResponse(rsp *http.Response) (*OAuthClientUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthClientUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthClientOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRefreshTokenListResponse parses an HTTP response from a OAuthRefreshTokenListWithResponse call
+func ParseOAuthRefreshTokenListResponse(rsp *http.Response) (*OAuthRefreshTokenListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRefreshTokenListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRefreshTokenListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRefreshTokenDeleteResponse parses an HTTP response from a OAuthRefreshTokenDeleteWithResponse call
+func ParseOAuthRefreshTokenDeleteResponse(rsp *http.Response) (*OAuthRefreshTokenDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRefreshTokenDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
 	}
 
 	return response, nil
@@ -28874,6 +32207,345 @@ func ParseNotificationUpdateResponse(rsp *http.Response) (*NotificationUpdateRes
 	return response, nil
 }
 
+// ParseOAuthAuthoriseResponse parses an HTTP response from a OAuthAuthoriseWithResponse call
+func ParseOAuthAuthoriseResponse(rsp *http.Response) (*OAuthAuthoriseResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthAuthoriseResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthAuthoriseConsentResponse parses an HTTP response from a OAuthAuthoriseConsentWithResponse call
+func ParseOAuthAuthoriseConsentResponse(rsp *http.Response) (*OAuthAuthoriseConsentResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthAuthoriseConsentResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthAuthoriseConsentOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthAuthoriseConsentSubmitResponse parses an HTTP response from a OAuthAuthoriseConsentSubmitWithResponse call
+func ParseOAuthAuthoriseConsentSubmitResponse(rsp *http.Response) (*OAuthAuthoriseConsentSubmitResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthAuthoriseConsentSubmitResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthAuthoriseConsentSubmitOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthDeviceConsentResponse parses an HTTP response from a OAuthDeviceConsentWithResponse call
+func ParseOAuthDeviceConsentResponse(rsp *http.Response) (*OAuthDeviceConsentResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthDeviceConsentResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthDeviceConsentOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthDeviceConsentSubmitResponse parses an HTTP response from a OAuthDeviceConsentSubmitWithResponse call
+func ParseOAuthDeviceConsentSubmitResponse(rsp *http.Response) (*OAuthDeviceConsentSubmitResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthDeviceConsentSubmitResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthDeviceConsentSubmitOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthDeviceAuthorisationResponse parses an HTTP response from a OAuthDeviceAuthorisationWithResponse call
+func ParseOAuthDeviceAuthorisationResponse(rsp *http.Response) (*OAuthDeviceAuthorisationResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthDeviceAuthorisationResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthDeviceAuthorisationOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthJWKSResponse parses an HTTP response from a OAuthJWKSWithResponse call
+func ParseOAuthJWKSResponse(rsp *http.Response) (*OAuthJWKSResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthJWKSResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthJWKSOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthTokenResponse parses an HTTP response from a OAuthTokenWithResponse call
+func ParseOAuthTokenResponse(rsp *http.Response) (*OAuthTokenResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthTokenResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthTokenOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest OAuthTokenError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthUserInfoResponse parses an HTTP response from a OAuthUserInfoWithResponse call
+func ParseOAuthUserInfoResponse(rsp *http.Response) (*OAuthUserInfoResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthUserInfoResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthUserInfoOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseGetSpecResponse parses an HTTP response from a GetSpecWithResponse call
 func ParseGetSpecResponse(rsp *http.Response) (*GetSpecResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -30335,6 +34007,30 @@ type ServerInterface interface {
 	// (POST /admin/email-queue/{email_id}/attempt)
 	EmailQueueRetry(ctx echo.Context, emailId EmailIDParam) error
 
+	// (GET /admin/oauth/clients)
+	AdminOAuthClientList(ctx echo.Context) error
+
+	// (POST /admin/oauth/clients)
+	AdminOAuthClientCreate(ctx echo.Context) error
+
+	// (DELETE /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientDelete(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (GET /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientGet(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (PATCH /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientUpdate(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (GET /admin/oauth/device-authorizations)
+	AdminOAuthDeviceAuthorisationList(ctx echo.Context) error
+
+	// (GET /admin/oauth/refresh-tokens)
+	AdminOAuthRefreshTokenList(ctx echo.Context) error
+
+	// (DELETE /admin/oauth/refresh-tokens/{oauth_refresh_token_id})
+	AdminOAuthRefreshTokenDelete(ctx echo.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam) error
+
 	// (POST /assets)
 	AssetUpload(ctx echo.Context, params AssetUploadParams) error
 
@@ -30373,6 +34069,27 @@ type ServerInterface interface {
 
 	// (POST /auth/logout)
 	AuthProviderLogout(ctx echo.Context, params AuthProviderLogoutParams) error
+
+	// (GET /auth/oauth/clients)
+	OAuthClientList(ctx echo.Context) error
+
+	// (POST /auth/oauth/clients)
+	OAuthClientCreate(ctx echo.Context) error
+
+	// (DELETE /auth/oauth/clients/{oauth_client_id})
+	OAuthClientDelete(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (GET /auth/oauth/clients/{oauth_client_id})
+	OAuthClientGet(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (PATCH /auth/oauth/clients/{oauth_client_id})
+	OAuthClientUpdate(ctx echo.Context, oauthClientId OAuthClientIDParam) error
+
+	// (GET /auth/oauth/tokens)
+	OAuthRefreshTokenList(ctx echo.Context) error
+
+	// (DELETE /auth/oauth/tokens/{oauth_refresh_token_id})
+	OAuthRefreshTokenDelete(ctx echo.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam) error
 
 	// (POST /auth/oauth/{oauth_provider}/callback)
 	OAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
@@ -30601,6 +34318,33 @@ type ServerInterface interface {
 
 	// (PATCH /notifications/{notification_id})
 	NotificationUpdate(ctx echo.Context, notificationId NotificationIDParam) error
+
+	// (GET /oauth/authorize)
+	OAuthAuthorise(ctx echo.Context, params OAuthAuthoriseParams) error
+
+	// (GET /oauth/authorize/consent)
+	OAuthAuthoriseConsent(ctx echo.Context, params OAuthAuthoriseConsentParams) error
+
+	// (POST /oauth/authorize/consent)
+	OAuthAuthoriseConsentSubmit(ctx echo.Context) error
+
+	// (GET /oauth/device/consent)
+	OAuthDeviceConsent(ctx echo.Context, params OAuthDeviceConsentParams) error
+
+	// (POST /oauth/device/consent)
+	OAuthDeviceConsentSubmit(ctx echo.Context) error
+
+	// (POST /oauth/device_authorization)
+	OAuthDeviceAuthorisation(ctx echo.Context) error
+
+	// (GET /oauth/jwks)
+	OAuthJWKS(ctx echo.Context) error
+
+	// (POST /oauth/token)
+	OAuthToken(ctx echo.Context) error
+
+	// (GET /oauth/userinfo)
+	OAuthUserInfo(ctx echo.Context) error
 	// OpenAPI specification
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
@@ -31472,6 +35216,138 @@ func (w *ServerInterfaceWrapper) EmailQueueRetry(ctx echo.Context) error {
 	return err
 }
 
+// AdminOAuthClientList converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthClientList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthClientList(ctx)
+	return err
+}
+
+// AdminOAuthClientCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthClientCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthClientCreate(ctx)
+	return err
+}
+
+// AdminOAuthClientDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthClientDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthClientDelete(ctx, oauthClientId)
+	return err
+}
+
+// AdminOAuthClientGet converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthClientGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthClientGet(ctx, oauthClientId)
+	return err
+}
+
+// AdminOAuthClientUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthClientUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthClientUpdate(ctx, oauthClientId)
+	return err
+}
+
+// AdminOAuthDeviceAuthorisationList converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthDeviceAuthorisationList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthDeviceAuthorisationList(ctx)
+	return err
+}
+
+// AdminOAuthRefreshTokenList converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthRefreshTokenList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthRefreshTokenList(ctx)
+	return err
+}
+
+// AdminOAuthRefreshTokenDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) AdminOAuthRefreshTokenDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_refresh_token_id" -------------
+	var oauthRefreshTokenId OAuthRefreshTokenIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_refresh_token_id", ctx.Param("oauth_refresh_token_id"), &oauthRefreshTokenId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_refresh_token_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AdminOAuthRefreshTokenDelete(ctx, oauthRefreshTokenId)
+	return err
+}
+
 // AssetUpload converts echo context to params.
 func (w *ServerInterfaceWrapper) AssetUpload(ctx echo.Context) error {
 	var err error
@@ -31710,6 +35586,111 @@ func (w *ServerInterfaceWrapper) AuthProviderLogout(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthProviderLogout(ctx, params)
+	return err
+}
+
+// OAuthClientList converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthClientList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthClientList(ctx)
+	return err
+}
+
+// OAuthClientCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthClientCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthClientCreate(ctx)
+	return err
+}
+
+// OAuthClientDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthClientDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthClientDelete(ctx, oauthClientId)
+	return err
+}
+
+// OAuthClientGet converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthClientGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthClientGet(ctx, oauthClientId)
+	return err
+}
+
+// OAuthClientUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthClientUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_client_id" -------------
+	var oauthClientId OAuthClientIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_client_id", ctx.Param("oauth_client_id"), &oauthClientId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_client_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthClientUpdate(ctx, oauthClientId)
+	return err
+}
+
+// OAuthRefreshTokenList converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRefreshTokenList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRefreshTokenList(ctx)
+	return err
+}
+
+// OAuthRefreshTokenDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRefreshTokenDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_refresh_token_id" -------------
+	var oauthRefreshTokenId OAuthRefreshTokenIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_refresh_token_id", ctx.Param("oauth_refresh_token_id"), &oauthRefreshTokenId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_refresh_token_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRefreshTokenDelete(ctx, oauthRefreshTokenId)
 	return err
 }
 
@@ -33359,6 +37340,168 @@ func (w *ServerInterfaceWrapper) NotificationUpdate(ctx echo.Context) error {
 	return err
 }
 
+// OAuthAuthorise converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthAuthorise(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OAuthAuthoriseParams
+	// ------------- Required query parameter "response_type" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "response_type", ctx.QueryParams(), &params.ResponseType)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter response_type: %s", err))
+	}
+
+	// ------------- Required query parameter "client_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "client_id", ctx.QueryParams(), &params.ClientId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter client_id: %s", err))
+	}
+
+	// ------------- Required query parameter "redirect_uri" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "redirect_uri", ctx.QueryParams(), &params.RedirectUri)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter redirect_uri: %s", err))
+	}
+
+	// ------------- Optional query parameter "scope" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "scope", ctx.QueryParams(), &params.Scope)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter scope: %s", err))
+	}
+
+	// ------------- Optional query parameter "state" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "state", ctx.QueryParams(), &params.State)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter state: %s", err))
+	}
+
+	// ------------- Required query parameter "code_challenge" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "code_challenge", ctx.QueryParams(), &params.CodeChallenge)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter code_challenge: %s", err))
+	}
+
+	// ------------- Required query parameter "code_challenge_method" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "code_challenge_method", ctx.QueryParams(), &params.CodeChallengeMethod)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter code_challenge_method: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthAuthorise(ctx, params)
+	return err
+}
+
+// OAuthAuthoriseConsent converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthAuthoriseConsent(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OAuthAuthoriseConsentParams
+	// ------------- Optional query parameter "request_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "request_id", ctx.QueryParams(), &params.RequestId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter request_id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthAuthoriseConsent(ctx, params)
+	return err
+}
+
+// OAuthAuthoriseConsentSubmit converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthAuthoriseConsentSubmit(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthAuthoriseConsentSubmit(ctx)
+	return err
+}
+
+// OAuthDeviceConsent converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthDeviceConsent(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OAuthDeviceConsentParams
+	// ------------- Optional query parameter "user_code" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "user_code", ctx.QueryParams(), &params.UserCode)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter user_code: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthDeviceConsent(ctx, params)
+	return err
+}
+
+// OAuthDeviceConsentSubmit converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthDeviceConsentSubmit(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthDeviceConsentSubmit(ctx)
+	return err
+}
+
+// OAuthDeviceAuthorisation converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthDeviceAuthorisation(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthDeviceAuthorisation(ctx)
+	return err
+}
+
+// OAuthJWKS converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthJWKS(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthJWKS(ctx)
+	return err
+}
+
+// OAuthToken converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthToken(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthToken(ctx)
+	return err
+}
+
+// OAuthUserInfo converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthUserInfo(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthUserInfo(ctx)
+	return err
+}
+
 // GetSpec converts echo context to params.
 func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
 	var err error
@@ -34311,6 +38454,14 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/admin/bans/:account_handle", wrapper.AdminAccountBanCreate)
 	router.GET(baseURL+"/admin/email-queue", wrapper.EmailQueueList)
 	router.POST(baseURL+"/admin/email-queue/:email_id/attempt", wrapper.EmailQueueRetry)
+	router.GET(baseURL+"/admin/oauth/clients", wrapper.AdminOAuthClientList)
+	router.POST(baseURL+"/admin/oauth/clients", wrapper.AdminOAuthClientCreate)
+	router.DELETE(baseURL+"/admin/oauth/clients/:oauth_client_id", wrapper.AdminOAuthClientDelete)
+	router.GET(baseURL+"/admin/oauth/clients/:oauth_client_id", wrapper.AdminOAuthClientGet)
+	router.PATCH(baseURL+"/admin/oauth/clients/:oauth_client_id", wrapper.AdminOAuthClientUpdate)
+	router.GET(baseURL+"/admin/oauth/device-authorizations", wrapper.AdminOAuthDeviceAuthorisationList)
+	router.GET(baseURL+"/admin/oauth/refresh-tokens", wrapper.AdminOAuthRefreshTokenList)
+	router.DELETE(baseURL+"/admin/oauth/refresh-tokens/:oauth_refresh_token_id", wrapper.AdminOAuthRefreshTokenDelete)
 	router.POST(baseURL+"/assets", wrapper.AssetUpload)
 	router.GET(baseURL+"/assets/:asset_filename", wrapper.AssetGet)
 	router.GET(baseURL+"/auth", wrapper.AuthProviderList)
@@ -34324,6 +38475,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/auth/email/signup", wrapper.AuthEmailSignup)
 	router.POST(baseURL+"/auth/email/verify", wrapper.AuthEmailVerify)
 	router.POST(baseURL+"/auth/logout", wrapper.AuthProviderLogout)
+	router.GET(baseURL+"/auth/oauth/clients", wrapper.OAuthClientList)
+	router.POST(baseURL+"/auth/oauth/clients", wrapper.OAuthClientCreate)
+	router.DELETE(baseURL+"/auth/oauth/clients/:oauth_client_id", wrapper.OAuthClientDelete)
+	router.GET(baseURL+"/auth/oauth/clients/:oauth_client_id", wrapper.OAuthClientGet)
+	router.PATCH(baseURL+"/auth/oauth/clients/:oauth_client_id", wrapper.OAuthClientUpdate)
+	router.GET(baseURL+"/auth/oauth/tokens", wrapper.OAuthRefreshTokenList)
+	router.DELETE(baseURL+"/auth/oauth/tokens/:oauth_refresh_token_id", wrapper.OAuthRefreshTokenDelete)
 	router.POST(baseURL+"/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
 	router.PATCH(baseURL+"/auth/password", wrapper.AuthPasswordUpdate)
 	router.POST(baseURL+"/auth/password", wrapper.AuthPasswordCreate)
@@ -34400,6 +38558,15 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/notifications", wrapper.NotificationList)
 	router.PATCH(baseURL+"/notifications", wrapper.NotificationUpdateMany)
 	router.PATCH(baseURL+"/notifications/:notification_id", wrapper.NotificationUpdate)
+	router.GET(baseURL+"/oauth/authorize", wrapper.OAuthAuthorise)
+	router.GET(baseURL+"/oauth/authorize/consent", wrapper.OAuthAuthoriseConsent)
+	router.POST(baseURL+"/oauth/authorize/consent", wrapper.OAuthAuthoriseConsentSubmit)
+	router.GET(baseURL+"/oauth/device/consent", wrapper.OAuthDeviceConsent)
+	router.POST(baseURL+"/oauth/device/consent", wrapper.OAuthDeviceConsentSubmit)
+	router.POST(baseURL+"/oauth/device_authorization", wrapper.OAuthDeviceAuthorisation)
+	router.GET(baseURL+"/oauth/jwks", wrapper.OAuthJWKS)
+	router.POST(baseURL+"/oauth/token", wrapper.OAuthToken)
+	router.GET(baseURL+"/oauth/userinfo", wrapper.OAuthUserInfo)
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
 	router.GET(baseURL+"/plugins", wrapper.PluginList)
 	router.POST(baseURL+"/plugins", wrapper.PluginAdd)
@@ -34706,6 +38873,49 @@ type NotificationListOKJSONResponse NotificationListResult
 type NotificationUpdateManyOKJSONResponse NotificationListResult
 
 type NotificationUpdateOKJSONResponse Notification
+
+type OAuthAuthoriseConsentOKJSONResponse OAuthAuthoriseConsent
+
+type OAuthAuthoriseConsentSubmitOKJSONResponse OAuthAuthoriseConsentResult
+
+type OAuthAuthoriseFoundResponseHeaders struct {
+	Location string
+}
+type OAuthAuthoriseFoundResponse struct {
+	Headers OAuthAuthoriseFoundResponseHeaders
+}
+
+type OAuthAuthoriseOKTexthtmlResponse struct {
+	Body io.Reader
+
+	ContentLength int64
+}
+
+type OAuthClientIssuedOKJSONResponse OAuthClientIssued
+
+type OAuthClientListOKJSONResponse OAuthClientListResult
+
+type OAuthClientOKJSONResponse OAuthClient
+
+type OAuthDeviceAuthorisationListOKJSONResponse OAuthDeviceAuthorisationListResult
+
+type OAuthDeviceAuthorisationOKJSONResponse OAuthDeviceAuthorisation
+
+type OAuthDeviceConsentOKJSONResponse OAuthDeviceConsent
+
+type OAuthDeviceConsentSubmitOKJSONResponse OAuthDeviceConsentResult
+
+type OAuthErrorJSONResponse OAuthError
+
+type OAuthJWKSOKJSONResponse OAuthJWKS
+
+type OAuthRefreshTokenListOKJSONResponse OAuthRefreshTokenListResult
+
+type OAuthTokenErrorJSONResponse OAuthError
+
+type OAuthTokenOKJSONResponse OAuthToken
+
+type OAuthUserInfoOKJSONResponse OAuthUserInfo
 
 type PluginCycleTokenOKJSONResponse PluginCycleToken
 
@@ -36417,6 +40627,334 @@ func (response EmailQueueRetrydefaultJSONResponse) VisitEmailQueueRetryResponse(
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type AdminOAuthClientListRequestObject struct {
+}
+
+type AdminOAuthClientListResponseObject interface {
+	VisitAdminOAuthClientListResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthClientList200JSONResponse struct{ OAuthClientListOKJSONResponse }
+
+func (response AdminOAuthClientList200JSONResponse) VisitAdminOAuthClientListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthClientList403Response = ForbiddenResponse
+
+func (response AdminOAuthClientList403Response) VisitAdminOAuthClientListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthClientListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthClientListdefaultJSONResponse) VisitAdminOAuthClientListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthClientCreateRequestObject struct {
+	Body *AdminOAuthClientCreateJSONRequestBody
+}
+
+type AdminOAuthClientCreateResponseObject interface {
+	VisitAdminOAuthClientCreateResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthClientCreate200JSONResponse struct{ OAuthClientOKJSONResponse }
+
+func (response AdminOAuthClientCreate200JSONResponse) VisitAdminOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthClientCreate400Response = BadRequestResponse
+
+func (response AdminOAuthClientCreate400Response) VisitAdminOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type AdminOAuthClientCreate403Response = ForbiddenResponse
+
+func (response AdminOAuthClientCreate403Response) VisitAdminOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthClientCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthClientCreatedefaultJSONResponse) VisitAdminOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthClientDeleteRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+}
+
+type AdminOAuthClientDeleteResponseObject interface {
+	VisitAdminOAuthClientDeleteResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthClientDelete204Response = NoContentResponse
+
+func (response AdminOAuthClientDelete204Response) VisitAdminOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type AdminOAuthClientDelete403Response = ForbiddenResponse
+
+func (response AdminOAuthClientDelete403Response) VisitAdminOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthClientDelete404Response = NotFoundResponse
+
+func (response AdminOAuthClientDelete404Response) VisitAdminOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AdminOAuthClientDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthClientDeletedefaultJSONResponse) VisitAdminOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthClientGetRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+}
+
+type AdminOAuthClientGetResponseObject interface {
+	VisitAdminOAuthClientGetResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthClientGet200JSONResponse struct{ OAuthClientOKJSONResponse }
+
+func (response AdminOAuthClientGet200JSONResponse) VisitAdminOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthClientGet403Response = ForbiddenResponse
+
+func (response AdminOAuthClientGet403Response) VisitAdminOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthClientGet404Response = NotFoundResponse
+
+func (response AdminOAuthClientGet404Response) VisitAdminOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AdminOAuthClientGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthClientGetdefaultJSONResponse) VisitAdminOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthClientUpdateRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+	Body          *AdminOAuthClientUpdateJSONRequestBody
+}
+
+type AdminOAuthClientUpdateResponseObject interface {
+	VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthClientUpdate200JSONResponse struct{ OAuthClientOKJSONResponse }
+
+func (response AdminOAuthClientUpdate200JSONResponse) VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthClientUpdate400Response = BadRequestResponse
+
+func (response AdminOAuthClientUpdate400Response) VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type AdminOAuthClientUpdate403Response = ForbiddenResponse
+
+func (response AdminOAuthClientUpdate403Response) VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthClientUpdate404Response = NotFoundResponse
+
+func (response AdminOAuthClientUpdate404Response) VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AdminOAuthClientUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthClientUpdatedefaultJSONResponse) VisitAdminOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthDeviceAuthorisationListRequestObject struct {
+}
+
+type AdminOAuthDeviceAuthorisationListResponseObject interface {
+	VisitAdminOAuthDeviceAuthorisationListResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthDeviceAuthorisationList200JSONResponse struct {
+	OAuthDeviceAuthorisationListOKJSONResponse
+}
+
+func (response AdminOAuthDeviceAuthorisationList200JSONResponse) VisitAdminOAuthDeviceAuthorisationListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthDeviceAuthorisationList403Response = ForbiddenResponse
+
+func (response AdminOAuthDeviceAuthorisationList403Response) VisitAdminOAuthDeviceAuthorisationListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthDeviceAuthorisationListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthDeviceAuthorisationListdefaultJSONResponse) VisitAdminOAuthDeviceAuthorisationListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthRefreshTokenListRequestObject struct {
+}
+
+type AdminOAuthRefreshTokenListResponseObject interface {
+	VisitAdminOAuthRefreshTokenListResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthRefreshTokenList200JSONResponse struct {
+	OAuthRefreshTokenListOKJSONResponse
+}
+
+func (response AdminOAuthRefreshTokenList200JSONResponse) VisitAdminOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AdminOAuthRefreshTokenList403Response = ForbiddenResponse
+
+func (response AdminOAuthRefreshTokenList403Response) VisitAdminOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthRefreshTokenListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthRefreshTokenListdefaultJSONResponse) VisitAdminOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AdminOAuthRefreshTokenDeleteRequestObject struct {
+	OauthRefreshTokenId OAuthRefreshTokenIDParam `json:"oauth_refresh_token_id"`
+}
+
+type AdminOAuthRefreshTokenDeleteResponseObject interface {
+	VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error
+}
+
+type AdminOAuthRefreshTokenDelete204Response = NoContentResponse
+
+func (response AdminOAuthRefreshTokenDelete204Response) VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type AdminOAuthRefreshTokenDelete403Response = ForbiddenResponse
+
+func (response AdminOAuthRefreshTokenDelete403Response) VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type AdminOAuthRefreshTokenDelete404Response = NotFoundResponse
+
+func (response AdminOAuthRefreshTokenDelete404Response) VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AdminOAuthRefreshTokenDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AdminOAuthRefreshTokenDeletedefaultJSONResponse) VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type AssetUploadRequestObject struct {
 	Params AssetUploadParams
 	Body   io.Reader
@@ -36980,6 +41518,312 @@ func (response AuthProviderLogout302Response) VisitAuthProviderLogoutResponse(w 
 	w.Header().Set("Set-Cookie", fmt.Sprint(response.Headers.SetCookie))
 	w.WriteHeader(302)
 	return nil
+}
+
+type OAuthClientListRequestObject struct {
+}
+
+type OAuthClientListResponseObject interface {
+	VisitOAuthClientListResponse(w http.ResponseWriter) error
+}
+
+type OAuthClientList200JSONResponse struct{ OAuthClientListOKJSONResponse }
+
+func (response OAuthClientList200JSONResponse) VisitOAuthClientListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientList401Response = UnauthorisedResponse
+
+func (response OAuthClientList401Response) VisitOAuthClientListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthClientListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthClientListdefaultJSONResponse) VisitOAuthClientListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthClientCreateRequestObject struct {
+	Body *OAuthClientCreateJSONRequestBody
+}
+
+type OAuthClientCreateResponseObject interface {
+	VisitOAuthClientCreateResponse(w http.ResponseWriter) error
+}
+
+type OAuthClientCreate200JSONResponse struct {
+	OAuthClientIssuedOKJSONResponse
+}
+
+func (response OAuthClientCreate200JSONResponse) VisitOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientCreate400Response = BadRequestResponse
+
+func (response OAuthClientCreate400Response) VisitOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthClientCreate401Response = UnauthorisedResponse
+
+func (response OAuthClientCreate401Response) VisitOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthClientCreate403Response = ForbiddenResponse
+
+func (response OAuthClientCreate403Response) VisitOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthClientCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthClientCreatedefaultJSONResponse) VisitOAuthClientCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthClientDeleteRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+}
+
+type OAuthClientDeleteResponseObject interface {
+	VisitOAuthClientDeleteResponse(w http.ResponseWriter) error
+}
+
+type OAuthClientDelete204Response = NoContentResponse
+
+func (response OAuthClientDelete204Response) VisitOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type OAuthClientDelete400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthClientDelete400JSONResponse) VisitOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientDelete401Response = UnauthorisedResponse
+
+func (response OAuthClientDelete401Response) VisitOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthClientDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthClientDeletedefaultJSONResponse) VisitOAuthClientDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthClientGetRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+}
+
+type OAuthClientGetResponseObject interface {
+	VisitOAuthClientGetResponse(w http.ResponseWriter) error
+}
+
+type OAuthClientGet200JSONResponse struct{ OAuthClientOKJSONResponse }
+
+func (response OAuthClientGet200JSONResponse) VisitOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientGet400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthClientGet400JSONResponse) VisitOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientGet401Response = UnauthorisedResponse
+
+func (response OAuthClientGet401Response) VisitOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthClientGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthClientGetdefaultJSONResponse) VisitOAuthClientGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthClientUpdateRequestObject struct {
+	OauthClientId OAuthClientIDParam `json:"oauth_client_id"`
+	Body          *OAuthClientUpdateJSONRequestBody
+}
+
+type OAuthClientUpdateResponseObject interface {
+	VisitOAuthClientUpdateResponse(w http.ResponseWriter) error
+}
+
+type OAuthClientUpdate200JSONResponse struct{ OAuthClientOKJSONResponse }
+
+func (response OAuthClientUpdate200JSONResponse) VisitOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthClientUpdate400Response = BadRequestResponse
+
+func (response OAuthClientUpdate400Response) VisitOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthClientUpdate401Response = UnauthorisedResponse
+
+func (response OAuthClientUpdate401Response) VisitOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthClientUpdate403Response = ForbiddenResponse
+
+func (response OAuthClientUpdate403Response) VisitOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthClientUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthClientUpdatedefaultJSONResponse) VisitOAuthClientUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRefreshTokenListRequestObject struct {
+}
+
+type OAuthRefreshTokenListResponseObject interface {
+	VisitOAuthRefreshTokenListResponse(w http.ResponseWriter) error
+}
+
+type OAuthRefreshTokenList200JSONResponse struct {
+	OAuthRefreshTokenListOKJSONResponse
+}
+
+func (response OAuthRefreshTokenList200JSONResponse) VisitOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRefreshTokenList401Response = UnauthorisedResponse
+
+func (response OAuthRefreshTokenList401Response) VisitOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthRefreshTokenListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRefreshTokenListdefaultJSONResponse) VisitOAuthRefreshTokenListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRefreshTokenDeleteRequestObject struct {
+	OauthRefreshTokenId OAuthRefreshTokenIDParam `json:"oauth_refresh_token_id"`
+}
+
+type OAuthRefreshTokenDeleteResponseObject interface {
+	VisitOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error
+}
+
+type OAuthRefreshTokenDelete204Response = NoContentResponse
+
+func (response OAuthRefreshTokenDelete204Response) VisitOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type OAuthRefreshTokenDelete400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthRefreshTokenDelete400JSONResponse) VisitOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRefreshTokenDelete401Response = UnauthorisedResponse
+
+func (response OAuthRefreshTokenDelete401Response) VisitOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthRefreshTokenDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRefreshTokenDeletedefaultJSONResponse) VisitOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
 }
 
 type OAuthProviderCallbackRequestObject struct {
@@ -40298,6 +45142,390 @@ func (response NotificationUpdatedefaultJSONResponse) VisitNotificationUpdateRes
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type OAuthAuthoriseRequestObject struct {
+	Params OAuthAuthoriseParams
+}
+
+type OAuthAuthoriseResponseObject interface {
+	VisitOAuthAuthoriseResponse(w http.ResponseWriter) error
+}
+
+type OAuthAuthorise200TexthtmlResponse struct {
+	OAuthAuthoriseOKTexthtmlResponse
+}
+
+func (response OAuthAuthorise200TexthtmlResponse) VisitOAuthAuthoriseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "text/html")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type OAuthAuthorise302Response = OAuthAuthoriseFoundResponse
+
+func (response OAuthAuthorise302Response) VisitOAuthAuthoriseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Location", fmt.Sprint(response.Headers.Location))
+	w.WriteHeader(302)
+	return nil
+}
+
+type OAuthAuthorise400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthAuthorise400JSONResponse) VisitOAuthAuthoriseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthAuthorisedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthAuthorisedefaultJSONResponse) VisitOAuthAuthoriseResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthAuthoriseConsentRequestObject struct {
+	Params OAuthAuthoriseConsentParams
+}
+
+type OAuthAuthoriseConsentResponseObject interface {
+	VisitOAuthAuthoriseConsentResponse(w http.ResponseWriter) error
+}
+
+type OAuthAuthoriseConsent200JSONResponse struct {
+	OAuthAuthoriseConsentOKJSONResponse
+}
+
+func (response OAuthAuthoriseConsent200JSONResponse) VisitOAuthAuthoriseConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthAuthoriseConsent400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthAuthoriseConsent400JSONResponse) VisitOAuthAuthoriseConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthAuthoriseConsent401Response = UnauthorisedResponse
+
+func (response OAuthAuthoriseConsent401Response) VisitOAuthAuthoriseConsentResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthAuthoriseConsentdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthAuthoriseConsentdefaultJSONResponse) VisitOAuthAuthoriseConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthAuthoriseConsentSubmitRequestObject struct {
+	Body *OAuthAuthoriseConsentSubmitJSONRequestBody
+}
+
+type OAuthAuthoriseConsentSubmitResponseObject interface {
+	VisitOAuthAuthoriseConsentSubmitResponse(w http.ResponseWriter) error
+}
+
+type OAuthAuthoriseConsentSubmit200JSONResponse struct {
+	OAuthAuthoriseConsentSubmitOKJSONResponse
+}
+
+func (response OAuthAuthoriseConsentSubmit200JSONResponse) VisitOAuthAuthoriseConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthAuthoriseConsentSubmit400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthAuthoriseConsentSubmit400JSONResponse) VisitOAuthAuthoriseConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthAuthoriseConsentSubmit401Response = UnauthorisedResponse
+
+func (response OAuthAuthoriseConsentSubmit401Response) VisitOAuthAuthoriseConsentSubmitResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthAuthoriseConsentSubmitdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthAuthoriseConsentSubmitdefaultJSONResponse) VisitOAuthAuthoriseConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthDeviceConsentRequestObject struct {
+	Params OAuthDeviceConsentParams
+}
+
+type OAuthDeviceConsentResponseObject interface {
+	VisitOAuthDeviceConsentResponse(w http.ResponseWriter) error
+}
+
+type OAuthDeviceConsent200JSONResponse struct {
+	OAuthDeviceConsentOKJSONResponse
+}
+
+func (response OAuthDeviceConsent200JSONResponse) VisitOAuthDeviceConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceConsent400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthDeviceConsent400JSONResponse) VisitOAuthDeviceConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceConsent401Response = UnauthorisedResponse
+
+func (response OAuthDeviceConsent401Response) VisitOAuthDeviceConsentResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthDeviceConsentdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthDeviceConsentdefaultJSONResponse) VisitOAuthDeviceConsentResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthDeviceConsentSubmitRequestObject struct {
+	Body *OAuthDeviceConsentSubmitJSONRequestBody
+}
+
+type OAuthDeviceConsentSubmitResponseObject interface {
+	VisitOAuthDeviceConsentSubmitResponse(w http.ResponseWriter) error
+}
+
+type OAuthDeviceConsentSubmit200JSONResponse struct {
+	OAuthDeviceConsentSubmitOKJSONResponse
+}
+
+func (response OAuthDeviceConsentSubmit200JSONResponse) VisitOAuthDeviceConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceConsentSubmit400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthDeviceConsentSubmit400JSONResponse) VisitOAuthDeviceConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceConsentSubmit401Response = UnauthorisedResponse
+
+func (response OAuthDeviceConsentSubmit401Response) VisitOAuthDeviceConsentSubmitResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthDeviceConsentSubmitdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthDeviceConsentSubmitdefaultJSONResponse) VisitOAuthDeviceConsentSubmitResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthDeviceAuthorisationRequestObject struct {
+	Body *OAuthDeviceAuthorisationFormdataRequestBody
+}
+
+type OAuthDeviceAuthorisationResponseObject interface {
+	VisitOAuthDeviceAuthorisationResponse(w http.ResponseWriter) error
+}
+
+type OAuthDeviceAuthorisation200JSONResponse struct {
+	OAuthDeviceAuthorisationOKJSONResponse
+}
+
+func (response OAuthDeviceAuthorisation200JSONResponse) VisitOAuthDeviceAuthorisationResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceAuthorisation400JSONResponse struct{ OAuthErrorJSONResponse }
+
+func (response OAuthDeviceAuthorisation400JSONResponse) VisitOAuthDeviceAuthorisationResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthDeviceAuthorisationdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthDeviceAuthorisationdefaultJSONResponse) VisitOAuthDeviceAuthorisationResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthJWKSRequestObject struct {
+}
+
+type OAuthJWKSResponseObject interface {
+	VisitOAuthJWKSResponse(w http.ResponseWriter) error
+}
+
+type OAuthJWKS200JSONResponse struct{ OAuthJWKSOKJSONResponse }
+
+func (response OAuthJWKS200JSONResponse) VisitOAuthJWKSResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthJWKSdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthJWKSdefaultJSONResponse) VisitOAuthJWKSResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthTokenRequestObject struct {
+	Body *OAuthTokenFormdataRequestBody
+}
+
+type OAuthTokenResponseObject interface {
+	VisitOAuthTokenResponse(w http.ResponseWriter) error
+}
+
+type OAuthToken200JSONResponse struct{ OAuthTokenOKJSONResponse }
+
+func (response OAuthToken200JSONResponse) VisitOAuthTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthToken400JSONResponse struct{ OAuthTokenErrorJSONResponse }
+
+func (response OAuthToken400JSONResponse) VisitOAuthTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthTokendefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthTokendefaultJSONResponse) VisitOAuthTokenResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthUserInfoRequestObject struct {
+}
+
+type OAuthUserInfoResponseObject interface {
+	VisitOAuthUserInfoResponse(w http.ResponseWriter) error
+}
+
+type OAuthUserInfo200JSONResponse struct{ OAuthUserInfoOKJSONResponse }
+
+func (response OAuthUserInfo200JSONResponse) VisitOAuthUserInfoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthUserInfo401Response = UnauthorisedResponse
+
+func (response OAuthUserInfo401Response) VisitOAuthUserInfoResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthUserInfodefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthUserInfodefaultJSONResponse) VisitOAuthUserInfoResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type GetSpecRequestObject struct {
 }
 
@@ -42267,6 +47495,30 @@ type StrictServerInterface interface {
 	// (POST /admin/email-queue/{email_id}/attempt)
 	EmailQueueRetry(ctx context.Context, request EmailQueueRetryRequestObject) (EmailQueueRetryResponseObject, error)
 
+	// (GET /admin/oauth/clients)
+	AdminOAuthClientList(ctx context.Context, request AdminOAuthClientListRequestObject) (AdminOAuthClientListResponseObject, error)
+
+	// (POST /admin/oauth/clients)
+	AdminOAuthClientCreate(ctx context.Context, request AdminOAuthClientCreateRequestObject) (AdminOAuthClientCreateResponseObject, error)
+
+	// (DELETE /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientDelete(ctx context.Context, request AdminOAuthClientDeleteRequestObject) (AdminOAuthClientDeleteResponseObject, error)
+
+	// (GET /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientGet(ctx context.Context, request AdminOAuthClientGetRequestObject) (AdminOAuthClientGetResponseObject, error)
+
+	// (PATCH /admin/oauth/clients/{oauth_client_id})
+	AdminOAuthClientUpdate(ctx context.Context, request AdminOAuthClientUpdateRequestObject) (AdminOAuthClientUpdateResponseObject, error)
+
+	// (GET /admin/oauth/device-authorizations)
+	AdminOAuthDeviceAuthorisationList(ctx context.Context, request AdminOAuthDeviceAuthorisationListRequestObject) (AdminOAuthDeviceAuthorisationListResponseObject, error)
+
+	// (GET /admin/oauth/refresh-tokens)
+	AdminOAuthRefreshTokenList(ctx context.Context, request AdminOAuthRefreshTokenListRequestObject) (AdminOAuthRefreshTokenListResponseObject, error)
+
+	// (DELETE /admin/oauth/refresh-tokens/{oauth_refresh_token_id})
+	AdminOAuthRefreshTokenDelete(ctx context.Context, request AdminOAuthRefreshTokenDeleteRequestObject) (AdminOAuthRefreshTokenDeleteResponseObject, error)
+
 	// (POST /assets)
 	AssetUpload(ctx context.Context, request AssetUploadRequestObject) (AssetUploadResponseObject, error)
 
@@ -42305,6 +47557,27 @@ type StrictServerInterface interface {
 
 	// (POST /auth/logout)
 	AuthProviderLogout(ctx context.Context, request AuthProviderLogoutRequestObject) (AuthProviderLogoutResponseObject, error)
+
+	// (GET /auth/oauth/clients)
+	OAuthClientList(ctx context.Context, request OAuthClientListRequestObject) (OAuthClientListResponseObject, error)
+
+	// (POST /auth/oauth/clients)
+	OAuthClientCreate(ctx context.Context, request OAuthClientCreateRequestObject) (OAuthClientCreateResponseObject, error)
+
+	// (DELETE /auth/oauth/clients/{oauth_client_id})
+	OAuthClientDelete(ctx context.Context, request OAuthClientDeleteRequestObject) (OAuthClientDeleteResponseObject, error)
+
+	// (GET /auth/oauth/clients/{oauth_client_id})
+	OAuthClientGet(ctx context.Context, request OAuthClientGetRequestObject) (OAuthClientGetResponseObject, error)
+
+	// (PATCH /auth/oauth/clients/{oauth_client_id})
+	OAuthClientUpdate(ctx context.Context, request OAuthClientUpdateRequestObject) (OAuthClientUpdateResponseObject, error)
+
+	// (GET /auth/oauth/tokens)
+	OAuthRefreshTokenList(ctx context.Context, request OAuthRefreshTokenListRequestObject) (OAuthRefreshTokenListResponseObject, error)
+
+	// (DELETE /auth/oauth/tokens/{oauth_refresh_token_id})
+	OAuthRefreshTokenDelete(ctx context.Context, request OAuthRefreshTokenDeleteRequestObject) (OAuthRefreshTokenDeleteResponseObject, error)
 
 	// (POST /auth/oauth/{oauth_provider}/callback)
 	OAuthProviderCallback(ctx context.Context, request OAuthProviderCallbackRequestObject) (OAuthProviderCallbackResponseObject, error)
@@ -42533,6 +47806,33 @@ type StrictServerInterface interface {
 
 	// (PATCH /notifications/{notification_id})
 	NotificationUpdate(ctx context.Context, request NotificationUpdateRequestObject) (NotificationUpdateResponseObject, error)
+
+	// (GET /oauth/authorize)
+	OAuthAuthorise(ctx context.Context, request OAuthAuthoriseRequestObject) (OAuthAuthoriseResponseObject, error)
+
+	// (GET /oauth/authorize/consent)
+	OAuthAuthoriseConsent(ctx context.Context, request OAuthAuthoriseConsentRequestObject) (OAuthAuthoriseConsentResponseObject, error)
+
+	// (POST /oauth/authorize/consent)
+	OAuthAuthoriseConsentSubmit(ctx context.Context, request OAuthAuthoriseConsentSubmitRequestObject) (OAuthAuthoriseConsentSubmitResponseObject, error)
+
+	// (GET /oauth/device/consent)
+	OAuthDeviceConsent(ctx context.Context, request OAuthDeviceConsentRequestObject) (OAuthDeviceConsentResponseObject, error)
+
+	// (POST /oauth/device/consent)
+	OAuthDeviceConsentSubmit(ctx context.Context, request OAuthDeviceConsentSubmitRequestObject) (OAuthDeviceConsentSubmitResponseObject, error)
+
+	// (POST /oauth/device_authorization)
+	OAuthDeviceAuthorisation(ctx context.Context, request OAuthDeviceAuthorisationRequestObject) (OAuthDeviceAuthorisationResponseObject, error)
+
+	// (GET /oauth/jwks)
+	OAuthJWKS(ctx context.Context, request OAuthJWKSRequestObject) (OAuthJWKSResponseObject, error)
+
+	// (POST /oauth/token)
+	OAuthToken(ctx context.Context, request OAuthTokenRequestObject) (OAuthTokenResponseObject, error)
+
+	// (GET /oauth/userinfo)
+	OAuthUserInfo(ctx context.Context, request OAuthUserInfoRequestObject) (OAuthUserInfoResponseObject, error)
 	// OpenAPI specification
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) (GetSpecResponseObject, error)
@@ -43578,6 +48878,210 @@ func (sh *strictHandler) EmailQueueRetry(ctx echo.Context, emailId EmailIDParam)
 	return nil
 }
 
+// AdminOAuthClientList operation middleware
+func (sh *strictHandler) AdminOAuthClientList(ctx echo.Context) error {
+	var request AdminOAuthClientListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthClientList(ctx.Request().Context(), request.(AdminOAuthClientListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthClientList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthClientListResponseObject); ok {
+		return validResponse.VisitAdminOAuthClientListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthClientCreate operation middleware
+func (sh *strictHandler) AdminOAuthClientCreate(ctx echo.Context) error {
+	var request AdminOAuthClientCreateRequestObject
+
+	var body AdminOAuthClientCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthClientCreate(ctx.Request().Context(), request.(AdminOAuthClientCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthClientCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthClientCreateResponseObject); ok {
+		return validResponse.VisitAdminOAuthClientCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthClientDelete operation middleware
+func (sh *strictHandler) AdminOAuthClientDelete(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request AdminOAuthClientDeleteRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthClientDelete(ctx.Request().Context(), request.(AdminOAuthClientDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthClientDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthClientDeleteResponseObject); ok {
+		return validResponse.VisitAdminOAuthClientDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthClientGet operation middleware
+func (sh *strictHandler) AdminOAuthClientGet(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request AdminOAuthClientGetRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthClientGet(ctx.Request().Context(), request.(AdminOAuthClientGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthClientGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthClientGetResponseObject); ok {
+		return validResponse.VisitAdminOAuthClientGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthClientUpdate operation middleware
+func (sh *strictHandler) AdminOAuthClientUpdate(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request AdminOAuthClientUpdateRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	var body AdminOAuthClientUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthClientUpdate(ctx.Request().Context(), request.(AdminOAuthClientUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthClientUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthClientUpdateResponseObject); ok {
+		return validResponse.VisitAdminOAuthClientUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthDeviceAuthorisationList operation middleware
+func (sh *strictHandler) AdminOAuthDeviceAuthorisationList(ctx echo.Context) error {
+	var request AdminOAuthDeviceAuthorisationListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthDeviceAuthorisationList(ctx.Request().Context(), request.(AdminOAuthDeviceAuthorisationListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthDeviceAuthorisationList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthDeviceAuthorisationListResponseObject); ok {
+		return validResponse.VisitAdminOAuthDeviceAuthorisationListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthRefreshTokenList operation middleware
+func (sh *strictHandler) AdminOAuthRefreshTokenList(ctx echo.Context) error {
+	var request AdminOAuthRefreshTokenListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthRefreshTokenList(ctx.Request().Context(), request.(AdminOAuthRefreshTokenListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthRefreshTokenList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthRefreshTokenListResponseObject); ok {
+		return validResponse.VisitAdminOAuthRefreshTokenListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AdminOAuthRefreshTokenDelete operation middleware
+func (sh *strictHandler) AdminOAuthRefreshTokenDelete(ctx echo.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam) error {
+	var request AdminOAuthRefreshTokenDeleteRequestObject
+
+	request.OauthRefreshTokenId = oauthRefreshTokenId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AdminOAuthRefreshTokenDelete(ctx.Request().Context(), request.(AdminOAuthRefreshTokenDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AdminOAuthRefreshTokenDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AdminOAuthRefreshTokenDeleteResponseObject); ok {
+		return validResponse.VisitAdminOAuthRefreshTokenDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // AssetUpload operation middleware
 func (sh *strictHandler) AssetUpload(ctx echo.Context, params AssetUploadParams) error {
 	var request AssetUploadRequestObject
@@ -43927,6 +49431,187 @@ func (sh *strictHandler) AuthProviderLogout(ctx echo.Context, params AuthProvide
 		return err
 	} else if validResponse, ok := response.(AuthProviderLogoutResponseObject); ok {
 		return validResponse.VisitAuthProviderLogoutResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthClientList operation middleware
+func (sh *strictHandler) OAuthClientList(ctx echo.Context) error {
+	var request OAuthClientListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthClientList(ctx.Request().Context(), request.(OAuthClientListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthClientList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthClientListResponseObject); ok {
+		return validResponse.VisitOAuthClientListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthClientCreate operation middleware
+func (sh *strictHandler) OAuthClientCreate(ctx echo.Context) error {
+	var request OAuthClientCreateRequestObject
+
+	var body OAuthClientCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthClientCreate(ctx.Request().Context(), request.(OAuthClientCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthClientCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthClientCreateResponseObject); ok {
+		return validResponse.VisitOAuthClientCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthClientDelete operation middleware
+func (sh *strictHandler) OAuthClientDelete(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request OAuthClientDeleteRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthClientDelete(ctx.Request().Context(), request.(OAuthClientDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthClientDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthClientDeleteResponseObject); ok {
+		return validResponse.VisitOAuthClientDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthClientGet operation middleware
+func (sh *strictHandler) OAuthClientGet(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request OAuthClientGetRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthClientGet(ctx.Request().Context(), request.(OAuthClientGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthClientGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthClientGetResponseObject); ok {
+		return validResponse.VisitOAuthClientGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthClientUpdate operation middleware
+func (sh *strictHandler) OAuthClientUpdate(ctx echo.Context, oauthClientId OAuthClientIDParam) error {
+	var request OAuthClientUpdateRequestObject
+
+	request.OauthClientId = oauthClientId
+
+	var body OAuthClientUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthClientUpdate(ctx.Request().Context(), request.(OAuthClientUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthClientUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthClientUpdateResponseObject); ok {
+		return validResponse.VisitOAuthClientUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRefreshTokenList operation middleware
+func (sh *strictHandler) OAuthRefreshTokenList(ctx echo.Context) error {
+	var request OAuthRefreshTokenListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRefreshTokenList(ctx.Request().Context(), request.(OAuthRefreshTokenListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRefreshTokenList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRefreshTokenListResponseObject); ok {
+		return validResponse.VisitOAuthRefreshTokenListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRefreshTokenDelete operation middleware
+func (sh *strictHandler) OAuthRefreshTokenDelete(ctx echo.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam) error {
+	var request OAuthRefreshTokenDeleteRequestObject
+
+	request.OauthRefreshTokenId = oauthRefreshTokenId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRefreshTokenDelete(ctx.Request().Context(), request.(OAuthRefreshTokenDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRefreshTokenDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRefreshTokenDeleteResponseObject); ok {
+		return validResponse.VisitOAuthRefreshTokenDeleteResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -46018,6 +51703,251 @@ func (sh *strictHandler) NotificationUpdate(ctx echo.Context, notificationId Not
 	return nil
 }
 
+// OAuthAuthorise operation middleware
+func (sh *strictHandler) OAuthAuthorise(ctx echo.Context, params OAuthAuthoriseParams) error {
+	var request OAuthAuthoriseRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthAuthorise(ctx.Request().Context(), request.(OAuthAuthoriseRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthAuthorise")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthAuthoriseResponseObject); ok {
+		return validResponse.VisitOAuthAuthoriseResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthAuthoriseConsent operation middleware
+func (sh *strictHandler) OAuthAuthoriseConsent(ctx echo.Context, params OAuthAuthoriseConsentParams) error {
+	var request OAuthAuthoriseConsentRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthAuthoriseConsent(ctx.Request().Context(), request.(OAuthAuthoriseConsentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthAuthoriseConsent")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthAuthoriseConsentResponseObject); ok {
+		return validResponse.VisitOAuthAuthoriseConsentResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthAuthoriseConsentSubmit operation middleware
+func (sh *strictHandler) OAuthAuthoriseConsentSubmit(ctx echo.Context) error {
+	var request OAuthAuthoriseConsentSubmitRequestObject
+
+	var body OAuthAuthoriseConsentSubmitJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthAuthoriseConsentSubmit(ctx.Request().Context(), request.(OAuthAuthoriseConsentSubmitRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthAuthoriseConsentSubmit")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthAuthoriseConsentSubmitResponseObject); ok {
+		return validResponse.VisitOAuthAuthoriseConsentSubmitResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthDeviceConsent operation middleware
+func (sh *strictHandler) OAuthDeviceConsent(ctx echo.Context, params OAuthDeviceConsentParams) error {
+	var request OAuthDeviceConsentRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthDeviceConsent(ctx.Request().Context(), request.(OAuthDeviceConsentRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthDeviceConsent")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthDeviceConsentResponseObject); ok {
+		return validResponse.VisitOAuthDeviceConsentResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthDeviceConsentSubmit operation middleware
+func (sh *strictHandler) OAuthDeviceConsentSubmit(ctx echo.Context) error {
+	var request OAuthDeviceConsentSubmitRequestObject
+
+	var body OAuthDeviceConsentSubmitJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthDeviceConsentSubmit(ctx.Request().Context(), request.(OAuthDeviceConsentSubmitRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthDeviceConsentSubmit")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthDeviceConsentSubmitResponseObject); ok {
+		return validResponse.VisitOAuthDeviceConsentSubmitResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthDeviceAuthorisation operation middleware
+func (sh *strictHandler) OAuthDeviceAuthorisation(ctx echo.Context) error {
+	var request OAuthDeviceAuthorisationRequestObject
+
+	if form, err := ctx.FormParams(); err == nil {
+		var body OAuthDeviceAuthorisationFormdataRequestBody
+		if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+			return err
+		}
+		request.Body = &body
+	} else {
+		return err
+	}
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthDeviceAuthorisation(ctx.Request().Context(), request.(OAuthDeviceAuthorisationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthDeviceAuthorisation")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthDeviceAuthorisationResponseObject); ok {
+		return validResponse.VisitOAuthDeviceAuthorisationResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthJWKS operation middleware
+func (sh *strictHandler) OAuthJWKS(ctx echo.Context) error {
+	var request OAuthJWKSRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthJWKS(ctx.Request().Context(), request.(OAuthJWKSRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthJWKS")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthJWKSResponseObject); ok {
+		return validResponse.VisitOAuthJWKSResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthToken operation middleware
+func (sh *strictHandler) OAuthToken(ctx echo.Context) error {
+	var request OAuthTokenRequestObject
+
+	if form, err := ctx.FormParams(); err == nil {
+		var body OAuthTokenFormdataRequestBody
+		if err := runtime.BindForm(&body, form, nil, nil); err != nil {
+			return err
+		}
+		request.Body = &body
+	} else {
+		return err
+	}
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthToken(ctx.Request().Context(), request.(OAuthTokenRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthToken")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthTokenResponseObject); ok {
+		return validResponse.VisitOAuthTokenResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthUserInfo operation middleware
+func (sh *strictHandler) OAuthUserInfo(ctx echo.Context) error {
+	var request OAuthUserInfoRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthUserInfo(ctx.Request().Context(), request.(OAuthUserInfoRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthUserInfo")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthUserInfoResponseObject); ok {
+		return validResponse.VisitOAuthUserInfoResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // GetSpec operation middleware
 func (sh *strictHandler) GetSpec(ctx echo.Context) error {
 	var request GetSpecRequestObject
@@ -47171,649 +53101,743 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"LQQA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
