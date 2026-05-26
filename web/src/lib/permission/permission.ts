@@ -111,6 +111,12 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "Use personal access keys to authenticate with the Storyden API and MCP server.",
   },
+  [Permission.USE_OAUTH_CLIENTS]: {
+    value: Permission.USE_OAUTH_CLIENTS,
+    name: "Authorize OAuth applications",
+    description:
+      "Authorize OAuth and OIDC applications to access Storyden as this account.",
+  },
   [Permission.MANAGE_SETTINGS]: {
     value: Permission.MANAGE_SETTINGS,
     name: "Manage settings",

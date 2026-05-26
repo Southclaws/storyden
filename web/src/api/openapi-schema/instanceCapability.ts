@@ -18,4 +18,5 @@ export const InstanceCapability = {
   semdex: "semdex",
   email_client: "email_client",
   sms_client: "sms_client",
+  oauth: "oauth",
 } as const;

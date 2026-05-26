@@ -26,7 +26,29 @@ import type {
   AuthProviderLogoutParams,
   AuthSuccessOKResponse,
   NoContentResponse,
+  OAuthAuthoriseConsentOKResponse,
+  OAuthAuthoriseConsentParams,
+  OAuthAuthoriseConsentSubmitBody,
+  OAuthAuthoriseConsentSubmitOKResponse,
+  OAuthAuthoriseOKResponse,
+  OAuthAuthoriseParams,
+  OAuthClientIssuedOKResponse,
+  OAuthClientListOKResponse,
+  OAuthClientOKResponse,
+  OAuthClientSelfCreateBody,
+  OAuthClientSelfUpdateBody,
+  OAuthDeviceAuthorisationBody,
+  OAuthDeviceAuthorisationOKResponse,
+  OAuthDeviceConsentOKResponse,
+  OAuthDeviceConsentParams,
+  OAuthDeviceConsentSubmitBody,
+  OAuthDeviceConsentSubmitOKResponse,
+  OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
+  OAuthRefreshTokenListOKResponse,
+  OAuthTokenBody,
+  OAuthTokenOKResponse,
+  OAuthUserInfoOKResponse,
   PhoneRequestCodeBody,
   PhoneRequestCodeParams,
   PhoneSubmitCodeBody,
@@ -449,6 +471,400 @@ export const oAuthProviderCallback = async (
 };
 
 /**
+ * List public JSON Web Keys that clients can use to validate Storyden
+OAuth access tokens and OpenID Connect ID tokens.
+
+This is advertised by `/.well-known/openid-configuration` as `jwks_uri`.
+Storyden serves this under the API mount because the key set is an API
+resource; the well-known discovery document itself is mounted at the
+instance root and is intentionally not part of this OpenAPI document.
+
+ */
+export type oAuthJWKSResponse = {
+  data: OAuthJWKSOKResponse;
+  status: number;
+};
+
+export const getOAuthJWKSUrl = () => {
+  return `/oauth/jwks`;
+};
+
+export const oAuthJWKS = async (
+  options?: RequestInit,
+): Promise<oAuthJWKSResponse> => {
+  return fetcher<Promise<oAuthJWKSResponse>>(getOAuthJWKSUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Start the OAuth 2.0 Device Authorization Grant for clients that cannot
+receive a browser redirect directly, such as CLIs, terminals, and
+desktop tools.
+
+The `scope` parameter follows OAuth 2.0 and is optional. Storyden
+applies additional client policy after parsing the request:
+
+- Built-in first-party device clients, such as the default Storyden CLI
+  client, must request exactly `openid profile offline_access`. On
+  approval Storyden expands the issued scope to the approving account's
+  current permissions.
+- Third-party explicit-scope clients may omit `scope`; omitted scope
+  means no requested scopes.
+
+`verification_uri` and `verification_uri_complete` point at the
+configured frontend consent page, not at an API-rendered HTML page.
+Custom frontends can change this URL with
+`OAUTH_DEVICE_AUTHORISATION_CONSENT_URL`.
+
+ */
+export type oAuthDeviceAuthorisationResponse = {
+  data: OAuthDeviceAuthorisationOKResponse;
+  status: number;
+};
+
+export const getOAuthDeviceAuthorisationUrl = () => {
+  return `/oauth/device_authorization`;
+};
+
+export const oAuthDeviceAuthorisation = async (
+  oAuthDeviceAuthorisationBody: OAuthDeviceAuthorisationBody,
+  options?: RequestInit,
+): Promise<oAuthDeviceAuthorisationResponse> => {
+  const formUrlEncoded = new URLSearchParams();
+  formUrlEncoded.append("client_id", oAuthDeviceAuthorisationBody.client_id);
+  if (oAuthDeviceAuthorisationBody.scope !== undefined) {
+    formUrlEncoded.append("scope", oAuthDeviceAuthorisationBody.scope);
+  }
+
+  return fetcher<Promise<oAuthDeviceAuthorisationResponse>>(
+    getOAuthDeviceAuthorisationUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        ...options?.headers,
+      },
+      body: formUrlEncoded,
+    },
+  );
+};
+
+/**
+ * Read a pending OAuth device authorisation request for a signed-in user
+before they approve or deny consent in the frontend.
+
+This is a Storyden frontend/API integration endpoint, not an OAuth
+protocol endpoint. The API never renders the consent UI directly. A
+frontend reads this JSON, displays the client and scopes, then submits
+the user's decision.
+
+Reading consent claims the user code for the signed-in account. This
+prevents another account from approving the same code after it has been
+displayed.
+
+ */
+export type oAuthDeviceConsentResponse = {
+  data: OAuthDeviceConsentOKResponse;
+  status: number;
+};
+
+export const getOAuthDeviceConsentUrl = (params?: OAuthDeviceConsentParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/oauth/device/consent?${normalizedParams.toString()}`
+    : `/oauth/device/consent`;
+};
+
+export const oAuthDeviceConsent = async (
+  params?: OAuthDeviceConsentParams,
+  options?: RequestInit,
+): Promise<oAuthDeviceConsentResponse> => {
+  return fetcher<Promise<oAuthDeviceConsentResponse>>(
+    getOAuthDeviceConsentUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Approve or deny a pending OAuth device authorisation request for the
+currently signed-in account.
+
+On approval Storyden recomputes the granted scope from the current
+account permissions and client policy. For first-party inherited clients
+this means the final token scope may include Storyden permission scopes
+that were not present in the original device authorisation request.
+
+ */
+export type oAuthDeviceConsentSubmitResponse = {
+  data: OAuthDeviceConsentSubmitOKResponse;
+  status: number;
+};
+
+export const getOAuthDeviceConsentSubmitUrl = () => {
+  return `/oauth/device/consent`;
+};
+
+export const oAuthDeviceConsentSubmit = async (
+  oAuthDeviceConsentSubmitBody: OAuthDeviceConsentSubmitBody,
+  options?: RequestInit,
+): Promise<oAuthDeviceConsentSubmitResponse> => {
+  return fetcher<Promise<oAuthDeviceConsentSubmitResponse>>(
+    getOAuthDeviceConsentSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthDeviceConsentSubmitBody),
+    },
+  );
+};
+
+/**
+ * Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+
+This endpoint requires a browser session. If the account is not signed
+in, Storyden redirects to the frontend login route instead of returning
+a protocol redirect to the client application.
+
+Unlike many OAuth servers, Storyden does not render a consent page from
+this API endpoint. A valid request creates a short-lived pending
+authorisation request and redirects the browser to the configured
+frontend authorisation-code consent URL. Custom frontends can change
+this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+
+The `scope` parameter follows OAuth 2.0 and is optional. Empty or
+omitted scope means no requested scopes. Storyden permission scopes are
+granted only when allowed by the client and by the signed-in account's
+current permissions.
+
+ */
+export type oAuthAuthoriseResponse = {
+  data: OAuthAuthoriseOKResponse;
+  status: number;
+};
+
+export const getOAuthAuthoriseUrl = (params: OAuthAuthoriseParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/oauth/authorize?${normalizedParams.toString()}`
+    : `/oauth/authorize`;
+};
+
+export const oAuthAuthorise = async (
+  params: OAuthAuthoriseParams,
+  options?: RequestInit,
+): Promise<oAuthAuthoriseResponse> => {
+  return fetcher<Promise<oAuthAuthoriseResponse>>(
+    getOAuthAuthoriseUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Read a pending OAuth authorisation code request for a signed-in user
+before they approve or deny consent in the frontend.
+
+This is a Storyden frontend/API integration endpoint, not an OAuth
+protocol endpoint. It returns the client, redirect URI, requested
+scopes, and currently grantable scopes so the frontend can render a
+consent screen.
+
+ */
+export type oAuthAuthoriseConsentResponse = {
+  data: OAuthAuthoriseConsentOKResponse;
+  status: number;
+};
+
+export const getOAuthAuthoriseConsentUrl = (
+  params?: OAuthAuthoriseConsentParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/oauth/authorize/consent?${normalizedParams.toString()}`
+    : `/oauth/authorize/consent`;
+};
+
+export const oAuthAuthoriseConsent = async (
+  params?: OAuthAuthoriseConsentParams,
+  options?: RequestInit,
+): Promise<oAuthAuthoriseConsentResponse> => {
+  return fetcher<Promise<oAuthAuthoriseConsentResponse>>(
+    getOAuthAuthoriseConsentUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Approve or deny a pending OAuth authorisation code request for the
+currently signed-in account.
+
+On approval this creates a short-lived authorisation code and returns
+the client redirect URI containing `code` and optional `state`. On
+denial the returned redirect URI contains `error=access_denied`.
+
+Storyden recomputes the granted scope at approval time from current
+account permissions and client policy.
+
+ */
+export type oAuthAuthoriseConsentSubmitResponse = {
+  data: OAuthAuthoriseConsentSubmitOKResponse;
+  status: number;
+};
+
+export const getOAuthAuthoriseConsentSubmitUrl = () => {
+  return `/oauth/authorize/consent`;
+};
+
+export const oAuthAuthoriseConsentSubmit = async (
+  oAuthAuthoriseConsentSubmitBody: OAuthAuthoriseConsentSubmitBody,
+  options?: RequestInit,
+): Promise<oAuthAuthoriseConsentSubmitResponse> => {
+  return fetcher<Promise<oAuthAuthoriseConsentSubmitResponse>>(
+    getOAuthAuthoriseConsentSubmitUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthAuthoriseConsentSubmitBody),
+    },
+  );
+};
+
+/**
+ * Exchange an OAuth authorisation code, device code, refresh token, or
+client credentials grant for tokens.
+
+Supported grants are advertised by `/.well-known/openid-configuration`.
+Public clients authenticate with `client_id` only and must use grants
+suitable for public clients, such as device code or authorisation code
+with PKCE. Confidential clients must provide `client_secret` for
+authorisation-code, refresh-token, and client-credentials exchanges.
+
+Storyden access tokens are short-lived JWTs containing the issued
+`scope`. Revoking a refresh token or changing account permissions does
+not revoke an already-issued access token; permission changes are
+applied on the next token issuance or refresh.
+
+Device-code polling returns OAuth-compatible errors such as
+`authorization_pending`, `slow_down`, `expired_token`,
+`access_denied`, and `invalid_grant`.
+
+ */
+export type oAuthTokenResponse = {
+  data: OAuthTokenOKResponse;
+  status: number;
+};
+
+export const getOAuthTokenUrl = () => {
+  return `/oauth/token`;
+};
+
+export const oAuthToken = async (
+  oAuthTokenBody: OAuthTokenBody,
+  options?: RequestInit,
+): Promise<oAuthTokenResponse> => {
+  const formUrlEncoded = new URLSearchParams();
+  formUrlEncoded.append("grant_type", oAuthTokenBody.grant_type);
+  formUrlEncoded.append("client_id", oAuthTokenBody.client_id);
+  if (oAuthTokenBody.client_secret !== undefined) {
+    formUrlEncoded.append("client_secret", oAuthTokenBody.client_secret);
+  }
+  if (oAuthTokenBody.scope !== undefined) {
+    formUrlEncoded.append("scope", oAuthTokenBody.scope);
+  }
+  if (oAuthTokenBody.device_code !== undefined) {
+    formUrlEncoded.append("device_code", oAuthTokenBody.device_code);
+  }
+  if (oAuthTokenBody.code !== undefined) {
+    formUrlEncoded.append("code", oAuthTokenBody.code);
+  }
+  if (oAuthTokenBody.redirect_uri !== undefined) {
+    formUrlEncoded.append("redirect_uri", oAuthTokenBody.redirect_uri);
+  }
+  if (oAuthTokenBody.code_verifier !== undefined) {
+    formUrlEncoded.append("code_verifier", oAuthTokenBody.code_verifier);
+  }
+  if (oAuthTokenBody.refresh_token !== undefined) {
+    formUrlEncoded.append("refresh_token", oAuthTokenBody.refresh_token);
+  }
+
+  return fetcher<Promise<oAuthTokenResponse>>(getOAuthTokenUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      ...options?.headers,
+    },
+    body: formUrlEncoded,
+  });
+};
+
+/**
+ * Return OpenID Connect UserInfo claims for the account represented by a
+valid bearer access token.
+
+Claims are scope-gated:
+
+- `openid` identifies the subject.
+- `profile` enables profile claims such as display name.
+- `email` enables email claims when the account has an email address.
+
+Storyden accounts do not always have email addresses, so email claims
+may be absent even when the `email` scope is present.
+
+ */
+export type oAuthUserInfoResponse = {
+  data: OAuthUserInfoOKResponse;
+  status: number;
+};
+
+export const getOAuthUserInfoUrl = () => {
+  return `/oauth/userinfo`;
+};
+
+export const oAuthUserInfo = async (
+  options?: RequestInit,
+): Promise<oAuthUserInfoResponse> => {
+  return fetcher<Promise<oAuthUserInfoResponse>>(getOAuthUserInfoUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
  * Start the WebAuthn registration process by requesting a credential.
 
  */
@@ -715,6 +1131,228 @@ export const accessKeyDelete = async (
 ): Promise<accessKeyDeleteResponse> => {
   return fetcher<Promise<accessKeyDeleteResponse>>(
     getAccessKeyDeleteUrl(accessKeyId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * List OAuth refresh tokens issued to the authenticated account.
+
+This is the member-facing "authorised applications" view: it lists apps
+the signed-in account has authorised and can revoke. In OAuth terms,
+these rows are grants/tokens, not application definitions.
+
+This may include grants for built-in first-party clients such as the
+default Storyden CLI. Those clients are not created by the member and
+therefore do not appear in the member OAuth client list.
+
+ */
+export type oAuthRefreshTokenListResponse = {
+  data: OAuthRefreshTokenListOKResponse;
+  status: number;
+};
+
+export const getOAuthRefreshTokenListUrl = () => {
+  return `/auth/oauth/tokens`;
+};
+
+export const oAuthRefreshTokenList = async (
+  options?: RequestInit,
+): Promise<oAuthRefreshTokenListResponse> => {
+  return fetcher<Promise<oAuthRefreshTokenListResponse>>(
+    getOAuthRefreshTokenListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Revoke one OAuth refresh token issued to the authenticated account.
+
+This prevents future refresh-token use for the selected grant. Existing
+JWT access tokens remain valid until their expiry.
+
+ */
+export type oAuthRefreshTokenDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getOAuthRefreshTokenDeleteUrl = (oauthRefreshTokenId: string) => {
+  return `/auth/oauth/tokens/${oauthRefreshTokenId}`;
+};
+
+export const oAuthRefreshTokenDelete = async (
+  oauthRefreshTokenId: string,
+  options?: RequestInit,
+): Promise<oAuthRefreshTokenDeleteResponse> => {
+  return fetcher<Promise<oAuthRefreshTokenDeleteResponse>>(
+    getOAuthRefreshTokenDeleteUrl(oauthRefreshTokenId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * List OAuth clients created by the authenticated account.
+
+This is the member-facing "apps I created" view. OAuth clients are
+application definitions: client ID, client type, redirect URIs, allowed
+scopes, and allowed grants.
+
+This does not list built-in first-party clients or third-party apps the
+member has merely authorised. Use `/auth/oauth/tokens` for the
+"apps I have authorised" view.
+
+ */
+export type oAuthClientListResponse = {
+  data: OAuthClientListOKResponse;
+  status: number;
+};
+
+export const getOAuthClientListUrl = () => {
+  return `/auth/oauth/clients`;
+};
+
+export const oAuthClientList = async (
+  options?: RequestInit,
+): Promise<oAuthClientListResponse> => {
+  return fetcher<Promise<oAuthClientListResponse>>(getOAuthClientListUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Create an OAuth client owned by the authenticated account.
+
+Member-created clients are third-party explicit-scope clients. The
+requested allowed scopes must be a subset of the authenticated account's
+current permissions.
+
+ */
+export type oAuthClientCreateResponse = {
+  data: OAuthClientIssuedOKResponse;
+  status: number;
+};
+
+export const getOAuthClientCreateUrl = () => {
+  return `/auth/oauth/clients`;
+};
+
+export const oAuthClientCreate = async (
+  oAuthClientSelfCreateBody: OAuthClientSelfCreateBody,
+  options?: RequestInit,
+): Promise<oAuthClientCreateResponse> => {
+  return fetcher<Promise<oAuthClientCreateResponse>>(
+    getOAuthClientCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthClientSelfCreateBody),
+    },
+  );
+};
+
+/**
+ * Read an OAuth client created by the authenticated account.
+
+Member-created clients are third-party application identities. They may
+be public or confidential but are never first-party inherited-permission
+clients.
+
+ */
+export type oAuthClientGetResponse = {
+  data: OAuthClientOKResponse;
+  status: number;
+};
+
+export const getOAuthClientGetUrl = (oauthClientId: string) => {
+  return `/auth/oauth/clients/${oauthClientId}`;
+};
+
+export const oAuthClientGet = async (
+  oauthClientId: string,
+  options?: RequestInit,
+): Promise<oAuthClientGetResponse> => {
+  return fetcher<Promise<oAuthClientGetResponse>>(
+    getOAuthClientGetUrl(oauthClientId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Update an OAuth client created by the authenticated account.
+
+Allowed scopes must remain within the authenticated account's current
+permissions. If the account has `ADMINISTRATOR`, it may configure any
+Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+permissions.
+
+Changing allowed scopes affects future grants and refreshes but does
+not immediately invalidate already-issued JWT access tokens.
+
+ */
+export type oAuthClientUpdateResponse = {
+  data: OAuthClientOKResponse;
+  status: number;
+};
+
+export const getOAuthClientUpdateUrl = (oauthClientId: string) => {
+  return `/auth/oauth/clients/${oauthClientId}`;
+};
+
+export const oAuthClientUpdate = async (
+  oauthClientId: string,
+  oAuthClientSelfUpdateBody: OAuthClientSelfUpdateBody,
+  options?: RequestInit,
+): Promise<oAuthClientUpdateResponse> => {
+  return fetcher<Promise<oAuthClientUpdateResponse>>(
+    getOAuthClientUpdateUrl(oauthClientId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthClientSelfUpdateBody),
+    },
+  );
+};
+
+/**
+ * Delete an OAuth client created by the authenticated account.
+
+This prevents new OAuth flows for the client and removes associated
+pending OAuth records and refresh tokens, preventing existing grants
+from being renewed. Existing JWT access tokens remain valid until
+expiry.
+
+ */
+export type oAuthClientDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getOAuthClientDeleteUrl = (oauthClientId: string) => {
+  return `/auth/oauth/clients/${oauthClientId}`;
+};
+
+export const oAuthClientDelete = async (
+  oauthClientId: string,
+  options?: RequestInit,
+): Promise<oAuthClientDeleteResponse> => {
+  return fetcher<Promise<oAuthClientDeleteResponse>>(
+    getOAuthClientDeleteUrl(oauthClientId),
     {
       ...options,
       method: "DELETE",

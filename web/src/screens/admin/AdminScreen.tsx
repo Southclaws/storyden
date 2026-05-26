@@ -17,6 +17,7 @@ import { BrandSettingsScreen } from "./BrandSettingsScreen";
 import { EmailLogSettingsScreen } from "./EmailLogSettingsScreen/EmailLogSettingsScreen";
 import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
+import { OAuthSettingsScreen } from "./OAuthSettingsScreen";
 import { PluginSettingsScreen } from "./PluginSettingsScreen";
 import { SystemSettingsScreen } from "./SystemSettingsScreen";
 
@@ -24,8 +25,11 @@ const DEFAULT_TAB = "brand";
 
 export function AdminScreen() {
   const pluginsEnabled = useCapability("plugins");
+  const oauthCapabilityEnabled = useCapability("oauth");
   const session = useSession();
   const canViewEmailLog = hasPermission(session, Permission.ADMINISTRATOR);
+  const canViewOAuth =
+    oauthCapabilityEnabled && hasPermission(session, Permission.ADMINISTRATOR);
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -47,7 +51,12 @@ export function AdminScreen() {
     if (!canViewEmailLog && tab === "email") {
       setTab(DEFAULT_TAB);
     }
-  }, [canViewEmailLog, pluginsEnabled, tab, setTab]);
+
+    if (!canViewOAuth && tab === "oauth") {
+      setTab(DEFAULT_TAB);
+    }
+
+  }, [canViewEmailLog, canViewOAuth, pluginsEnabled, tab, setTab]);
 
   function handleTabChange({ value }: TabsValueChangeDetails) {
     setTab(value);
@@ -72,6 +81,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="interface">Interface</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
+        {canViewOAuth && <Tabs.Trigger value="oauth">OAuth</Tabs.Trigger>}
         {pluginsEnabled && <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>}
         <Tabs.Indicator />
       </Tabs.List>
@@ -109,6 +119,12 @@ export function AdminScreen() {
       <Tabs.Content value="access_keys">
         <AccessKeySettingsScreen />
       </Tabs.Content>
+
+      {canViewOAuth && (
+        <Tabs.Content value="oauth">
+          <OAuthSettingsScreen />
+        </Tabs.Content>
+      )}
 
       {pluginsEnabled && (
         <Tabs.Content value="plugins">

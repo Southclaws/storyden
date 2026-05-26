@@ -27,6 +27,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
+	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
+	"github.com/Southclaws/storyden/internal/ent/oauthclient"
+	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -455,6 +460,96 @@ func (_c *AccountCreate) AddAuthentication(v ...*Authentication) *AccountCreate 
 		ids[i] = v[i].ID
 	}
 	return _c.AddAuthenticationIDs(ids...)
+}
+
+// AddOauthClientIDs adds the "oauth_clients" edge to the OAuthClient entity by IDs.
+func (_c *AccountCreate) AddOauthClientIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthClientIDs(ids...)
+	return _c
+}
+
+// AddOauthClients adds the "oauth_clients" edges to the OAuthClient entity.
+func (_c *AccountCreate) AddOauthClients(v ...*OAuthClient) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthClientIDs(ids...)
+}
+
+// AddOauthAuthorisationCodeIDs adds the "oauth_authorisation_codes" edge to the OAuthAuthorisationCode entity by IDs.
+func (_c *AccountCreate) AddOauthAuthorisationCodeIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthAuthorisationCodeIDs(ids...)
+	return _c
+}
+
+// AddOauthAuthorisationCodes adds the "oauth_authorisation_codes" edges to the OAuthAuthorisationCode entity.
+func (_c *AccountCreate) AddOauthAuthorisationCodes(v ...*OAuthAuthorisationCode) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthAuthorisationCodeIDs(ids...)
+}
+
+// AddOauthAuthorisationRequestIDs adds the "oauth_authorisation_requests" edge to the OAuthAuthorisationRequest entity by IDs.
+func (_c *AccountCreate) AddOauthAuthorisationRequestIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthAuthorisationRequestIDs(ids...)
+	return _c
+}
+
+// AddOauthAuthorisationRequests adds the "oauth_authorisation_requests" edges to the OAuthAuthorisationRequest entity.
+func (_c *AccountCreate) AddOauthAuthorisationRequests(v ...*OAuthAuthorisationRequest) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthAuthorisationRequestIDs(ids...)
+}
+
+// AddOauthRefreshTokenIDs adds the "oauth_refresh_tokens" edge to the OAuthRefreshToken entity by IDs.
+func (_c *AccountCreate) AddOauthRefreshTokenIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddOauthRefreshTokenIDs(ids...)
+	return _c
+}
+
+// AddOauthRefreshTokens adds the "oauth_refresh_tokens" edges to the OAuthRefreshToken entity.
+func (_c *AccountCreate) AddOauthRefreshTokens(v ...*OAuthRefreshToken) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddOauthRefreshTokenIDs(ids...)
+}
+
+// AddClaimedOauthDeviceAuthorisationIDs adds the "claimed_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_c *AccountCreate) AddClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+	return _c
+}
+
+// AddClaimedOauthDeviceAuthorisations adds the "claimed_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_c *AccountCreate) AddClaimedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddClaimedOauthDeviceAuthorisationIDs(ids...)
+}
+
+// AddApprovedOauthDeviceAuthorisationIDs adds the "approved_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by IDs.
+func (_c *AccountCreate) AddApprovedOauthDeviceAuthorisationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddApprovedOauthDeviceAuthorisationIDs(ids...)
+	return _c
+}
+
+// AddApprovedOauthDeviceAuthorisations adds the "approved_oauth_device_authorisations" edges to the OAuthDeviceAuthorisation entity.
+func (_c *AccountCreate) AddApprovedOauthDeviceAuthorisations(v ...*OAuthDeviceAuthorisation) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddApprovedOauthDeviceAuthorisationIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
@@ -1121,6 +1216,102 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthClientsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthClientsTable,
+			Columns: []string{account.OauthClientsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthclient.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthAuthorisationCodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationCodesTable,
+			Columns: []string{account.OauthAuthorisationCodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationcode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthAuthorisationRequestsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthAuthorisationRequestsTable,
+			Columns: []string{account.OauthAuthorisationRequestsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthauthorisationrequest.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.OauthRefreshTokensIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.OauthRefreshTokensTable,
+			Columns: []string{account.OauthRefreshTokensColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthrefreshtoken.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ClaimedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ClaimedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ClaimedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ApprovedOauthDeviceAuthorisationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ApprovedOauthDeviceAuthorisationsTable,
+			Columns: []string{account.ApprovedOauthDeviceAuthorisationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(oauthdeviceauthorisation.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

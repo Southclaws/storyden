@@ -101,6 +101,24 @@ func (Account) Edges() []ent.Edge {
 		edge.To("authentication", Authentication.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("oauth_clients", OAuthClient.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("oauth_authorisation_codes", OAuthAuthorisationCode.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("oauth_authorisation_requests", OAuthAuthorisationRequest.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("oauth_refresh_tokens", OAuthRefreshToken.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("claimed_oauth_device_authorisations", OAuthDeviceAuthorisation.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("approved_oauth_device_authorisations", OAuthDeviceAuthorisation.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("tags", Tag.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

@@ -37,7 +37,32 @@ import type {
   InternalServerErrorResponse,
   NoContentResponse,
   NotFoundResponse,
+  OAuthAuthoriseConsentOKResponse,
+  OAuthAuthoriseConsentParams,
+  OAuthAuthoriseConsentSubmitBody,
+  OAuthAuthoriseConsentSubmitOKResponse,
+  OAuthAuthoriseFoundResponse,
+  OAuthAuthoriseOKResponse,
+  OAuthAuthoriseParams,
+  OAuthClientIssuedOKResponse,
+  OAuthClientListOKResponse,
+  OAuthClientOKResponse,
+  OAuthClientSelfCreateBody,
+  OAuthClientSelfUpdateBody,
+  OAuthDeviceAuthorisationBody,
+  OAuthDeviceAuthorisationOKResponse,
+  OAuthDeviceConsentOKResponse,
+  OAuthDeviceConsentParams,
+  OAuthDeviceConsentSubmitBody,
+  OAuthDeviceConsentSubmitOKResponse,
+  OAuthErrorResponse,
+  OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
+  OAuthRefreshTokenListOKResponse,
+  OAuthTokenBody,
+  OAuthTokenErrorResponse,
+  OAuthTokenOKResponse,
+  OAuthUserInfoOKResponse,
   PhoneRequestCodeBody,
   PhoneRequestCodeParams,
   PhoneSubmitCodeBody,
@@ -864,6 +889,615 @@ export const useOAuthProviderCallback = <
   };
 };
 /**
+ * List public JSON Web Keys that clients can use to validate Storyden
+OAuth access tokens and OpenID Connect ID tokens.
+
+This is advertised by `/.well-known/openid-configuration` as `jwks_uri`.
+Storyden serves this under the API mount because the key set is an API
+resource; the well-known discovery document itself is mounted at the
+instance root and is intentionally not part of this OpenAPI document.
+
+ */
+export const oAuthJWKS = () => {
+  return fetcher<OAuthJWKSOKResponse>({ url: `/oauth/jwks`, method: "GET" });
+};
+
+export const getOAuthJWKSKey = () => [`/oauth/jwks`] as const;
+
+export type OAuthJWKSQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthJWKS>>
+>;
+export type OAuthJWKSQueryError = InternalServerErrorResponse;
+
+export const useOAuthJWKS = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof oAuthJWKS>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getOAuthJWKSKey() : null));
+  const swrFn = () => oAuthJWKS();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Start the OAuth 2.0 Device Authorization Grant for clients that cannot
+receive a browser redirect directly, such as CLIs, terminals, and
+desktop tools.
+
+The `scope` parameter follows OAuth 2.0 and is optional. Storyden
+applies additional client policy after parsing the request:
+
+- Built-in first-party device clients, such as the default Storyden CLI
+  client, must request exactly `openid profile offline_access`. On
+  approval Storyden expands the issued scope to the approving account's
+  current permissions.
+- Third-party explicit-scope clients may omit `scope`; omitted scope
+  means no requested scopes.
+
+`verification_uri` and `verification_uri_complete` point at the
+configured frontend consent page, not at an API-rendered HTML page.
+Custom frontends can change this URL with
+`OAUTH_DEVICE_AUTHORISATION_CONSENT_URL`.
+
+ */
+export const oAuthDeviceAuthorisation = (
+  oAuthDeviceAuthorisationBody: OAuthDeviceAuthorisationBody,
+) => {
+  const formUrlEncoded = new URLSearchParams();
+  formUrlEncoded.append("client_id", oAuthDeviceAuthorisationBody.client_id);
+  if (oAuthDeviceAuthorisationBody.scope !== undefined) {
+    formUrlEncoded.append("scope", oAuthDeviceAuthorisationBody.scope);
+  }
+
+  return fetcher<OAuthDeviceAuthorisationOKResponse>({
+    url: `/oauth/device_authorization`,
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    data: formUrlEncoded,
+  });
+};
+
+export const getOAuthDeviceAuthorisationMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthDeviceAuthorisationBody },
+  ): Promise<OAuthDeviceAuthorisationOKResponse> => {
+    return oAuthDeviceAuthorisation(arg);
+  };
+};
+export const getOAuthDeviceAuthorisationMutationKey = () =>
+  [`/oauth/device_authorization`] as const;
+
+export type OAuthDeviceAuthorisationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthDeviceAuthorisation>>
+>;
+export type OAuthDeviceAuthorisationMutationError =
+  | OAuthErrorResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthDeviceAuthorisation = <
+  TError = OAuthErrorResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthDeviceAuthorisation>>,
+    TError,
+    Key,
+    OAuthDeviceAuthorisationBody,
+    Awaited<ReturnType<typeof oAuthDeviceAuthorisation>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthDeviceAuthorisationMutationKey();
+  const swrFn = getOAuthDeviceAuthorisationMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Read a pending OAuth device authorisation request for a signed-in user
+before they approve or deny consent in the frontend.
+
+This is a Storyden frontend/API integration endpoint, not an OAuth
+protocol endpoint. The API never renders the consent UI directly. A
+frontend reads this JSON, displays the client and scopes, then submits
+the user's decision.
+
+Reading consent claims the user code for the signed-in account. This
+prevents another account from approving the same code after it has been
+displayed.
+
+ */
+export const oAuthDeviceConsent = (params?: OAuthDeviceConsentParams) => {
+  return fetcher<OAuthDeviceConsentOKResponse>({
+    url: `/oauth/device/consent`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getOAuthDeviceConsentKey = (params?: OAuthDeviceConsentParams) =>
+  [`/oauth/device/consent`, ...(params ? [params] : [])] as const;
+
+export type OAuthDeviceConsentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthDeviceConsent>>
+>;
+export type OAuthDeviceConsentQueryError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthDeviceConsent = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  params?: OAuthDeviceConsentParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthDeviceConsent>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthDeviceConsentKey(params) : null));
+  const swrFn = () => oAuthDeviceConsent(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Approve or deny a pending OAuth device authorisation request for the
+currently signed-in account.
+
+On approval Storyden recomputes the granted scope from the current
+account permissions and client policy. For first-party inherited clients
+this means the final token scope may include Storyden permission scopes
+that were not present in the original device authorisation request.
+
+ */
+export const oAuthDeviceConsentSubmit = (
+  oAuthDeviceConsentSubmitBody: OAuthDeviceConsentSubmitBody,
+) => {
+  return fetcher<OAuthDeviceConsentSubmitOKResponse>({
+    url: `/oauth/device/consent`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthDeviceConsentSubmitBody,
+  });
+};
+
+export const getOAuthDeviceConsentSubmitMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthDeviceConsentSubmitBody },
+  ): Promise<OAuthDeviceConsentSubmitOKResponse> => {
+    return oAuthDeviceConsentSubmit(arg);
+  };
+};
+export const getOAuthDeviceConsentSubmitMutationKey = () =>
+  [`/oauth/device/consent`] as const;
+
+export type OAuthDeviceConsentSubmitMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthDeviceConsentSubmit>>
+>;
+export type OAuthDeviceConsentSubmitMutationError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthDeviceConsentSubmit = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthDeviceConsentSubmit>>,
+    TError,
+    Key,
+    OAuthDeviceConsentSubmitBody,
+    Awaited<ReturnType<typeof oAuthDeviceConsentSubmit>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthDeviceConsentSubmitMutationKey();
+  const swrFn = getOAuthDeviceConsentSubmitMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+
+This endpoint requires a browser session. If the account is not signed
+in, Storyden redirects to the frontend login route instead of returning
+a protocol redirect to the client application.
+
+Unlike many OAuth servers, Storyden does not render a consent page from
+this API endpoint. A valid request creates a short-lived pending
+authorisation request and redirects the browser to the configured
+frontend authorisation-code consent URL. Custom frontends can change
+this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+
+The `scope` parameter follows OAuth 2.0 and is optional. Empty or
+omitted scope means no requested scopes. Storyden permission scopes are
+granted only when allowed by the client and by the signed-in account's
+current permissions.
+
+ */
+export const oAuthAuthorise = (params: OAuthAuthoriseParams) => {
+  return fetcher<OAuthAuthoriseOKResponse>({
+    url: `/oauth/authorize`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getOAuthAuthoriseKey = (params: OAuthAuthoriseParams) =>
+  [`/oauth/authorize`, ...(params ? [params] : [])] as const;
+
+export type OAuthAuthoriseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthAuthorise>>
+>;
+export type OAuthAuthoriseQueryError =
+  | OAuthAuthoriseFoundResponse
+  | OAuthErrorResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthAuthorise = <
+  TError =
+    | OAuthAuthoriseFoundResponse
+    | OAuthErrorResponse
+    | InternalServerErrorResponse,
+>(
+  params: OAuthAuthoriseParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthAuthorise>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthAuthoriseKey(params) : null));
+  const swrFn = () => oAuthAuthorise(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Read a pending OAuth authorisation code request for a signed-in user
+before they approve or deny consent in the frontend.
+
+This is a Storyden frontend/API integration endpoint, not an OAuth
+protocol endpoint. It returns the client, redirect URI, requested
+scopes, and currently grantable scopes so the frontend can render a
+consent screen.
+
+ */
+export const oAuthAuthoriseConsent = (params?: OAuthAuthoriseConsentParams) => {
+  return fetcher<OAuthAuthoriseConsentOKResponse>({
+    url: `/oauth/authorize/consent`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getOAuthAuthoriseConsentKey = (
+  params?: OAuthAuthoriseConsentParams,
+) => [`/oauth/authorize/consent`, ...(params ? [params] : [])] as const;
+
+export type OAuthAuthoriseConsentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthAuthoriseConsent>>
+>;
+export type OAuthAuthoriseConsentQueryError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthAuthoriseConsent = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  params?: OAuthAuthoriseConsentParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthAuthoriseConsent>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthAuthoriseConsentKey(params) : null));
+  const swrFn = () => oAuthAuthoriseConsent(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Approve or deny a pending OAuth authorisation code request for the
+currently signed-in account.
+
+On approval this creates a short-lived authorisation code and returns
+the client redirect URI containing `code` and optional `state`. On
+denial the returned redirect URI contains `error=access_denied`.
+
+Storyden recomputes the granted scope at approval time from current
+account permissions and client policy.
+
+ */
+export const oAuthAuthoriseConsentSubmit = (
+  oAuthAuthoriseConsentSubmitBody: OAuthAuthoriseConsentSubmitBody,
+) => {
+  return fetcher<OAuthAuthoriseConsentSubmitOKResponse>({
+    url: `/oauth/authorize/consent`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthAuthoriseConsentSubmitBody,
+  });
+};
+
+export const getOAuthAuthoriseConsentSubmitMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthAuthoriseConsentSubmitBody },
+  ): Promise<OAuthAuthoriseConsentSubmitOKResponse> => {
+    return oAuthAuthoriseConsentSubmit(arg);
+  };
+};
+export const getOAuthAuthoriseConsentSubmitMutationKey = () =>
+  [`/oauth/authorize/consent`] as const;
+
+export type OAuthAuthoriseConsentSubmitMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthAuthoriseConsentSubmit>>
+>;
+export type OAuthAuthoriseConsentSubmitMutationError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthAuthoriseConsentSubmit = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthAuthoriseConsentSubmit>>,
+    TError,
+    Key,
+    OAuthAuthoriseConsentSubmitBody,
+    Awaited<ReturnType<typeof oAuthAuthoriseConsentSubmit>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getOAuthAuthoriseConsentSubmitMutationKey();
+  const swrFn = getOAuthAuthoriseConsentSubmitMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Exchange an OAuth authorisation code, device code, refresh token, or
+client credentials grant for tokens.
+
+Supported grants are advertised by `/.well-known/openid-configuration`.
+Public clients authenticate with `client_id` only and must use grants
+suitable for public clients, such as device code or authorisation code
+with PKCE. Confidential clients must provide `client_secret` for
+authorisation-code, refresh-token, and client-credentials exchanges.
+
+Storyden access tokens are short-lived JWTs containing the issued
+`scope`. Revoking a refresh token or changing account permissions does
+not revoke an already-issued access token; permission changes are
+applied on the next token issuance or refresh.
+
+Device-code polling returns OAuth-compatible errors such as
+`authorization_pending`, `slow_down`, `expired_token`,
+`access_denied`, and `invalid_grant`.
+
+ */
+export const oAuthToken = (oAuthTokenBody: OAuthTokenBody) => {
+  const formUrlEncoded = new URLSearchParams();
+  formUrlEncoded.append("grant_type", oAuthTokenBody.grant_type);
+  formUrlEncoded.append("client_id", oAuthTokenBody.client_id);
+  if (oAuthTokenBody.client_secret !== undefined) {
+    formUrlEncoded.append("client_secret", oAuthTokenBody.client_secret);
+  }
+  if (oAuthTokenBody.scope !== undefined) {
+    formUrlEncoded.append("scope", oAuthTokenBody.scope);
+  }
+  if (oAuthTokenBody.device_code !== undefined) {
+    formUrlEncoded.append("device_code", oAuthTokenBody.device_code);
+  }
+  if (oAuthTokenBody.code !== undefined) {
+    formUrlEncoded.append("code", oAuthTokenBody.code);
+  }
+  if (oAuthTokenBody.redirect_uri !== undefined) {
+    formUrlEncoded.append("redirect_uri", oAuthTokenBody.redirect_uri);
+  }
+  if (oAuthTokenBody.code_verifier !== undefined) {
+    formUrlEncoded.append("code_verifier", oAuthTokenBody.code_verifier);
+  }
+  if (oAuthTokenBody.refresh_token !== undefined) {
+    formUrlEncoded.append("refresh_token", oAuthTokenBody.refresh_token);
+  }
+
+  return fetcher<OAuthTokenOKResponse>({
+    url: `/oauth/token`,
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    data: formUrlEncoded,
+  });
+};
+
+export const getOAuthTokenMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthTokenBody },
+  ): Promise<OAuthTokenOKResponse> => {
+    return oAuthToken(arg);
+  };
+};
+export const getOAuthTokenMutationKey = () => [`/oauth/token`] as const;
+
+export type OAuthTokenMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthToken>>
+>;
+export type OAuthTokenMutationError =
+  | OAuthTokenErrorResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthToken = <
+  TError = OAuthTokenErrorResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthToken>>,
+    TError,
+    Key,
+    OAuthTokenBody,
+    Awaited<ReturnType<typeof oAuthToken>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthTokenMutationKey();
+  const swrFn = getOAuthTokenMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Return OpenID Connect UserInfo claims for the account represented by a
+valid bearer access token.
+
+Claims are scope-gated:
+
+- `openid` identifies the subject.
+- `profile` enables profile claims such as display name.
+- `email` enables email claims when the account has an email address.
+
+Storyden accounts do not always have email addresses, so email claims
+may be absent even when the `email` scope is present.
+
+ */
+export const oAuthUserInfo = () => {
+  return fetcher<OAuthUserInfoOKResponse>({
+    url: `/oauth/userinfo`,
+    method: "GET",
+  });
+};
+
+export const getOAuthUserInfoKey = () => [`/oauth/userinfo`] as const;
+
+export type OAuthUserInfoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthUserInfo>>
+>;
+export type OAuthUserInfoQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthUserInfo = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof oAuthUserInfo>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getOAuthUserInfoKey() : null));
+  const swrFn = () => oAuthUserInfo();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
  * Start the WebAuthn registration process by requesting a credential.
 
  */
@@ -1381,6 +2015,442 @@ export const useAccessKeyDelete = <
   const swrKey =
     swrOptions?.swrKey ?? getAccessKeyDeleteMutationKey(accessKeyId);
   const swrFn = getAccessKeyDeleteMutationFetcher(accessKeyId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List OAuth refresh tokens issued to the authenticated account.
+
+This is the member-facing "authorised applications" view: it lists apps
+the signed-in account has authorised and can revoke. In OAuth terms,
+these rows are grants/tokens, not application definitions.
+
+This may include grants for built-in first-party clients such as the
+default Storyden CLI. Those clients are not created by the member and
+therefore do not appear in the member OAuth client list.
+
+ */
+export const oAuthRefreshTokenList = () => {
+  return fetcher<OAuthRefreshTokenListOKResponse>({
+    url: `/auth/oauth/tokens`,
+    method: "GET",
+  });
+};
+
+export const getOAuthRefreshTokenListKey = () =>
+  [`/auth/oauth/tokens`] as const;
+
+export type OAuthRefreshTokenListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRefreshTokenList>>
+>;
+export type OAuthRefreshTokenListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRefreshTokenList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof oAuthRefreshTokenList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthRefreshTokenListKey() : null));
+  const swrFn = () => oAuthRefreshTokenList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Revoke one OAuth refresh token issued to the authenticated account.
+
+This prevents future refresh-token use for the selected grant. Existing
+JWT access tokens remain valid until their expiry.
+
+ */
+export const oAuthRefreshTokenDelete = (oauthRefreshTokenId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/auth/oauth/tokens/${oauthRefreshTokenId}`,
+    method: "DELETE",
+  });
+};
+
+export const getOAuthRefreshTokenDeleteMutationFetcher = (
+  oauthRefreshTokenId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return oAuthRefreshTokenDelete(oauthRefreshTokenId);
+  };
+};
+export const getOAuthRefreshTokenDeleteMutationKey = (
+  oauthRefreshTokenId: string,
+) => [`/auth/oauth/tokens/${oauthRefreshTokenId}`] as const;
+
+export type OAuthRefreshTokenDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRefreshTokenDelete>>
+>;
+export type OAuthRefreshTokenDeleteMutationError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRefreshTokenDelete = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  oauthRefreshTokenId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof oAuthRefreshTokenDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof oAuthRefreshTokenDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getOAuthRefreshTokenDeleteMutationKey(oauthRefreshTokenId);
+  const swrFn = getOAuthRefreshTokenDeleteMutationFetcher(oauthRefreshTokenId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List OAuth clients created by the authenticated account.
+
+This is the member-facing "apps I created" view. OAuth clients are
+application definitions: client ID, client type, redirect URIs, allowed
+scopes, and allowed grants.
+
+This does not list built-in first-party clients or third-party apps the
+member has merely authorised. Use `/auth/oauth/tokens` for the
+"apps I have authorised" view.
+
+ */
+export const oAuthClientList = () => {
+  return fetcher<OAuthClientListOKResponse>({
+    url: `/auth/oauth/clients`,
+    method: "GET",
+  });
+};
+
+export const getOAuthClientListKey = () => [`/auth/oauth/clients`] as const;
+
+export type OAuthClientListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientList>>
+>;
+export type OAuthClientListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof oAuthClientList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getOAuthClientListKey() : null));
+  const swrFn = () => oAuthClientList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create an OAuth client owned by the authenticated account.
+
+Member-created clients are third-party explicit-scope clients. The
+requested allowed scopes must be a subset of the authenticated account's
+current permissions.
+
+ */
+export const oAuthClientCreate = (
+  oAuthClientSelfCreateBody: OAuthClientSelfCreateBody,
+) => {
+  return fetcher<OAuthClientIssuedOKResponse>({
+    url: `/auth/oauth/clients`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthClientSelfCreateBody,
+  });
+};
+
+export const getOAuthClientCreateMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthClientSelfCreateBody },
+  ): Promise<OAuthClientIssuedOKResponse> => {
+    return oAuthClientCreate(arg);
+  };
+};
+export const getOAuthClientCreateMutationKey = () =>
+  [`/auth/oauth/clients`] as const;
+
+export type OAuthClientCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientCreate>>
+>;
+export type OAuthClientCreateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthClientCreate>>,
+    TError,
+    Key,
+    OAuthClientSelfCreateBody,
+    Awaited<ReturnType<typeof oAuthClientCreate>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthClientCreateMutationKey();
+  const swrFn = getOAuthClientCreateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Read an OAuth client created by the authenticated account.
+
+Member-created clients are third-party application identities. They may
+be public or confidential but are never first-party inherited-permission
+clients.
+
+ */
+export const oAuthClientGet = (oauthClientId: string) => {
+  return fetcher<OAuthClientOKResponse>({
+    url: `/auth/oauth/clients/${oauthClientId}`,
+    method: "GET",
+  });
+};
+
+export const getOAuthClientGetKey = (oauthClientId: string) =>
+  [`/auth/oauth/clients/${oauthClientId}`] as const;
+
+export type OAuthClientGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientGet>>
+>;
+export type OAuthClientGetQueryError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientGet = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthClientGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!oauthClientId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthClientGetKey(oauthClientId) : null));
+  const swrFn = () => oAuthClientGet(oauthClientId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update an OAuth client created by the authenticated account.
+
+Allowed scopes must remain within the authenticated account's current
+permissions. If the account has `ADMINISTRATOR`, it may configure any
+Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+permissions.
+
+Changing allowed scopes affects future grants and refreshes but does
+not immediately invalidate already-issued JWT access tokens.
+
+ */
+export const oAuthClientUpdate = (
+  oauthClientId: string,
+  oAuthClientSelfUpdateBody: OAuthClientSelfUpdateBody,
+) => {
+  return fetcher<OAuthClientOKResponse>({
+    url: `/auth/oauth/clients/${oauthClientId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthClientSelfUpdateBody,
+  });
+};
+
+export const getOAuthClientUpdateMutationFetcher = (oauthClientId: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthClientSelfUpdateBody },
+  ): Promise<OAuthClientOKResponse> => {
+    return oAuthClientUpdate(oauthClientId, arg);
+  };
+};
+export const getOAuthClientUpdateMutationKey = (oauthClientId: string) =>
+  [`/auth/oauth/clients/${oauthClientId}`] as const;
+
+export type OAuthClientUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientUpdate>>
+>;
+export type OAuthClientUpdateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof oAuthClientUpdate>>,
+      TError,
+      Key,
+      OAuthClientSelfUpdateBody,
+      Awaited<ReturnType<typeof oAuthClientUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getOAuthClientUpdateMutationKey(oauthClientId);
+  const swrFn = getOAuthClientUpdateMutationFetcher(oauthClientId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete an OAuth client created by the authenticated account.
+
+This prevents new OAuth flows for the client and removes associated
+pending OAuth records and refresh tokens, preventing existing grants
+from being renewed. Existing JWT access tokens remain valid until
+expiry.
+
+ */
+export const oAuthClientDelete = (oauthClientId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/auth/oauth/clients/${oauthClientId}`,
+    method: "DELETE",
+  });
+};
+
+export const getOAuthClientDeleteMutationFetcher = (oauthClientId: string) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return oAuthClientDelete(oauthClientId);
+  };
+};
+export const getOAuthClientDeleteMutationKey = (oauthClientId: string) =>
+  [`/auth/oauth/clients/${oauthClientId}`] as const;
+
+export type OAuthClientDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientDelete>>
+>;
+export type OAuthClientDeleteMutationError =
+  | OAuthErrorResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientDelete = <
+  TError =
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof oAuthClientDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof oAuthClientDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getOAuthClientDeleteMutationKey(oauthClientId);
+  const swrFn = getOAuthClientDeleteMutationFetcher(oauthClientId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

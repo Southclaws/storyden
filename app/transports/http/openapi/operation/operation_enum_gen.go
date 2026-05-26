@@ -33,6 +33,14 @@ var (
 	OperationIDAdminAccountBanRemove                  = OperationID{`AdminAccountBanRemove`}
 	OperationIDAdminAccessKeyList                     = OperationID{`AdminAccessKeyList`}
 	OperationIDAdminAccessKeyDelete                   = OperationID{`AdminAccessKeyDelete`}
+	OperationIDAdminOAuthClientList                   = OperationID{`AdminOAuthClientList`}
+	OperationIDAdminOAuthClientCreate                 = OperationID{`AdminOAuthClientCreate`}
+	OperationIDAdminOAuthClientGet                    = OperationID{`AdminOAuthClientGet`}
+	OperationIDAdminOAuthClientUpdate                 = OperationID{`AdminOAuthClientUpdate`}
+	OperationIDAdminOAuthClientDelete                 = OperationID{`AdminOAuthClientDelete`}
+	OperationIDAdminOAuthDeviceAuthorisationList      = OperationID{`AdminOAuthDeviceAuthorisationList`}
+	OperationIDAdminOAuthRefreshTokenList             = OperationID{`AdminOAuthRefreshTokenList`}
+	OperationIDAdminOAuthRefreshTokenDelete           = OperationID{`AdminOAuthRefreshTokenDelete`}
 	OperationIDPluginList                             = OperationID{`PluginList`}
 	OperationIDPluginAdd                              = OperationID{`PluginAdd`}
 	OperationIDPluginGet                              = OperationID{`PluginGet`}
@@ -64,6 +72,15 @@ var (
 	OperationIDAuthEmailSignin                        = OperationID{`AuthEmailSignin`}
 	OperationIDAuthEmailVerify                        = OperationID{`AuthEmailVerify`}
 	OperationIDOAuthProviderCallback                  = OperationID{`OAuthProviderCallback`}
+	OperationIDOAuthJWKS                              = OperationID{`OAuthJWKS`}
+	OperationIDOAuthDeviceAuthorisation               = OperationID{`OAuthDeviceAuthorisation`}
+	OperationIDOAuthDeviceConsent                     = OperationID{`OAuthDeviceConsent`}
+	OperationIDOAuthDeviceConsentSubmit               = OperationID{`OAuthDeviceConsentSubmit`}
+	OperationIDOAuthAuthorise                         = OperationID{`OAuthAuthorise`}
+	OperationIDOAuthAuthoriseConsent                  = OperationID{`OAuthAuthoriseConsent`}
+	OperationIDOAuthAuthoriseConsentSubmit            = OperationID{`OAuthAuthoriseConsentSubmit`}
+	OperationIDOAuthToken                             = OperationID{`OAuthToken`}
+	OperationIDOAuthUserInfo                          = OperationID{`OAuthUserInfo`}
 	OperationIDWebAuthnRequestCredential              = OperationID{`WebAuthnRequestCredential`}
 	OperationIDWebAuthnMakeCredential                 = OperationID{`WebAuthnMakeCredential`}
 	OperationIDWebAuthnGetAssertion                   = OperationID{`WebAuthnGetAssertion`}
@@ -73,6 +90,13 @@ var (
 	OperationIDAccessKeyList                          = OperationID{`AccessKeyList`}
 	OperationIDAccessKeyCreate                        = OperationID{`AccessKeyCreate`}
 	OperationIDAccessKeyDelete                        = OperationID{`AccessKeyDelete`}
+	OperationIDOAuthRefreshTokenList                  = OperationID{`OAuthRefreshTokenList`}
+	OperationIDOAuthRefreshTokenDelete                = OperationID{`OAuthRefreshTokenDelete`}
+	OperationIDOAuthClientList                        = OperationID{`OAuthClientList`}
+	OperationIDOAuthClientCreate                      = OperationID{`OAuthClientCreate`}
+	OperationIDOAuthClientGet                         = OperationID{`OAuthClientGet`}
+	OperationIDOAuthClientUpdate                      = OperationID{`OAuthClientUpdate`}
+	OperationIDOAuthClientDelete                      = OperationID{`OAuthClientDelete`}
 	OperationIDAuthProviderLogout                     = OperationID{`AuthProviderLogout`}
 	OperationIDAccountManageCreate                    = OperationID{`AccountManageCreate`}
 	OperationIDAccountGet                             = OperationID{`AccountGet`}
@@ -259,6 +283,22 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAdminAccessKeyList, nil
 	case string(`AdminAccessKeyDelete`):
 		return OperationIDAdminAccessKeyDelete, nil
+	case string(`AdminOAuthClientList`):
+		return OperationIDAdminOAuthClientList, nil
+	case string(`AdminOAuthClientCreate`):
+		return OperationIDAdminOAuthClientCreate, nil
+	case string(`AdminOAuthClientGet`):
+		return OperationIDAdminOAuthClientGet, nil
+	case string(`AdminOAuthClientUpdate`):
+		return OperationIDAdminOAuthClientUpdate, nil
+	case string(`AdminOAuthClientDelete`):
+		return OperationIDAdminOAuthClientDelete, nil
+	case string(`AdminOAuthDeviceAuthorisationList`):
+		return OperationIDAdminOAuthDeviceAuthorisationList, nil
+	case string(`AdminOAuthRefreshTokenList`):
+		return OperationIDAdminOAuthRefreshTokenList, nil
+	case string(`AdminOAuthRefreshTokenDelete`):
+		return OperationIDAdminOAuthRefreshTokenDelete, nil
 	case string(`PluginList`):
 		return OperationIDPluginList, nil
 	case string(`PluginAdd`):
@@ -321,6 +361,24 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAuthEmailVerify, nil
 	case string(`OAuthProviderCallback`):
 		return OperationIDOAuthProviderCallback, nil
+	case string(`OAuthJWKS`):
+		return OperationIDOAuthJWKS, nil
+	case string(`OAuthDeviceAuthorisation`):
+		return OperationIDOAuthDeviceAuthorisation, nil
+	case string(`OAuthDeviceConsent`):
+		return OperationIDOAuthDeviceConsent, nil
+	case string(`OAuthDeviceConsentSubmit`):
+		return OperationIDOAuthDeviceConsentSubmit, nil
+	case string(`OAuthAuthorise`):
+		return OperationIDOAuthAuthorise, nil
+	case string(`OAuthAuthoriseConsent`):
+		return OperationIDOAuthAuthoriseConsent, nil
+	case string(`OAuthAuthoriseConsentSubmit`):
+		return OperationIDOAuthAuthoriseConsentSubmit, nil
+	case string(`OAuthToken`):
+		return OperationIDOAuthToken, nil
+	case string(`OAuthUserInfo`):
+		return OperationIDOAuthUserInfo, nil
 	case string(`WebAuthnRequestCredential`):
 		return OperationIDWebAuthnRequestCredential, nil
 	case string(`WebAuthnMakeCredential`):
@@ -339,6 +397,20 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAccessKeyCreate, nil
 	case string(`AccessKeyDelete`):
 		return OperationIDAccessKeyDelete, nil
+	case string(`OAuthRefreshTokenList`):
+		return OperationIDOAuthRefreshTokenList, nil
+	case string(`OAuthRefreshTokenDelete`):
+		return OperationIDOAuthRefreshTokenDelete, nil
+	case string(`OAuthClientList`):
+		return OperationIDOAuthClientList, nil
+	case string(`OAuthClientCreate`):
+		return OperationIDOAuthClientCreate, nil
+	case string(`OAuthClientGet`):
+		return OperationIDOAuthClientGet, nil
+	case string(`OAuthClientUpdate`):
+		return OperationIDOAuthClientUpdate, nil
+	case string(`OAuthClientDelete`):
+		return OperationIDOAuthClientDelete, nil
 	case string(`AuthProviderLogout`):
 		return OperationIDAuthProviderLogout, nil
 	case string(`AccountManageCreate`):

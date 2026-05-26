@@ -57,7 +57,10 @@ export async function buildResult<T>(response: Response): Promise<T> {
     const data = await response.json().catch(() => undefined);
     const fallback = `${response.status} ${response.statusText}`;
 
-    throw new RequestError(data?.message ?? fallback, response.status);
+    throw new RequestError(
+      data?.message ?? data?.error ?? fallback,
+      response.status,
+    );
   }
 
   // NOTE: The API code generator returns empty responses where there is no

@@ -1,0 +1,249 @@
+---
+title: OAuth 2.0 & OpenID Connect
+description: Storyden can act as an OAuth 2.0 authorisation server and OpenID Connect provider, letting external applications authenticate as your members.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Storyden includes a built-in OAuth 2.0 authorisation server and OpenID Connect (OIDC) provider. This lets you build or integrate applications that can act on behalf of your members, with their explicit consent, using standard, widely-supported protocols.
+
+<Callout type="info">
+  This page is about Storyden acting **as** an authorisation server. If you want
+  members to **sign in via** Google, GitHub, or Discord, see [Social
+  Login](/docs/reference/oauth).
+</Callout>
+
+## What this enables
+
+Once enabled, external applications can request access to a member's Storyden account. A member explicitly approves or denies the request in a consent screen. If approved, Storyden issues an access token that lets the application call the Storyden API on that member's behalf.
+
+The final token scope is computed by Storyden from the requested scopes, the OAuth client's policy, the client's allowed scopes, and the member's current permissions. This means the consent screen approves the application/request, while Storyden enforces the exact permissions that can be issued.
+
+Common uses:
+
+- **The Storyden CLI** authenticates this way. The built-in `storyden-cli` client starts a device authorisation flow and asks the member to approve it in a browser consent screen.
+- **Third-party integrations** built by your community or by you that need to read or write content programmatically.
+- **Single sign-on**: if you have another app, your members can "sign in with Storyden" via the standard OIDC flow.
+
+## Authorisation flows
+
+Storyden supports two interactive authorisation flows:
+
+| Flow                                                                     | Best for                                            |
+| ------------------------------------------------------------------------ | --------------------------------------------------- |
+| [Device Authorization Grant](/docs/introduction/oauth/device-flow)       | CLI tools, headless apps, devices without a browser |
+| [Authorization Code + PKCE](/docs/introduction/oauth/authorization-code) | Web apps, native apps                               |
+
+Both flows end with the application holding an access token it can use as a `Bearer` header on API requests. Storyden also supports the `refresh_token` grant for renewal and the `client_credentials` grant for confidential client integrations that act as their owning account rather than through an interactive member consent flow.
+
+## OpenID Connect
+
+When a client requests the `openid` scope, Storyden issues an **ID token** alongside the access token. ID tokens are signed JWTs containing identity claims about the authenticated member. They always include the subject identifier and issuer/audience metadata. When the client also receives the `profile` scope, the ID token includes the member's display name. When the client receives the `email` scope, the ID token includes `email` and `email_verified` claims when available. This is the basis for "sign in with Storyden" style integrations.
+
+Storyden publishes a standards-compliant OIDC discovery document:
+
+```
+GET https://your-storyden.example/.well-known/openid-configuration
+```
+
+Most OIDC-aware libraries and identity platforms can auto-configure from this endpoint.
+
+<Callout type="warn">
+  This endpoint is not part of the Storyden OpenAPI contract and thus not
+  defined in the spec document. It is however covered by the OIDC spec. It also
+  does not live under `/api` as to adhere to the `.well-known` convention.
+</Callout>
+
+## Enabling the authorisation server
+
+The OAuth server is disabled by default. You need two things to enable it: enable the configuration flag, and set up an RSA signing key used to sign tokens.
+
+### Generate a signing key
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+openssl genrsa -out oauth-signing.pem 4096
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+openssl genrsa -out oauth-signing.pem 4096
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+openssl genrsa -out oauth-signing.pem 4096
+```
+
+</Tab>
+</Tabs>
+
+Base64-encode it for the environment variable:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("oauth-signing.pem"))
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+base64 -i oauth-signing.pem | tr -d '\n'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+base64 -w 0 oauth-signing.pem
+```
+
+</Tab>
+</Tabs>
+
+### Set environment variables
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+$env:OAUTH_ENABLED = "true"
+$env:OAUTH_SIGNING_KEY_BASE64 = "<base64-encoded PEM from above>"
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+export OAUTH_ENABLED=true
+export OAUTH_SIGNING_KEY_BASE64=<base64-encoded PEM from above>
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+export OAUTH_ENABLED=true
+export OAUTH_SIGNING_KEY_BASE64=<base64-encoded PEM from above>
+```
+
+</Tab>
+</Tabs>
+
+Optionally, assign a stable key ID. If omitted, Storyden derives one automatically from the public key:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+$env:OAUTH_SIGNING_KEY_ID = "my-key-2026"
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+export OAUTH_SIGNING_KEY_ID=my-key-2026
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+export OAUTH_SIGNING_KEY_ID=my-key-2026
+```
+
+</Tab>
+</Tabs>
+
+<Callout type="warn">
+  Keep the signing key secret and treat it like a password. Any token signed by
+  this key can authenticate as a Storyden member.
+</Callout>
+
+### Token lifetimes
+
+| Variable                  | Default          | Description                                    |
+| ------------------------- | ---------------- | ---------------------------------------------- |
+| `OAUTH_ACCESS_TOKEN_TTL`  | `15m`            | How long access tokens are valid               |
+| `OAUTH_REFRESH_TOKEN_TTL` | `720h` (30 days) | How long refresh tokens are valid              |
+| `OAUTH_DEVICE_CODE_TTL`   | `10m`            | How long a device code stays open for approval |
+| `OAUTH_DEVICE_POLL_EVERY` | `5s`             | Minimum poll interval for the device flow      |
+
+Short-lived access tokens are intentional. Applications that need long-lived access should request the `offline_access` scope. Storyden issues a refresh token only when the OAuth client is also allowed to use the `refresh_token` grant.
+
+### Consent screen URLs
+
+By default the built-in frontend handles consent. If you run a custom frontend, override these:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+$env:OAUTH_DEVICE_AUTHORISATION_CONSENT_URL = "https://your-custom-frontend.example/oauth/consent"
+$env:OAUTH_AUTHORISATION_CODE_CONSENT_URL = "https://your-custom-frontend.example/oauth/authorize/consent"
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+export OAUTH_DEVICE_AUTHORISATION_CONSENT_URL=https://your-custom-frontend.example/oauth/consent
+export OAUTH_AUTHORISATION_CODE_CONSENT_URL=https://your-custom-frontend.example/oauth/authorize/consent
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+export OAUTH_DEVICE_AUTHORISATION_CONSENT_URL=https://your-custom-frontend.example/oauth/consent
+export OAUTH_AUTHORISATION_CODE_CONSENT_URL=https://your-custom-frontend.example/oauth/authorize/consent
+```
+
+</Tab>
+</Tabs>
+
+## Member permissions
+
+Not every member can authorise OAuth applications. You must grant the `USE_OAUTH_CLIENTS` [permission](/docs/introduction/members/permissions) via a [role](/docs/introduction/members/roles) before a member can approve consent requests. Members with `ADMINISTRATOR` get this automatically.
+
+## Storyden-specific behaviour
+
+Storyden follows OAuth 2.0 and OpenID Connect protocol shapes, with a few implementation details operators should understand:
+
+- The OAuth server is disabled by default. When disabled, discovery and OAuth endpoints return disabled/temporarily unavailable responses.
+- Consent UI is owned by the frontend. The API does not render OAuth consent pages directly; it redirects or returns JSON for the configured frontend route.
+- Access tokens are signed **stateless** JWTs. Revoking a refresh token, deleting a client, or changing account permissions prevents future renewal but does not immediately invalidate already-issued access tokens. Those remain valid until their normal expiry or signing-key rotation.
+- The built-in `storyden-cli` client is created on first device authorisation request. It must request exactly `openid profile offline_access`, then Storyden expands the issued scope to the approving member's current permissions.
+- Explicit-scope clients receive the intersection of requested scopes, client allowed scopes, and current member permissions. If the member has `ADMINISTRATOR`, Storyden treats that as implicitly granting all permission scopes.
+
+## Protocol endpoints
+
+Once enabled, the following protocol endpoints become active:
+
+| Endpoint                                 | Description                                                                       |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
+| `GET  /.well-known/openid-configuration` | OIDC discovery document                                                           |
+| `GET  /api/oauth/jwks`                   | JSON Web Key Set for token verification                                           |
+| `POST /api/oauth/device_authorization`   | Start a device authorisation flow                                                 |
+| `GET  /api/oauth/authorize`              | Start an authorisation code flow                                                  |
+| `POST /api/oauth/token`                  | Exchange authorisation codes, device codes, refresh tokens, or client credentials |
+| `GET  /api/oauth/userinfo`               | Fetch identity claims for a token                                                 |
+
+## Other endpoints
+
+There are two other groups of endpoints related to OAuth.
+
+1. Consent management endpoints used by the frontend to render consent screens and approve/deny requests.
+2. OAuth management endpoints for clients, tokens, and authorisations.
+
+See the [API documentation](/docs/api/auth/OAuthAuthorize) for more information.

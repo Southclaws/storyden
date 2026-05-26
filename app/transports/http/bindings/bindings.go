@@ -88,6 +88,7 @@ type Bindings struct {
 	Links
 	Datagraph
 	Events
+	OAuth
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -123,6 +124,7 @@ func bindingsProviders() fx.Option {
 		NewLinks,
 		NewDatagraph,
 		NewEvents,
+		NewOAuth,
 	)
 }
 
@@ -157,6 +159,7 @@ func mount(
 	router *echo.Echo,
 	auth *Authorisation,
 	si openapi.StrictServerInterface,
+	oauthBinding OAuth,
 ) error {
 	spec, err := openapi.GetSwagger()
 	if err != nil {
@@ -181,6 +184,16 @@ func mount(
 			return true
 		}
 
+		// Skip validation for the OAuth token & device authorisation endpoints
+		// since form data validation in the current openapi lib is broken.
+		if c.Path() == "/api/oauth/token" && c.Request().Method == http.MethodPost {
+			return true
+		}
+
+		if c.Path() == "/api/oauth/device_authorization" && c.Request().Method == http.MethodPost {
+			return true
+		}
+
 		return false
 	}
 
@@ -200,6 +213,14 @@ func mount(
 	})
 
 	openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), apiPathPrefix)
+
+	router.GET("/.well-known/openid-configuration", func(c echo.Context) error {
+		if !oauthBinding.oauth.Enabled() {
+			return c.JSON(http.StatusNotFound, oauthDisabledAPIError())
+		}
+
+		return c.JSON(http.StatusOK, oauthBinding.OAuthDiscovery(c.Request().Context()))
+	})
 
 	router.Use(
 		requestValidatorMiddleware,

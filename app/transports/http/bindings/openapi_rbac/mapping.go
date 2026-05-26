@@ -86,6 +86,38 @@ func (m *Mapping) AdminAccessKeyDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
 
+func (m *Mapping) AdminOAuthClientList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthClientCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthClientGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthClientUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthClientDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthDeviceAuthorisationList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthRefreshTokenList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminOAuthRefreshTokenDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) AdminAccountBanRemove() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSuspensions
 }
@@ -214,6 +246,42 @@ func (m *Mapping) OAuthProviderCallback() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
+func (m *Mapping) OAuthJWKS() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
+func (m *Mapping) OAuthDeviceAuthorisation() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
+func (m *Mapping) OAuthDeviceConsent() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) OAuthDeviceConsentSubmit() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) OAuthAuthorise() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) OAuthAuthoriseConsent() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) OAuthAuthoriseConsentSubmit() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) OAuthToken() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
+func (m *Mapping) OAuthUserInfo() (bool, *rbac.Permission) {
+	return false, nil // Authenticated by bearer token.
+}
+
 func (m *Mapping) WebAuthnRequestCredential() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
@@ -248,6 +316,34 @@ func (m *Mapping) AccessKeyCreate() (bool, *rbac.Permission) {
 
 func (m *Mapping) AccessKeyDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUsePersonalAccessKeys
+}
+
+func (m *Mapping) OAuthRefreshTokenList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthRefreshTokenDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthClientList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthClientCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthClientGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthClientUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) OAuthClientDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
 }
 
 func (m *Mapping) AuthProviderLogout() (bool, *rbac.Permission) {

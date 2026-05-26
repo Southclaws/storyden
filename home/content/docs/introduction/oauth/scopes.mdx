@@ -1,0 +1,119 @@
+---
+title: Scopes & Permissions
+description: How OAuth scopes map to Storyden permissions, and how tokens are granted based on what members are actually allowed to do.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+OAuth scopes are strings that define what access an application is requesting. Storyden's scope system has two layers: standard OIDC scopes for identity, and permission scopes that map directly to Storyden's [RBAC permission system](/docs/introduction/members/permissions).
+
+## Standard OIDC scopes
+
+These are defined by the OpenID Connect specification and control what identity information is included in ID tokens and available at the `/api/oauth/userinfo` endpoint.
+
+| Scope            | What it grants                                                                                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `openid`         | Issues an ID token. Required for any OIDC flow. Without this, no ID token is issued.                                                  |
+| `profile`        | Includes `name` in the ID token, and `name` plus `preferred_username` in the userinfo response                                        |
+| `email`          | Includes `email` and `email_verified` in the ID token and userinfo response                                                           |
+| `offline_access` | Requests refresh-token access. Storyden issues a refresh token only when the client is also allowed to use the `refresh_token` grant. |
+
+`openid` must be included if you want an ID token. The `profile` and `email` scopes only have meaning alongside `openid`.
+
+## Permission scopes
+
+Any [Storyden permission](/docs/introduction/members/permissions) can be used as a scope. The scope name is the permission's ID string, for example:
+
+```
+CREATE_POST
+READ_PUBLISHED_THREADS
+MANAGE_LIBRARY
+UPLOAD_ASSET
+```
+
+When a token is issued, the granted permission scopes are the **intersection** of:
+
+1. The scopes the client is registered to use
+2. The scopes the application requested
+3. The permissions the member actually holds
+
+This means an application can only ever act with a subset of the member's own permissions. It can never escalate. If a member doesn't have `MANAGE_LIBRARY`, no OAuth token for that member will carry it either, regardless of what the application requested.
+
+## Scope policies
+
+The way Storyden permission scopes are granted depends on the client's **scope policy**:
+
+### Inherited-permission clients
+
+The built-in Storyden CLI client (`storyden-cli`) uses the `inherit` scope policy. When it requests exactly `openid profile offline_access` without any permission scopes, the resulting access token inherits the authenticated member's current Storyden permissions.
+
+This policy is useful for operator-controlled tools where the application is intended to act as the approving member. The client still needs the member to approve consent, and the member must have permission to authorise OAuth clients.
+
+On refresh, inherited tokens are capped to the permissions that were present in the previous token and are still held by the member. Promotion after initial authorisation does not silently add new permission scopes to an existing grant.
+
+### Explicit-scope clients
+
+Clients with the `explicit` scope policy must request specific permission scopes. Storyden grants the intersection of:
+
+1. The scopes the client is registered to use
+2. The scopes the application requested
+3. The permissions the member actually holds
+
+An explicit-scope application requesting `CREATE_POST READ_PUBLISHED_THREADS` will only receive those two permissions in its token, even if the approving member is an administrator with far broader access. Administrators can configure any permission scope on clients because `ADMINISTRATOR` implicitly grants all permissions.
+
+## What the access token carries
+
+Access tokens are JWTs signed with RS256. The `scope` claim in the token lists all granted scopes as a space-separated string. When an access token is used to call the API, Storyden checks the token's scope against the required permission for each endpoint.
+
+An access token calling `POST /api/threads` must have `CREATE_POST` in its scope. Without it, the API returns `403 Forbidden`.
+
+## The userinfo endpoint
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "https://your-storyden.example/api/oauth/userinfo" `
+  -Headers @{ Authorization = "Bearer <access_token>" }
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/userinfo \
+  -H 'Authorization: Bearer <access_token>'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/userinfo \
+  -H 'Authorization: Bearer <access_token>'
+```
+
+</Tab>
+</Tabs>
+
+Returns the identity claims corresponding to the scopes the token carries:
+
+```json
+{
+  "sub": "01j2k3...",
+  "name": "Barney",
+  "preferred_username": "barney",
+  "email": "barney@example.com",
+  "email_verified": true
+}
+```
+
+Fields are only present if the corresponding scope was granted. A token with only `openid` returns just `sub`.
+
+## Refresh token scope recalculation
+
+When a refresh token is exchanged for a new access token, granted scopes are recalculated against the member's **current** permissions and the client's current policy.
+
+This keeps tokens from accumulating stale permissions over time. An application might find a permission it previously had is no longer in a refreshed token if the member's role was changed, the client allowed scopes changed, or the grant was refreshed after permission revocation. Already-issued JWT access tokens remain valid until their normal expiry.

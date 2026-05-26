@@ -1,0 +1,11 @@
+{
+    "title": "OAuth 2.0 & OIDC",
+    "description": "Use Storyden as an OAuth 2.0 authorization server and OpenID Connect provider.",
+    "pages": [
+        "index",
+        "device-flow",
+        "authorization-code",
+        "scopes",
+        "clients"
+    ]
+}

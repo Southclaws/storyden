@@ -291,6 +291,24 @@ type Config struct {
 	KeycloakClientSecret string `envconfig:"OAUTH_KEYCLOAK_CLIENT_SECRET"`
 	// The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
 	KeycloakIssuerURL url.URL `envconfig:"OAUTH_KEYCLOAK_ISSUER_URL"`
+	// Enable Storyden's built-in OAuth2/OIDC authorization server endpoints.
+	OAuthEnabled bool `envconfig:"OAUTH_ENABLED"`
+	// Access token lifetime for Storyden OAuth tokens.
+	OAuthAccessTokenTTL time.Duration `default:"15m" envconfig:"OAUTH_ACCESS_TOKEN_TTL"`
+	// Refresh token lifetime for Storyden OAuth tokens.
+	OAuthRefreshTokenTTL time.Duration `default:"720h" envconfig:"OAUTH_REFRESH_TOKEN_TTL"`
+	// Device code lifetime for the OAuth Device Authorization Grant.
+	OAuthDeviceCodeTTL time.Duration `default:"10m" envconfig:"OAUTH_DEVICE_CODE_TTL"`
+	// Poll interval used by device flow responses.
+	OAuthDevicePollEvery time.Duration `default:"5s" envconfig:"OAUTH_DEVICE_POLL_EVERY"`
+	// Frontend URL used by OAuth Device Authorization Grant users to approve or deny consent.
+	OAuthDeviceAuthorisationConsentURL url.URL `envconfig:"OAUTH_DEVICE_AUTHORISATION_CONSENT_URL"`
+	// Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
+	OAuthAuthorisationCodeConsentURL url.URL `envconfig:"OAUTH_AUTHORISATION_CODE_CONSENT_URL"`
+	// Base64-encoded PEM private signing key used for OAuth2/OIDC JWT signing.
+	OAuthSigningKeyBase64 string `envconfig:"OAUTH_SIGNING_KEY_BASE64"`
+	// Optional JWT key ID (kid) for OAuth signing keys.
+	OAuthSigningKeyID string `envconfig:"OAUTH_SIGNING_KEY_ID"`
 
 	// -
 	// SMS

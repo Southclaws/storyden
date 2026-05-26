@@ -1,0 +1,315 @@
+---
+title: OAuth Clients
+description: Register and manage OAuth 2.0 clients, the applications that can request tokens from your Storyden instance.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+An OAuth client represents an application that can initiate authorization flows and receive tokens. Before any application can authenticate via Storyden (other than the built-in CLI), it needs to be registered as a client.
+
+## Public vs confidential clients
+
+[RFC 6749](https://datatracker.ietf.org/doc/html/rfc6749#section-2.1) distinguishes two kinds of clients:
+
+**Public clients** cannot keep a secret. This includes single-page apps running in a browser, CLI tools, and mobile/desktop apps where the application binary is accessible to the user. They use PKCE to prove they're the same application that initiated the flow.
+
+**Confidential clients** run in a controlled environment (like a server) that can keep a secret. They present a `client_secret` when exchanging codes for tokens, providing an additional layer of security beyond PKCE.
+
+Use a confidential client for server-side web applications. Use a public client for everything else.
+
+## Registering a client
+
+OAuth client management is an administrator-controlled feature. Members need the `USE_OAUTH_CLIENTS` [permission](/docs/introduction/members/permissions) to approve OAuth consent requests, but creating and managing OAuth clients requires `ADMINISTRATOR`.
+
+The account-owned client endpoints create confidential clients for integrations owned by the signed-in administrator account:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/auth/oauth/clients" `
+  -Headers @{ Cookie = "storyden_session=..." } `
+  -ContentType "application/json" `
+  -Body '{"name":"My Integration","allowed_scopes":["CREATE_POST","READ_PUBLISHED_THREADS"]}'
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/clients \
+  -H 'Cookie: storyden_session=...' \
+  -H 'Content-Type: application/json' \
+  --data '{"name":"My Integration","allowed_scopes":["CREATE_POST","READ_PUBLISHED_THREADS"]}'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/clients \
+  -H 'Cookie: storyden_session=...' \
+  -H 'Content-Type: application/json' \
+  --data '{"name":"My Integration","allowed_scopes":["CREATE_POST","READ_PUBLISHED_THREADS"]}'
+```
+
+</Tab>
+</Tabs>
+
+The response includes the client ID and the **client secret**, which is shown only once:
+
+```json
+{
+  "client": {
+    "id": "01j2k3...",
+    "client_id": "sdoak_...",
+    "name": "My Integration",
+    "type": "confidential",
+    "scope_policy": "explicit",
+    "redirect_uris": [],
+    "allowed_scopes": ["CREATE_POST", "READ_PUBLISHED_THREADS"],
+    "allowed_grants": ["client_credentials"]
+  },
+  "client_secret": "sdoas_..."
+}
+```
+
+Store the `client_secret` immediately. It can't be retrieved again. If you lose it, delete the client and create a new one.
+
+<Callout type="info">
+  Account-owned clients created this way are **confidential** and only support
+  the `client_credentials` grant. This is suitable for server-to-server
+  integrations where the application acts as itself rather than on behalf of a
+  specific member. For flows that need user consent, contact an administrator to
+  register a client with broader grant type support through the admin OAuth
+  client endpoints.
+</Callout>
+
+## Client credentials grant
+
+A confidential client with the `client_credentials` grant can authenticate as its owning account without an interactive consent step. This is useful for automated server processes:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/oauth/token" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "grant_type=client_credentials&client_id=sdoak_...&client_secret=sdoas_..."
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=client_credentials' \
+  --data 'client_id=sdoak_...' \
+  --data 'client_secret=sdoas_...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=client_credentials' \
+  --data 'client_id=sdoak_...' \
+  --data 'client_secret=sdoas_...'
+```
+
+</Tab>
+</Tabs>
+
+The token is issued with the intersection of the client's allowed scopes and the owning account's current permissions. The scope of the resulting token can be narrowed further:
+
+```
+grant_type=client_credentials&client_id=...&client_secret=...&scope=CREATE_POST
+```
+
+## Managing your clients
+
+### Listing clients
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "https://your-storyden.example/api/auth/oauth/clients" `
+  -Headers @{ Cookie = "storyden_session=..." }
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/clients \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/clients \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+</Tabs>
+
+### Updating a client
+
+Administrators can update the name, redirect URIs, and allowed scopes of their own account-owned clients. Allowed scopes must remain within the administrator account's current permissions. Because `ADMINISTRATOR` implicitly grants all permissions, administrators can configure any Storyden permission scope.
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Patch `
+  -Uri "https://your-storyden.example/api/auth/oauth/clients/{id}" `
+  -Headers @{ Cookie = "storyden_session=..." } `
+  -ContentType "application/json" `
+  -Body '{"name":"Updated Name","redirect_uris":["https://myapp.example/callback","https://myapp.example/oauth"]}'
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS -X PATCH https://your-storyden.example/api/auth/oauth/clients/{id} \
+  -H 'Cookie: storyden_session=...' \
+  -H 'Content-Type: application/json' \
+  --data '{"name":"Updated Name","redirect_uris":["https://myapp.example/callback","https://myapp.example/oauth"]}'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS -X PATCH https://your-storyden.example/api/auth/oauth/clients/{id} \
+  -H 'Cookie: storyden_session=...' \
+  -H 'Content-Type: application/json' \
+  --data '{"name":"Updated Name","redirect_uris":["https://myapp.example/callback","https://myapp.example/oauth"]}'
+```
+
+</Tab>
+</Tabs>
+
+### Deleting a client
+
+Deleting a client prevents new OAuth flows for that client and removes associated pending OAuth records and refresh tokens. Existing JWT access tokens remain valid until their normal expiry.
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Delete `
+  -Uri "https://your-storyden.example/api/auth/oauth/clients/{id}" `
+  -Headers @{ Cookie = "storyden_session=..." }
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS -X DELETE https://your-storyden.example/api/auth/oauth/clients/{id} \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS -X DELETE https://your-storyden.example/api/auth/oauth/clients/{id} \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+</Tabs>
+
+## Managing refresh tokens
+
+Administrators can view refresh tokens associated with their account and revoke individual ones from settings. This is useful for ending renewal access for a specific application without affecting others.
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Get `
+  -Uri "https://your-storyden.example/api/auth/oauth/tokens" `
+  -Headers @{ Cookie = "storyden_session=..." }
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/tokens \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/auth/oauth/tokens \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+</Tabs>
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Delete `
+  -Uri "https://your-storyden.example/api/auth/oauth/tokens/{id}" `
+  -Headers @{ Cookie = "storyden_session=..." }
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS -X DELETE https://your-storyden.example/api/auth/oauth/tokens/{id} \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS -X DELETE https://your-storyden.example/api/auth/oauth/tokens/{id} \
+  -H 'Cookie: storyden_session=...'
+```
+
+</Tab>
+</Tabs>
+
+Revoking a refresh token does not immediately invalidate the corresponding access token. Those expire on their own schedule (default 15 minutes). But the application won't be able to renew access after expiry.
+
+## The Storyden CLI client
+
+The built-in CLI client (`storyden-cli`) is automatically provisioned the first time a device authorisation flow is initiated. It is not owned by a member account and is managed by Storyden itself. Its `inherit` scope policy means tokens issued through it inherit the current permissions of the approving member. See [Scopes: inherited-permission clients](/docs/introduction/oauth/scopes#inherited-permission-clients).
+
+## Security checklist
+
+- Treat `client_secret` values like passwords. Store them in environment variables or a secret manager, never in source control.
+- For redirect-based clients, register only the redirect URIs your application actually uses. The list is validated exactly; wildcards are not supported.
+- Keep allowed scopes minimal. Only include what the application genuinely needs.
+- Rotate client secrets if you suspect compromise by deleting and recreating the client.
+- Administrators can revoke application renewal access from settings by revoking the relevant refresh token.

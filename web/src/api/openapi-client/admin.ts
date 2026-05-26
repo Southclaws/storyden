@@ -32,6 +32,12 @@ import type {
   ModerationActionCreateBody,
   NoContentResponse,
   NotFoundResponse,
+  OAuthClientCreateBody,
+  OAuthClientListOKResponse,
+  OAuthClientOKResponse,
+  OAuthClientUpdateBody,
+  OAuthDeviceAuthorisationListOKResponse,
+  OAuthRefreshTokenListOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -644,6 +650,482 @@ export const useAdminAccessKeyDelete = <
   const swrKey =
     swrOptions?.swrKey ?? getAdminAccessKeyDeleteMutationKey(accessKeyId);
   const swrFn = getAdminAccessKeyDeleteMutationFetcher(accessKeyId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List OAuth clients registered for this instance.
+
+This admin view includes both member-created third-party clients and
+built-in first-party clients. Built-in clients will not be owned by an
+account; their grants and refresh tokens are owned by the approving
+account instead.
+
+ */
+export const adminOAuthClientList = () => {
+  return fetcher<OAuthClientListOKResponse>({
+    url: `/admin/oauth/clients`,
+    method: "GET",
+  });
+};
+
+export const getAdminOAuthClientListKey = () =>
+  [`/admin/oauth/clients`] as const;
+
+export type AdminOAuthClientListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthClientList>>
+>;
+export type AdminOAuthClientListQueryError =
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthClientList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof adminOAuthClientList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAdminOAuthClientListKey() : null));
+  const swrFn = () => adminOAuthClientList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create an OAuth client.
+
+Confidential clients receive a generated secret once at creation time
+and must authenticate to `/oauth/token` when using confidential grants.
+Public clients do not receive or use a client secret.
+
+ */
+export const adminOAuthClientCreate = (
+  oAuthClientCreateBody: OAuthClientCreateBody,
+) => {
+  return fetcher<OAuthClientOKResponse>({
+    url: `/admin/oauth/clients`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthClientCreateBody,
+  });
+};
+
+export const getAdminOAuthClientCreateMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthClientCreateBody },
+  ): Promise<OAuthClientOKResponse> => {
+    return adminOAuthClientCreate(arg);
+  };
+};
+export const getAdminOAuthClientCreateMutationKey = () =>
+  [`/admin/oauth/clients`] as const;
+
+export type AdminOAuthClientCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthClientCreate>>
+>;
+export type AdminOAuthClientCreateMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthClientCreate = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof adminOAuthClientCreate>>,
+    TError,
+    Key,
+    OAuthClientCreateBody,
+    Awaited<ReturnType<typeof adminOAuthClientCreate>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAdminOAuthClientCreateMutationKey();
+  const swrFn = getAdminOAuthClientCreateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Read an OAuth client.
+
+OAuth clients represent application/software identity. They are not the
+same thing as a user authorisation; user-owned authorisations are
+represented by device authorisations, authorisation requests, and
+refresh tokens.
+
+ */
+export const adminOAuthClientGet = (oauthClientId: string) => {
+  return fetcher<OAuthClientOKResponse>({
+    url: `/admin/oauth/clients/${oauthClientId}`,
+    method: "GET",
+  });
+};
+
+export const getAdminOAuthClientGetKey = (oauthClientId: string) =>
+  [`/admin/oauth/clients/${oauthClientId}`] as const;
+
+export type AdminOAuthClientGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthClientGet>>
+>;
+export type AdminOAuthClientGetQueryError =
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthClientGet = <
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthClientGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!oauthClientId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAdminOAuthClientGetKey(oauthClientId) : null));
+  const swrFn = () => adminOAuthClientGet(oauthClientId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update an OAuth client.
+
+Changing allowed grants or scopes only affects future authorisation and
+refresh operations. Already-issued JWT access tokens remain valid until
+their expiry unless their signing key is rotated.
+
+For account-owned clients, allowed permission scopes must be grantable
+by the owning account. An account with `ADMINISTRATOR` may configure any
+Storyden permission scope because `ADMINISTRATOR` implicitly grants all
+permissions.
+
+ */
+export const adminOAuthClientUpdate = (
+  oauthClientId: string,
+  oAuthClientUpdateBody: OAuthClientUpdateBody,
+) => {
+  return fetcher<OAuthClientOKResponse>({
+    url: `/admin/oauth/clients/${oauthClientId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthClientUpdateBody,
+  });
+};
+
+export const getAdminOAuthClientUpdateMutationFetcher = (
+  oauthClientId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthClientUpdateBody },
+  ): Promise<OAuthClientOKResponse> => {
+    return adminOAuthClientUpdate(oauthClientId, arg);
+  };
+};
+export const getAdminOAuthClientUpdateMutationKey = (oauthClientId: string) =>
+  [`/admin/oauth/clients/${oauthClientId}`] as const;
+
+export type AdminOAuthClientUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthClientUpdate>>
+>;
+export type AdminOAuthClientUpdateMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthClientUpdate = <
+  TError =
+    | BadRequestResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminOAuthClientUpdate>>,
+      TError,
+      Key,
+      OAuthClientUpdateBody,
+      Awaited<ReturnType<typeof adminOAuthClientUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminOAuthClientUpdateMutationKey(oauthClientId);
+  const swrFn = getAdminOAuthClientUpdateMutationFetcher(oauthClientId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete an OAuth client.
+
+Deleting a client also removes its pending OAuth records and refresh
+tokens, preventing existing grants from being renewed. Existing JWT
+access tokens are self-contained and remain valid until expiry.
+
+ */
+export const adminOAuthClientDelete = (oauthClientId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/admin/oauth/clients/${oauthClientId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAdminOAuthClientDeleteMutationFetcher = (
+  oauthClientId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return adminOAuthClientDelete(oauthClientId);
+  };
+};
+export const getAdminOAuthClientDeleteMutationKey = (oauthClientId: string) =>
+  [`/admin/oauth/clients/${oauthClientId}`] as const;
+
+export type AdminOAuthClientDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthClientDelete>>
+>;
+export type AdminOAuthClientDeleteMutationError =
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthClientDelete = <
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  oauthClientId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminOAuthClientDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof adminOAuthClientDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminOAuthClientDeleteMutationKey(oauthClientId);
+  const swrFn = getAdminOAuthClientDeleteMutationFetcher(oauthClientId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List OAuth device authorisation records.
+
+Device authorisation records are short-lived records created by the
+OAuth 2.0 Device Authorization Grant. They are not owned by an account
+until a signed-in user claims and approves or denies the user code.
+
+ */
+export const adminOAuthDeviceAuthorisationList = () => {
+  return fetcher<OAuthDeviceAuthorisationListOKResponse>({
+    url: `/admin/oauth/device-authorizations`,
+    method: "GET",
+  });
+};
+
+export const getAdminOAuthDeviceAuthorisationListKey = () =>
+  [`/admin/oauth/device-authorizations`] as const;
+
+export type AdminOAuthDeviceAuthorisationListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthDeviceAuthorisationList>>
+>;
+export type AdminOAuthDeviceAuthorisationListQueryError =
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthDeviceAuthorisationList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof adminOAuthDeviceAuthorisationList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAdminOAuthDeviceAuthorisationListKey() : null));
+  const swrFn = () => adminOAuthDeviceAuthorisationList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List OAuth refresh tokens.
+
+Refresh tokens are account-owned grants for an OAuth client. Revoking a
+refresh token prevents future token renewal, but does not immediately
+invalidate already-issued JWT access tokens.
+
+ */
+export const adminOAuthRefreshTokenList = () => {
+  return fetcher<OAuthRefreshTokenListOKResponse>({
+    url: `/admin/oauth/refresh-tokens`,
+    method: "GET",
+  });
+};
+
+export const getAdminOAuthRefreshTokenListKey = () =>
+  [`/admin/oauth/refresh-tokens`] as const;
+
+export type AdminOAuthRefreshTokenListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthRefreshTokenList>>
+>;
+export type AdminOAuthRefreshTokenListQueryError =
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthRefreshTokenList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof adminOAuthRefreshTokenList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAdminOAuthRefreshTokenListKey() : null));
+  const swrFn = () => adminOAuthRefreshTokenList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Revoke an OAuth refresh token.
+
+This prevents future refresh-token use. Because Storyden OAuth access
+tokens are JWTs, any access token already issued from this grant remains
+valid until its normal expiry.
+
+ */
+export const adminOAuthRefreshTokenDelete = (oauthRefreshTokenId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/admin/oauth/refresh-tokens/${oauthRefreshTokenId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAdminOAuthRefreshTokenDeleteMutationFetcher = (
+  oauthRefreshTokenId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return adminOAuthRefreshTokenDelete(oauthRefreshTokenId);
+  };
+};
+export const getAdminOAuthRefreshTokenDeleteMutationKey = (
+  oauthRefreshTokenId: string,
+) => [`/admin/oauth/refresh-tokens/${oauthRefreshTokenId}`] as const;
+
+export type AdminOAuthRefreshTokenDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminOAuthRefreshTokenDelete>>
+>;
+export type AdminOAuthRefreshTokenDeleteMutationError =
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAdminOAuthRefreshTokenDelete = <
+  TError = ForbiddenResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  oauthRefreshTokenId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminOAuthRefreshTokenDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof adminOAuthRefreshTokenDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAdminOAuthRefreshTokenDeleteMutationKey(oauthRefreshTokenId);
+  const swrFn =
+    getAdminOAuthRefreshTokenDeleteMutationFetcher(oauthRefreshTokenId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

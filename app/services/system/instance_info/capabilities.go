@@ -10,6 +10,7 @@ const (
 	capabilitySemdex      capabilityEnum = `semdex`
 	capabilityEmailClient capabilityEnum = `email_client`
 	capabilitySMSClient   capabilityEnum = `sms_client`
+	capabilityOAuth       capabilityEnum = `oauth`
 )
 
 type Capabilities []Capability

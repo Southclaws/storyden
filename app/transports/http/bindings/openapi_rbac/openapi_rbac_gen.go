@@ -24,6 +24,14 @@ type OperationPermissions interface {
 	AdminAccountBanRemove() (bool, *rbac.Permission)
 	AdminAccessKeyList() (bool, *rbac.Permission)
 	AdminAccessKeyDelete() (bool, *rbac.Permission)
+	AdminOAuthClientList() (bool, *rbac.Permission)
+	AdminOAuthClientCreate() (bool, *rbac.Permission)
+	AdminOAuthClientGet() (bool, *rbac.Permission)
+	AdminOAuthClientUpdate() (bool, *rbac.Permission)
+	AdminOAuthClientDelete() (bool, *rbac.Permission)
+	AdminOAuthDeviceAuthorisationList() (bool, *rbac.Permission)
+	AdminOAuthRefreshTokenList() (bool, *rbac.Permission)
+	AdminOAuthRefreshTokenDelete() (bool, *rbac.Permission)
 	PluginList() (bool, *rbac.Permission)
 	PluginAdd() (bool, *rbac.Permission)
 	PluginGet() (bool, *rbac.Permission)
@@ -55,6 +63,15 @@ type OperationPermissions interface {
 	AuthEmailSignin() (bool, *rbac.Permission)
 	AuthEmailVerify() (bool, *rbac.Permission)
 	OAuthProviderCallback() (bool, *rbac.Permission)
+	OAuthJWKS() (bool, *rbac.Permission)
+	OAuthDeviceAuthorisation() (bool, *rbac.Permission)
+	OAuthDeviceConsent() (bool, *rbac.Permission)
+	OAuthDeviceConsentSubmit() (bool, *rbac.Permission)
+	OAuthAuthorise() (bool, *rbac.Permission)
+	OAuthAuthoriseConsent() (bool, *rbac.Permission)
+	OAuthAuthoriseConsentSubmit() (bool, *rbac.Permission)
+	OAuthToken() (bool, *rbac.Permission)
+	OAuthUserInfo() (bool, *rbac.Permission)
 	WebAuthnRequestCredential() (bool, *rbac.Permission)
 	WebAuthnMakeCredential() (bool, *rbac.Permission)
 	WebAuthnGetAssertion() (bool, *rbac.Permission)
@@ -64,6 +81,13 @@ type OperationPermissions interface {
 	AccessKeyList() (bool, *rbac.Permission)
 	AccessKeyCreate() (bool, *rbac.Permission)
 	AccessKeyDelete() (bool, *rbac.Permission)
+	OAuthRefreshTokenList() (bool, *rbac.Permission)
+	OAuthRefreshTokenDelete() (bool, *rbac.Permission)
+	OAuthClientList() (bool, *rbac.Permission)
+	OAuthClientCreate() (bool, *rbac.Permission)
+	OAuthClientGet() (bool, *rbac.Permission)
+	OAuthClientUpdate() (bool, *rbac.Permission)
+	OAuthClientDelete() (bool, *rbac.Permission)
 	AuthProviderLogout() (bool, *rbac.Permission)
 	AccountManageCreate() (bool, *rbac.Permission)
 	AccountGet() (bool, *rbac.Permission)
@@ -215,6 +239,22 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminAccessKeyList()
 	case "AdminAccessKeyDelete":
 		return optable.AdminAccessKeyDelete()
+	case "AdminOAuthClientList":
+		return optable.AdminOAuthClientList()
+	case "AdminOAuthClientCreate":
+		return optable.AdminOAuthClientCreate()
+	case "AdminOAuthClientGet":
+		return optable.AdminOAuthClientGet()
+	case "AdminOAuthClientUpdate":
+		return optable.AdminOAuthClientUpdate()
+	case "AdminOAuthClientDelete":
+		return optable.AdminOAuthClientDelete()
+	case "AdminOAuthDeviceAuthorisationList":
+		return optable.AdminOAuthDeviceAuthorisationList()
+	case "AdminOAuthRefreshTokenList":
+		return optable.AdminOAuthRefreshTokenList()
+	case "AdminOAuthRefreshTokenDelete":
+		return optable.AdminOAuthRefreshTokenDelete()
 	case "PluginList":
 		return optable.PluginList()
 	case "PluginAdd":
@@ -277,6 +317,24 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AuthEmailVerify()
 	case "OAuthProviderCallback":
 		return optable.OAuthProviderCallback()
+	case "OAuthJWKS":
+		return optable.OAuthJWKS()
+	case "OAuthDeviceAuthorisation":
+		return optable.OAuthDeviceAuthorisation()
+	case "OAuthDeviceConsent":
+		return optable.OAuthDeviceConsent()
+	case "OAuthDeviceConsentSubmit":
+		return optable.OAuthDeviceConsentSubmit()
+	case "OAuthAuthorise":
+		return optable.OAuthAuthorise()
+	case "OAuthAuthoriseConsent":
+		return optable.OAuthAuthoriseConsent()
+	case "OAuthAuthoriseConsentSubmit":
+		return optable.OAuthAuthoriseConsentSubmit()
+	case "OAuthToken":
+		return optable.OAuthToken()
+	case "OAuthUserInfo":
+		return optable.OAuthUserInfo()
 	case "WebAuthnRequestCredential":
 		return optable.WebAuthnRequestCredential()
 	case "WebAuthnMakeCredential":
@@ -295,6 +353,20 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccessKeyCreate()
 	case "AccessKeyDelete":
 		return optable.AccessKeyDelete()
+	case "OAuthRefreshTokenList":
+		return optable.OAuthRefreshTokenList()
+	case "OAuthRefreshTokenDelete":
+		return optable.OAuthRefreshTokenDelete()
+	case "OAuthClientList":
+		return optable.OAuthClientList()
+	case "OAuthClientCreate":
+		return optable.OAuthClientCreate()
+	case "OAuthClientGet":
+		return optable.OAuthClientGet()
+	case "OAuthClientUpdate":
+		return optable.OAuthClientUpdate()
+	case "OAuthClientDelete":
+		return optable.OAuthClientDelete()
 	case "AuthProviderLogout":
 		return optable.AuthProviderLogout()
 	case "AccountManageCreate":

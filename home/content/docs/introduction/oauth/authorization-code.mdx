@@ -1,0 +1,197 @@
+---
+title: Authorization Code Flow
+description: Standard OAuth 2.0 authorization code flow with PKCE for web and native apps.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+import { Step, Steps } from "fumadocs-ui/components/steps";
+
+The Authorization Code Grant ([RFC 6749 §4.1](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1)) is the standard flow for web applications and native apps that can open a browser. It's the flow behind every "Sign in with [Platform]" button you've ever clicked.
+
+Storyden requires **PKCE** (Proof Key for Code Exchange, [RFC 7636](https://datatracker.ietf.org/doc/html/rfc7636)) for all authorization code flows. PKCE prevents an authorization code from being stolen in transit and used by a different application, even for confidential clients. Only the `S256` challenge method is supported.
+
+## How it works
+
+<Steps>
+<Step>
+
+### Generate a PKCE code verifier and challenge
+
+Before starting the flow, the application generates a random **code verifier**: a cryptographically random string between 43 and 128 characters, using only URL-safe characters (`A-Z`, `a-z`, `0-9`, `-`, `.`, `_`, `~`).
+
+```js
+const verifier =
+  crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+// Must be 43-128 URL-safe chars
+```
+
+The **code challenge** is the SHA-256 hash of the verifier, base64url-encoded:
+
+```js
+const challenge = btoa(
+  String.fromCharCode(
+    ...new Uint8Array(
+      await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier)),
+    ),
+  ),
+)
+  .replace(/\+/g, "-")
+  .replace(/\//g, "_")
+  .replace(/=/g, "");
+```
+
+The verifier stays secret inside the application. The challenge is sent to Storyden.
+
+</Step>
+<Step>
+
+### Redirect the user to the authorization endpoint
+
+Send the user's browser to the authorization endpoint with the required parameters:
+
+```
+GET /api/oauth/authorize
+  ?response_type=code
+  &client_id=your-client-id
+  &redirect_uri=https://yourapp.example/callback
+  &scope=openid+profile+email+offline_access
+  &state=random-csrf-token
+  &code_challenge=<base64url-sha256-of-verifier>
+  &code_challenge_method=S256
+```
+
+| Parameter               | Required    | Description                                                                                             |
+| ----------------------- | ----------- | ------------------------------------------------------------------------------------------------------- |
+| `response_type`         | Yes         | Must be `code`                                                                                          |
+| `client_id`             | Yes         | Your registered client ID                                                                               |
+| `redirect_uri`          | Yes         | Must exactly match a URI registered with the client                                                     |
+| `scope`                 | No          | Space-separated list of [scopes](/docs/introduction/oauth/scopes). If omitted, no scopes are requested. |
+| `state`                 | Recommended | Random value you generate; returned unchanged in the callback for CSRF protection                       |
+| `code_challenge`        | Yes         | Base64url-encoded SHA-256 hash of your code verifier                                                    |
+| `code_challenge_method` | Yes         | Must be `S256`                                                                                          |
+
+If the user isn't signed in, they'll be redirected to the login page first and then sent back to this URL.
+
+</Step>
+<Step>
+
+### User approves in the consent screen
+
+Storyden redirects the user to the consent screen, which shows:
+
+- The name of the requesting application
+- The redirect URI they will be sent to after approval
+- The permissions being requested
+
+The redirect URI is shown prominently because it's the most verifiable thing a user can check. It should match where they expect the application to live.
+
+The user clicks **Approve** or **Deny**.
+
+</Step>
+<Step>
+
+### Storyden redirects back with an authorization code
+
+If approved, Storyden redirects the user's browser to the `redirect_uri` with a short-lived authorization code:
+
+```
+https://yourapp.example/callback?code=gquxHwL...&state=random-csrf-token
+```
+
+Your application **must** verify that the `state` matches what it sent in step 2. A mismatch indicates a CSRF attack.
+
+If denied, the redirect includes an error instead:
+
+```
+https://yourapp.example/callback?error=access_denied&state=random-csrf-token
+```
+
+</Step>
+<Step>
+
+### Exchange the code for tokens
+
+Your application's backend exchanges the authorization code for tokens. This request must include the `code_verifier` from step 1. Storyden verifies that its SHA-256 hash matches the `code_challenge` sent in step 2:
+
+<Tabs groupId="user-environment" items={["Windows", "Mac", "Linux"]}>
+<Tab value="Windows">
+
+```powershell
+Invoke-RestMethod `
+  -Method Post `
+  -Uri "https://your-storyden.example/api/oauth/token" `
+  -ContentType "application/x-www-form-urlencoded" `
+  -Body "grant_type=authorization_code&client_id=your-client-id&client_secret=your-client-secret&code=gquxHwL...&redirect_uri=https%3A%2F%2Fyourapp.example%2Fcallback&code_verifier=the-original-verifier"
+```
+
+</Tab>
+<Tab value="Mac">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=authorization_code' \
+  --data 'client_id=your-client-id' \
+  --data 'client_secret=your-client-secret' \
+  --data 'code=gquxHwL...' \
+  --data-urlencode 'redirect_uri=https://yourapp.example/callback' \
+  --data 'code_verifier=the-original-verifier'
+```
+
+</Tab>
+<Tab value="Linux">
+
+```bash
+curl -sS https://your-storyden.example/api/oauth/token \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'grant_type=authorization_code' \
+  --data 'client_id=your-client-id' \
+  --data 'client_secret=your-client-secret' \
+  --data 'code=gquxHwL...' \
+  --data-urlencode 'redirect_uri=https://yourapp.example/callback' \
+  --data 'code_verifier=the-original-verifier'
+```
+
+</Tab>
+</Tabs>
+
+Omit `client_secret` for public clients.
+
+On success:
+
+```json
+{
+  "access_token": "eyJ...",
+  "token_type": "Bearer",
+  "expires_in": 900,
+  "scope": "openid profile email offline_access",
+  "id_token": "eyJ...",
+  "refresh_token": "kP3x..."
+}
+```
+
+The `id_token` is present because `openid` was in the scope. The `refresh_token` is present only if `offline_access` was granted and the client is allowed to use the `refresh_token` grant.
+
+</Step>
+</Steps>
+
+## Authorization codes are short-lived
+
+Authorization codes expire after **10 minutes** and are single-use. If the exchange fails or times out, the user must restart the flow. Your application should complete the exchange promptly after receiving the callback.
+
+## Refreshing access tokens
+
+See [Device Flow: Refreshing an access token](/docs/introduction/oauth/device-flow#refreshing-an-access-token). The refresh token exchange is identical between the two flows.
+
+## Registering a client
+
+Authorization code clients must be registered before they can initiate this flow, and the client must be allowed to use the `authorization_code` grant. If the client needs refresh tokens, it must also be allowed to use the `refresh_token` grant. The `redirect_uri` values sent at authorization time are validated against the list of URIs registered with the client. Any mismatch is rejected.
+
+See [Clients](/docs/introduction/oauth/clients) for how to register one.
+
+## Public vs confidential clients
+
+- **Confidential clients** (server-side web apps) have a `client_secret` and include it in the token exchange. The secret must be kept server-side and never exposed to a browser.
+- **Public clients** (native/mobile apps, SPAs) cannot safely hold a secret. They rely entirely on PKCE for security. The `client_secret` field is omitted.
+
+PKCE is required regardless. For confidential clients it's an extra layer on top of the secret; for public clients it's the only security mechanism protecting the code exchange.

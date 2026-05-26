@@ -28,6 +28,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/email_queue"
 	"github.com/Southclaws/storyden/app/resources/email_queue/email_queue_querier"
+	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -35,6 +36,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
+	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
@@ -53,6 +55,7 @@ type Admin struct {
 	as                account_suspension.Service
 	settingsManager   *settings_manager.Manager
 	akr               *access_key.Repository
+	oauth             *oauthservice.Service
 	actionDispatcher  *action_dispatcher.Service
 	warnings          *warning_manager.Manager
 }
@@ -66,6 +69,7 @@ func NewAdmin(
 	as account_suspension.Service,
 	settingsManager *settings_manager.Manager,
 	akr *access_key.Repository,
+	oauth *oauthservice.Service,
 	actionDispatcher *action_dispatcher.Service,
 	warnings *warning_manager.Manager,
 	router *echo.Echo,
@@ -79,6 +83,7 @@ func NewAdmin(
 		as:                as,
 		settingsManager:   settingsManager,
 		akr:               akr,
+		oauth:             oauth,
 		actionDispatcher:  actionDispatcher,
 		warnings:          warnings,
 	}
@@ -612,6 +617,173 @@ func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminA
 	}
 
 	return openapi.NoContentResponse{}, nil
+}
+
+func (i *Admin) AdminOAuthClientList(ctx context.Context, request openapi.AdminOAuthClientListRequestObject) (openapi.AdminOAuthClientListResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	clients, err := i.oauth.ListClients(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthClientList200JSONResponse{
+		OAuthClientListOKJSONResponse: openapi.OAuthClientListOKJSONResponse(openapi.OAuthClientListResult{
+			Clients: serialiseOAuthClientList(clients),
+		}),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthClientCreate(ctx context.Context, request openapi.AdminOAuthClientCreateRequestObject) (openapi.AdminOAuthClientCreateResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if request.Body == nil {
+		return openapi.AdminOAuthClientCreate400Response{}, nil
+	}
+
+	permissions, err := session.GetPermissions(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	clientType, err := oauthresource.NewClientType(string(request.Body.Type))
+	if err != nil {
+		return openapi.AdminOAuthClientCreate400Response{}, nil
+	}
+
+	client, err := i.oauth.CreateClient(ctx, oauthservice.ClientCreate{
+		AccountID:          account.AccountID(deserialiseID(request.Body.AccountId)),
+		AccountPermissions: permissions,
+		ClientID:           request.Body.ClientId,
+		ClientSecretHash:   opt.NewPtr(request.Body.ClientSecretHash),
+		Name:               request.Body.Name,
+		Type:               clientType,
+		ScopePolicy:        optionalOAuthScopePolicy(request.Body.ScopePolicy),
+		RedirectURIs:       request.Body.RedirectUris,
+		AllowedScopes:      request.Body.AllowedScopes,
+		AllowedGrants:      request.Body.AllowedGrants,
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthClientCreate200JSONResponse{
+		OAuthClientOKJSONResponse: openapi.OAuthClientOKJSONResponse(serialiseOAuthClient(client)),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthClientGet(ctx context.Context, request openapi.AdminOAuthClientGetRequestObject) (openapi.AdminOAuthClientGetResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	client, err := i.oauth.GetClient(ctx, oauthresource.ClientID(deserialiseID(request.OauthClientId)))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthClientGet200JSONResponse{
+		OAuthClientOKJSONResponse: openapi.OAuthClientOKJSONResponse(serialiseOAuthClient(client)),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthClientUpdate(ctx context.Context, request openapi.AdminOAuthClientUpdateRequestObject) (openapi.AdminOAuthClientUpdateResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if request.Body == nil {
+		return openapi.AdminOAuthClientUpdate400Response{}, nil
+	}
+
+	client, err := i.oauth.UpdateClient(ctx, oauthresource.ClientID(deserialiseID(request.OauthClientId)), oauthservice.ClientUpdate{
+		Name:             opt.NewPtr(request.Body.Name),
+		ClientSecretHash: opt.NewPtr(request.Body.ClientSecretHash),
+		ScopePolicy:      optionalOAuthScopePolicy(request.Body.ScopePolicy),
+		RedirectURIs:     opt.NewPtr(request.Body.RedirectUris),
+		AllowedScopes:    opt.NewPtr(request.Body.AllowedScopes),
+		AllowedGrants:    opt.NewPtr(request.Body.AllowedGrants),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthClientUpdate200JSONResponse{
+		OAuthClientOKJSONResponse: openapi.OAuthClientOKJSONResponse(serialiseOAuthClient(client)),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthClientDelete(ctx context.Context, request openapi.AdminOAuthClientDeleteRequestObject) (openapi.AdminOAuthClientDeleteResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := i.oauth.DeleteClient(ctx, oauthresource.ClientID(deserialiseID(request.OauthClientId))); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthClientDelete204Response{}, nil
+}
+
+func (i *Admin) AdminOAuthDeviceAuthorisationList(ctx context.Context, request openapi.AdminOAuthDeviceAuthorisationListRequestObject) (openapi.AdminOAuthDeviceAuthorisationListResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	devices, err := i.oauth.ListDeviceAuthorisations(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthDeviceAuthorisationList200JSONResponse{
+		OAuthDeviceAuthorisationListOKJSONResponse: openapi.OAuthDeviceAuthorisationListOKJSONResponse(openapi.OAuthDeviceAuthorisationListResult{
+			DeviceAuthorisations: serialiseOAuthDeviceAuthorisationList(devices),
+		}),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthRefreshTokenList(ctx context.Context, request openapi.AdminOAuthRefreshTokenListRequestObject) (openapi.AdminOAuthRefreshTokenListResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tokens, err := i.oauth.ListRefreshTokens(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthRefreshTokenList200JSONResponse{
+		OAuthRefreshTokenListOKJSONResponse: openapi.OAuthRefreshTokenListOKJSONResponse(openapi.OAuthRefreshTokenListResult{
+			Tokens: serialiseOAuthRefreshTokenList(tokens),
+		}),
+	}, nil
+}
+
+func (i *Admin) AdminOAuthRefreshTokenDelete(ctx context.Context, request openapi.AdminOAuthRefreshTokenDeleteRequestObject) (openapi.AdminOAuthRefreshTokenDeleteResponseObject, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := i.oauth.RevokeRefreshToken(ctx, oauthresource.RefreshTokenID(deserialiseID(request.OauthRefreshTokenId))); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AdminOAuthRefreshTokenDelete204Response{}, nil
+}
+
+func optionalOAuthScopePolicy(in *openapi.OAuthClientScopePolicy) opt.Optional[oauthresource.ScopePolicy] {
+	if in == nil {
+		return opt.NewEmpty[oauthresource.ScopePolicy]()
+	}
+
+	v, err := oauthresource.NewScopePolicy(string(*in))
+	if err != nil {
+		return opt.NewEmpty[oauthresource.ScopePolicy]()
+	}
+
+	return opt.New(v)
 }
 
 func serialiseSettings(in *settings.Settings, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {

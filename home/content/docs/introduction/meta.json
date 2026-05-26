@@ -25,6 +25,7 @@
         "---Extending---",
         "mcp",
         "api",
+        "oauth",
         "plugins",
         "custom-frontend"
     ]

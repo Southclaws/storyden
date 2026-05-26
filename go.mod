@@ -1,6 +1,6 @@
 module github.com/Southclaws/storyden
 
-go 1.25.3
+go 1.25.8
 
 tool (
 	entgo.io/ent/cmd/ent
@@ -22,6 +22,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.6.0
 	github.com/samber/lo v1.52.0
+	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/dig v1.19.0
 	go.uber.org/fx v1.24.0
@@ -118,7 +119,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
-	github.com/bits-and-blooms/bitset v1.22.0 // indirect
+	github.com/bits-and-blooms/bitset v1.24.4 // indirect
 	github.com/blevesearch/bleve_index_api v1.2.11 // indirect
 	github.com/blevesearch/geo v0.2.4 // indirect
 	github.com/blevesearch/go-faiss v1.0.26 // indirect
@@ -141,6 +142,7 @@ require (
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20250909171706-0a81c39169bc // indirect
 	github.com/ebitengine/purego v0.9.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -192,7 +194,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
-	github.com/mattn/go-runewidth v0.0.16 // indirect
+	github.com/mattn/go-runewidth v0.0.23 // indirect
 	github.com/minio/crc64nvme v1.0.2 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
@@ -219,7 +221,6 @@ require (
 	github.com/speakeasy-api/jsonpath v0.6.2 // indirect
 	github.com/speakeasy-api/openapi-overlay v0.10.3 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
-	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tetratelabs/wazero v1.9.0 // indirect
@@ -301,7 +302,7 @@ require (
 	golang.org/x/crypto v0.49.0
 	golang.org/x/mod v0.33.0 // indirect
 	golang.org/x/net v0.52.0
-	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/text v0.35.0
 	golang.org/x/time v0.13.0 // indirect
 	google.golang.org/protobuf v1.36.11

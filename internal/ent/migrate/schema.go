@@ -742,6 +742,228 @@ var (
 			},
 		},
 	}
+	// OauthAuthorisationCodesColumns holds the columns for the "oauth_authorisation_codes" table.
+	OauthAuthorisationCodesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "code_hash", Type: field.TypeString},
+		{Name: "redirect_uri", Type: field.TypeString},
+		{Name: "scope", Type: field.TypeString},
+		{Name: "code_challenge", Type: field.TypeString},
+		{Name: "code_challenge_method", Type: field.TypeEnum, Enums: []string{"S256"}, Default: "S256"},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "consumed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "client_id", Type: field.TypeString, Size: 20},
+	}
+	// OauthAuthorisationCodesTable holds the schema information for the "oauth_authorisation_codes" table.
+	OauthAuthorisationCodesTable = &schema.Table{
+		Name:       "oauth_authorisation_codes",
+		Columns:    OauthAuthorisationCodesColumns,
+		PrimaryKey: []*schema.Column{OauthAuthorisationCodesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_authorisation_codes_accounts_oauth_authorisation_codes",
+				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[9]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_authorisation_codes_oauth_clients_authorisation_codes",
+				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[10]},
+				RefColumns: []*schema.Column{OauthClientsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "oauthauthorisationcode_code_hash",
+				Unique:  true,
+				Columns: []*schema.Column{OauthAuthorisationCodesColumns[2]},
+			},
+		},
+	}
+	// OauthAuthorisationRequestsColumns holds the columns for the "oauth_authorisation_requests" table.
+	OauthAuthorisationRequestsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "request_id_hash", Type: field.TypeString},
+		{Name: "redirect_uri", Type: field.TypeString},
+		{Name: "scope", Type: field.TypeString},
+		{Name: "state", Type: field.TypeString, Nullable: true},
+		{Name: "code_challenge", Type: field.TypeString},
+		{Name: "code_challenge_method", Type: field.TypeEnum, Enums: []string{"S256"}, Default: "S256"},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "approved_at", Type: field.TypeTime, Nullable: true},
+		{Name: "denied_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "client_id", Type: field.TypeString, Size: 20},
+	}
+	// OauthAuthorisationRequestsTable holds the schema information for the "oauth_authorisation_requests" table.
+	OauthAuthorisationRequestsTable = &schema.Table{
+		Name:       "oauth_authorisation_requests",
+		Columns:    OauthAuthorisationRequestsColumns,
+		PrimaryKey: []*schema.Column{OauthAuthorisationRequestsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_authorisation_requests_accounts_oauth_authorisation_requests",
+				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[11]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_authorisation_requests_oauth_clients_authorisation_requests",
+				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[12]},
+				RefColumns: []*schema.Column{OauthClientsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "oauthauthorisationrequest_request_id_hash",
+				Unique:  true,
+				Columns: []*schema.Column{OauthAuthorisationRequestsColumns[2]},
+			},
+		},
+	}
+	// OauthClientsColumns holds the columns for the "oauth_clients" table.
+	OauthClientsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "client_id", Type: field.TypeString, Unique: true},
+		{Name: "client_secret_hash", Type: field.TypeString, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"public", "confidential"}, Default: "public"},
+		{Name: "scope_policy", Type: field.TypeEnum, Enums: []string{"explicit", "inherit"}, Default: "explicit"},
+		{Name: "redirect_uris", Type: field.TypeJSON},
+		{Name: "allowed_scopes", Type: field.TypeJSON},
+		{Name: "allowed_grants", Type: field.TypeJSON},
+		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// OauthClientsTable holds the schema information for the "oauth_clients" table.
+	OauthClientsTable = &schema.Table{
+		Name:       "oauth_clients",
+		Columns:    OauthClientsColumns,
+		PrimaryKey: []*schema.Column{OauthClientsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_clients_accounts_oauth_clients",
+				Columns:    []*schema.Column{OauthClientsColumns[11]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "oauthclient_client_id",
+				Unique:  true,
+				Columns: []*schema.Column{OauthClientsColumns[3]},
+			},
+		},
+	}
+	// OauthDeviceAuthorisationsColumns holds the columns for the "oauth_device_authorisations" table.
+	OauthDeviceAuthorisationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "device_code_hash", Type: field.TypeString},
+		{Name: "user_code_hash", Type: field.TypeString},
+		{Name: "user_code_display", Type: field.TypeString},
+		{Name: "scope", Type: field.TypeString},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "poll_interval_seconds", Type: field.TypeInt, Default: 5},
+		{Name: "last_polled_at", Type: field.TypeTime, Nullable: true},
+		{Name: "approved_at", Type: field.TypeTime, Nullable: true},
+		{Name: "denied_at", Type: field.TypeTime, Nullable: true},
+		{Name: "consumed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "claimed_by_account_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "approved_by_account_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "client_id", Type: field.TypeString, Size: 20},
+	}
+	// OauthDeviceAuthorisationsTable holds the schema information for the "oauth_device_authorisations" table.
+	OauthDeviceAuthorisationsTable = &schema.Table{
+		Name:       "oauth_device_authorisations",
+		Columns:    OauthDeviceAuthorisationsColumns,
+		PrimaryKey: []*schema.Column{OauthDeviceAuthorisationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_device_authorisations_accounts_claimed_oauth_device_authorisations",
+				Columns:    []*schema.Column{OauthDeviceAuthorisationsColumns[12]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_device_authorisations_accounts_approved_oauth_device_authorisations",
+				Columns:    []*schema.Column{OauthDeviceAuthorisationsColumns[13]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_device_authorisations_oauth_clients_device_authorisations",
+				Columns:    []*schema.Column{OauthDeviceAuthorisationsColumns[14]},
+				RefColumns: []*schema.Column{OauthClientsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "oauthdeviceauthorisation_device_code_hash",
+				Unique:  true,
+				Columns: []*schema.Column{OauthDeviceAuthorisationsColumns[2]},
+			},
+			{
+				Name:    "oauthdeviceauthorisation_user_code_hash",
+				Unique:  false,
+				Columns: []*schema.Column{OauthDeviceAuthorisationsColumns[3]},
+			},
+		},
+	}
+	// OauthRefreshTokensColumns holds the columns for the "oauth_refresh_tokens" table.
+	OauthRefreshTokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "token_hash", Type: field.TypeString},
+		{Name: "scope", Type: field.TypeString},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "revoked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_used_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "client_id", Type: field.TypeString, Size: 20},
+		{Name: "replaced_by_token_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// OauthRefreshTokensTable holds the schema information for the "oauth_refresh_tokens" table.
+	OauthRefreshTokensTable = &schema.Table{
+		Name:       "oauth_refresh_tokens",
+		Columns:    OauthRefreshTokensColumns,
+		PrimaryKey: []*schema.Column{OauthRefreshTokensColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "oauth_refresh_tokens_accounts_oauth_refresh_tokens",
+				Columns:    []*schema.Column{OauthRefreshTokensColumns[7]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "oauth_refresh_tokens_oauth_clients_refresh_tokens",
+				Columns:    []*schema.Column{OauthRefreshTokensColumns[8]},
+				RefColumns: []*schema.Column{OauthClientsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "oauth_refresh_tokens_oauth_refresh_tokens_replaced_by",
+				Columns:    []*schema.Column{OauthRefreshTokensColumns[9]},
+				RefColumns: []*schema.Column{OauthRefreshTokensColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "oauthrefreshtoken_token_hash",
+				Unique:  true,
+				Columns: []*schema.Column{OauthRefreshTokensColumns[2]},
+			},
+		},
+	}
 	// PluginsColumns holds the columns for the "plugins" table.
 	PluginsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1384,6 +1606,11 @@ var (
 		ModerationNotesTable,
 		NodesTable,
 		NotificationsTable,
+		OauthAuthorisationCodesTable,
+		OauthAuthorisationRequestsTable,
+		OauthClientsTable,
+		OauthDeviceAuthorisationsTable,
+		OauthRefreshTokensTable,
 		PluginsTable,
 		PostsTable,
 		PostReadsTable,
@@ -1448,6 +1675,17 @@ func init() {
 	NodesTable.ForeignKeys[4].RefTable = PropertySchemasTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
+	OauthAuthorisationCodesTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthAuthorisationCodesTable.ForeignKeys[1].RefTable = OauthClientsTable
+	OauthAuthorisationRequestsTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthAuthorisationRequestsTable.ForeignKeys[1].RefTable = OauthClientsTable
+	OauthClientsTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthDeviceAuthorisationsTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthDeviceAuthorisationsTable.ForeignKeys[1].RefTable = AccountsTable
+	OauthDeviceAuthorisationsTable.ForeignKeys[2].RefTable = OauthClientsTable
+	OauthRefreshTokensTable.ForeignKeys[0].RefTable = AccountsTable
+	OauthRefreshTokensTable.ForeignKeys[1].RefTable = OauthClientsTable
+	OauthRefreshTokensTable.ForeignKeys[2].RefTable = OauthRefreshTokensTable
 	PluginsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable

@@ -6,6 +6,7 @@ package session_cookie
 import (
 	"context"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -106,16 +107,29 @@ func (j *Jar) tryFromHeader(r *http.Request) (context.Context, bool) {
 	}
 
 	// The header should be in the format "Bearer <token>".
-	if len(authHeader) < 7 || authHeader[:7] != "Bearer " {
+	raw, ok := strings.CutPrefix(authHeader, "Bearer ")
+	if !ok {
 		return r.Context(), false
 	}
 
-	ctx, err := j.validator.ValidateAccessKeyToken(r.Context(), authHeader[7:])
+	var (
+		ctx context.Context
+		err error
+	)
+	if looksLikeJWT(raw) {
+		ctx, err = j.validator.ValidateOAuthToken(r.Context(), raw)
+	} else {
+		ctx, err = j.validator.ValidateAccessKeyToken(r.Context(), raw)
+	}
 	if err != nil {
 		return r.Context(), false
 	}
 
 	return ctx, true
+}
+
+func looksLikeJWT(raw string) bool {
+	return strings.HasPrefix(raw, "ey")
 }
 
 func (j *Jar) withDefaultRoles(r *http.Request) context.Context {

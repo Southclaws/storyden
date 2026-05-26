@@ -69,6 +69,21 @@ type Node func(*sql.Selector)
 // Notification is the predicate function for notification builders.
 type Notification func(*sql.Selector)
 
+// OAuthAuthorisationCode is the predicate function for oauthauthorisationcode builders.
+type OAuthAuthorisationCode func(*sql.Selector)
+
+// OAuthAuthorisationRequest is the predicate function for oauthauthorisationrequest builders.
+type OAuthAuthorisationRequest func(*sql.Selector)
+
+// OAuthClient is the predicate function for oauthclient builders.
+type OAuthClient func(*sql.Selector)
+
+// OAuthDeviceAuthorisation is the predicate function for oauthdeviceauthorisation builders.
+type OAuthDeviceAuthorisation func(*sql.Selector)
+
+// OAuthRefreshToken is the predicate function for oauthrefreshtoken builders.
+type OAuthRefreshToken func(*sql.Selector)
+
 // Plugin is the predicate function for plugin builders.
 type Plugin func(*sql.Selector)
 
