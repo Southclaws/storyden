@@ -21,6 +21,12 @@ type Provider struct {
 	logger   *slog.Logger
 }
 
+var backendRoutePrefixes = []string{
+	"/api",
+	"/.well-known",
+	"/mcp",
+}
+
 func New(
 	cfg config.Config,
 	logger *slog.Logger,
@@ -96,7 +102,7 @@ func (p *Provider) WithFrontendProxy() func(next http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, "/api") {
+			if isBackendRoute(r.URL.Path) {
 				next.ServeHTTP(w, r)
 			} else {
 				if p.frontend == nil {
@@ -122,6 +128,16 @@ func (p *Provider) WithFrontendProxy() func(next http.Handler) http.Handler {
 			}
 		})
 	}
+}
+
+func isBackendRoute(path string) bool {
+	for _, prefix := range backendRoutePrefixes {
+		if path == prefix || strings.HasPrefix(path, prefix+"/") {
+			return true
+		}
+	}
+
+	return false
 }
 
 func Build() fx.Option {

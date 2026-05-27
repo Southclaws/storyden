@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
@@ -33,6 +34,7 @@ func MountMCP(
 	// NOTE: This is duplicated from the OpenAPI router because there's an issue
 	// in the OpenAPI codegen that makes mounting it on a sub-router difficult.
 	// Eventually, when that's fixed, middleware can be declared once at root.
+	ri *headers.Middleware,
 	co *origin.Middleware,
 	lo *reqlog.Middleware,
 	cj *session_cookie.Jar,
@@ -65,6 +67,7 @@ func MountMCP(
 		)
 
 		applied := httpserver.Apply(sse,
+			ri.WithHeaderContext(),
 			co.WithCORS(),
 			lo.WithLogger(),
 			cj.WithAuth(),

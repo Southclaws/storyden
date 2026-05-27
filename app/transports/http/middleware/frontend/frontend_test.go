@@ -54,35 +54,101 @@ func TestWithFrontendProxyPreservesIncomingXFF(t *testing.T) {
 	)
 }
 
-func TestWithFrontendProxyBypassesAPIRequests(t *testing.T) {
+func TestWithFrontendProxyBypassesBackendRoutes(t *testing.T) {
 	t.Parallel()
 
-	upstreamCalled := false
-	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		upstreamCalled = true
-		w.WriteHeader(http.StatusNoContent)
-	}))
-	defer upstream.Close()
+	testCases := []struct {
+		name string
+		path string
+	}{
+		{name: "api", path: "/api/version"},
+		{name: "api exact", path: "/api"},
+		{name: "well known", path: "/.well-known/openid-configuration"},
+		{name: "well known exact", path: "/.well-known"},
+		{name: "mcp", path: "/mcp/sse"},
+		{name: "mcp exact", path: "/mcp"},
+	}
 
-	frontendProxyURL, err := url.Parse(upstream.URL)
-	require.NoError(t, err)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 
-	p := New(
-		config.Config{FrontendProxy: *frontendProxyURL},
-		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		http.NewServeMux(),
-		nil,
-		nil,
-	)
+			upstreamCalled := false
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upstreamCalled = true
+				w.WriteHeader(http.StatusNoContent)
+			}))
+			defer upstream.Close()
 
-	handler := p.WithFrontendProxy()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusAccepted)
-	}))
+			frontendProxyURL, err := url.Parse(upstream.URL)
+			require.NoError(t, err)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/version", nil)
-	rr := httptest.NewRecorder()
-	handler.ServeHTTP(rr, req)
+			p := New(
+				config.Config{FrontendProxy: *frontendProxyURL},
+				slog.New(slog.NewTextHandler(io.Discard, nil)),
+				http.NewServeMux(),
+				nil,
+				nil,
+			)
 
-	assert.Equal(t, http.StatusAccepted, rr.Code)
-	assert.False(t, upstreamCalled)
+			handler := p.WithFrontendProxy()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusAccepted)
+			}))
+
+			req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+			rr := httptest.NewRecorder()
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusAccepted, rr.Code)
+			assert.False(t, upstreamCalled)
+		})
+	}
+}
+
+func TestWithFrontendProxyDoesNotBypassSimilarPrefixes(t *testing.T) {
+	t.Parallel()
+
+	testCases := []struct {
+		name string
+		path string
+	}{
+		{name: "api prefix only", path: "/apix"},
+		{name: "well known prefix only", path: "/.well-knownness"},
+		{name: "mcp prefix only", path: "/mcproxy"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			upstreamCalled := false
+			upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				upstreamCalled = true
+				w.WriteHeader(http.StatusNoContent)
+			}))
+			defer upstream.Close()
+
+			frontendProxyURL, err := url.Parse(upstream.URL)
+			require.NoError(t, err)
+
+			p := New(
+				config.Config{FrontendProxy: *frontendProxyURL},
+				slog.New(slog.NewTextHandler(io.Discard, nil)),
+				http.NewServeMux(),
+				nil,
+				nil,
+			)
+
+			handler := p.WithFrontendProxy()(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusAccepted)
+			}))
+
+			req := httptest.NewRequest(http.MethodGet, tc.path, nil)
+			rr := httptest.NewRecorder()
+			handler.ServeHTTP(rr, req)
+
+			assert.Equal(t, http.StatusNoContent, rr.Code)
+			assert.True(t, upstreamCalled)
+		})
+	}
 }
