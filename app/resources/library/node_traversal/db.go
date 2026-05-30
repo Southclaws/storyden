@@ -131,44 +131,25 @@ type subtreeRow struct {
 	Depth          int                   `db:"depth"`
 }
 
-func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, fs ...Filter) ([]*library.Node, error) {
-	f := filters{}
-	for _, fn := range fs {
-		fn(&f)
-	}
-
-	// NOTE: i fucking hate writing raw sql into source code...
-
+func buildSubtreeQuery(id opt.Optional[library.NodeID], f filters, rebind func(string) string) (string, []interface{}) {
 	var rootPredicate string
 	predicates := []string{}
 	args := []interface{}{}
-	argOffset := 0
-
-	getPlaceholder := func() string {
-		argOffset += 1
-		return fmt.Sprintf("$%d", argOffset)
-	}
 
 	if parentNodeID, ok := id.Get(); ok {
 		args = append(args, parentNodeID.String())
-		rootPredicate = fmt.Sprintf("id = cast(%s as text)", getPlaceholder())
+		rootPredicate = "id = cast(? as text)"
 	} else {
 		rootPredicate = "parent_node_id is null"
 	}
 
 	if f.rootAccountHandleFilter != nil {
-		predicates = append(predicates, fmt.Sprintf(
-			"a.handle = %s",
-			getPlaceholder()))
-
+		predicates = append(predicates, "a.handle = ?")
 		args = append(args, *f.rootAccountHandleFilter)
 	}
 
 	if f.depth != nil {
-		predicates = append(predicates, fmt.Sprintf(
-			"depth <= %s",
-			getPlaceholder()))
-
+		predicates = append(predicates, "depth <= ?")
 		args = append(args, *f.depth)
 	}
 
@@ -176,7 +157,17 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 	if len(predicates) > 0 {
 		additional = "where " + strings.Join(predicates, " AND ")
 	}
-	q := fmt.Sprintf(ddl, rootPredicate, additional)
+
+	return rebind(fmt.Sprintf(ddl, rootPredicate, additional)), args
+}
+
+func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, fs ...Filter) ([]*library.Node, error) {
+	f := filters{}
+	for _, fn := range fs {
+		fn(&f)
+	}
+
+	q, args := buildSubtreeQuery(id, f, d.raw.Rebind)
 
 	r, err := d.raw.QueryxContext(ctx, q, args...)
 	if err != nil {
