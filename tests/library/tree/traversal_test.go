@@ -154,6 +154,31 @@ func TestNodesTreeQuerying(t *testing.T) {
 				}
 			})
 
+			t.Run("query_flat_with_depth", func(t *testing.T) {
+				r := require.New(t)
+
+				depth := "10"
+				format := openapi.NodeListParamsFormatFlat
+				response, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
+					Depth:  &depth,
+					Format: &format,
+				})
+				tests.Ok(t, err, response)
+
+				ids := dt.Map(response.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
+				expectedIDs := []string{
+					node1.JSON200.Id,
+					node2.JSON200.Id,
+					node3.JSON200.Id,
+					node4.JSON200.Id,
+				}
+				matchedFixtureIDs := lo.Filter(ids, func(id string, _ int) bool {
+					return lo.Contains(expectedIDs, id)
+				})
+
+				r.ElementsMatch(expectedIDs, matchedFixtureIDs, "flat depth query must contain exactly this test subtree")
+			})
+
 			t.Run("query_node1_with_children", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
