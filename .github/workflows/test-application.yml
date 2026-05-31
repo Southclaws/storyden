@@ -36,14 +36,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: yarn
-          cache-dependency-path: web/yarn.lock
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
 
       - uses: actions/cache@v4
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('web/yarn.lock') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('web/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
@@ -51,11 +51,11 @@ jobs:
         with:
           path: |
             web/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('web/yarn.lock') }}-${{ hashFiles('web/**/*.js', 'web/**/*.jsx', 'web/**/*.ts', 'web/**/*.tsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('web/pnpm-lock.yaml') }}-${{ hashFiles('web/**/*.js', 'web/**/*.jsx', 'web/**/*.ts', 'web/**/*.tsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('web/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('web/pnpm-lock.yaml') }}-
 
-      - run: yarn install
+      - run: pnpm install --frozen-lockfile
         working-directory: web
 
       - run: npx playwright install --with-deps
