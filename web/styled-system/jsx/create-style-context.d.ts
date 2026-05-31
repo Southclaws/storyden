@@ -1,7 +1,7 @@
 /* eslint-disable */
 import type { SlotRecipeRuntimeFn, RecipeVariantProps } from '../types/recipe';
 import type { JsxHTMLProps, JsxStyleProps, Assign } from '../types/system-types';
-import type { JsxFactoryOptions, ComponentProps } from '../types/jsx';
+import type { JsxFactoryOptions, ComponentProps, DataAttrs, AsProps } from '../types/jsx';
 import type { ComponentType, ElementType } from 'react'
 
 interface UnstyledProps {
@@ -19,11 +19,11 @@ type SlotRecipe = SvaFn | SlotRecipeFn
 type InferSlot<R extends SlotRecipe> = R extends SlotRecipeFn ? R['__slot'] : R extends SvaFn<infer S> ? S : never
 
 interface WithProviderOptions<P = {}> {
-  defaultProps?: Partial<P> | undefined
+  defaultProps?: (Partial<P> & DataAttrs) | undefined
 }
 
 type StyleContextProvider<T extends ElementType, R extends SlotRecipe> = ComponentType<
-  JsxHTMLProps<ComponentProps<T> & UnstyledProps, Assign<RecipeVariantProps<R>, JsxStyleProps>>
+  JsxHTMLProps<ComponentProps<T> & UnstyledProps & AsProps, Assign<RecipeVariantProps<R>, JsxStyleProps>>
 >
 
 type StyleContextRootProvider<T extends ElementType, R extends SlotRecipe> = ComponentType<
@@ -31,7 +31,7 @@ type StyleContextRootProvider<T extends ElementType, R extends SlotRecipe> = Com
 >
 
 type StyleContextConsumer<T extends ElementType> = ComponentType<
-  JsxHTMLProps<ComponentProps<T> & UnstyledProps, JsxStyleProps>
+  JsxHTMLProps<ComponentProps<T> & UnstyledProps & AsProps, JsxStyleProps>
 >
 
 export interface StyleContext<R extends SlotRecipe> {

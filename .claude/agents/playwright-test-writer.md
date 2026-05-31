@@ -39,10 +39,10 @@ By default, with no flags, this will run all Playwright tests. You can pass argu
 If you change the frontend code, you MUST rebuild it with:
 
 ```
-cd web ; yarn build
+cd web ; pnpm build
 ```
 
-Because the test script executes `yarn start`, not `yarn dev`.
+Because the test script executes `pnpm start`, not `pnpm dev`.
 
 ## Testing Best Practices You Must Follow
 

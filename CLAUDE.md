@@ -20,7 +20,6 @@ Storyden follows a strict zero service dependencies production-ready deployment 
 ### Core Components
 
 - **Backend (Go)**: Rough "clean architecture" not strict or silly levels of adherence though
-
   - `cmd/backend/main.go`: Main application entry point
   - `app/`: Core application logic divided into resources, services, and transports
     - `app/resources`: Persistence and data structures/data models. NEVER imports from services or transports.
@@ -29,7 +28,6 @@ Storyden follows a strict zero service dependencies production-ready deployment 
   - `internal/`: Infrastructure components (database, pubsub, config, etc.) NEVER imports anything from `./app/` completely isolated from business logic.
 
 - **Frontend (Next.js)**: Located in `web/` directory
-
   - Built with Next.js 15, React 19, TypeScript
   - Uses Park UI components and Panda CSS
   - API client generated from OpenAPI specification
@@ -58,7 +56,7 @@ Storyden follows a strict zero service dependencies production-ready deployment 
 ### Commands you MUST NEVER RUN
 
 ```bash
-yarn dev
+pnpm dev
 go run
 task release
 ```
@@ -96,13 +94,13 @@ task generate:db
 cd web
 
 # Install dependencies
-yarn install
+pnpm install
 
 # Check types
-yarn tsc --noEmit
+pnpm tsc --noEmit
 
 # Lint code
-yarn lint
+pnpm lint
 ```
 
 ### Documentation Site
@@ -112,13 +110,13 @@ yarn lint
 cd home
 
 # Install dependencies
-yarn install
+pnpm install
 
 # Check types
-yarn tsc --noEmit
+pnpm tsc --noEmit
 
 # Lint code
-yarn lint
+pnpm lint
 ```
 
 ## Testing

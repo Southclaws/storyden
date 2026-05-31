@@ -31,10 +31,10 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /storyden
 
-COPY ./web/package.json ./web/yarn.lock* ./web/.yarnrc.yml ./
-RUN --mount=type=cache,target=/root/.yarn \
+COPY ./web/package.json ./web/pnpm-lock.yaml* ./web/pnpm-workspace.yaml ./
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     corepack enable && \
-    YARN_CACHE_FOLDER=/root/.yarn yarn install --immutable --network-timeout 1000000
+    pnpm install --frozen-lockfile
 
 #
 # BUILDER LAYER
@@ -52,7 +52,7 @@ ENV NEXT_BUILD_STANDALONE=true
 # page. But we don't want to constantly be adding force-dynamic to every page so
 # this ensures no SSG runs during the Docker build.
 RUN --mount=type=cache,target=/storyden/.next/cache \
-    corepack enable && yarn next build --experimental-build-mode=compile
+    corepack enable && pnpm next build --experimental-build-mode=compile
 
 #
 # RUNTIME IMAGE

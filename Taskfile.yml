@@ -120,10 +120,10 @@ tasks:
     cmds: [go generate ./api]
   generate:openapi:frontend:
     dir: web
-    cmds: [yarn openapi]
+    cmds: [pnpm openapi]
   generate:openapi:docs:
     dir: home
-    cmds: [yarn openapi]
+    cmds: [pnpm openapi]
 
   # -
   # Database
@@ -149,7 +149,7 @@ tasks:
     cmds:
       - mkdir -p ./tests/e2e-data || true
       - go build -o ./tests/e2e-data/backend.exe ./cmd/backend
-      - cd web ; yarn build ; cd ..
+      - cd web ; pnpm build ; cd ..
 
   test:e2e:fresh:
     deps: [test:e2e:rebuild]

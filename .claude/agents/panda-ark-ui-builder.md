@@ -22,7 +22,7 @@ Your core responsibilities:
 **Design System Integration:**
 
 - Always reference design tokens from panda.config.ts and use styled-system generated types
-- Validate TypeScript compatibility with yarn tsc --noEmit before finalizing components
+- Validate TypeScript compatibility with pnpm tsc --noEmit before finalizing components
 - Style Ark UI components using Park UI presets from https://park-ui.com/
 - Place custom recipes in ./web/src/recipes and component definitions in ./web/src/components/ui
 

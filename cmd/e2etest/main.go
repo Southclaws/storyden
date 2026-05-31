@@ -60,7 +60,7 @@ func run(ctx context.Context, playwrightArgs []string) error {
 	}
 	defer stopProcess("backend", backendCmd)
 
-	frontendCmd := exec.CommandContext(ctx, "yarn", "start", "--port", "3001")
+	frontendCmd := exec.CommandContext(ctx, "pnpm", "start", "--port", "3001")
 	frontendCmd.Dir = "web"
 	frontendCmd.Env = append(os.Environ(),
 		"PUBLIC_API_ADDRESS=http://localhost:8001",

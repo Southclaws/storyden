@@ -77,7 +77,7 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 
 - Never start backend or frontend runtime processes from the agent.
 - Do not run Go app entrypoints (for example `go run ./cmd/backend`).
-- Do not run Next.js app servers (for example `yarn dev`, `yarn start`, `next dev`, `next start`).
+- Do not run Next.js app servers (for example `pnpm dev`, `pnpm start`, `next dev`, `next start`).
 - Assume the user already has required services running; use tests, linters, codegen, and static checks instead.
 
 ## Codegen Routing
@@ -89,8 +89,8 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 - Common source-of-truth -> command mapping:
   - `internal/ent/schema/**` -> `task generate:db` or `go generate ./internal/ent`
   - `api/openapi.yaml`, `api/common/**`, `api/plugin.yaml`, `api/rpc/**` -> `task generate:openapi` or `go generate ./api`
-  - OpenAPI frontend client only -> `task generate:openapi:frontend` (runs `yarn openapi` in `web`)
-  - OpenAPI docs site only -> `task generate:openapi:docs` (runs `yarn openapi` in `home`)
+  - OpenAPI frontend client only -> `task generate:openapi:frontend` (runs `pnpm openapi` in `web`)
+  - OpenAPI docs site only -> `task generate:openapi:docs` (runs `pnpm openapi` in `home`)
   - Full regen when unsure -> `task generate`
 
 - Go generators are typically invoked with `go generate ./<path>`.

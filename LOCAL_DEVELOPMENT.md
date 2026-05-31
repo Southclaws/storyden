@@ -10,7 +10,7 @@ To run Storyden locally, you need to have the following installed:
 
 - **Go** - the API is written in Go!
 - **Node.js** - the frontend is built with Next.js
-- **Yarn** - the package manager for the frontend
+- **pnpm** - the package manager for the frontend
 - **[Task](https://taskfile.dev)** - task runner for code generation and development workflows
 
 If anything is missing from this list, please open an issue!
@@ -48,8 +48,8 @@ You can also run the frontend service:
 
 ```bash
 cd web
-yarn
-yarn dev
+pnpm
+pnpm dev
 ```
 
 The frontend will be available at `http://localhost:3000` and will by default automatically connect to the API at `http://localhost:8000`.
@@ -106,22 +106,22 @@ Note: Storyden automatically handles database migrations on startup, so you don'
 cd web
 
 # Install dependencies
-yarn install
+pnpm install
 
 # Start development server
-yarn dev
+pnpm dev
 
 # Build for production
-yarn build
+pnpm build
 
 # Lint code
-yarn lint
+pnpm lint
 
 # Type check
-yarn tsc --noEmit
+pnpm tsc --noEmit
 
 # Regenerate API client from OpenAPI spec
-yarn openapi
+pnpm openapi
 ```
 
 ## Environment Variables
@@ -160,7 +160,7 @@ LISTEN_ADDR=0.0.0.0:8080 go run ./cmd/backend
 
 # Change frontend port
 cd web
-PORT=3001 yarn dev
+PORT=3001 pnpm dev
 ```
 
 If you change ports or need to run on different addresses, make sure to update the address configuration:
@@ -207,7 +207,7 @@ You can also use tools like:
 
 ## Hot Reload
 
-The frontend has built-in hot reload with Next.js when running `yarn dev`.
+The frontend has built-in hot reload with Next.js when running `pnpm dev`.
 
 ## Additional Resources
 
