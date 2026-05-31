@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import { AccountCommonProps, AuthMode } from "@/api/openapi-schema";
+import { AccountCommonProps, AuthMode, Permission } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
 import { Settings } from "@/lib/settings/settings";
 import { Box } from "@/styled-system/jsx";
+import { hasPermission } from "@/utils/permissions";
 
 type Props = {
   session: AccountCommonProps | undefined;
@@ -20,9 +21,12 @@ export function VerificationBanner({ session, settings }: Props) {
     return null;
   }
 
+  const isAdmin = hasPermission(session, Permission.ADMINISTRATOR);
+
   const shouldShow =
     settings.authentication_mode === AuthMode.email &&
-    session.verified_status === "none";
+    session.verified_status === "none" &&
+    !isAdmin;
 
   if (!shouldShow) {
     return null;

@@ -1,8 +1,11 @@
 import { flatten } from "lodash";
 
-import { Account, Permission } from "@/api/openapi-schema";
+import { Account, AccountCommonProps, Permission } from "@/api/openapi-schema";
 
-export function hasPermission(account?: Account, ...permissions: Permission[]) {
+export function hasPermission(
+  account?: Account | AccountCommonProps,
+  ...permissions: Permission[]
+) {
   if (!account) return false;
 
   // extract each permission from each role
@@ -18,7 +21,7 @@ export function hasPermission(account?: Account, ...permissions: Permission[]) {
 }
 
 export function hasPermissionOr(
-  account?: Account,
+  account?: Account | AccountCommonProps,
   fn?: () => boolean,
   ...permissions: Permission[]
 ) {
