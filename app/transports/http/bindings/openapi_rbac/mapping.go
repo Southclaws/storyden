@@ -374,6 +374,14 @@ func (m *Mapping) AccountManageUpdateEmailVerifiedStatus() (bool, *rbac.Permissi
 	return true, &rbac.PermissionManageAccounts
 }
 
+func (m *Mapping) AccountPasswordResetTokenGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageAccounts
+}
+
+func (m *Mapping) AccountEmailPasswordReset() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageAccounts
+}
+
 func (m *Mapping) AccountAuthProviderList() (bool, *rbac.Permission) {
 	return true, nil
 }

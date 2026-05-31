@@ -33,6 +33,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_role_assign"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
@@ -55,6 +56,8 @@ type Accounts struct {
 	settingsRepo          *settings.SettingsRepository
 	roleAssign            *account_role_assign.Manager
 	warnings              *warning_manager.Manager
+	tokenProvider         *password_reset.TokenProvider
+	emailResetter         *password_reset.EmailResetter
 	webAddress            url.URL
 }
 
@@ -73,6 +76,8 @@ func NewAccounts(
 	settingsRepo *settings.SettingsRepository,
 	roleAssign *account_role_assign.Manager,
 	warnings *warning_manager.Manager,
+	tokenProvider *password_reset.TokenProvider,
+	emailResetter *password_reset.EmailResetter,
 ) Accounts {
 	return Accounts{
 		profile_cache:         profile_cache,
@@ -88,6 +93,8 @@ func NewAccounts(
 		settingsRepo:          settingsRepo,
 		roleAssign:            roleAssign,
 		warnings:              warnings,
+		tokenProvider:         tokenProvider,
+		emailResetter:         emailResetter,
 		webAddress:            cfg.PublicWebAddress,
 	}
 }
@@ -836,4 +843,35 @@ func serialiseModerationNote(note *moderation_note.Note) openapi.ModerationNote 
 		Content:   note.Content,
 		CreatedAt: note.CreatedAt,
 	}
+}
+
+func (h *Accounts) AccountPasswordResetTokenGet(ctx context.Context, request openapi.AccountPasswordResetTokenGetRequestObject) (openapi.AccountPasswordResetTokenGetResponseObject, error) {
+	accountID := account.AccountID(openapi.ParseID(request.AccountId))
+
+	token, err := h.accountManage.GetPasswordResetToken(ctx, accountID, h.tokenProvider)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountPasswordResetTokenGet200JSONResponse{
+		AccountPasswordResetTokenGetOKJSONResponse: openapi.AccountPasswordResetTokenGetOKJSONResponse{
+			Token: token,
+		},
+	}, nil
+}
+
+func (h *Accounts) AccountEmailPasswordReset(ctx context.Context, request openapi.AccountEmailPasswordResetRequestObject) (openapi.AccountEmailPasswordResetResponseObject, error) {
+	accountID := account.AccountID(openapi.ParseID(request.AccountId))
+	emailAddressID := openapi.ParseID(request.Body.EmailAddressId)
+
+	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := h.accountManage.SendPasswordResetEmail(ctx, accountID, emailAddressID, *lt, h.emailResetter); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountEmailPasswordReset204Response{}, nil
 }

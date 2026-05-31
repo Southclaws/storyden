@@ -12,7 +12,9 @@ const (
 	eventTypeAccountContentPurged  eventTypeEnum = "account_content_purged"
 	eventTypeModerationNoteCreated eventTypeEnum = "moderation_note_created"
 	eventTypeModerationNoteDeleted eventTypeEnum = "moderation_note_deleted"
-	eventTypeAccountWarned         eventTypeEnum = "account_warned"
-	eventTypeAccountWarningUpdated eventTypeEnum = "account_warning_updated"
-	eventTypeAccountWarningDeleted eventTypeEnum = "account_warning_deleted"
+	eventTypeAccountWarned                   eventTypeEnum = "account_warned"
+	eventTypeAccountWarningUpdated           eventTypeEnum = "account_warning_updated"
+	eventTypeAccountWarningDeleted           eventTypeEnum = "account_warning_deleted"
+	eventTypeAccountPasswordResetTokenIssued eventTypeEnum = "account_password_reset_token_issued"
+	eventTypeAccountPasswordResetEmailSent   eventTypeEnum = "account_password_reset_email_sent"
 )

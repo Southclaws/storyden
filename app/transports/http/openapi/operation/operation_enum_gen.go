@@ -103,6 +103,8 @@ var (
 	OperationIDAccountUpdate                          = OperationID{`AccountUpdate`}
 	OperationIDAccountView                            = OperationID{`AccountView`}
 	OperationIDAccountManageUpdate                    = OperationID{`AccountManageUpdate`}
+	OperationIDAccountPasswordResetTokenGet           = OperationID{`AccountPasswordResetTokenGet`}
+	OperationIDAccountEmailPasswordReset              = OperationID{`AccountEmailPasswordReset`}
 	OperationIDAccountManageUpdateEmailVerifiedStatus = OperationID{`AccountManageUpdateEmailVerifiedStatus`}
 	OperationIDAccountWarningList                     = OperationID{`AccountWarningList`}
 	OperationIDAccountWarningCreate                   = OperationID{`AccountWarningCreate`}
@@ -423,6 +425,10 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAccountView, nil
 	case string(`AccountManageUpdate`):
 		return OperationIDAccountManageUpdate, nil
+	case string(`AccountPasswordResetTokenGet`):
+		return OperationIDAccountPasswordResetTokenGet, nil
+	case string(`AccountEmailPasswordReset`):
+		return OperationIDAccountEmailPasswordReset, nil
 	case string(`AccountManageUpdateEmailVerifiedStatus`):
 		return OperationIDAccountManageUpdateEmailVerifiedStatus, nil
 	case string(`AccountWarningList`):

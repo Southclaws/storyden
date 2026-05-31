@@ -969,6 +969,22 @@ func serialiseAuditEvent(in *audit.AuditLog) openapi.AuditEvent {
 			AccountId: openapi.Identifier(accountID),
 			WarningId: openapi.Identifier(warningID),
 		})
+
+	case audit.EventTypeAccountPasswordResetTokenIssued:
+		accountID := metadataString(in.Metadata, "account_id")
+		err = out.FromAuditEventAccountPasswordResetTokenIssued(openapi.AuditEventAccountPasswordResetTokenIssued{
+			Type:      openapi.AccountPasswordResetTokenIssued,
+			AccountId: openapi.Identifier(accountID),
+		})
+
+	case audit.EventTypeAccountPasswordResetEmailSent:
+		accountID := metadataString(in.Metadata, "account_id")
+		emailAddressID := metadataString(in.Metadata, "email_address_id")
+		err = out.FromAuditEventAccountPasswordResetEmailSent(openapi.AuditEventAccountPasswordResetEmailSent{
+			Type:           openapi.AccountPasswordResetEmailSent,
+			AccountId:      openapi.Identifier(accountID),
+			EmailAddressId: openapi.Identifier(emailAddressID),
+		})
 	}
 
 	if err != nil {

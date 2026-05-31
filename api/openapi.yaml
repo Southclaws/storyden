@@ -1670,6 +1670,41 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
 
+  /accounts/{account_id}/auth/password/reset-token:
+    post:
+      operationId: AccountPasswordResetTokenGet
+      description: |
+        Provides the caller with a token that can be used with the endpoint
+        `/auth/password/reset` to reset the account's password. This is intended
+        for admin usage for when the instance is not using email authentication
+        mode or if the target account has no email addresses to send resets.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AccountPasswordResetTokenGetOK" }
+
+  /accounts/{account_id}/auth/email-password/reset:
+    post:
+      operationId: AccountEmailPasswordReset
+      description: |
+        Send a password reset email for the specified account. This is intended
+        for admin. This will trigger a password reset email to the specified
+        email address. The email address must be associated with the account.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      requestBody:
+        $ref: "#/components/requestBodies/AccountEmailPasswordReset"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "204": { description: OK }
+
   /accounts/{account_id}/emails/{email_address_id}/verified:
     patch:
       operationId: AccountManageUpdateEmailVerifiedStatus
@@ -4235,6 +4270,12 @@ components:
           schema:
             $ref: "#/components/schemas/AccountEmailVerifiedStatusMutableProps"
 
+    AccountEmailPasswordReset:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountEmailPasswordResetProps"
+
     AccountModerationNoteCreate:
       content:
         application/json:
@@ -4783,6 +4824,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AccountEmailAddress"
+
+    AccountPasswordResetTokenGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountPasswordResetToken"
 
     AccountAuthProviderListOK:
       description: OK
@@ -5909,6 +5957,8 @@ components:
         - account_warned
         - account_warning_updated
         - account_warning_deleted
+        - account_password_reset_token_issued
+        - account_password_reset_email_sent
 
     AuditEventProps:
       required: [id, type, timestamp]
@@ -5936,6 +5986,8 @@ components:
           account_warned: "#/components/schemas/AuditEventAccountWarned"
           account_warning_updated: "#/components/schemas/AuditEventAccountWarningUpdated"
           account_warning_deleted: "#/components/schemas/AuditEventAccountWarningDeleted"
+          account_password_reset_token_issued: "#/components/schemas/AuditEventAccountPasswordResetTokenIssued"
+          account_password_reset_email_sent: "#/components/schemas/AuditEventAccountPasswordResetEmailSent"
       oneOf:
         - $ref: "#/components/schemas/AuditEventThreadDeleted"
         - $ref: "#/components/schemas/AuditEventThreadReplyDeleted"
@@ -5947,6 +5999,8 @@ components:
         - $ref: "#/components/schemas/AuditEventAccountWarned"
         - $ref: "#/components/schemas/AuditEventAccountWarningUpdated"
         - $ref: "#/components/schemas/AuditEventAccountWarningDeleted"
+        - $ref: "#/components/schemas/AuditEventAccountPasswordResetTokenIssued"
+        - $ref: "#/components/schemas/AuditEventAccountPasswordResetEmailSent"
 
     AuditEventThreadDeleted:
       type: object
@@ -6026,6 +6080,27 @@ components:
         type: { $ref: "#/components/schemas/AuditEventType" }
         account_id: { $ref: "#/components/schemas/Identifier" }
         warning_id: { $ref: "#/components/schemas/Identifier" }
+
+    AuditEventAccountPasswordResetTokenIssued:
+      type: object
+      required: [type, account_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id:
+          description: Target account ID that received password reset access.
+          $ref: "#/components/schemas/Identifier"
+
+    AuditEventAccountPasswordResetEmailSent:
+      type: object
+      required: [type, account_id, email_address_id]
+      properties:
+        type: { $ref: "#/components/schemas/AuditEventType" }
+        account_id:
+          description: Target account ID that received the password reset email.
+          $ref: "#/components/schemas/Identifier"
+        email_address_id:
+          description: Email address ID that the reset email was sent to.
+          $ref: "#/components/schemas/Identifier"
 
     AuditEventList:
       type: array
@@ -7897,6 +7972,43 @@ components:
       properties:
         verified:
           type: boolean
+
+    AccountEmailPasswordResetProps:
+      type: object
+      required: [email_address_id, token_url]
+      properties:
+        email_address_id:
+          description: |
+            The email address ID to send the reset email to. The email address
+            must belong to the specified account.
+          $ref: "#/components/schemas/Identifier"
+        token_url:
+          type: object
+          required: [url, query]
+          properties:
+            url:
+              description: |
+                The URL to include in the password reset email. This URL's host
+                must match the configured Storyden instance's web address value.
+              type: string
+            query:
+              description: |
+                The query parameters to store the reset token in. This is a
+                frontend client specific value.
+              type: string
+
+    AccountPasswordResetToken:
+      type: object
+      required: [token]
+      properties:
+        token:
+          description: |
+            Password reset token that can be used on the `/auth/password/reset`
+            endpoint to reset the account's password. This token is valid for
+            one hour and can only be used once. The token is identical in format
+            to tokens sent via email in the user-facing password reset flow.
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
     #
     # 8888888                   d8b 888             888    d8b

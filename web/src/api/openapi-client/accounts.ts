@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   AccountAuthProviderListOKResponse,
   AccountEmailAddBody,
+  AccountEmailPasswordResetBody,
   AccountEmailUpdateOKResponse,
   AccountEmailVerifiedStatusUpdateBody,
   AccountGetAvatarResponse,
@@ -25,6 +26,7 @@ import type {
   AccountModerationNoteCreateBody,
   AccountModerationNoteCreateOKResponse,
   AccountModerationNoteListOKResponse,
+  AccountPasswordResetTokenGetOKResponse,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
@@ -329,6 +331,144 @@ export const useAccountManageUpdate = <
   const swrKey =
     swrOptions?.swrKey ?? getAccountManageUpdateMutationKey(accountId);
   const swrFn = getAccountManageUpdateMutationFetcher(accountId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Provides the caller with a token that can be used with the endpoint
+`/auth/password/reset` to reset the account's password. This is intended
+for admin usage for when the instance is not using email authentication
+mode or if the target account has no email addresses to send resets.
+
+ */
+export const accountPasswordResetTokenGet = (accountId: string) => {
+  return fetcher<AccountPasswordResetTokenGetOKResponse>({
+    url: `/accounts/${accountId}/auth/password/reset-token`,
+    method: "POST",
+  });
+};
+
+export const getAccountPasswordResetTokenGetMutationFetcher = (
+  accountId: string,
+) => {
+  return (
+    _: Key,
+    __: { arg: Arguments },
+  ): Promise<AccountPasswordResetTokenGetOKResponse> => {
+    return accountPasswordResetTokenGet(accountId);
+  };
+};
+export const getAccountPasswordResetTokenGetMutationKey = (accountId: string) =>
+  [`/accounts/${accountId}/auth/password/reset-token`] as const;
+
+export type AccountPasswordResetTokenGetMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountPasswordResetTokenGet>>
+>;
+export type AccountPasswordResetTokenGetMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountPasswordResetTokenGet = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountPasswordResetTokenGet>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof accountPasswordResetTokenGet>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountPasswordResetTokenGetMutationKey(accountId);
+  const swrFn = getAccountPasswordResetTokenGetMutationFetcher(accountId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Send a password reset email for the specified account. This is intended
+for admin. This will trigger a password reset email to the specified
+email address. The email address must be associated with the account.
+
+ */
+export const accountEmailPasswordReset = (
+  accountId: string,
+  accountEmailPasswordResetBody: AccountEmailPasswordResetBody,
+) => {
+  return fetcher<void>({
+    url: `/accounts/${accountId}/auth/email-password/reset`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accountEmailPasswordResetBody,
+  });
+};
+
+export const getAccountEmailPasswordResetMutationFetcher = (
+  accountId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountEmailPasswordResetBody },
+  ): Promise<void> => {
+    return accountEmailPasswordReset(accountId, arg);
+  };
+};
+export const getAccountEmailPasswordResetMutationKey = (accountId: string) =>
+  [`/accounts/${accountId}/auth/email-password/reset`] as const;
+
+export type AccountEmailPasswordResetMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountEmailPasswordReset>>
+>;
+export type AccountEmailPasswordResetMutationError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountEmailPasswordReset = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountEmailPasswordReset>>,
+      TError,
+      Key,
+      AccountEmailPasswordResetBody,
+      Awaited<ReturnType<typeof accountEmailPasswordReset>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountEmailPasswordResetMutationKey(accountId);
+  const swrFn = getAccountEmailPasswordResetMutationFetcher(accountId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

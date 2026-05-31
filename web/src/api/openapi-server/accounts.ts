@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AccountAuthProviderListOKResponse,
   AccountEmailAddBody,
+  AccountEmailPasswordResetBody,
   AccountEmailUpdateOKResponse,
   AccountEmailVerifiedStatusUpdateBody,
   AccountGetAvatarResponse,
@@ -19,6 +20,7 @@ import type {
   AccountModerationNoteCreateBody,
   AccountModerationNoteCreateOKResponse,
   AccountModerationNoteListOKResponse,
+  AccountPasswordResetTokenGetOKResponse,
   AccountSetAvatarBody,
   AccountUpdateBody,
   AccountUpdateOKResponse,
@@ -155,6 +157,66 @@ export const accountManageUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(accountManageUpdateBody),
+    },
+  );
+};
+
+/**
+ * Provides the caller with a token that can be used with the endpoint
+`/auth/password/reset` to reset the account's password. This is intended
+for admin usage for when the instance is not using email authentication
+mode or if the target account has no email addresses to send resets.
+
+ */
+export type accountPasswordResetTokenGetResponse = {
+  data: AccountPasswordResetTokenGetOKResponse;
+  status: number;
+};
+
+export const getAccountPasswordResetTokenGetUrl = (accountId: string) => {
+  return `/accounts/${accountId}/auth/password/reset-token`;
+};
+
+export const accountPasswordResetTokenGet = async (
+  accountId: string,
+  options?: RequestInit,
+): Promise<accountPasswordResetTokenGetResponse> => {
+  return fetcher<Promise<accountPasswordResetTokenGetResponse>>(
+    getAccountPasswordResetTokenGetUrl(accountId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+/**
+ * Send a password reset email for the specified account. This is intended
+for admin. This will trigger a password reset email to the specified
+email address. The email address must be associated with the account.
+
+ */
+export type accountEmailPasswordResetResponse = {
+  data: void;
+  status: number;
+};
+
+export const getAccountEmailPasswordResetUrl = (accountId: string) => {
+  return `/accounts/${accountId}/auth/email-password/reset`;
+};
+
+export const accountEmailPasswordReset = async (
+  accountId: string,
+  accountEmailPasswordResetBody: AccountEmailPasswordResetBody,
+  options?: RequestInit,
+): Promise<accountEmailPasswordResetResponse> => {
+  return fetcher<Promise<accountEmailPasswordResetResponse>>(
+    getAccountEmailPasswordResetUrl(accountId),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(accountEmailPasswordResetBody),
     },
   );
 };
