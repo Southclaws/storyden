@@ -5,6 +5,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMark(t *testing.T) {
@@ -86,5 +87,52 @@ func TestMark(t *testing.T) {
 			input := id + slug
 			check(args{in: input, slug: input})
 		}
+	})
+}
+
+func TestQueryableEqual(t *testing.T) {
+	r := require.New(t)
+
+	idA := xid.New()
+	idB := xid.New()
+
+	t.Run("same id, same slug — equal", func(t *testing.T) {
+		a := NewQueryKey(idA.String() + "-foo")
+		b := NewQueryKey(idA.String() + "-foo")
+		r.True(a.Equal(b))
+	})
+
+	t.Run("same id, different slug — equal (id is canonical)", func(t *testing.T) {
+		a := NewQueryKey(idA.String() + "-foo")
+		b := NewQueryKey(idA.String() + "-bar")
+		r.True(a.Equal(b))
+	})
+
+	t.Run("different ids — not equal", func(t *testing.T) {
+		a := NewQueryKeyID(idA)
+		b := NewQueryKeyID(idB)
+		r.False(a.Equal(b))
+	})
+
+	t.Run("same slug only — equal", func(t *testing.T) {
+		a := NewQueryKey("hello")
+		b := NewQueryKey("hello")
+		r.True(a.Equal(b))
+	})
+
+	t.Run("different slugs only — not equal", func(t *testing.T) {
+		a := NewQueryKey("hello")
+		b := NewQueryKey("world")
+		r.False(a.Equal(b))
+	})
+
+	t.Run("id-only vs slug-only — not equal (cannot establish)", func(t *testing.T) {
+		// Previously this returned true and caused 'cannot relate a node to
+		// itself' errors when moving a node by slug to a parent referenced by
+		// xid (or vice versa).
+		a := NewQueryKeyID(idA)
+		b := NewQueryKey("some-slug")
+		r.False(a.Equal(b))
+		r.False(b.Equal(a))
 	})
 }

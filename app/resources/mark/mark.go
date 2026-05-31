@@ -99,24 +99,26 @@ func (m Queryable) Slug() opt.Optional[string] {
 	return m.slug
 }
 
+// Equal reports whether two Queryables refer to the same resource based only
+// on the fields they share. ID is canonical so it wins when both sides have
+// one; otherwise we fall back to slug. When the two have no overlapping field
+// (one has id-only, the other slug-only) we cannot establish identity from the
+// keys alone and return false — callers should resolve the keys against the
+// database before claiming equality.
 func (m Queryable) Equal(b Queryable) bool {
-	if a, ok := m.id.Get(); ok {
-		if b, ok := b.id.Get(); ok {
-			if a != b {
-				return false
-			}
-		}
+	aID, aHasID := m.id.Get()
+	bID, bHasID := b.id.Get()
+	if aHasID && bHasID {
+		return aID == bID
 	}
 
-	if a, ok := m.slug.Get(); ok {
-		if b, ok := b.slug.Get(); ok {
-			if a != b {
-				return false
-			}
-		}
+	aSlug, aHasSlug := m.slug.Get()
+	bSlug, bHasSlug := b.slug.Get()
+	if aHasSlug && bHasSlug {
+		return aSlug == bSlug
 	}
 
-	return true
+	return false
 }
 
 func (m Queryable) Mark() (*Mark, error) {
