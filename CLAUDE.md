@@ -29,7 +29,7 @@ Storyden follows a strict zero service dependencies production-ready deployment 
 
 - **Frontend (Next.js)**: Located in `web/` directory
   - Built with Next.js 15, React 19, TypeScript
-  - Uses Park UI components and Panda CSS
+  - Uses Park UI components and Panda CSS with **strict design tokens** (see Design System section below)
   - API client generated from OpenAPI specification
 
 - **Project website**: Located in `home/` directory
@@ -149,6 +149,99 @@ You must first edit the source of truth and generate the code.
 Run `task generate` to regenerate everything.
 
 **Note**: Panda CSS changes (design tokens, recipes, patterns) in `web/panda.config.ts` do NOT require running `task generate`. Panda CSS generates its output automatically.
+
+## Design System (Panda CSS)
+
+The frontend uses Panda CSS with **STRICT TOKEN ENFORCEMENT**. This is a mature project with a comprehensive design system.
+
+### Critical Rules
+
+- **NEVER use raw CSS values** (no `16rem`, `1px solid`, `#3b82f6`, etc.)
+- **ALWAYS use design tokens** for all styling
+- The config enforces `strictTokens: true` and `strictPropertyValues: true` - builds will fail with raw values
+- When writing CSS modules, use CSS variables like `var(--colors-border-subtle)`, `var(--spacing-6)`, etc.
+- GUIDELINES NOT RULES: Sometimes you MAY have to break these a little to get things done, but that's rare.
+
+### Common Design Tokens
+
+**Spacing**: Use token names like `4`, `6`, `8` or CSS vars like `var(--spacing-4)`
+
+```tsx
+// Good (TSX)
+<Box p="4" gap="6" />
+
+// Good (CSS)
+padding: var(--spacing-4);
+gap: var(--spacing-6);
+
+// Bad
+<Box p="16px" />
+padding: 16px;
+```
+
+**Colors**: Use semantic tokens like `border.subtle`, `bg.canvas`, `fg.muted`
+
+```tsx
+// Good (TSX)
+<Box borderColor="border.subtle" bg="bg.canvas" />
+
+// Good (CSS)
+border-color: var(--colors-border-subtle);
+background: var(--colors-bg-canvas);
+
+// Bad
+<Box borderColor="#e5e7eb" />
+border-color: #e5e7eb;
+```
+
+**Borders**: Use `borderWidth="thin"` or CSS vars like `var(--borders-thin)`
+
+```tsx
+// Good (TSX)
+<Box borderWidth="thin" borderColor="border.subtle" />
+
+// Good (CSS)
+border: var(--borders-thin) solid var(--colors-border-subtle);
+
+// Bad
+<Box borderWidth="1px" />
+border: 1px solid #ccc;
+```
+
+**Sizes**: Use token names like `64`, `72` or CSS vars like `var(--sizes-64)`
+
+```tsx
+// Good (TSX)
+<Box w="64" maxW="breakpoint-2xl" />
+
+// Good (CSS)
+width: var(--sizes-64);
+max-width: var(--sizes-breakpoint-2xl);
+
+// Bad
+<Box w="256px" />
+width: 256px;
+```
+
+**Z-Index**: Use semantic tokens like `docked`, `overlay`, `popover`
+
+```tsx
+// Good (TSX)
+<Box zIndex="docked" />
+
+// Good (CSS)
+z-index: var(--z-index-docked);
+
+// Bad
+z-index: 50;
+```
+
+### Finding Available Tokens
+
+- Check `web/panda.config.ts` for the config
+- Look at existing components in `web/src/components/` for examples
+- Common patterns: `border.subtle`, `bg.canvas`, `fg.muted`, `spacing-{n}`, `sizes-{n}`
+- Use Panda's generated types for autocomplete in TSX
 
 ## Environment Configuration
 
