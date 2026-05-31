@@ -22,88 +22,46 @@ export type Assign<T, U> = {
  * Native css properties
  * -----------------------------------------------------------------------------*/
 
-type DashedIdent = `--${string}`
-
-type StringToMultiple<T extends string> = T | `${T}, ${T}`
-
-export type PositionAreaAxis =
-  | 'left'
-  | 'center'
-  | 'right'
-  | 'x-start'
-  | 'x-end'
-  | 'span-x-start'
-  | 'span-x-end'
-  | 'x-self-start'
-  | 'x-self-end'
-  | 'span-x-self-start'
-  | 'span-x-self-end'
-  | 'span-all'
-  | 'top'
-  | 'bottom'
-  | 'span-top'
-  | 'span-bottom'
-  | 'y-start'
-  | 'y-end'
-  | 'span-y-start'
-  | 'span-y-end'
-  | 'y-self-start'
-  | 'y-self-end'
-  | 'span-y-self-start'
-  | 'span-y-self-end'
-  | 'block-start'
-  | 'block-end'
-  | 'span-block-start'
-  | 'span-block-end'
-  | 'inline-start'
-  | 'inline-end'
-  | 'span-inline-start'
-  | 'span-inline-end'
-  | 'self-block-start'
-  | 'self-block-end'
-  | 'span-self-block-start'
-  | 'span-self-block-end'
-  | 'self-inline-start'
-  | 'self-inline-end'
-  | 'span-self-inline-start'
-  | 'span-self-inline-end'
-  | 'start'
-  | 'end'
-  | 'span-start'
-  | 'span-end'
-  | 'self-start'
-  | 'self-end'
-  | 'span-self-start'
-  | 'span-self-end'
-
-type PositionTry =
-  | 'normal'
-  | 'flip-block'
-  | 'flip-inline'
-  | 'top'
-  | 'bottom'
-  | 'left'
-  | 'right'
-  | 'block-start'
-  | 'block-end'
-  | 'inline-start'
-  | 'inline-end'
-  | DashedIdent
+type CornerShapeValue = 'round' | 'square' | 'bevel' | 'scoop' | 'notch' | 'squircle' | `superellipse(${number})`
 
 export interface ModernCssProperties {
-  anchorName?: Globals | 'none' | DashedIdent | StringToMultiple<DashedIdent>
-  anchorScope?: Globals | 'none' | 'all' | DashedIdent | StringToMultiple<DashedIdent>
-  fieldSizing?: Globals | 'fixed' | 'content'
-  interpolateSize?: Globals | 'allow-keywords' | 'numeric-only'
-  positionAnchor?: Globals | 'auto' | DashedIdent
-  positionArea?: Globals | 'auto' | PositionAreaAxis | `${PositionAreaAxis} ${PositionAreaAxis}` | String
-  positionTry?: Globals | StringToMultiple<PositionTry> | String
-  positionTryFallback?: Globals | 'none' | StringToMultiple<PositionTry> | String
-  positionTryOrder?: Globals | 'normal' | 'most-width' | 'most-height' | 'most-block-size' | 'most-inline-size'
-  positionVisibility?: Globals | 'always' | 'anchors-visible' | 'no-overflow'
-  textWrapMode?: Globals | 'wrap' | 'nowrap'
-  textSpacingTrim?: Globals | 'normal' | 'space-all' | 'space-first' | 'trim-start'
-  textWrapStyle?: Globals | 'auto' | 'balance' | 'pretty' | 'stable'
+  /**
+   * Controls whether the entire element should be draggable instead of its contents.
+   */
+  WebkitUserDrag?: Globals | 'auto' | 'element' | 'none'
+
+  /**
+   * Specifies whether an element can be used to drag the entire app window (Electron).
+   */
+  WebkitAppRegion?: Globals | 'drag' | 'no-drag'
+
+  /**
+   * Sets the horizontal spacing between table borders.
+   */
+  WebkitBorderHorizontalSpacing?: Globals | String | Number
+
+  /**
+   * Sets the vertical spacing between table borders.
+   */
+  WebkitBorderVerticalSpacing?: Globals | String | Number
+
+  /**
+   * Controls the display of text content for security purposes (e.g., password fields).
+   */
+  WebkitTextSecurity?: Globals | 'none' | 'circle' | 'disc' | 'square'
+
+  /**
+   * Specifies the shape of a box's corners within the area defined by the border-radius property.
+   * @experimental
+   * @see https://developer.mozilla.org/en-US/docs/Web/CSS/corner-shape
+   */
+  cornerShape?:
+    | Globals
+    | CornerShapeValue
+    | `${CornerShapeValue} ${CornerShapeValue}`
+    | `${CornerShapeValue} ${CornerShapeValue} ${CornerShapeValue}`
+    | `${CornerShapeValue} ${CornerShapeValue} ${CornerShapeValue} ${CornerShapeValue}`
+    | String
 }
 
 export type CssProperty = keyof PropertiesFallback

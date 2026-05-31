@@ -8,7 +8,5 @@ export interface FloatingProps extends FloatingProperties, DistributiveOmit<HTML
 
 /**
  * Floating overlay elements.
-
-
  */
 export declare const Floating: FunctionComponent<FloatingProps>

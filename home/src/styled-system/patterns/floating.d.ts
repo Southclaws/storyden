@@ -9,7 +9,6 @@ export interface FloatingProperties {
    
 }
 
-
 interface FloatingStyles extends FloatingProperties, DistributiveOmit<SystemStyleObject, keyof FloatingProperties > {}
 
 interface FloatingPatternFn {
@@ -19,7 +18,5 @@ interface FloatingPatternFn {
 
 /**
  * Floating overlay elements.
-
-
  */
 export declare const Floating: FloatingPatternFn;

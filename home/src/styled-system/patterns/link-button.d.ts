@@ -9,7 +9,6 @@ export interface LinkButtonProperties {
    
 }
 
-
 interface LinkButtonStyles extends LinkButtonProperties, DistributiveOmit<SystemStyleObject, keyof LinkButtonProperties > {}
 
 interface LinkButtonPatternFn {
@@ -19,7 +18,5 @@ interface LinkButtonPatternFn {
 
 /**
  * Link button
-
-
  */
 export declare const linkButton: LinkButtonPatternFn;

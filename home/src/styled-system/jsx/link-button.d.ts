@@ -8,7 +8,5 @@ export interface LinkButtonProps extends LinkButtonProperties, DistributiveOmit<
 
 /**
  * Link button
-
-
  */
 export declare const LinkButton: FunctionComponent<LinkButtonProps>

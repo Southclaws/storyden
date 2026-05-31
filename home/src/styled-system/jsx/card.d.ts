@@ -8,7 +8,5 @@ export interface CardProps extends CardProperties, DistributiveOmit<HTMLStyledPr
 
 /**
  * A card component that can be used to display content in a container with a border and a shadow.
-
-
  */
 export declare const Card: FunctionComponent<CardProps>
