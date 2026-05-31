@@ -202,6 +202,68 @@ func TestNodesTreeMutations(t *testing.T) {
 				ids := dt.Map(listresponse1.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
 				a.Contains(ids, nodeC1.JSON200.Id, "C1 must appear as a root node")
 			})
+
+			t.Run("update_position_parent_accepts_slug_and_id", func(t *testing.T) {
+				r := require.New(t)
+
+				// Two roots: child + parent. Move the child under the parent
+				// twice — once with the parent passed as a slug, once as an
+				// xid. Both forms must work; this guards the binding fix at
+				// app/transports/http/bindings/nodes.go:NodeUpdatePosition
+				// and the Queryable.Equal fix at app/resources/mark/mark.go.
+				childName := "pos-child-" + uuid.NewString()
+				child := tests.AssertRequest(
+					cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+						Name: childName, Slug: &childName, Visibility: &visibility,
+					}, sh.WithSession(ctx)),
+				)(t, 200)
+
+				parentName := "pos-parent-" + uuid.NewString()
+				parent := tests.AssertRequest(
+					cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+						Name: parentName, Slug: &parentName, Visibility: &visibility,
+					}, sh.WithSession(ctx)),
+				)(t, 200)
+
+				_ = child
+
+				// Move by slug — used to fail with 'xid: invalid ID'.
+				bySlug := openapi.NodePositionMutableProps{}
+				bySlug.Parent.Set(parentName)
+				moveSlug := tests.AssertRequest(
+					cl.NodeUpdatePositionWithResponse(ctx, childName, bySlug, sh.WithSession(ctx)),
+				)(t, 200).JSON200
+				r.NotNil(moveSlug.Parent)
+				r.Equal(parent.JSON200.Id, moveSlug.Parent.Id)
+
+				// Detach so the next move is a real reparent.
+				toRoot := openapi.NodePositionMutableProps{}
+				toRoot.Parent.SetNull()
+				detach := tests.AssertRequest(
+					cl.NodeUpdatePositionWithResponse(ctx, childName, toRoot, sh.WithSession(ctx)),
+				)(t, 200).JSON200
+				r.Nil(detach.Parent)
+
+				// Move by xid — used to work and must keep working.
+				byID := openapi.NodePositionMutableProps{}
+				byID.Parent.Set(parent.JSON200.Id)
+				moveID := tests.AssertRequest(
+					cl.NodeUpdatePositionWithResponse(ctx, childName, byID, sh.WithSession(ctx)),
+				)(t, 200).JSON200
+				r.NotNil(moveID.Parent)
+				r.Equal(parent.JSON200.Id, moveID.Parent.Id)
+
+				// Mixed forms — child by slug, parent by xid — used to fail
+				// with 'cannot relate a node to itself' due to the Equal bug.
+				tests.AssertRequest(
+					cl.NodeUpdatePositionWithResponse(ctx, childName, toRoot, sh.WithSession(ctx)),
+				)(t, 200)
+				moveMixed := tests.AssertRequest(
+					cl.NodeUpdatePositionWithResponse(ctx, childName, byID, sh.WithSession(ctx)),
+				)(t, 200).JSON200
+				r.NotNil(moveMixed.Parent)
+				r.Equal(parent.JSON200.Id, moveMixed.Parent.Id)
+			})
 		}))
 	}))
 }

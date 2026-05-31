@@ -625,9 +625,11 @@ func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpda
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	// parent accepts either a slug or an xid; library.NewKey auto-detects.
+	// OpenAPI documents this field as a slug, so xid-only would be a docs
+	// mismatch and a footgun for callers piping slugs from `sd node list`.
 	parentID, err := deletable.NewMapErr(request.Body.Parent, func(s string) (library.QueryKey, error) {
-		id, err := xid.FromString(s)
-		return library.NewID(id), err
+		return library.NewKey(s), nil
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
