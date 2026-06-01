@@ -13,6 +13,7 @@ import { hasPermission } from "@/utils/permissions";
 import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 import { MemberIdent } from "../MemberBadge/MemberIdent";
+import { MemberPasswordResetTrigger } from "../MemberPasswordReset/MemberPasswordResetTrigger";
 import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
 import { MemberWarningTrigger } from "../MemberWarning/MemberWarningTrigger";
@@ -37,6 +38,8 @@ export function MemberOptionsMenu({
   const canWarn = !isSelf && hasPermission(session, Permission.MANAGE_WARNINGS);
   const canSuspend =
     !isSelf && hasPermission(session, Permission.MANAGE_SUSPENSIONS);
+  const canResetPassword =
+    !isSelf && hasPermission(session, Permission.MANAGE_ACCOUNTS);
 
   const isRoleChangeEnabled = hasPermission(session, "MANAGE_ROLES");
 
@@ -82,6 +85,12 @@ export function MemberOptionsMenu({
               <ReportMemberMenuItem profile={profile} />
 
               {isRoleChangeEnabled && <MemberRoleMenu profile={profile} />}
+
+              {canResetPassword && (
+                <MemberPasswordResetTrigger profile={profile}>
+                  <Menu.Item value="reset-password">Reset password</Menu.Item>
+                </MemberPasswordResetTrigger>
+              )}
 
               {canWarn && (
                 <MemberWarningTrigger profile={profile}>

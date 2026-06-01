@@ -94,6 +94,8 @@ type OperationPermissions interface {
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountView() (bool, *rbac.Permission)
 	AccountManageUpdate() (bool, *rbac.Permission)
+	AccountPasswordResetTokenGet() (bool, *rbac.Permission)
+	AccountEmailPasswordReset() (bool, *rbac.Permission)
 	AccountManageUpdateEmailVerifiedStatus() (bool, *rbac.Permission)
 	AccountWarningList() (bool, *rbac.Permission)
 	AccountWarningCreate() (bool, *rbac.Permission)
@@ -379,6 +381,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountView()
 	case "AccountManageUpdate":
 		return optable.AccountManageUpdate()
+	case "AccountPasswordResetTokenGet":
+		return optable.AccountPasswordResetTokenGet()
+	case "AccountEmailPasswordReset":
+		return optable.AccountEmailPasswordReset()
 	case "AccountManageUpdateEmailVerifiedStatus":
 		return optable.AccountManageUpdateEmailVerifiedStatus()
 	case "AccountWarningList":

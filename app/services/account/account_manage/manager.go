@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/audit/audit_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
@@ -25,6 +26,7 @@ type Manager struct {
 	accountWrite *account_writer.Writer
 	accountEmail *account_email.Manager
 	updater      *account_update.Updater
+	auditWriter  *audit_writer.Writer
 }
 
 func New(
@@ -32,12 +34,14 @@ func New(
 	accountWrite *account_writer.Writer,
 	accountEmail *account_email.Manager,
 	updater *account_update.Updater,
+	auditWriter *audit_writer.Writer,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,
 		accountWrite: accountWrite,
 		accountEmail: accountEmail,
 		updater:      updater,
+		auditWriter:  auditWriter,
 	}
 }
 

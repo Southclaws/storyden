@@ -8,21 +8,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.26.8-post
  */
 
-export type AuditEventType =
-  (typeof AuditEventType)[keyof typeof AuditEventType];
+export type AuditEventAccountPasswordResetEmailSentType =
+  (typeof AuditEventAccountPasswordResetEmailSentType)[keyof typeof AuditEventAccountPasswordResetEmailSentType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AuditEventType = {
-  thread_deleted: "thread_deleted",
-  thread_reply_deleted: "thread_reply_deleted",
-  account_suspended: "account_suspended",
-  account_unsuspended: "account_unsuspended",
-  account_content_purged: "account_content_purged",
-  moderation_note_created: "moderation_note_created",
-  moderation_note_deleted: "moderation_note_deleted",
-  account_warned: "account_warned",
-  account_warning_updated: "account_warning_updated",
-  account_warning_deleted: "account_warning_deleted",
-  account_password_reset_token_issued: "account_password_reset_token_issued",
+export const AuditEventAccountPasswordResetEmailSentType = {
   account_password_reset_email_sent: "account_password_reset_email_sent",
 } as const;

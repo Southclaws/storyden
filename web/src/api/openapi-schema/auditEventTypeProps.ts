@@ -8,6 +8,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.26.8-post
  */
 import type { AuditEventAccountContentPurged } from "./auditEventAccountContentPurged";
+import type { AuditEventAccountPasswordResetEmailSent } from "./auditEventAccountPasswordResetEmailSent";
+import type { AuditEventAccountPasswordResetTokenIssued } from "./auditEventAccountPasswordResetTokenIssued";
 import type { AuditEventAccountSuspended } from "./auditEventAccountSuspended";
 import type { AuditEventAccountUnsuspended } from "./auditEventAccountUnsuspended";
 import type { AuditEventAccountWarned } from "./auditEventAccountWarned";
@@ -28,4 +30,6 @@ export type AuditEventTypeProps =
   | AuditEventModerationNoteDeleted
   | AuditEventAccountWarned
   | AuditEventAccountWarningUpdated
-  | AuditEventAccountWarningDeleted;
+  | AuditEventAccountWarningDeleted
+  | AuditEventAccountPasswordResetTokenIssued
+  | AuditEventAccountPasswordResetEmailSent;

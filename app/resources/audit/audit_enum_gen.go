@@ -12,16 +12,18 @@ type EventType struct {
 }
 
 var (
-	EventTypeThreadDeleted         = EventType{eventTypeThreadDeleted}
-	EventTypeThreadReplyDeleted    = EventType{eventTypeThreadReplyDeleted}
-	EventTypeAccountSuspended      = EventType{eventTypeAccountSuspended}
-	EventTypeAccountUnsuspended    = EventType{eventTypeAccountUnsuspended}
-	EventTypeAccountContentPurged  = EventType{eventTypeAccountContentPurged}
-	EventTypeModerationNoteCreated = EventType{eventTypeModerationNoteCreated}
-	EventTypeModerationNoteDeleted = EventType{eventTypeModerationNoteDeleted}
-	EventTypeAccountWarned         = EventType{eventTypeAccountWarned}
-	EventTypeAccountWarningUpdated = EventType{eventTypeAccountWarningUpdated}
-	EventTypeAccountWarningDeleted = EventType{eventTypeAccountWarningDeleted}
+	EventTypeThreadDeleted                   = EventType{eventTypeThreadDeleted}
+	EventTypeThreadReplyDeleted              = EventType{eventTypeThreadReplyDeleted}
+	EventTypeAccountSuspended                = EventType{eventTypeAccountSuspended}
+	EventTypeAccountUnsuspended              = EventType{eventTypeAccountUnsuspended}
+	EventTypeAccountContentPurged            = EventType{eventTypeAccountContentPurged}
+	EventTypeModerationNoteCreated           = EventType{eventTypeModerationNoteCreated}
+	EventTypeModerationNoteDeleted           = EventType{eventTypeModerationNoteDeleted}
+	EventTypeAccountWarned                   = EventType{eventTypeAccountWarned}
+	EventTypeAccountWarningUpdated           = EventType{eventTypeAccountWarningUpdated}
+	EventTypeAccountWarningDeleted           = EventType{eventTypeAccountWarningDeleted}
+	EventTypeAccountPasswordResetTokenIssued = EventType{eventTypeAccountPasswordResetTokenIssued}
+	EventTypeAccountPasswordResetEmailSent   = EventType{eventTypeAccountPasswordResetEmailSent}
 )
 
 func (r EventType) Format(f fmt.State, verb rune) {
@@ -81,6 +83,10 @@ func NewEventType(__iNpUt__ string) (EventType, error) {
 		return EventTypeAccountWarningUpdated, nil
 	case string(eventTypeAccountWarningDeleted):
 		return EventTypeAccountWarningDeleted, nil
+	case string(eventTypeAccountPasswordResetTokenIssued):
+		return EventTypeAccountPasswordResetTokenIssued, nil
+	case string(eventTypeAccountPasswordResetEmailSent):
+		return EventTypeAccountPasswordResetEmailSent, nil
 	default:
 		return EventType{}, fmt.Errorf("invalid value for type 'EventType': '%s'", __iNpUt__)
 	}
