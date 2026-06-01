@@ -97,7 +97,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.9
 	github.com/superfly/sprites-go v0.0.0-20260527183125-476284aa7404
-	github.com/tursodatabase/libsql-client-go v0.0.0-20251219100830-236aa1ff8acc
+	github.com/tursodatabase/libsql-client-go v0.0.0-20260528064733-9d5d30a29a60
 	github.com/twilio/twilio-go v1.28.3
 	github.com/weaviate/weaviate v1.33.4
 	github.com/weaviate/weaviate-go-client/v5 v5.5.0
@@ -348,5 +348,5 @@ require (
 	golang.org/x/text v0.35.0
 	golang.org/x/time v0.13.0 // indirect
 	google.golang.org/protobuf v1.36.11
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gopkg.in/yaml.v3 v3.0.1
 )
