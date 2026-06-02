@@ -27,11 +27,18 @@ type AuthenticatedClientOption func(*authenticatedClientOptions)
 
 type authenticatedClientOptions struct {
 	rateLimitWarnings io.Writer
+	requestTimeout    time.Duration
 }
 
 func WithRateLimitWarnings(w io.Writer) AuthenticatedClientOption {
 	return func(opts *authenticatedClientOptions) {
 		opts.rateLimitWarnings = w
+	}
+}
+
+func WithRequestTimeout(timeout time.Duration) AuthenticatedClientOption {
+	return func(opts *authenticatedClientOptions) {
+		opts.requestTimeout = timeout
 	}
 }
 
@@ -47,6 +54,7 @@ type AuthSession struct {
 func NewAuthenticatedClient(ctx context.Context, store *config.Store, options ...AuthenticatedClientOption) (*Client, error) {
 	opts := authenticatedClientOptions{
 		rateLimitWarnings: os.Stderr,
+		requestTimeout:    requestTimeout,
 	}
 	for _, option := range options {
 		option(&opts)
@@ -77,7 +85,7 @@ func NewAuthenticatedClient(ctx context.Context, store *config.Store, options ..
 	authenticated, err := openapi.NewClientWithResponses(
 		client.BaseURL,
 		openapi.WithHTTPClient(authenticatedDoer{
-			base:              &http.Client{Timeout: requestTimeout},
+			base:              &http.Client{Timeout: opts.requestTimeout},
 			session:           session,
 			rateLimitWarnings: opts.rateLimitWarnings,
 		}),
