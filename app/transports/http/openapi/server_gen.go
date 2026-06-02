@@ -34922,6 +34922,8 @@ func (w *ServerInterfaceWrapper) AccountGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountGet(ctx)
 	return err
@@ -34934,6 +34936,8 @@ func (w *ServerInterfaceWrapper) AccountUpdate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountUpdate(ctx)
@@ -34948,6 +34952,8 @@ func (w *ServerInterfaceWrapper) AccountManageCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountManageCreate(ctx)
 	return err
@@ -34960,6 +34966,8 @@ func (w *ServerInterfaceWrapper) AccountAuthProviderList(ctx echo.Context) error
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountAuthProviderList(ctx)
@@ -34981,6 +34989,8 @@ func (w *ServerInterfaceWrapper) AccountAuthMethodDelete(ctx echo.Context) error
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountAuthMethodDelete(ctx, authMethodId)
 	return err
@@ -34993,6 +35003,8 @@ func (w *ServerInterfaceWrapper) AccountSetAvatar(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AccountSetAvatarParams
@@ -35029,6 +35041,8 @@ func (w *ServerInterfaceWrapper) AccountEmailAdd(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountEmailAdd(ctx)
 	return err
@@ -35049,6 +35063,8 @@ func (w *ServerInterfaceWrapper) AccountEmailRemove(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountEmailRemove(ctx, emailAddressId)
 	return err
@@ -35068,6 +35084,8 @@ func (w *ServerInterfaceWrapper) AccountGetAvatar(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountGetAvatar(ctx, accountHandle)
@@ -35097,6 +35115,8 @@ func (w *ServerInterfaceWrapper) AccountRemoveRole(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountRemoveRole(ctx, accountHandle, roleId)
 	return err
@@ -35124,6 +35144,8 @@ func (w *ServerInterfaceWrapper) AccountAddRole(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountAddRole(ctx, accountHandle, roleId)
@@ -35153,6 +35175,8 @@ func (w *ServerInterfaceWrapper) AccountRoleRemoveBadge(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountRoleRemoveBadge(ctx, accountHandle, roleId)
 	return err
@@ -35181,6 +35205,8 @@ func (w *ServerInterfaceWrapper) AccountRoleSetBadge(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountRoleSetBadge(ctx, accountHandle, roleId)
 	return err
@@ -35200,6 +35226,8 @@ func (w *ServerInterfaceWrapper) AccountView(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountView(ctx, accountId)
@@ -35221,6 +35249,8 @@ func (w *ServerInterfaceWrapper) AccountManageUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountManageUpdate(ctx, accountId)
 	return err
@@ -35241,6 +35271,8 @@ func (w *ServerInterfaceWrapper) AccountEmailPasswordReset(ctx echo.Context) err
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountEmailPasswordReset(ctx, accountId)
 	return err
@@ -35260,6 +35292,8 @@ func (w *ServerInterfaceWrapper) AccountPasswordResetTokenGet(ctx echo.Context) 
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountPasswordResetTokenGet(ctx, accountId)
@@ -35289,6 +35323,8 @@ func (w *ServerInterfaceWrapper) AccountManageUpdateEmailVerifiedStatus(ctx echo
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountManageUpdateEmailVerifiedStatus(ctx, accountId, emailAddressId)
 	return err
@@ -35309,6 +35345,8 @@ func (w *ServerInterfaceWrapper) AccountModerationNoteList(ctx echo.Context) err
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountModerationNoteList(ctx, accountId)
 	return err
@@ -35328,6 +35366,8 @@ func (w *ServerInterfaceWrapper) AccountModerationNoteCreate(ctx echo.Context) e
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountModerationNoteCreate(ctx, accountId)
@@ -35357,6 +35397,8 @@ func (w *ServerInterfaceWrapper) AccountModerationNoteDelete(ctx echo.Context) e
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountModerationNoteDelete(ctx, accountId, moderationNoteId)
 	return err
@@ -35377,6 +35419,8 @@ func (w *ServerInterfaceWrapper) AccountWarningList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountWarningList(ctx, accountId)
 	return err
@@ -35396,6 +35440,8 @@ func (w *ServerInterfaceWrapper) AccountWarningCreate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountWarningCreate(ctx, accountId)
@@ -35425,6 +35471,8 @@ func (w *ServerInterfaceWrapper) AccountWarningDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountWarningDelete(ctx, accountId, warningId)
 	return err
@@ -35453,6 +35501,8 @@ func (w *ServerInterfaceWrapper) AccountWarningUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountWarningUpdate(ctx, accountId, warningId)
 	return err
@@ -35465,6 +35515,8 @@ func (w *ServerInterfaceWrapper) AdminSettingsGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminSettingsGet(ctx)
@@ -35479,6 +35531,8 @@ func (w *ServerInterfaceWrapper) AdminSettingsUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminSettingsUpdate(ctx)
 	return err
@@ -35491,6 +35545,8 @@ func (w *ServerInterfaceWrapper) AdminAccessKeyList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminAccessKeyList(ctx)
@@ -35512,6 +35568,8 @@ func (w *ServerInterfaceWrapper) AdminAccessKeyDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminAccessKeyDelete(ctx, accessKeyId)
 	return err
@@ -35525,6 +35583,8 @@ func (w *ServerInterfaceWrapper) ModerationActionCreate(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ModerationActionCreate(ctx)
 	return err
@@ -35537,6 +35597,8 @@ func (w *ServerInterfaceWrapper) AuditEventList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AuditEventListParams
@@ -35581,6 +35643,8 @@ func (w *ServerInterfaceWrapper) AuditEventGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuditEventGet(ctx, auditEventId)
 	return err
@@ -35600,6 +35664,8 @@ func (w *ServerInterfaceWrapper) AdminAccountBanRemove(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminAccountBanRemove(ctx, accountHandle)
@@ -35621,6 +35687,8 @@ func (w *ServerInterfaceWrapper) AdminAccountBanCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminAccountBanCreate(ctx, accountHandle)
 	return err
@@ -35633,6 +35701,8 @@ func (w *ServerInterfaceWrapper) EmailQueueList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params EmailQueueListParams
@@ -35684,6 +35754,8 @@ func (w *ServerInterfaceWrapper) EmailQueueRetry(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EmailQueueRetry(ctx, emailId)
 	return err
@@ -35697,6 +35769,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthClientList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthClientList(ctx)
 	return err
@@ -35709,6 +35783,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthClientCreate(ctx echo.Context) error 
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthClientCreate(ctx)
@@ -35730,6 +35806,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthClientDelete(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthClientDelete(ctx, oauthClientId)
 	return err
@@ -35749,6 +35827,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthClientGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthClientGet(ctx, oauthClientId)
@@ -35770,6 +35850,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthClientUpdate(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthClientUpdate(ctx, oauthClientId)
 	return err
@@ -35783,6 +35865,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthDeviceAuthorisationList(ctx echo.Cont
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthDeviceAuthorisationList(ctx)
 	return err
@@ -35795,6 +35879,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthRefreshTokenList(ctx echo.Context) er
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthRefreshTokenList(ctx)
@@ -35816,6 +35902,8 @@ func (w *ServerInterfaceWrapper) AdminOAuthRefreshTokenDelete(ctx echo.Context) 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthRefreshTokenDelete(ctx, oauthRefreshTokenId)
 	return err
@@ -35828,6 +35916,8 @@ func (w *ServerInterfaceWrapper) AssetUpload(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AssetUploadParams
@@ -35884,6 +35974,8 @@ func (w *ServerInterfaceWrapper) AssetGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AssetGet(ctx, assetFilename)
 	return err
@@ -35897,6 +35989,8 @@ func (w *ServerInterfaceWrapper) AuthProviderList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthProviderList(ctx)
 	return err
@@ -35909,6 +36003,8 @@ func (w *ServerInterfaceWrapper) AccessKeyList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccessKeyList(ctx)
@@ -35941,6 +36037,8 @@ func (w *ServerInterfaceWrapper) AccessKeyDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccessKeyDelete(ctx, accessKeyId)
 	return err
@@ -35953,6 +36051,8 @@ func (w *ServerInterfaceWrapper) AuthPasswordResetRequestEmail(ctx echo.Context)
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthPasswordResetRequestEmail(ctx)
@@ -35967,6 +36067,8 @@ func (w *ServerInterfaceWrapper) AuthEmailPasswordSignin(ctx echo.Context) error
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthEmailPasswordSignin(ctx)
 	return err
@@ -35979,6 +36081,8 @@ func (w *ServerInterfaceWrapper) AuthEmailPasswordSignup(ctx echo.Context) error
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AuthEmailPasswordSignupParams
@@ -36002,6 +36106,8 @@ func (w *ServerInterfaceWrapper) AuthEmailSignin(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthEmailSignin(ctx)
 	return err
@@ -36014,6 +36120,8 @@ func (w *ServerInterfaceWrapper) AuthEmailSignup(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AuthEmailSignupParams
@@ -36036,6 +36144,8 @@ func (w *ServerInterfaceWrapper) AuthEmailVerify(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthEmailVerify(ctx)
@@ -36182,6 +36292,8 @@ func (w *ServerInterfaceWrapper) OAuthProviderCallback(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.OAuthProviderCallback(ctx, oauthProvider)
 	return err
@@ -36217,6 +36329,8 @@ func (w *ServerInterfaceWrapper) AuthPasswordReset(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthPasswordReset(ctx)
 	return err
@@ -36230,6 +36344,8 @@ func (w *ServerInterfaceWrapper) AuthPasswordSignin(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AuthPasswordSignin(ctx)
 	return err
@@ -36242,6 +36358,8 @@ func (w *ServerInterfaceWrapper) AuthPasswordSignup(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params AuthPasswordSignupParams
@@ -36264,6 +36382,8 @@ func (w *ServerInterfaceWrapper) PhoneRequestCode(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PhoneRequestCodeParams
@@ -36293,6 +36413,8 @@ func (w *ServerInterfaceWrapper) PhoneSubmitCode(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PhoneSubmitCode(ctx, accountHandle)
@@ -36324,6 +36446,8 @@ func (w *ServerInterfaceWrapper) WebAuthnGetAssertion(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.WebAuthnGetAssertion(ctx, accountHandle)
@@ -36365,6 +36489,8 @@ func (w *ServerInterfaceWrapper) WebAuthnRequestCredential(ctx echo.Context) err
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.WebAuthnRequestCredential(ctx, accountHandle)
 	return err
@@ -36387,6 +36513,8 @@ func (w *ServerInterfaceWrapper) CategoryList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryList(ctx)
 	return err
@@ -36399,6 +36527,8 @@ func (w *ServerInterfaceWrapper) CategoryCreate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryCreate(ctx)
@@ -36420,6 +36550,8 @@ func (w *ServerInterfaceWrapper) CategoryDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryDelete(ctx, categorySlug)
 	return err
@@ -36439,6 +36571,8 @@ func (w *ServerInterfaceWrapper) CategoryGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryGet(ctx, categorySlug)
@@ -36460,6 +36594,8 @@ func (w *ServerInterfaceWrapper) CategoryUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryUpdate(ctx, categorySlug)
 	return err
@@ -36480,6 +36616,8 @@ func (w *ServerInterfaceWrapper) CategoryUpdatePosition(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CategoryUpdatePosition(ctx, categorySlug)
 	return err
@@ -36492,6 +36630,8 @@ func (w *ServerInterfaceWrapper) CollectionList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params CollectionListParams
@@ -36522,6 +36662,8 @@ func (w *ServerInterfaceWrapper) CollectionCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionCreate(ctx)
 	return err
@@ -36541,6 +36683,8 @@ func (w *ServerInterfaceWrapper) CollectionDelete(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionDelete(ctx, collectionMark)
@@ -36562,6 +36706,8 @@ func (w *ServerInterfaceWrapper) CollectionGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionGet(ctx, collectionMark)
 	return err
@@ -36581,6 +36727,8 @@ func (w *ServerInterfaceWrapper) CollectionUpdate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionUpdate(ctx, collectionMark)
@@ -36610,6 +36758,8 @@ func (w *ServerInterfaceWrapper) CollectionRemoveNode(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionRemoveNode(ctx, collectionMark, nodeId)
 	return err
@@ -36637,6 +36787,8 @@ func (w *ServerInterfaceWrapper) CollectionAddNode(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionAddNode(ctx, collectionMark, nodeId)
@@ -36666,6 +36818,8 @@ func (w *ServerInterfaceWrapper) CollectionRemovePost(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionRemovePost(ctx, collectionMark, postId)
 	return err
@@ -36694,6 +36848,8 @@ func (w *ServerInterfaceWrapper) CollectionAddPost(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.CollectionAddPost(ctx, collectionMark, postId)
 	return err
@@ -36706,6 +36862,8 @@ func (w *ServerInterfaceWrapper) DatagraphSearch(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DatagraphSearchParams
@@ -36764,6 +36922,8 @@ func (w *ServerInterfaceWrapper) DatagraphAsk(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DatagraphAskParams
 	// ------------- Required query parameter "q" -------------
@@ -36792,6 +36952,8 @@ func (w *ServerInterfaceWrapper) DatagraphMatches(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params DatagraphMatchesParams
@@ -36831,6 +36993,8 @@ func (w *ServerInterfaceWrapper) EventList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Parameter object where we will unmarshal all parameters from the context
 	var params EventListParams
 	// ------------- Optional query parameter "q" -------------
@@ -36860,6 +37024,8 @@ func (w *ServerInterfaceWrapper) EventCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventCreate(ctx)
 	return err
@@ -36879,6 +37045,8 @@ func (w *ServerInterfaceWrapper) EventDelete(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventDelete(ctx, eventMark)
@@ -36900,6 +37068,8 @@ func (w *ServerInterfaceWrapper) EventGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventGet(ctx, eventMark)
 	return err
@@ -36919,6 +37089,8 @@ func (w *ServerInterfaceWrapper) EventUpdate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventUpdate(ctx, eventMark)
@@ -36948,6 +37120,8 @@ func (w *ServerInterfaceWrapper) EventParticipantRemove(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventParticipantRemove(ctx, eventMark, accountId)
 	return err
@@ -36975,6 +37149,8 @@ func (w *ServerInterfaceWrapper) EventParticipantUpdate(ctx echo.Context) error 
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.EventParticipantUpdate(ctx, eventMark, accountId)
@@ -37007,6 +37183,8 @@ func (w *ServerInterfaceWrapper) BannerUpload(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.BannerUpload(ctx)
 	return err
@@ -37019,6 +37197,8 @@ func (w *ServerInterfaceWrapper) IconUpload(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.IconUpload(ctx)
@@ -37049,6 +37229,8 @@ func (w *ServerInterfaceWrapper) InvitationList(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Parameter object where we will unmarshal all parameters from the context
 	var params InvitationListParams
 	// ------------- Optional query parameter "account_id" -------------
@@ -37071,6 +37253,8 @@ func (w *ServerInterfaceWrapper) InvitationCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.InvitationCreate(ctx)
 	return err
@@ -37090,6 +37274,8 @@ func (w *ServerInterfaceWrapper) InvitationDelete(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.InvitationDelete(ctx, invitationId)
@@ -37111,6 +37297,8 @@ func (w *ServerInterfaceWrapper) InvitationGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.InvitationGet(ctx, invitationId)
 	return err
@@ -37130,6 +37318,8 @@ func (w *ServerInterfaceWrapper) LikePostRemove(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LikePostRemove(ctx, postId)
@@ -37151,6 +37341,8 @@ func (w *ServerInterfaceWrapper) LikePostGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LikePostGet(ctx, postId)
 	return err
@@ -37171,6 +37363,8 @@ func (w *ServerInterfaceWrapper) LikePostAdd(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LikePostAdd(ctx, postId)
 	return err
@@ -37190,6 +37384,8 @@ func (w *ServerInterfaceWrapper) LikeProfileGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params LikeProfileGetParams
@@ -37212,6 +37408,8 @@ func (w *ServerInterfaceWrapper) LinkList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params LinkListParams
@@ -37242,6 +37440,8 @@ func (w *ServerInterfaceWrapper) LinkCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LinkCreate(ctx)
 	return err
@@ -37262,6 +37462,8 @@ func (w *ServerInterfaceWrapper) LinkGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.LinkGet(ctx, linkSlug)
 	return err
@@ -37274,6 +37476,8 @@ func (w *ServerInterfaceWrapper) NodeList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params NodeListParams
@@ -37339,6 +37543,8 @@ func (w *ServerInterfaceWrapper) NodeCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeCreate(ctx)
 	return err
@@ -37358,6 +37564,8 @@ func (w *ServerInterfaceWrapper) NodeDelete(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params NodeDeleteParams
@@ -37387,6 +37595,8 @@ func (w *ServerInterfaceWrapper) NodeGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params NodeGetParams
@@ -37424,6 +37634,8 @@ func (w *ServerInterfaceWrapper) NodeUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdate(ctx, nodeSlug)
 	return err
@@ -37451,6 +37663,8 @@ func (w *ServerInterfaceWrapper) NodeRemoveAsset(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeRemoveAsset(ctx, nodeSlug, assetId)
@@ -37480,6 +37694,8 @@ func (w *ServerInterfaceWrapper) NodeAddAsset(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeAddAsset(ctx, nodeSlug, assetId)
 	return err
@@ -37499,6 +37715,8 @@ func (w *ServerInterfaceWrapper) NodeListChildren(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params NodeListChildrenParams
@@ -37550,6 +37768,8 @@ func (w *ServerInterfaceWrapper) NodeUpdateChildrenPropertySchema(ctx echo.Conte
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdateChildrenPropertySchema(ctx, nodeSlug)
 	return err
@@ -37569,6 +37789,8 @@ func (w *ServerInterfaceWrapper) NodeGenerateContent(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeGenerateContent(ctx, nodeSlug)
@@ -37598,6 +37820,8 @@ func (w *ServerInterfaceWrapper) NodeRemoveNode(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeRemoveNode(ctx, nodeSlug, nodeSlugChild)
 	return err
@@ -37626,6 +37850,8 @@ func (w *ServerInterfaceWrapper) NodeAddNode(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeAddNode(ctx, nodeSlug, nodeSlugChild)
 	return err
@@ -37645,6 +37871,8 @@ func (w *ServerInterfaceWrapper) NodeUpdatePosition(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdatePosition(ctx, nodeSlug)
@@ -37666,6 +37894,8 @@ func (w *ServerInterfaceWrapper) NodeUpdateProperties(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdateProperties(ctx, nodeSlug)
 	return err
@@ -37685,6 +37915,8 @@ func (w *ServerInterfaceWrapper) NodeUpdatePropertySchema(ctx echo.Context) erro
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdatePropertySchema(ctx, nodeSlug)
@@ -37706,6 +37938,8 @@ func (w *ServerInterfaceWrapper) NodeGenerateTags(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeGenerateTags(ctx, nodeSlug)
 	return err
@@ -37725,6 +37959,8 @@ func (w *ServerInterfaceWrapper) NodeGenerateTitle(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeGenerateTitle(ctx, nodeSlug)
@@ -37746,6 +37982,8 @@ func (w *ServerInterfaceWrapper) NodeUpdateVisibility(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NodeUpdateVisibility(ctx, nodeSlug)
 	return err
@@ -37758,6 +37996,8 @@ func (w *ServerInterfaceWrapper) NotificationList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params NotificationListParams
@@ -37788,6 +38028,8 @@ func (w *ServerInterfaceWrapper) NotificationUpdateMany(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NotificationUpdateMany(ctx)
 	return err
@@ -37807,6 +38049,8 @@ func (w *ServerInterfaceWrapper) NotificationUpdate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.NotificationUpdate(ctx, notificationId)
@@ -38194,6 +38438,8 @@ func (w *ServerInterfaceWrapper) PostLocationGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Parameter object where we will unmarshal all parameters from the context
 	var params PostLocationGetParams
 	// ------------- Required query parameter "id" -------------
@@ -38223,6 +38469,8 @@ func (w *ServerInterfaceWrapper) PostDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostDelete(ctx, postId)
 	return err
@@ -38243,6 +38491,8 @@ func (w *ServerInterfaceWrapper) PostUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostUpdate(ctx, postId)
 	return err
@@ -38262,6 +38512,8 @@ func (w *ServerInterfaceWrapper) PostReactAdd(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostReactAdd(ctx, postId)
@@ -38291,6 +38543,8 @@ func (w *ServerInterfaceWrapper) PostReactRemove(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.PostReactRemove(ctx, postId, reactId)
 	return err
@@ -38303,6 +38557,8 @@ func (w *ServerInterfaceWrapper) ProfileList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ProfileListParams
@@ -38368,6 +38624,8 @@ func (w *ServerInterfaceWrapper) ProfileGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ProfileGet(ctx, accountHandle)
 	return err
@@ -38388,6 +38646,8 @@ func (w *ServerInterfaceWrapper) ProfileFollowersRemove(ctx echo.Context) error 
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ProfileFollowersRemove(ctx, accountHandle)
 	return err
@@ -38407,6 +38667,8 @@ func (w *ServerInterfaceWrapper) ProfileFollowersGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ProfileFollowersGetParams
@@ -38437,6 +38699,8 @@ func (w *ServerInterfaceWrapper) ProfileFollowersAdd(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ProfileFollowersAdd(ctx, accountHandle)
 	return err
@@ -38456,6 +38720,8 @@ func (w *ServerInterfaceWrapper) ProfileFollowingGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ProfileFollowingGetParams
@@ -38478,6 +38744,8 @@ func (w *ServerInterfaceWrapper) ReportList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ReportListParams
@@ -38515,6 +38783,8 @@ func (w *ServerInterfaceWrapper) ReportCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReportCreate(ctx)
 	return err
@@ -38535,6 +38805,8 @@ func (w *ServerInterfaceWrapper) ReportUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReportUpdate(ctx, reportId)
 	return err
@@ -38547,6 +38819,8 @@ func (w *ServerInterfaceWrapper) RoleList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleList(ctx)
@@ -38561,6 +38835,8 @@ func (w *ServerInterfaceWrapper) RoleCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleCreate(ctx)
 	return err
@@ -38573,6 +38849,8 @@ func (w *ServerInterfaceWrapper) RoleUpdateOrder(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleUpdateOrder(ctx)
@@ -38594,6 +38872,8 @@ func (w *ServerInterfaceWrapper) RoleDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleDelete(ctx, roleId)
 	return err
@@ -38614,6 +38894,8 @@ func (w *ServerInterfaceWrapper) RoleGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleGet(ctx, roleId)
 	return err
@@ -38633,6 +38915,8 @@ func (w *ServerInterfaceWrapper) RoleUpdate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleUpdate(ctx, roleId)
@@ -38655,6 +38939,8 @@ func (w *ServerInterfaceWrapper) TagList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params TagListParams
@@ -38685,6 +38971,8 @@ func (w *ServerInterfaceWrapper) TagGet(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.TagGet(ctx, tagName)
 	return err
@@ -38697,6 +38985,8 @@ func (w *ServerInterfaceWrapper) ThreadList(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ThreadListParams
@@ -38762,6 +39052,8 @@ func (w *ServerInterfaceWrapper) ThreadCreate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ThreadCreate(ctx)
 	return err
@@ -38782,6 +39074,8 @@ func (w *ServerInterfaceWrapper) ThreadDelete(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ThreadDelete(ctx, threadMark)
 	return err
@@ -38801,6 +39095,8 @@ func (w *ServerInterfaceWrapper) ThreadGet(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Parameter object where we will unmarshal all parameters from the context
 	var params ThreadGetParams
@@ -38831,6 +39127,8 @@ func (w *ServerInterfaceWrapper) ThreadUpdate(ctx echo.Context) error {
 
 	ctx.Set(Access_keyScopes, []string{})
 
+	ctx.Set(Oauth_tokenScopes, []string{})
+
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ThreadUpdate(ctx, threadMark)
 	return err
@@ -38850,6 +39148,8 @@ func (w *ServerInterfaceWrapper) ReplyCreate(ctx echo.Context) error {
 	ctx.Set(BrowserScopes, []string{})
 
 	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.ReplyCreate(ctx, threadMark)
@@ -54477,17 +54777,17 @@ var swaggerSpec = []string{
 	"PJ5OisfywXYQkQcwWr/k5x3Br8Fzt9BNUvfUeuxHa7j8HtUc9Uxt5NPReG9nDZ1EwiEmfDrDcxUJx1R+",
 	"t6HiNZXuUDxFhLT+8C/ErFxEYf4IZ58uoGvkLkzwND04dKp48gT/vQFGXTB6hqlqOhQm9KKjRlgB2Bk6",
 	"rpIsMaIU3IoAimczVcscaKlRdxAg0E0c90Y6luvpFBs4Ttb4SH6jJW/FPnfikzuelVyqVlxz64xU40fA",
-	"NQ+5dV6BmnNTbzCuaNACcb6pDLj3+YiaadyKRSgMhq5Ca0tSf7m6Oke0thGCQoTcvtgqCMcMhU27BZHv",
-	"5uaYz+TxDZtxN0GvuVqEcJVlunJWFpEWhp4Q4MmIIj4UDDoT1UCPq8D4EcA0oHBhiftMGAlY+SUbCe4q",
-	"Q5HeBkpKZcqjH4/8Io+SGulVxUoJw0s2FY6D4y50AIieSj9xpcgygSp6o4M3mgxNOJ9Vu/WkRvsKH7OE",
-	"UUZuzWQqQAhrmesdgDEtweIk40Lp9+rICwiEQ5+epS6VXFg3EU7m6UTo2m35mNo/i70iMbeosfbKTVpG",
-	"frR149bG4/SrtpeF5FJ1Jx1lXSUl0vVvW8a+vvObpLSLZJSObfy+ZfRpyNLyp469DTH/JNkhSkdYHXze",
-	"KDtpHE/IpVwdhPIsmL6yMaz+ZcvAD2bMFTU+4uRXBQglafMKM31Qr/PfUsqh4RAuLhpvgGvRcgBqUcNM",
-	"UGJ+ktp2jmmPSALpZ0K12ep0P2tTTVNXW3g76R8tW5lqpAmsdq1R1KdRtu/Pz7IMQDW4B4WeK/gpJUJr",
-	"ReuS38pbYY/vtAuXZ+tWln7EOvrPq5AFWJaItmEDeMLmWZMBba4xZ6rcQX/EmEYFvDZkGzojRIP8i9Y1",
-	"Xupc8pINtb71Wl/zs9TtppsyNnw2YX+CL+nh8nsMBv3Zc/R0Ks9g4fG119aL56IqAekOrjlx9mlkf8l0",
-	"2BsauPunvhfnoAHkPJ+I6yCXryeCF1RCdOr/0vfrNrpcJ9Dp+ePmw/e9o9dXfLxtEDxz3zt6y63rR8Nx",
-	"y6Dmw/f39/f/fwAAAP//0lWcZ8Q8BAA=",
+	"NQ+5dV6BmnNTbzCuaNACcb6pDLj3+YiaadyKRfhNC5I+NBpaW6X6y9XVOQK4jRAnIqT7xe5BOGYobNpA",
+	"iNw5N8d8Jo9v2Iy7CTrS1SJEsCzTlbOyiOQx9LQBT0Zg8aFg0Kyoxn5cxcqPmKYBmAur3mfCSIDPL9lI",
+	"cFcZCv42gFMqUx79eOQXeZSUTa/qWkoYXrKpcBx8eaEpQHRe+okrRcYKFNYbHRzUZHvCka2asic1AFj4",
+	"mCXYMvJ0JlMBaFjLXO8An2kJKScZF6rBV0deQGwcWvcsNa7kwrqJcDJPJ0Jvb8vH1C5bbB+J6UaNtVdu",
+	"0jLyo617uTYep1+1vSzkm6o76SgRK6marn/bMvb1nd8kpV0ko3Rs4/cto09D4pY/dWx3iCkpyQ5RhsLq",
+	"4PNGJUrjeEJ65eogFHHBGpaNYfUvWwZ+MGOuqBcSJ1croCpJm1eY/IOqnv+WUg4Nhwhy0XgDXIuWA1CL",
+	"GnmCcvWTbLdzzIREEkg/EwrQVqf7WZtqmnrfwttJJWnZylRJTZC2ayWjPo2yfX9+lmXArsE9KPRcwU8p",
+	"EVorWpf8Vt4Ke3ynXbg8W7ey9CPW0X9ehcTAskQADhvwFDbPmgxo85Y5U+UOWibGzCrgtSEB0RkhGuRf",
+	"tK7xUueSl2yo9a1XBJufpW433ZSx4bMJ+xN8SQ+X32Mw6M+eo6dTeQYLj6+9tl5iF1UJ4HdwzYmzTyP7",
+	"S6bDdtHA3T/1vYQHpSDn+URcB1F9PRG8oKqiU/+Xvl+30eU6GU/PHzcfvu8dvb7i422D4Jn73tFbbl0/",
+	"2pJbBjUfvr+/v///AwAA//89qDCH1zwEAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

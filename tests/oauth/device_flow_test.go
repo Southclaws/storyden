@@ -227,8 +227,11 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 				r.NotNil(reuse.JSON400)
 				a.Equal("invalid_grant", reuse.JSON400.Error)
 
-				adminSettings := tests.AssertRequest(cl.AdminSettingsGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
-				r.NotNil(adminSettings.JSON200)
+				userinfo := tests.AssertRequest(cl.OAuthUserInfoWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
+				r.NotNil(userinfo.JSON200)
+
+				account := tests.AssertRequest(cl.AccountGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
+				r.NotNil(account.JSON200)
 			})
 
 			t.Run("explicit_client_cannot_expand_beyond_member_permissions", func(t *testing.T) {
@@ -264,8 +267,8 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 				a.Contains(*token.JSON200.Scope, rbac.PermissionCreatePost.String())
 				a.NotContains(*token.JSON200.Scope, rbac.PermissionManageReports.String())
 
-				adminSettings := tests.AssertRequest(cl.AdminSettingsGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusForbidden)
-				a.NotNil(adminSettings)
+				account := tests.AssertRequest(cl.AccountGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
+				r.NotNil(account.JSON200)
 
 				category := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 					Name: "oauth-explicit-category-" + uuid.NewString(),

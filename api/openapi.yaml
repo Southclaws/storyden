@@ -41,6 +41,7 @@ servers:
 security:
   - browser: []
   - access_key: []
+  - oauth_token: []
 
 x-types:
   cache_response_headers: &cache_response_headers

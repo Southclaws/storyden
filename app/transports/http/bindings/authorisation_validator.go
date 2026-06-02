@@ -35,14 +35,14 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	allowedSecuritySchemes := ai.RequestValidationInput.Route.Operation.Security
+	allowedSecuritySchemes := effectiveSecurityRequirements(ai)
 
 	// If the route defines a set of security schemes, ensure the one used by
 	// the request exists in the list. If not, reject the request entirely. A
 	// quirk of the OpenAPI runtime is it calls this validator for every scheme
 	// defined in the spec, so this function gets called multiple times which is
 	// not amazing for performance but... whatadayagonnado? Early exit at least.
-	if allowedSecuritySchemes != nil {
+	if allowedSecuritySchemes != nil && len(*allowedSecuritySchemes) > 0 {
 		matchSecurityScheme := lo.ContainsBy(*allowedSecuritySchemes, func(sr openapi3.SecurityRequirement) bool {
 			return lo.HasKey(sr, requestSecurityScheme)
 		})
@@ -96,6 +96,14 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 	}
 
 	return nil
+}
+
+func effectiveSecurityRequirements(ai *openapi3filter.AuthenticationInput) *openapi3.SecurityRequirements {
+	if security := ai.RequestValidationInput.Route.Operation.Security; security != nil {
+		return security
+	}
+
+	return &ai.RequestValidationInput.Route.Spec.Security
 }
 
 // TODO: Use Scopes field of OpenAPI security spec.

@@ -71,8 +71,13 @@ func TestOAuthBearerTokenValidation(t *testing.T) {
 			t.Run("valid_oauth_token_authenticates_request", func(t *testing.T) {
 				r := require.New(t)
 
-				adminSettings := tests.AssertRequest(cl.AdminSettingsGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
-				r.NotNil(adminSettings.JSON200)
+				userinfo := tests.AssertRequest(cl.OAuthUserInfoWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
+				r.NotNil(userinfo.JSON200)
+			})
+
+			t.Run("oauth_token_is_allowed_by_inherited_default_security", func(t *testing.T) {
+				resp := tests.AssertRequest(cl.AccountGetWithResponse(root, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
+				a.NotNil(resp.JSON200)
 			})
 
 			t.Run("tampered_oauth_token_is_rejected", func(t *testing.T) {
