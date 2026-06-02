@@ -32,16 +32,31 @@ import (
 	nodemove "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/move"
 	nodeopen "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/open"
 	nodeproperties "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties"
-	nodesearch "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/search"
 	propertiesget "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/get"
 	propertiesschema "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema"
 	schemachildren "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/children"
 	schemaget "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/get"
 	schemaset "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/set"
 	propertiesset "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/set"
+	nodesearch "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/search"
 	nodetree "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/tree"
 	nodeupdate "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/update"
 	nodevisibility "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/visibility"
+	plugincmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin"
+	pluginactivate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/activate"
+	plugindeactivate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/deactivate"
+	plugindelete "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/delete"
+	plugindev "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev"
+	plugindevinstall "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/install"
+	plugindevnew "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/new"
+	plugindevpackage "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/package"
+	plugindevrun "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/run"
+	plugindevvalidate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/validate"
+	pluginget "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/get"
+	pluginlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/list"
+	pluginlogs "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/logs"
+	plugintoken "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token"
+	plugintokenrotate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token/rotate"
 	threadcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread"
 	threadget "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/get"
 	threadlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/list"
@@ -56,6 +71,7 @@ func newRootCommand(
 	configCommand configcmd.ConfigCommand,
 	threadCommand threadcmd.ThreadCommand,
 	nodeCommand nodecmd.NodeCommand,
+	pluginCommand plugincmd.PluginCommand,
 	tuiCommand tuicmd.TUICommand,
 ) *cobra.Command {
 	root := &cobra.Command{
@@ -105,6 +121,7 @@ sd auth switch
 	root.AddCommand((*cobra.Command)(configCommand))
 	root.AddCommand((*cobra.Command)(threadCommand))
 	root.AddCommand((*cobra.Command)(nodeCommand))
+	root.AddCommand((*cobra.Command)(pluginCommand))
 	root.AddCommand((*cobra.Command)(tuiCommand))
 
 	help.SetupMarkdownHelp(root)
@@ -165,6 +182,21 @@ func main() {
 			propertiesschema.New,
 			nodeproperties.New,
 			nodecmd.New,
+			plugindevnew.New,
+			plugindevrun.New,
+			plugindevpackage.New,
+			plugindevvalidate.New,
+			plugindevinstall.New,
+			plugindev.New,
+			pluginlist.New,
+			pluginget.New,
+			plugindelete.New,
+			pluginactivate.New,
+			plugindeactivate.New,
+			pluginlogs.New,
+			plugintokenrotate.New,
+			plugintoken.New,
+			plugincmd.New,
 			newRootCommand,
 		),
 		fx.Invoke(configureDefaultLogger),
