@@ -6,6 +6,12 @@
       "sourceType": "github",
       "computedHash": "20b74ca9310c1339360b54916621f81abeac34576758bfffcd70062cfd1d73cd"
     },
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "228f87d57035100d9dc6efcfc05aafd4b6e3962adacaa04b8217ab2fadb15dc8"
+    },
     "animate": {
       "source": "pbakaus/impeccable",
       "sourceType": "github",
