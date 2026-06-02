@@ -12,7 +12,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/plugin"
@@ -24,41 +23,16 @@ import (
 
 type Plugins struct {
 	pm *plugin_manager.Manager
+	pl *plugin_logger.Reader
 }
 
 func NewPlugins(
 	pm *plugin_manager.Manager,
 	pl *plugin_logger.Reader,
-	router *echo.Echo,
 ) Plugins {
-	// The generated OpenAPI code does not expose the underlying ResponseWriter
-	// which we need for streaming Q&A responses for that ✨chatgpt✨ effect.
-	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			path := c.Path()
-
-			if !strings.HasPrefix(path, "/api/plugins/") {
-				return next(c)
-			}
-
-			if !strings.HasSuffix(path, "/logs") {
-				return next(c)
-			}
-
-			if c.Request().Method != http.MethodGet {
-				return next(c)
-			}
-
-			ctx := c.Request().Context()
-
-			pluginID := plugin.InstallationID(deserialiseID(c.Param("plugin_instance_id")))
-
-			return streamPluginLogs(ctx, c, pm, pl, pluginID)
-		}
-	})
-
 	return Plugins{
 		pm: pm,
+		pl: pl,
 	}
 }
 
@@ -193,7 +167,12 @@ func (p *Plugins) PluginSetActiveState(ctx context.Context, request openapi.Plug
 }
 
 func (p *Plugins) PluginGetLogs(ctx context.Context, request openapi.PluginGetLogsRequestObject) (openapi.PluginGetLogsResponseObject, error) {
-	return nil, nil
+	return pluginGetLogsStreamResponse{
+		ctx:      ctx,
+		pm:       p.pm,
+		pl:       p.pl,
+		pluginID: plugin.InstallationID(deserialiseID(request.PluginInstanceId)),
+	}, nil
 }
 
 func (p *Plugins) PluginUpdateManifest(ctx context.Context, request openapi.PluginUpdateManifestRequestObject) (openapi.PluginUpdateManifestResponseObject, error) {
@@ -455,9 +434,20 @@ func serialisePluginConfigurationField(in rpc.PluginConfigurationFieldSchema) op
 	return out
 }
 
+type pluginGetLogsStreamResponse struct {
+	ctx      context.Context
+	pm       *plugin_manager.Manager
+	pluginID plugin.InstallationID
+	pl       *plugin_logger.Reader
+}
+
+func (response pluginGetLogsStreamResponse) VisitPluginGetLogsResponse(w http.ResponseWriter) error {
+	return streamPluginLogs(response.ctx, w, response.pm, response.pl, response.pluginID)
+}
+
 func streamPluginLogs(
 	ctx context.Context,
-	c echo.Context,
+	w http.ResponseWriter,
 	pm *plugin_manager.Manager,
 	pr *plugin_logger.Reader,
 	pluginID plugin.InstallationID,
@@ -475,7 +465,6 @@ func streamPluginLogs(
 		)
 	}
 
-	w := c.Response().Writer
 	w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -491,6 +480,8 @@ func streamPluginLogs(
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
+
+	w.WriteHeader(http.StatusOK)
 
 	for {
 		select {
