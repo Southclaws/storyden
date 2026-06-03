@@ -581,7 +581,6 @@ paths:
       operationId: PluginList
       description: List all plugins that are installed on the instance.
       tags: [plugins]
-      security: [browser: []]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/PluginListOK" }
@@ -593,7 +592,6 @@ paths:
 
         Plugins can be uploaded directly as files or via a URL to a repository.
       tags: [plugins]
-      security: [browser: []]
       requestBody: { $ref: "#/components/requestBodies/PluginAdd" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -606,7 +604,6 @@ paths:
       operationId: PluginGet
       description: Get information about a specific plugin.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -621,7 +618,6 @@ paths:
         Some plugins may write additional data to the instance, this will not
         be removed by this operation unless the plugin cleans up after itself.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -643,7 +639,6 @@ paths:
         External plugins cannot be managed with this endpoint and will return
         a bad request error.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/PluginSetActiveState" }
       responses:
@@ -665,7 +660,6 @@ paths:
         External plugins do not have host-managed logs and this endpoint
         returns a bad request error for external mode.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -682,7 +676,6 @@ paths:
         newly generated token. This operation is only valid for external
         plugins. Supervised plugins cycle their connection token automatically.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -702,7 +695,6 @@ paths:
         This only works for External plugins that were created by uploading a 
         manifest directly. It does not work for Supervised plugins.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/PluginUpdateManifest" }
       responses:
@@ -723,7 +715,6 @@ paths:
         using the new package. If inactive, the package is replaced without
         changing active state.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       requestBody: { $ref: "#/components/requestBodies/PluginUpdatePackage" }
       responses:
@@ -741,7 +732,6 @@ paths:
         file. The schema should be used to render a configuration form for the
         plugin in the client so that administrators can configure the plugin.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -758,7 +748,6 @@ paths:
         the current configuration state in the client, using the layout driven
         by the result of `PluginGetConfigurationSchema` to build a form-like UI.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -775,7 +764,6 @@ paths:
         received, it is sent to the plugin via RPC and the plugin is expected to
         apply the new configuration to itself internally.
       tags: [plugins]
-      security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
       requestBody:
         { $ref: "#/components/requestBodies/PluginUpdateConfiguration" }
