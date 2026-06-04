@@ -1047,7 +1047,6 @@ The Semdex is a semantic index that provides vector-based storage of content. Th
 
 Either:
 - `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
-- `weaviate` for Weaviate, a self-hostable or managed vector database.
 - `pinecone` for Pinecone, a fully managed vector database.
 
 ## Local Semdex
@@ -1062,42 +1061,6 @@ Configuration for when `SEMDEX_PROVIDER` is set to `chromem`.
 </table>
 
 The path to the directory where Chromem will store vector indexes.
-
-## Weaviate Semdex
-
-Configuration for when `SEMDEX_PROVIDER` is set to `weaviate`.
-
-### `WEAVIATE_URL`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or the Weaviate Cloud API.
-
-### `WEAVIATE_API_TOKEN`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-For self-hosted Weaviate where authentication is enabled, or when using Weaviate Cloud.
-
-### `WEAVIATE_CLASS_NAME`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-The class name for Weaviate. This value actually controls which model is used for embeddings and other configuration. In future, there will be a more flexible configuration for Weaviate.
-
-Value values are:
-
-- `text2vec-transformers`: requires that the Weaviate instance is using the `text2vec-transformers` module. This is for calculating embeddings locally using a GPU (or very slowly, using a CPU.) This is only available when self-hosting Weaviate.
-- `text2vec-openai`: requires that the Weaviate instance is using the `text2vec-openai` module. This uses OpenAI's API to calculate embeddings. This works on both self-hosted and Weaviate Cloud instances.
 
 ## Pinecone Semdex
 
