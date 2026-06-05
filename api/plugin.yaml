@@ -110,6 +110,20 @@ properties:
       Optional API access configuration for this plugin. When provided, the
       host can provision a bot account and access key for API calls via RPC.
 
+  files:
+    type: array
+    example:
+      - "**/*"
+    description: >
+      Glob patterns controlling which files are included in the plugin package
+      when running `sd plugin dev package`. Patterns use double-star glob
+      syntax and are matched against file paths relative to the plugin project
+      root (e.g. `dist/**`, `*.py`, `assets/**/*.json`). When omitted, all
+      files are included minus built-in exclusions (`.git`, `node_modules`,
+      `.next`).
+    items:
+      type: string
+
   configuration_schema:
     $ref: "common/plugin-configuration.yaml"
     example:

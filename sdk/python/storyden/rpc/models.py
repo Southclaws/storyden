@@ -699,6 +699,8 @@ class Manifest(BaseModel):
     description: str
     """The list of events the plugin subscribes to and will receive from the host via RPC. Events allow your plugins to react to things that humans or robots do on Storyden."""
     events_consumed: List[Event] | None = None
+    """Glob patterns controlling which files are included in the plugin package when running `sd plugin dev package`. Patterns use double-star glob syntax and are matched against file paths relative to the plugin project root (e.g. `dist/**`, `*.py`, `assets/**/*.json`). When omitted, all files are included minus built-in exclusions (`.git`, `node_modules`, `.next`)."""
+    files: List[str] | None = None
     """
     The unique identifier of the plugin. Must match the pattern `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.
     (NOTE: May change in future.)

@@ -42,6 +42,8 @@ version: "1.0.0"
 command: "./myplugin.exe"
 args:
   - "--enable-coolness"
+files:
+  - "**/*"
 events_consumed:
   - "EventThreadReplyCreated"
 access:
@@ -120,6 +122,14 @@ If you are distributing a plugin for others to use, we highly recommend that you
 
 Arguments passed to the "command" invocation.
 This field is used only for Supervised plugins. External plugins can omit it or provide placeholder values.
+
+### files
+
+- Type: `array<string>`
+- Required: No
+- Example: `array[1]`
+
+Glob patterns controlling which files are included in the plugin package when running `sd plugin dev package`. Patterns use double-star glob syntax and are matched against file paths relative to the plugin project root (e.g. `dist/**`, `*.py`, `assets/**/*.json`). When omitted, all files are included minus built-in exclusions (`.git`, `node_modules`, `.next`).
 
 ### events_consumed
 
