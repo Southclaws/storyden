@@ -57,6 +57,7 @@ import (
 	pluginlogs "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/logs"
 	plugintoken "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token"
 	plugintokenrotate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token/rotate"
+	searchcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/search"
 	threadcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread"
 	threadget "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/get"
 	threadlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/list"
@@ -72,6 +73,7 @@ func newRootCommand(
 	threadCommand threadcmd.ThreadCommand,
 	nodeCommand nodecmd.NodeCommand,
 	pluginCommand plugincmd.PluginCommand,
+	searchCommand searchcmd.SearchCommand,
 	tuiCommand tuicmd.TUICommand,
 ) *cobra.Command {
 	root := &cobra.Command{
@@ -122,6 +124,7 @@ sd auth switch
 	root.AddCommand((*cobra.Command)(threadCommand))
 	root.AddCommand((*cobra.Command)(nodeCommand))
 	root.AddCommand((*cobra.Command)(pluginCommand))
+	root.AddCommand((*cobra.Command)(searchCommand))
 	root.AddCommand((*cobra.Command)(tuiCommand))
 
 	help.SetupMarkdownHelp(root)
@@ -197,6 +200,7 @@ func main() {
 			plugintokenrotate.New,
 			plugintoken.New,
 			plugincmd.New,
+			searchcmd.New,
 			newRootCommand,
 		),
 		fx.Invoke(configureDefaultLogger),
