@@ -115,6 +115,8 @@ author: tester
 description: An example plugin.
 version: 0.1.0
 command: "./example-plugin"
+files:
+  - "example-plugin"
 `), 0o644)
 	require.NoError(t, err)
 	err = os.WriteFile(filepath.Join(dir, "example-plugin"), []byte("#!/bin/sh\n"), 0o755)
@@ -201,7 +203,7 @@ files:
 	require.NotContains(t, names, "README.md")
 }
 
-func TestBuildPackageFilesGlobEmpty(t *testing.T) {
+func TestBuildPackageRequiresFilesField(t *testing.T) {
 	dir := t.TempDir()
 	err := os.WriteFile(filepath.Join(dir, ManifestFilename), []byte(`id: example-plugin
 name: Example Plugin
@@ -212,14 +214,10 @@ command: "./example-plugin"
 `), 0o644)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "example-plugin"), []byte("#!/bin/sh\n"), 0o755))
-	require.NoError(t, os.WriteFile(filepath.Join(dir, "README.md"), []byte("# readme"), 0o644))
 
-	pkg, err := BuildPackage(context.Background(), dir, ManifestFilename)
-	require.NoError(t, err)
-
-	names := archiveNames(t, pkg.Bytes)
-	require.Contains(t, names, "example-plugin")
-	require.Contains(t, names, "README.md")
+	_, err = BuildPackage(context.Background(), dir, ManifestFilename)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "files")
 }
 
 func writeExampleManifest(t *testing.T, dir string) {
@@ -230,6 +228,8 @@ author: tester
 description: An example plugin.
 version: 0.1.0
 command: "./example-plugin"
+files:
+  - "**/*"
 `), 0o644)
 	require.NoError(t, err)
 	err = os.WriteFile(filepath.Join(dir, "example-plugin"), []byte("#!/bin/sh\n"), 0o755)

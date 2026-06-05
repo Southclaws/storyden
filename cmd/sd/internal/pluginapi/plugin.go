@@ -120,6 +120,10 @@ func BuildPackage(ctx context.Context, dir string, manifestPath string, excludeP
 		return nil, err
 	}
 
+	if len(mf.Manifest.Files) == 0 {
+		return nil, fmt.Errorf("manifest has no \"files\" patterns; add a \"files\" field to declare which files to include in the package")
+	}
+
 	manifestJSON, err := json.MarshalIndent(mf.Manifest, "", "  ")
 	if err != nil {
 		return nil, err
