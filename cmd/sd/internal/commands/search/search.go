@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -88,11 +89,14 @@ sd search "agents" --all --format jsonl
 		},
 	}
 
-	command.Flags().StringSliceVar(&opts.Kinds, "kind", nil, "Filter by datagraph item kind: post, thread, reply, node, collection, profile, event")
+	command.Flags().StringSliceVar(&opts.Kinds, "kind", nil, "Filter by datagraph item kind: "+strings.Join(searchKinds, ", "))
 	command.Flags().StringSliceVar(&opts.Authors, "authors", nil, "Filter by author account IDs or handles; repeat or comma-separate")
 	command.Flags().StringSliceVar(&opts.Categories, "categories", nil, "Filter by category slugs; repeat or comma-separate")
 	command.Flags().StringSliceVar(&opts.Tags, "tags", nil, "Filter by tag names; repeat or comma-separate")
 	flags.Bind(command)
+	carapace.Gen(command).FlagCompletion(carapace.ActionMap{
+		"kind": carapace.ActionValues(searchKinds...),
+	})
 	help.SetupMarkdownHelp(command)
 
 	return SearchCommand(command)
@@ -105,21 +109,23 @@ func (o *options) validate() error {
 
 	for _, kind := range o.Kinds {
 		if _, ok := validKinds[strings.ToLower(strings.TrimSpace(kind))]; !ok {
-			return fmt.Errorf("invalid --kind %q; must be one of: post, thread, reply, node, collection, profile, event", kind)
+			return fmt.Errorf("invalid --kind %q; must be one of: %s", kind, strings.Join(searchKinds, ", "))
 		}
 	}
 
 	return nil
 }
 
-var validKinds = map[string]struct{}{
-	"post":       {},
-	"thread":     {},
-	"reply":      {},
-	"node":       {},
-	"collection": {},
-	"profile":    {},
-	"event":      {},
+var searchKinds = []string{"post", "thread", "reply", "node", "collection", "profile", "event"}
+
+var validKinds = mapFromSlice(searchKinds)
+
+func mapFromSlice(values []string) map[string]struct{} {
+	mapped := make(map[string]struct{}, len(values))
+	for _, value := range values {
+		mapped[value] = struct{}{}
+	}
+	return mapped
 }
 
 func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
