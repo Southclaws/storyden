@@ -43,6 +43,11 @@ author: Southclaws
 description: React to every new thread reply with a fire emoji.
 version: 1.0.0
 command: "./reactbot.exe"
+files:
+  - "reactbot.exe"
+  - "*.go"
+  - "go.mod"
+  - "go.sum"
 events_consumed:
   - EventThreadReplyCreated
 access:
@@ -62,6 +67,11 @@ author: Southclaws
 description: React to every new thread reply with a fire emoji.
 version: 1.0.0
 command: "./reactbot"
+files:
+  - "reactbot"
+  - "*.go"
+  - "go.mod"
+  - "go.sum"
 events_consumed:
   - EventThreadReplyCreated
 access:
@@ -81,6 +91,11 @@ author: Southclaws
 description: React to every new thread reply with a fire emoji.
 version: 1.0.0
 command: "./reactbot"
+files:
+  - "reactbot"
+  - "*.go"
+  - "go.mod"
+  - "go.sum"
 events_consumed:
   - EventThreadReplyCreated
 access:
@@ -98,6 +113,7 @@ What matters here:
 - `events_consumed` subscribes the plugin to reply creation events
 - `access.permissions` asks for `CREATE_REACTION` so API calls can add reacts (see [Permissions](/docs/introduction/members/permissions))
 - `command` is the supervised runtime entrypoint (`./reactbot.exe` on Windows, `./reactbot` on Mac/Linux)
+- `files` declares exactly which files are bundled — the binary plus the Go source. Including source is strongly recommended (see [Step 4](#4-package-for-supervised-runtime) for why).
 
 ## 2. Implement the plugin with the Go SDK
 
@@ -332,12 +348,9 @@ But if you're only changing your own code and logic, you can just do your change
 
 ## 4. Package for Supervised runtime
 
-Supervised plugins are uploaded as `.zip` archives containing:
+Supervised plugins are uploaded as `.zip` archives. The `sd` CLI handles building the archive from your project directory, using the `files` patterns in `manifest.yaml` to decide what goes in.
 
-- `manifest.json` (required)
-- plugin binary
-
-From your plugin project root:
+First build the binary for your target platform:
 
 <Tabs groupId="user-environment" items={["You are using Windows", "You are using Mac", "You are using Linux"]}>
 <Tab value="You are using Windows">
@@ -346,10 +359,7 @@ From your plugin project root:
 <Tab value="Storyden is running on Windows">
 
 ```powershell
-# Windows -> Windows
-$env:CGO_ENABLED='0'
-$env:GOOS='windows'
-$env:GOARCH='amd64'
+$env:CGO_ENABLED='0'; $env:GOOS='windows'; $env:GOARCH='amd64'
 go build -o reactbot.exe main.go
 ```
 
@@ -357,10 +367,7 @@ go build -o reactbot.exe main.go
 <Tab value="Storyden is running on Mac">
 
 ```powershell
-# Windows -> Mac
-$env:CGO_ENABLED='0'
-$env:GOOS='darwin'
-$env:GOARCH='amd64'
+$env:CGO_ENABLED='0'; $env:GOOS='darwin'; $env:GOARCH='amd64'
 go build -o reactbot main.go
 ```
 
@@ -368,10 +375,7 @@ go build -o reactbot main.go
 <Tab value="Storyden is running on Linux">
 
 ```powershell
-# Windows -> Linux
-$env:CGO_ENABLED='0'
-$env:GOOS='linux'
-$env:GOARCH='amd64'
+$env:CGO_ENABLED='0'; $env:GOOS='linux'; $env:GOARCH='amd64'
 go build -o reactbot main.go
 ```
 
@@ -385,33 +389,21 @@ go build -o reactbot main.go
 <Tab value="Storyden is running on Windows">
 
 ```bash
-# Mac -> Windows
-export CGO_ENABLED=0
-export GOOS=windows
-export GOARCH=amd64
-go build -o reactbot.exe main.go
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o reactbot.exe main.go
 ```
 
 </Tab>
 <Tab value="Storyden is running on Mac">
 
 ```bash
-# Mac -> Mac
-export CGO_ENABLED=0
-export GOOS=darwin
-export GOARCH=amd64
-go build -o reactbot main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o reactbot main.go
 ```
 
 </Tab>
 <Tab value="Storyden is running on Linux">
 
 ```bash
-# Mac -> Linux
-export CGO_ENABLED=0
-export GOOS=linux
-export GOARCH=amd64
-go build -o reactbot main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o reactbot main.go
 ```
 
 </Tab>
@@ -424,33 +416,21 @@ go build -o reactbot main.go
 <Tab value="Storyden is running on Windows">
 
 ```bash
-# Linux -> Windows
-export CGO_ENABLED=0
-export GOOS=windows
-export GOARCH=amd64
-go build -o reactbot.exe main.go
+CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o reactbot.exe main.go
 ```
 
 </Tab>
 <Tab value="Storyden is running on Mac">
 
 ```bash
-# Linux -> Mac
-export CGO_ENABLED=0
-export GOOS=darwin
-export GOARCH=amd64
-go build -o reactbot main.go
+CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o reactbot main.go
 ```
 
 </Tab>
 <Tab value="Storyden is running on Linux">
 
 ```bash
-# Linux -> Linux
-export CGO_ENABLED=0
-export GOOS=linux
-export GOARCH=amd64
-go build -o reactbot main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o reactbot main.go
 ```
 
 </Tab>
@@ -461,125 +441,25 @@ go build -o reactbot main.go
 
 If your Storyden machine is `arm64`, swap `GOARCH=amd64` for `GOARCH=arm64`.
 
-Convert `manifest.yaml` to JSON:
-
-<Tabs groupId="user-environment" items={["You are using Windows", "You are using Mac", "You are using Linux"]}>
-<Tab value="You are using Windows">
-
-```powershell
-yq -o=json manifest.yaml | Set-Content -Encoding utf8 manifest.json
-```
-
-</Tab>
-<Tab value="You are using Mac">
+Then create the package:
 
 ```bash
-yq -o=json manifest.yaml > manifest.json
+sd plugin dev package
 ```
 
-</Tab>
-<Tab value="You are using Linux">
-
-```bash
-yq -o=json manifest.yaml > manifest.json
-```
-
-</Tab>
-</Tabs>
-
-No `yq`? Same thing in Nu:
-
-```nu
-(open manifest.yaml | to json) | save --force manifest.json
-```
-
-Create the archive:
-
-<Tabs groupId="user-environment" items={["You are using Windows", "You are using Mac", "You are using Linux"]}>
-<Tab value="You are using Windows">
-
-<Tabs groupId="host-environment" items={["Storyden is running on Windows", "Storyden is running on Mac", "Storyden is running on Linux"]}>
-<Tab value="Storyden is running on Windows">
-
-```powershell
-Compress-Archive -Path manifest.json,reactbot.exe -DestinationPath reactbot.zip -Force
-```
-
-</Tab>
-<Tab value="Storyden is running on Mac">
-
-```powershell
-Compress-Archive -Path manifest.json,reactbot -DestinationPath reactbot.zip -Force
-```
-
-</Tab>
-<Tab value="Storyden is running on Linux">
-
-```powershell
-Compress-Archive -Path manifest.json,reactbot -DestinationPath reactbot.zip -Force
-```
-
-</Tab>
-</Tabs>
-
-</Tab>
-<Tab value="You are using Mac">
-
-<Tabs groupId="host-environment" items={["Storyden is running on Windows", "Storyden is running on Mac", "Storyden is running on Linux"]}>
-<Tab value="Storyden is running on Windows">
-
-```bash
-zip reactbot.zip manifest.json reactbot.exe
-```
-
-</Tab>
-<Tab value="Storyden is running on Mac">
-
-```bash
-zip reactbot.zip manifest.json reactbot
-```
-
-</Tab>
-<Tab value="Storyden is running on Linux">
-
-```bash
-zip reactbot.zip manifest.json reactbot
-```
-
-</Tab>
-</Tabs>
-
-</Tab>
-<Tab value="You are using Linux">
-
-<Tabs groupId="host-environment" items={["Storyden is running on Windows", "Storyden is running on Mac", "Storyden is running on Linux"]}>
-<Tab value="Storyden is running on Windows">
-
-```bash
-zip reactbot.zip manifest.json reactbot.exe
-```
-
-</Tab>
-<Tab value="Storyden is running on Mac">
-
-```bash
-zip reactbot.zip manifest.json reactbot
-```
-
-</Tab>
-<Tab value="Storyden is running on Linux">
-
-```bash
-zip reactbot.zip manifest.json reactbot
-```
-
-</Tab>
-</Tabs>
-
-</Tab>
-</Tabs>
+That's it. `sd` reads `manifest.yaml`, converts it to `manifest.json`, and zips exactly the files matched by your `files` patterns into `reactbot.zip`.
 
 Install `reactbot.zip` in Admin -> Plugins tab as a Supervised plugin.
+
+### Why include source code?
+
+The `files` patterns in this tutorial include `*.go`, `go.mod`, and `go.sum` alongside the binary. This is deliberate.
+
+Storyden instance operators are trusting your plugin to run on their machine, potentially without a sandbox. Shipping source gives them — and their community — a way to read, audit, and modify the plugin without having to track down a separate repository. It also makes the plugin more forkable: if someone wants a variant that reacts with a different emoji, they can just edit `main.go` and rebuild without starting from scratch.
+
+If your plugin is genuinely open source, the archive is a good way to make that tangible rather than just pointing to a repository link.
+
+For plugins that are not intended to be open source, omit the source patterns and ship only the binary. But if you are distributing a plugin for a public community, the open-source callout in the next step applies.
 
 ## 5. Distribute and use
 
@@ -596,6 +476,8 @@ Distribution for this plugin is literally shipping `reactbot.zip` plus a short R
     ![2026-02-26-20-43-56.png](2026-02-26-20-43-56.png)
 
     It's good practice to be transparent about what your plugin does and which permissions it requests, so operators can make informed decisions about whether to install it or not.
+
+    Include your source files in the `files` manifest field so operators — and community members — can read and modify the plugin without needing to find a separate repository.
 
 </Callout>
 
