@@ -43,24 +43,38 @@ func IsCommandError(err error) bool {
 }
 
 func Execute(ctx context.Context, root *cobra.Command) error {
-	if isHelpRequest(os.Args[1:]) {
+	args := os.Args[1:]
+	if isCarapaceRequest(args) {
+		root.SetArgs(normalizeCarapaceArgs(root, args))
 		return root.ExecuteContext(ctx)
 	}
 
-	if err := fang.Execute(ctx, root, fang.WithoutCompletions()); err != nil {
+	if isHelpRequest(args) {
+		return root.ExecuteContext(ctx)
+	}
+
+	if err := fang.Execute(ctx, root); err != nil {
 		return CommandError{Err: err}
 	}
 
 	return nil
 }
 
+func isRawCobraRequest(args []string) bool {
+	return isHelpRequest(args) || isCarapaceRequest(args)
+}
+
+func normalizeCarapaceArgs(root *cobra.Command, args []string) []string {
+	normalized := append([]string(nil), args...)
+	if len(normalized) == 3 && normalized[2] == root.Name() {
+		normalized = append(normalized, "")
+	}
+	return normalized
+}
+
 func isHelpRequest(args []string) bool {
 	if len(args) == 0 {
 		return true
-	}
-
-	if args[0] == "_carapace" {
-		return false
 	}
 
 	for _, arg := range args {
@@ -70,4 +84,8 @@ func isHelpRequest(args []string) bool {
 	}
 
 	return false
+}
+
+func isCarapaceRequest(args []string) bool {
+	return len(args) > 0 && args[0] == "_carapace"
 }
