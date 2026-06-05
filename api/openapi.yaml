@@ -5551,19 +5551,29 @@ components:
 
     APIError:
       type: object
-      description: |
-        A description of an error including a human readable message and any
-        related metadata from the request and associated services.
-      required: [error]
+      description: RFC 7807 Problem Details spec compliant error response.
+      required: [trace_id]
       properties:
-        error:
-          description: The internal error, not intended for end-user display.
+        type:
+          description: >
+            A URI reference [RFC3986] that identifies the problem type. This
+            specification encourages that, when dereferenced, it provide
+            human-readable documentation for the problem type (e.g., using HTML
+            [W3C.REC-html5-20141028]). When this member is not present, its
+            value is assumed to be "about:blank".
           type: string
-        message:
-          description: A human-readable message intended for end-user display.
+        title:
+          description: A short, human-readable summary of the problem type.
           type: string
-        suggested:
-          description: A suggested action for the user.
+        detail:
+          description: >
+            A human-readable explanation specific to this occurrence of the
+            problem.
+          type: string
+        trace_id:
+          description: >
+            A unique identifier for the request that can be used to trace the
+            request through the system.
           type: string
         metadata:
           description: Any additional metadata related to the error.

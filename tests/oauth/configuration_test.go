@@ -59,11 +59,13 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 				var body openapi.APIError
 				r.NoError(json.NewDecoder(resp.Body).Decode(&body))
 				a.Equal(http.StatusNotFound, resp.StatusCode)
-				a.Equal("oauth_disabled", body.Error)
-				r.NotNil(body.Message)
-				a.Contains(*body.Message, "not enabled")
-				r.NotNil(body.Suggested)
-				a.Contains(*body.Suggested, "administrator")
+				r.NotNil(body.Type)
+				a.Equal("urn:storyden:problem:not-found", *body.Type)
+				r.NotNil(body.Title)
+				a.Contains(*body.Title, "not enabled")
+				r.NotNil(body.Metadata)
+				a.Equal("oauth_disabled", (*body.Metadata)["code"])
+				a.Contains((*body.Metadata)["suggested"], "administrator")
 			})
 
 			t.Run("jwks_returns_clear_disabled_response", func(t *testing.T) {
@@ -77,9 +79,10 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 				var body openapi.APIError
 				r.NoError(json.Unmarshal(resp.Body, &body))
 				a.Equal(http.StatusNotFound, resp.StatusCode())
-				a.Equal("oauth_disabled", body.Error)
-				r.NotNil(body.Message)
-				a.Contains(*body.Message, "not enabled")
+				r.NotNil(body.Type)
+				a.Equal("urn:storyden:problem:not-found", *body.Type)
+				r.NotNil(body.Title)
+				a.Contains(*body.Title, "not enabled")
 			})
 
 			t.Run("device_authorization_returns_oauth_error", func(t *testing.T) {

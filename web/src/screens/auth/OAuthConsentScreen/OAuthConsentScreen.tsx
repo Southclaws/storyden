@@ -73,7 +73,10 @@ export function OAuthConsentScreen() {
     );
   }
 
-  if (error instanceof RequestError && error.message === "access_denied") {
+  if (
+    error instanceof RequestError &&
+    error.problem?.type === "urn:storyden:problem:oauth:access-denied"
+  ) {
     return (
       <Alert.Root colorPalette="red">
         <Alert.Icon asChild>

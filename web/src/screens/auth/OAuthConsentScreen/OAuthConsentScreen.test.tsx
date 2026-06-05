@@ -2,6 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { RequestError } from "@/api/common";
+
 import { OAuthConsentScreen } from "./OAuthConsentScreen";
 
 let params = new URLSearchParams();
@@ -36,6 +38,29 @@ describe("OAuthConsentScreen", () => {
 
     expect(screen.getByRole("heading", { name: "Missing code" })).toBeVisible();
     expect(screen.getByText("Open the full link from the application and try again.")).toBeVisible();
+  });
+
+  it("shows access denied when the OAuth API returns access_denied", () => {
+    params = new URLSearchParams({ user_code: "ABCD-EFGH" });
+    hookState = {
+      data: undefined,
+      error: new RequestError("Permission denied.", 400, {
+        trace_id: "unknown",
+        type: "urn:storyden:problem:oauth:access-denied",
+        title: "Permission denied.",
+        detail: "OAuth error: access_denied",
+      }),
+      isLoading: false,
+    };
+
+    render(<OAuthConsentScreen />);
+
+    expect(screen.getByText("Access denied")).toBeVisible();
+    expect(
+      screen.getByText(
+        "Your account does not have permission to use third-party applications. Contact an administrator for access.",
+      ),
+    ).toBeVisible();
   });
 
   it("submits approval and shows the completion state", async () => {

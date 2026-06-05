@@ -52,8 +52,8 @@ func TestThreadModerationWordLists(t *testing.T) {
 			tests.Status(t, err, blockedThread, http.StatusBadRequest)
 			r.NotNil(blockedThread.JSONDefault)
 			if blockedThread.JSONDefault != nil {
-				r.NotNil(blockedThread.JSONDefault.Message)
-				r.Equal("Content violates community guidelines", *blockedThread.JSONDefault.Message)
+				r.NotNil(blockedThread.JSONDefault.Title)
+				r.Equal("Content violates community guidelines", *blockedThread.JSONDefault.Title)
 			}
 
 			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{
@@ -112,8 +112,8 @@ func TestReplyModerationWordLists(t *testing.T) {
 			tests.Status(t, err, blockedReply, http.StatusBadRequest)
 			r.NotNil(blockedReply.JSONDefault)
 			if blockedReply.JSONDefault != nil {
-				r.NotNil(blockedReply.JSONDefault.Message)
-				r.Equal("Content violates community guidelines", *blockedReply.JSONDefault.Message)
+				r.NotNil(blockedReply.JSONDefault.Title)
+				r.Equal("Content violates community guidelines", *blockedReply.JSONDefault.Title)
 			}
 
 			updateModerationSettings(t, root, settingsRepo, bus, settings.ModerationServiceSettings{

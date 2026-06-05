@@ -4,6 +4,10 @@ import (
 	"context"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -55,12 +59,9 @@ func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
 	}
 }
 
-func (o OAuth) OAuthJWKS(context.Context, openapi.OAuthJWKSRequestObject) (openapi.OAuthJWKSResponseObject, error) {
+func (o OAuth) OAuthJWKS(ctx context.Context, _ openapi.OAuthJWKSRequestObject) (openapi.OAuthJWKSResponseObject, error) {
 	if !o.oauth.Enabled() {
-		return openapi.OAuthJWKSdefaultJSONResponse{
-			Body:       oauthDisabledAPIError(),
-			StatusCode: 404,
-		}, nil
+		return nil, oauthDisabledError(ctx)
 	}
 
 	return openapi.OAuthJWKS200JSONResponse{
@@ -70,15 +71,20 @@ func (o OAuth) OAuthJWKS(context.Context, openapi.OAuthJWKSRequestObject) (opena
 	}, nil
 }
 
-func oauthDisabledAPIError() openapi.APIError {
+func oauthDisabledError(ctx context.Context) error {
 	message := "OAuth and OpenID Connect are not enabled on this Storyden instance."
 	suggested := "Ask the instance administrator to configure OAuth before using OAuth clients."
 
-	return openapi.APIError{
-		Error:     "oauth_disabled",
-		Message:   &message,
-		Suggested: &suggested,
-	}
+	ctx = fctx.WithMeta(ctx,
+		"code", "oauth_disabled",
+		"suggested", suggested,
+	)
+
+	return fault.New("oauth_disabled",
+		fctx.With(ctx),
+		fmsg.WithDesc("oauth_disabled", message),
+		ftag.With(ftag.NotFound),
+	)
 }
 
 func (o OAuth) OAuthDeviceAuthorisation(ctx context.Context, req openapi.OAuthDeviceAuthorisationRequestObject) (openapi.OAuthDeviceAuthorisationResponseObject, error) {

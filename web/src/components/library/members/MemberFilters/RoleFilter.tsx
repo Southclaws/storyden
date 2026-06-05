@@ -11,6 +11,7 @@ import {
   MultiSelectPickerItem,
 } from "@/components/ui/MultiSelectPicker";
 import { isGuestRole, isMemberRole } from "@/lib/role/defaults";
+import { deriveError } from "@/utils/error";
 
 const roleToMultiSelectItem = map(
   (role: Role): MultiSelectPickerItem => ({
@@ -78,7 +79,7 @@ export function RoleFilter() {
       onChange={handleChange}
       onQuery={handleQuery}
       queryResults={searchResults}
-      queryError={error?.message}
+      queryError={deriveError(error)}
       size="sm"
       triggerProps={{
         width: "full",

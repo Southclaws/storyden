@@ -1,4 +1,4 @@
-import { RequestError } from "@/api/common";
+import { RequestError, parseProblemDetails } from "@/api/common";
 
 const ErrUnexpected = "An unexpected error occurred";
 
@@ -17,7 +17,7 @@ export function deriveError(e: unknown): string {
 
   if (e instanceof Error) {
     if (e instanceof RequestError) {
-      return e.message;
+      return e.problem?.title ?? e.message;
     }
 
     if (e instanceof TypeError) {
@@ -31,6 +31,11 @@ export function deriveError(e: unknown): string {
     }
 
     return e.message ?? ErrUnexpected;
+  }
+
+  const problem = parseProblemDetails(e);
+  if (problem) {
+    return problem.title ?? ErrUnexpected;
   }
 
   console.error("unable to derive error text:", e);

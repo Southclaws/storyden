@@ -1,4 +1,5 @@
 import { filter, flow, reduce, toPairs } from "lodash/fp";
+import { z } from "zod";
 
 import { getAPIAddress } from "@/config";
 
@@ -14,12 +15,32 @@ export type Options = {
   cache?: RequestCache;
 };
 
+export const ProblemDetailsSchema = z.object({
+  trace_id: z.string().min(1),
+  type: z.string().optional(),
+  title: z.string().optional(),
+  detail: z.string().optional(),
+  metadata: z.unknown().optional(),
+});
+export type ProblemDetails = z.infer<typeof ProblemDetailsSchema>;
+
+const OAuthErrorSchema = z.object({
+  error: z.string().min(1),
+  error_description: z.string().optional(),
+});
+
+type OAuthError = z.infer<typeof OAuthErrorSchema>;
+
+const genericErrorMessage = `An unexpected error occurred.`;
+
 export class RequestError extends Error {
   public status: number;
+  public problem?: ProblemDetails;
 
-  constructor(message: string, status: number) {
+  constructor(message: string, status: number, problem?: ProblemDetails) {
     super(message);
     this.status = status;
+    this.problem = problem;
   }
 }
 
@@ -54,12 +75,14 @@ export function buildRequest({
 
 export async function buildResult<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const data = await response.json().catch(() => undefined);
-    const fallback = `${response.status} ${response.statusText}`;
+    const data = (await response.json().catch(() => undefined)) as unknown;
+
+    const err = normaliseRequestError(data);
 
     throw new RequestError(
-      data?.message ?? data?.error ?? fallback,
+      err.title ?? genericErrorMessage,
       response.status,
+      err,
     );
   }
 
@@ -75,6 +98,49 @@ export async function buildResult<T>(response: Response): Promise<T> {
   }
 
   return response.blob() as T;
+}
+
+function normaliseRequestError(e: unknown): ProblemDetails {
+  const problem = parseProblemDetails(e);
+  if (problem) {
+    return problem;
+  }
+
+  const oauthError = parseOAuthError(e);
+  if (oauthError) {
+    return {
+      trace_id: "unknown",
+      type: oauthProblemType(oauthError.error),
+      title: oauthError.error_description ?? genericErrorMessage,
+      detail: `OAuth error: ${oauthError.error}`,
+    };
+  }
+
+  return {
+    trace_id: "unknown",
+    title: "An unexpected error occurred.",
+    detail: "unknown error",
+  };
+}
+
+export function parseProblemDetails(data: unknown): ProblemDetails | undefined {
+  const result = ProblemDetailsSchema.safeParse(data);
+
+  return result.success ? result.data : undefined;
+}
+
+function parseOAuthError(data: unknown): OAuthError | undefined {
+  const result = OAuthErrorSchema.safeParse(data);
+
+  return result.success ? result.data : undefined;
+}
+
+function oauthProblemType(code: string): string {
+  return `urn:storyden:problem:oauth:${slugProblemCode(code)}`;
+}
+
+function slugProblemCode(code: string): string {
+  return code.toLowerCase().replaceAll("_", "-").replaceAll(" ", "-");
 }
 
 export const buildPayload = (data: unknown) => {
