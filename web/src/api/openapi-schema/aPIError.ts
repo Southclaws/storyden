@@ -10,17 +10,20 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { APIErrorMetadata } from "./aPIErrorMetadata";
 
 /**
- * A description of an error including a human readable message and any
-related metadata from the request and associated services.
-
+ * RFC 7807 Problem Details spec compliant error response.
  */
 export interface APIError {
-  /** The internal error, not intended for end-user display. */
-  error: string;
-  /** A human-readable message intended for end-user display. */
-  message?: string;
+  /** A human-readable explanation specific to this occurrence of the problem.
+   */
+  detail?: string;
   /** Any additional metadata related to the error. */
   metadata?: APIErrorMetadata;
-  /** A suggested action for the user. */
-  suggested?: string;
+  /** A short, human-readable summary of the problem type. */
+  title?: string;
+  /** A unique identifier for the request that can be used to trace the request through the system.
+   */
+  trace_id: string;
+  /** A URI reference [RFC3986] that identifies the problem type. This specification encourages that, when dereferenced, it provide human-readable documentation for the problem type (e.g., using HTML [W3C.REC-html5-20141028]). When this member is not present, its value is assumed to be "about:blank".
+   */
+  type?: string;
 }

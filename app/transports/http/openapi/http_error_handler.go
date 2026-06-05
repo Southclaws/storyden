@@ -2,22 +2,27 @@ package openapi
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
 	"net/http"
+	"strings"
 	"syscall"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/Southclaws/storyden/internal/ent"
 )
+
+const ProblemJSONMediaType = "application/problem+json"
+const UnknownTraceID = "unknown"
 
 // HTTPErrorHandler provides an error handler function for use with the Echo
 // router. The purpose of this implementation is to map application level errors
@@ -29,31 +34,88 @@ func HTTPErrorHandler(logger *slog.Logger) func(err error, c echo.Context) {
 		errmsg := err.Error()
 		errtag, status := categorise(err)
 		errctx := fctx.Unwrap(err)
-		message := fmsg.GetIssue(err)
+		title := fmsg.GetIssue(err)
 		chain := fault.Flatten(err)
+		meta := lo.MapValues(errctx, func(v, k string) any { return v })
+		problem := NewAPIError(c.Request().Context(), status, errtag, title, errmsg, meta)
 
 		if status == http.StatusInternalServerError {
 			logger.Error(errmsg,
 				slog.String("package", "http"),
-				slog.String("message", message),
+				slog.String("title", title),
 				slog.String("path", c.Path()),
 				slog.String("tag", string(errtag)),
+				slog.String("trace_id", problem.TraceId),
 				slog.Any("metadata", errctx),
 				slog.Any("trace", chain),
 			)
 		}
 
-		meta := lo.MapValues(errctx, func(v, k string) any { return v })
-		errormessage := opt.NewIf(message, func(s string) bool { return s != "" }).Ptr()
-		errormetadata := opt.NewIf(meta, func(m map[string]any) bool { return len(m) > 0 }).Ptr()
-
 		//nolint:errcheck
-		c.JSON(status, APIError{
-			Error:    errmsg,
-			Message:  errormessage,
-			Metadata: errormetadata,
-		})
+		c.Blob(status, ProblemJSONMediaType, mustMarshalProblem(problem))
 	}
+}
+
+func NewAPIError(ctx context.Context, status int, kind ftag.Kind, title string, detail string, metadata map[string]any) APIError {
+	if title == "" {
+		title = "Error"
+		if statusText := http.StatusText(status); statusText != "" {
+			title = statusText
+		}
+	}
+
+	problem := APIError{
+		TraceId: requestTraceID(ctx),
+		Title:   &title,
+	}
+
+	if problemType := problemTypeFromKind(kind); problemType != nil {
+		problem.Type = problemType
+	}
+
+	if detail != "" {
+		problem.Detail = &detail
+	}
+
+	if len(metadata) > 0 {
+		problem.Metadata = &metadata
+	}
+
+	return problem
+}
+
+func problemTypeFromKind(kind ftag.Kind) *string {
+	if kind == ftag.None {
+		return nil
+	}
+
+	problemType := "urn:storyden:problem:" + slugProblemKind(kind)
+
+	return &problemType
+}
+
+func slugProblemKind(kind ftag.Kind) string {
+	replacer := strings.NewReplacer("_", "-", " ", "-")
+
+	return strings.ToLower(replacer.Replace(string(kind)))
+}
+
+func mustMarshalProblem(problem APIError) []byte {
+	body, err := json.Marshal(problem)
+	if err != nil {
+		return []byte(`{"title":"Internal Server Error","trace_id":"` + problem.TraceId + `"}`)
+	}
+
+	return body
+}
+
+func requestTraceID(ctx context.Context) string {
+	spanContext := trace.SpanContextFromContext(ctx)
+	if spanContext.HasTraceID() {
+		return spanContext.TraceID().String()
+	}
+
+	return UnknownTraceID
 }
 
 func categorise(err error) (ftag.Kind, int) {

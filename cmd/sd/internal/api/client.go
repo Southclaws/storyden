@@ -123,10 +123,12 @@ func discoverOAuth(ctx context.Context, endpoint string) (*Discovery, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		var apiError openapi.APIError
-		if err := json.NewDecoder(resp.Body).Decode(&apiError); err == nil && apiError.Message != nil {
-			message := *apiError.Message
-			if apiError.Suggested != nil && *apiError.Suggested != "" {
-				message += "\n\n" + *apiError.Suggested
+		if err := json.NewDecoder(resp.Body).Decode(&apiError); err == nil && apiError.Title != nil {
+			message := *apiError.Title
+			if apiError.Metadata != nil {
+				if suggested, ok := (*apiError.Metadata)["suggested"].(string); ok && suggested != "" {
+					message += "\n\n" + suggested
+				}
 			}
 
 			return nil, fmt.Errorf("%s", message)

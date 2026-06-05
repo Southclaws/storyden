@@ -60,14 +60,7 @@ export function useImageUpload() {
             // TODO: Validate this properly, remove "as".
             const apiError = JSON.parse(xhr.responseText) as APIError;
 
-            // NOTE: Derive error should also handle these cases.
-            reject(
-              new Error(
-                deriveError(
-                  apiError.message || apiError.error || "Upload failed",
-                ),
-              ),
-            );
+            reject(new Error(deriveError(apiError)));
           } catch {
             reject(new Error(`Upload failed with status ${xhr.status}`));
           }

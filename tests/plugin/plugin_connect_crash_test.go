@@ -84,7 +84,9 @@ func TestPluginCrashOnConnect(t *testing.T) {
 			}, adminSession)
 			r.NoError(err)
 			r.Equal(http.StatusBadGateway, activeResp.StatusCode())
-			a.Contains(activeResp.JSONDefault.Error, "exit status 42")
+			r.NotNil(activeResp.JSONDefault)
+			r.NotNil(activeResp.JSONDefault.Detail)
+			a.Contains(*activeResp.JSONDefault.Detail, "exit status 42")
 
 			sess, err := runner.GetSession(root, installationID)
 			r.NoError(err)

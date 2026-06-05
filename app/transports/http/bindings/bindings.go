@@ -216,7 +216,7 @@ func mount(
 
 	router.GET("/.well-known/openid-configuration", func(c echo.Context) error {
 		if !oauthBinding.oauth.Enabled() {
-			return c.JSON(http.StatusNotFound, oauthDisabledAPIError())
+			return oauthDisabledError(c.Request().Context())
 		}
 
 		return c.JSON(http.StatusOK, oauthBinding.OAuthDiscovery(c.Request().Context()))

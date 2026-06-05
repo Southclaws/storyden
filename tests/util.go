@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Southclaws/opt"
 	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/require"
 
@@ -57,9 +56,10 @@ type ResponseShape struct {
 func logAPIError(t *testing.T, resp WithStatusCode) {
 	if resp.StatusCode() != http.StatusOK {
 		if ae := getAPIError(resp); ae != nil {
-			t.Logf(`API error response: "%s" message: "%v"`,
-				ae.Error,
-				opt.NewPtr(ae.Message).OrZero(),
+			t.Logf(`API error response: title: "%v" detail: "%v" trace_id: "%s"`,
+				ae.Title,
+				ae.Detail,
+				ae.TraceId,
 			)
 		}
 	}
