@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/redis"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
-	"github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
 )
 
@@ -36,7 +35,6 @@ func Build() fx.Option {
 		fx.Provide(webauthn.New),
 		object.Build(),
 		frontend.Build(),
-		weaviate.Build(),
 		pinecone.Build(),
 		fx.Provide(ai.New),
 		jwt.Build(),

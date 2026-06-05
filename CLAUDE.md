@@ -40,7 +40,7 @@ Storyden follows a strict zero service dependencies production-ready deployment 
 
 - **Database**: SQLite or PostgreSQL/CockroachDB with Ent ORM for schema management
 - **Caching**: Optional Redis for session storage, rate limiting and caching
-- **Search**: Optional vector databases (Pinecone, Weaviate) for semantic search and recommendations
+- **Search**: Optional vector databases (Pinecone) for semantic search and recommendations
 - **Storage**: Filesystem or S3-compatible object storage for files/assets
 - **Message Queue**: Optional RabbitMQ for pubsub
 

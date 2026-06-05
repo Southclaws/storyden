@@ -529,7 +529,6 @@ type Config struct {
 	/*
 	   Either:
 	   - `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
-	   - `weaviate` for Weaviate, a self-hostable or managed vector database.
 	   - `pinecone` for Pinecone, a fully managed vector database.
 	*/
 	SemdexProvider string `default:"" envconfig:"SEMDEX_PROVIDER"`
@@ -540,24 +539,6 @@ type Config struct {
 
 	// The path to the directory where Chromem will store vector indexes.
 	SemdexLocalPath string `default:"data/semdex" envconfig:"SEMDEX_LOCAL_PATH"`
-
-	// -
-	// Weaviate Semdex
-	// -
-
-	// The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or the Weaviate Cloud API.
-	WeaviateURL string `envconfig:"WEAVIATE_URL"`
-	// For self-hosted Weaviate where authentication is enabled, or when using Weaviate Cloud.
-	WeaviateToken string `envconfig:"WEAVIATE_API_TOKEN"`
-	/*
-	   The class name for Weaviate. This value actually controls which model is used for embeddings and other configuration. In future, there will be a more flexible configuration for Weaviate.
-
-	   Value values are:
-
-	   - `text2vec-transformers`: requires that the Weaviate instance is using the `text2vec-transformers` module. This is for calculating embeddings locally using a GPU (or very slowly, using a CPU.) This is only available when self-hosting Weaviate.
-	   - `text2vec-openai`: requires that the Weaviate instance is using the `text2vec-openai` module. This uses OpenAI's API to calculate embeddings. This works on both self-hosted and Weaviate Cloud instances.
-	*/
-	WeaviateClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
 
 	// -
 	// Pinecone Semdex
