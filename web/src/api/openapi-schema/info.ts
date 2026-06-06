@@ -20,6 +20,9 @@ import type { RegistrationMode } from "./registrationMode";
  */
 export interface Info {
   accent_colour: string;
+  /** The public API address for this Storyden instance.
+   */
+  api_address: string;
   authentication_mode: AuthMode;
   capabilities: InstanceCapabilityList;
   content: PostContent;
@@ -29,4 +32,7 @@ export interface Info {
   onboarding_status: OnboardingStatus;
   registration_mode: RegistrationMode;
   title: string;
+  /** The public web frontend address for this Storyden instance.
+   */
+  web_address: string;
 }

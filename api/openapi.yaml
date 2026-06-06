@@ -5408,6 +5408,8 @@ components:
         - registration_mode
         - capabilities
         - onboarding_status
+        - web_address
+        - api_address
       properties:
         title:
           type: string
@@ -5425,6 +5427,16 @@ components:
           $ref: "#/components/schemas/RegistrationMode"
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
+        web_address:
+          type: string
+          format: uri
+          description: |
+            The public web frontend address for this Storyden instance.
+        api_address:
+          type: string
+          format: uri
+          description: |
+            The public API address for this Storyden instance.
         metadata:
           $ref: "#/components/schemas/Metadata"
         motd:

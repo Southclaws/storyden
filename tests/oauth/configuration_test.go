@@ -43,6 +43,8 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 				info := tests.AssertRequest(cl.GetInfoWithResponse(root))(t, http.StatusOK)
 				r.NotNil(info.JSON200)
 				a.NotContains(info.JSON200.Capabilities, openapi.InstanceCapability("oauth"))
+				a.Equal("http://localhost", info.JSON200.WebAddress)
+				a.Equal("http://localhost", info.JSON200.ApiAddress)
 			})
 
 			t.Run("discovery_returns_clear_disabled_response", func(t *testing.T) {

@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/switcher"
 	configcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/config/path"
+	infocmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/info"
 	nodecmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/node"
 	nodeassets "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/assets"
 	nodechildren "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/children"
@@ -70,6 +71,7 @@ func newRootCommand(
 	streams cli.Streams,
 	authCommand auth.AuthCommand,
 	configCommand configcmd.ConfigCommand,
+	infoCommand infocmd.InfoCommand,
 	threadCommand threadcmd.ThreadCommand,
 	nodeCommand nodecmd.NodeCommand,
 	pluginCommand plugincmd.PluginCommand,
@@ -102,6 +104,13 @@ View your config file location:
 sd config path
 ~~~
 
+## Instance Information
+
+Agents and scripts can inspect top-line information about the current authenticated instance:
+~~~bash
+sd info
+~~~
+
 ## Multiple Instances
 
 You can authenticate with multiple Storyden instances and switch between them:
@@ -121,6 +130,7 @@ sd auth switch
 
 	root.AddCommand((*cobra.Command)(authCommand))
 	root.AddCommand((*cobra.Command)(configCommand))
+	root.AddCommand((*cobra.Command)(infoCommand))
 	root.AddCommand((*cobra.Command)(threadCommand))
 	root.AddCommand((*cobra.Command)(nodeCommand))
 	root.AddCommand((*cobra.Command)(pluginCommand))
@@ -160,6 +170,7 @@ func main() {
 			auth.New,
 			path.New,
 			configcmd.New,
+			infocmd.New,
 			threadlist.New,
 			threadget.New,
 			threadcmd.New,

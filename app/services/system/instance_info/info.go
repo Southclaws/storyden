@@ -3,6 +3,7 @@ package instance_info
 import (
 	"context"
 	"log/slog"
+	"net/url"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -41,6 +42,8 @@ type Info struct {
 	Settings         *settings.Settings
 	OnboardingStatus *onboarding.Status
 	Capabilities     Capabilities
+	WebAddress       url.URL
+	APIAddress       url.URL
 }
 
 func (p *Provider) Get(ctx context.Context) (*Info, error) {
@@ -89,6 +92,8 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		Settings:         settings,
 		OnboardingStatus: status,
 		Capabilities:     caps,
+		WebAddress:       p.config.PublicWebAddress,
+		APIAddress:       p.config.PublicAPIAddress,
 	}, nil
 }
 
