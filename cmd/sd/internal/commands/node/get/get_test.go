@@ -91,7 +91,7 @@ func testNode(t *testing.T) *openapi.NodeWithChildren {
 		Children: []openapi.NodeWithChildren{{
 			Name:        "Child Page",
 			Slug:        "child-page",
-			Visibility:  openapi.Published,
+			Visibility:  openapi.VisibilityPublished,
 			Description: "A child page",
 		}},
 		Content:     &content,
@@ -112,7 +112,7 @@ func testNode(t *testing.T) *openapi.NodeWithChildren {
 		Slug:       "documentation-hub",
 		Tags:       openapi.TagReferenceList{{Name: "docs", Colour: "#abcdef"}},
 		UpdatedAt:  mustParseTime(t, "2026-05-29T10:56:07+07:00"),
-		Visibility: openapi.Published,
+		Visibility: openapi.VisibilityPublished,
 	}
 }
 
@@ -124,7 +124,7 @@ func TestRenderYAMLUsesStructuredEncoder(t *testing.T) {
 	node := &openapi.NodeWithChildren{
 		Name:        "name: with # characters",
 		Slug:        "node-slug",
-		Visibility:  openapi.Published,
+		Visibility:  openapi.VisibilityPublished,
 		Owner:       openapi.ProfileReference{Name: "owner: with # characters"},
 		Description: " description: with # characters\nand newlines ",
 		Tags:        openapi.TagReferenceList{{Name: "tag: with # characters"}},

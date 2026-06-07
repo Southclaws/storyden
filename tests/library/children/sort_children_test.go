@@ -43,7 +43,7 @@ func TestNodeSorting(t *testing.T) {
 			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_011_Váli)
 			memberSession := sh.WithSession(memberCtx)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			makenode := func(name string, parent *string) *openapi.Node {
 				slug := name + uuid.NewString()
@@ -352,7 +352,7 @@ func TestNodeSortKeyNormalise(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			session := sh.WithSession(adminCtx)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			makenode := func(name string, parent *string) *openapi.Node {
 				slug := name + uuid.NewString()

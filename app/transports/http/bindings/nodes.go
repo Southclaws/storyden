@@ -33,6 +33,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
+	"github.com/Southclaws/storyden/app/services/library/node_versioning"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -48,6 +49,7 @@ type Nodes struct {
 	summariser    generative.Summariser
 	titler        generative.Titler
 	nodeReader    *node_read.HydratedQuerier
+	versioning    *node_versioning.Service
 	nv            *node_visibility.Controller
 	ntree         nodetree.Graph
 	npos          *nodetree.Position
@@ -63,6 +65,7 @@ func NewNodes(
 	summariser generative.Summariser,
 	titler generative.Titler,
 	nodeReader *node_read.HydratedQuerier,
+	versioning *node_versioning.Service,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	npos *nodetree.Position,
@@ -77,6 +80,7 @@ func NewNodes(
 		summariser:    summariser,
 		titler:        titler,
 		nodeReader:    nodeReader,
+		versioning:    versioning,
 		nv:            nv,
 		ntree:         ntree,
 		npos:          npos,
@@ -660,17 +664,18 @@ func serialiseUpdatedNode(in *library.Node) openapi.NodeWithChildren {
 
 func serialiseNode(in *library.Node) openapi.Node {
 	return openapi.Node{
-		Id:           in.Mark.ID().String(),
-		CreatedAt:    in.CreatedAt,
-		UpdatedAt:    in.UpdatedAt,
-		Name:         in.Name,
-		Slug:         in.Mark.Slug(),
-		Assets:       dt.Map(in.Assets, serialiseAssetPtr),
-		Link:         opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
-		Description:  in.GetDesc(),
-		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
-		Content:      opt.Map(in.Content, serialiseContentHTML).Ptr(),
-		Owner:        serialiseProfileReference(in.Owner),
+		Id:               in.Mark.ID().String(),
+		CreatedAt:        in.CreatedAt,
+		UpdatedAt:        in.UpdatedAt,
+		Name:             in.Name,
+		Slug:             in.Mark.Slug(),
+		CurrentVersionId: serialiseNullableIdentifier(in.CurrentVersion),
+		Assets:           dt.Map(in.Assets, serialiseAssetPtr),
+		Link:             opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
+		Description:      in.GetDesc(),
+		PrimaryImage:     opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Content:          opt.Map(in.Content, serialiseContentHTML).Ptr(),
+		Owner:            serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
@@ -687,17 +692,18 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	childPropertySchema := opt.Map(in.ChildProperties, serialisePropertySchemaList)
 
 	return openapi.NodeWithChildren{
-		Id:           in.Mark.ID().String(),
-		CreatedAt:    in.CreatedAt,
-		UpdatedAt:    in.UpdatedAt,
-		Name:         in.Name,
-		Slug:         in.Mark.Slug(),
-		Assets:       dt.Map(in.Assets, serialiseAssetPtr),
-		Link:         opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
-		Description:  in.GetDesc(),
-		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
-		Content:      opt.Map(in.Content, serialiseContentHTML).Ptr(),
-		Owner:        serialiseProfileReference(in.Owner),
+		Id:               in.Mark.ID().String(),
+		CreatedAt:        in.CreatedAt,
+		UpdatedAt:        in.UpdatedAt,
+		Name:             in.Name,
+		Slug:             in.Mark.Slug(),
+		CurrentVersionId: serialiseNullableIdentifier(in.CurrentVersion),
+		Assets:           dt.Map(in.Assets, serialiseAssetPtr),
+		Link:             opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
+		Description:      in.GetDesc(),
+		PrimaryImage:     opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Content:          opt.Map(in.Content, serialiseContentHTML).Ptr(),
+		Owner:            serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),

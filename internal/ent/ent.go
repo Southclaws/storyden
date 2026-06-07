@@ -32,6 +32,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -132,6 +133,7 @@ func checkColumn(t, c string) error {
 			mentionprofile.Table:            mentionprofile.ValidColumn,
 			moderationnote.Table:            moderationnote.ValidColumn,
 			node.Table:                      node.ValidColumn,
+			nodeversion.Table:               nodeversion.ValidColumn,
 			notification.Table:              notification.ValidColumn,
 			oauthauthorisationcode.Table:    oauthauthorisationcode.ValidColumn,
 			oauthauthorisationrequest.Table: oauthauthorisationrequest.ValidColumn,

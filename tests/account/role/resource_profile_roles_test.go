@@ -60,7 +60,7 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				Colour:      "#f97316",
 			}, authorSession))(t, http.StatusOK)
 
-			vis := openapi.Published
+			vis := openapi.VisibilityPublished
 			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(authorCtx, openapi.ThreadInitialProps{
 				Title:      "thread-with-roles-" + xid.New().String(),
 				Body:       opt.New("<p>thread body</p>").Ptr(),
@@ -268,6 +268,29 @@ func TestResourceProfileReferencesIncludeRoles(t *testing.T) {
 				})
 				r.True(found, "created node should appear in node list")
 				assertProfileRefHasCustomRole(t, "node.list owner should include assigned custom role", nodeItem.Owner.Roles)
+			})
+
+			t.Run("node_draft_list_author_and_owner", func(t *testing.T) {
+				r := require.New(t)
+
+				// Create a draft on the node with custom role
+				draftName := "draft-with-roles-" + xid.New().String()
+				draftCreate := tests.AssertRequest(cl.NodeVersionCreateWithResponse(authorCtx, nodeCreate.JSON200.Slug, openapi.NodeVersionInitialProps{
+					Name: &draftName,
+				}, authorSession))(t, http.StatusOK)
+
+				// List all drafts
+				draftList := tests.AssertRequest(cl.NodeDraftListWithResponse(authorCtx, &openapi.NodeDraftListParams{}, authorSession))(t, http.StatusOK)
+				draftItem, found := lo.Find(draftList.JSON200.Drafts, func(in openapi.NodeDraft) bool {
+					return in.Id == draftCreate.JSON200.Id
+				})
+				r.True(found, "created draft should appear in draft list")
+
+				// Check draft author has custom role
+				assertProfileRefHasCustomRole(t, "node_draft_list draft author should include assigned custom role", draftItem.Author.Roles)
+
+				// Check target node owner has custom role
+				assertProfileRefHasCustomRole(t, "node_draft_list target node owner should include assigned custom role", draftItem.Node.Owner.Roles)
 			})
 
 			t.Run("collection_get_owner", func(t *testing.T) {

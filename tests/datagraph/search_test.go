@@ -49,8 +49,8 @@ func TestSearchMultipleKinds(t *testing.T) {
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
 			tests.Ok(t, err, cat1)
 
-			published := openapi.Published
-			draft := openapi.Draft
+			published := openapi.VisibilityPublished
+			draft := openapi.VisibilityDraft
 
 			hot := "<p>this contains the keyword we want</p>"
 			cold := "<p>this contains none of the words we want</p>"
@@ -58,14 +58,14 @@ func TestSearchMultipleKinds(t *testing.T) {
 			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
 			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(cold).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)
@@ -217,8 +217,8 @@ func TestSearchVisibilityRules(t *testing.T) {
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
 			tests.Ok(t, err, cat1)
 
-			published := openapi.Published
-			draft := openapi.Draft
+			published := openapi.VisibilityPublished
+			draft := openapi.VisibilityDraft
 
 			hot := "<p>this contains the keyword we want</p>"
 			cold := "<p>this contains the keyword we want but it's not published</p>"
@@ -226,14 +226,14 @@ func TestSearchVisibilityRules(t *testing.T) {
 			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
 			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(cold).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Draft).Ptr(),
+				Visibility: opt.New(openapi.VisibilityDraft).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)
@@ -336,14 +336,14 @@ func TestSearchFilters(t *testing.T) {
 			cat2, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: "Food" + uuid.NewString(), Colour: "#111"}, adminSession)
 			tests.Ok(t, err, cat2)
 
-			published := openapi.Published
+			published := openapi.VisibilityPublished
 			hot := "<p>keyword</p>"
 
 			// Create threads with different authors, categories, and tags
 			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread by baldur in tech with sharing",
 				Tags:       &[]openapi.TagName{"sharing"},
 			}, session1)
@@ -352,7 +352,7 @@ func TestSearchFilters(t *testing.T) {
 			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat2.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread by loki in food with tips",
 				Tags:       &[]openapi.TagName{"tips"},
 			}, session2)
@@ -361,7 +361,7 @@ func TestSearchFilters(t *testing.T) {
 			t3, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread by baldur in tech with sharing and tips",
 				Tags:       &[]openapi.TagName{"sharing", "tips"},
 			}, session1)

@@ -45,7 +45,7 @@ func TestLikeThreads(t *testing.T) {
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>this is a thread</p>").Ptr(),
 				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread testing",
 			}, adminSession)
 			tests.Ok(t, err, thread1create)
@@ -140,7 +140,7 @@ func TestLikeReplies(t *testing.T) {
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>this is a thread</p>").Ptr(),
 				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread testing",
 			}, adminSession)
 			tests.Ok(t, err, thread1create)

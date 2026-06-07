@@ -36,7 +36,7 @@ import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleB
 export function LibraryPageBlocks() {
   const { store } = useLibraryPageContext();
   const { moveBlock, addBlock, removeBlock } = store.getState();
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
 
   const meta = useWatch((s) => s.draft.meta);
 
@@ -80,7 +80,7 @@ export function LibraryPageBlocks() {
 
   const blockIds = blocks.map((block) => block.type);
 
-  if (editing) {
+  if (isDirectEditing) {
     const editStateBlocks = meta.layout?.blocks ?? [];
 
     return (

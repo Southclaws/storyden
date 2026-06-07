@@ -64,7 +64,7 @@ export function LibraryPageDirectoryBlockGrid({
 }: Props) {
   const { nodeID, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
 
   const { setChildPropertyValue } = store.getState();
 
@@ -142,7 +142,7 @@ export function LibraryPageDirectoryBlockGrid({
               key={node.id}
               nodeID={nodeID}
               node={node}
-              editing={editing}
+              editing={isDirectEditing}
               columnValues={columnValues}
               valueTable={valueTable}
               coverImagePlaceholder={coverImagePlaceholder}

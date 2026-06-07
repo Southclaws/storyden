@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/rs/xid"
 )
@@ -46,6 +47,8 @@ type Node struct {
 	HideChildTree bool `json:"hide_child_tree,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// CurrentVersionID holds the value of the "current_version_id" field.
+	CurrentVersionID *xid.ID `json:"current_version_id,omitempty"`
 	// PropertySchemaID holds the value of the "property_schema_id" field.
 	PropertySchemaID *xid.ID `json:"property_schema_id,omitempty"`
 	// PrimaryAssetID holds the value of the "primary_asset_id" field.
@@ -88,11 +91,15 @@ type NodeEdges struct {
 	ContentLinks []*Link `json:"content_links,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
+	// Versions holds the value of the versions edge.
+	Versions []*NodeVersion `json:"versions,omitempty"`
+	// CurrentVersion holds the value of the current_version edge.
+	CurrentVersion *NodeVersion `json:"current_version,omitempty"`
 	// CollectionNodes holds the value of the collection_nodes edge.
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [14]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -204,10 +211,30 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
+// VersionsOrErr returns the Versions value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) VersionsOrErr() ([]*NodeVersion, error) {
+	if e.loadedTypes[11] {
+		return e.Versions, nil
+	}
+	return nil, &NotLoadedError{edge: "versions"}
+}
+
+// CurrentVersionOrErr returns the CurrentVersion value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NodeEdges) CurrentVersionOrErr() (*NodeVersion, error) {
+	if e.CurrentVersion != nil {
+		return e.CurrentVersion, nil
+	} else if e.loadedTypes[12] {
+		return nil, &NotFoundError{label: nodeversion.Label}
+	}
+	return nil, &NotLoadedError{edge: "current_version"}
+}
+
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[13] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
@@ -218,7 +245,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldPropertySchemaID, node.FieldPrimaryAssetID:
+		case node.FieldCurrentVersionID, node.FieldPropertySchemaID, node.FieldPrimaryAssetID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case node.FieldMetadata:
 			values[i] = new([]byte)
@@ -322,6 +349,13 @@ func (_m *Node) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
 				_m.AccountID = *value
+			}
+		case node.FieldCurrentVersionID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field current_version_id", values[i])
+			} else if value.Valid {
+				_m.CurrentVersionID = new(xid.ID)
+				*_m.CurrentVersionID = *value.S.(*xid.ID)
 			}
 		case node.FieldPropertySchemaID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -431,6 +465,16 @@ func (_m *Node) QueryCollections() *CollectionQuery {
 	return NewNodeClient(_m.config).QueryCollections(_m)
 }
 
+// QueryVersions queries the "versions" edge of the Node entity.
+func (_m *Node) QueryVersions() *NodeVersionQuery {
+	return NewNodeClient(_m.config).QueryVersions(_m)
+}
+
+// QueryCurrentVersion queries the "current_version" edge of the Node entity.
+func (_m *Node) QueryCurrentVersion() *NodeVersionQuery {
+	return NewNodeClient(_m.config).QueryCurrentVersion(_m)
+}
+
 // QueryCollectionNodes queries the "collection_nodes" edge of the Node entity.
 func (_m *Node) QueryCollectionNodes() *CollectionNodeQuery {
 	return NewNodeClient(_m.config).QueryCollectionNodes(_m)
@@ -499,6 +543,11 @@ func (_m *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
+	builder.WriteString(", ")
+	if v := _m.CurrentVersionID; v != nil {
+		builder.WriteString("current_version_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := _m.PropertySchemaID; v != nil {
 		builder.WriteString("property_schema_id=")

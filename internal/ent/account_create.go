@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -595,6 +596,21 @@ func (_c *AccountCreate) AddNodes(v ...*Node) *AccountCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddNodeIDs(ids...)
+}
+
+// AddNodeVersionIDs adds the "node_versions" edge to the NodeVersion entity by IDs.
+func (_c *AccountCreate) AddNodeVersionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddNodeVersionIDs(ids...)
+	return _c
+}
+
+// AddNodeVersions adds the "node_versions" edges to the NodeVersion entity.
+func (_c *AccountCreate) AddNodeVersions(v ...*NodeVersion) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddNodeVersionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -1360,6 +1376,22 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.NodeVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

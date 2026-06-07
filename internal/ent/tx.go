@@ -54,6 +54,8 @@ type Tx struct {
 	ModerationNote *ModerationNoteClient
 	// Node is the client for interacting with the Node builders.
 	Node *NodeClient
+	// NodeVersion is the client for interacting with the NodeVersion builders.
+	NodeVersion *NodeVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
@@ -245,6 +247,7 @@ func (tx *Tx) init() {
 	tx.MentionProfile = NewMentionProfileClient(tx.config)
 	tx.ModerationNote = NewModerationNoteClient(tx.config)
 	tx.Node = NewNodeClient(tx.config)
+	tx.NodeVersion = NewNodeVersionClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(tx.config)
 	tx.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(tx.config)

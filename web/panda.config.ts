@@ -10,6 +10,7 @@ import { colorPicker } from "@/recipes/color-picker";
 import { combobox } from "@/recipes/combobox";
 import { datePicker } from "@/recipes/date-picker";
 import { fileUpload } from "@/recipes/file-upload";
+import { group } from "@/recipes/group";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
 import { inputGroup } from "@/recipes/input-group";
@@ -193,6 +194,7 @@ export default defineConfig({
         badge: badge,
         checkbox: checkbox,
         button: button,
+        group: group,
         input: input,
         switchRecipe: switchRecipe,
         text: text,

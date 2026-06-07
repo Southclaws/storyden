@@ -44,27 +44,27 @@ func TestThreadListReviewVisibility(t *testing.T) {
 			publishedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>Published thread</p>").Ptr(),
 				Title:      "Published Thread",
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionMember)
 			tests.Ok(t, err, publishedThread)
 
 			reviewThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>Review thread</p>").Ptr(),
 				Title:      "Review Thread",
-				Visibility: opt.New(openapi.Review).Ptr(),
+				Visibility: opt.New(openapi.VisibilityReview).Ptr(),
 			}, sessionMember)
 			tests.Ok(t, err, reviewThread)
 
 			otherReviewThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>Other review thread</p>").Ptr(),
 				Title:      "Other Review Thread",
-				Visibility: opt.New(openapi.Review).Ptr(),
+				Visibility: opt.New(openapi.VisibilityReview).Ptr(),
 			}, sessionOther)
 			tests.Ok(t, err, otherReviewThread)
 
 			t.Run("moderator_sees_all_review_threads_with_visibility_filter", func(t *testing.T) {
 				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-					Visibility: &[]openapi.Visibility{openapi.Published, openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityPublished, openapi.VisibilityReview},
 				}, sessionAdmin)
 				tests.Ok(t, err, threadList)
 
@@ -96,7 +96,7 @@ func TestThreadListReviewVisibility(t *testing.T) {
 
 			t.Run("member_sees_own_review_threads_when_filtering_by_own_account", func(t *testing.T) {
 				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-					Visibility: &[]openapi.Visibility{openapi.Published, openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityPublished, openapi.VisibilityReview},
 					Author:     &memberAcc.Handle,
 				}, sessionMember)
 				tests.Ok(t, err, threadList)
@@ -109,7 +109,7 @@ func TestThreadListReviewVisibility(t *testing.T) {
 
 			t.Run("member_cannot_see_others_review_threads_when_filtering_by_other_account", func(t *testing.T) {
 				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-					Visibility: &[]openapi.Visibility{openapi.Published, openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityPublished, openapi.VisibilityReview},
 					Author:     &adminAcc.Handle,
 				}, sessionMember)
 				tests.Ok(t, err, threadList)
@@ -119,13 +119,13 @@ func TestThreadListReviewVisibility(t *testing.T) {
 				})
 
 				for _, th := range adminThreads {
-					a.NotEqual(openapi.Review, th.Visibility, "non-moderator member should not see admin's review threads")
+					a.NotEqual(openapi.VisibilityReview, th.Visibility, "non-moderator member should not see admin's review threads")
 				}
 			})
 
 			t.Run("unauthenticated_user_only_sees_published_threads", func(t *testing.T) {
 				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-					Visibility: &[]openapi.Visibility{openapi.Published, openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityPublished, openapi.VisibilityReview},
 				})
 				tests.Ok(t, err, threadList)
 
@@ -137,7 +137,7 @@ func TestThreadListReviewVisibility(t *testing.T) {
 
 			t.Run("member_filtering_by_account_with_only_review_visibility", func(t *testing.T) {
 				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
-					Visibility: &[]openapi.Visibility{openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityReview},
 					Author:     &memberAcc.Handle,
 				}, sessionMember)
 				tests.Ok(t, err, threadList)
@@ -148,7 +148,7 @@ func TestThreadListReviewVisibility(t *testing.T) {
 
 				r.Len(threads, 1, "should only return the member's review thread")
 				a.Equal(reviewThread.JSON200.Id, threads[0].Id)
-				a.Equal(openapi.Review, threads[0].Visibility)
+				a.Equal(openapi.VisibilityReview, threads[0].Visibility)
 			})
 		}))
 	}))

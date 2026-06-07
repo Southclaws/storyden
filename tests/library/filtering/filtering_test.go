@@ -33,7 +33,7 @@ func TestNodesFiltering(t *testing.T) {
 			ctx1, acc1 := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 			ctx2, acc2 := e2e.WithAccount(ctx, aw, seed.Account_002_Frigg)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			name1 := "test-node-owned-by-1"
 			slug1 := name1 + uuid.NewString()

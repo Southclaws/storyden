@@ -33,6 +33,7 @@ func (Node) Fields() []ent.Field {
 			}),
 		),
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("current_version_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("property_schema_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
@@ -92,5 +93,13 @@ func (Node) Edges() []ent.Edge {
 		edge.From("collections", Collection.Type).
 			Ref("nodes").
 			Through("collection_nodes", CollectionNode.Type),
+
+		edge.To("versions", NodeVersion.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+		edge.From("current_version", NodeVersion.Type).
+			Ref("current_for_nodes").
+			Field("current_version_id").
+			Unique().
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

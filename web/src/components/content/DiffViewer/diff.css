@@ -1,0 +1,57 @@
+/* Text-level insertions (green underline) */
+.diff-insertion {
+  background-color: var(--colors-green-3);
+  color: var(--colors-green-12);
+  text-decoration: underline;
+  text-decoration-color: var(--colors-green-9);
+  text-decoration-thickness: var(--border-widths-thin);
+  border-radius: var(--radii-xs);
+  padding-inline: var(--spacing-0\.5);
+}
+
+/* Text-level deletions (red strikethrough) */
+.diff-deletion {
+  background-color: var(--colors-red-4);
+  color: var(--colors-red-12);
+  text-decoration: line-through;
+  text-decoration-color: var(--colors-red-9);
+  text-decoration-thickness: var(--border-widths-thin);
+  border-radius: var(--radii-xs);
+  padding-inline: var(--spacing-0\.5);
+  opacity: 0.8;
+}
+
+/* Block-level additions (green left border) */
+.diff-block-added {
+  border-left: var(--border-widths-thick) solid var(--colors-green-9);
+  background-color: var(--colors-green-2);
+  padding-left: var(--spacing-4);
+  padding-block: var(--spacing-2);
+  margin-block: var(--spacing-2);
+  border-radius: var(--radii-md);
+}
+
+/* Block-level deletions (red left border) */
+.diff-block-removed {
+  border-left: var(--border-widths-thick) solid var(--colors-red-9);
+  background-color: var(--colors-red-2);
+  padding-left: var(--spacing-4);
+  padding-block: var(--spacing-2);
+  margin-block: var(--spacing-2);
+  border-radius: var(--radii-md);
+  opacity: var(--opacity-7);
+}
+
+/* Custom node insertions (linkPreview, image, etc.) */
+/* This targets ONLY NodeView wrappers, not inline text spans */
+.diff-node-insertion {
+  outline-color: var(--colors-green-9);
+  outline-width: var(--border-widths-medium);
+  outline-style: solid;
+}
+
+/* Custom node deletions (linkPreview, image, etc.) */
+/* This targets ONLY NodeView wrappers, not inline text spans */
+.diff-node-deletion {
+  opacity: 0.5;
+}

@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -630,6 +631,21 @@ func (_u *AccountUpdate) AddNodes(v ...*Node) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddNodeIDs(ids...)
+}
+
+// AddNodeVersionIDs adds the "node_versions" edge to the NodeVersion entity by IDs.
+func (_u *AccountUpdate) AddNodeVersionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddNodeVersionIDs(ids...)
+	return _u
+}
+
+// AddNodeVersions adds the "node_versions" edges to the NodeVersion entity.
+func (_u *AccountUpdate) AddNodeVersions(v ...*NodeVersion) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddNodeVersionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -1310,6 +1326,27 @@ func (_u *AccountUpdate) RemoveNodes(v ...*Node) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveNodeIDs(ids...)
+}
+
+// ClearNodeVersions clears all "node_versions" edges to the NodeVersion entity.
+func (_u *AccountUpdate) ClearNodeVersions() *AccountUpdate {
+	_u.mutation.ClearNodeVersions()
+	return _u
+}
+
+// RemoveNodeVersionIDs removes the "node_versions" edge to NodeVersion entities by IDs.
+func (_u *AccountUpdate) RemoveNodeVersionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveNodeVersionIDs(ids...)
+	return _u
+}
+
+// RemoveNodeVersions removes "node_versions" edges to NodeVersion entities.
+func (_u *AccountUpdate) RemoveNodeVersions(v ...*NodeVersion) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveNodeVersionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -2811,6 +2848,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.NodeVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedNodeVersionsIDs(); len(nodes) > 0 && !_u.mutation.NodeVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NodeVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -3899,6 +3981,21 @@ func (_u *AccountUpdateOne) AddNodes(v ...*Node) *AccountUpdateOne {
 	return _u.AddNodeIDs(ids...)
 }
 
+// AddNodeVersionIDs adds the "node_versions" edge to the NodeVersion entity by IDs.
+func (_u *AccountUpdateOne) AddNodeVersionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddNodeVersionIDs(ids...)
+	return _u
+}
+
+// AddNodeVersions adds the "node_versions" edges to the NodeVersion entity.
+func (_u *AccountUpdateOne) AddNodeVersions(v ...*NodeVersion) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddNodeVersionIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (_u *AccountUpdateOne) AddAssetIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddAssetIDs(ids...)
@@ -4577,6 +4674,27 @@ func (_u *AccountUpdateOne) RemoveNodes(v ...*Node) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveNodeIDs(ids...)
+}
+
+// ClearNodeVersions clears all "node_versions" edges to the NodeVersion entity.
+func (_u *AccountUpdateOne) ClearNodeVersions() *AccountUpdateOne {
+	_u.mutation.ClearNodeVersions()
+	return _u
+}
+
+// RemoveNodeVersionIDs removes the "node_versions" edge to NodeVersion entities by IDs.
+func (_u *AccountUpdateOne) RemoveNodeVersionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveNodeVersionIDs(ids...)
+	return _u
+}
+
+// RemoveNodeVersions removes "node_versions" edges to NodeVersion entities.
+func (_u *AccountUpdateOne) RemoveNodeVersions(v ...*NodeVersion) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveNodeVersionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -6101,6 +6219,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.NodeVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedNodeVersionsIDs(); len(nodes) > 0 && !_u.mutation.NodeVersionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NodeVersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodeVersionsTable,
+			Columns: []string{account.NodeVersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

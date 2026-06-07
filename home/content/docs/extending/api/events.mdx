@@ -281,6 +281,62 @@ Payload fields:
 | `id` | `string (nodeID)` | Yes | Library node ID |
 | `slug` | `string` | Yes | Node slug |
 
+### EventNodeVersionDraftCreated
+
+Emitted when a draft version is created for a library node.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventNodeVersionDraftCreated` | Yes | - |
+| `author_id` | `string (accountID)` | Yes | Draft author account ID |
+| `node_id` | `string (nodeID)` | Yes | Library node ID |
+| `node_slug` | `string` | Yes | Node slug |
+| `version_id` | `string (versionID)` | Yes | Draft version ID |
+
+### EventNodeVersionDraftUpdated
+
+Emitted when a draft version is updated.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventNodeVersionDraftUpdated` | Yes | - |
+| `author_id` | `string (accountID)` | Yes | Draft author account ID |
+| `node_id` | `string (nodeID)` | Yes | Library node ID |
+| `node_slug` | `string` | Yes | Node slug |
+| `version_id` | `string (versionID)` | Yes | Draft version ID |
+
+### EventNodeVersionDraftDeleted
+
+Emitted when a draft version is discarded.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventNodeVersionDraftDeleted` | Yes | - |
+| `author_id` | `string (accountID)` | Yes | Draft author account ID |
+| `node_id` | `string (nodeID)` | Yes | Library node ID |
+| `node_slug` | `string` | Yes | Node slug |
+| `version_id` | `string (versionID)` | Yes | Draft version ID |
+
+### EventNodeVersionDraftApplied
+
+Emitted when a draft version is applied to a library node.
+
+Payload fields:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `event` | `string, const EventNodeVersionDraftApplied` | Yes | - |
+| `author_id` | `string (accountID)` | Yes | Draft author account ID |
+| `node_id` | `string (nodeID)` | Yes | Library node ID |
+| `node_slug` | `string` | Yes | Node slug |
+| `version_id` | `string (versionID)` | Yes | Draft version ID |
+
 ### EventAccountCreated
 
 Emitted after a new account is created.

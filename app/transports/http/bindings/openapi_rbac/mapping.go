@@ -710,6 +710,42 @@ func (m *Mapping) NodeUpdateVisibility() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) NodeDraftList() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedLibrary
+}
+
+func (m *Mapping) NodeVersionList() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedLibrary
+}
+
+func (m *Mapping) NodeVersionCreate() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeVersionDraftGet() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedLibrary
+}
+
+func (m *Mapping) NodeVersionDraftUpdate() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeVersionGet() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedLibrary
+}
+
+func (m *Mapping) NodeVersionUpdate() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeVersionDelete() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeVersionUpdateStatus() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageLibrary
+}
+
 func (m *Mapping) NodeAddAsset() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }

@@ -53,7 +53,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "The Quick Brown Fox",
 				Body:       opt.New("<p>A thread about a quick brown fox jumping over lazy dogs</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadFox)
 
@@ -61,7 +61,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Understanding Quantum Computing",
 				Body:       opt.New("<p>A deep dive into quantum mechanics and computing principles</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadQuantum)
 
@@ -69,7 +69,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Recipe for Perfect Pancakes",
 				Body:       opt.New("<p>Learn how to make fluffy pancakes with this simple recipe</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadPancakes)
 
@@ -77,7 +77,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "JavaScript Tutorial",
 				Body:       opt.New("<p>Learn JavaScript basics</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadJavaScript)
 
@@ -85,7 +85,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Java Programming Guide",
 				Body:       opt.New("<p>Java programming fundamentals</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadJava)
 
@@ -93,7 +93,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Matlab Data Science",
 				Body:       opt.New("<p>Data science with Matlab</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadMatlab)
 
@@ -101,7 +101,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "机器学习入门指南",
 				Body:       opt.New("<p>这是一个关于机器学习的基础教程</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadChinese)
 
@@ -109,7 +109,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "深度学习与神经网络",
 				Body:       opt.New("<p>深入探讨深度学习和神经网络的原理与应用</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadChineseDeepLearning)
 
@@ -117,7 +117,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Программирование на Python",
 				Body:       opt.New("<p>Изучение основ программирования на языке Python</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadRussian)
 
@@ -125,7 +125,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Основы веб-разработки",
 				Body:       opt.New("<p>Полное руководство по современной веб-разработке</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadRussianWeb)
 
@@ -133,7 +133,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "تطوير تطبيقات الويب",
 				Body:       opt.New("<p>دورة كاملة في تطوير تطبيقات الويب الحديثة</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadArabic)
 
@@ -141,7 +141,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Recetas de Cocina Mediterránea",
 				Body:       opt.New("<p>Descubre los secretos de la cocina mediterránea tradicional</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadSpanish)
 
@@ -149,7 +149,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Histoire de l'Architecture Gothique",
 				Body:       opt.New("<p>Exploration des cathédrales gothiques européennes et leur influence</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadFrench)
 
@@ -157,7 +157,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Wandern in den Alpen",
 				Body:       opt.New("<p>Die besten Wanderwege und Bergtouren in den Alpen</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadGerman)
 
@@ -165,7 +165,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Música Tradicional Brasileira",
 				Body:       opt.New("<p>Explorando os ritmos e melodias da música brasileira</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadPortuguese)
 
@@ -173,7 +173,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Αρχαία Ελληνική Φιλοσοφία",
 				Body:       opt.New("<p>Μελέτη των έργων των αρχαίων Ελλήνων φιλοσόφων</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadGreek)
 
@@ -181,7 +181,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Geleneksel Türk Mutfağı",
 				Body:       opt.New("<p>Türk mutfağının zengin lezzetlerini keşfedin</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadTurkish)
 
@@ -189,7 +189,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "ქართული ხალხური სიმღერები",
 				Body:       opt.New("<p>ქართული პოლიფონიური სიმღერების ისტორია და მნიშვნელობა</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadGeorgian)
 
@@ -197,7 +197,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "भारतीय शास्त्रीय संगीत",
 				Body:       opt.New("<p>भारतीय शास्त्रीय संगीत की परंपराओं का अन्वेषण</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadHindi)
 
@@ -205,7 +205,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Hadithi za Kiswahili",
 				Body:       opt.New("<p>Hadithi na masimulizi ya kitamaduni kutoka Afrika Mashariki</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadSwahili)
 
@@ -213,7 +213,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Հայկական Ավանդական Խոհանոց",
 				Body:       opt.New("<p>Հայկական խոհանոցի պատմությունը և ավանդական բաղադրատոմսերը</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadArmenian)
 
@@ -221,7 +221,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "ספרות עברית מודרנית",
 				Body:       opt.New("<p>סקירה של הספרות העברית המודרנית והסופרים המשפיעים</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadHebrew)
 
@@ -229,7 +229,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "شعر کلاسیک فارسی",
 				Body:       opt.New("<p>بررسی شاعران بزرگ فارسی و آثار ماندگار آنها</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadPersian)
 
@@ -237,7 +237,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "اردو شاعری کی روایت",
 				Body:       opt.New("<p>اردو شاعری کی تاریخ اور مشہور شعراء کا تعارف</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadUrdu)
 
@@ -245,7 +245,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "ਪੰਜਾਬੀ ਲੋਕ ਗੀਤ",
 				Body:       opt.New("<p>ਪੰਜਾਬੀ ਸੱਭਿਆਚਾਰ ਵਿੱਚ ਲੋਕ ਗੀਤਾਂ ਦਾ ਮਹੱਤਵ</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadPunjabi)
 
@@ -253,7 +253,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "नेपाली पर्वतारोहण",
 				Body:       opt.New("<p>नेपालको हिमाल र पर्वतारोहणको इतिहास</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadNepali)
 
@@ -261,7 +261,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Àṣà Yorùbá",
 				Body:       opt.New("<p>Ìtàn àti àṣà àwọn ènìyàn Yorùbá ní Nàìjíríà</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadYoruba)
 
@@ -269,7 +269,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Omenala Igbo",
 				Body:       opt.New("<p>Akụkọ ọdịnala na omenala ndị Igbo</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadIgbo)
 
@@ -277,7 +277,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Tarihin Hausawa",
 				Body:       opt.New("<p>Tarihi da al'adun Hausawa a Arewacin Najeriya</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadHausa)
 
@@ -285,7 +285,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Akanfo Atetesɛm",
 				Body:       opt.New("<p>Akanman mu atetesɛm ne amammerɛ</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadAkan)
 
@@ -312,7 +312,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Thread by Baldur in Tech with sharing",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Tags:       &[]openapi.TagName{"sharing"},
 			}, session1)
 			tests.Ok(t, err, t1)
@@ -321,7 +321,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Thread by Loki in Food with tips",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat2.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Tags:       &[]openapi.TagName{"tips"},
 			}, session2)
 			tests.Ok(t, err, t2)
@@ -330,7 +330,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				Title:      "Thread by Baldur in Tech with sharing and tips",
 				Body:       opt.New(hot).Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Tags:       &[]openapi.TagName{"sharing", "tips"},
 			}, session1)
 			tests.Ok(t, err, t3)

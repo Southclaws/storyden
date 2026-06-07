@@ -48,7 +48,7 @@ func TestPostLocation(t *testing.T) {
 					Title:      title,
 					Body:       opt.New(fmt.Sprintf("<p>%s</p>", title)).Ptr(),
 					Category:   opt.New(catResp.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				}, session)
 				tests.Ok(currentT, err, resp)
 				return resp.JSON200

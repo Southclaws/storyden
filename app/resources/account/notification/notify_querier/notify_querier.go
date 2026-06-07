@@ -14,6 +14,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -26,6 +28,7 @@ import (
 type Querier struct {
 	db             *ent.Client
 	postSearcher   post_search.Repository
+	nodeQuerier    *node_querier.Querier
 	roleQuerier    *role_hydrate.Hydrator
 	profileQuerier *profile_querier.Querier
 	logger         *slog.Logger
@@ -34,6 +37,7 @@ type Querier struct {
 func New(
 	db *ent.Client,
 	postSearcher post_search.Repository,
+	nodeQuerier *node_querier.Querier,
 	roleQuerier *role_hydrate.Hydrator,
 	profileQuerier *profile_querier.Querier,
 	logger *slog.Logger,
@@ -41,6 +45,7 @@ func New(
 	return &Querier{
 		db:             db,
 		postSearcher:   postSearcher,
+		nodeQuerier:    nodeQuerier,
 		roleQuerier:    roleQuerier,
 		profileQuerier: profileQuerier,
 		logger:         logger,
@@ -94,6 +99,15 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 	}
 	pg := lo.KeyBy(posts, func(p *post.Post) post.ID { return p.ID })
 
+	nodeIDs := dt.Map(grouped[datagraph.KindNode], func(n *notification.NotificationRef) library.NodeID {
+		return library.NodeID(n.ItemRef.OrZero().ID)
+	})
+	nodes, err := n.nodeQuerier.ProbeMany(ctx, nodeIDs...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	nodeLookup := lo.KeyBy(nodes, func(n *library.Node) library.NodeID { return library.NodeID(n.GetID()) })
+
 	profileIDs := dt.Map(grouped[datagraph.KindProfile], func(n *notification.NotificationRef) account.AccountID {
 		return account.AccountID(n.ItemRef.OrZero().ID)
 	})
@@ -128,6 +142,20 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 				ID:     r.ID,
 				Event:  r.Event,
 				Item:   p,
+				Source: r.Source,
+				Time:   r.Time,
+				Read:   r.Read,
+			}
+		case datagraph.KindNode:
+			node := nodeLookup[library.NodeID(itemRef.ID)]
+			if node == nil {
+				return nil
+			}
+
+			return &notification.Notification{
+				ID:     r.ID,
+				Event:  r.Event,
+				Item:   node,
 				Source: r.Source,
 				Time:   r.Time,
 				Read:   r.Read,

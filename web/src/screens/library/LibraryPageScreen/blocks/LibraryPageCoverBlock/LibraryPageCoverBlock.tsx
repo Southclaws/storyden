@@ -22,10 +22,10 @@ import {
 } from "./useLibraryPageCoverBlock";
 
 export function LibraryPageCoverBlock() {
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
   const primary_image = useWatch((s) => s.draft.primary_image);
 
-  if (editing) {
+  if (isDirectEditing) {
     return <LibraryPageCoverBlockEditing />;
   }
 

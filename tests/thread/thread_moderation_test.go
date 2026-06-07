@@ -47,7 +47,7 @@ func TestThreadModerationWordLists(t *testing.T) {
 			blockedThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This contains a banned topic</p>").Ptr(),
 				Title:      "Banned content",
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionUser)
 			tests.Status(t, err, blockedThread, http.StatusBadRequest)
 			r.NotNil(blockedThread.JSONDefault)
@@ -64,10 +64,10 @@ func TestThreadModerationWordLists(t *testing.T) {
 			reviewThread, err := cl.ThreadCreateWithResponse(userCtx, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This should be flagged for review</p>").Ptr(),
 				Title:      "Flagged thread",
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionUser)
 			tests.Ok(t, err, reviewThread)
-			r.Equal(openapi.Review, reviewThread.JSON200.Visibility, "thread with report-listed content should be sent to review")
+			r.Equal(openapi.VisibilityReview, reviewThread.JSON200.Visibility, "thread with report-listed content should be sent to review")
 			r.Equal(user.ID.String(), reviewThread.JSON200.Author.Id)
 		}))
 	}))
@@ -96,7 +96,7 @@ func TestReplyModerationWordLists(t *testing.T) {
 			threadCreate, err := cl.ThreadCreateWithResponse(threadCtx, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>Safe thread content</p>").Ptr(),
 				Title:      "Reply moderation",
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionThreadAuthor)
 			tests.Ok(t, err, threadCreate)
 			r.Equal(threadAuthor.ID.String(), threadCreate.JSON200.Author.Id)
@@ -125,7 +125,7 @@ func TestReplyModerationWordLists(t *testing.T) {
 				Body: "this reply contains flagged content",
 			}, sessionReplier)
 			tests.Ok(t, err, reviewReply)
-			r.Equal(openapi.Review, reviewReply.JSON200.Visibility, "reply with report-listed content should enter review")
+			r.Equal(openapi.VisibilityReview, reviewReply.JSON200.Visibility, "reply with report-listed content should enter review")
 		}))
 	}))
 }

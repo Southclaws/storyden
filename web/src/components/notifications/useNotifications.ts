@@ -163,5 +163,20 @@ function getNotificationContent(n: Notification) {
         description: "issued you a warning",
         url: p?.slug ? `/m/${p.slug}` : "#",
       };
+    case "node_version_created":
+      return {
+        description: "created a draft for your page",
+        url: p?.slug ? `/l/${p.slug}` : "#",
+      };
+    case "node_version_applied":
+      return {
+        description: "applied your draft",
+        url: p?.slug ? `/l/${p.slug}` : "#",
+      };
+    case "node_version_deleted":
+      return {
+        description: "discarded your draft",
+        url: p?.slug ? `/l/${p.slug}` : "#",
+      };
   }
 }

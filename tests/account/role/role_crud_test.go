@@ -53,7 +53,7 @@ func TestRoleCRUD(t *testing.T) {
 				guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				guest1Session := sh.WithSession(guestCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 
 				tests.AssertRequest(cl.AccountAddRoleWithResponse(adminCtx, guest1.Handle, role.JSON200.Id, adminSession))(t, http.StatusOK)
 				tests.AssertRequest(cl.CategoryCreateWithResponse(guestCtx, openapi.CategoryCreateJSONRequestBody{

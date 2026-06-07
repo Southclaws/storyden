@@ -84,7 +84,7 @@ func testThread(t *testing.T) *openapi.Thread {
 		Tags:        openapi.TagReferenceList{{Name: "release", Colour: "#abcdef"}},
 		Title:       "Launch Notes",
 		UpdatedAt:   mustParseThreadTime(t, "2026-05-23T15:31:53+07:00"),
-		Visibility:  openapi.Published,
+		Visibility:  openapi.VisibilityPublished,
 	}
 }
 

@@ -107,6 +107,8 @@ type AccountEdges struct {
 	Collections []*Collection `json:"collections,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// NodeVersions holds the value of the node_versions edge.
+	NodeVersions []*NodeVersion `json:"node_versions,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// Events holds the value of the events edge.
@@ -131,7 +133,7 @@ type AccountEdges struct {
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [36]bool
+	loadedTypes [37]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -361,10 +363,19 @@ func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 	return nil, &NotLoadedError{edge: "nodes"}
 }
 
+// NodeVersionsOrErr returns the NodeVersions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) NodeVersionsOrErr() ([]*NodeVersion, error) {
+	if e.loadedTypes[25] {
+		return e.NodeVersions, nil
+	}
+	return nil, &NotLoadedError{edge: "node_versions"}
+}
+
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[26] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -373,7 +384,7 @@ func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
 // EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[27] {
 		return e.Events, nil
 	}
 	return nil, &NotLoadedError{edge: "events"}
@@ -382,7 +393,7 @@ func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
 // PostReadsOrErr returns the PostReads value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[28] {
 		return e.PostReads, nil
 	}
 	return nil, &NotLoadedError{edge: "post_reads"}
@@ -391,7 +402,7 @@ func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
 // ReportsOrErr returns the Reports value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ReportsOrErr() ([]*Report, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[29] {
 		return e.Reports, nil
 	}
 	return nil, &NotLoadedError{edge: "reports"}
@@ -400,7 +411,7 @@ func (e AccountEdges) ReportsOrErr() ([]*Report, error) {
 // HandledReportsOrErr returns the HandledReports value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
-	if e.loadedTypes[29] {
+	if e.loadedTypes[30] {
 		return e.HandledReports, nil
 	}
 	return nil, &NotLoadedError{edge: "handled_reports"}
@@ -409,7 +420,7 @@ func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
 // AuditLogsOrErr returns the AuditLogs value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
-	if e.loadedTypes[30] {
+	if e.loadedTypes[31] {
 		return e.AuditLogs, nil
 	}
 	return nil, &NotLoadedError{edge: "audit_logs"}
@@ -418,7 +429,7 @@ func (e AccountEdges) AuditLogsOrErr() ([]*AuditLog, error) {
 // ModerationNotesOrErr returns the ModerationNotes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ModerationNotesOrErr() ([]*ModerationNote, error) {
-	if e.loadedTypes[31] {
+	if e.loadedTypes[32] {
 		return e.ModerationNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "moderation_notes"}
@@ -427,7 +438,7 @@ func (e AccountEdges) ModerationNotesOrErr() ([]*ModerationNote, error) {
 // AuthoredModerationNotesOrErr returns the AuthoredModerationNotes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) {
-	if e.loadedTypes[32] {
+	if e.loadedTypes[33] {
 		return e.AuthoredModerationNotes, nil
 	}
 	return nil, &NotLoadedError{edge: "authored_moderation_notes"}
@@ -436,7 +447,7 @@ func (e AccountEdges) AuthoredModerationNotesOrErr() ([]*ModerationNote, error) 
 // WarningsOrErr returns the Warnings value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) WarningsOrErr() ([]*Warning, error) {
-	if e.loadedTypes[33] {
+	if e.loadedTypes[34] {
 		return e.Warnings, nil
 	}
 	return nil, &NotLoadedError{edge: "warnings"}
@@ -445,7 +456,7 @@ func (e AccountEdges) WarningsOrErr() ([]*Warning, error) {
 // AuthoredWarningsOrErr returns the AuthoredWarnings value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthoredWarningsOrErr() ([]*Warning, error) {
-	if e.loadedTypes[34] {
+	if e.loadedTypes[35] {
 		return e.AuthoredWarnings, nil
 	}
 	return nil, &NotLoadedError{edge: "authored_warnings"}
@@ -454,7 +465,7 @@ func (e AccountEdges) AuthoredWarningsOrErr() ([]*Warning, error) {
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[35] {
+	if e.loadedTypes[36] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -726,6 +737,11 @@ func (_m *Account) QueryCollections() *CollectionQuery {
 // QueryNodes queries the "nodes" edge of the Account entity.
 func (_m *Account) QueryNodes() *NodeQuery {
 	return NewAccountClient(_m.config).QueryNodes(_m)
+}
+
+// QueryNodeVersions queries the "node_versions" edge of the Account entity.
+func (_m *Account) QueryNodeVersions() *NodeVersionQuery {
+	return NewAccountClient(_m.config).QueryNodeVersions(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Account entity.

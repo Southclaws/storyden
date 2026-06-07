@@ -9,7 +9,7 @@ import { useEditState } from "../../useEditState";
 import { useBlock } from "../useBlock";
 
 export function useLibraryPageAssetsBlock() {
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
   const { nodeID, store } = useLibraryPageContext();
   const block = useBlock("assets");
 
@@ -18,7 +18,7 @@ export function useLibraryPageAssetsBlock() {
   const assets = useWatch((s) => s.draft.assets);
 
   const isEmpty = assets.length === 0;
-  const shouldShow = editing || !isEmpty;
+  const shouldShow = isDirectEditing || !isEmpty;
 
   const { revalidate } = useLibraryMutation();
 
@@ -71,7 +71,7 @@ export function useLibraryPageAssetsBlock() {
   };
 
   return {
-    editing,
+    editing: isDirectEditing,
     shouldShow,
     assets,
     config: block.config,

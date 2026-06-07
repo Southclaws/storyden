@@ -13,11 +13,11 @@ import { useEditState } from "../../useEditState";
 import { useLibraryPageLinkBlock } from "./useLibraryPageLinkBlock";
 
 export function LibraryPageLinkBlock() {
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
 
   const link = useWatch((s) => s.draft.link);
 
-  if (editing) {
+  if (isDirectEditing) {
     return <LibraryPageLinkBlockEditing />;
   }
 

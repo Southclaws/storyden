@@ -9,10 +9,10 @@ import { useEditState } from "../../useEditState";
 import { useLibraryPageTagsBlockEditing } from "./useLibraryPageTagsBlock";
 
 export function LibraryPageTagsBlock() {
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
   const { store } = useLibraryPageContext();
 
-  if (editing) {
+  if (isDirectEditing) {
     return <LibraryPageTagsBlockEditing />;
   }
 

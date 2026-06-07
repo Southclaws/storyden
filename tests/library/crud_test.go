@@ -36,7 +36,7 @@ func TestNodesHappyPath(t *testing.T) {
 
 			ctx, acc := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			name1 := "test-node-1"
 			slug1 := name1 + uuid.NewString()

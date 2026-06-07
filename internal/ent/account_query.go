@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -78,6 +79,7 @@ type AccountQuery struct {
 	withTags                              *TagQuery
 	withCollections                       *CollectionQuery
 	withNodes                             *NodeQuery
+	withNodeVersions                      *NodeVersionQuery
 	withAssets                            *AssetQuery
 	withEvents                            *EventParticipantQuery
 	withPostReads                         *PostReadQuery
@@ -676,6 +678,28 @@ func (_q *AccountQuery) QueryNodes() *NodeQuery {
 	return query
 }
 
+// QueryNodeVersions chains the current query on the "node_versions" edge.
+func (_q *AccountQuery) QueryNodeVersions() *NodeVersionQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NodeVersionsTable, account.NodeVersionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAssets chains the current query on the "assets" edge.
 func (_q *AccountQuery) QueryAssets() *AssetQuery {
 	query := (&AssetClient{config: _q.config}).Query()
@@ -1135,6 +1159,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withTags:                              _q.withTags.Clone(),
 		withCollections:                       _q.withCollections.Clone(),
 		withNodes:                             _q.withNodes.Clone(),
+		withNodeVersions:                      _q.withNodeVersions.Clone(),
 		withAssets:                            _q.withAssets.Clone(),
 		withEvents:                            _q.withEvents.Clone(),
 		withPostReads:                         _q.withPostReads.Clone(),
@@ -1428,6 +1453,17 @@ func (_q *AccountQuery) WithNodes(opts ...func(*NodeQuery)) *AccountQuery {
 	return _q
 }
 
+// WithNodeVersions tells the query-builder to eager-load the nodes that are connected to
+// the "node_versions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithNodeVersions(opts ...func(*NodeVersionQuery)) *AccountQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withNodeVersions = query
+	return _q
+}
+
 // WithAssets tells the query-builder to eager-load the nodes that are connected to
 // the "assets" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithAssets(opts ...func(*AssetQuery)) *AccountQuery {
@@ -1627,7 +1663,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [36]bool{
+		loadedTypes = [37]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -1653,6 +1689,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withTags != nil,
 			_q.withCollections != nil,
 			_q.withNodes != nil,
+			_q.withNodeVersions != nil,
 			_q.withAssets != nil,
 			_q.withEvents != nil,
 			_q.withPostReads != nil,
@@ -1870,6 +1907,13 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadNodes(ctx, query, nodes,
 			func(n *Account) { n.Edges.Nodes = []*Node{} },
 			func(n *Account, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withNodeVersions; query != nil {
+		if err := _q.loadNodeVersions(ctx, query, nodes,
+			func(n *Account) { n.Edges.NodeVersions = []*NodeVersion{} },
+			func(n *Account, e *NodeVersion) { n.Edges.NodeVersions = append(n.Edges.NodeVersions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2780,6 +2824,36 @@ func (_q *AccountQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes [
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadNodeVersions(ctx context.Context, query *NodeVersionQuery, nodes []*Account, init func(*Account), assign func(*Account, *NodeVersion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(nodeversion.FieldAuthorID)
+	}
+	query.Where(predicate.NodeVersion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.NodeVersionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AuthorID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "author_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

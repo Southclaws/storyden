@@ -4,16 +4,22 @@ import { Drawer } from "vaul";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { Heading } from "@/components/ui/heading";
-import { Box, HStack, VStack, WStack } from "@/styled-system/jsx";
+import { cx } from "@/styled-system/css";
+import { Box, VStack, WStack } from "@/styled-system/jsx";
 
 import { CloseAction } from "../Action/Close";
 
 type Props = {
   title?: string;
   dismissable?: boolean;
+  className?: string;
 } & UseDisclosureProps;
 
-export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
+export function ModalDrawer({
+  children,
+  className,
+  ...props
+}: PropsWithChildren<Props>) {
   const handleOpenChange = (open: boolean) => {
     try {
       if (open) {
@@ -41,12 +47,18 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
             <VStack
               minHeight={{ base: "full", md: "0" }}
               minWidth={{ base: "full", md: "md" }}
-              maxWidth={{ base: "full", md: "prose" }}
+              maxWidth={{
+                base: "full",
+                md: "breakpoint-sm",
+                lg: "breakpoint-md",
+                xl: "breakpoint-lg",
+              }}
               borderTopRadius={{ base: "xl", md: "md" }}
               borderBottomRadius={{ base: "none", md: "md" }}
               bgColor="bg.default"
               boxShadow="lg"
               p={{ base: "4", md: "3" }}
+              className={className}
             >
               <WStack alignItems="start">
                 <Drawer.Title asChild>

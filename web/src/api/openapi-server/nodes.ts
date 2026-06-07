@@ -13,6 +13,8 @@ import type {
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
   NodeDeleteParams,
+  NodeDraftListOKResponse,
+  NodeDraftListParams,
   NodeGenerateContentBody,
   NodeGenerateContentOKResponse,
   NodeGenerateTagsBody,
@@ -32,6 +34,15 @@ import type {
   NodeUpdatePropertiesOKResponse,
   NodeUpdatePropertySchemaBody,
   NodeUpdatePropertySchemaOKResponse,
+  NodeVersionCreateBody,
+  NodeVersionCreateOKResponse,
+  NodeVersionDeleteOKResponse,
+  NodeVersionGetOKResponse,
+  NodeVersionListOKResponse,
+  NodeVersionListParams,
+  NodeVersionUpdateBody,
+  NodeVersionUpdateOKResponse,
+  NodeVersionUpdateStatusBody,
   VisibilityUpdateBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -104,6 +115,51 @@ export const nodeList = async (
 };
 
 /**
+ * List all draft versions across all nodes visible to the caller.
+
+This endpoint is designed for moderation and queue screens where you need
+to see all pending draft proposals in one request. Each draft includes a
+reference to its target node for context.
+
+Drafts are visible based on the caller's permissions:
+- Draft authors can see their own drafts
+- Members with `MANAGE_LIBRARY` can see all drafts
+- Unauthenticated requests receive 401 Unauthorized
+
+Results are ordered by `updated_at` descending so recently updated drafts
+appear first.
+
+ */
+export type nodeDraftListResponse = {
+  data: NodeDraftListOKResponse;
+  status: number;
+};
+
+export const getNodeDraftListUrl = (params?: NodeDraftListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/drafts?${normalizedParams.toString()}`
+    : `/nodes/drafts`;
+};
+
+export const nodeDraftList = async (
+  params?: NodeDraftListParams,
+  options?: RequestInit,
+): Promise<nodeDraftListResponse> => {
+  return fetcher<Promise<nodeDraftListResponse>>(getNodeDraftListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
  * Get a node by its URL slug.
  */
 export type nodeGetResponse = {
@@ -137,7 +193,16 @@ export const nodeGet = async (
 };
 
 /**
- * Update a node.
+ * Update a node directly.
+
+Direct updates are intended for fast edits by members who can manage
+the target node. If a node has a working draft version, direct updates
+to versioned page fields are rejected until the draft is applied or
+deleted. When a direct update changes versioned page fields and no
+draft exists, the node's `current_version_id` pointer is cleared
+because the live node no longer exactly represents an applied
+checkpoint.
+
  */
 export type nodeUpdateResponse = {
   data: NodeUpdateOKResponse;
@@ -461,6 +526,328 @@ export const nodeUpdateVisibility = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(visibilityUpdateBody),
+    },
+  );
+};
+
+/**
+ * List edit versions for a node.
+
+Versions have two states: draft and applied. A version is a draft when
+it is pre-published. There can only be a single draft of a node. 
+
+Applied versions are immutable historical snapshots of the page fields
+that were copied into the node. The single draft version, when present,
+is the working snapshot ahead of the live node and is visible only to
+its author and members with `MANAGE_LIBRARY`.
+
+Results are ordered by `updated_at` descending so draft autosaves and
+recently applied checkpoints appear before older history.
+
+ */
+export type nodeVersionListResponse = {
+  data: NodeVersionListOKResponse;
+  status: number;
+};
+
+export const getNodeVersionListUrl = (
+  nodeSlug: string,
+  params?: NodeVersionListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}/versions?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}/versions`;
+};
+
+export const nodeVersionList = async (
+  nodeSlug: string,
+  params?: NodeVersionListParams,
+  options?: RequestInit,
+): Promise<nodeVersionListResponse> => {
+  return fetcher<Promise<nodeVersionListResponse>>(
+    getNodeVersionListUrl(nodeSlug, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create the single mutable draft checkpoint for a node.
+
+This operation requires either `SUBMIT_LIBRARY_NODE_CHANGES` or
+`MANAGE_LIBRARY` permission. The draft starts as a full snapshot of the
+node's current versioned page fields. Fields supplied in the request
+overlay that snapshot, omitted fields keep the snapshotted value, and
+explicit null values clear nullable fields.
+
+A node can have only one draft. If a draft already exists for the node,
+this operation returns a conflict. Drafts do not mutate the target node
+until the draft is applied through the version status endpoint by a
+member with `MANAGE_LIBRARY`.
+
+ */
+export type nodeVersionCreateResponse = {
+  data: NodeVersionCreateOKResponse;
+  status: number;
+};
+
+export const getNodeVersionCreateUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/versions`;
+};
+
+export const nodeVersionCreate = async (
+  nodeSlug: string,
+  nodeVersionCreateBody: NodeVersionCreateBody,
+  options?: RequestInit,
+): Promise<nodeVersionCreateResponse> => {
+  return fetcher<Promise<nodeVersionCreateResponse>>(
+    getNodeVersionCreateUrl(nodeSlug),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeVersionCreateBody),
+    },
+  );
+};
+
+/**
+ * Get the node's single working draft checkpoint.
+
+This is a stable alias for the draft version of a node. It allows
+clients to read "the draft" without listing versions and inspecting
+status values. If the node has no draft, or the draft is not visible to
+the caller, this operation returns not found.
+
+The draft is visible only to its author and members with
+`MANAGE_LIBRARY`.
+
+ */
+export type nodeVersionDraftGetResponse = {
+  data: NodeVersionGetOKResponse;
+  status: number;
+};
+
+export const getNodeVersionDraftGetUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/versions/draft`;
+};
+
+export const nodeVersionDraftGet = async (
+  nodeSlug: string,
+  options?: RequestInit,
+): Promise<nodeVersionDraftGetResponse> => {
+  return fetcher<Promise<nodeVersionDraftGetResponse>>(
+    getNodeVersionDraftGetUrl(nodeSlug),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Update the node's single working draft checkpoint.
+
+This is a stable alias for patching the draft version of a node without
+first listing versions or knowing the draft version identifier. The
+node must already have a draft visible to the caller. This operation
+does not create a draft and does not apply the draft to the target node.
+
+The caller must be the draft author or have `MANAGE_LIBRARY`. Fields
+omitted from the request are left unchanged on the draft snapshot.
+Explicit null values clear nullable fields. Properties are a complete
+desired-state list for the target node properties.
+
+ */
+export type nodeVersionDraftUpdateResponse = {
+  data: NodeVersionUpdateOKResponse;
+  status: number;
+};
+
+export const getNodeVersionDraftUpdateUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/versions/draft`;
+};
+
+export const nodeVersionDraftUpdate = async (
+  nodeSlug: string,
+  nodeVersionUpdateBody: NodeVersionUpdateBody,
+  options?: RequestInit,
+): Promise<nodeVersionDraftUpdateResponse> => {
+  return fetcher<Promise<nodeVersionDraftUpdateResponse>>(
+    getNodeVersionDraftUpdateUrl(nodeSlug),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeVersionUpdateBody),
+    },
+  );
+};
+
+/**
+ * Get an edit version for a node.
+
+The version must belong to the node identified by `node_slug`. Applied
+versions are immutable historical snapshots and are visible to callers
+who can read the target node. The draft version is visible only to its
+author and members with `MANAGE_LIBRARY`.
+
+ */
+export type nodeVersionGetResponse = {
+  data: NodeVersionGetOKResponse;
+  status: number;
+};
+
+export const getNodeVersionGetUrl = (nodeSlug: string, versionId: string) => {
+  return `/nodes/${nodeSlug}/versions/${versionId}`;
+};
+
+export const nodeVersionGet = async (
+  nodeSlug: string,
+  versionId: string,
+  options?: RequestInit,
+): Promise<nodeVersionGetResponse> => {
+  return fetcher<Promise<nodeVersionGetResponse>>(
+    getNodeVersionGetUrl(nodeSlug, versionId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Update the node's single draft checkpoint.
+
+This operation is for draft autosave and editing only. It does not
+change version status and cannot apply a version to the target node.
+The version must still have draft status and the caller must be the
+draft author or have `MANAGE_LIBRARY`.
+
+Fields omitted from the request are left unchanged on the draft
+snapshot. Explicit null values clear nullable fields. Properties are a
+complete desired-state list for the target node properties: when the
+version is applied, the list replaces the node's existing property set
+rather than merging with it.
+
+ */
+export type nodeVersionUpdateResponse = {
+  data: NodeVersionUpdateOKResponse;
+  status: number;
+};
+
+export const getNodeVersionUpdateUrl = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return `/nodes/${nodeSlug}/versions/${versionId}`;
+};
+
+export const nodeVersionUpdate = async (
+  nodeSlug: string,
+  versionId: string,
+  nodeVersionUpdateBody: NodeVersionUpdateBody,
+  options?: RequestInit,
+): Promise<nodeVersionUpdateResponse> => {
+  return fetcher<Promise<nodeVersionUpdateResponse>>(
+    getNodeVersionUpdateUrl(nodeSlug, versionId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeVersionUpdateBody),
+    },
+  );
+};
+
+/**
+ * Delete the working draft checkpoint.
+
+A draft author can discard their own draft. Members with `MANAGE_LIBRARY`
+permission can discard any draft for the node. The draft row is removed
+from history. Applied versions are immutable history entries and cannot
+be deleted through this endpoint.
+
+ */
+export type nodeVersionDeleteResponse = {
+  data: NodeVersionDeleteOKResponse;
+  status: number;
+};
+
+export const getNodeVersionDeleteUrl = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return `/nodes/${nodeSlug}/versions/${versionId}`;
+};
+
+export const nodeVersionDelete = async (
+  nodeSlug: string,
+  versionId: string,
+  options?: RequestInit,
+): Promise<nodeVersionDeleteResponse> => {
+  return fetcher<Promise<nodeVersionDeleteResponse>>(
+    getNodeVersionDeleteUrl(nodeSlug, versionId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Update the lifecycle status of a checkpoint.
+
+This endpoint is separate from the content patch endpoint because status
+changes have side effects. For the initial checkpoint workflow, the
+only supported transition is draft to applied. Applying a version is
+restricted to members with `MANAGE_LIBRARY`.
+
+Applying a draft copies the full draft snapshot into the target node,
+applies properties as a complete desired-state list, marks the version
+immutable, and updates the node's `current_version_id` pointer to the
+applied version. This is a linear operation; applying a draft does not
+merge against other draft or historical versions.
+
+Clients must use this endpoint for lifecycle transitions and must not
+combine status changes with regular draft content updates.
+
+ */
+export type nodeVersionUpdateStatusResponse = {
+  data: NodeVersionUpdateOKResponse;
+  status: number;
+};
+
+export const getNodeVersionUpdateStatusUrl = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return `/nodes/${nodeSlug}/versions/${versionId}/status`;
+};
+
+export const nodeVersionUpdateStatus = async (
+  nodeSlug: string,
+  versionId: string,
+  nodeVersionUpdateStatusBody: NodeVersionUpdateStatusBody,
+  options?: RequestInit,
+): Promise<nodeVersionUpdateStatusResponse> => {
+  return fetcher<Promise<nodeVersionUpdateStatusResponse>>(
+    getNodeVersionUpdateStatusUrl(nodeSlug, versionId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeVersionUpdateStatusBody),
     },
   );
 };

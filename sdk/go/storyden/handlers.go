@@ -206,6 +206,42 @@ func (p *Plugin) OnNodeUnpublished(handler func(context.Context, *rpc.EventNodeU
 	})
 }
 
+func (p *Plugin) OnNodeVersionDraftCreated(handler func(context.Context, *rpc.EventNodeVersionDraftCreated) error) {
+	p.On("EventNodeVersionDraftCreated", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventNodeVersionDraftCreated); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnNodeVersionDraftUpdated(handler func(context.Context, *rpc.EventNodeVersionDraftUpdated) error) {
+	p.On("EventNodeVersionDraftUpdated", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventNodeVersionDraftUpdated); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnNodeVersionDraftDeleted(handler func(context.Context, *rpc.EventNodeVersionDraftDeleted) error) {
+	p.On("EventNodeVersionDraftDeleted", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventNodeVersionDraftDeleted); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
+func (p *Plugin) OnNodeVersionDraftApplied(handler func(context.Context, *rpc.EventNodeVersionDraftApplied) error) {
+	p.On("EventNodeVersionDraftApplied", func(ctx context.Context, event rpc.EventPayload) error {
+		if e, ok := event.EventPayloadUnion.(*rpc.EventNodeVersionDraftApplied); ok {
+			return handler(ctx, e)
+		}
+		return nil
+	})
+}
+
 func (p *Plugin) OnAccountCreated(handler func(context.Context, *rpc.EventAccountCreated) error) {
 	p.On("EventAccountCreated", func(ctx context.Context, event rpc.EventPayload) error {
 		if e, ok := event.EventPayloadUnion.(*rpc.EventAccountCreated); ok {

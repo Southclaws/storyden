@@ -67,7 +67,7 @@ func TestUsernamePasswordAuthMemberPermissions(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>test thread from username user</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Username user thread",
 					}, userSession),
 				)(t, http.StatusOK)

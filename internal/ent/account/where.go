@@ -1291,6 +1291,29 @@ func HasNodesWith(preds ...predicate.Node) predicate.Account {
 	})
 }
 
+// HasNodeVersions applies the HasEdge predicate on the "node_versions" edge.
+func HasNodeVersions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, NodeVersionsTable, NodeVersionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeVersionsWith applies the HasEdge predicate on the "node_versions" edge with a given conditions (other predicates).
+func HasNodeVersionsWith(preds ...predicate.NodeVersion) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newNodeVersionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAssets applies the HasEdge predicate on the "assets" edge.
 func HasAssets() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

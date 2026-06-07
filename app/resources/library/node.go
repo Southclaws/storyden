@@ -52,6 +52,7 @@ type Node struct {
 	IndexedAt opt.Optional[time.Time]
 
 	Name            string
+	CurrentVersion  opt.Optional[xid.ID]
 	Assets          []*asset.Asset
 	WebLink         opt.Optional[link_ref.LinkRef]
 	Content         opt.Optional[datagraph.Content]

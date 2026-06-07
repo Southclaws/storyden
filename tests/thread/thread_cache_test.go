@@ -49,7 +49,7 @@ func TestThreadCacheWithReactions(t *testing.T) {
 			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for cache</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread cache test",
 			}, session1))(t, http.StatusOK)
 			a.Equal(acc1.ID.String(), threadCreate.JSON200.Author.Id)
@@ -119,7 +119,7 @@ func TestThreadCacheWithReplies(t *testing.T) {
 			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for replies</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread cache test - replies",
 			}, session1))(t, http.StatusOK)
 			a.Len(threadCreate.JSON200.Replies.Replies, 0, "newly created thread should have no replies")
@@ -183,7 +183,7 @@ func TestThreadCacheWithReplyUpdate(t *testing.T) {
 			threadCreate := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>test thread for reply update</p>").Ptr(),
 				Category:   opt.New(catCreate.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "Thread cache test - reply update",
 			}, session1))(t, http.StatusOK)
 

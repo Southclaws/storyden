@@ -99,10 +99,10 @@ func TestNodesVisibility(t *testing.T) {
 
 				update1 := tests.AssertRequest(
 					cl.NodeUpdateVisibilityWithResponse(root, node1.JSON200.Slug, openapi.VisibilityMutationProps{
-						Visibility: openapi.Published,
+						Visibility: openapi.VisibilityPublished,
 					}, adminSession),
 				)(t, http.StatusOK)
-				a.Equal(openapi.Published, update1.JSON200.Visibility)
+				a.Equal(openapi.VisibilityPublished, update1.JSON200.Visibility)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
 					Author: &accAuthor.Handle,
@@ -127,10 +127,10 @@ func TestNodesVisibility(t *testing.T) {
 
 				update2 := tests.AssertRequest(
 					cl.NodeUpdateVisibilityWithResponse(root, node2.JSON200.Slug, openapi.VisibilityMutationProps{
-						Visibility: openapi.Published,
+						Visibility: openapi.VisibilityPublished,
 					}, authorSession),
 				)(t, http.StatusOK)
-				a.Equal(openapi.Published, update2.JSON200.Visibility)
+				a.Equal(openapi.VisibilityPublished, update2.JSON200.Visibility)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
 					Author: &accAuthor.Handle,
@@ -153,7 +153,7 @@ func TestNodesVisibility(t *testing.T) {
 				node4 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n4", Slug: opt.New(uuid.NewString()).Ptr()}, randoSession))(t, http.StatusOK)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
-					Visibility: &[]openapi.Visibility{openapi.Draft},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityDraft},
 				}, authorSession))(t, http.StatusOK)
 
 				ids := dt.Map(clist.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
@@ -173,7 +173,7 @@ func TestNodesVisibility(t *testing.T) {
 				node4 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n4", Slug: opt.New(uuid.NewString()).Ptr()}, randoSession))(t, http.StatusOK)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
-					Visibility: &[]openapi.Visibility{openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityReview},
 				}, adminSession))(t, http.StatusOK)
 
 				ids := dt.Map(clist.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
@@ -194,13 +194,13 @@ func TestNodesVisibility(t *testing.T) {
 
 				update3 := tests.AssertRequest(
 					cl.NodeUpdateVisibilityWithResponse(root, node3.JSON200.Slug, openapi.VisibilityMutationProps{
-						Visibility: openapi.Review,
+						Visibility: openapi.VisibilityReview,
 					}, authorSession),
 				)(t, http.StatusOK)
-				a.Equal(openapi.Review, update3.JSON200.Visibility)
+				a.Equal(openapi.VisibilityReview, update3.JSON200.Visibility)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
-					Visibility: &[]openapi.Visibility{openapi.Review},
+					Visibility: &[]openapi.Visibility{openapi.VisibilityReview},
 				}, adminSession))(t, http.StatusOK)
 
 				ids := dt.Map(clist.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
@@ -211,7 +211,7 @@ func TestNodesVisibility(t *testing.T) {
 				a.NotContains(ids, node4.JSON200.Id, "")
 
 				get3 := tests.AssertRequest(cl.NodeGetWithResponse(root, node3.JSON200.Slug, &openapi.NodeGetParams{}, adminSession))(t, http.StatusOK)
-				a.Equal(openapi.Review, get3.JSON200.Visibility)
+				a.Equal(openapi.VisibilityReview, get3.JSON200.Visibility)
 			})
 
 			t.Run("author_submmits_unlisted", func(t *testing.T) {
@@ -224,13 +224,13 @@ func TestNodesVisibility(t *testing.T) {
 
 				update3 := tests.AssertRequest(
 					cl.NodeUpdateVisibilityWithResponse(root, node3.JSON200.Slug, openapi.VisibilityMutationProps{
-						Visibility: openapi.Unlisted,
+						Visibility: openapi.VisibilityUnlisted,
 					}, authorSession),
 				)(t, http.StatusOK)
-				a.Equal(openapi.Unlisted, update3.JSON200.Visibility)
+				a.Equal(openapi.VisibilityUnlisted, update3.JSON200.Visibility)
 
 				clist := tests.AssertRequest(cl.NodeListWithResponse(root, &openapi.NodeListParams{
-					// Visibility: &[]openapi.Visibility{openapi.Unlisted},
+					// Visibility: &[]openapi.Visibility{openapi.VisibilityUnlisted},
 				}, adminSession))(t, http.StatusOK)
 
 				ids := dt.Map(clist.JSON200.Nodes, func(c openapi.NodeWithChildren) string { return c.Id })
@@ -244,8 +244,8 @@ func TestNodesVisibility(t *testing.T) {
 			t.Run("visibility_affects_children", func(t *testing.T) {
 				t.Parallel()
 
-				published := openapi.Published
-				draft := openapi.Draft
+				published := openapi.VisibilityPublished
+				draft := openapi.VisibilityDraft
 
 				node1 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, adminSession))(t, http.StatusOK)
 				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, authorSession))(t, http.StatusOK)
@@ -265,8 +265,8 @@ func TestNodesVisibility(t *testing.T) {
 			t.Run("only_author_sees_non_published_children", func(t *testing.T) {
 				t.Parallel()
 
-				published := openapi.Published
-				draft := openapi.Draft
+				published := openapi.VisibilityPublished
+				draft := openapi.VisibilityDraft
 
 				node1 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, adminSession))(t, http.StatusOK)
 				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, authorSession))(t, http.StatusOK)
@@ -291,8 +291,8 @@ func TestNodesVisibility(t *testing.T) {
 			t.Run("visibility_non_published_non_owner_404", func(t *testing.T) {
 				t.Parallel()
 
-				published := openapi.Published
-				draft := openapi.Draft
+				published := openapi.VisibilityPublished
+				draft := openapi.VisibilityDraft
 
 				node1 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, adminSession))(t, http.StatusOK)
 				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, authorSession))(t, http.StatusOK)

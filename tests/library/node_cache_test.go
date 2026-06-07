@@ -35,7 +35,7 @@ func TestNodeCacheWithUpdate(t *testing.T) {
 			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			session := sh.WithSession(ctx)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 			name := "cache-test-node-" + uuid.NewString()
 			slug := name
 
@@ -99,7 +99,7 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			session := sh.WithSession(ctx)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 			name := "cache-test-schema-" + uuid.NewString()
 			slug := name
 			ptype := openapi.PropertyTypeText

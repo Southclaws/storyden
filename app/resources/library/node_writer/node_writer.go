@@ -61,6 +61,18 @@ func WithName(v string) Option {
 	}
 }
 
+func WithCurrentVersion(id xid.ID) Option {
+	return func(c *ent.NodeMutation) {
+		c.SetCurrentVersionID(id)
+	}
+}
+
+func WithCurrentVersionCleared() Option {
+	return func(c *ent.NodeMutation) {
+		c.ClearCurrentVersion()
+	}
+}
+
 func WithSlug(v string) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetSlug(v)

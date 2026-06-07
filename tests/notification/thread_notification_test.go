@@ -25,7 +25,7 @@ package notification
 // 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, user1session)
 // 			tests.Ok(t, err, cat1create)
 
-// 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: "<p>thread</p>", Category: cat1create.JSON200.Id, Visibility: openapi.Published, Title: "Thread testing"}, user1session)
+// 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{Body: "<p>thread</p>", Category: cat1create.JSON200.Id, Visibility: openapi.VisibilityPublished, Title: "Thread testing"}, user1session)
 // 			tests.Ok(t, err, thread1create)
 
 // 			reply1, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{Body: "<p>reply</p>"}, user2session)

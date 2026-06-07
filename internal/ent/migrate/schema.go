@@ -663,6 +663,7 @@ var (
 		{Name: "link_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "parent_node_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "primary_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "current_version_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "property_schema_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NodesTable holds the schema information for the "nodes" table.
@@ -696,8 +697,14 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "nodes_property_schemas_node",
+				Symbol:     "nodes_node_versions_current_for_nodes",
 				Columns:    []*schema.Column{NodesColumns[17]},
+				RefColumns: []*schema.Column{NodeVersionsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "nodes_property_schemas_node",
+				Columns:    []*schema.Column{NodesColumns[18]},
 				RefColumns: []*schema.Column{PropertySchemasColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -707,6 +714,53 @@ var (
 				Name:    "node_slug",
 				Unique:  false,
 				Columns: []*schema.Column{NodesColumns[6]},
+			},
+		},
+	}
+	// NodeVersionsColumns holds the columns for the "node_versions" table.
+	NodeVersionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"draft", "applied"}, Default: "draft"},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "content", Type: field.TypeString, Nullable: true},
+		{Name: "properties_snapshot", Type: field.TypeJSON, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "author_id", Type: field.TypeString, Size: 20},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+	}
+	// NodeVersionsTable holds the schema information for the "node_versions" table.
+	NodeVersionsTable = &schema.Table{
+		Name:       "node_versions",
+		Columns:    NodeVersionsColumns,
+		PrimaryKey: []*schema.Column{NodeVersionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "node_versions_accounts_node_versions",
+				Columns:    []*schema.Column{NodeVersionsColumns[10]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "node_versions_nodes_versions",
+				Columns:    []*schema.Column{NodeVersionsColumns[11]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "nodeversion_node_id_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{NodeVersionsColumns[11], NodeVersionsColumns[2]},
+			},
+			{
+				Name:    "nodeversion_node_id_status_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{NodeVersionsColumns[11], NodeVersionsColumns[3], NodeVersionsColumns[2]},
 			},
 		},
 	}
@@ -1609,6 +1663,7 @@ var (
 		MentionProfilesTable,
 		ModerationNotesTable,
 		NodesTable,
+		NodeVersionsTable,
 		NotificationsTable,
 		OauthAuthorisationCodesTable,
 		OauthAuthorisationRequestsTable,
@@ -1676,7 +1731,10 @@ func init() {
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable
 	NodesTable.ForeignKeys[3].RefTable = AssetsTable
-	NodesTable.ForeignKeys[4].RefTable = PropertySchemasTable
+	NodesTable.ForeignKeys[4].RefTable = NodeVersionsTable
+	NodesTable.ForeignKeys[5].RefTable = PropertySchemasTable
+	NodeVersionsTable.ForeignKeys[0].RefTable = AccountsTable
+	NodeVersionsTable.ForeignKeys[1].RefTable = NodesTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
 	OauthAuthorisationCodesTable.ForeignKeys[0].RefTable = AccountsTable

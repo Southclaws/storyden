@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { Asset } from "./asset";
 import type { AssetList } from "./assetList";
+import type { Identifier } from "./identifier";
 import type { LinkReference } from "./linkReference";
 import type { Metadata } from "./metadata";
 import type { Node } from "./node";
@@ -27,6 +28,11 @@ import type { Visibility } from "./visibility";
 export interface NodeCommonProps {
   assets: AssetList;
   content?: PostContent;
+  /** The applied checkpoint that the live node currently represents. If
+this is unset, the node either has no applied checkpoint history or
+has been directly edited since the last applied checkpoint.
+ */
+  current_version_id?: Identifier;
   description: NodeDescription;
   /** A boolean indicating if the children of this node tree are hidden
 when querying the full tree. This is useful for nodes that contain

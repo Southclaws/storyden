@@ -12,36 +12,37 @@ type Permission struct {
 }
 
 var (
-	PermissionCreatePost            = Permission{`CREATE_POST`}
-	PermissionReadPublishedThreads  = Permission{`READ_PUBLISHED_THREADS`}
-	PermissionCreateReaction        = Permission{`CREATE_REACTION`}
-	PermissionManagePosts           = Permission{`MANAGE_POSTS`}
-	PermissionManageCategories      = Permission{`MANAGE_CATEGORIES`}
-	PermissionCreateInvitation      = Permission{`CREATE_INVITATION`}
-	PermissionReadPublishedLibrary  = Permission{`READ_PUBLISHED_LIBRARY`}
-	PermissionManageLibrary         = Permission{`MANAGE_LIBRARY`}
-	PermissionSubmitLibraryNode     = Permission{`SUBMIT_LIBRARY_NODE`}
-	PermissionUploadAsset           = Permission{`UPLOAD_ASSET`}
-	PermissionManageEvents          = Permission{`MANAGE_EVENTS`}
-	PermissionListProfiles          = Permission{`LIST_PROFILES`}
-	PermissionReadProfile           = Permission{`READ_PROFILE`}
-	PermissionCreateCollection      = Permission{`CREATE_COLLECTION`}
-	PermissionListCollections       = Permission{`LIST_COLLECTIONS`}
-	PermissionReadCollection        = Permission{`READ_COLLECTION`}
-	PermissionManageCollections     = Permission{`MANAGE_COLLECTIONS`}
-	PermissionCollectionSubmit      = Permission{`COLLECTION_SUBMIT`}
-	PermissionUsePersonalAccessKeys = Permission{`USE_PERSONAL_ACCESS_KEYS`}
-	PermissionUseOauthClients       = Permission{`USE_OAUTH_CLIENTS`}
-	PermissionManageSettings        = Permission{`MANAGE_SETTINGS`}
-	PermissionManageAccounts        = Permission{`MANAGE_ACCOUNTS`}
-	PermissionManageWarnings        = Permission{`MANAGE_WARNINGS`}
-	PermissionManageSuspensions     = Permission{`MANAGE_SUSPENSIONS`}
-	PermissionManageRoles           = Permission{`MANAGE_ROLES`}
-	PermissionManageReports         = Permission{`MANAGE_REPORTS`}
-	PermissionViewAccounts          = Permission{`VIEW_ACCOUNTS`}
-	PermissionViewModerationNotes   = Permission{`VIEW_MODERATION_NOTES`}
-	PermissionManageModerationNotes = Permission{`MANAGE_MODERATION_NOTES`}
-	PermissionAdministrator         = Permission{`ADMINISTRATOR`}
+	PermissionCreatePost               = Permission{`CREATE_POST`}
+	PermissionReadPublishedThreads     = Permission{`READ_PUBLISHED_THREADS`}
+	PermissionCreateReaction           = Permission{`CREATE_REACTION`}
+	PermissionManagePosts              = Permission{`MANAGE_POSTS`}
+	PermissionManageCategories         = Permission{`MANAGE_CATEGORIES`}
+	PermissionCreateInvitation         = Permission{`CREATE_INVITATION`}
+	PermissionReadPublishedLibrary     = Permission{`READ_PUBLISHED_LIBRARY`}
+	PermissionManageLibrary            = Permission{`MANAGE_LIBRARY`}
+	PermissionSubmitLibraryNode        = Permission{`SUBMIT_LIBRARY_NODE`}
+	PermissionSubmitLibraryNodeChanges = Permission{`SUBMIT_LIBRARY_NODE_CHANGES`}
+	PermissionUploadAsset              = Permission{`UPLOAD_ASSET`}
+	PermissionManageEvents             = Permission{`MANAGE_EVENTS`}
+	PermissionListProfiles             = Permission{`LIST_PROFILES`}
+	PermissionReadProfile              = Permission{`READ_PROFILE`}
+	PermissionCreateCollection         = Permission{`CREATE_COLLECTION`}
+	PermissionListCollections          = Permission{`LIST_COLLECTIONS`}
+	PermissionReadCollection           = Permission{`READ_COLLECTION`}
+	PermissionManageCollections        = Permission{`MANAGE_COLLECTIONS`}
+	PermissionCollectionSubmit         = Permission{`COLLECTION_SUBMIT`}
+	PermissionUsePersonalAccessKeys    = Permission{`USE_PERSONAL_ACCESS_KEYS`}
+	PermissionUseOauthClients          = Permission{`USE_OAUTH_CLIENTS`}
+	PermissionManageSettings           = Permission{`MANAGE_SETTINGS`}
+	PermissionManageAccounts           = Permission{`MANAGE_ACCOUNTS`}
+	PermissionManageWarnings           = Permission{`MANAGE_WARNINGS`}
+	PermissionManageSuspensions        = Permission{`MANAGE_SUSPENSIONS`}
+	PermissionManageRoles              = Permission{`MANAGE_ROLES`}
+	PermissionManageReports            = Permission{`MANAGE_REPORTS`}
+	PermissionViewAccounts             = Permission{`VIEW_ACCOUNTS`}
+	PermissionViewModerationNotes      = Permission{`VIEW_MODERATION_NOTES`}
+	PermissionManageModerationNotes    = Permission{`MANAGE_MODERATION_NOTES`}
+	PermissionAdministrator            = Permission{`ADMINISTRATOR`}
 )
 
 func (r Permission) Format(f fmt.State, verb rune) {
@@ -99,6 +100,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionManageLibrary, nil
 	case string(`SUBMIT_LIBRARY_NODE`):
 		return PermissionSubmitLibraryNode, nil
+	case string(`SUBMIT_LIBRARY_NODE_CHANGES`):
+		return PermissionSubmitLibraryNodeChanges, nil
 	case string(`UPLOAD_ASSET`):
 		return PermissionUploadAsset, nil
 	case string(`MANAGE_EVENTS`):

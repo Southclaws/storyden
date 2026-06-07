@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/oapi-codegen/nullable"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -291,6 +292,23 @@ func deserialiseOptionalFloat(in *float32) opt.Optional[float64] {
 
 func serialiseOptionalFloat(in opt.Optional[float64]) *float32 {
 	return opt.PtrMap(in, func(s float64) float32 { return float32(s) })
+}
+
+func serialiseNullableOpt[T any](in opt.Optional[T]) nullable.Nullable[T] {
+	if v, ok := in.Get(); ok {
+		return nullable.NewNullableWithValue(v)
+	}
+
+	return nullable.Nullable[T]{}
+}
+
+func serialiseNullableIdentifier(in opt.Optional[xid.ID]) *openapi.Identifier {
+	if id, ok := in.Get(); ok {
+		v := openapi.Identifier(id.String())
+		return &v
+	}
+
+	return nil
 }
 
 func seraliseOptionalURL(in opt.Optional[url.URL]) *string {

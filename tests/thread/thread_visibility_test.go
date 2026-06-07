@@ -38,7 +38,7 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 			threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Body:       opt.New("<p>This is a test thread</p>").Ptr(),
 				Title:      "Test Thread for Visibility",
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, sessionMember)
 			tests.Ok(t, err, threadCreate)
 
@@ -53,7 +53,7 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 			tests.Ok(t, err, reply2Create)
 
 			_, err = cl.PostUpdateWithResponse(root, reply2Create.JSON200.Id, openapi.PostMutableProps{
-				Visibility: opt.New(openapi.Review).Ptr(),
+				Visibility: opt.New(openapi.VisibilityReview).Ptr(),
 			}, sessionAdmin)
 			r.NoError(err)
 
@@ -78,8 +78,8 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 
 				r.NotNil(publishedReply, "should find published reply")
 				r.NotNil(reviewReply, "should find review reply (own)")
-				a.Equal(openapi.Published, publishedReply.Visibility)
-				a.Equal(openapi.Review, reviewReply.Visibility)
+				a.Equal(openapi.VisibilityPublished, publishedReply.Visibility)
+				a.Equal(openapi.VisibilityReview, reviewReply.Visibility)
 			})
 
 			t.Run("admin_sees_both_replies", func(t *testing.T) {
@@ -105,17 +105,17 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 					}
 				}
 				r.NotNil(reviewReply, "should find the review reply")
-				a.Equal(openapi.Review, reviewReply.Visibility, "reply should be marked as review")
+				a.Equal(openapi.VisibilityReview, reviewReply.Visibility, "reply should be marked as review")
 			})
 
 			t.Run("admin_can_accept_review_reply", func(t *testing.T) {
 				a := assert.New(t)
 
 				replyUpdate, err := cl.PostUpdateWithResponse(root, reply2Create.JSON200.Id, openapi.PostMutableProps{
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				}, sessionAdmin)
 				tests.Ok(t, err, replyUpdate)
-				a.Equal(openapi.Published, replyUpdate.JSON200.Visibility, "reply should now be published")
+				a.Equal(openapi.VisibilityPublished, replyUpdate.JSON200.Visibility, "reply should now be published")
 
 				threadGet, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil, sessionMember)
 				tests.Ok(t, err, threadGet)
@@ -124,12 +124,12 @@ func TestThreadVisibilityWithReviewReplies(t *testing.T) {
 
 			t.Run("member_cannot_change_reply_visibility", func(t *testing.T) {
 				_, err := cl.PostUpdateWithResponse(root, reply2Create.JSON200.Id, openapi.PostMutableProps{
-					Visibility: opt.New(openapi.Review).Ptr(),
+					Visibility: opt.New(openapi.VisibilityReview).Ptr(),
 				}, sessionAdmin)
 				r.NoError(err)
 
 				replyUpdate, err := cl.PostUpdateWithResponse(root, reply2Create.JSON200.Id, openapi.PostMutableProps{
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				}, sessionMember)
 				r.NoError(err)
 				r.Equal(403, replyUpdate.StatusCode(), "member should not be able to change visibility")

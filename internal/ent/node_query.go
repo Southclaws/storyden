@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
@@ -43,6 +44,8 @@ type NodeQuery struct {
 	withLink            *LinkQuery
 	withContentLinks    *LinkQuery
 	withCollections     *CollectionQuery
+	withVersions        *NodeVersionQuery
+	withCurrentVersion  *NodeVersionQuery
 	withCollectionNodes *CollectionNodeQuery
 	modifiers           []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -323,6 +326,50 @@ func (_q *NodeQuery) QueryCollections() *CollectionQuery {
 	return query
 }
 
+// QueryVersions chains the current query on the "versions" edge.
+func (_q *NodeQuery) QueryVersions() *NodeVersionQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.VersionsTable, node.VersionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCurrentVersion chains the current query on the "current_version" edge.
+func (_q *NodeQuery) QueryCurrentVersion() *NodeVersionQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.CurrentVersionTable, node.CurrentVersionColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryCollectionNodes chains the current query on the "collection_nodes" edge.
 func (_q *NodeQuery) QueryCollectionNodes() *CollectionNodeQuery {
 	query := (&CollectionNodeClient{config: _q.config}).Query()
@@ -548,6 +595,8 @@ func (_q *NodeQuery) Clone() *NodeQuery {
 		withLink:            _q.withLink.Clone(),
 		withContentLinks:    _q.withContentLinks.Clone(),
 		withCollections:     _q.withCollections.Clone(),
+		withVersions:        _q.withVersions.Clone(),
+		withCurrentVersion:  _q.withCurrentVersion.Clone(),
 		withCollectionNodes: _q.withCollectionNodes.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -677,6 +726,28 @@ func (_q *NodeQuery) WithCollections(opts ...func(*CollectionQuery)) *NodeQuery 
 	return _q
 }
 
+// WithVersions tells the query-builder to eager-load the nodes that are connected to
+// the "versions" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NodeQuery) WithVersions(opts ...func(*NodeVersionQuery)) *NodeQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withVersions = query
+	return _q
+}
+
+// WithCurrentVersion tells the query-builder to eager-load the nodes that are connected to
+// the "current_version" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NodeQuery) WithCurrentVersion(opts ...func(*NodeVersionQuery)) *NodeQuery {
+	query := (&NodeVersionClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withCurrentVersion = query
+	return _q
+}
+
 // WithCollectionNodes tells the query-builder to eager-load the nodes that are connected to
 // the "collection_nodes" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *NodeQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *NodeQuery {
@@ -766,7 +837,7 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	var (
 		nodes       = []*Node{}
 		_spec       = _q.querySpec()
-		loadedTypes = [12]bool{
+		loadedTypes = [14]bool{
 			_q.withOwner != nil,
 			_q.withParent != nil,
 			_q.withNodes != nil,
@@ -778,6 +849,8 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			_q.withLink != nil,
 			_q.withContentLinks != nil,
 			_q.withCollections != nil,
+			_q.withVersions != nil,
+			_q.withCurrentVersion != nil,
 			_q.withCollectionNodes != nil,
 		}
 	)
@@ -871,6 +944,19 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 		if err := _q.loadCollections(ctx, query, nodes,
 			func(n *Node) { n.Edges.Collections = []*Collection{} },
 			func(n *Node, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withVersions; query != nil {
+		if err := _q.loadVersions(ctx, query, nodes,
+			func(n *Node) { n.Edges.Versions = []*NodeVersion{} },
+			func(n *Node, e *NodeVersion) { n.Edges.Versions = append(n.Edges.Versions, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withCurrentVersion; query != nil {
+		if err := _q.loadCurrentVersion(ctx, query, nodes, nil,
+			func(n *Node, e *NodeVersion) { n.Edges.CurrentVersion = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1339,6 +1425,68 @@ func (_q *NodeQuery) loadCollections(ctx context.Context, query *CollectionQuery
 	}
 	return nil
 }
+func (_q *NodeQuery) loadVersions(ctx context.Context, query *NodeVersionQuery, nodes []*Node, init func(*Node), assign func(*Node, *NodeVersion)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(nodeversion.FieldNodeID)
+	}
+	query.Where(predicate.NodeVersion(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.VersionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.NodeID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "node_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *NodeQuery) loadCurrentVersion(ctx context.Context, query *NodeVersionQuery, nodes []*Node, init func(*Node), assign func(*Node, *NodeVersion)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Node)
+	for i := range nodes {
+		if nodes[i].CurrentVersionID == nil {
+			continue
+		}
+		fk := *nodes[i].CurrentVersionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(nodeversion.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "current_version_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (_q *NodeQuery) loadCollectionNodes(ctx context.Context, query *CollectionNodeQuery, nodes []*Node, init func(*Node), assign func(*Node, *CollectionNode)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Node)
@@ -1412,6 +1560,9 @@ func (_q *NodeQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if _q.withLink != nil {
 			_spec.Node.AddColumnOnce(node.FieldLinkID)
+		}
+		if _q.withCurrentVersion != nil {
+			_spec.Node.AddColumnOnce(node.FieldCurrentVersionID)
 		}
 	}
 	if ps := _q.predicates; len(ps) > 0 {

@@ -21,10 +21,15 @@ const TAG = "div";
 export type LinkPreviewAttributes = {
   href: string;
   "data-display": "card";
+  "data-diff"?: "insertion" | "deletion";
 };
 
 function LinkPreviewComponent(props: NodeViewProps) {
   const href = props.node.attrs["href"] as string;
+  const dataDiff = props.node.attrs["data-diff"] as
+    | "insertion"
+    | "deletion"
+    | undefined;
   const isEditable = props.editor.isEditable;
   // selection is only ever really possible while editable. though prosemirror
   // or tiptap (not sure who) sometimes sets selected to true when read-only.
@@ -38,9 +43,12 @@ function LinkPreviewComponent(props: NodeViewProps) {
     });
   }, [href, trigger]);
 
+  const diffClass = dataDiff ? `diff-node-${dataDiff}` : "";
+
   return (
     <NodeViewWrapper
-      className={css({
+      data-diff={dataDiff}
+      className={`${diffClass} ${css({
         position: "relative",
         display: "inline-block",
         width: "full",
@@ -55,7 +63,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
         // background mix with subtle selection colour
         background: isSelected && !isMutating ? "blue.5" : "transparent",
         mixBlendMode: isSelected && !isMutating ? "screen" : "normal",
-      })}
+      })}`}
     >
       <div data-no-typography>
         {!data ? (
@@ -148,6 +156,16 @@ export const LinkPreview = Node.create<{}>({
           return { "data-display": attributes["data-display"] };
         },
       },
+      "data-diff": {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-diff"),
+        renderHTML: (attributes: Record<string, any>) => {
+          if (!attributes["data-diff"]) {
+            return {};
+          }
+          return { "data-diff": attributes["data-diff"] };
+        },
+      },
     };
   },
 
@@ -162,14 +180,19 @@ export const LinkPreview = Node.create<{}>({
 
   renderHTML({ node }) {
     const href = node.attrs["href"] || "";
-    return [
-      TAG,
-      {
-        "data-href": href,
-        "data-display": "card",
-        class: "link-card",
-      },
-    ];
+    const dataDiff = node.attrs["data-diff"];
+
+    const attrs: Record<string, string> = {
+      "data-href": href,
+      "data-display": "card",
+      class: "link-card",
+    };
+
+    if (dataDiff) {
+      attrs["data-diff"] = dataDiff;
+    }
+
+    return [TAG, attrs];
   },
 
   addNodeView() {

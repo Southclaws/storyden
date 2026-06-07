@@ -56,11 +56,11 @@ func TestCollectionSubmissions(t *testing.T) {
 			threadCreateProps := openapi.ThreadInitialProps{
 				Body:       opt.New("<p>this is a thread</p>").Ptr(),
 				Category:   opt.New(cat1.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Title:      "thread",
 			}
 
-			published := openapi.Published
+			published := openapi.VisibilityPublished
 
 			thread1create, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
 			tests.Ok(t, err, thread1create)
@@ -133,7 +133,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				unlisted := openapi.Unlisted
+				unlisted := openapi.VisibilityUnlisted
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name: "c2",
@@ -176,7 +176,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				unlisted := openapi.Unlisted
+				unlisted := openapi.VisibilityUnlisted
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name: "c2",

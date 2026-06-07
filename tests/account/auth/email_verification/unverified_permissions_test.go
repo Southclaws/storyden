@@ -85,7 +85,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>test thread from unverified user</p>").Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Unverified user thread",
 				}, unverifiedSession)
 				r.NoError(err)
@@ -110,7 +110,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>test thread from verified user</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Verified user thread",
 					}, unverifiedSession),
 				)(t, http.StatusOK)
@@ -137,7 +137,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>public thread content</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Public Thread",
 					}, adminSession),
 				)(t, http.StatusOK)
@@ -188,7 +188,7 @@ func TestUnverifiedUserPermissions(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread for reaction test</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Reaction Test Thread",
 					}, adminSession),
 				)(t, http.StatusOK)

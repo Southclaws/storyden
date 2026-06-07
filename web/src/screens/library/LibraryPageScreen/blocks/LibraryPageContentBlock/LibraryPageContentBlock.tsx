@@ -10,7 +10,7 @@ import { useEditState } from "../../useEditState";
 import { useLibraryContentEvent } from "./events";
 
 export function useLibraryPageContentBlock() {
-  const { editing } = useEditState();
+  const { editing, editorSourceKey, isProposalEditing } = useEditState();
   const { nodeID, store } = useLibraryPageContext();
   const { handleAssetUpload } = useAssets(nodeID);
   const content = useWatch((s) => s.draft.content);
@@ -49,6 +49,8 @@ export function useLibraryPageContentBlock() {
 
   return {
     editing,
+    editorSourceKey,
+    isProposalEditing,
     generatedContent,
     content,
     handleAssetUpload,
@@ -59,6 +61,8 @@ export function useLibraryPageContentBlock() {
 export function LibraryPageContentBlock() {
   const {
     editing,
+    editorSourceKey,
+    isProposalEditing,
     generatedContent,
     content,
     handleAssetUpload,
@@ -67,9 +71,10 @@ export function LibraryPageContentBlock() {
 
   return (
     <ContentComposer
+      key={`content:${editorSourceKey}`}
       onChange={handleChange}
       disabled={!editing}
-      onAssetUpload={handleAssetUpload}
+      onAssetUpload={isProposalEditing ? undefined : handleAssetUpload}
       initialValue={content}
       value={generatedContent}
     />

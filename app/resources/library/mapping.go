@@ -73,21 +73,22 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 		}
 
 		n := &Node{
-			Mark:          NewMark(c.ID, c.Slug),
-			CreatedAt:     c.CreatedAt,
-			UpdatedAt:     c.UpdatedAt,
-			IndexedAt:     opt.NewPtr(c.IndexedAt),
-			Name:          c.Name,
-			Assets:        assets,
-			WebLink:       link,
-			Content:       richContent,
-			Description:   opt.NewPtr(c.Description),
-			PrimaryImage:  primaryImage,
-			Owner:         *pro,
-			Parent:        parent,
-			HideChildTree: c.HideChildTree,
-			Tags:          tags,
-			Collections:   collection_item_status.Status{
+			Mark:           NewMark(c.ID, c.Slug),
+			CreatedAt:      c.CreatedAt,
+			UpdatedAt:      c.UpdatedAt,
+			IndexedAt:      opt.NewPtr(c.IndexedAt),
+			Name:           c.Name,
+			CurrentVersion: opt.NewPtr(c.CurrentVersionID),
+			Assets:         assets,
+			WebLink:        link,
+			Content:        richContent,
+			Description:    opt.NewPtr(c.Description),
+			PrimaryImage:   primaryImage,
+			Owner:          *pro,
+			Parent:         parent,
+			HideChildTree:  c.HideChildTree,
+			Tags:           tags,
+			Collections:    collection_item_status.Status{
 				// NOTE: Members cannot yet add nodes to collections.
 			},
 			Nodes:      nodes,
@@ -117,15 +118,16 @@ func ItemRef(c *ent.Node) (datagraph.Item, error) {
 	}
 
 	return &Node{
-		Mark:        NewMark(c.ID, c.Slug),
-		CreatedAt:   c.CreatedAt,
-		UpdatedAt:   c.UpdatedAt,
-		IndexedAt:   opt.NewPtr(c.IndexedAt),
-		Name:        c.Name,
-		Content:     content,
-		Description: opt.NewPtr(c.Description),
-		Visibility:  visibility.NewVisibilityFromEnt(c.Visibility),
-		SortKey:     c.Sort,
-		Metadata:    c.Metadata,
+		Mark:           NewMark(c.ID, c.Slug),
+		CreatedAt:      c.CreatedAt,
+		UpdatedAt:      c.UpdatedAt,
+		IndexedAt:      opt.NewPtr(c.IndexedAt),
+		Name:           c.Name,
+		CurrentVersion: opt.NewPtr(c.CurrentVersionID),
+		Content:        content,
+		Description:    opt.NewPtr(c.Description),
+		Visibility:     visibility.NewVisibilityFromEnt(c.Visibility),
+		SortKey:        c.Sort,
+		Metadata:       c.Metadata,
 	}, nil
 }

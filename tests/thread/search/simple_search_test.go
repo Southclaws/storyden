@@ -42,7 +42,7 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 				Title:      "Test Thread About Programming",
 				Body:       opt.New("<p>A thread discussing programming topics</p>").Ptr(),
 				Category:   opt.New(catResp.JSON200.Id).Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 			}, adminSession)
 			tests.Ok(t, err, threadResp)
 

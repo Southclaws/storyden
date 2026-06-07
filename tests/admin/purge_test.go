@@ -42,7 +42,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				memberCtx, member := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				memberSession := sh.WithSession(memberCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				thread1, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
 					Title:      "Test Thread 1",
 					Body:       opt.New("<p>Content 1</p>").Ptr(),
@@ -103,7 +103,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				otherMemberCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 				otherMemberSession := sh.WithSession(otherMemberCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				createdThread, err := cl.ThreadCreateWithResponse(otherMemberCtx, openapi.ThreadInitialProps{
 					Title:      "Test Thread",
 					Body:       opt.New("<p>Thread content</p>").Ptr(),
@@ -169,7 +169,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				nestedReplyAuthorSession := sh.WithSession(nestedReplyAuthorCtx)
 
 				// Create a thread
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				threadResp := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(threadAuthorCtx, openapi.ThreadInitialProps{
 						Title:      "Thread for Nested Replies",
@@ -267,7 +267,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				otherMemberCtx, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 				otherMemberSession := sh.WithSession(otherMemberCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				memberThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
 					Title:      "Member Thread",
 					Body:       opt.New("<p>Member content</p>").Ptr(),
@@ -437,7 +437,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				memberSession := sh.WithSession(memberCtx)
 
 				// Create a thread to add to collection
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				threadResp := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
 						Title:      "Thread for Collection",
