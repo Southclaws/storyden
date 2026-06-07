@@ -258,6 +258,9 @@ func Build() fx.Option {
 		// Mount the bound OpenAPI routes onto the router.
 		fx.Invoke(mount),
 
+		// Mount the MCP server card discovery endpoint.
+		fx.Invoke(mountMCPServerCard),
+
 		// Provide all service layer bindings to the DI system.
 		bindingsProviders(),
 	)
