@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/node"
-	"github.com/Southclaws/storyden/internal/ent/predicate"
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
@@ -30,8 +29,6 @@ type Search interface {
 type query struct {
 	nameContains    string
 	contentContains string
-	descContains    string
-	tagContains     string
 	visibility      []visibility.Visibility
 	authors         []account.AccountID
 	tags            []tag_ref.Name
@@ -48,18 +45,6 @@ func WithNameContains(s string) Option {
 func WithContentContains(s string) Option {
 	return func(q *query) {
 		q.contentContains = s
-	}
-}
-
-func WithDescriptionContains(s string) Option {
-	return func(q *query) {
-		q.descContains = s
-	}
-}
-
-func WithTagContains(s string) Option {
-	return func(q *query) {
-		q.tagContains = s
 	}
 }
 
@@ -102,15 +87,11 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		fn(q)
 	}
 
-	searchPredicates := []predicate.Node{
-		node.NameContainsFold(q.nameContains),
-		node.ContentContainsFold(q.contentContains),
-		node.DescriptionContainsFold(q.descContains),
-		node.HasTagsWith(ent_tag.NameContainsFold(q.tagContains)),
-	}
-
 	baseQuery := s.db.Node.Query().Where(
-		node.Or(searchPredicates...),
+		node.Or(
+			node.NameContainsFold(q.nameContains),
+			node.ContentContainsFold(q.contentContains),
+		),
 		node.VisibilityEQ(node.VisibilityPublished),
 		node.DeletedAtIsNil(),
 	)
