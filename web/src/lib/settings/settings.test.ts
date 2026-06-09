@@ -25,6 +25,8 @@ function baseInfo(overrides: Partial<Info> = {}): Info {
     registration_mode: RegistrationMode.public,
     capabilities: [],
     metadata: DefaultFrontendConfig,
+    api_address: "http://localhost:8000",
+    web_address: "http://localhost:3000",
     ...overrides,
   };
 }
@@ -41,6 +43,8 @@ function baseAdminSettings(
     registration_mode: RegistrationMode.public,
     capabilities: [],
     metadata: DefaultFrontendConfig,
+    api_address: "http://localhost:8000",
+    web_address: "http://localhost:3000",
     ...overrides,
   };
 }

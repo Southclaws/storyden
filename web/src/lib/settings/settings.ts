@@ -51,6 +51,8 @@ export const DefaultSettings = {
   registration_mode: RegistrationMode.public,
   capabilities: [],
   metadata: DefaultFrontendConfig,
+  api_address: "http://localhost:8000",
+  web_address: "http://localhost:3000",
 } satisfies Settings;
 
 // The frontend configuration is stored in Storyden's settings metadata field
