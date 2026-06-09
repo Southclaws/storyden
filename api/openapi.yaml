@@ -5720,6 +5720,8 @@ components:
         - accent_colour
         - authentication_mode
         - registration_mode
+        - api_address
+        - web_address
       properties:
         title:
           type: string
@@ -5733,6 +5735,16 @@ components:
           $ref: "#/components/schemas/AuthMode"
         registration_mode:
           $ref: "#/components/schemas/RegistrationMode"
+        web_address:
+          type: string
+          format: uri
+          description: |
+            The public web frontend address for this Storyden instance.
+        api_address:
+          type: string
+          format: uri
+          description: |
+            The public API address for this Storyden instance.
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         services:

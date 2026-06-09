@@ -41,6 +41,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
 	"github.com/Southclaws/storyden/app/services/moderation/action_dispatcher"
 	"github.com/Southclaws/storyden/app/services/moderation/warning_manager"
+	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -58,6 +59,7 @@ type Admin struct {
 	oauth             *oauthservice.Service
 	actionDispatcher  *action_dispatcher.Service
 	warnings          *warning_manager.Manager
+	instanceInfo      *instance_info.Provider
 }
 
 func NewAdmin(
@@ -72,6 +74,7 @@ func NewAdmin(
 	oauth *oauthservice.Service,
 	actionDispatcher *action_dispatcher.Service,
 	warnings *warning_manager.Manager,
+	instanceInfo *instance_info.Provider,
 	router *echo.Echo,
 ) Admin {
 	a := Admin{
@@ -86,6 +89,7 @@ func NewAdmin(
 		oauth:             oauth,
 		actionDispatcher:  actionDispatcher,
 		warnings:          warnings,
+		instanceInfo:      instanceInfo,
 	}
 
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
@@ -111,14 +115,14 @@ func NewAdmin(
 }
 
 func (a *Admin) AdminSettingsGet(ctx context.Context, request openapi.AdminSettingsGetRequestObject) (openapi.AdminSettingsGetResponseObject, error) {
-	settings, err := a.settingsManager.Get(ctx)
+	info, err := a.instanceInfo.Get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AdminSettingsGet200JSONResponse{
 		AdminSettingsGetOKJSONResponse: openapi.AdminSettingsGetOKJSONResponse(
-			serialiseSettings(settings, getNetworkHeadersSample(ctx)),
+			serialiseSettings(info, getNetworkHeadersSample(ctx)),
 		),
 	}, nil
 }
@@ -241,7 +245,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		}
 	}
 
-	settings, err := a.settingsManager.Set(ctx, settings.Settings{
+	_, err = a.settingsManager.Set(ctx, settings.Settings{
 		Title:              opt.NewPtr(request.Body.Title),
 		Description:        opt.NewPtr(request.Body.Description),
 		Content:            content,
@@ -256,9 +260,14 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	info, err := a.instanceInfo.Get(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.AdminSettingsUpdate200JSONResponse{
 		AdminSettingsUpdateOKJSONResponse: openapi.AdminSettingsUpdateOKJSONResponse(
-			serialiseSettings(settings, nil),
+			serialiseSettings(info, nil),
 		),
 	}, nil
 }
@@ -786,17 +795,19 @@ func optionalOAuthScopePolicy(in *openapi.OAuthClientScopePolicy) opt.Optional[o
 	return opt.New(v)
 }
 
-func serialiseSettings(in *settings.Settings, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
+func serialiseSettings(in *instance_info.Info, headers *openapi.NetworkHeadersSample) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
-		AccentColour:       in.AccentColour.OrZero(),
-		Description:        in.Description.OrZero(),
-		Content:            in.Content.OrZero().HTML(),
-		Title:              in.Title.OrZero(),
-		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
-		RegistrationMode:   openapi.RegistrationMode(in.RegistrationMode.Or(settings.RegistrationModePublic).String()),
-		Services:           opt.Map(in.Services, serialiseServiceSettings).Ptr(),
-		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
-		Motd:               opt.Map(in.Motd, serialiseMOTD).Ptr(),
+		AccentColour:       in.Settings.AccentColour.OrZero(),
+		Description:        in.Settings.Description.OrZero(),
+		Content:            in.Settings.Content.OrZero().HTML(),
+		Title:              in.Settings.Title.OrZero(),
+		AuthenticationMode: openapi.AuthMode(in.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		RegistrationMode:   openapi.RegistrationMode(in.Settings.RegistrationMode.Or(settings.RegistrationModePublic).String()),
+		WebAddress:         in.WebAddress.String(),
+		ApiAddress:         in.APIAddress.String(),
+		Services:           opt.Map(in.Settings.Services, serialiseServiceSettings).Ptr(),
+		Metadata:           (*openapi.Metadata)(in.Settings.Metadata.Ptr()),
+		Motd:               opt.Map(in.Settings.Motd, serialiseMOTD).Ptr(),
 		Headers:            headers,
 	}
 }

@@ -21,6 +21,9 @@ import type { RegistrationMode } from "./registrationMode";
  */
 export interface AdminSettingsProps {
   accent_colour: string;
+  /** The public API address for this Storyden instance.
+   */
+  api_address: string;
   authentication_mode: AuthMode;
   capabilities?: InstanceCapabilityList;
   content: PostContent;
@@ -31,4 +34,7 @@ export interface AdminSettingsProps {
   registration_mode: RegistrationMode;
   services?: AdminSettingsServiceProps;
   title: string;
+  /** The public web frontend address for this Storyden instance.
+   */
+  web_address: string;
 }
