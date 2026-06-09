@@ -51,7 +51,10 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 
 				created := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
 					Name:          "Analytics Sync",
+					Type:          openapi.OAuthClientTypeConfidential,
 					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{oauthGrantClientCredentials},
+					PkceRequired:  false,
 				}, firstSession))(t, http.StatusOK)
 				r.NotNil(created.JSON200)
 				r.NotNil(created.JSON200.ClientSecret)
@@ -134,9 +137,103 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 
 				resp := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
 					Name:          "Bad Scope",
+					Type:          openapi.OAuthClientTypeConfidential,
 					AllowedScopes: []string{"NOT_A_PERMISSION"},
+					AllowedGrants: []string{oauthGrantClientCredentials},
+					PkceRequired:  false,
 				}, firstSession))(t, http.StatusBadRequest)
 				a.NotNil(resp)
+			})
+
+			t.Run("create_app_integration_client_with_authorization_code", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				created := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Claude MCP Integration",
+					Type:          openapi.OAuthClientTypeConfidential,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS", "CREATE_POST"},
+					AllowedGrants: []string{"authorization_code", "refresh_token"},
+					RedirectUris:  &[]string{"https://claude.ai/api/mcp/auth_callback"},
+					PkceRequired:  true,
+				}, firstSession))(t, http.StatusOK)
+				r.NotNil(created.JSON200)
+				r.NotNil(created.JSON200.ClientSecret)
+				a.NotEmpty(*created.JSON200.ClientSecret)
+				a.Equal("Claude MCP Integration", created.JSON200.Client.Name)
+				a.Equal(openapi.OAuthClientTypeConfidential, created.JSON200.Client.Type)
+				a.Contains(created.JSON200.Client.AllowedGrants, "authorization_code")
+				a.Contains(created.JSON200.Client.AllowedGrants, "refresh_token")
+				a.Contains(created.JSON200.Client.RedirectUris, "https://claude.ai/api/mcp/auth_callback")
+				a.Contains(created.JSON200.Client.AllowedScopes, "READ_PUBLISHED_THREADS")
+				a.Contains(created.JSON200.Client.AllowedScopes, "CREATE_POST")
+			})
+
+			t.Run("create_public_app_client", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				created := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Public Mobile App",
+					Type:          openapi.OAuthClientTypePublic,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{"authorization_code", "refresh_token"},
+					RedirectUris:  &[]string{"myapp://callback"},
+					PkceRequired:  true,
+				}, firstSession))(t, http.StatusOK)
+				r.NotNil(created.JSON200)
+				a.Nil(created.JSON200.ClientSecret)
+				a.Equal("Public Mobile App", created.JSON200.Client.Name)
+				a.Equal(openapi.OAuthClientTypePublic, created.JSON200.Client.Type)
+				a.Contains(created.JSON200.Client.AllowedGrants, "authorization_code")
+				a.Contains(created.JSON200.Client.AllowedGrants, "refresh_token")
+				a.Contains(created.JSON200.Client.RedirectUris, "myapp://callback")
+			})
+
+			t.Run("create_rejects_authorization_code_without_redirect_uris", func(t *testing.T) {
+				resp := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Bad App Integration",
+					Type:          openapi.OAuthClientTypeConfidential,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{"authorization_code"},
+					PkceRequired:  true,
+				}, firstSession))(t, http.StatusBadRequest)
+				require.NotNil(t, resp)
+			})
+
+			t.Run("create_rejects_public_client_with_client_credentials", func(t *testing.T) {
+				resp := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Bad Public Client",
+					Type:          openapi.OAuthClientTypePublic,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{"client_credentials"},
+					PkceRequired:  false,
+				}, firstSession))(t, http.StatusBadRequest)
+				require.NotNil(t, resp)
+			})
+
+			t.Run("create_rejects_public_client_without_pkce", func(t *testing.T) {
+				resp := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Public Client Without PKCE",
+					Type:          openapi.OAuthClientTypePublic,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{"authorization_code"},
+					RedirectUris:  &[]string{"myapp://callback"},
+					PkceRequired:  false,
+				}, firstSession))(t, http.StatusBadRequest)
+				require.NotNil(t, resp)
+			})
+
+			t.Run("create_rejects_machine_client_with_redirect_uris", func(t *testing.T) {
+				resp := tests.AssertRequest(cl.OAuthClientCreateWithResponse(root, openapi.OAuthClientCreateJSONRequestBody{
+					Name:          "Machine Client With Redirects",
+					Type:          openapi.OAuthClientTypeConfidential,
+					AllowedScopes: []string{"READ_PUBLISHED_THREADS"},
+					AllowedGrants: []string{"client_credentials"},
+					RedirectUris:  &[]string{"https://example.com/callback"},
+					PkceRequired:  false,
+				}, firstSession))(t, http.StatusBadRequest)
+				require.NotNil(t, resp)
 			})
 
 			t.Run("management_requires_administrator_permission", func(t *testing.T) {

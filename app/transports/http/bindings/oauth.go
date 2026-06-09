@@ -473,12 +473,20 @@ func (o OAuth) OAuthClientCreate(ctx context.Context, req openapi.OAuthClientCre
 		return nil, err
 	}
 
+	clientType, err := oauthresource.NewClientType(string(req.Body.Type))
+	if err != nil {
+		return openapi.OAuthClientCreate400Response{}, nil
+	}
+
 	result, err := o.oauth.CreateClientForAccount(ctx, oauthservice.ClientSelfCreate{
 		AccountID:          account.AccountID(acc),
 		AccountPermissions: permissions,
 		Name:               req.Body.Name,
+		Type:               clientType,
 		RedirectURIs:       opt.NewPtr(req.Body.RedirectUris).OrZero(),
 		AllowedScopes:      req.Body.AllowedScopes,
+		AllowedGrants:      req.Body.AllowedGrants,
+		PKCERequired:       opt.New(req.Body.PkceRequired),
 	})
 	if err != nil {
 		return nil, err

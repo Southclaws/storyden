@@ -7271,15 +7271,20 @@ components:
 
     OAuthClientSelfCreateProps:
       type: object
-      required: [name, allowed_scopes]
+      required: [name, type, allowed_grants, allowed_scopes, pkce_required]
       properties:
         name: { type: string }
+        type: { $ref: "#/components/schemas/OAuthClientType" }
         redirect_uris:
           type: array
           items: { type: string, format: uri }
         allowed_scopes:
           type: array
           items: { type: string }
+        allowed_grants:
+          type: array
+          items: { type: string }
+        pkce_required: { type: boolean }
 
     OAuthClientSelfUpdateProps:
       type: object
