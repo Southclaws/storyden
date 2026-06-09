@@ -6,6 +6,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
@@ -33,8 +34,11 @@ type ClientSelfCreate struct {
 	AccountID          account.AccountID
 	AccountPermissions rbac.Permissions
 	Name               string
+	Type               oauthresource.ClientType
 	RedirectURIs       []string
 	AllowedScopes      []string
+	AllowedGrants      []string
+	PKCERequired       opt.Optional[bool]
 }
 
 type ClientSelfCreateResult struct {
@@ -68,6 +72,50 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 	}
 
+	// Validate grant types
+	if err := validateGrantTypes(input.AllowedGrants); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	// Validate redirect URIs for authorization code grant
+	if hasGrant(input.AllowedGrants, GrantTypeAuthorizationCode) && len(input.RedirectURIs) == 0 {
+		return nil, fault.Wrap(
+			fault.New("redirect_uris required for authorization_code grant"),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
+	}
+
+	// Validate client credentials grant is confidential only
+	if hasGrant(input.AllowedGrants, GrantTypeClientCredentials) && input.Type == oauthresource.ClientTypePublic {
+		return nil, fault.Wrap(
+			fault.New("client_credentials grant requires confidential client type"),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
+	}
+
+	// Validate public clients require PKCE for authorization_code
+	if input.Type == oauthresource.ClientTypePublic && hasGrant(input.AllowedGrants, GrantTypeAuthorizationCode) {
+		pkceRequired := input.PKCERequired.OrZero()
+		if !pkceRequired {
+			return nil, fault.Wrap(
+				fault.New("public clients with authorization_code must require PKCE"),
+				fctx.With(ctx),
+				ftag.With(ftag.InvalidArgument),
+			)
+		}
+	}
+
+	// Validate machine clients should not have redirect URIs
+	if hasGrant(input.AllowedGrants, GrantTypeClientCredentials) && !hasGrant(input.AllowedGrants, GrantTypeAuthorizationCode) && len(input.RedirectURIs) > 0 {
+		return nil, fault.Wrap(
+			fault.New("machine clients (client_credentials only) should not have redirect URIs"),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+		)
+	}
+
 	clientIDToken, err := randomToken(18)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -76,32 +124,33 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 	clientSecret := opt.NewEmpty[string]()
 	clientSecretHash := opt.NewEmpty[string]()
 
-	secretToken, err := randomToken(32)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	secret := oauthresource.OAuthAccessSecretPrefix + secretToken
+	// Only generate client secret for confidential clients
+	if input.Type == oauthresource.ClientTypeConfidential {
+		secretToken, err := randomToken(32)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		secret := oauthresource.OAuthAccessSecretPrefix + secretToken
 
-	hash, err := argon2id.CreateHash(secret, argon2id.DefaultParams)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+		hash, err := argon2id.CreateHash(secret, argon2id.DefaultParams)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 
-	clientSecret = opt.New(secret)
-	clientSecretHash = opt.New(hash)
+		clientSecret = opt.New(secret)
+		clientSecretHash = opt.New(hash)
+	}
 
 	client, err := s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
 		AccountID:        opt.New(input.AccountID),
 		ClientID:         oauthresource.OAuthAccessKeyPrefix + clientIDToken,
 		ClientSecretHash: clientSecretHash,
 		Name:             input.Name,
-		Type:             oauthresource.ClientTypeConfidential,
+		Type:             input.Type,
 		ScopePolicy:      opt.New(oauthresource.ScopePolicyExplicit),
 		RedirectURIs:     input.RedirectURIs,
 		AllowedScopes:    input.AllowedScopes,
-		AllowedGrants: []string{
-			GrantTypeClientCredentials,
-		},
+		AllowedGrants:    input.AllowedGrants,
 	})
 	if err != nil {
 		return nil, err
@@ -111,4 +160,34 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 		Client:       client,
 		ClientSecret: clientSecret,
 	}, nil
+}
+
+func validateGrantTypes(grants []string) error {
+	if len(grants) == 0 {
+		return fault.New("invalid grants", fmsg.WithDesc("no grants specified", "Allowed Grants field must contain at least one grant"))
+	}
+
+	validGrants := map[string]bool{
+		GrantTypeAuthorizationCode: true,
+		GrantTypeRefreshToken:      true,
+		GrantTypeClientCredentials: true,
+		GrantTypeDeviceCode:        true,
+	}
+
+	for _, grant := range grants {
+		if !validGrants[grant] {
+			return fault.Newf("invalid grant type: %s", grant)
+		}
+	}
+
+	return nil
+}
+
+func hasGrant(grants []string, grant string) bool {
+	for _, g := range grants {
+		if g == grant {
+			return true
+		}
+	}
+	return false
 }

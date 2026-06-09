@@ -75,9 +75,9 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
         /* Modal mode - on desktop screens */
         @media screen and (min-width: 48em) {
           .modaldrawer__content {
-            height: 100%;
+            height: 80vh;
             width: 100%;
-            top: 0;
+            top: 10%;
             display: flex;
             flex-direction: column;
             justify-content: center;
