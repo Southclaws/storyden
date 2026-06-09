@@ -24,6 +24,8 @@ func (s *nodeSearcher) Search(ctx context.Context, query string, p pagination.Pa
 	o := []node_search.Option{
 		node_search.WithNameContains(query),
 		node_search.WithContentContains(query),
+		node_search.WithDescriptionContains(query),
+		node_search.WithTagContains(query),
 	}
 
 	opts.Authors.Call(func(value []account.AccountID) {
