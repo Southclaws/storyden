@@ -70,6 +70,29 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 				a.Contains((*body.Metadata)["suggested"], "administrator")
 			})
 
+			t.Run("oauth_authorization_server_metadata_returns_clear_disabled_response", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-authorization-server", nil)
+				r.NoError(err)
+
+				resp, err := http.DefaultClient.Do(req)
+				r.NoError(err)
+				defer resp.Body.Close()
+
+				var body openapi.APIError
+				r.NoError(json.NewDecoder(resp.Body).Decode(&body))
+				a.Equal(http.StatusNotFound, resp.StatusCode)
+				r.NotNil(body.Type)
+				a.Equal("urn:storyden:problem:not-found", *body.Type)
+				r.NotNil(body.Title)
+				a.Contains(*body.Title, "not enabled")
+				r.NotNil(body.Metadata)
+				a.Equal("oauth_disabled", (*body.Metadata)["code"])
+				a.Contains((*body.Metadata)["suggested"], "administrator")
+			})
+
 			t.Run("jwks_returns_clear_disabled_response", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)

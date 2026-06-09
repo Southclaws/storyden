@@ -59,6 +59,34 @@ func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
 	}
 }
 
+type OAuthAuthorizationServerMetadata struct {
+	Issuer                            string   `json:"issuer"`
+	AuthorizationEndpoint             string   `json:"authorization_endpoint"`
+	TokenEndpoint                     string   `json:"token_endpoint"`
+	JWKSURI                           string   `json:"jwks_uri,omitempty"`
+	ScopesSupported                   []string `json:"scopes_supported,omitempty"`
+	ResponseTypesSupported            []string `json:"response_types_supported"`
+	GrantTypesSupported               []string `json:"grant_types_supported,omitempty"`
+	CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported,omitempty"`
+	DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint,omitempty"`
+}
+
+func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizationServerMetadata {
+	discovery := o.oauth.Discovery()
+
+	return OAuthAuthorizationServerMetadata{
+		Issuer:                        discovery.Issuer,
+		AuthorizationEndpoint:         discovery.AuthorizationEndpoint,
+		TokenEndpoint:                 discovery.TokenEndpoint,
+		JWKSURI:                       discovery.JWKSURI,
+		ScopesSupported:               discovery.ScopesSupported,
+		ResponseTypesSupported:        discovery.ResponseTypesSupported,
+		GrantTypesSupported:           discovery.GrantTypesSupported,
+		CodeChallengeMethodsSupported: discovery.CodeChallengeMethodsSupported,
+		DeviceAuthorizationEndpoint:   discovery.DeviceAuthorizationEndpoint,
+	}
+}
+
 func (o OAuth) OAuthJWKS(ctx context.Context, _ openapi.OAuthJWKSRequestObject) (openapi.OAuthJWKSResponseObject, error) {
 	if !o.oauth.Enabled() {
 		return nil, oauthDisabledError(ctx)
