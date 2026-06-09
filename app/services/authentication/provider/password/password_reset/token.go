@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 	"github.com/rs/xid"
@@ -45,7 +46,11 @@ func (r *TokenProvider) GetResetToken(ctx context.Context, accountID account.Acc
 func (r *TokenProvider) Validate(ctx context.Context, tokenString string) (account.AccountID, error) {
 	token, err := r.endec.Decrypt(tokenString)
 	if err != nil {
-		return account.AccountID{}, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to decrypt token"))
+		return account.AccountID{}, fault.Wrap(err,
+			fctx.With(ctx),
+			ftag.With(ftag.Unauthenticated),
+			fmsg.WithDesc("failed to decrypt token", "Your password reset link has expired or is invalid. Please request a new one."),
+		)
 	}
 
 	rawID, ok := token[accountIDKey]
