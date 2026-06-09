@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
+	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 )
 
 type TreeCommand *cobra.Command
@@ -27,11 +28,11 @@ func New(store *config.Store) TreeCommand {
 	filterFlags := &filter.NodeFlags{}
 
 	command := &cobra.Command{
-		Use:   "tree",
+		Use:   "tree [slug]",
 		Short: "Show nodes as a tree",
 		Long: `# Display Node Tree
 
-Visualize your entire content hierarchy as a tree.
+Visualize your entire content hierarchy as a tree, or a subtree rooted at a specific node.
 
 The tree shows all nodes with ` + "`└──`" + ` and ` + "`├──`" + ` branch indicators, displaying each node's name and slug.
 
@@ -42,9 +43,19 @@ Show full tree:
 sd node tree
 ~~~
 
+Show subtree rooted at a specific node:
+~~~bash
+sd node tree design
+~~~
+
 Limit depth:
 ~~~bash
 sd node tree --depth 2
+~~~
+
+Limit depth within a subtree:
+~~~bash
+sd node tree web-development --depth 2
 ~~~
 
 Filter by visibility (comma-separated):
@@ -64,6 +75,7 @@ sd node tree > sitemap.txt
 
 Use ` + "`sd node children`" + ` to list just the direct children of a specific node.
 `,
+		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if depth < 0 {
 				return fmt.Errorf("--depth must be greater than or equal to zero")
@@ -80,7 +92,18 @@ Use ` + "`sd node children`" + ` to list just the direct children of a specific 
 				return err
 			}
 
-			result, err := fetchTree(cmd.Context(), client.OpenAPI, depth, visibility)
+			var rootLabel string
+			var nodeID string
+			if len(args) == 1 {
+				root, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, args[0])
+				if err != nil {
+					return fmt.Errorf("could not find node %q: %w", args[0], err)
+				}
+				rootLabel = string(root.Name) + " [slug=" + args[0] + "]"
+				nodeID = string(root.Id)
+			}
+
+			result, err := fetchTree(cmd.Context(), client.OpenAPI, depth, visibility, nodeID)
 			if err != nil {
 				return err
 			}
@@ -91,7 +114,7 @@ Use ` + "`sd node children`" + ` to list just the direct children of a specific 
 				nodes = pruneTree(nodes, opts)
 			}
 
-			return renderTree(cmd.OutOrStdout(), nodes)
+			return renderTree(cmd.OutOrStdout(), nodes, rootLabel)
 		},
 	}
 
@@ -109,12 +132,18 @@ func fetchTree(
 	client *openapi.ClientWithResponses,
 	depth int,
 	visibility []string,
+	nodeID string,
 ) (*openapi.NodeListResult, error) {
 	depthParam := openapi.TreeDepthParam(strconv.Itoa(depth))
 	format := openapi.NodeListParamsFormatTree
 	params := &openapi.NodeListParams{
 		Depth:  &depthParam,
 		Format: &format,
+	}
+
+	if nodeID != "" {
+		id := openapi.Identifier(nodeID)
+		params.NodeId = &id
 	}
 
 	if len(visibility) > 0 {
@@ -187,8 +216,24 @@ func prunedNode(n openapi.NodeWithChildren, opts filter.NodeOptions) (openapi.No
 	return n, true
 }
 
-func renderTree(out io.Writer, nodes []openapi.NodeWithChildren) error {
-	fmt.Fprintln(out, ".")
+func renderTree(out io.Writer, nodes []openapi.NodeWithChildren, rootLabel string) error {
+	if rootLabel != "" && len(nodes) == 1 {
+		// When the API is scoped to a node by ID it returns the root node
+		// itself as the single top-level item. Render the node's own label as
+		// the tree root and recurse into its children, so the root line is not
+		// repeated twice.
+		fmt.Fprintln(out, nodeLabel(nodes[0]))
+		for i, child := range nodes[0].Children {
+			renderNode(out, child, "", i == len(nodes[0].Children)-1)
+		}
+		return nil
+	}
+
+	if rootLabel != "" {
+		fmt.Fprintln(out, rootLabel)
+	} else {
+		fmt.Fprintln(out, ".")
+	}
 
 	for i, node := range nodes {
 		renderNode(out, node, "", i == len(nodes)-1)
