@@ -18,7 +18,11 @@ import { ContentNavigationList } from "../ContentNavigationList/ContentNavigatio
 
 import { useMobileCommandBar } from "./useMobileCommandBar";
 
-export function MobileCommandBar() {
+type Props = {
+  canRegister?: boolean;
+};
+
+export function MobileCommandBar({ canRegister }: Props) {
   const { isExpanded, onExpand, onClose, account } = useMobileCommandBar();
 
   return (
@@ -48,7 +52,11 @@ export function MobileCommandBar() {
               <SiteIcon borderRadius="md" w="8" h="8" />
             )}
             <HomeAnchor hideLabel size="sm" />
-            {account ? <ComposeAnchor hideLabel size="sm" /> : <LoginAnchor />}
+            {account ? (
+              <ComposeAnchor hideLabel size="sm" />
+            ) : (
+              canRegister && <LoginAnchor />
+            )}
             <LibraryAnchor hideLabel size="sm" />
             <ExpandTrigger onClick={onExpand} />
           </>
