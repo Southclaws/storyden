@@ -44,7 +44,7 @@ func TestRenderTree(t *testing.T) {
 
 	var out bytes.Buffer
 
-	err := renderTree(&out, nodes)
+	err := renderTree(&out, nodes, "")
 
 	require.NoError(t, err)
 	require.Equal(t, `.
