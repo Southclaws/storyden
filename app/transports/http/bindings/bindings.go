@@ -222,6 +222,14 @@ func mount(
 		return c.JSON(http.StatusOK, oauthBinding.OAuthDiscovery(c.Request().Context()))
 	})
 
+	router.GET("/.well-known/oauth-authorization-server", func(c echo.Context) error {
+		if !oauthBinding.oauth.Enabled() {
+			return oauthDisabledError(c.Request().Context())
+		}
+
+		return c.JSON(http.StatusOK, oauthBinding.OAuthAuthorizationServerMetadata(c.Request().Context()))
+	})
+
 	router.Use(
 		requestValidatorMiddleware,
 		openapi.ParameterContext,

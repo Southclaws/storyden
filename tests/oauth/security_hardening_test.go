@@ -3,6 +3,7 @@ package oauth_test
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -180,6 +181,34 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000/api/oauth/token", discovery.TokenEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/userinfo", discovery.UserinfoEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/jwks", discovery.JWKSURI)
+
+			req2, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-authorization-server", nil)
+			r.NoError(err)
+			resp2, err := http.DefaultClient.Do(req2)
+			r.NoError(err)
+			defer resp2.Body.Close()
+			r.Equal(http.StatusOK, resp2.StatusCode)
+
+			var metadata struct {
+				Issuer                      string `json:"issuer"`
+				AuthorizationEndpoint       string `json:"authorization_endpoint"`
+				TokenEndpoint               string `json:"token_endpoint"`
+				JWKSURI                     string `json:"jwks_uri"`
+				DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint"`
+			}
+			body2, err := io.ReadAll(resp2.Body)
+			r.NoError(err)
+			r.NoError(json.Unmarshal(body2, &metadata))
+			a.Equal("http://localhost:8000", metadata.Issuer)
+			a.Equal("http://localhost:8000/api/oauth/authorize", metadata.AuthorizationEndpoint)
+			a.Equal("http://localhost:8000/api/oauth/token", metadata.TokenEndpoint)
+			a.Equal("http://localhost:8000/api/oauth/jwks", metadata.JWKSURI)
+			a.Equal("http://localhost:8000/api/oauth/device_authorization", metadata.DeviceAuthorizationEndpoint)
+
+			var rawMetadata map[string]any
+			r.NoError(json.Unmarshal(body2, &rawMetadata))
+			a.NotContains(rawMetadata, "userinfo_endpoint")
+			a.NotContains(rawMetadata, "id_token_signing_alg_values_supported")
 		}))
 	}))
 }
