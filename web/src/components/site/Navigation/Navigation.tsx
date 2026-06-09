@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 
 import { getServerSession } from "@/auth/server-session";
 import { parseMemberSettings } from "@/lib/settings/member-settings";
+import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 import { Box } from "@/styled-system/jsx";
 
@@ -25,6 +26,7 @@ export async function Navigation({
   children,
 }: PropsWithChildren<Props>) {
   const globalSettings = await getSettings();
+  const canRegister = allowsPublicRegistration(globalSettings.registration_mode);
   const sessionAccount = await getServerSession();
   const session = sessionAccount
     ? parseMemberSettings(sessionAccount, globalSettings.metadata)
@@ -89,7 +91,7 @@ export async function Navigation({
         </Box>
 
         <Box className={styles["navpill"]}>
-          <MobileCommandBar />
+          <MobileCommandBar canRegister={canRegister} />
         </Box>
       </Box>
     </Box>
