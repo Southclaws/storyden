@@ -29,10 +29,10 @@ func TestSearchNodeMetadata(t *testing.T) {
 func TestSearchNodeMetadataBleve(t *testing.T) {
 	t.Parallel()
 
-	bleveName := time.Now().Format(time.RFC3339) + t.Name()
+	bleveIndexName := time.Now().Format(time.RFC3339) + t.Name()
 	runNodeMetadataSearchTest(t, &config.Config{
 		SearchProvider: "bleve",
-		BlevePath:      fmt.Sprintf("data/%s.bleve", bleveName),
+		BlevePath:      fmt.Sprintf("data/%s.bleve", bleveIndexName),
 	}, true, func(ctx context.Context, idx *search_indexer.Indexer) {
 		require.NoError(t, idx.ReindexAll(ctx))
 	})

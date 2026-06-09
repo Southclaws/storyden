@@ -146,8 +146,11 @@ func (idx *Indexer) reindexNodes(ctx context.Context) (int, error) {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
+		const isRoot = false
+		var propertySchemas *library.PropertySchemaTable
+
 		return dt.MapErr(nodes, func(n *ent.Node) (datagraph.Item, error) {
-			return library.MapNode(false, nil)(n)
+			return library.MapNode(isRoot, propertySchemas)(n)
 		})
 	}, func(ids []xid.ID, t time.Time) (int, error) {
 		i, err := idx.db.Node.Update().
