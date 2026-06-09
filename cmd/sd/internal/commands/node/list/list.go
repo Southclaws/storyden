@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
+	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
@@ -42,6 +43,7 @@ func New(store *config.Store) ListCommand {
 	var visibility []string
 	var search string
 	var nodeID string
+	var parent string
 	var depth int
 	var depthSet bool
 	var nodeFormat string
@@ -86,6 +88,11 @@ Filter by owner handle and name substring:
 sd node list --owner-handle southclaws --name-contains design
 ~~~
 
+List all nodes under a specific parent (by slug):
+~~~bash
+sd node list --parent web-development
+~~~
+
 Full-text search on the server:
 ~~~bash
 sd node list --search "design system"
@@ -119,9 +126,23 @@ sd node list --format json > nodes.json
 				filterFlags.OwnerHandle = author
 			}
 
+			if parent != "" && nodeID != "" {
+				return fmt.Errorf("--parent and --node-id are mutually exclusive")
+			}
+
 			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
 			if err != nil {
 				return err
+			}
+
+			// --parent resolves a human-readable slug to the node ID required
+			// by the server-side NodeId filter.
+			if parent != "" {
+				parentNode, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, parent)
+				if err != nil {
+					return fmt.Errorf("could not find parent node %q: %w", parent, err)
+				}
+				nodeID = string(parentNode.Id)
 			}
 
 			if nodeFormat != "" && nodeFormat != "tree" && nodeFormat != "flat" {
@@ -154,6 +175,7 @@ sd node list --format json > nodes.json
 	command.Flags().StringSliceVar(&visibility, "visibility", nil, "Filter by visibility (comma-separated: draft, review, published, unlisted)")
 	command.Flags().StringVarP(&search, "search", "q", "", "Server-side full-text search query")
 	command.Flags().StringVar(&nodeID, "node-id", "", "Limit to descendants of this node id")
+	command.Flags().StringVar(&parent, "parent", "", "Limit to children of this node (accepts slug; resolves to node id automatically)")
 	command.Flags().IntVar(&depth, "depth", 0, "Maximum child depth to return (0 = root nodes only)")
 	command.Flags().StringVar(&nodeFormat, "node-format", "flat", "Server response shape: flat (default, every match) or tree (roots with nested children)")
 
@@ -320,6 +342,12 @@ func nodeProfile() render.Profile[openapi.NodeWithChildren] {
 			{Header: "AUTHOR", Render: func(n openapi.NodeWithChildren) string { return render.AuthorName(n.Owner) }},
 			{Header: "CHILDREN", Render: func(n openapi.NodeWithChildren) string { return strconv.Itoa(len(n.Children)) }, Wide: true},
 			{Header: "VISIBILITY", Render: func(n openapi.NodeWithChildren) string { return string(n.Visibility) }, Wide: true},
+			{Header: "PARENT", Render: func(n openapi.NodeWithChildren) string {
+				if n.Parent != nil {
+					return string(n.Parent.Slug)
+				}
+				return ""
+			}, Wide: true},
 			{Header: "SLUG", Render: func(n openapi.NodeWithChildren) string { return string(n.Slug) }, Wide: true},
 		},
 	}
@@ -372,10 +400,12 @@ func fetchNodes(
 		f := openapi.NodeListParamsFormat(q.nodeFormat)
 		params.Format = &f
 
-		// Flat format with no explicit depth defaults to a deep traversal so
-		// you don't have to remember --depth=10. Tree format keeps the old
-		// shallow default to preserve existing behaviour.
-		if q.depth == nil && q.nodeFormat == "flat" {
+		// Default to a deep traversal when no explicit depth is set.
+		// For flat format this surfaces all descendants as a flat list.
+		// For tree format scoped via --parent/--node-id this ensures children
+		// are returned (without depth the server defaults to depth=0 and
+		// returns only the root node itself).
+		if q.depth == nil {
 			d := openapi.TreeDepthParam("10")
 			params.Depth = &d
 		}
