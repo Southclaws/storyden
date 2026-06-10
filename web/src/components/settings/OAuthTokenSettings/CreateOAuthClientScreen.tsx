@@ -33,6 +33,19 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
     onClose,
   });
 
+  const selectablePermissions = PermissionList.filter((permission) =>
+    hasPermission(session, permission.value),
+  );
+
+  const selectedPreset = form.watch("preset");
+  const showRedirectUris =
+    selectedPreset === "app_integration" || selectedPreset === "public_app";
+
+  const { fields, append, remove } = useFieldArray<Form>({
+    control: form.control,
+    name: "redirectUris",
+  });
+
   if (createdClient) {
     return (
       <LStack h="full" gap="8" justifyContent="space-between">
@@ -68,19 +81,6 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
       </LStack>
     );
   }
-
-  const selectablePermissions = PermissionList.filter((permission) =>
-    hasPermission(session, permission.value),
-  );
-
-  const selectedPreset = form.watch("preset");
-  const showRedirectUris =
-    selectedPreset === "app_integration" || selectedPreset === "public_app";
-
-  const { fields, append, remove } = useFieldArray<Form>({
-    control: form.control,
-    name: "redirectUris",
-  });
 
   return (
     <styled.form onSubmit={handleSubmit}>
