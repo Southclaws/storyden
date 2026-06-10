@@ -148,7 +148,7 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 	t.Parallel()
 
 	cfg := oauthConfig(t)
-	publicAPIAddress, err := url.Parse("http://localhost:8000/api")
+	publicAPIAddress, err := url.Parse("http://localhost:8000/")
 	require.NoError(t, err)
 	cfg.PublicAPIAddress = *publicAPIAddress
 
