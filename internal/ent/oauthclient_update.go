@@ -117,6 +117,40 @@ func (_u *OAuthClientUpdate) SetNillableScopePolicy(v *oauthclient.ScopePolicy) 
 	return _u
 }
 
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (_u *OAuthClientUpdate) SetTokenEndpointAuthMethod(v string) *OAuthClientUpdate {
+	_u.mutation.SetTokenEndpointAuthMethod(v)
+	return _u
+}
+
+// SetNillableTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field if the given value is not nil.
+func (_u *OAuthClientUpdate) SetNillableTokenEndpointAuthMethod(v *string) *OAuthClientUpdate {
+	if v != nil {
+		_u.SetTokenEndpointAuthMethod(*v)
+	}
+	return _u
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (_u *OAuthClientUpdate) ClearTokenEndpointAuthMethod() *OAuthClientUpdate {
+	_u.mutation.ClearTokenEndpointAuthMethod()
+	return _u
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (_u *OAuthClientUpdate) SetPkceRequired(v bool) *OAuthClientUpdate {
+	_u.mutation.SetPkceRequired(v)
+	return _u
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (_u *OAuthClientUpdate) SetNillablePkceRequired(v *bool) *OAuthClientUpdate {
+	if v != nil {
+		_u.SetPkceRequired(*v)
+	}
+	return _u
+}
+
 // SetRedirectUris sets the "redirect_uris" field.
 func (_u *OAuthClientUpdate) SetRedirectUris(v []string) *OAuthClientUpdate {
 	_u.mutation.SetRedirectUris(v)
@@ -401,6 +435,15 @@ func (_u *OAuthClientUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	}
 	if value, ok := _u.mutation.ScopePolicy(); ok {
 		_spec.SetField(oauthclient.FieldScopePolicy, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.TokenEndpointAuthMethod(); ok {
+		_spec.SetField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString, value)
+	}
+	if _u.mutation.TokenEndpointAuthMethodCleared() {
+		_spec.ClearField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString)
+	}
+	if value, ok := _u.mutation.PkceRequired(); ok {
+		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.RedirectUris(); ok {
 		_spec.SetField(oauthclient.FieldRedirectUris, field.TypeJSON, value)
@@ -706,6 +749,40 @@ func (_u *OAuthClientUpdateOne) SetScopePolicy(v oauthclient.ScopePolicy) *OAuth
 func (_u *OAuthClientUpdateOne) SetNillableScopePolicy(v *oauthclient.ScopePolicy) *OAuthClientUpdateOne {
 	if v != nil {
 		_u.SetScopePolicy(*v)
+	}
+	return _u
+}
+
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (_u *OAuthClientUpdateOne) SetTokenEndpointAuthMethod(v string) *OAuthClientUpdateOne {
+	_u.mutation.SetTokenEndpointAuthMethod(v)
+	return _u
+}
+
+// SetNillableTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field if the given value is not nil.
+func (_u *OAuthClientUpdateOne) SetNillableTokenEndpointAuthMethod(v *string) *OAuthClientUpdateOne {
+	if v != nil {
+		_u.SetTokenEndpointAuthMethod(*v)
+	}
+	return _u
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (_u *OAuthClientUpdateOne) ClearTokenEndpointAuthMethod() *OAuthClientUpdateOne {
+	_u.mutation.ClearTokenEndpointAuthMethod()
+	return _u
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (_u *OAuthClientUpdateOne) SetPkceRequired(v bool) *OAuthClientUpdateOne {
+	_u.mutation.SetPkceRequired(v)
+	return _u
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (_u *OAuthClientUpdateOne) SetNillablePkceRequired(v *bool) *OAuthClientUpdateOne {
+	if v != nil {
+		_u.SetPkceRequired(*v)
 	}
 	return _u
 }
@@ -1024,6 +1101,15 @@ func (_u *OAuthClientUpdateOne) sqlSave(ctx context.Context) (_node *OAuthClient
 	}
 	if value, ok := _u.mutation.ScopePolicy(); ok {
 		_spec.SetField(oauthclient.FieldScopePolicy, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.TokenEndpointAuthMethod(); ok {
+		_spec.SetField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString, value)
+	}
+	if _u.mutation.TokenEndpointAuthMethodCleared() {
+		_spec.ClearField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString)
+	}
+	if value, ok := _u.mutation.PkceRequired(); ok {
+		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.RedirectUris(); ok {
 		_spec.SetField(oauthclient.FieldRedirectUris, field.TypeJSON, value)

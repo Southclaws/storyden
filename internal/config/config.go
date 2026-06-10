@@ -309,6 +309,8 @@ type Config struct {
 	OAuthSigningKeyBase64 string `envconfig:"OAUTH_SIGNING_KEY_BASE64"`
 	// Optional JWT key ID (kid) for OAuth signing keys.
 	OAuthSigningKeyID string `envconfig:"OAUTH_SIGNING_KEY_ID"`
+	// Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
+	OAuthDynamicRegistrationEnabled bool `envconfig:"OAUTH_DYNAMIC_REGISTRATION_ENABLED"`
 
 	// -
 	// SMS

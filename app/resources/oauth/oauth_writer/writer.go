@@ -29,15 +29,17 @@ func New(db *ent.Client) *Writer {
 }
 
 type ClientCreate struct {
-	AccountID        opt.Optional[account.AccountID]
-	ClientID         string
-	ClientSecretHash opt.Optional[string]
-	Name             string
-	Type             oauth.ClientType
-	ScopePolicy      opt.Optional[oauth.ScopePolicy]
-	RedirectURIs     []string
-	AllowedScopes    []string
-	AllowedGrants    []string
+	AccountID               opt.Optional[account.AccountID]
+	ClientID                string
+	ClientSecretHash        opt.Optional[string]
+	Name                    string
+	Type                    oauth.ClientType
+	ScopePolicy             opt.Optional[oauth.ScopePolicy]
+	TokenEndpointAuthMethod opt.Optional[string]
+	PKCERequired            opt.Optional[bool]
+	RedirectURIs            []string
+	AllowedScopes           []string
+	AllowedGrants           []string
 }
 
 type ClientUpdate struct {
@@ -107,6 +109,12 @@ func (w *Writer) CreateClient(ctx context.Context, input ClientCreate) (*oauth.C
 	})
 	input.ScopePolicy.Call(func(policy oauth.ScopePolicy) {
 		create.SetScopePolicy(oauthclient.ScopePolicy(policy.String()))
+	})
+	input.TokenEndpointAuthMethod.Call(func(method string) {
+		create.SetTokenEndpointAuthMethod(method)
+	})
+	input.PKCERequired.Call(func(required bool) {
+		create.SetPkceRequired(required)
 	})
 
 	row, err := create.Save(ctx)

@@ -107,15 +107,16 @@ func oauthConfigWithAccessTTL(t *testing.T, accessTTL time.Duration) *config.Con
 	require.NoError(t, err)
 
 	return &config.Config{
-		PublicWebAddress:      *publicWebAddress,
-		PublicAPIAddress:      *publicAPIAddress,
-		OAuthEnabled:          true,
-		OAuthSigningKeyBase64: base64.StdEncoding.EncodeToString(pemBytes),
-		OAuthSigningKeyID:     "test-key",
-		OAuthAccessTokenTTL:   accessTTL,
-		OAuthRefreshTokenTTL:  24 * time.Hour,
-		OAuthDeviceCodeTTL:    10 * time.Minute,
-		OAuthDevicePollEvery:  5 * time.Second,
+		PublicWebAddress:                *publicWebAddress,
+		PublicAPIAddress:                *publicAPIAddress,
+		OAuthEnabled:                    true,
+		OAuthDynamicRegistrationEnabled: true,
+		OAuthSigningKeyBase64:           base64.StdEncoding.EncodeToString(pemBytes),
+		OAuthSigningKeyID:               "test-key",
+		OAuthAccessTokenTTL:             accessTTL,
+		OAuthRefreshTokenTTL:            24 * time.Hour,
+		OAuthDeviceCodeTTL:              10 * time.Minute,
+		OAuthDevicePollEvery:            5 * time.Second,
 	}
 }
 

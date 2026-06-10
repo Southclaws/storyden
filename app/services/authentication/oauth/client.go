@@ -141,16 +141,24 @@ func (s *Service) CreateClientForAccount(ctx context.Context, input ClientSelfCr
 		clientSecretHash = opt.New(hash)
 	}
 
+	// Determine token endpoint auth method based on client type
+	authMethod := "client_secret_post"
+	if input.Type == oauthresource.ClientTypePublic {
+		authMethod = "none"
+	}
+
 	client, err := s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
-		AccountID:        opt.New(input.AccountID),
-		ClientID:         oauthresource.OAuthAccessKeyPrefix + clientIDToken,
-		ClientSecretHash: clientSecretHash,
-		Name:             input.Name,
-		Type:             input.Type,
-		ScopePolicy:      opt.New(oauthresource.ScopePolicyExplicit),
-		RedirectURIs:     input.RedirectURIs,
-		AllowedScopes:    input.AllowedScopes,
-		AllowedGrants:    input.AllowedGrants,
+		AccountID:               opt.New(input.AccountID),
+		ClientID:                oauthresource.OAuthAccessKeyPrefix + clientIDToken,
+		ClientSecretHash:        clientSecretHash,
+		Name:                    input.Name,
+		Type:                    input.Type,
+		ScopePolicy:             opt.New(oauthresource.ScopePolicyExplicit),
+		TokenEndpointAuthMethod: opt.New(authMethod),
+		PKCERequired:            input.PKCERequired,
+		RedirectURIs:            input.RedirectURIs,
+		AllowedScopes:           input.AllowedScopes,
+		AllowedGrants:           input.AllowedGrants,
 	})
 	if err != nil {
 		return nil, err

@@ -36,6 +36,10 @@ type OAuthClient struct {
 	Type oauthclient.Type `json:"type,omitempty"`
 	// ScopePolicy holds the value of the "scope_policy" field.
 	ScopePolicy oauthclient.ScopePolicy `json:"scope_policy,omitempty"`
+	// TokenEndpointAuthMethod holds the value of the "token_endpoint_auth_method" field.
+	TokenEndpointAuthMethod string `json:"token_endpoint_auth_method,omitempty"`
+	// PkceRequired holds the value of the "pkce_required" field.
+	PkceRequired bool `json:"pkce_required,omitempty"`
 	// RedirectUris holds the value of the "redirect_uris" field.
 	RedirectUris []string `json:"redirect_uris,omitempty"`
 	// AllowedScopes holds the value of the "allowed_scopes" field.
@@ -121,7 +125,9 @@ func (*OAuthClient) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case oauthclient.FieldRedirectUris, oauthclient.FieldAllowedScopes, oauthclient.FieldAllowedGrants:
 			values[i] = new([]byte)
-		case oauthclient.FieldClientID, oauthclient.FieldClientSecretHash, oauthclient.FieldName, oauthclient.FieldType, oauthclient.FieldScopePolicy:
+		case oauthclient.FieldPkceRequired:
+			values[i] = new(sql.NullBool)
+		case oauthclient.FieldClientID, oauthclient.FieldClientSecretHash, oauthclient.FieldName, oauthclient.FieldType, oauthclient.FieldScopePolicy, oauthclient.FieldTokenEndpointAuthMethod:
 			values[i] = new(sql.NullString)
 		case oauthclient.FieldCreatedAt, oauthclient.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -197,6 +203,18 @@ func (_m *OAuthClient) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field scope_policy", values[i])
 			} else if value.Valid {
 				_m.ScopePolicy = oauthclient.ScopePolicy(value.String)
+			}
+		case oauthclient.FieldTokenEndpointAuthMethod:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field token_endpoint_auth_method", values[i])
+			} else if value.Valid {
+				_m.TokenEndpointAuthMethod = value.String
+			}
+		case oauthclient.FieldPkceRequired:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field pkce_required", values[i])
+			} else if value.Valid {
+				_m.PkceRequired = value.Bool
 			}
 		case oauthclient.FieldRedirectUris:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -310,6 +328,12 @@ func (_m *OAuthClient) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("scope_policy=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ScopePolicy))
+	builder.WriteString(", ")
+	builder.WriteString("token_endpoint_auth_method=")
+	builder.WriteString(_m.TokenEndpointAuthMethod)
+	builder.WriteString(", ")
+	builder.WriteString("pkce_required=")
+	builder.WriteString(fmt.Sprintf("%v", _m.PkceRequired))
 	builder.WriteString(", ")
 	builder.WriteString("redirect_uris=")
 	builder.WriteString(fmt.Sprintf("%v", _m.RedirectUris))

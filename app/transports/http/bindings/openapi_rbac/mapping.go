@@ -282,6 +282,10 @@ func (m *Mapping) OAuthUserInfo() (bool, *rbac.Permission) {
 	return false, nil // Authenticated by bearer token.
 }
 
+func (m *Mapping) OAuthClientRegister() (bool, *rbac.Permission) {
+	return false, nil // Public RFC 7591 dynamic client registration.
+}
+
 func (m *Mapping) WebAuthnRequestCredential() (bool, *rbac.Permission) {
 	return false, nil // Public
 }

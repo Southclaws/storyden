@@ -72,6 +72,7 @@ type OperationPermissions interface {
 	OAuthAuthoriseConsentSubmit() (bool, *rbac.Permission)
 	OAuthToken() (bool, *rbac.Permission)
 	OAuthUserInfo() (bool, *rbac.Permission)
+	OAuthClientRegister() (bool, *rbac.Permission)
 	WebAuthnRequestCredential() (bool, *rbac.Permission)
 	WebAuthnMakeCredential() (bool, *rbac.Permission)
 	WebAuthnGetAssertion() (bool, *rbac.Permission)
@@ -337,6 +338,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.OAuthToken()
 	case "OAuthUserInfo":
 		return optable.OAuthUserInfo()
+	case "OAuthClientRegister":
+		return optable.OAuthClientRegister()
 	case "WebAuthnRequestCredential":
 		return optable.WebAuthnRequestCredential()
 	case "WebAuthnMakeCredential":

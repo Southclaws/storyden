@@ -8,6 +8,7 @@ type Discovery struct {
 	DeviceAuthorizationEndpoint      string
 	TokenEndpoint                    string
 	UserinfoEndpoint                 string
+	RegistrationEndpoint             string
 	JWKSURI                          string
 	ResponseTypesSupported           []string
 	GrantTypesSupported              []string
@@ -20,12 +21,18 @@ type Discovery struct {
 func (s *Service) Discovery() Discovery {
 	endpointBase := strings.TrimSuffix(s.apiEndpointBase(), "/")
 
+	registrationEndpoint := ""
+	if s.cfg.OAuthDynamicRegistrationEnabled {
+		registrationEndpoint = endpointBase + "/oauth/register"
+	}
+
 	return Discovery{
 		Issuer:                           s.issuer,
 		AuthorizationEndpoint:            endpointBase + "/oauth/authorize",
 		DeviceAuthorizationEndpoint:      endpointBase + "/oauth/device_authorization",
 		TokenEndpoint:                    endpointBase + "/oauth/token",
 		UserinfoEndpoint:                 endpointBase + "/oauth/userinfo",
+		RegistrationEndpoint:             registrationEndpoint,
 		JWKSURI:                          endpointBase + "/oauth/jwks",
 		ResponseTypesSupported:           []string{"code"},
 		GrantTypesSupported:              []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken, GrantTypeClientCredentials, GrantTypeDeviceCode},

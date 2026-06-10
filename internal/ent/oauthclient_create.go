@@ -125,6 +125,34 @@ func (_c *OAuthClientCreate) SetNillableScopePolicy(v *oauthclient.ScopePolicy) 
 	return _c
 }
 
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (_c *OAuthClientCreate) SetTokenEndpointAuthMethod(v string) *OAuthClientCreate {
+	_c.mutation.SetTokenEndpointAuthMethod(v)
+	return _c
+}
+
+// SetNillableTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field if the given value is not nil.
+func (_c *OAuthClientCreate) SetNillableTokenEndpointAuthMethod(v *string) *OAuthClientCreate {
+	if v != nil {
+		_c.SetTokenEndpointAuthMethod(*v)
+	}
+	return _c
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (_c *OAuthClientCreate) SetPkceRequired(v bool) *OAuthClientCreate {
+	_c.mutation.SetPkceRequired(v)
+	return _c
+}
+
+// SetNillablePkceRequired sets the "pkce_required" field if the given value is not nil.
+func (_c *OAuthClientCreate) SetNillablePkceRequired(v *bool) *OAuthClientCreate {
+	if v != nil {
+		_c.SetPkceRequired(*v)
+	}
+	return _c
+}
+
 // SetRedirectUris sets the "redirect_uris" field.
 func (_c *OAuthClientCreate) SetRedirectUris(v []string) *OAuthClientCreate {
 	_c.mutation.SetRedirectUris(v)
@@ -273,6 +301,14 @@ func (_c *OAuthClientCreate) defaults() {
 		v := oauthclient.DefaultScopePolicy
 		_c.mutation.SetScopePolicy(v)
 	}
+	if _, ok := _c.mutation.TokenEndpointAuthMethod(); !ok {
+		v := oauthclient.DefaultTokenEndpointAuthMethod
+		_c.mutation.SetTokenEndpointAuthMethod(v)
+	}
+	if _, ok := _c.mutation.PkceRequired(); !ok {
+		v := oauthclient.DefaultPkceRequired
+		_c.mutation.SetPkceRequired(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := oauthclient.DefaultID()
 		_c.mutation.SetID(v)
@@ -318,6 +354,9 @@ func (_c *OAuthClientCreate) check() error {
 		if err := oauthclient.ScopePolicyValidator(v); err != nil {
 			return &ValidationError{Name: "scope_policy", err: fmt.Errorf(`ent: validator failed for field "OAuthClient.scope_policy": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.PkceRequired(); !ok {
+		return &ValidationError{Name: "pkce_required", err: errors.New(`ent: missing required field "OAuthClient.pkce_required"`)}
 	}
 	if _, ok := _c.mutation.RedirectUris(); !ok {
 		return &ValidationError{Name: "redirect_uris", err: errors.New(`ent: missing required field "OAuthClient.redirect_uris"`)}
@@ -396,6 +435,14 @@ func (_c *OAuthClientCreate) createSpec() (*OAuthClient, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ScopePolicy(); ok {
 		_spec.SetField(oauthclient.FieldScopePolicy, field.TypeEnum, value)
 		_node.ScopePolicy = value
+	}
+	if value, ok := _c.mutation.TokenEndpointAuthMethod(); ok {
+		_spec.SetField(oauthclient.FieldTokenEndpointAuthMethod, field.TypeString, value)
+		_node.TokenEndpointAuthMethod = value
+	}
+	if value, ok := _c.mutation.PkceRequired(); ok {
+		_spec.SetField(oauthclient.FieldPkceRequired, field.TypeBool, value)
+		_node.PkceRequired = value
 	}
 	if value, ok := _c.mutation.RedirectUris(); ok {
 		_spec.SetField(oauthclient.FieldRedirectUris, field.TypeJSON, value)
@@ -620,6 +667,36 @@ func (u *OAuthClientUpsert) UpdateScopePolicy() *OAuthClientUpsert {
 	return u
 }
 
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsert) SetTokenEndpointAuthMethod(v string) *OAuthClientUpsert {
+	u.Set(oauthclient.FieldTokenEndpointAuthMethod, v)
+	return u
+}
+
+// UpdateTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field to the value that was provided on create.
+func (u *OAuthClientUpsert) UpdateTokenEndpointAuthMethod() *OAuthClientUpsert {
+	u.SetExcluded(oauthclient.FieldTokenEndpointAuthMethod)
+	return u
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsert) ClearTokenEndpointAuthMethod() *OAuthClientUpsert {
+	u.SetNull(oauthclient.FieldTokenEndpointAuthMethod)
+	return u
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (u *OAuthClientUpsert) SetPkceRequired(v bool) *OAuthClientUpsert {
+	u.Set(oauthclient.FieldPkceRequired, v)
+	return u
+}
+
+// UpdatePkceRequired sets the "pkce_required" field to the value that was provided on create.
+func (u *OAuthClientUpsert) UpdatePkceRequired() *OAuthClientUpsert {
+	u.SetExcluded(oauthclient.FieldPkceRequired)
+	return u
+}
+
 // SetRedirectUris sets the "redirect_uris" field.
 func (u *OAuthClientUpsert) SetRedirectUris(v []string) *OAuthClientUpsert {
 	u.Set(oauthclient.FieldRedirectUris, v)
@@ -798,6 +875,41 @@ func (u *OAuthClientUpsertOne) SetScopePolicy(v oauthclient.ScopePolicy) *OAuthC
 func (u *OAuthClientUpsertOne) UpdateScopePolicy() *OAuthClientUpsertOne {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.UpdateScopePolicy()
+	})
+}
+
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsertOne) SetTokenEndpointAuthMethod(v string) *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetTokenEndpointAuthMethod(v)
+	})
+}
+
+// UpdateTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field to the value that was provided on create.
+func (u *OAuthClientUpsertOne) UpdateTokenEndpointAuthMethod() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateTokenEndpointAuthMethod()
+	})
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsertOne) ClearTokenEndpointAuthMethod() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (u *OAuthClientUpsertOne) SetPkceRequired(v bool) *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetPkceRequired(v)
+	})
+}
+
+// UpdatePkceRequired sets the "pkce_required" field to the value that was provided on create.
+func (u *OAuthClientUpsertOne) UpdatePkceRequired() *OAuthClientUpsertOne {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdatePkceRequired()
 	})
 }
 
@@ -1152,6 +1264,41 @@ func (u *OAuthClientUpsertBulk) SetScopePolicy(v oauthclient.ScopePolicy) *OAuth
 func (u *OAuthClientUpsertBulk) UpdateScopePolicy() *OAuthClientUpsertBulk {
 	return u.Update(func(s *OAuthClientUpsert) {
 		s.UpdateScopePolicy()
+	})
+}
+
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsertBulk) SetTokenEndpointAuthMethod(v string) *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetTokenEndpointAuthMethod(v)
+	})
+}
+
+// UpdateTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field to the value that was provided on create.
+func (u *OAuthClientUpsertBulk) UpdateTokenEndpointAuthMethod() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdateTokenEndpointAuthMethod()
+	})
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (u *OAuthClientUpsertBulk) ClearTokenEndpointAuthMethod() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.ClearTokenEndpointAuthMethod()
+	})
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (u *OAuthClientUpsertBulk) SetPkceRequired(v bool) *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.SetPkceRequired(v)
+	})
+}
+
+// UpdatePkceRequired sets the "pkce_required" field to the value that was provided on create.
+func (u *OAuthClientUpsertBulk) UpdatePkceRequired() *OAuthClientUpsertBulk {
+	return u.Update(func(s *OAuthClientUpsert) {
+		s.UpdatePkceRequired()
 	})
 }
 

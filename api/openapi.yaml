@@ -1285,6 +1285,39 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/OAuthUserInfoOK" }
 
+  /oauth/register:
+    post:
+      operationId: OAuthClientRegister
+      description: |
+        RFC 7591 OAuth 2.0 Dynamic Client Registration.
+
+        Allows clients such as MCP connectors to register themselves without
+        prior administrator configuration. Dynamically registered clients are
+        tenant-owned (they have no account owner), use the explicit scope
+        policy, and are restricted to a conservative grant and scope allowlist.
+
+        Authorization Code clients must use PKCE; Storyden enforces PKCE (S256)
+        at the authorize and token endpoints for all clients.
+
+        Public clients register with `token_endpoint_auth_method: none` and
+        receive no client secret. Confidential clients register with
+        `client_secret_basic` or `client_secret_post` and receive a one-time
+        `client_secret` in the response. The registration endpoint is advertised
+        as `registration_endpoint` by the authorization server metadata
+        documents.
+
+        This is an unauthenticated endpoint that creates server state, so it
+        is heavily rate limited to prevent abuse.
+      x-storyden:
+        rate-limit-cost: 10
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/OAuthClientRegister" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "201": { $ref: "#/components/responses/OAuthClientRegisterOK" }
+        "400": { $ref: "#/components/responses/OAuthClientRegisterError" }
+
   /auth/webauthn/make/{account_handle}:
     get:
       operationId: WebAuthnRequestCredential
@@ -4208,6 +4241,12 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/OAuthClientSelfUpdateProps" }
 
+    OAuthClientRegister:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthClientRegisterProps" }
+
     WebAuthnMakeCredential:
       content:
         application/json:
@@ -4734,6 +4773,23 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OAuthClientIssued"
+
+    OAuthClientRegisterOK:
+      description: |
+        RFC 7591 client information response. Contains the generated
+        `client_id`, the one-time `client_secret` for confidential clients, and
+        the registered client metadata.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthClientRegistration"
+
+    OAuthClientRegisterError:
+      description: RFC 7591 client registration error response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthError"
 
     OAuthDeviceAuthorisationListOK:
       description: OAuth device authorisations.
@@ -7304,6 +7360,70 @@ components:
         client: { $ref: "#/components/schemas/OAuthClient" }
         client_secret:
           type: string
+
+    OAuthClientRegisterProps:
+      description: |
+        RFC 7591 client metadata supplied by a dynamically registering client.
+        All fields are optional; Storyden applies safe defaults and rejects
+        metadata that requests unsupported grants, response types, redirect URIs
+        or scopes.
+      type: object
+      properties:
+        client_name: { type: string }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        grant_types:
+          type: array
+          items: { type: string }
+        response_types:
+          type: array
+          items: { type: string }
+        scope: { type: string }
+        token_endpoint_auth_method: { type: string }
+        application_type: { type: string }
+        logo_uri: { type: string, format: uri }
+        client_uri: { type: string, format: uri }
+        tos_uri: { type: string, format: uri }
+        policy_uri: { type: string, format: uri }
+
+    OAuthClientRegistration:
+      description: |
+        RFC 7591 client information response containing issued credentials and
+        the registered client metadata. `client_secret` is only present for
+        confidential clients. `client_secret_expires_at` is always `0`,
+        indicating the secret does not expire.
+      type: object
+      required:
+        - client_id
+        - client_id_issued_at
+        - client_secret_expires_at
+        - redirect_uris
+        - grant_types
+        - response_types
+        - token_endpoint_auth_method
+      properties:
+        client_id: { type: string }
+        client_secret: { type: string }
+        client_id_issued_at: { type: integer, format: int64 }
+        client_secret_expires_at: { type: integer, format: int64 }
+        client_name: { type: string }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        grant_types:
+          type: array
+          items: { type: string }
+        response_types:
+          type: array
+          items: { type: string }
+        scope: { type: string }
+        token_endpoint_auth_method: { type: string }
+        application_type: { type: string }
+        logo_uri: { type: string, format: uri }
+        client_uri: { type: string, format: uri }
+        tos_uri: { type: string, format: uri }
+        policy_uri: { type: string, format: uri }
 
     OAuthClientList:
       type: array
