@@ -1,6 +1,8 @@
 package oauth
 
-import "strings"
+import (
+	"strings"
+)
 
 type Discovery struct {
 	Issuer                           string
@@ -45,6 +47,40 @@ func (s *Service) apiEndpointBase() string {
 	u.Path = path
 
 	return u.String()
+}
+
+// ProtectedResourceMetadata holds RFC 9728 OAuth Protected Resource Metadata.
+type ProtectedResourceMetadata struct {
+	Resource               string   `json:"resource"`
+	AuthorizationServers   []string `json:"authorization_servers"`
+	BearerMethodsSupported []string `json:"bearer_methods_supported"`
+	ScopesSupported        []string `json:"scopes_supported,omitempty"`
+}
+
+func (s *Service) RootProtectedResourceMetadata() ProtectedResourceMetadata {
+	return ProtectedResourceMetadata{
+		Resource:               s.issuer,
+		AuthorizationServers:   []string{s.issuer},
+		BearerMethodsSupported: []string{"header"},
+	}
+}
+
+func (s *Service) APIProtectedResourceMetadata() ProtectedResourceMetadata {
+	return ProtectedResourceMetadata{
+		Resource:               s.apiEndpointBase(),
+		AuthorizationServers:   []string{s.issuer},
+		BearerMethodsSupported: []string{"header"},
+		ScopesSupported:        publicProtectedResourceScopes(),
+	}
+}
+
+func (s *Service) MCPSSEProtectedResourceMetadata() ProtectedResourceMetadata {
+	return ProtectedResourceMetadata{
+		Resource:               s.issuer + "/mcp/sse",
+		AuthorizationServers:   []string{s.issuer},
+		BearerMethodsSupported: []string{"header"},
+		ScopesSupported:        publicProtectedResourceScopes(),
+	}
 }
 
 type JWK struct {

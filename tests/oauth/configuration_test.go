@@ -93,6 +93,35 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 				a.Contains((*body.Metadata)["suggested"], "administrator")
 			})
 
+			t.Run("protected_resource_metadata_returns_clear_disabled_response", func(t *testing.T) {
+				for _, path := range []string{
+					"/.well-known/oauth-protected-resource",
+					"/.well-known/oauth-protected-resource/api",
+					"/.well-known/oauth-protected-resource/mcp/sse",
+				} {
+					path := path
+					t.Run(path, func(t *testing.T) {
+						a := assert.New(t)
+						r := require.New(t)
+
+						req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+path, nil)
+						r.NoError(err)
+
+						resp, err := http.DefaultClient.Do(req)
+						r.NoError(err)
+						defer resp.Body.Close()
+
+						var body openapi.APIError
+						r.NoError(json.NewDecoder(resp.Body).Decode(&body))
+						a.Equal(http.StatusNotFound, resp.StatusCode)
+						r.NotNil(body.Type)
+						a.Equal("urn:storyden:problem:not-found", *body.Type)
+						r.NotNil(body.Metadata)
+						a.Equal("oauth_disabled", (*body.Metadata)["code"])
+					})
+				}
+			})
+
 			t.Run("jwks_returns_clear_disabled_response", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)

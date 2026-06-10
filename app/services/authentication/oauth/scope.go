@@ -21,6 +21,32 @@ func supportedScopes() []string {
 	return append([]string{"openid", "profile", "email", "offline_access"}, rbacAllPermissionNames()...)
 }
 
+// publicProtectedResourceScopes returns OAuth scopes appropriate for public
+// protected resource metadata. Administrative and moderation-only permissions
+// are excluded.
+func publicProtectedResourceScopes() []string {
+	excluded := map[rbac.Permission]struct{}{
+		rbac.PermissionManageSettings:       {},
+		rbac.PermissionManageAccounts:       {},
+		rbac.PermissionManageWarnings:       {},
+		rbac.PermissionManageSuspensions:    {},
+		rbac.PermissionManageRoles:          {},
+		rbac.PermissionManageReports:        {},
+		rbac.PermissionViewAccounts:         {},
+		rbac.PermissionViewModerationNotes:  {},
+		rbac.PermissionManageModerationNotes: {},
+		rbac.PermissionAdministrator:        {},
+	}
+	publicPerms := dt.Filter(rbac.AllPermissions, func(p rbac.Permission) bool {
+		_, skip := excluded[p]
+		return !skip
+	})
+	return append(
+		[]string{"openid", "profile", "email", "offline_access"},
+		dt.Map(publicPerms, func(p rbac.Permission) string { return p.String() })...,
+	)
+}
+
 func validateScopeNames(scope string) error {
 	for _, sc := range splitScope(scope) {
 		if _, err := permissionFromScope(sc); err != nil {
