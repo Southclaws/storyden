@@ -2,6 +2,10 @@ package bindings
 
 import (
 	"context"
+	"encoding/base64"
+	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -9,6 +13,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/labstack/echo/v4"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
@@ -21,8 +26,58 @@ type OAuth struct {
 	oauth *oauthservice.Service
 }
 
-func NewOAuth(oauth *oauthservice.Service) OAuth {
+func NewOAuth(oauth *oauthservice.Service, router *echo.Echo) OAuth {
+	router.Use(oauthTokenClientAuth)
 	return OAuth{oauth: oauth}
+}
+
+// clientAuth carries credentials extracted from Authorization: Basic for the
+// OAuth token endpoint (client_secret_basic per RFC 6749 2.3.1).
+type clientAuth struct {
+	ClientID string
+	Secret   string
+}
+
+var clientAuthKey = struct{}{}
+
+// oauthTokenClientAuth is an echo middleware that extracts HTTP Basic credentials
+// for POST /api/oauth/token and stores them in the request context so the binding
+// can supply them to the service regardless of the generated request object shape.
+func oauthTokenClientAuth(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if c.Request().Method != http.MethodPost {
+			return next(c)
+		}
+		if c.Path() != "/api/oauth/token" {
+			return next(c)
+		}
+
+		h := c.Request().Header.Get(echo.HeaderAuthorization)
+		if !strings.HasPrefix(strings.ToLower(h), "basic ") {
+			return next(c)
+		}
+
+		encoded := strings.TrimSpace(h[6:])
+		decoded, err := base64.StdEncoding.DecodeString(encoded)
+		if err != nil {
+			return next(c)
+		}
+
+		s := string(decoded)
+		idx := strings.Index(s, ":")
+		if idx < 0 {
+			return next(c)
+		}
+
+		rawID := s[:idx]
+		rawSecret := s[idx+1:]
+		id, _ := url.QueryUnescape(rawID)
+		secret, _ := url.QueryUnescape(rawSecret)
+		ctx := context.WithValue(c.Request().Context(), clientAuthKey, clientAuth{ClientID: id, Secret: secret})
+		c.SetRequest(c.Request().WithContext(ctx))
+
+		return next(c)
+	}
 }
 
 type OAuthDiscoveryResponse struct {
@@ -410,10 +465,31 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 		}, nil
 	}
 
+	var clientID string
+	var clientSecret opt.Optional[string]
+
+	if ca, ok := ctx.Value(clientAuthKey).(clientAuth); ok {
+		if req.Body.ClientId != "" || req.Body.ClientSecret != nil {
+			desc := "multiple client authentication methods used"
+			return &openapi.OAuthToken400JSONResponse{
+				OAuthTokenErrorJSONResponse: openapi.OAuthTokenErrorJSONResponse(openapi.OAuthError{
+					Error:            "invalid_client",
+					ErrorDescription: &desc,
+				}),
+			}, nil
+		}
+
+		clientID = ca.ClientID
+		clientSecret = opt.New(ca.Secret)
+	} else {
+		clientID = req.Body.ClientId
+		clientSecret = opt.NewPtr(req.Body.ClientSecret)
+	}
+
 	token, oauthErr, err := o.oauth.ExchangeToken(ctx, oauthservice.TokenRequest{
 		GrantType:    req.Body.GrantType,
-		ClientID:     req.Body.ClientId,
-		ClientSecret: opt.NewPtr(req.Body.ClientSecret),
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
 		Scope:        opt.NewPtr(req.Body.Scope),
 		DeviceCode:   opt.NewPtr(req.Body.DeviceCode),
 		Code:         opt.NewPtr(req.Body.Code),

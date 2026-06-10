@@ -234,10 +234,7 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.ClientType, *Error) {
 	method = strings.TrimSpace(method)
 	if method == "" {
-		// RFC 7591 defaults omitted token_endpoint_auth_method to
-		// client_secret_basic however, Storyden currently only supports
-		// client_secret_post at the token endpoint.
-		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "token_endpoint_auth_method is required")
+		method = TokenEndpointAuthMethodClientSecretBasic
 	}
 
 	switch method {
@@ -246,8 +243,7 @@ func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.Client
 	case TokenEndpointAuthMethodClientSecretPost:
 		return method, oauthresource.ClientTypeConfidential, nil
 	case TokenEndpointAuthMethodClientSecretBasic:
-		// Reject client_secret_basic since the token endpoint doesn't support HTTP Basic auth
-		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "client_secret_basic is not supported; use client_secret_post or none")
+		return method, oauthresource.ClientTypeConfidential, nil
 	default:
 		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "Unsupported token_endpoint_auth_method")
 	}

@@ -2,6 +2,7 @@ package oauth_test
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -114,18 +115,138 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				a.Equal(int64(0), resp.JSON201.ClientSecretExpiresAt)
 			})
 
-			t.Run("rejects_client_secret_basic_unsupported", func(t *testing.T) {
+			t.Run("accepts_client_secret_basic", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
 
-				// client_secret_basic requires HTTP Basic auth which the token endpoint doesn't support
 				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
 					ClientName:              ptr("Basic Auth Client"),
 					RedirectUris:            &[]string{"https://app.example/callback"},
 					TokenEndpointAuthMethod: ptr("client_secret_basic"),
-				}, memberSession))(t, http.StatusBadRequest)
-				r.NotNil(resp.JSON400)
-				a.Equal("invalid_client_metadata", resp.JSON400.Error)
+				}, memberSession))(t, http.StatusCreated)
+				r.NotNil(resp.JSON201)
+				r.NotNil(resp.JSON201.ClientSecret)
+				a.True(strings.HasPrefix(*resp.JSON201.ClientSecret, oauthresource.OAuthAccessSecretPrefix))
+				a.Equal("client_secret_basic", resp.JSON201.TokenEndpointAuthMethod)
+				a.Equal(int64(0), resp.JSON201.ClientSecretExpiresAt)
+			})
+
+			t.Run("client_secret_basic_client_can_exchange_tokens_via_basic_auth", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				redirectURI := "https://basic-client.example/callback"
+				registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
+					ClientName:              ptr("Basic Confidential"),
+					RedirectUris:            &[]string{redirectURI},
+					TokenEndpointAuthMethod: ptr("client_secret_basic"),
+					Scope:                   ptr("openid profile"),
+				}, memberSession))(t, http.StatusCreated)
+				r.NotNil(registered.JSON201)
+				clientID := registered.JSON201.ClientId
+				clientSecret := *registered.JSON201.ClientSecret
+
+				verifier := strings.Repeat("b", 43)
+
+				location := authorizeRedirect(t, root, ts, memberSession, authorizeRequest{
+					ClientID:            clientID,
+					RedirectURI:         redirectURI,
+					Scope:               "openid profile",
+					State:               "state-" + uuid.NewString(),
+					CodeChallenge:       codeChallenge(verifier),
+					CodeChallengeMethod: "S256",
+				})
+
+				consentURL, err := url.Parse(location)
+				r.NoError(err)
+				requestID := consentURL.Query().Get("request_id")
+				r.NotEmpty(requestID)
+
+				consent := tests.AssertRequest(cl.OAuthAuthoriseConsentWithResponse(root, &openapi.OAuthAuthoriseConsentParams{
+					RequestId: (*openapi.OAuthAuthorizationRequestIDQuery)(&requestID),
+				}, memberSession))(t, http.StatusOK)
+				r.NotNil(consent.JSON200)
+
+				submit := tests.AssertRequest(cl.OAuthAuthoriseConsentSubmitWithResponse(root, openapi.OAuthAuthoriseConsentSubmitJSONRequestBody{
+					RequestId: requestID,
+					Decision:  openapi.OAuthAuthoriseDecisionApprove,
+				}, memberSession))(t, http.StatusOK)
+				r.NotNil(submit.JSON200)
+				a.Equal(openapi.OAuthAuthoriseConsentResultStatusApproved, submit.JSON200.Status)
+
+				codeRedirect, err := url.Parse(submit.JSON200.Location)
+				r.NoError(err)
+				code := codeRedirect.Query().Get("code")
+				r.NotEmpty(code)
+
+				// Exercise client_secret_basic using only Authorization: Basic (RFC 6749 §2.3
+				// requires that clients MUST NOT use more than one authentication method).
+				// client_id and client_secret are therefore omitted from the form body.
+				form := url.Values{}
+				form.Set("grant_type", oauthGrantAuthorizationCode)
+				form.Set("code", code)
+				form.Set("redirect_uri", redirectURI)
+				form.Set("code_verifier", verifier)
+
+				basic := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
+				httpReq, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/api/oauth/token", strings.NewReader(form.Encode()))
+				r.NoError(err)
+				httpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				httpReq.Header.Set("Authorization", "Basic "+basic)
+
+				httpResp, err := http.DefaultClient.Do(httpReq)
+				r.NoError(err)
+				defer httpResp.Body.Close()
+
+				a.Equal(http.StatusOK, httpResp.StatusCode)
+
+				var tok openapi.OAuthToken
+				r.NoError(json.NewDecoder(httpResp.Body).Decode(&tok))
+				r.NotNil(tok.AccessToken)
+				a.NotEmpty(*tok.AccessToken)
+			})
+
+			t.Run("rejects_mixing_basic_and_body_client_auth", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				// Register another basic client
+				registered := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
+					ClientName:              ptr("Mixed Auth Client"),
+					RedirectUris:            &[]string{"https://mixed.example/cb"},
+					TokenEndpointAuthMethod: ptr("client_secret_basic"),
+				}, memberSession))(t, http.StatusCreated)
+				r.NotNil(registered.JSON201)
+				clientID := registered.JSON201.ClientId
+				clientSecret := *registered.JSON201.ClientSecret
+
+				// Now send a token request that uses BOTH Basic header AND client_secret in the body.
+				// Per the strict rule (RFC 6749 §2.3), this must be rejected as multiple auth methods.
+				form := url.Values{}
+				form.Set("grant_type", oauthGrantAuthorizationCode)
+				form.Set("client_id", clientID)
+				form.Set("client_secret", clientSecret)
+				form.Set("code", "dummycode")
+				form.Set("redirect_uri", "https://mixed.example/cb")
+				form.Set("code_verifier", strings.Repeat("x", 43))
+
+				basic := base64.StdEncoding.EncodeToString([]byte(clientID + ":" + clientSecret))
+				httpReq, err := http.NewRequestWithContext(root, http.MethodPost, ts.URL+"/api/oauth/token", strings.NewReader(form.Encode()))
+				r.NoError(err)
+				httpReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+				httpReq.Header.Set("Authorization", "Basic "+basic)
+
+				httpResp, err := http.DefaultClient.Do(httpReq)
+				r.NoError(err)
+				defer httpResp.Body.Close()
+
+				a.Equal(http.StatusBadRequest, httpResp.StatusCode)
+
+				var errResp openapi.OAuthError
+				r.NoError(json.NewDecoder(httpResp.Body).Decode(&errResp))
+				a.Equal("invalid_client", errResp.Error)
+				r.NotNil(errResp.ErrorDescription)
+				a.Equal("multiple client authentication methods used", *errResp.ErrorDescription)
 			})
 
 			t.Run("rejects_invalid_redirect_uri", func(t *testing.T) {
