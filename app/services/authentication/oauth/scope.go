@@ -22,9 +22,20 @@ func supportedScopes() []string {
 }
 
 func validateClientRequestedScopes(scope string, allowedScopes []string) error {
+	clientHasAdministrator := contains(allowedScopes, rbac.PermissionAdministrator.String())
+
 	for _, sc := range splitScope(scope) {
 		if !contains(allowedScopes, sc) {
-			return fault.New("scope is not allowed for client")
+			permission, err := permissionFromScope(sc)
+			if err != nil {
+				return err
+			}
+			if permission == nil {
+				return fault.New("scope is not allowed for client")
+			}
+			if !clientHasAdministrator {
+				return fault.New("scope is not allowed for client")
+			}
 		}
 		if _, err := permissionFromScope(sc); err != nil {
 			return err
