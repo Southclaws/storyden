@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -51,7 +52,7 @@ func New(
 				return err
 			}
 
-			if accessKey || accessKeyStdin {
+			if accessKey || accessKeyStdin || os.Getenv("STORYDEN_ACCESS_KEY") != "" {
 				auth, err := authenticateAccessKey(cmd, accessKeyStdin)
 				if err != nil {
 					return err
@@ -160,9 +161,14 @@ Login to localhost:
 sd auth login http://localhost:8000
 ~~~
 
-Login with an access key:
+Login with an access key (interactive prompt):
 ~~~bash
 sd auth login http://localhost:8000 --access-key --auth-storage file
+~~~
+
+Read an access key from the environment (for scripts and CI):
+~~~bash
+STORYDEN_ACCESS_KEY=your-key sd auth login http://localhost:8000 --auth-storage file
 ~~~
 
 Read an access key from stdin:
@@ -310,16 +316,17 @@ func authenticate(ctx context.Context, cmd *cobra.Command, client *api.Client) (
 }
 
 func authenticateAccessKey(cmd *cobra.Command, stdin bool) (*config.Auth, error) {
-	key := ""
+	key := strings.TrimSpace(os.Getenv("STORYDEN_ACCESS_KEY"))
 	if stdin {
 		data, err := io.ReadAll(cmd.InOrStdin())
 		if err != nil {
 			return nil, err
 		}
-		key = string(data)
+		if s := strings.TrimSpace(string(data)); s != "" {
+			key = s
+		}
 	}
 
-	key = strings.TrimSpace(key)
 	if key == "" && !stdin {
 		form := tui.NewForm(
 			cmd.InOrStdin(),
