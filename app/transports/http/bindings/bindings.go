@@ -230,6 +230,38 @@ func mount(
 		return c.JSON(http.StatusOK, oauthBinding.OAuthAuthorizationServerMetadata(c.Request().Context()))
 	})
 
+	router.GET("/.well-known/oauth-protected-resource", func(c echo.Context) error {
+		if !oauthBinding.oauth.Enabled() {
+			return oauthDisabledError(c.Request().Context())
+		}
+
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
+
+		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(oauthBinding.Issuer()))
+	})
+
+	router.GET("/.well-known/oauth-protected-resource/*", func(c echo.Context) error {
+		if !oauthBinding.oauth.Enabled() {
+			return oauthDisabledError(c.Request().Context())
+		}
+
+		suffix := c.Param("*")
+		// Normalize: treat empty or "/" suffix as root; ensure leading slash for non-empty.
+		suffix = strings.Trim(suffix, "/")
+		if suffix != "" {
+			suffix = "/" + suffix
+		}
+		resource := strings.TrimSuffix(oauthBinding.Issuer(), "/") + suffix
+
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
+
+		if suffix == "/api" || suffix == "/mcp/sse" {
+			return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadataWithScopes(resource))
+		}
+
+		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(resource))
+	})
+
 	router.Use(
 		requestValidatorMiddleware,
 		openapi.ParameterContext,

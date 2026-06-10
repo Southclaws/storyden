@@ -209,6 +209,73 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.NoError(json.Unmarshal(body2, &rawMetadata))
 			a.NotContains(rawMetadata, "userinfo_endpoint")
 			a.NotContains(rawMetadata, "id_token_signing_alg_values_supported")
+
+			// RFC 9728 OAuth Protected Resource Metadata
+			req3, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource", nil)
+			r.NoError(err)
+			resp3, err := http.DefaultClient.Do(req3)
+			r.NoError(err)
+			defer resp3.Body.Close()
+			r.Equal(http.StatusOK, resp3.StatusCode)
+			a.Equal("public, max-age=3600", resp3.Header.Get("Cache-Control"))
+
+			var prm struct {
+				Resource               string   `json:"resource"`
+				AuthorizationServers   []string `json:"authorization_servers"`
+				BearerMethodsSupported []string `json:"bearer_methods_supported"`
+			}
+			body3, err := io.ReadAll(resp3.Body)
+			r.NoError(err)
+			r.NoError(json.Unmarshal(body3, &prm))
+			a.Equal("http://localhost:8000", prm.Resource)
+			r.Len(prm.AuthorizationServers, 1)
+			a.Equal("http://localhost:8000", prm.AuthorizationServers[0])
+			r.Contains(prm.BearerMethodsSupported, "header")
+
+			// API resource
+			req4, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/api", nil)
+			r.NoError(err)
+			resp4, err := http.DefaultClient.Do(req4)
+			r.NoError(err)
+			defer resp4.Body.Close()
+			r.Equal(http.StatusOK, resp4.StatusCode)
+
+			var prmAPI struct {
+				Resource             string   `json:"resource"`
+				AuthorizationServers []string `json:"authorization_servers"`
+				ScopesSupported      []string `json:"scopes_supported"`
+			}
+			body4, err := io.ReadAll(resp4.Body)
+			r.NoError(err)
+			r.NoError(json.Unmarshal(body4, &prmAPI))
+			a.Equal("http://localhost:8000/api", prmAPI.Resource)
+			r.Len(prmAPI.AuthorizationServers, 1)
+			a.Equal("http://localhost:8000", prmAPI.AuthorizationServers[0])
+			r.Contains(prmAPI.ScopesSupported, "openid")
+			r.Contains(prmAPI.ScopesSupported, "profile")
+			r.Contains(prmAPI.ScopesSupported, "email")
+			r.Contains(prmAPI.ScopesSupported, "offline_access")
+
+			// MCP SSE resource
+			req5, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp/sse", nil)
+			r.NoError(err)
+			resp5, err := http.DefaultClient.Do(req5)
+			r.NoError(err)
+			defer resp5.Body.Close()
+			r.Equal(http.StatusOK, resp5.StatusCode)
+
+			var prmMCP struct {
+				Resource             string   `json:"resource"`
+				AuthorizationServers []string `json:"authorization_servers"`
+				ScopesSupported      []string `json:"scopes_supported"`
+			}
+			body5, err := io.ReadAll(resp5.Body)
+			r.NoError(err)
+			r.NoError(json.Unmarshal(body5, &prmMCP))
+			a.Equal("http://localhost:8000/mcp/sse", prmMCP.Resource)
+			r.Len(prmMCP.AuthorizationServers, 1)
+			a.Equal("http://localhost:8000", prmMCP.AuthorizationServers[0])
+			r.Contains(prmMCP.ScopesSupported, "openid")
 		}))
 	}))
 }

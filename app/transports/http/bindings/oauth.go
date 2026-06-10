@@ -87,6 +87,41 @@ func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizat
 	}
 }
 
+// OAuthProtectedResourceMetadata represents RFC 9728 OAuth Protected Resource Metadata.
+type OAuthProtectedResourceMetadata struct {
+	Resource                 string   `json:"resource"`
+	AuthorizationServers     []string `json:"authorization_servers"`
+	BearerMethodsSupported   []string `json:"bearer_methods_supported,omitempty"`
+	ScopesSupported          []string `json:"scopes_supported,omitempty"`
+}
+
+// publicScopes returns the set of OAuth scopes that are appropriate to advertise
+// publicly via protected resource metadata. Internal/elevated permission scopes
+// are not included; only the standard OAuth/OIDC scopes are exposed.
+func publicScopes() []string {
+	return []string{"openid", "profile", "email", "offline_access"}
+}
+
+func (o OAuth) OAuthProtectedResourceMetadata(resource string) OAuthProtectedResourceMetadata {
+	return OAuthProtectedResourceMetadata{
+		Resource:               resource,
+		AuthorizationServers:   []string{o.oauth.Issuer()},
+		BearerMethodsSupported: []string{"header"},
+	}
+}
+
+func (o OAuth) OAuthProtectedResourceMetadataWithScopes(resource string) OAuthProtectedResourceMetadata {
+	m := o.OAuthProtectedResourceMetadata(resource)
+	m.ScopesSupported = publicScopes()
+	return m
+}
+
+// Issuer returns the authorization server issuer URL for use in protected
+// resource metadata authorization_servers arrays.
+func (o OAuth) Issuer() string {
+	return o.oauth.Issuer()
+}
+
 func (o OAuth) OAuthJWKS(ctx context.Context, _ openapi.OAuthJWKSRequestObject) (openapi.OAuthJWKSResponseObject, error) {
 	if !o.oauth.Enabled() {
 		return nil, oauthDisabledError(ctx)

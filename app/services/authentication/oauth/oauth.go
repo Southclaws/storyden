@@ -66,9 +66,7 @@ func New(
 	tokens *oauth_writer.Writer,
 	account *account_querier.Querier,
 ) (*Service, error) {
-	issuerURL := cfg.PublicAPIAddress
-	issuerURL.Path = strings.TrimSuffix(strings.TrimSuffix(issuerURL.Path, "/"), "/api")
-	issuer := strings.TrimSuffix(issuerURL.String(), "/")
+	issuer := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/")
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
