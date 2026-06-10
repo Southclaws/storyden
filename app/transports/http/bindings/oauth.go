@@ -17,6 +17,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -158,7 +159,13 @@ type OAuthProtectedResourceMetadata struct {
 // publicly via protected resource metadata. Internal/elevated permission scopes
 // are not included; only the standard OAuth/OIDC scopes are exposed.
 func publicScopes() []string {
-	return []string{"openid", "profile", "email", "offline_access"}
+	return append([]string{"openid", "profile", "email", "offline_access"}, rbacAllPermissionNames()...)
+}
+
+func rbacAllPermissionNames() []string {
+	return dt.Map(rbac.AllPermissions, func(permission rbac.Permission) string {
+		return permission.String()
+	})
 }
 
 func (o OAuth) OAuthProtectedResourceMetadata(resource string) OAuthProtectedResourceMetadata {
