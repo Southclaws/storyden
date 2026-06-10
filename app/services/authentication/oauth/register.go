@@ -87,7 +87,7 @@ type DynamicClientRegistrationResult struct {
 // client unconditionally.
 func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistration) (*DynamicClientRegistrationResult, *Error, error) {
 	if !s.Enabled() || !s.cfg.OAuthDynamicRegistrationEnabled {
-		return nil, oauthError("temporarily_unavailable"), nil
+		return nil, oauthError("temporarily_unavailable", "Dynamic client registration is not enabled"), nil
 	}
 
 	authMethod, clientType, oauthErr := resolveTokenEndpointAuthMethod(input.TokenEndpointAuthMethod)
@@ -104,12 +104,12 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	// A public client has no client authentication, so it must not receive
 	// app-level tokens via client_credentials.
 	if contains(grantTypes, GrantTypeClientCredentials) && clientType == oauthresource.ClientTypePublic {
-		return nil, oauthError("invalid_client_metadata"), nil
+		return nil, oauthError("invalid_client_metadata", "client_credentials grant requires a confidential client"), nil
 	}
 
 	// refresh_token grant should only be allowed with authorization_code
 	if contains(grantTypes, GrantTypeRefreshToken) && !contains(grantTypes, GrantTypeAuthorizationCode) {
-		return nil, oauthError("invalid_client_metadata"), nil
+		return nil, oauthError("invalid_client_metadata", "refresh_token grant requires authorization_code grant"), nil
 	}
 
 	// Resolve response types (with defaults)
@@ -121,12 +121,12 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	// RFC 7591 Section 2.1: Validate grant_types and response_types consistency
 	// authorization_code grant requires "code" response type
 	if contains(grantTypes, GrantTypeAuthorizationCode) && !contains(responseTypes, "code") {
-		return nil, oauthError("invalid_client_metadata"), nil
+		return nil, oauthError("invalid_client_metadata", "authorization_code grant requires 'code' response type"), nil
 	}
 
 	// "code" response type requires authorization_code grant
 	if contains(responseTypes, "code") && !contains(grantTypes, GrantTypeAuthorizationCode) {
-		return nil, oauthError("invalid_client_metadata"), nil
+		return nil, oauthError("invalid_client_metadata", "'code' response type requires authorization_code grant"), nil
 	}
 
 	redirectURIs, oauthErr := validateDCRRedirectURIs(input.RedirectURIs, grantTypes)
@@ -137,22 +137,22 @@ func (s *Service) RegisterClient(ctx context.Context, input DynamicClientRegistr
 	// Validate metadata URIs if provided
 	if input.LogoURI != "" {
 		if err := validateMetadataURI(input.LogoURI); err != nil {
-			return nil, oauthError("invalid_client_metadata"), nil
+			return nil, oauthError("invalid_client_metadata", "logo_uri must be a valid HTTPS URL"), nil
 		}
 	}
 	if input.ClientURI != "" {
 		if err := validateMetadataURI(input.ClientURI); err != nil {
-			return nil, oauthError("invalid_client_metadata"), nil
+			return nil, oauthError("invalid_client_metadata", "client_uri must be a valid HTTPS URL"), nil
 		}
 	}
 	if input.TOSURI != "" {
 		if err := validateMetadataURI(input.TOSURI); err != nil {
-			return nil, oauthError("invalid_client_metadata"), nil
+			return nil, oauthError("invalid_client_metadata", "tos_uri must be a valid HTTPS URL"), nil
 		}
 	}
 	if input.PolicyURI != "" {
 		if err := validateMetadataURI(input.PolicyURI); err != nil {
-			return nil, oauthError("invalid_client_metadata"), nil
+			return nil, oauthError("invalid_client_metadata", "policy_uri must be a valid HTTPS URL"), nil
 		}
 	}
 
@@ -237,7 +237,7 @@ func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.Client
 		// RFC 7591 defaults omitted token_endpoint_auth_method to
 		// client_secret_basic however, Storyden currently only supports
 		// client_secret_post at the token endpoint.
-		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata")
+		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "token_endpoint_auth_method is required")
 	}
 
 	switch method {
@@ -247,9 +247,9 @@ func resolveTokenEndpointAuthMethod(method string) (string, oauthresource.Client
 		return method, oauthresource.ClientTypeConfidential, nil
 	case TokenEndpointAuthMethodClientSecretBasic:
 		// Reject client_secret_basic since the token endpoint doesn't support HTTP Basic auth
-		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata")
+		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "client_secret_basic is not supported; use client_secret_post or none")
 	default:
-		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata")
+		return "", oauthresource.ClientType{}, oauthError("invalid_client_metadata", "Unsupported token_endpoint_auth_method")
 	}
 }
 
@@ -274,7 +274,7 @@ func (s *Service) resolveDCRGrantTypes(requested []string) ([]string, *Error) {
 			continue
 		}
 		if _, ok := allowed[grant]; !ok {
-			return nil, oauthError("invalid_client_metadata")
+			return nil, oauthError("invalid_client_metadata", "Unsupported grant type; only authorization_code and refresh_token are allowed")
 		}
 		if _, ok := seen[grant]; ok {
 			continue
@@ -307,13 +307,13 @@ func resolveDCRResponseTypes(requested []string, grantTypes []string) ([]string,
 			continue
 		}
 		if responseType != "code" {
-			return nil, oauthError("invalid_client_metadata")
+			return nil, oauthError("invalid_client_metadata", "Only 'code' response type is supported")
 		}
 		out = append(out, responseType)
 	}
 
 	if contains(out, "code") && !usesAuthCode {
-		return nil, oauthError("invalid_client_metadata")
+		return nil, oauthError("invalid_client_metadata", "'code' response type requires authorization_code grant")
 	}
 
 	return out, nil
@@ -324,7 +324,7 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 
 	if len(redirectURIs) == 0 {
 		if usesAuthCode {
-			return nil, oauthError("invalid_redirect_uri")
+			return nil, oauthError("invalid_redirect_uri", "At least one redirect_uri is required for authorization_code clients")
 		}
 		return []string{}, nil
 	}
@@ -338,7 +338,7 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 			continue
 		}
 		if err := validateDCRRedirectURI(raw); err != nil {
-			return nil, oauthError("invalid_redirect_uri")
+			return nil, oauthError("invalid_redirect_uri", "Invalid redirect_uri: must be an absolute HTTPS URI (or HTTP for loopback)")
 		}
 		// Deduplicate
 		if _, exists := seen[raw]; exists {
@@ -350,7 +350,7 @@ func validateDCRRedirectURIs(redirectURIs []string, grantTypes []string) ([]stri
 
 	// After deduplication, check if we still have URIs when required
 	if len(out) == 0 && usesAuthCode {
-		return nil, oauthError("invalid_redirect_uri")
+		return nil, oauthError("invalid_redirect_uri", "At least one valid redirect_uri is required for authorization_code clients")
 	}
 
 	return out, nil
@@ -421,7 +421,7 @@ func resolveDCRScopes(scope string) ([]string, *Error) {
 	out := []string{}
 	for _, sc := range requested {
 		if !contains(dcrDefaultScopes, sc) {
-			return nil, oauthError("invalid_client_metadata")
+			return nil, oauthError("invalid_client_metadata", "Scope is not permitted for dynamic client registration")
 		}
 		if _, ok := seen[sc]; ok {
 			continue

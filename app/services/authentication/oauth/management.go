@@ -50,7 +50,7 @@ func (s *Service) GetClientByAccount(ctx context.Context, accountID account.Acco
 		return nil, nil, err
 	}
 	if owner, ok := client.AccountID.Get(); !ok || owner != accountID {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Client does not belong to the requesting account"), nil
 	}
 
 	return client, nil, nil
@@ -101,11 +101,11 @@ func (s *Service) DeleteClient(ctx context.Context, id oauthresource.ClientID) e
 func (s *Service) DeleteClientByAccount(ctx context.Context, accountID account.AccountID, id oauthresource.ClientID) *Error {
 	_, oauthErr, err := s.GetClientByAccount(ctx, accountID, id)
 	if err != nil || oauthErr != nil {
-		return oauthError("invalid_request")
+		return oauthError("invalid_request", "Client not found or does not belong to account")
 	}
 
 	if err := s.tokens.DeleteClient(ctx, id); err != nil {
-		return oauthError("invalid_request")
+		return oauthError("invalid_request", "Failed to delete client")
 	}
 
 	return nil
@@ -131,11 +131,11 @@ func (s *Service) RevokeRefreshToken(ctx context.Context, id oauthresource.Refre
 func (s *Service) RevokeRefreshTokenByAccount(ctx context.Context, accountID account.AccountID, id oauthresource.RefreshTokenID) *Error {
 	token, err := s.clients.GetRefreshToken(ctx, id)
 	if err != nil || token.AccountID != accountID {
-		return oauthError("invalid_request")
+		return oauthError("invalid_request", "Refresh token not found or does not belong to account")
 	}
 
 	if _, err := s.tokens.RevokeRefreshToken(ctx, id, time.Now(), opt.NewEmpty[oauthresource.RefreshTokenID]()); err != nil {
-		return oauthError("invalid_request")
+		return oauthError("invalid_request", "Failed to revoke refresh token")
 	}
 
 	return nil

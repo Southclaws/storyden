@@ -93,10 +93,10 @@ func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizat
 
 // OAuthProtectedResourceMetadata represents RFC 9728 OAuth Protected Resource Metadata.
 type OAuthProtectedResourceMetadata struct {
-	Resource                 string   `json:"resource"`
-	AuthorizationServers     []string `json:"authorization_servers"`
-	BearerMethodsSupported   []string `json:"bearer_methods_supported,omitempty"`
-	ScopesSupported          []string `json:"scopes_supported,omitempty"`
+	Resource               string   `json:"resource"`
+	AuthorizationServers   []string `json:"authorization_servers"`
+	BearerMethodsSupported []string `json:"bearer_methods_supported,omitempty"`
+	ScopesSupported        []string `json:"scopes_supported,omitempty"`
 }
 
 // publicScopes returns the set of OAuth scopes that are appropriate to advertise
@@ -170,7 +170,8 @@ func (o OAuth) OAuthDeviceAuthorisation(ctx context.Context, req openapi.OAuthDe
 	if oauthErr != nil {
 		return openapi.OAuthDeviceAuthorisation400JSONResponse{
 			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
-				Error: oauthErr.Code,
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
 			}),
 		}, nil
 	}
@@ -208,7 +209,10 @@ func (o OAuth) OAuthDeviceConsent(ctx context.Context, req openapi.OAuthDeviceCo
 	}
 	if oauthErr != nil {
 		return openapi.OAuthDeviceConsent400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -227,8 +231,12 @@ func (o OAuth) OAuthDeviceConsent(ctx context.Context, req openapi.OAuthDeviceCo
 
 func (o OAuth) OAuthDeviceConsentSubmit(ctx context.Context, req openapi.OAuthDeviceConsentSubmitRequestObject) (openapi.OAuthDeviceConsentSubmitResponseObject, error) {
 	if req.Body == nil {
+		desc := "Request body is required"
 		return openapi.OAuthDeviceConsentSubmit400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: "invalid_request"}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            "invalid_request",
+				ErrorDescription: &desc,
+			}),
 		}, nil
 	}
 
@@ -244,7 +252,10 @@ func (o OAuth) OAuthDeviceConsentSubmit(ctx context.Context, req openapi.OAuthDe
 	oauthErr := o.oauth.ApproveDeviceAuthorization(ctx, account.AccountID(acc), permissions, req.Body.UserCode, req.Body.Decision == openapi.OAuthDeviceDecisionApprove)
 	if oauthErr != nil {
 		return openapi.OAuthDeviceConsentSubmit400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -289,7 +300,8 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 	if oauthErr != nil {
 		return openapi.OAuthAuthorise400JSONResponse{
 			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
-				Error: oauthErr.Code,
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
 			}),
 		}, nil
 	}
@@ -320,7 +332,10 @@ func (o OAuth) OAuthAuthoriseConsent(ctx context.Context, req openapi.OAuthAutho
 	}
 	if oauthErr != nil {
 		return openapi.OAuthAuthoriseConsent400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -340,8 +355,12 @@ func (o OAuth) OAuthAuthoriseConsent(ctx context.Context, req openapi.OAuthAutho
 
 func (o OAuth) OAuthAuthoriseConsentSubmit(ctx context.Context, req openapi.OAuthAuthoriseConsentSubmitRequestObject) (openapi.OAuthAuthoriseConsentSubmitResponseObject, error) {
 	if req.Body == nil {
+		desc := "Request body is required"
 		return openapi.OAuthAuthoriseConsentSubmit400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: "invalid_request"}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            "invalid_request",
+				ErrorDescription: &desc,
+			}),
 		}, nil
 	}
 
@@ -360,7 +379,10 @@ func (o OAuth) OAuthAuthoriseConsentSubmit(ctx context.Context, req openapi.OAut
 	}
 	if oauthErr != nil {
 		return openapi.OAuthAuthoriseConsentSubmit400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -379,9 +401,11 @@ func (o OAuth) OAuthAuthoriseConsentSubmit(ctx context.Context, req openapi.OAut
 
 func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObject) (openapi.OAuthTokenResponseObject, error) {
 	if req.Body == nil {
+		desc := "Request body is required"
 		return openapi.OAuthToken400JSONResponse{
 			OAuthTokenErrorJSONResponse: openapi.OAuthTokenErrorJSONResponse(openapi.OAuthError{
-				Error: "invalid_request",
+				Error:            "invalid_request",
+				ErrorDescription: &desc,
 			}),
 		}, nil
 	}
@@ -403,7 +427,8 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 	if oauthErr != nil {
 		return openapi.OAuthToken400JSONResponse{
 			OAuthTokenErrorJSONResponse: openapi.OAuthTokenErrorJSONResponse(openapi.OAuthError{
-				Error: oauthErr.Code,
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
 			}),
 		}, nil
 	}
@@ -442,7 +467,8 @@ func (o OAuth) OAuthClientRegister(ctx context.Context, req openapi.OAuthClientR
 	if oauthErr != nil {
 		return openapi.OAuthClientRegister400JSONResponse{
 			OAuthClientRegisterErrorJSONResponse: openapi.OAuthClientRegisterErrorJSONResponse(openapi.OAuthError{
-				Error: oauthErr.Code,
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
 			}),
 		}, nil
 	}
@@ -505,7 +531,10 @@ func (o OAuth) OAuthRefreshTokenDelete(ctx context.Context, req openapi.OAuthRef
 	oauthErr := o.oauth.RevokeRefreshTokenByAccount(ctx, account.AccountID(acc), oauthresource.RefreshTokenID(deserialiseID(req.OauthRefreshTokenId)))
 	if oauthErr != nil {
 		return openapi.OAuthRefreshTokenDelete400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -580,7 +609,10 @@ func (o OAuth) OAuthClientGet(ctx context.Context, req openapi.OAuthClientGetReq
 	}
 	if oauthErr != nil {
 		return openapi.OAuthClientGet400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 
@@ -630,7 +662,10 @@ func (o OAuth) OAuthClientDelete(ctx context.Context, req openapi.OAuthClientDel
 	oauthErr := o.oauth.DeleteClientByAccount(ctx, account.AccountID(acc), oauthresource.ClientID(deserialiseID(req.OauthClientId)))
 	if oauthErr != nil {
 		return openapi.OAuthClientDelete400JSONResponse{
-			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{Error: oauthErr.Code}),
+			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{
+				Error:            oauthErr.Code,
+				ErrorDescription: &oauthErr.Description,
+			}),
 		}, nil
 	}
 

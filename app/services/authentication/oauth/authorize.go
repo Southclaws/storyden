@@ -48,30 +48,30 @@ type AuthorisationConsentResult struct {
 
 func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*AuthoriseResult, *Error, error) {
 	if !s.Enabled() {
-		return nil, oauthError("temporarily_unavailable"), nil
+		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
 	}
 
 	if input.ResponseType != "code" || input.CodeChallengeMethod != CodeChallengeMethodS256 || !validCodeVerifier(input.CodeChallenge) {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Invalid response_type, code_challenge_method, or code_challenge"), nil
 	}
 	if !canAuthoriseOAuthClients(input.AccountPermissions) {
-		return nil, oauthError("access_denied"), nil
+		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
 	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
 	}
 	if !contains(cl.RedirectURIs, input.RedirectURI) {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Redirect URI is not registered for this client"), nil
 	}
 
 	scope := strings.TrimSpace(input.Scope.OrZero())
 	if _, err := grantScope(scope, cl, input.AccountPermissions); err != nil {
-		return nil, oauthError("invalid_scope"), nil
+		return nil, oauthError("invalid_scope", "Requested scope is not permitted for this account"), nil
 	}
 
 	requestID, err := randomToken(32)
@@ -99,7 +99,7 @@ func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*Autho
 
 func (s *Service) GetAuthorisationConsent(ctx context.Context, accountID account.AccountID, accountPermissions rbac.Permissions, requestID string) (*AuthorisationConsent, *Error, error) {
 	if !s.Enabled() {
-		return nil, oauthError("temporarily_unavailable"), nil
+		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
 	}
 
 	rec, oauthErr, err := s.getPendingAuthorisationRequest(ctx, accountID, requestID)
@@ -107,17 +107,17 @@ func (s *Service) GetAuthorisationConsent(ctx context.Context, accountID account
 		return nil, oauthErr, err
 	}
 	if !canAuthoriseOAuthClients(accountPermissions) {
-		return nil, oauthError("access_denied"), nil
+		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
 	cl, err := s.clients.GetClient(ctx, rec.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 
 	grantedScope, err := grantScope(rec.Scope, cl, accountPermissions)
 	if err != nil {
-		return nil, oauthError("invalid_scope"), nil
+		return nil, oauthError("invalid_scope", "Requested scope is not permitted for this account"), nil
 	}
 
 	return &AuthorisationConsent{
@@ -134,7 +134,7 @@ func (s *Service) GetAuthorisationConsent(ctx context.Context, accountID account
 
 func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID account.AccountID, accountPermissions rbac.Permissions, requestID string, approved bool) (*AuthorisationConsentResult, *Error, error) {
 	if !s.Enabled() {
-		return nil, oauthError("temporarily_unavailable"), nil
+		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
 	}
 
 	rec, oauthErr, err := s.getPendingAuthorisationRequest(ctx, accountID, requestID)
@@ -148,7 +148,7 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 			return nil, nil, err
 		}
 		if !ok {
-			return nil, oauthError("invalid_request"), nil
+			return nil, oauthError("invalid_request", "Failed to record denial"), nil
 		}
 
 		return &AuthorisationConsentResult{
@@ -157,17 +157,17 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 		}, nil, nil
 	}
 	if !canAuthoriseOAuthClients(accountPermissions) {
-		return nil, oauthError("access_denied"), nil
+		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
 	cl, err := s.clients.GetClient(ctx, rec.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 
 	grantedScope, err := grantScope(rec.Scope, cl, accountPermissions)
 	if err != nil {
-		return nil, oauthError("invalid_scope"), nil
+		return nil, oauthError("invalid_scope", "Requested scope is not permitted for this account"), nil
 	}
 
 	code, err := randomToken(32)
@@ -188,7 +188,7 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 		return nil, nil, err
 	}
 	if !ok {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Failed to approve authorisation request"), nil
 	}
 
 	return &AuthorisationConsentResult{
@@ -199,16 +199,16 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 
 func (s *Service) getPendingAuthorisationRequest(ctx context.Context, accountID account.AccountID, requestID string) (*oauthresource.AuthorisationRequest, *Error, error) {
 	if strings.TrimSpace(requestID) == "" {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Missing request_id"), nil
 	}
 
 	rec, err := s.clients.GetAuthorisationRequestByRequestIDHash(ctx, hashString(requestID))
 	if err != nil {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Request ID not found"), nil
 	}
 
 	if rec.AccountID != accountID || rec.ExpiresAt.Before(time.Now()) || rec.ApprovedAt.Ok() || rec.DeniedAt.Ok() {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Request is invalid, expired, or already processed"), nil
 	}
 
 	return rec, nil, nil

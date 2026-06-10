@@ -37,7 +37,8 @@ const (
 )
 
 type Error struct {
-	Code string
+	Code        string
+	Description string
 }
 
 type Service struct {
@@ -187,8 +188,8 @@ func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger
 	}
 }
 
-func oauthError(code string) *Error {
-	return &Error{Code: code}
+func oauthError(code string, description string) *Error {
+	return &Error{Code: code, Description: description}
 }
 
 func (s *Service) deviceAuthorizationConsentURL(userCode string) string {

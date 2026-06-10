@@ -38,7 +38,7 @@ type Token struct {
 
 func (s *Service) ExchangeToken(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
 	if !s.Enabled() {
-		return nil, oauthError("temporarily_unavailable"), nil
+		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
 	}
 
 	switch input.GrantType {
@@ -51,20 +51,20 @@ func (s *Service) ExchangeToken(ctx context.Context, input TokenRequest) (*Token
 	case GrantTypeClientCredentials:
 		return s.exchangeClientCredentials(ctx, input)
 	default:
-		return nil, oauthError("unsupported_grant_type"), nil
+		return nil, oauthError("unsupported_grant_type", "The grant_type is not supported"), nil
 	}
 }
 
 func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
 	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 	if cl.Type != oauthresource.ClientTypeConfidential {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client is not confidential"), nil
 	}
 	if !contains(cl.AllowedGrants, GrantTypeClientCredentials) {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client is not authorized for client_credentials grant"), nil
 	}
 	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
@@ -72,7 +72,7 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 
 	accountID, ok := cl.AccountID.Get()
 	if !ok {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client has no associated account"), nil
 	}
 
 	accountPermissions, err := s.accountPermissions(ctx, accountID)
@@ -82,7 +82,7 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 
 	grantedScope, err := grantClientCredentialsScope(input.Scope.OrZero(), cl, accountPermissions)
 	if err != nil {
-		return nil, oauthError("invalid_scope"), nil
+		return nil, oauthError("invalid_scope", "Requested scope is not permitted"), nil
 	}
 
 	token, err := s.issueTokens(ctx, cl, accountID, grantedScope)
@@ -96,40 +96,40 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
 	code, ok := input.Code.Get()
 	if !ok {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Missing authorization code"), nil
 	}
 	redirectURI, ok := input.RedirectURI.Get()
 	if !ok {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Missing redirect_uri"), nil
 	}
 	codeVerifier, ok := input.CodeVerifier.Get()
 	if !ok {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Missing code_verifier"), nil
 	}
 
 	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
 	}
 	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
 	}
 	if !validCodeVerifier(codeVerifier) {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Invalid code_verifier format"), nil
 	}
 
 	rec, err := s.clients.GetAuthorisationCodeByCodeHash(ctx, hashString(code))
 	if err != nil || rec.ClientID != cl.ID || rec.RedirectURI != redirectURI || rec.ExpiresAt.Before(time.Now()) || rec.ConsumedAt.Ok() {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Authorization code is invalid, expired, or already used"), nil
 	}
 
 	sum := sha256.Sum256([]byte(codeVerifier))
 	sumb64 := b64url(sum[:])
 	if sumb64 != rec.CodeChallenge {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Code verifier does not match the code challenge"), nil
 	}
 
 	consumed, err := s.tokens.ConsumeAuthorisationCode(ctx, rec.ID, time.Now())
@@ -137,7 +137,7 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 		return nil, nil, err
 	}
 	if !consumed {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Authorization code has already been consumed"), nil
 	}
 
 	token, err := s.issueTokens(ctx, cl, rec.AccountID, rec.Scope)
@@ -151,15 +151,15 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
 	refreshToken, ok := input.RefreshToken.Get()
 	if !ok {
-		return nil, oauthError("invalid_request"), nil
+		return nil, oauthError("invalid_request", "Missing refresh_token"), nil
 	}
 
 	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client"), nil
+		return nil, oauthError("invalid_client", "Client not found"), nil
 	}
 	if !contains(cl.AllowedGrants, GrantTypeRefreshToken) {
-		return nil, oauthError("unauthorized_client"), nil
+		return nil, oauthError("unauthorized_client", "Client is not authorized for refresh_token grant"), nil
 	}
 	if oauthErr, err := s.authenticateConfidentialClient(ctx, cl, input.ClientSecret); oauthErr != nil || err != nil {
 		return nil, oauthErr, err
@@ -167,7 +167,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 
 	rec, err := s.clients.GetRefreshTokenByTokenHash(ctx, hashString(refreshToken))
 	if err != nil || rec.ClientID != cl.ID || rec.ExpiresAt.Before(time.Now()) || rec.RevokedAt.Ok() {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
 	}
 
 	accountPermissions, err := s.accountPermissions(ctx, rec.AccountID)
@@ -177,7 +177,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 
 	grantedScope, err := refreshScope(rec.Scope, cl, accountPermissions)
 	if err != nil {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Refresh token scope is no longer permitted"), nil
 	}
 
 	consumedAt := time.Now()
@@ -186,7 +186,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 		return nil, nil, err
 	}
 	if !consumed {
-		return nil, oauthError("invalid_grant"), nil
+		return nil, oauthError("invalid_grant", "Refresh token has already been consumed"), nil
 	}
 
 	token, newID, err := s.issueTokensWithRefresh(ctx, cl, rec.AccountID, grantedScope)
@@ -218,12 +218,12 @@ func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oa
 
 	hash, ok := client.ClientSecretHash.Get()
 	if !ok {
-		return oauthError("invalid_client"), nil
+		return oauthError("invalid_client", "Client has no secret configured"), nil
 	}
 
 	raw, ok := secret.Get()
 	if !ok {
-		return oauthError("invalid_client"), nil
+		return oauthError("invalid_client", "Missing client_secret"), nil
 	}
 
 	match, _, err := argon2id.CheckHash(raw, hash)
@@ -231,7 +231,7 @@ func (s *Service) authenticateConfidentialClient(ctx context.Context, client *oa
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if !match {
-		return oauthError("invalid_client"), nil
+		return oauthError("invalid_client", "Invalid client_secret"), nil
 	}
 
 	return nil, nil
