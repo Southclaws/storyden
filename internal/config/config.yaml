@@ -479,6 +479,12 @@
       description: |-
         Optional JWT key ID (kid) for OAuth signing keys.
 
+    - env: OAUTH_DYNAMIC_REGISTRATION_ENABLED
+      name: OAuthDynamicRegistrationEnabled
+      type: bool
+      description: |-
+        Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
+
 - section: SMS
   description: |-
     SMS sending configuration. This must be enabled in order to support SMS-based authentication.

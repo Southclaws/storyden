@@ -81,6 +81,7 @@ var (
 	OperationIDOAuthAuthoriseConsentSubmit            = OperationID{`OAuthAuthoriseConsentSubmit`}
 	OperationIDOAuthToken                             = OperationID{`OAuthToken`}
 	OperationIDOAuthUserInfo                          = OperationID{`OAuthUserInfo`}
+	OperationIDOAuthClientRegister                    = OperationID{`OAuthClientRegister`}
 	OperationIDWebAuthnRequestCredential              = OperationID{`WebAuthnRequestCredential`}
 	OperationIDWebAuthnMakeCredential                 = OperationID{`WebAuthnMakeCredential`}
 	OperationIDWebAuthnGetAssertion                   = OperationID{`WebAuthnGetAssertion`}
@@ -381,6 +382,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDOAuthToken, nil
 	case string(`OAuthUserInfo`):
 		return OperationIDOAuthUserInfo, nil
+	case string(`OAuthClientRegister`):
+		return OperationIDOAuthClientRegister, nil
 	case string(`WebAuthnRequestCredential`):
 		return OperationIDWebAuthnRequestCredential, nil
 	case string(`WebAuthnMakeCredential`):

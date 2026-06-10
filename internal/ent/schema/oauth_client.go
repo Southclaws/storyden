@@ -24,6 +24,8 @@ func (OAuthClient) Fields() []ent.Field {
 		field.String("name").NotEmpty(),
 		field.Enum("type").Values("public", "confidential").Default("public"),
 		field.Enum("scope_policy").Values("explicit", "inherit").Default("explicit"),
+		field.String("token_endpoint_auth_method").Default("client_secret_basic").Optional(),
+		field.Bool("pkce_required").Default(false),
 		field.JSON("redirect_uris", []string{}),
 		field.JSON("allowed_scopes", []string{}),
 		field.JSON("allowed_grants", []string{}),

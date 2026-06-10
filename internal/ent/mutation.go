@@ -24591,6 +24591,8 @@ type OAuthClientMutation struct {
 	name                          *string
 	_type                         *oauthclient.Type
 	scope_policy                  *oauthclient.ScopePolicy
+	token_endpoint_auth_method    *string
+	pkce_required                 *bool
 	redirect_uris                 *[]string
 	appendredirect_uris           []string
 	allowed_scopes                *[]string
@@ -25035,6 +25037,91 @@ func (m *OAuthClientMutation) ResetScopePolicy() {
 	m.scope_policy = nil
 }
 
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (m *OAuthClientMutation) SetTokenEndpointAuthMethod(s string) {
+	m.token_endpoint_auth_method = &s
+}
+
+// TokenEndpointAuthMethod returns the value of the "token_endpoint_auth_method" field in the mutation.
+func (m *OAuthClientMutation) TokenEndpointAuthMethod() (r string, exists bool) {
+	v := m.token_endpoint_auth_method
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenEndpointAuthMethod returns the old "token_endpoint_auth_method" field's value of the OAuthClient entity.
+// If the OAuthClient object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthClientMutation) OldTokenEndpointAuthMethod(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenEndpointAuthMethod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenEndpointAuthMethod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenEndpointAuthMethod: %w", err)
+	}
+	return oldValue.TokenEndpointAuthMethod, nil
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (m *OAuthClientMutation) ClearTokenEndpointAuthMethod() {
+	m.token_endpoint_auth_method = nil
+	m.clearedFields[oauthclient.FieldTokenEndpointAuthMethod] = struct{}{}
+}
+
+// TokenEndpointAuthMethodCleared returns if the "token_endpoint_auth_method" field was cleared in this mutation.
+func (m *OAuthClientMutation) TokenEndpointAuthMethodCleared() bool {
+	_, ok := m.clearedFields[oauthclient.FieldTokenEndpointAuthMethod]
+	return ok
+}
+
+// ResetTokenEndpointAuthMethod resets all changes to the "token_endpoint_auth_method" field.
+func (m *OAuthClientMutation) ResetTokenEndpointAuthMethod() {
+	m.token_endpoint_auth_method = nil
+	delete(m.clearedFields, oauthclient.FieldTokenEndpointAuthMethod)
+}
+
+// SetPkceRequired sets the "pkce_required" field.
+func (m *OAuthClientMutation) SetPkceRequired(b bool) {
+	m.pkce_required = &b
+}
+
+// PkceRequired returns the value of the "pkce_required" field in the mutation.
+func (m *OAuthClientMutation) PkceRequired() (r bool, exists bool) {
+	v := m.pkce_required
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPkceRequired returns the old "pkce_required" field's value of the OAuthClient entity.
+// If the OAuthClient object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthClientMutation) OldPkceRequired(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPkceRequired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPkceRequired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPkceRequired: %w", err)
+	}
+	return oldValue.PkceRequired, nil
+}
+
+// ResetPkceRequired resets all changes to the "pkce_required" field.
+func (m *OAuthClientMutation) ResetPkceRequired() {
+	m.pkce_required = nil
+}
+
 // SetRedirectUris sets the "redirect_uris" field.
 func (m *OAuthClientMutation) SetRedirectUris(s []string) {
 	m.redirect_uris = &s
@@ -25465,7 +25552,7 @@ func (m *OAuthClientMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OAuthClientMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, oauthclient.FieldCreatedAt)
 	}
@@ -25489,6 +25576,12 @@ func (m *OAuthClientMutation) Fields() []string {
 	}
 	if m.scope_policy != nil {
 		fields = append(fields, oauthclient.FieldScopePolicy)
+	}
+	if m.token_endpoint_auth_method != nil {
+		fields = append(fields, oauthclient.FieldTokenEndpointAuthMethod)
+	}
+	if m.pkce_required != nil {
+		fields = append(fields, oauthclient.FieldPkceRequired)
 	}
 	if m.redirect_uris != nil {
 		fields = append(fields, oauthclient.FieldRedirectUris)
@@ -25523,6 +25616,10 @@ func (m *OAuthClientMutation) Field(name string) (ent.Value, bool) {
 		return m.GetType()
 	case oauthclient.FieldScopePolicy:
 		return m.ScopePolicy()
+	case oauthclient.FieldTokenEndpointAuthMethod:
+		return m.TokenEndpointAuthMethod()
+	case oauthclient.FieldPkceRequired:
+		return m.PkceRequired()
 	case oauthclient.FieldRedirectUris:
 		return m.RedirectUris()
 	case oauthclient.FieldAllowedScopes:
@@ -25554,6 +25651,10 @@ func (m *OAuthClientMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldType(ctx)
 	case oauthclient.FieldScopePolicy:
 		return m.OldScopePolicy(ctx)
+	case oauthclient.FieldTokenEndpointAuthMethod:
+		return m.OldTokenEndpointAuthMethod(ctx)
+	case oauthclient.FieldPkceRequired:
+		return m.OldPkceRequired(ctx)
 	case oauthclient.FieldRedirectUris:
 		return m.OldRedirectUris(ctx)
 	case oauthclient.FieldAllowedScopes:
@@ -25625,6 +25726,20 @@ func (m *OAuthClientMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetScopePolicy(v)
 		return nil
+	case oauthclient.FieldTokenEndpointAuthMethod:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenEndpointAuthMethod(v)
+		return nil
+	case oauthclient.FieldPkceRequired:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPkceRequired(v)
+		return nil
 	case oauthclient.FieldRedirectUris:
 		v, ok := value.([]string)
 		if !ok {
@@ -25682,6 +25797,9 @@ func (m *OAuthClientMutation) ClearedFields() []string {
 	if m.FieldCleared(oauthclient.FieldClientSecretHash) {
 		fields = append(fields, oauthclient.FieldClientSecretHash)
 	}
+	if m.FieldCleared(oauthclient.FieldTokenEndpointAuthMethod) {
+		fields = append(fields, oauthclient.FieldTokenEndpointAuthMethod)
+	}
 	return fields
 }
 
@@ -25701,6 +25819,9 @@ func (m *OAuthClientMutation) ClearField(name string) error {
 		return nil
 	case oauthclient.FieldClientSecretHash:
 		m.ClearClientSecretHash()
+		return nil
+	case oauthclient.FieldTokenEndpointAuthMethod:
+		m.ClearTokenEndpointAuthMethod()
 		return nil
 	}
 	return fmt.Errorf("unknown OAuthClient nullable field %s", name)
@@ -25733,6 +25854,12 @@ func (m *OAuthClientMutation) ResetField(name string) error {
 		return nil
 	case oauthclient.FieldScopePolicy:
 		m.ResetScopePolicy()
+		return nil
+	case oauthclient.FieldTokenEndpointAuthMethod:
+		m.ResetTokenEndpointAuthMethod()
+		return nil
+	case oauthclient.FieldPkceRequired:
+		m.ResetPkceRequired()
 		return nil
 	case oauthclient.FieldRedirectUris:
 		m.ResetRedirectUris()

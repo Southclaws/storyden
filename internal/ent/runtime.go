@@ -1040,6 +1040,14 @@ func init() {
 	oauthclientDescName := oauthclientFields[3].Descriptor()
 	// oauthclient.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	oauthclient.NameValidator = oauthclientDescName.Validators[0].(func(string) error)
+	// oauthclientDescTokenEndpointAuthMethod is the schema descriptor for token_endpoint_auth_method field.
+	oauthclientDescTokenEndpointAuthMethod := oauthclientFields[6].Descriptor()
+	// oauthclient.DefaultTokenEndpointAuthMethod holds the default value on creation for the token_endpoint_auth_method field.
+	oauthclient.DefaultTokenEndpointAuthMethod = oauthclientDescTokenEndpointAuthMethod.Default.(string)
+	// oauthclientDescPkceRequired is the schema descriptor for pkce_required field.
+	oauthclientDescPkceRequired := oauthclientFields[7].Descriptor()
+	// oauthclient.DefaultPkceRequired holds the default value on creation for the pkce_required field.
+	oauthclient.DefaultPkceRequired = oauthclientDescPkceRequired.Default.(bool)
 	// oauthclientDescID is the schema descriptor for id field.
 	oauthclientDescID := oauthclientMixinFields0[0].Descriptor()
 	// oauthclient.DefaultID holds the default value on creation for the id field.

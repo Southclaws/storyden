@@ -836,6 +836,8 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"public", "confidential"}, Default: "public"},
 		{Name: "scope_policy", Type: field.TypeEnum, Enums: []string{"explicit", "inherit"}, Default: "explicit"},
+		{Name: "token_endpoint_auth_method", Type: field.TypeString, Nullable: true, Default: "client_secret_basic"},
+		{Name: "pkce_required", Type: field.TypeBool, Default: false},
 		{Name: "redirect_uris", Type: field.TypeJSON},
 		{Name: "allowed_scopes", Type: field.TypeJSON},
 		{Name: "allowed_grants", Type: field.TypeJSON},
@@ -849,7 +851,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "oauth_clients_accounts_oauth_clients",
-				Columns:    []*schema.Column{OauthClientsColumns[11]},
+				Columns:    []*schema.Column{OauthClientsColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

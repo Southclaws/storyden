@@ -31,6 +31,7 @@ type OAuthDiscoveryResponse struct {
 	DeviceAuthorizationEndpoint      string   `json:"device_authorization_endpoint"`
 	TokenEndpoint                    string   `json:"token_endpoint"`
 	UserinfoEndpoint                 string   `json:"userinfo_endpoint"`
+	RegistrationEndpoint             string   `json:"registration_endpoint,omitempty"`
 	JWKSURI                          string   `json:"jwks_uri"`
 	ResponseTypesSupported           []string `json:"response_types_supported"`
 	GrantTypesSupported              []string `json:"grant_types_supported"`
@@ -49,6 +50,7 @@ func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
 		DeviceAuthorizationEndpoint:      discovery.DeviceAuthorizationEndpoint,
 		TokenEndpoint:                    discovery.TokenEndpoint,
 		UserinfoEndpoint:                 discovery.UserinfoEndpoint,
+		RegistrationEndpoint:             discovery.RegistrationEndpoint,
 		JWKSURI:                          discovery.JWKSURI,
 		ResponseTypesSupported:           discovery.ResponseTypesSupported,
 		GrantTypesSupported:              discovery.GrantTypesSupported,
@@ -60,15 +62,16 @@ func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
 }
 
 type OAuthAuthorizationServerMetadata struct {
-	Issuer                            string   `json:"issuer"`
-	AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-	TokenEndpoint                     string   `json:"token_endpoint"`
-	JWKSURI                           string   `json:"jwks_uri,omitempty"`
-	ScopesSupported                   []string `json:"scopes_supported,omitempty"`
-	ResponseTypesSupported            []string `json:"response_types_supported"`
-	GrantTypesSupported               []string `json:"grant_types_supported,omitempty"`
-	CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported,omitempty"`
-	DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint,omitempty"`
+	Issuer                        string   `json:"issuer"`
+	AuthorizationEndpoint         string   `json:"authorization_endpoint"`
+	TokenEndpoint                 string   `json:"token_endpoint"`
+	RegistrationEndpoint          string   `json:"registration_endpoint,omitempty"`
+	JWKSURI                       string   `json:"jwks_uri,omitempty"`
+	ScopesSupported               []string `json:"scopes_supported,omitempty"`
+	ResponseTypesSupported        []string `json:"response_types_supported"`
+	GrantTypesSupported           []string `json:"grant_types_supported,omitempty"`
+	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported,omitempty"`
+	DeviceAuthorizationEndpoint   string   `json:"device_authorization_endpoint,omitempty"`
 }
 
 func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizationServerMetadata {
@@ -78,6 +81,7 @@ func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizat
 		Issuer:                        discovery.Issuer,
 		AuthorizationEndpoint:         discovery.AuthorizationEndpoint,
 		TokenEndpoint:                 discovery.TokenEndpoint,
+		RegistrationEndpoint:          discovery.RegistrationEndpoint,
 		JWKSURI:                       discovery.JWKSURI,
 		ScopesSupported:               discovery.ScopesSupported,
 		ResponseTypesSupported:        discovery.ResponseTypesSupported,
@@ -381,6 +385,38 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 	}, nil
 }
 
+func (o OAuth) OAuthClientRegister(ctx context.Context, req openapi.OAuthClientRegisterRequestObject) (openapi.OAuthClientRegisterResponseObject, error) {
+	input := oauthservice.DynamicClientRegistration{
+		ClientName:              opt.NewPtr(req.Body.ClientName).OrZero(),
+		RedirectURIs:            opt.NewPtr(req.Body.RedirectUris).OrZero(),
+		GrantTypes:              opt.NewPtr(req.Body.GrantTypes).OrZero(),
+		ResponseTypes:           opt.NewPtr(req.Body.ResponseTypes).OrZero(),
+		Scope:                   opt.NewPtr(req.Body.Scope).OrZero(),
+		TokenEndpointAuthMethod: opt.NewPtr(req.Body.TokenEndpointAuthMethod).OrZero(),
+		ApplicationType:         opt.NewPtr(req.Body.ApplicationType).OrZero(),
+		LogoURI:                 opt.NewPtr(req.Body.LogoUri).OrZero(),
+		ClientURI:               opt.NewPtr(req.Body.ClientUri).OrZero(),
+		TOSURI:                  opt.NewPtr(req.Body.TosUri).OrZero(),
+		PolicyURI:               opt.NewPtr(req.Body.PolicyUri).OrZero(),
+	}
+
+	result, oauthErr, err := o.oauth.RegisterClient(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+	if oauthErr != nil {
+		return openapi.OAuthClientRegister400JSONResponse{
+			OAuthClientRegisterErrorJSONResponse: openapi.OAuthClientRegisterErrorJSONResponse(openapi.OAuthError{
+				Error: oauthErr.Code,
+			}),
+		}, nil
+	}
+
+	return openapi.OAuthClientRegister201JSONResponse{
+		OAuthClientRegisterOKJSONResponse: openapi.OAuthClientRegisterOKJSONResponse(serialiseOAuthClientRegistration(result)),
+	}, nil
+}
+
 func (o OAuth) OAuthUserInfo(ctx context.Context, _ openapi.OAuthUserInfoRequestObject) (openapi.OAuthUserInfoResponseObject, error) {
 	acc, err := session.GetAccountID(ctx)
 	if err != nil {
@@ -596,6 +632,43 @@ func serialiseOAuthClient(in *oauthresource.Client) openapi.OAuthClient {
 		AllowedScopes: in.AllowedScopes,
 		AllowedGrants: in.AllowedGrants,
 	}
+}
+
+func serialiseOAuthClientRegistration(in *oauthservice.DynamicClientRegistrationResult) openapi.OAuthClientRegistration {
+	out := openapi.OAuthClientRegistration{
+		ClientId:                in.Client.ClientID,
+		ClientSecret:            in.ClientSecret.Ptr(),
+		ClientIdIssuedAt:        in.ClientIDIssuedAt,
+		ClientSecretExpiresAt:   in.ClientSecretExpiresAt,
+		RedirectUris:            in.RedirectURIs,
+		GrantTypes:              in.GrantTypes,
+		ResponseTypes:           in.ResponseTypes,
+		TokenEndpointAuthMethod: in.TokenEndpointAuthMethod,
+	}
+
+	if in.ClientName != "" {
+		out.ClientName = &in.ClientName
+	}
+	if in.Scope != "" {
+		out.Scope = &in.Scope
+	}
+	if in.ApplicationType != "" {
+		out.ApplicationType = &in.ApplicationType
+	}
+	if in.LogoURI != "" {
+		out.LogoUri = &in.LogoURI
+	}
+	if in.ClientURI != "" {
+		out.ClientUri = &in.ClientURI
+	}
+	if in.TOSURI != "" {
+		out.TosUri = &in.TOSURI
+	}
+	if in.PolicyURI != "" {
+		out.PolicyUri = &in.PolicyURI
+	}
+
+	return out
 }
 
 func serialiseOAuthClientIssued(in *oauthservice.ClientSelfCreateResult) openapi.OAuthClientIssued {

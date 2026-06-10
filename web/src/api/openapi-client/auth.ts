@@ -47,6 +47,9 @@ import type {
   OAuthClientIssuedOKResponse,
   OAuthClientListOKResponse,
   OAuthClientOKResponse,
+  OAuthClientRegisterBody,
+  OAuthClientRegisterErrorResponse,
+  OAuthClientRegisterOKResponse,
   OAuthClientSelfCreateBody,
   OAuthClientSelfUpdateBody,
   OAuthDeviceAuthorisationBody,
@@ -1491,6 +1494,80 @@ export const useOAuthUserInfo = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * RFC 7591 OAuth 2.0 Dynamic Client Registration.
+
+Allows clients such as MCP connectors to register themselves without
+prior administrator configuration. Dynamically registered clients are
+tenant-owned (they have no account owner), use the explicit scope
+policy, and are restricted to a conservative grant and scope allowlist.
+
+Authorization Code clients must use PKCE; Storyden enforces PKCE (S256)
+at the authorize and token endpoints for all clients.
+
+Public clients register with `token_endpoint_auth_method: none` and
+receive no client secret. Confidential clients register with
+`client_secret_basic` or `client_secret_post` and receive a one-time
+`client_secret` in the response. The registration endpoint is advertised
+as `registration_endpoint` by the authorization server metadata
+documents.
+
+This is an unauthenticated endpoint that creates server state, so it
+is heavily rate limited to prevent abuse.
+
+ */
+export const oAuthClientRegister = (
+  oAuthClientRegisterBody: OAuthClientRegisterBody,
+) => {
+  return fetcher<OAuthClientRegisterOKResponse>({
+    url: `/oauth/register`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthClientRegisterBody,
+  });
+};
+
+export const getOAuthClientRegisterMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthClientRegisterBody },
+  ): Promise<OAuthClientRegisterOKResponse> => {
+    return oAuthClientRegister(arg);
+  };
+};
+export const getOAuthClientRegisterMutationKey = () =>
+  [`/oauth/register`] as const;
+
+export type OAuthClientRegisterMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthClientRegister>>
+>;
+export type OAuthClientRegisterMutationError =
+  | OAuthClientRegisterErrorResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthClientRegister = <
+  TError = OAuthClientRegisterErrorResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthClientRegister>>,
+    TError,
+    Key,
+    OAuthClientRegisterBody,
+    Awaited<ReturnType<typeof oAuthClientRegister>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthClientRegisterMutationKey();
+  const swrFn = getOAuthClientRegisterMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

@@ -32,6 +32,10 @@ const (
 	FieldType = "type"
 	// FieldScopePolicy holds the string denoting the scope_policy field in the database.
 	FieldScopePolicy = "scope_policy"
+	// FieldTokenEndpointAuthMethod holds the string denoting the token_endpoint_auth_method field in the database.
+	FieldTokenEndpointAuthMethod = "token_endpoint_auth_method"
+	// FieldPkceRequired holds the string denoting the pkce_required field in the database.
+	FieldPkceRequired = "pkce_required"
 	// FieldRedirectUris holds the string denoting the redirect_uris field in the database.
 	FieldRedirectUris = "redirect_uris"
 	// FieldAllowedScopes holds the string denoting the allowed_scopes field in the database.
@@ -98,6 +102,8 @@ var Columns = []string{
 	FieldName,
 	FieldType,
 	FieldScopePolicy,
+	FieldTokenEndpointAuthMethod,
+	FieldPkceRequired,
 	FieldRedirectUris,
 	FieldAllowedScopes,
 	FieldAllowedGrants,
@@ -124,6 +130,10 @@ var (
 	ClientIDValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultTokenEndpointAuthMethod holds the default value on creation for the "token_endpoint_auth_method" field.
+	DefaultTokenEndpointAuthMethod string
+	// DefaultPkceRequired holds the default value on creation for the "pkce_required" field.
+	DefaultPkceRequired bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -228,6 +238,16 @@ func ByType(opts ...sql.OrderTermOption) OrderOption {
 // ByScopePolicy orders the results by the scope_policy field.
 func ByScopePolicy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScopePolicy, opts...).ToFunc()
+}
+
+// ByTokenEndpointAuthMethod orders the results by the token_endpoint_auth_method field.
+func ByTokenEndpointAuthMethod(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenEndpointAuthMethod, opts...).ToFunc()
+}
+
+// ByPkceRequired orders the results by the pkce_required field.
+func ByPkceRequired(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPkceRequired, opts...).ToFunc()
 }
 
 // ByAccountField orders the results by account field.

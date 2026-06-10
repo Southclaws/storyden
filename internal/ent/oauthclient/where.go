@@ -86,6 +86,16 @@ func Name(v string) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldName, v))
 }
 
+// TokenEndpointAuthMethod applies equality check predicate on the "token_endpoint_auth_method" field. It's identical to TokenEndpointAuthMethodEQ.
+func TokenEndpointAuthMethod(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldTokenEndpointAuthMethod, v))
+}
+
+// PkceRequired applies equality check predicate on the "pkce_required" field. It's identical to PkceRequiredEQ.
+func PkceRequired(v bool) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldPkceRequired, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldEQ(FieldCreatedAt, v))
@@ -489,6 +499,91 @@ func ScopePolicyIn(vs ...ScopePolicy) predicate.OAuthClient {
 // ScopePolicyNotIn applies the NotIn predicate on the "scope_policy" field.
 func ScopePolicyNotIn(vs ...ScopePolicy) predicate.OAuthClient {
 	return predicate.OAuthClient(sql.FieldNotIn(FieldScopePolicy, vs...))
+}
+
+// TokenEndpointAuthMethodEQ applies the EQ predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodEQ(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodNEQ applies the NEQ predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodNEQ(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNEQ(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodIn applies the In predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodIn(vs ...string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIn(FieldTokenEndpointAuthMethod, vs...))
+}
+
+// TokenEndpointAuthMethodNotIn applies the NotIn predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodNotIn(vs ...string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotIn(FieldTokenEndpointAuthMethod, vs...))
+}
+
+// TokenEndpointAuthMethodGT applies the GT predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodGT(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGT(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodGTE applies the GTE predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodGTE(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldGTE(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodLT applies the LT predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodLT(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLT(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodLTE applies the LTE predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodLTE(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldLTE(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodContains applies the Contains predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodContains(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldContains(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodHasPrefix applies the HasPrefix predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodHasPrefix(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldHasPrefix(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodHasSuffix applies the HasSuffix predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodHasSuffix(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldHasSuffix(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodIsNil applies the IsNil predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodIsNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldIsNull(FieldTokenEndpointAuthMethod))
+}
+
+// TokenEndpointAuthMethodNotNil applies the NotNil predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodNotNil() predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNotNull(FieldTokenEndpointAuthMethod))
+}
+
+// TokenEndpointAuthMethodEqualFold applies the EqualFold predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodEqualFold(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEqualFold(FieldTokenEndpointAuthMethod, v))
+}
+
+// TokenEndpointAuthMethodContainsFold applies the ContainsFold predicate on the "token_endpoint_auth_method" field.
+func TokenEndpointAuthMethodContainsFold(v string) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldContainsFold(FieldTokenEndpointAuthMethod, v))
+}
+
+// PkceRequiredEQ applies the EQ predicate on the "pkce_required" field.
+func PkceRequiredEQ(v bool) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldEQ(FieldPkceRequired, v))
+}
+
+// PkceRequiredNEQ applies the NEQ predicate on the "pkce_required" field.
+func PkceRequiredNEQ(v bool) predicate.OAuthClient {
+	return predicate.OAuthClient(sql.FieldNEQ(FieldPkceRequired, v))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.
