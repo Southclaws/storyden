@@ -47,6 +47,12 @@ func (s *Service) apiEndpointBase() string {
 	return u.String()
 }
 
+// Issuer returns the OAuth issuer identifier (the authorization server base URL).
+// This is derived from PublicAPIAddress with any trailing /api suffix removed.
+func (s *Service) Issuer() string {
+	return s.issuer
+}
+
 type JWK struct {
 	Kty string
 	Use string
