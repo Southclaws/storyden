@@ -94,7 +94,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Name</FormLabel>
-          <Input {...form.register("name")} placeholder="e.g. Claude MCP" />
+          <Input {...form.register("name")} placeholder="e.g. My Application" />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
@@ -199,9 +199,6 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                 <PlusIcon /> Add Redirect URI
               </Button>
             </LStack>
-            <styled.p color="fg.muted" fontSize="xs">
-              For Claude MCP, use: https://claude.ai/api/mcp/auth_callback
-            </styled.p>
             <FormErrorText>
               {form.formState.errors.redirectUris?.message}
             </FormErrorText>
