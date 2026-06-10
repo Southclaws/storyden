@@ -21,27 +21,22 @@ func supportedScopes() []string {
 	return append([]string{"openid", "profile", "email", "offline_access"}, rbacAllPermissionNames()...)
 }
 
-func validateClientRequestedScopes(scope string, allowedScopes []string) error {
-	clientHasAdministrator := contains(allowedScopes, rbac.PermissionAdministrator.String())
-
+func validateScopeNames(scope string) error {
 	for _, sc := range splitScope(scope) {
-		if !contains(allowedScopes, sc) {
-			permission, err := permissionFromScope(sc)
-			if err != nil {
-				return err
-			}
-			if permission == nil {
-				return fault.New("scope is not allowed for client")
-			}
-			if !clientHasAdministrator {
-				return fault.New("scope is not allowed for client")
-			}
-		}
 		if _, err := permissionFromScope(sc); err != nil {
 			return err
 		}
 	}
+	return nil
+}
 
+func authorizeScopeNames(scope string, allowedScopes []string) error {
+	clientHasAdministrator := contains(allowedScopes, rbac.PermissionAdministrator.String())
+	for _, sc := range splitScope(scope) {
+		if !contains(allowedScopes, sc) && !clientHasAdministrator {
+			return fault.New("scope is not allowed for client")
+		}
+	}
 	return nil
 }
 
@@ -78,7 +73,7 @@ func validatePermissionOnlyScopes(scopes []string) error {
 
 func grantScope(requestedScope string, client *oauthresource.Client, accountPermissions rbac.Permissions) (string, error) {
 	requestedScopes := splitScope(requestedScope)
-	if err := validateClientRequestedScopes(requestedScope, client.AllowedScopes); err != nil {
+	if err := validateScopeNames(requestedScope); err != nil {
 		return "", err
 	}
 
@@ -104,7 +99,26 @@ func grantScope(requestedScope string, client *oauthresource.Client, accountPerm
 
 func grantClientCredentialsScope(requestedScope string, client *oauthresource.Client, accountPermissions rbac.Permissions) (string, error) {
 	if requestedScope != "" {
-		return grantScope(requestedScope, client, accountPermissions)
+		if err := validateScopeNames(requestedScope); err != nil {
+			return "", err
+		}
+		if err := authorizeScopeNames(requestedScope, client.AllowedScopes); err != nil {
+			return "", err
+		}
+
+		requestedScopes := splitScope(requestedScope)
+		requestedPermissions, err := permissionsFromScopes(requestedScopes)
+		if err != nil {
+			return "", err
+		}
+
+		allowedPermissions, err := permissionsFromScopes(client.AllowedScopes)
+		if err != nil {
+			return "", err
+		}
+
+		grantedPermissions := intersectPermissions(requestedPermissions, allowedPermissions, accountPermissions)
+		return joinScopes(nil, grantedPermissions.List()), nil
 	}
 
 	allowedPermissions, err := permissionsFromScopes(client.AllowedScopes)

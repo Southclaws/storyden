@@ -52,7 +52,10 @@ func (s *Service) StartDeviceAuthorization(ctx context.Context, clientID string,
 	if cl.ClientID == StorydenCLIClientID && !isStorydenDeviceScope(scope) {
 		return nil, oauthError("invalid_scope"), nil
 	}
-	if err := validateClientRequestedScopes(scope, cl.AllowedScopes); err != nil {
+	if err := validateScopeNames(scope); err != nil {
+		return nil, oauthError("invalid_scope"), nil
+	}
+	if err := authorizeScopeNames(scope, cl.AllowedScopes); err != nil {
 		return nil, oauthError("invalid_scope"), nil
 	}
 
