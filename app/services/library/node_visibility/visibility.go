@@ -6,8 +6,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/fault/fmsg"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
@@ -22,26 +22,23 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Controller struct {
-	accountQuery *account_querier.Querier
-	nodeQuerier  *node_querier.Querier
-	nodeWriter   *node_writer.Writer
-	nc           *node_children.Writer
-	bus          *pubsub.Bus
+	nodeQuerier *node_querier.Querier
+	nodeWriter  *node_writer.Writer
+	nc          *node_children.Writer
+	bus         *pubsub.Bus
 }
 
 func New(
-	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nc *node_children.Writer,
 	bus *pubsub.Bus,
 ) *Controller {
 	return &Controller{
-		accountQuery: accountQuery,
-		nodeQuerier:  nodeQuerier,
-		nodeWriter:   nodeWriter,
-		nc:           nc,
-		bus:          bus,
+		nodeQuerier: nodeQuerier,
+		nodeWriter:  nodeWriter,
+		nc:          nc,
+		bus:         bus,
 	}
 }
 
@@ -51,19 +48,15 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := m.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	n, err := m.nodeQuerier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+	if err := session.Authorise(ctx, func() error {
 		if n.Owner.ID != accountID {
-			return fault.Wrap(errNotAuthorised, fctx.With(ctx))
+			return fault.Wrap(errNotAuthorised, fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of the page and do not have the Manage Library permission."))
 		}
 		return nil
 	}, rbac.PermissionManageLibrary); err != nil {

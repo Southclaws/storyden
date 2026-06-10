@@ -20,17 +20,12 @@ func (s *Mutator) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.accountQuery.GetByID(ctx, aid)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
 	p, err := s.replyQuerier.Get(ctx, postID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+	if err := session.Authorise(ctx, func() error {
 		if p.Author.ID != aid {
 			return fault.Wrap(rbac.ErrPermissions,
 				fctx.With(ctx),

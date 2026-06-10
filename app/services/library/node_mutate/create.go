@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
@@ -23,12 +24,7 @@ func (s *Manager) Create(ctx context.Context,
 ) (*library.Node, error) {
 	if v, ok := p.Visibility.Get(); ok {
 		if v == visibility.VisibilityPublished {
-			acc, err := s.accountQuery.GetByID(ctx, owner)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
-
-			if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionManageLibrary); err != nil {
+			if err := session.Authorise(ctx, nil, rbac.PermissionManageLibrary); err != nil {
 				return nil, fault.Wrap(err,
 					fctx.With(ctx),
 					fmsg.WithDesc("non admin cannot publish nodes", "You do not have permission to publish, please submit as draft, review or unlisted."),

@@ -5,7 +5,6 @@ import (
 
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -44,7 +43,6 @@ type Partial struct {
 }
 
 type Manager struct {
-	accountQuery *account_querier.Querier
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
 	schemaWriter *node_properties.SchemaWriter
@@ -60,7 +58,6 @@ type Manager struct {
 }
 
 func New(
-	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	schemaWriter *node_properties.SchemaWriter,
@@ -75,7 +72,6 @@ func New(
 	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
-		accountQuery: accountQuery,
 		nodeQuerier:  nodeQuerier,
 		nodeWriter:   nodeWriter,
 		schemaWriter: schemaWriter,

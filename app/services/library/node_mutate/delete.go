@@ -5,11 +5,12 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
@@ -23,17 +24,19 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	n, err := s.nodeQuerier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := node_auth.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+	if err := session.Authorise(ctx, func() error {
+		if n.Owner.ID != accountID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of the page and do not have the Manage Library permission."))
+		}
+		return nil
+	}, rbac.PermissionManageLibrary); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

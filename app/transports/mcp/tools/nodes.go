@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -19,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -95,6 +97,10 @@ var libraryPageTreeTool = mcp.NewTool("getLibraryPageTree",
 )
 
 func (t *nodeTools) libraryPageTree(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionReadPublishedLibrary); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	account, err := session.GetAccount(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -134,6 +140,10 @@ var libraryPageGetTool = mcp.NewTool("getLibraryPage",
 )
 
 func (t *nodeTools) libraryPageGet(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionReadPublishedLibrary); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	slug, err := request.RequireString("slug")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -201,6 +211,10 @@ var libraryPageCreateTool = mcp.NewTool("createLibraryPage",
 )
 
 func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionManageLibrary, rbac.PermissionSubmitLibraryNode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	name, err := request.RequireString("name")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -300,6 +314,27 @@ func (t *nodeTools) libraryPageUpdate(ctx context.Context, request mcp.CallToolR
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	node, err := t.nodeReader.GetBySlug(ctx, library.NewKey(slug), nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := session.Authorise(ctx, func() error {
+		if node.Owner.ID != accountID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of the page and do not have the Manage Library permission."))
+		}
+		return nil
+	}, rbac.PermissionManageLibrary); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	name := request.GetString("name", "")
 	content := request.GetString("content", "")
 	visibilityStr := request.GetString("visibility", "")
@@ -340,7 +375,7 @@ func (t *nodeTools) libraryPageUpdate(ctx context.Context, request mcp.CallToolR
 		partial.Parent = opt.New(library.NewKey(parentStr))
 	}
 
-	node, err := t.nodeMutator.Update(ctx, library.NewKey(slug), partial)
+	node, err = t.nodeMutator.Update(ctx, library.NewKey(slug), partial)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -360,6 +395,10 @@ var libraryPageSearchTool = mcp.NewTool("searchLibraryPages",
 )
 
 func (t *nodeTools) libraryPageSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionReadPublishedLibrary); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	query, err := request.RequireString("query")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -32,17 +32,19 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.accountQuery.GetByID(ctx, aid)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	thr, err := s.threadQuerier.Get(ctx, threadID, pagination.Parameters{}, opt.NewEmpty[account.AccountID]())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := authoriseThreadUpdate(ctx, acc, thr); err != nil {
+	if err := session.Authorise(ctx, func() error {
+		if thr.Author.ID != aid {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not author", "You are not the author of the thread and do not have the Manage Posts permission."))
+		}
+		return nil
+	}, rbac.PermissionManagePosts); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -123,16 +125,4 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	return thr, nil
-}
-
-func authoriseThreadUpdate(ctx context.Context, acc *account.AccountWithEdges, thr *thread.Thread) error {
-	return acc.Roles.Permissions().Authorise(ctx, func() error {
-		if thr.Author.ID != acc.ID {
-			return fault.Wrap(rbac.ErrPermissions,
-				fctx.With(ctx),
-				fmsg.WithDesc("not author", "You are not the author of the thread and do not have the Manage Posts permission."),
-			)
-		}
-		return nil
-	}, rbac.PermissionManagePosts)
 }

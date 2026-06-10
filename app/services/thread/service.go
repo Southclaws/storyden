@@ -11,7 +11,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -89,7 +88,6 @@ func Build() fx.Option {
 type service struct {
 	ins spanner.Instrumentation
 
-	accountQuery   *account_querier.Querier
 	threadQuerier  *thread_querier.Querier
 	threadWriter   *thread_writer.Writer
 	tagWriter      *tag_writer.Writer
@@ -105,7 +103,6 @@ type service struct {
 func New(
 	ins spanner.Builder,
 
-	accountQuery *account_querier.Querier,
 	threadQuerier *thread_querier.Querier,
 	threadWriter *thread_writer.Writer,
 	tagWriter *tag_writer.Writer,
@@ -120,7 +117,6 @@ func New(
 	return &service{
 		ins: ins.Build(),
 
-		accountQuery:   accountQuery,
 		threadQuerier:  threadQuerier,
 		threadWriter:   threadWriter,
 		tagWriter:      tagWriter,

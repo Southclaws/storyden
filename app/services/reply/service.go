@@ -5,7 +5,6 @@ import (
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
@@ -42,18 +41,16 @@ func Build() fx.Option {
 }
 
 type Mutator struct {
-	accountQuery  *account_querier.Querier
-	replyQuerier  *reply_querier.Querier
-	replyWriter   *reply_writer.Writer
-	fetcher       *fetcher.Fetcher
-	bus           *pubsub.Bus
-	cpm           *moderation.Manager
-	cache         *thread_cache.Cache
+	replyQuerier   *reply_querier.Querier
+	replyWriter    *reply_writer.Writer
+	fetcher        *fetcher.Fetcher
+	bus            *pubsub.Bus
+	cpm            *moderation.Manager
+	cache          *thread_cache.Cache
 	systemReporter *system_report.Manager
 }
 
 func New(
-	accountQuery *account_querier.Querier,
 	replyQuerier *reply_querier.Querier,
 	replyWriter *reply_writer.Writer,
 	fetcher *fetcher.Fetcher,
@@ -63,7 +60,6 @@ func New(
 	systemReporter *system_report.Manager,
 ) *Mutator {
 	return &Mutator{
-		accountQuery:   accountQuery,
 		replyQuerier:   replyQuerier,
 		replyWriter:    replyWriter,
 		fetcher:        fetcher,

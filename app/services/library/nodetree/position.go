@@ -5,16 +5,17 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -27,7 +28,6 @@ type Position struct {
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
 	graph        Graph
-	accountQuery *account_querier.Querier
 	cache        *node_cache.Cache
 	bus          *pubsub.Bus
 }
@@ -37,7 +37,6 @@ func NewPositionService(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	graph Graph,
-	accountQuery *account_querier.Querier,
 	cache *node_cache.Cache,
 	bus *pubsub.Bus,
 ) *Position {
@@ -46,7 +45,6 @@ func NewPositionService(
 		nodeQuerier:  nodeQuerier,
 		nodeWriter:   nodeWriter,
 		graph:        graph,
-		accountQuery: accountQuery,
 		cache:        cache,
 		bus:          bus,
 	}
@@ -65,17 +63,19 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := p.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	n, err := p.nodeQuerier.Get(ctx, nm)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := node_auth.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+	if err := session.Authorise(ctx, func() error {
+		if n.Owner.ID != accountID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of the page and do not have the Manage Library permission."))
+		}
+		return nil
+	}, rbac.PermissionManageLibrary); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

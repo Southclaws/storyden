@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/mark3labs/mcp-go/mcp"
@@ -23,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -79,6 +81,10 @@ var threadCreateTool = mcp.NewTool("createThread",
 )
 
 func (t *threadTools) threadCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionCreatePost); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	title, err := request.RequireString("title")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -180,6 +186,10 @@ var threadListTool = mcp.NewTool("listThreads",
 )
 
 func (t *threadTools) threadList(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionReadPublishedThreads); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	query := request.GetString("query", "")
 	visibilityStr := request.GetString("visibility", "")
 	pageStr := request.GetString("page", "1")
@@ -242,6 +252,10 @@ var threadGetTool = mcp.NewTool("getThread",
 )
 
 func (t *threadTools) threadGet(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionReadPublishedThreads); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	threadMark, err := request.RequireString("slug")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -291,6 +305,32 @@ func (t *threadTools) threadUpdate(ctx context.Context, request mcp.CallToolRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	postID, err := t.thread_mark_svc.Lookup(ctx, threadMark)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	thr, err := t.thread_svc.Get(ctx, postID, pagination.NewPageParams(1, 1))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := session.Authorise(ctx, func() error {
+		if thr.Author.ID != accountID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not author", "You are not the author of the thread and do not have the Manage Posts permission."))
+		}
+		return nil
+	}, rbac.PermissionManagePosts); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	title := request.GetString("title", "")
 	body := request.GetString("body", "")
 	visibilityStr := request.GetString("visibility", "")
@@ -301,11 +341,6 @@ func (t *threadTools) threadUpdate(ctx context.Context, request mcp.CallToolRequ
 		for i := range tags {
 			tags[i] = strings.TrimSpace(tags[i])
 		}
-	}
-
-	postID, err := t.thread_mark_svc.Lookup(ctx, threadMark)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	partial := thread_service.Partial{}
@@ -359,6 +394,10 @@ var threadReplyTool = mcp.NewTool("replyToThread",
 )
 
 func (t *threadTools) threadReply(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionCreatePost); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	threadMark, err := request.RequireString("slug")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

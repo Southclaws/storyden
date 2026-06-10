@@ -5,18 +5,18 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -36,30 +36,27 @@ type Graph interface {
 }
 
 type service struct {
-	nodeQuerier  *node_querier.Querier
-	nodeWriter   *node_writer.Writer
-	accountQuery *account_querier.Querier
-	cache        *node_cache.Cache
-	bus          *pubsub.Bus
+	nodeQuerier *node_querier.Querier
+	nodeWriter  *node_writer.Writer
+	cache       *node_cache.Cache
+	bus         *pubsub.Bus
 }
 
 func New(
 	nodeChildren *node_children.Writer,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
-	accountQuery *account_querier.Querier,
 	cache *node_cache.Cache,
 	bus *pubsub.Bus,
 ) (Graph, *Position) {
 	g := &service{
-		nodeQuerier:  nodeQuerier,
-		nodeWriter:   nodeWriter,
-		accountQuery: accountQuery,
-		cache:        cache,
-		bus:          bus,
+		nodeQuerier: nodeQuerier,
+		nodeWriter:  nodeWriter,
+		cache:       cache,
+		bus:         bus,
 	}
 
-	p := NewPositionService(nodeChildren, nodeQuerier, nodeWriter, g, accountQuery, cache, bus)
+	p := NewPositionService(nodeChildren, nodeQuerier, nodeWriter, g, cache, bus)
 
 	return g, p
 }
@@ -74,11 +71,6 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := s.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -89,7 +81,19 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := node_auth.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+	if err := session.Authorise(ctx, func() error {
+		ownsChild := cnode.Owner.ID == accountID
+		ownsParent := pnode.Owner.ID == accountID
+		ownsNeither := !ownsChild && !ownsParent
+
+		if ownsNeither {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of both of the pages being affected and do not have the Manage Library permission."))
+		}
+
+		return nil
+	}, rbac.PermissionManageLibrary); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -136,10 +140,6 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	acc, err := s.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
 
 	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
@@ -151,7 +151,19 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := node_auth.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+	if err := session.Authorise(ctx, func() error {
+		ownsChild := cnode.Owner.ID == accountID
+		ownsParent := pnode.Owner.ID == accountID
+		ownsNeither := !ownsChild && !ownsParent
+
+		if ownsNeither {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of both of the pages being affected and do not have the Manage Library permission."))
+		}
+
+		return nil
+	}, rbac.PermissionManageLibrary); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
