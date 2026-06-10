@@ -79,10 +79,10 @@ var schemaLock = sync.Mutex{}
 func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, err := connect(wctx, cfg, db)
+	client, driver, err := connect(wctx, cfg, db)
 	if err != nil {
 		cancel()
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(wctx), fmsg.With("failed to connect ent client"))
 	}
 
 	tr := tf.Build(lc)
@@ -129,6 +129,17 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 			schemaLock.Lock()
 			defer schemaLock.Unlock()
 
+			// June 2026: Turso seems to have introduced an undocumented change
+			// where foreign key constraints are no longer enabled by default,
+			// and they don't seem to be able to be enabled via connection
+			// string pragmas. So we have to enable them manually...
+			if driver == "libsql" {
+				_, err = db.ExecContext(ctx, "PRAGMA foreign_keys = ON")
+				if err != nil {
+					return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to enable foreign key constraints for libsql (remote)"))
+				}
+			}
+
 			// Run migrations with hooks and index cleanup.
 			if err := client.Schema.Create(
 				ctx,
@@ -138,7 +149,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				schema.WithApplyHook(migrateReplyVisibility()),
 				schema.WithApplyHook(migrateAccountVerifiedStatus()),
 			); err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
+				return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to run schema migration"))
 			}
 
 			return nil
@@ -158,10 +169,10 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	return client, nil
 }
 
-func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Client, error) {
+func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Client, string, error) {
 	d, _, err := getDriver(cfg.DatabaseURL)
 	if err != nil {
-		return nil, fault.Wrap(err)
+		return nil, "", fault.Wrap(err)
 	}
 
 	opts := []ent.Option{}
@@ -184,7 +195,7 @@ func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Clien
 		panic(fmt.Sprintf("unsupported driver '%s' in ent connect", d))
 	}
 
-	return ent.NewClient(opts...), nil
+	return ent.NewClient(opts...), d, nil
 }
 
 func getDriver(databaseURL string) (string, string, error) {
