@@ -16,6 +16,7 @@ type Discovery struct {
 	ScopesSupported                   []string
 	SubjectTypesSupported             []string
 	IDTokenSigningAlgValuesSupported  []string
+	TokenEndpointAuthMethodsSupported []string
 	ClientIDMetadataDocumentSupported bool
 }
 
@@ -41,6 +42,7 @@ func (s *Service) Discovery() Discovery {
 		ScopesSupported:                   supportedScopes(),
 		SubjectTypesSupported:             []string{"public"},
 		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+		TokenEndpointAuthMethodsSupported: []string{TokenEndpointAuthMethodNone, TokenEndpointAuthMethodClientSecretBasic, TokenEndpointAuthMethodClientSecretPost},
 		ClientIDMetadataDocumentSupported: s.cimdEnabled(),
 	}
 }

@@ -95,6 +95,7 @@ type OAuthDiscoveryResponse struct {
 	ScopesSupported                   []string `json:"scopes_supported"`
 	SubjectTypesSupported             []string `json:"subject_types_supported"`
 	IDTokenSigningAlgValuesSupported  []string `json:"id_token_signing_alg_values_supported"`
+	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 	ClientIDMetadataDocumentSupported bool     `json:"client_id_metadata_document_supported"`
 }
 
@@ -115,6 +116,7 @@ func (o OAuth) OAuthDiscovery(context.Context) OAuthDiscoveryResponse {
 		ScopesSupported:                   discovery.ScopesSupported,
 		SubjectTypesSupported:             discovery.SubjectTypesSupported,
 		IDTokenSigningAlgValuesSupported:  discovery.IDTokenSigningAlgValuesSupported,
+		TokenEndpointAuthMethodsSupported: discovery.TokenEndpointAuthMethodsSupported,
 		ClientIDMetadataDocumentSupported: discovery.ClientIDMetadataDocumentSupported,
 	}
 }
@@ -130,6 +132,7 @@ type OAuthAuthorizationServerMetadata struct {
 	GrantTypesSupported               []string `json:"grant_types_supported,omitempty"`
 	CodeChallengeMethodsSupported     []string `json:"code_challenge_methods_supported,omitempty"`
 	DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint,omitempty"`
+	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 	ClientIDMetadataDocumentSupported bool     `json:"client_id_metadata_document_supported"`
 }
 
@@ -147,6 +150,7 @@ func (o OAuth) OAuthAuthorizationServerMetadata(context.Context) OAuthAuthorizat
 		GrantTypesSupported:               discovery.GrantTypesSupported,
 		CodeChallengeMethodsSupported:     discovery.CodeChallengeMethodsSupported,
 		DeviceAuthorizationEndpoint:       discovery.DeviceAuthorizationEndpoint,
+		TokenEndpointAuthMethodsSupported: discovery.TokenEndpointAuthMethodsSupported,
 		ClientIDMetadataDocumentSupported: discovery.ClientIDMetadataDocumentSupported,
 	}
 }
