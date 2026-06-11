@@ -33,7 +33,8 @@ const (
 
 	StorydenCLIClientID = "storyden-cli"
 
-	cleanupInterval = time.Hour
+	cleanupInterval          = time.Hour
+	dcrClientRetentionPeriod = 7 * 24 * time.Hour
 )
 
 type Error struct {
@@ -167,7 +168,7 @@ func (s *Service) cleanupExpiredRecordsLoop(ctx context.Context, logger *slog.Lo
 func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger) {
 	now := time.Now()
 
-	DeviceAuthorisations, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, now)
+	deviceAuthorisations, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, now)
 	if err != nil {
 		logger.Error("failed to clean expired oauth device authorizations", slog.Any("error", err))
 		return
@@ -179,11 +180,18 @@ func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger
 		return
 	}
 
-	if DeviceAuthorisations > 0 || authorizationRequests > 0 {
+	unusedDCRClients, err := s.tokens.DeleteUnusedDCRClients(ctx, now.Add(-dcrClientRetentionPeriod))
+	if err != nil {
+		logger.Error("failed to clean unused dcr clients", slog.Any("error", err))
+		return
+	}
+
+	if deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 {
 		logger.Debug(
 			"cleaned expired oauth records",
-			slog.Int("device_authorizations", DeviceAuthorisations),
+			slog.Int("device_authorizations", deviceAuthorisations),
 			slog.Int("authorization_requests", authorizationRequests),
+			slog.Int("unused_dcr_clients", unusedDCRClients),
 		)
 	}
 }

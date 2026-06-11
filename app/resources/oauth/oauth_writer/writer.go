@@ -411,6 +411,68 @@ func (w *Writer) ConsumeDeviceAuthorisation(ctx context.Context, id oauth.Device
 	return updated > 0, nil
 }
 
+func (w *Writer) DeleteUnusedDCRClients(ctx context.Context, before time.Time) (int, error) {
+	var deleted int
+
+	err := ent.WithTx(ctx, w.db, func(tx *ent.Tx) error {
+		ids, err := w.db.OAuthClient.Query().
+			Where(
+				oauthclient.AccountIDIsNil(),
+				oauthclient.ClientIDHasPrefix(oauth.OAuthAccessKeyPrefix),
+				oauthclient.CreatedAtLT(before),
+				oauthclient.Not(oauthclient.HasAuthorisationCodes()),
+				oauthclient.Not(oauthclient.HasRefreshTokens()),
+			).
+			IDs(ctx)
+		if err != nil {
+			return wrapWriteError(ctx, err)
+		}
+
+		if len(ids) == 0 {
+			return nil
+		}
+
+		if _, err := tx.OAuthAuthorisationCode.Delete().
+			Where(oauthauthorisationcode.ClientIDIn(ids...)).
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		if _, err := tx.OAuthAuthorisationRequest.Delete().
+			Where(oauthauthorisationrequest.ClientIDIn(ids...)).
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		if _, err := tx.OAuthDeviceAuthorisation.Delete().
+			Where(oauthdeviceauthorisation.ClientIDIn(ids...)).
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		if _, err := tx.OAuthRefreshToken.Delete().
+			Where(oauthrefreshtoken.ClientIDIn(ids...)).
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		n, err := tx.OAuthClient.Delete().
+			Where(oauthclient.IDIn(ids...)).
+			Exec(ctx)
+		if err != nil {
+			return err
+		}
+
+		deleted = n
+		return nil
+	})
+	if err != nil {
+		return 0, wrapWriteError(ctx, err)
+	}
+
+	return deleted, nil
+}
+
 func (w *Writer) DeleteExpiredDeviceAuthorisations(ctx context.Context, now time.Time) (int, error) {
 	deleted, err := w.db.OAuthDeviceAuthorisation.Delete().
 		Where(oauthdeviceauthorisation.ExpiresAtLT(now)).
