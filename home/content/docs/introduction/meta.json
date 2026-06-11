@@ -27,6 +27,6 @@
         "api",
         "oauth",
         "plugins",
-        "custom-frontend"
+        "frontend"
     ]
 }
