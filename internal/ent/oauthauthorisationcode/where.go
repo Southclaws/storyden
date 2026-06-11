@@ -86,6 +86,11 @@ func Scope(v string) predicate.OAuthAuthorisationCode {
 	return predicate.OAuthAuthorisationCode(sql.FieldEQ(FieldScope, v))
 }
 
+// Nonce applies equality check predicate on the "nonce" field. It's identical to NonceEQ.
+func Nonce(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldEQ(FieldNonce, v))
+}
+
 // CodeChallenge applies equality check predicate on the "code_challenge" field. It's identical to CodeChallengeEQ.
 func CodeChallenge(v string) predicate.OAuthAuthorisationCode {
 	return predicate.OAuthAuthorisationCode(sql.FieldEQ(FieldCodeChallenge, v))
@@ -474,6 +479,81 @@ func ScopeEqualFold(v string) predicate.OAuthAuthorisationCode {
 // ScopeContainsFold applies the ContainsFold predicate on the "scope" field.
 func ScopeContainsFold(v string) predicate.OAuthAuthorisationCode {
 	return predicate.OAuthAuthorisationCode(sql.FieldContainsFold(FieldScope, v))
+}
+
+// NonceEQ applies the EQ predicate on the "nonce" field.
+func NonceEQ(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldEQ(FieldNonce, v))
+}
+
+// NonceNEQ applies the NEQ predicate on the "nonce" field.
+func NonceNEQ(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldNEQ(FieldNonce, v))
+}
+
+// NonceIn applies the In predicate on the "nonce" field.
+func NonceIn(vs ...string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldIn(FieldNonce, vs...))
+}
+
+// NonceNotIn applies the NotIn predicate on the "nonce" field.
+func NonceNotIn(vs ...string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldNotIn(FieldNonce, vs...))
+}
+
+// NonceGT applies the GT predicate on the "nonce" field.
+func NonceGT(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldGT(FieldNonce, v))
+}
+
+// NonceGTE applies the GTE predicate on the "nonce" field.
+func NonceGTE(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldGTE(FieldNonce, v))
+}
+
+// NonceLT applies the LT predicate on the "nonce" field.
+func NonceLT(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldLT(FieldNonce, v))
+}
+
+// NonceLTE applies the LTE predicate on the "nonce" field.
+func NonceLTE(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldLTE(FieldNonce, v))
+}
+
+// NonceContains applies the Contains predicate on the "nonce" field.
+func NonceContains(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldContains(FieldNonce, v))
+}
+
+// NonceHasPrefix applies the HasPrefix predicate on the "nonce" field.
+func NonceHasPrefix(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldHasPrefix(FieldNonce, v))
+}
+
+// NonceHasSuffix applies the HasSuffix predicate on the "nonce" field.
+func NonceHasSuffix(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldHasSuffix(FieldNonce, v))
+}
+
+// NonceIsNil applies the IsNil predicate on the "nonce" field.
+func NonceIsNil() predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldIsNull(FieldNonce))
+}
+
+// NonceNotNil applies the NotNil predicate on the "nonce" field.
+func NonceNotNil() predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldNotNull(FieldNonce))
+}
+
+// NonceEqualFold applies the EqualFold predicate on the "nonce" field.
+func NonceEqualFold(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldEqualFold(FieldNonce, v))
+}
+
+// NonceContainsFold applies the ContainsFold predicate on the "nonce" field.
+func NonceContainsFold(v string) predicate.OAuthAuthorisationCode {
+	return predicate.OAuthAuthorisationCode(sql.FieldContainsFold(FieldNonce, v))
 }
 
 // CodeChallengeEQ applies the EQ predicate on the "code_challenge" field.

@@ -28,6 +28,8 @@ const (
 	FieldRedirectURI = "redirect_uri"
 	// FieldScope holds the string denoting the scope field in the database.
 	FieldScope = "scope"
+	// FieldNonce holds the string denoting the nonce field in the database.
+	FieldNonce = "nonce"
 	// FieldCodeChallenge holds the string denoting the code_challenge field in the database.
 	FieldCodeChallenge = "code_challenge"
 	// FieldCodeChallengeMethod holds the string denoting the code_challenge_method field in the database.
@@ -67,6 +69,7 @@ var Columns = []string{
 	FieldCodeHash,
 	FieldRedirectURI,
 	FieldScope,
+	FieldNonce,
 	FieldCodeChallenge,
 	FieldCodeChallengeMethod,
 	FieldExpiresAt,
@@ -159,6 +162,11 @@ func ByRedirectURI(opts ...sql.OrderTermOption) OrderOption {
 // ByScope orders the results by the scope field.
 func ByScope(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScope, opts...).ToFunc()
+}
+
+// ByNonce orders the results by the nonce field.
+func ByNonce(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNonce, opts...).ToFunc()
 }
 
 // ByCodeChallenge orders the results by the code_challenge field.

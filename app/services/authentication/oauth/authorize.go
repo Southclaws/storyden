@@ -22,6 +22,7 @@ type AuthoriseRequest struct {
 	RedirectURI         string
 	Scope               opt.Optional[string]
 	State               opt.Optional[string]
+	Nonce               opt.Optional[string]
 	CodeChallenge       string
 	CodeChallengeMethod string
 	AccountID           account.AccountID
@@ -92,6 +93,7 @@ func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*Autho
 		RedirectURI:         input.RedirectURI,
 		Scope:               scope,
 		State:               input.State,
+		Nonce:               input.Nonce,
 		CodeChallenge:       input.CodeChallenge,
 		CodeChallengeMethod: CodeChallengeMethodS256,
 		ExpiresAt:           time.Now().Add(10 * time.Minute),
@@ -186,6 +188,7 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 		CodeHash:            hashString(code),
 		RedirectURI:         rec.RedirectURI,
 		Scope:               grantedScope,
+		Nonce:               rec.Nonce,
 		CodeChallenge:       rec.CodeChallenge,
 		CodeChallengeMethod: CodeChallengeMethodS256,
 		ExpiresAt:           time.Now().Add(10 * time.Minute),

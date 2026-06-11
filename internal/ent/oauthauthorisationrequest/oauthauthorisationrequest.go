@@ -30,6 +30,8 @@ const (
 	FieldScope = "scope"
 	// FieldState holds the string denoting the state field in the database.
 	FieldState = "state"
+	// FieldNonce holds the string denoting the nonce field in the database.
+	FieldNonce = "nonce"
 	// FieldCodeChallenge holds the string denoting the code_challenge field in the database.
 	FieldCodeChallenge = "code_challenge"
 	// FieldCodeChallengeMethod holds the string denoting the code_challenge_method field in the database.
@@ -72,6 +74,7 @@ var Columns = []string{
 	FieldRedirectURI,
 	FieldScope,
 	FieldState,
+	FieldNonce,
 	FieldCodeChallenge,
 	FieldCodeChallengeMethod,
 	FieldExpiresAt,
@@ -170,6 +173,11 @@ func ByScope(opts ...sql.OrderTermOption) OrderOption {
 // ByState orders the results by the state field.
 func ByState(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldState, opts...).ToFunc()
+}
+
+// ByNonce orders the results by the nonce field.
+func ByNonce(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNonce, opts...).ToFunc()
 }
 
 // ByCodeChallenge orders the results by the code_challenge field.

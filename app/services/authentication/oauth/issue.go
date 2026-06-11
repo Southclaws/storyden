@@ -13,12 +13,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 )
 
-func (s *Service) issueTokens(ctx context.Context, client *oauthresource.Client, accountID account.AccountID, scope string) (*Token, error) {
-	resp, _, err := s.issueTokensWithRefresh(ctx, client, accountID, scope)
+func (s *Service) issueTokens(ctx context.Context, client *oauthresource.Client, accountID account.AccountID, scope string, nonce opt.Optional[string]) (*Token, error) {
+	resp, _, err := s.issueTokensWithRefresh(ctx, client, accountID, scope, nonce)
 	return resp, err
 }
 
-func (s *Service) issueTokensWithRefresh(ctx context.Context, client *oauthresource.Client, accountID account.AccountID, scope string) (*Token, oauthresource.RefreshTokenID, error) {
+func (s *Service) issueTokensWithRefresh(ctx context.Context, client *oauthresource.Client, accountID account.AccountID, scope string, nonce opt.Optional[string]) (*Token, oauthresource.RefreshTokenID, error) {
 	now := time.Now()
 	exp := now.Add(s.cfg.OAuthAccessTokenTTL)
 
@@ -49,7 +49,7 @@ func (s *Service) issueTokensWithRefresh(ctx context.Context, client *oauthresou
 
 	scopes := splitScope(scope)
 	if contains(scopes, "openid") {
-		claims, err := s.idTokenClaims(ctx, accountID, client.ClientID, scopes, exp, now)
+		claims, err := s.idTokenClaims(ctx, accountID, client.ClientID, scopes, nonce, exp, now)
 		if err != nil {
 			return nil, oauthresource.RefreshTokenID{}, err
 		}
@@ -84,7 +84,7 @@ func (s *Service) issueTokensWithRefresh(ctx context.Context, client *oauthresou
 	return resp, refreshTokenID, nil
 }
 
-func (s *Service) idTokenClaims(ctx context.Context, accountID account.AccountID, audience string, scopes []string, exp, now time.Time) (jwt.MapClaims, error) {
+func (s *Service) idTokenClaims(ctx context.Context, accountID account.AccountID, audience string, scopes []string, nonce opt.Optional[string], exp, now time.Time) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{
 		"iss": s.issuer,
 		"sub": accountID.String(),
@@ -92,6 +92,10 @@ func (s *Service) idTokenClaims(ctx context.Context, accountID account.AccountID
 		"exp": exp.Unix(),
 		"iat": now.Unix(),
 	}
+
+	nonce.Call(func(value string) {
+		claims["nonce"] = value
+	})
 
 	if !contains(scopes, "profile") && !contains(scopes, "email") {
 		return claims, nil

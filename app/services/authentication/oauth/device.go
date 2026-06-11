@@ -311,7 +311,7 @@ func (s *Service) exchangeDeviceCode(ctx context.Context, input TokenRequest) (*
 		return nil, oauthError("invalid_grant", "Device authorisation has already been consumed"), nil
 	}
 
-	token, err := s.issueTokens(ctx, cl, accountID, rec.Scope)
+	token, err := s.issueTokens(ctx, cl, accountID, rec.Scope, opt.NewEmpty[string]())
 	if err != nil {
 		return nil, nil, err
 	}

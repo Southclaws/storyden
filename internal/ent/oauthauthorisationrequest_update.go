@@ -150,6 +150,9 @@ func (_u *OAuthAuthorisationRequestUpdate) sqlSave(ctx context.Context) (_node i
 	if _u.mutation.StateCleared() {
 		_spec.ClearField(oauthauthorisationrequest.FieldState, field.TypeString)
 	}
+	if _u.mutation.NonceCleared() {
+		_spec.ClearField(oauthauthorisationrequest.FieldNonce, field.TypeString)
+	}
 	if value, ok := _u.mutation.ApprovedAt(); ok {
 		_spec.SetField(oauthauthorisationrequest.FieldApprovedAt, field.TypeTime, value)
 	}
@@ -334,6 +337,9 @@ func (_u *OAuthAuthorisationRequestUpdateOne) sqlSave(ctx context.Context) (_nod
 	}
 	if _u.mutation.StateCleared() {
 		_spec.ClearField(oauthauthorisationrequest.FieldState, field.TypeString)
+	}
+	if _u.mutation.NonceCleared() {
+		_spec.ClearField(oauthauthorisationrequest.FieldNonce, field.TypeString)
 	}
 	if value, ok := _u.mutation.ApprovedAt(); ok {
 		_spec.SetField(oauthauthorisationrequest.FieldApprovedAt, field.TypeTime, value)

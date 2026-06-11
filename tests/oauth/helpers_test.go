@@ -214,6 +214,7 @@ type authorizeRequest struct {
 	RedirectURI         string
 	Scope               string
 	State               string
+	Nonce               string
 	CodeChallenge       string
 	CodeChallengeMethod string
 }
@@ -251,6 +252,9 @@ func authorizeHTTPResponse(t *testing.T, ctx context.Context, ts *httptest.Serve
 		q.Set("scope", req.Scope)
 	}
 	q.Set("state", req.State)
+	if req.Nonce != "" {
+		q.Set("nonce", req.Nonce)
+	}
 	q.Set("code_challenge", req.CodeChallenge)
 	q.Set("code_challenge_method", codeChallengeMethod)
 

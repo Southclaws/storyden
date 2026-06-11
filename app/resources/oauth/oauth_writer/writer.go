@@ -57,6 +57,7 @@ type AuthorisationCodeCreate struct {
 	CodeHash            string
 	RedirectURI         string
 	Scope               string
+	Nonce               opt.Optional[string]
 	CodeChallenge       string
 	CodeChallengeMethod string
 	ExpiresAt           time.Time
@@ -69,6 +70,7 @@ type AuthorisationRequestCreate struct {
 	RedirectURI         string
 	Scope               string
 	State               opt.Optional[string]
+	Nonce               opt.Optional[string]
 	CodeChallenge       string
 	CodeChallengeMethod string
 	ExpiresAt           time.Time
@@ -199,6 +201,7 @@ func (w *Writer) CreateAuthorisationCode(ctx context.Context, input Authorisatio
 		SetCodeHash(input.CodeHash).
 		SetRedirectURI(input.RedirectURI).
 		SetScope(input.Scope).
+		SetNillableNonce(input.Nonce.Ptr()).
 		SetCodeChallenge(input.CodeChallenge).
 		SetCodeChallengeMethod(oauthauthorisationcode.CodeChallengeMethod(input.CodeChallengeMethod)).
 		SetExpiresAt(input.ExpiresAt).
@@ -217,6 +220,7 @@ func (w *Writer) CreateAuthorisationRequest(ctx context.Context, input Authorisa
 		SetRequestIDHash(input.RequestIDHash).
 		SetRedirectURI(input.RedirectURI).
 		SetScope(input.Scope).
+		SetNillableNonce(input.Nonce.Ptr()).
 		SetCodeChallenge(input.CodeChallenge).
 		SetCodeChallengeMethod(oauthauthorisationrequest.CodeChallengeMethod(input.CodeChallengeMethod)).
 		SetExpiresAt(input.ExpiresAt)
@@ -259,6 +263,7 @@ func (w *Writer) ApproveAuthorisationRequestAndCreateCode(ctx context.Context, i
 			SetCodeHash(code.CodeHash).
 			SetRedirectURI(code.RedirectURI).
 			SetScope(code.Scope).
+			SetNillableNonce(code.Nonce.Ptr()).
 			SetCodeChallenge(code.CodeChallenge).
 			SetCodeChallengeMethod(oauthauthorisationcode.CodeChallengeMethod(code.CodeChallengeMethod)).
 			SetExpiresAt(code.ExpiresAt).

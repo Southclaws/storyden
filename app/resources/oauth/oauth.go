@@ -64,6 +64,7 @@ type AuthorisationCode struct {
 	CodeHash            string
 	RedirectURI         string
 	Scope               string
+	Nonce               opt.Optional[string]
 	CodeChallenge       string
 	CodeChallengeMethod string
 	ExpiresAt           time.Time
@@ -79,6 +80,7 @@ type AuthorisationRequest struct {
 	RedirectURI         string
 	Scope               string
 	State               opt.Optional[string]
+	Nonce               opt.Optional[string]
 	CodeChallenge       string
 	CodeChallengeMethod string
 	ExpiresAt           time.Time
@@ -149,6 +151,7 @@ func MapAuthorisationCode(in *ent.OAuthAuthorisationCode) *AuthorisationCode {
 		CodeHash:            in.CodeHash,
 		RedirectURI:         in.RedirectURI,
 		Scope:               in.Scope,
+		Nonce:               opt.NewPtr(in.Nonce),
 		CodeChallenge:       in.CodeChallenge,
 		CodeChallengeMethod: in.CodeChallengeMethod.String(),
 		ExpiresAt:           in.ExpiresAt,
@@ -166,6 +169,7 @@ func MapAuthorisationRequest(in *ent.OAuthAuthorisationRequest) *AuthorisationRe
 		RedirectURI:         in.RedirectURI,
 		Scope:               in.Scope,
 		State:               opt.NewPtr(in.State),
+		Nonce:               opt.NewPtr(in.Nonce),
 		CodeChallenge:       in.CodeChallenge,
 		CodeChallengeMethod: in.CodeChallengeMethod.String(),
 		ExpiresAt:           in.ExpiresAt,

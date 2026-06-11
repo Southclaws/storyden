@@ -22562,6 +22562,7 @@ type OAuthAuthorisationCodeMutation struct {
 	code_hash             *string
 	redirect_uri          *string
 	scope                 *string
+	nonce                 *string
 	code_challenge        *string
 	code_challenge_method *oauthauthorisationcode.CodeChallengeMethod
 	expires_at            *time.Time
@@ -22896,6 +22897,55 @@ func (m *OAuthAuthorisationCodeMutation) ResetScope() {
 	m.scope = nil
 }
 
+// SetNonce sets the "nonce" field.
+func (m *OAuthAuthorisationCodeMutation) SetNonce(s string) {
+	m.nonce = &s
+}
+
+// Nonce returns the value of the "nonce" field in the mutation.
+func (m *OAuthAuthorisationCodeMutation) Nonce() (r string, exists bool) {
+	v := m.nonce
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNonce returns the old "nonce" field's value of the OAuthAuthorisationCode entity.
+// If the OAuthAuthorisationCode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthAuthorisationCodeMutation) OldNonce(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNonce is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNonce requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNonce: %w", err)
+	}
+	return oldValue.Nonce, nil
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (m *OAuthAuthorisationCodeMutation) ClearNonce() {
+	m.nonce = nil
+	m.clearedFields[oauthauthorisationcode.FieldNonce] = struct{}{}
+}
+
+// NonceCleared returns if the "nonce" field was cleared in this mutation.
+func (m *OAuthAuthorisationCodeMutation) NonceCleared() bool {
+	_, ok := m.clearedFields[oauthauthorisationcode.FieldNonce]
+	return ok
+}
+
+// ResetNonce resets all changes to the "nonce" field.
+func (m *OAuthAuthorisationCodeMutation) ResetNonce() {
+	m.nonce = nil
+	delete(m.clearedFields, oauthauthorisationcode.FieldNonce)
+}
+
 // SetCodeChallenge sets the "code_challenge" field.
 func (m *OAuthAuthorisationCodeMutation) SetCodeChallenge(s string) {
 	m.code_challenge = &s
@@ -23141,7 +23191,7 @@ func (m *OAuthAuthorisationCodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OAuthAuthorisationCodeMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, oauthauthorisationcode.FieldCreatedAt)
 	}
@@ -23159,6 +23209,9 @@ func (m *OAuthAuthorisationCodeMutation) Fields() []string {
 	}
 	if m.scope != nil {
 		fields = append(fields, oauthauthorisationcode.FieldScope)
+	}
+	if m.nonce != nil {
+		fields = append(fields, oauthauthorisationcode.FieldNonce)
 	}
 	if m.code_challenge != nil {
 		fields = append(fields, oauthauthorisationcode.FieldCodeChallenge)
@@ -23192,6 +23245,8 @@ func (m *OAuthAuthorisationCodeMutation) Field(name string) (ent.Value, bool) {
 		return m.RedirectURI()
 	case oauthauthorisationcode.FieldScope:
 		return m.Scope()
+	case oauthauthorisationcode.FieldNonce:
+		return m.Nonce()
 	case oauthauthorisationcode.FieldCodeChallenge:
 		return m.CodeChallenge()
 	case oauthauthorisationcode.FieldCodeChallengeMethod:
@@ -23221,6 +23276,8 @@ func (m *OAuthAuthorisationCodeMutation) OldField(ctx context.Context, name stri
 		return m.OldRedirectURI(ctx)
 	case oauthauthorisationcode.FieldScope:
 		return m.OldScope(ctx)
+	case oauthauthorisationcode.FieldNonce:
+		return m.OldNonce(ctx)
 	case oauthauthorisationcode.FieldCodeChallenge:
 		return m.OldCodeChallenge(ctx)
 	case oauthauthorisationcode.FieldCodeChallengeMethod:
@@ -23280,6 +23337,13 @@ func (m *OAuthAuthorisationCodeMutation) SetField(name string, value ent.Value) 
 		}
 		m.SetScope(v)
 		return nil
+	case oauthauthorisationcode.FieldNonce:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNonce(v)
+		return nil
 	case oauthauthorisationcode.FieldCodeChallenge:
 		v, ok := value.(string)
 		if !ok {
@@ -23338,6 +23402,9 @@ func (m *OAuthAuthorisationCodeMutation) AddField(name string, value ent.Value) 
 // mutation.
 func (m *OAuthAuthorisationCodeMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(oauthauthorisationcode.FieldNonce) {
+		fields = append(fields, oauthauthorisationcode.FieldNonce)
+	}
 	if m.FieldCleared(oauthauthorisationcode.FieldConsumedAt) {
 		fields = append(fields, oauthauthorisationcode.FieldConsumedAt)
 	}
@@ -23355,6 +23422,9 @@ func (m *OAuthAuthorisationCodeMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *OAuthAuthorisationCodeMutation) ClearField(name string) error {
 	switch name {
+	case oauthauthorisationcode.FieldNonce:
+		m.ClearNonce()
+		return nil
 	case oauthauthorisationcode.FieldConsumedAt:
 		m.ClearConsumedAt()
 		return nil
@@ -23383,6 +23453,9 @@ func (m *OAuthAuthorisationCodeMutation) ResetField(name string) error {
 		return nil
 	case oauthauthorisationcode.FieldScope:
 		m.ResetScope()
+		return nil
+	case oauthauthorisationcode.FieldNonce:
+		m.ResetNonce()
 		return nil
 	case oauthauthorisationcode.FieldCodeChallenge:
 		m.ResetCodeChallenge()
@@ -23503,6 +23576,7 @@ type OAuthAuthorisationRequestMutation struct {
 	redirect_uri          *string
 	scope                 *string
 	state                 *string
+	nonce                 *string
 	code_challenge        *string
 	code_challenge_method *oauthauthorisationrequest.CodeChallengeMethod
 	expires_at            *time.Time
@@ -23887,6 +23961,55 @@ func (m *OAuthAuthorisationRequestMutation) ResetState() {
 	delete(m.clearedFields, oauthauthorisationrequest.FieldState)
 }
 
+// SetNonce sets the "nonce" field.
+func (m *OAuthAuthorisationRequestMutation) SetNonce(s string) {
+	m.nonce = &s
+}
+
+// Nonce returns the value of the "nonce" field in the mutation.
+func (m *OAuthAuthorisationRequestMutation) Nonce() (r string, exists bool) {
+	v := m.nonce
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNonce returns the old "nonce" field's value of the OAuthAuthorisationRequest entity.
+// If the OAuthAuthorisationRequest object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthAuthorisationRequestMutation) OldNonce(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNonce is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNonce requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNonce: %w", err)
+	}
+	return oldValue.Nonce, nil
+}
+
+// ClearNonce clears the value of the "nonce" field.
+func (m *OAuthAuthorisationRequestMutation) ClearNonce() {
+	m.nonce = nil
+	m.clearedFields[oauthauthorisationrequest.FieldNonce] = struct{}{}
+}
+
+// NonceCleared returns if the "nonce" field was cleared in this mutation.
+func (m *OAuthAuthorisationRequestMutation) NonceCleared() bool {
+	_, ok := m.clearedFields[oauthauthorisationrequest.FieldNonce]
+	return ok
+}
+
+// ResetNonce resets all changes to the "nonce" field.
+func (m *OAuthAuthorisationRequestMutation) ResetNonce() {
+	m.nonce = nil
+	delete(m.clearedFields, oauthauthorisationrequest.FieldNonce)
+}
+
 // SetCodeChallenge sets the "code_challenge" field.
 func (m *OAuthAuthorisationRequestMutation) SetCodeChallenge(s string) {
 	m.code_challenge = &s
@@ -24181,7 +24304,7 @@ func (m *OAuthAuthorisationRequestMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *OAuthAuthorisationRequestMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, oauthauthorisationrequest.FieldCreatedAt)
 	}
@@ -24202,6 +24325,9 @@ func (m *OAuthAuthorisationRequestMutation) Fields() []string {
 	}
 	if m.state != nil {
 		fields = append(fields, oauthauthorisationrequest.FieldState)
+	}
+	if m.nonce != nil {
+		fields = append(fields, oauthauthorisationrequest.FieldNonce)
 	}
 	if m.code_challenge != nil {
 		fields = append(fields, oauthauthorisationrequest.FieldCodeChallenge)
@@ -24240,6 +24366,8 @@ func (m *OAuthAuthorisationRequestMutation) Field(name string) (ent.Value, bool)
 		return m.Scope()
 	case oauthauthorisationrequest.FieldState:
 		return m.State()
+	case oauthauthorisationrequest.FieldNonce:
+		return m.Nonce()
 	case oauthauthorisationrequest.FieldCodeChallenge:
 		return m.CodeChallenge()
 	case oauthauthorisationrequest.FieldCodeChallengeMethod:
@@ -24273,6 +24401,8 @@ func (m *OAuthAuthorisationRequestMutation) OldField(ctx context.Context, name s
 		return m.OldScope(ctx)
 	case oauthauthorisationrequest.FieldState:
 		return m.OldState(ctx)
+	case oauthauthorisationrequest.FieldNonce:
+		return m.OldNonce(ctx)
 	case oauthauthorisationrequest.FieldCodeChallenge:
 		return m.OldCodeChallenge(ctx)
 	case oauthauthorisationrequest.FieldCodeChallengeMethod:
@@ -24340,6 +24470,13 @@ func (m *OAuthAuthorisationRequestMutation) SetField(name string, value ent.Valu
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetState(v)
+		return nil
+	case oauthauthorisationrequest.FieldNonce:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNonce(v)
 		return nil
 	case oauthauthorisationrequest.FieldCodeChallenge:
 		v, ok := value.(string)
@@ -24409,6 +24546,9 @@ func (m *OAuthAuthorisationRequestMutation) ClearedFields() []string {
 	if m.FieldCleared(oauthauthorisationrequest.FieldState) {
 		fields = append(fields, oauthauthorisationrequest.FieldState)
 	}
+	if m.FieldCleared(oauthauthorisationrequest.FieldNonce) {
+		fields = append(fields, oauthauthorisationrequest.FieldNonce)
+	}
 	if m.FieldCleared(oauthauthorisationrequest.FieldApprovedAt) {
 		fields = append(fields, oauthauthorisationrequest.FieldApprovedAt)
 	}
@@ -24431,6 +24571,9 @@ func (m *OAuthAuthorisationRequestMutation) ClearField(name string) error {
 	switch name {
 	case oauthauthorisationrequest.FieldState:
 		m.ClearState()
+		return nil
+	case oauthauthorisationrequest.FieldNonce:
+		m.ClearNonce()
 		return nil
 	case oauthauthorisationrequest.FieldApprovedAt:
 		m.ClearApprovedAt()
@@ -24466,6 +24609,9 @@ func (m *OAuthAuthorisationRequestMutation) ResetField(name string) error {
 		return nil
 	case oauthauthorisationrequest.FieldState:
 		m.ResetState()
+		return nil
+	case oauthauthorisationrequest.FieldNonce:
+		m.ResetNonce()
 		return nil
 	case oauthauthorisationrequest.FieldCodeChallenge:
 		m.ResetCodeChallenge()

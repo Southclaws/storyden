@@ -93,7 +93,7 @@ func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequ
 		return nil, oauthError("invalid_scope", "Requested scope is not permitted"), nil
 	}
 
-	token, err := s.issueTokens(ctx, cl, accountID, grantedScope)
+	token, err := s.issueTokens(ctx, cl, accountID, grantedScope, opt.NewEmpty[string]())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -152,7 +152,7 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 		return nil, oauthError("invalid_grant", "Authorization code has already been consumed"), nil
 	}
 
-	token, err := s.issueTokens(ctx, cl, rec.AccountID, rec.Scope)
+	token, err := s.issueTokens(ctx, cl, rec.AccountID, rec.Scope, rec.Nonce)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -205,7 +205,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 		return nil, oauthError("invalid_grant", "Refresh token has already been consumed"), nil
 	}
 
-	token, newID, err := s.issueTokensWithRefresh(ctx, cl, rec.AccountID, grantedScope)
+	token, newID, err := s.issueTokensWithRefresh(ctx, cl, rec.AccountID, grantedScope, opt.NewEmpty[string]())
 	if err != nil {
 		return nil, nil, err
 	}

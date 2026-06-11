@@ -1184,6 +1184,7 @@ paths:
         - { $ref: "#/components/parameters/OAuthRedirectURIQuery" }
         - { $ref: "#/components/parameters/OAuthScopeQuery" }
         - { $ref: "#/components/parameters/OAuthStateQuery" }
+        - { $ref: "#/components/parameters/OAuthNonceQuery" }
         - { $ref: "#/components/parameters/OAuthCodeChallengeQuery" }
         - { $ref: "#/components/parameters/OAuthCodeChallengeMethodQuery" }
       responses:
@@ -3774,6 +3775,16 @@ components:
     OAuthStateQuery:
       description: Client-provided opaque state returned to the redirect URI.
       name: state
+      in: query
+      required: false
+      schema:
+        type: string
+
+    OAuthNonceQuery:
+      description: |
+        OpenID Connect nonce. When provided, it is returned unmodified as the
+        `nonce` claim in the issued ID token (OIDC Core §3.1.2).
+      name: nonce
       in: query
       required: false
       schema:

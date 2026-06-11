@@ -70,6 +70,20 @@ func (_c *OAuthAuthorisationCodeCreate) SetScope(v string) *OAuthAuthorisationCo
 	return _c
 }
 
+// SetNonce sets the "nonce" field.
+func (_c *OAuthAuthorisationCodeCreate) SetNonce(v string) *OAuthAuthorisationCodeCreate {
+	_c.mutation.SetNonce(v)
+	return _c
+}
+
+// SetNillableNonce sets the "nonce" field if the given value is not nil.
+func (_c *OAuthAuthorisationCodeCreate) SetNillableNonce(v *string) *OAuthAuthorisationCodeCreate {
+	if v != nil {
+		_c.SetNonce(*v)
+	}
+	return _c
+}
+
 // SetCodeChallenge sets the "code_challenge" field.
 func (_c *OAuthAuthorisationCodeCreate) SetCodeChallenge(v string) *OAuthAuthorisationCodeCreate {
 	_c.mutation.SetCodeChallenge(v)
@@ -295,6 +309,10 @@ func (_c *OAuthAuthorisationCodeCreate) createSpec() (*OAuthAuthorisationCode, *
 		_spec.SetField(oauthauthorisationcode.FieldScope, field.TypeString, value)
 		_node.Scope = value
 	}
+	if value, ok := _c.mutation.Nonce(); ok {
+		_spec.SetField(oauthauthorisationcode.FieldNonce, field.TypeString, value)
+		_node.Nonce = &value
+	}
 	if value, ok := _c.mutation.CodeChallenge(); ok {
 		_spec.SetField(oauthauthorisationcode.FieldCodeChallenge, field.TypeString, value)
 		_node.CodeChallenge = value
@@ -458,6 +476,9 @@ func (u *OAuthAuthorisationCodeUpsertOne) UpdateNewValues() *OAuthAuthorisationC
 		}
 		if _, exists := u.create.mutation.RedirectURI(); exists {
 			s.SetIgnore(oauthauthorisationcode.FieldRedirectURI)
+		}
+		if _, exists := u.create.mutation.Nonce(); exists {
+			s.SetIgnore(oauthauthorisationcode.FieldNonce)
 		}
 		if _, exists := u.create.mutation.CodeChallenge(); exists {
 			s.SetIgnore(oauthauthorisationcode.FieldCodeChallenge)
@@ -731,6 +752,9 @@ func (u *OAuthAuthorisationCodeUpsertBulk) UpdateNewValues() *OAuthAuthorisation
 			}
 			if _, exists := b.mutation.RedirectURI(); exists {
 				s.SetIgnore(oauthauthorisationcode.FieldRedirectURI)
+			}
+			if _, exists := b.mutation.Nonce(); exists {
+				s.SetIgnore(oauthauthorisationcode.FieldNonce)
 			}
 			if _, exists := b.mutation.CodeChallenge(); exists {
 				s.SetIgnore(oauthauthorisationcode.FieldCodeChallenge)
