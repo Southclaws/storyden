@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -159,6 +160,20 @@ func (_c *NodeCreate) SetNillableHideChildTree(v *bool) *NodeCreate {
 // SetAccountID sets the "account_id" field.
 func (_c *NodeCreate) SetAccountID(v xid.ID) *NodeCreate {
 	_c.mutation.SetAccountID(v)
+	return _c
+}
+
+// SetCurrentVersionID sets the "current_version_id" field.
+func (_c *NodeCreate) SetCurrentVersionID(v xid.ID) *NodeCreate {
+	_c.mutation.SetCurrentVersionID(v)
+	return _c
+}
+
+// SetNillableCurrentVersionID sets the "current_version_id" field if the given value is not nil.
+func (_c *NodeCreate) SetNillableCurrentVersionID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetCurrentVersionID(*v)
+	}
 	return _c
 }
 
@@ -399,6 +414,26 @@ func (_c *NodeCreate) AddCollections(v ...*Collection) *NodeCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddCollectionIDs(ids...)
+}
+
+// AddVersionIDs adds the "versions" edge to the NodeVersion entity by IDs.
+func (_c *NodeCreate) AddVersionIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddVersionIDs(ids...)
+	return _c
+}
+
+// AddVersions adds the "versions" edges to the NodeVersion entity.
+func (_c *NodeCreate) AddVersions(v ...*NodeVersion) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddVersionIDs(ids...)
+}
+
+// SetCurrentVersion sets the "current_version" edge to the NodeVersion entity.
+func (_c *NodeCreate) SetCurrentVersion(v *NodeVersion) *NodeCreate {
+	return _c.SetCurrentVersionID(v.ID)
 }
 
 // Mutation returns the NodeMutation object of the builder.
@@ -773,6 +808,39 @@ func (_c *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := _c.mutation.VersionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.VersionsTable,
+			Columns: []string{node.VersionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CurrentVersionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.CurrentVersionTable,
+			Columns: []string{node.CurrentVersionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(nodeversion.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CurrentVersionID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -972,6 +1040,24 @@ func (u *NodeUpsert) SetAccountID(v xid.ID) *NodeUpsert {
 // UpdateAccountID sets the "account_id" field to the value that was provided on create.
 func (u *NodeUpsert) UpdateAccountID() *NodeUpsert {
 	u.SetExcluded(node.FieldAccountID)
+	return u
+}
+
+// SetCurrentVersionID sets the "current_version_id" field.
+func (u *NodeUpsert) SetCurrentVersionID(v xid.ID) *NodeUpsert {
+	u.Set(node.FieldCurrentVersionID, v)
+	return u
+}
+
+// UpdateCurrentVersionID sets the "current_version_id" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateCurrentVersionID() *NodeUpsert {
+	u.SetExcluded(node.FieldCurrentVersionID)
+	return u
+}
+
+// ClearCurrentVersionID clears the value of the "current_version_id" field.
+func (u *NodeUpsert) ClearCurrentVersionID() *NodeUpsert {
+	u.SetNull(node.FieldCurrentVersionID)
 	return u
 }
 
@@ -1294,6 +1380,27 @@ func (u *NodeUpsertOne) SetAccountID(v xid.ID) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateAccountID() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetCurrentVersionID sets the "current_version_id" field.
+func (u *NodeUpsertOne) SetCurrentVersionID(v xid.ID) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetCurrentVersionID(v)
+	})
+}
+
+// UpdateCurrentVersionID sets the "current_version_id" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateCurrentVersionID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateCurrentVersionID()
+	})
+}
+
+// ClearCurrentVersionID clears the value of the "current_version_id" field.
+func (u *NodeUpsertOne) ClearCurrentVersionID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearCurrentVersionID()
 	})
 }
 
@@ -1799,6 +1906,27 @@ func (u *NodeUpsertBulk) SetAccountID(v xid.ID) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateAccountID() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetCurrentVersionID sets the "current_version_id" field.
+func (u *NodeUpsertBulk) SetCurrentVersionID(v xid.ID) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetCurrentVersionID(v)
+	})
+}
+
+// UpdateCurrentVersionID sets the "current_version_id" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateCurrentVersionID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateCurrentVersionID()
+	})
+}
+
+// ClearCurrentVersionID clears the value of the "current_version_id" field.
+func (u *NodeUpsertBulk) ClearCurrentVersionID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearCurrentVersionID()
 	})
 }
 

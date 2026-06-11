@@ -278,7 +278,7 @@ func TestOAuthDeviceFlowPermissionPolicies(t *testing.T) {
 					Title:      "oauth explicit thread " + uuid.NewString(),
 					Body:       ptr("<p>created with an oauth token</p>"),
 					Category:   &category.JSON200.Id,
-					Visibility: ptr(openapi.Published),
+					Visibility: ptr(openapi.VisibilityPublished),
 				}, bearer(*token.JSON200.AccessToken)))(t, http.StatusOK)
 				r.NotNil(thread.JSON200)
 			})

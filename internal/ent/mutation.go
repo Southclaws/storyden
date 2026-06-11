@@ -32,6 +32,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -86,6 +87,7 @@ const (
 	TypeMentionProfile            = "MentionProfile"
 	TypeModerationNote            = "ModerationNote"
 	TypeNode                      = "Node"
+	TypeNodeVersion               = "NodeVersion"
 	TypeNotification              = "Notification"
 	TypeOAuthAuthorisationCode    = "OAuthAuthorisationCode"
 	TypeOAuthAuthorisationRequest = "OAuthAuthorisationRequest"
@@ -203,6 +205,9 @@ type AccountMutation struct {
 	nodes                                       map[xid.ID]struct{}
 	removednodes                                map[xid.ID]struct{}
 	clearednodes                                bool
+	node_versions                               map[xid.ID]struct{}
+	removednode_versions                        map[xid.ID]struct{}
+	clearednode_versions                        bool
 	assets                                      map[xid.ID]struct{}
 	removedassets                               map[xid.ID]struct{}
 	clearedassets                               bool
@@ -2279,6 +2284,60 @@ func (m *AccountMutation) ResetNodes() {
 	m.removednodes = nil
 }
 
+// AddNodeVersionIDs adds the "node_versions" edge to the NodeVersion entity by ids.
+func (m *AccountMutation) AddNodeVersionIDs(ids ...xid.ID) {
+	if m.node_versions == nil {
+		m.node_versions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.node_versions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeVersions clears the "node_versions" edge to the NodeVersion entity.
+func (m *AccountMutation) ClearNodeVersions() {
+	m.clearednode_versions = true
+}
+
+// NodeVersionsCleared reports if the "node_versions" edge to the NodeVersion entity was cleared.
+func (m *AccountMutation) NodeVersionsCleared() bool {
+	return m.clearednode_versions
+}
+
+// RemoveNodeVersionIDs removes the "node_versions" edge to the NodeVersion entity by IDs.
+func (m *AccountMutation) RemoveNodeVersionIDs(ids ...xid.ID) {
+	if m.removednode_versions == nil {
+		m.removednode_versions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.node_versions, ids[i])
+		m.removednode_versions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeVersions returns the removed IDs of the "node_versions" edge to the NodeVersion entity.
+func (m *AccountMutation) RemovedNodeVersionsIDs() (ids []xid.ID) {
+	for id := range m.removednode_versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeVersionsIDs returns the "node_versions" edge IDs in the mutation.
+func (m *AccountMutation) NodeVersionsIDs() (ids []xid.ID) {
+	for id := range m.node_versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeVersions resets all changes to the "node_versions" edge.
+func (m *AccountMutation) ResetNodeVersions() {
+	m.node_versions = nil
+	m.clearednode_versions = false
+	m.removednode_versions = nil
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *AccountMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -3272,7 +3331,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3347,6 +3406,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.nodes != nil {
 		edges = append(edges, account.EdgeNodes)
+	}
+	if m.node_versions != nil {
+		edges = append(edges, account.EdgeNodeVersions)
 	}
 	if m.assets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -3536,6 +3598,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeNodeVersions:
+		ids := make([]ent.Value, 0, len(m.node_versions))
+		for id := range m.node_versions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -3608,7 +3676,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3680,6 +3748,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removednodes != nil {
 		edges = append(edges, account.EdgeNodes)
+	}
+	if m.removednode_versions != nil {
+		edges = append(edges, account.EdgeNodeVersions)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, account.EdgeAssets)
@@ -3865,6 +3936,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeNodeVersions:
+		ids := make([]ent.Value, 0, len(m.removednode_versions))
+		for id := range m.removednode_versions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.removedassets))
 		for id := range m.removedassets {
@@ -3937,7 +4014,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 36)
+	edges := make([]string, 0, 37)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4012,6 +4089,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearednodes {
 		edges = append(edges, account.EdgeNodes)
+	}
+	if m.clearednode_versions {
+		edges = append(edges, account.EdgeNodeVersions)
 	}
 	if m.clearedassets {
 		edges = append(edges, account.EdgeAssets)
@@ -4103,6 +4183,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedcollections
 	case account.EdgeNodes:
 		return m.clearednodes
+	case account.EdgeNodeVersions:
+		return m.clearednode_versions
 	case account.EdgeAssets:
 		return m.clearedassets
 	case account.EdgeEvents:
@@ -4218,6 +4300,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeNodes:
 		m.ResetNodes()
+		return nil
+	case account.EdgeNodeVersions:
+		m.ResetNodeVersions()
 		return nil
 	case account.EdgeAssets:
 		m.ResetAssets()
@@ -19537,6 +19622,11 @@ type NodeMutation struct {
 	collections            map[xid.ID]struct{}
 	removedcollections     map[xid.ID]struct{}
 	clearedcollections     bool
+	versions               map[xid.ID]struct{}
+	removedversions        map[xid.ID]struct{}
+	clearedversions        bool
+	current_version        *xid.ID
+	clearedcurrent_version bool
 	done                   bool
 	oldValue               func(context.Context) (*Node, error)
 	predicates             []predicate.Node
@@ -20105,6 +20195,55 @@ func (m *NodeMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
 // ResetAccountID resets all changes to the "account_id" field.
 func (m *NodeMutation) ResetAccountID() {
 	m.owner = nil
+}
+
+// SetCurrentVersionID sets the "current_version_id" field.
+func (m *NodeMutation) SetCurrentVersionID(x xid.ID) {
+	m.current_version = &x
+}
+
+// CurrentVersionID returns the value of the "current_version_id" field in the mutation.
+func (m *NodeMutation) CurrentVersionID() (r xid.ID, exists bool) {
+	v := m.current_version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCurrentVersionID returns the old "current_version_id" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldCurrentVersionID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCurrentVersionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCurrentVersionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCurrentVersionID: %w", err)
+	}
+	return oldValue.CurrentVersionID, nil
+}
+
+// ClearCurrentVersionID clears the value of the "current_version_id" field.
+func (m *NodeMutation) ClearCurrentVersionID() {
+	m.current_version = nil
+	m.clearedFields[node.FieldCurrentVersionID] = struct{}{}
+}
+
+// CurrentVersionIDCleared returns if the "current_version_id" field was cleared in this mutation.
+func (m *NodeMutation) CurrentVersionIDCleared() bool {
+	_, ok := m.clearedFields[node.FieldCurrentVersionID]
+	return ok
+}
+
+// ResetCurrentVersionID resets all changes to the "current_version_id" field.
+func (m *NodeMutation) ResetCurrentVersionID() {
+	m.current_version = nil
+	delete(m.clearedFields, node.FieldCurrentVersionID)
 }
 
 // SetPropertySchemaID sets the "property_schema_id" field.
@@ -20873,6 +21012,87 @@ func (m *NodeMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
+// AddVersionIDs adds the "versions" edge to the NodeVersion entity by ids.
+func (m *NodeMutation) AddVersionIDs(ids ...xid.ID) {
+	if m.versions == nil {
+		m.versions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.versions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVersions clears the "versions" edge to the NodeVersion entity.
+func (m *NodeMutation) ClearVersions() {
+	m.clearedversions = true
+}
+
+// VersionsCleared reports if the "versions" edge to the NodeVersion entity was cleared.
+func (m *NodeMutation) VersionsCleared() bool {
+	return m.clearedversions
+}
+
+// RemoveVersionIDs removes the "versions" edge to the NodeVersion entity by IDs.
+func (m *NodeMutation) RemoveVersionIDs(ids ...xid.ID) {
+	if m.removedversions == nil {
+		m.removedversions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.versions, ids[i])
+		m.removedversions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVersions returns the removed IDs of the "versions" edge to the NodeVersion entity.
+func (m *NodeMutation) RemovedVersionsIDs() (ids []xid.ID) {
+	for id := range m.removedversions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VersionsIDs returns the "versions" edge IDs in the mutation.
+func (m *NodeMutation) VersionsIDs() (ids []xid.ID) {
+	for id := range m.versions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVersions resets all changes to the "versions" edge.
+func (m *NodeMutation) ResetVersions() {
+	m.versions = nil
+	m.clearedversions = false
+	m.removedversions = nil
+}
+
+// ClearCurrentVersion clears the "current_version" edge to the NodeVersion entity.
+func (m *NodeMutation) ClearCurrentVersion() {
+	m.clearedcurrent_version = true
+	m.clearedFields[node.FieldCurrentVersionID] = struct{}{}
+}
+
+// CurrentVersionCleared reports if the "current_version" edge to the NodeVersion entity was cleared.
+func (m *NodeMutation) CurrentVersionCleared() bool {
+	return m.CurrentVersionIDCleared() || m.clearedcurrent_version
+}
+
+// CurrentVersionIDs returns the "current_version" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CurrentVersionID instead. It exists only for internal usage by the builders.
+func (m *NodeMutation) CurrentVersionIDs() (ids []xid.ID) {
+	if id := m.current_version; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCurrentVersion resets all changes to the "current_version" edge.
+func (m *NodeMutation) ResetCurrentVersion() {
+	m.current_version = nil
+	m.clearedcurrent_version = false
+}
+
 // Where appends a list predicates to the NodeMutation builder.
 func (m *NodeMutation) Where(ps ...predicate.Node) {
 	m.predicates = append(m.predicates, ps...)
@@ -20907,7 +21127,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -20940,6 +21160,9 @@ func (m *NodeMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, node.FieldAccountID)
+	}
+	if m.current_version != nil {
+		fields = append(fields, node.FieldCurrentVersionID)
 	}
 	if m.property_schema != nil {
 		fields = append(fields, node.FieldPropertySchemaID)
@@ -20989,6 +21212,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.HideChildTree()
 	case node.FieldAccountID:
 		return m.AccountID()
+	case node.FieldCurrentVersionID:
+		return m.CurrentVersionID()
 	case node.FieldPropertySchemaID:
 		return m.PropertySchemaID()
 	case node.FieldPrimaryAssetID:
@@ -21032,6 +21257,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldHideChildTree(ctx)
 	case node.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case node.FieldCurrentVersionID:
+		return m.OldCurrentVersionID(ctx)
 	case node.FieldPropertySchemaID:
 		return m.OldPropertySchemaID(ctx)
 	case node.FieldPrimaryAssetID:
@@ -21130,6 +21357,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAccountID(v)
 		return nil
+	case node.FieldCurrentVersionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCurrentVersionID(v)
+		return nil
 	case node.FieldPropertySchemaID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -21217,6 +21451,9 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldParentNodeID) {
 		fields = append(fields, node.FieldParentNodeID)
 	}
+	if m.FieldCleared(node.FieldCurrentVersionID) {
+		fields = append(fields, node.FieldCurrentVersionID)
+	}
 	if m.FieldCleared(node.FieldPropertySchemaID) {
 		fields = append(fields, node.FieldPropertySchemaID)
 	}
@@ -21257,6 +21494,9 @@ func (m *NodeMutation) ClearField(name string) error {
 		return nil
 	case node.FieldParentNodeID:
 		m.ClearParentNodeID()
+		return nil
+	case node.FieldCurrentVersionID:
+		m.ClearCurrentVersionID()
 		return nil
 	case node.FieldPropertySchemaID:
 		m.ClearPropertySchemaID()
@@ -21311,6 +21551,9 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldAccountID:
 		m.ResetAccountID()
 		return nil
+	case node.FieldCurrentVersionID:
+		m.ResetCurrentVersionID()
+		return nil
 	case node.FieldPropertySchemaID:
 		m.ResetPropertySchemaID()
 		return nil
@@ -21335,7 +21578,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 13)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -21368,6 +21611,12 @@ func (m *NodeMutation) AddedEdges() []string {
 	}
 	if m.collections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.versions != nil {
+		edges = append(edges, node.EdgeVersions)
+	}
+	if m.current_version != nil {
+		edges = append(edges, node.EdgeCurrentVersion)
 	}
 	return edges
 }
@@ -21432,13 +21681,23 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.versions))
+		for id := range m.versions {
+			ids = append(ids, id)
+		}
+		return ids
+	case node.EdgeCurrentVersion:
+		if id := m.current_version; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 13)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -21456,6 +21715,9 @@ func (m *NodeMutation) RemovedEdges() []string {
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.removedversions != nil {
+		edges = append(edges, node.EdgeVersions)
 	}
 	return edges
 }
@@ -21500,13 +21762,19 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeVersions:
+		ids := make([]ent.Value, 0, len(m.removedversions))
+		for id := range m.removedversions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 13)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -21540,6 +21808,12 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedcollections {
 		edges = append(edges, node.EdgeCollections)
 	}
+	if m.clearedversions {
+		edges = append(edges, node.EdgeVersions)
+	}
+	if m.clearedcurrent_version {
+		edges = append(edges, node.EdgeCurrentVersion)
+	}
 	return edges
 }
 
@@ -21569,6 +21843,10 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedcontent_links
 	case node.EdgeCollections:
 		return m.clearedcollections
+	case node.EdgeVersions:
+		return m.clearedversions
+	case node.EdgeCurrentVersion:
+		return m.clearedcurrent_version
 	}
 	return false
 }
@@ -21591,6 +21869,9 @@ func (m *NodeMutation) ClearEdge(name string) error {
 		return nil
 	case node.EdgeLink:
 		m.ClearLink()
+		return nil
+	case node.EdgeCurrentVersion:
+		m.ClearCurrentVersion()
 		return nil
 	}
 	return fmt.Errorf("unknown Node unique edge %s", name)
@@ -21633,8 +21914,1150 @@ func (m *NodeMutation) ResetEdge(name string) error {
 	case node.EdgeCollections:
 		m.ResetCollections()
 		return nil
+	case node.EdgeVersions:
+		m.ResetVersions()
+		return nil
+	case node.EdgeCurrentVersion:
+		m.ResetCurrentVersion()
+		return nil
 	}
 	return fmt.Errorf("unknown Node edge %s", name)
+}
+
+// NodeVersionMutation represents an operation that mutates the NodeVersion nodes in the graph.
+type NodeVersionMutation struct {
+	config
+	op                       Op
+	typ                      string
+	id                       *xid.ID
+	created_at               *time.Time
+	updated_at               *time.Time
+	status                   *nodeversion.Status
+	name                     *string
+	slug                     *string
+	description              *string
+	content                  *string
+	properties_snapshot      *schema.PropertySnapshot
+	metadata                 *map[string]interface{}
+	clearedFields            map[string]struct{}
+	node                     *xid.ID
+	clearednode              bool
+	author                   *xid.ID
+	clearedauthor            bool
+	current_for_nodes        map[xid.ID]struct{}
+	removedcurrent_for_nodes map[xid.ID]struct{}
+	clearedcurrent_for_nodes bool
+	done                     bool
+	oldValue                 func(context.Context) (*NodeVersion, error)
+	predicates               []predicate.NodeVersion
+}
+
+var _ ent.Mutation = (*NodeVersionMutation)(nil)
+
+// nodeversionOption allows management of the mutation configuration using functional options.
+type nodeversionOption func(*NodeVersionMutation)
+
+// newNodeVersionMutation creates new mutation for the NodeVersion entity.
+func newNodeVersionMutation(c config, op Op, opts ...nodeversionOption) *NodeVersionMutation {
+	m := &NodeVersionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeNodeVersion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withNodeVersionID sets the ID field of the mutation.
+func withNodeVersionID(id xid.ID) nodeversionOption {
+	return func(m *NodeVersionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *NodeVersion
+		)
+		m.oldValue = func(ctx context.Context) (*NodeVersion, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().NodeVersion.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withNodeVersion sets the old NodeVersion of the mutation.
+func withNodeVersion(node *NodeVersion) nodeversionOption {
+	return func(m *NodeVersionMutation) {
+		m.oldValue = func(context.Context) (*NodeVersion, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m NodeVersionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m NodeVersionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of NodeVersion entities.
+func (m *NodeVersionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *NodeVersionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *NodeVersionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().NodeVersion.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *NodeVersionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *NodeVersionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *NodeVersionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *NodeVersionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *NodeVersionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *NodeVersionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetNodeID sets the "node_id" field.
+func (m *NodeVersionMutation) SetNodeID(x xid.ID) {
+	m.node = &x
+}
+
+// NodeID returns the value of the "node_id" field in the mutation.
+func (m *NodeVersionMutation) NodeID() (r xid.ID, exists bool) {
+	v := m.node
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNodeID returns the old "node_id" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldNodeID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNodeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNodeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNodeID: %w", err)
+	}
+	return oldValue.NodeID, nil
+}
+
+// ResetNodeID resets all changes to the "node_id" field.
+func (m *NodeVersionMutation) ResetNodeID() {
+	m.node = nil
+}
+
+// SetAuthorID sets the "author_id" field.
+func (m *NodeVersionMutation) SetAuthorID(x xid.ID) {
+	m.author = &x
+}
+
+// AuthorID returns the value of the "author_id" field in the mutation.
+func (m *NodeVersionMutation) AuthorID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorID returns the old "author_id" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldAuthorID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorID: %w", err)
+	}
+	return oldValue.AuthorID, nil
+}
+
+// ResetAuthorID resets all changes to the "author_id" field.
+func (m *NodeVersionMutation) ResetAuthorID() {
+	m.author = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *NodeVersionMutation) SetStatus(n nodeversion.Status) {
+	m.status = &n
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *NodeVersionMutation) Status() (r nodeversion.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldStatus(ctx context.Context) (v nodeversion.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *NodeVersionMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetName sets the "name" field.
+func (m *NodeVersionMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *NodeVersionMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *NodeVersionMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *NodeVersionMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *NodeVersionMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *NodeVersionMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *NodeVersionMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *NodeVersionMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldDescription(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *NodeVersionMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[nodeversion.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *NodeVersionMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[nodeversion.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *NodeVersionMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, nodeversion.FieldDescription)
+}
+
+// SetContent sets the "content" field.
+func (m *NodeVersionMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *NodeVersionMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldContent(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ClearContent clears the value of the "content" field.
+func (m *NodeVersionMutation) ClearContent() {
+	m.content = nil
+	m.clearedFields[nodeversion.FieldContent] = struct{}{}
+}
+
+// ContentCleared returns if the "content" field was cleared in this mutation.
+func (m *NodeVersionMutation) ContentCleared() bool {
+	_, ok := m.clearedFields[nodeversion.FieldContent]
+	return ok
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *NodeVersionMutation) ResetContent() {
+	m.content = nil
+	delete(m.clearedFields, nodeversion.FieldContent)
+}
+
+// SetPropertiesSnapshot sets the "properties_snapshot" field.
+func (m *NodeVersionMutation) SetPropertiesSnapshot(ss schema.PropertySnapshot) {
+	m.properties_snapshot = &ss
+}
+
+// PropertiesSnapshot returns the value of the "properties_snapshot" field in the mutation.
+func (m *NodeVersionMutation) PropertiesSnapshot() (r schema.PropertySnapshot, exists bool) {
+	v := m.properties_snapshot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPropertiesSnapshot returns the old "properties_snapshot" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldPropertiesSnapshot(ctx context.Context) (v schema.PropertySnapshot, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPropertiesSnapshot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPropertiesSnapshot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPropertiesSnapshot: %w", err)
+	}
+	return oldValue.PropertiesSnapshot, nil
+}
+
+// ClearPropertiesSnapshot clears the value of the "properties_snapshot" field.
+func (m *NodeVersionMutation) ClearPropertiesSnapshot() {
+	m.properties_snapshot = nil
+	m.clearedFields[nodeversion.FieldPropertiesSnapshot] = struct{}{}
+}
+
+// PropertiesSnapshotCleared returns if the "properties_snapshot" field was cleared in this mutation.
+func (m *NodeVersionMutation) PropertiesSnapshotCleared() bool {
+	_, ok := m.clearedFields[nodeversion.FieldPropertiesSnapshot]
+	return ok
+}
+
+// ResetPropertiesSnapshot resets all changes to the "properties_snapshot" field.
+func (m *NodeVersionMutation) ResetPropertiesSnapshot() {
+	m.properties_snapshot = nil
+	delete(m.clearedFields, nodeversion.FieldPropertiesSnapshot)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *NodeVersionMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *NodeVersionMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the NodeVersion entity.
+// If the NodeVersion object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeVersionMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *NodeVersionMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[nodeversion.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *NodeVersionMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[nodeversion.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *NodeVersionMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, nodeversion.FieldMetadata)
+}
+
+// ClearNode clears the "node" edge to the Node entity.
+func (m *NodeVersionMutation) ClearNode() {
+	m.clearednode = true
+	m.clearedFields[nodeversion.FieldNodeID] = struct{}{}
+}
+
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *NodeVersionMutation) NodeCleared() bool {
+	return m.clearednode
+}
+
+// NodeIDs returns the "node" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *NodeVersionMutation) NodeIDs() (ids []xid.ID) {
+	if id := m.node; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetNode resets all changes to the "node" edge.
+func (m *NodeVersionMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *NodeVersionMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[nodeversion.FieldAuthorID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *NodeVersionMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *NodeVersionMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *NodeVersionMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// AddCurrentForNodeIDs adds the "current_for_nodes" edge to the Node entity by ids.
+func (m *NodeVersionMutation) AddCurrentForNodeIDs(ids ...xid.ID) {
+	if m.current_for_nodes == nil {
+		m.current_for_nodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.current_for_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCurrentForNodes clears the "current_for_nodes" edge to the Node entity.
+func (m *NodeVersionMutation) ClearCurrentForNodes() {
+	m.clearedcurrent_for_nodes = true
+}
+
+// CurrentForNodesCleared reports if the "current_for_nodes" edge to the Node entity was cleared.
+func (m *NodeVersionMutation) CurrentForNodesCleared() bool {
+	return m.clearedcurrent_for_nodes
+}
+
+// RemoveCurrentForNodeIDs removes the "current_for_nodes" edge to the Node entity by IDs.
+func (m *NodeVersionMutation) RemoveCurrentForNodeIDs(ids ...xid.ID) {
+	if m.removedcurrent_for_nodes == nil {
+		m.removedcurrent_for_nodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.current_for_nodes, ids[i])
+		m.removedcurrent_for_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCurrentForNodes returns the removed IDs of the "current_for_nodes" edge to the Node entity.
+func (m *NodeVersionMutation) RemovedCurrentForNodesIDs() (ids []xid.ID) {
+	for id := range m.removedcurrent_for_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CurrentForNodesIDs returns the "current_for_nodes" edge IDs in the mutation.
+func (m *NodeVersionMutation) CurrentForNodesIDs() (ids []xid.ID) {
+	for id := range m.current_for_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCurrentForNodes resets all changes to the "current_for_nodes" edge.
+func (m *NodeVersionMutation) ResetCurrentForNodes() {
+	m.current_for_nodes = nil
+	m.clearedcurrent_for_nodes = false
+	m.removedcurrent_for_nodes = nil
+}
+
+// Where appends a list predicates to the NodeVersionMutation builder.
+func (m *NodeVersionMutation) Where(ps ...predicate.NodeVersion) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the NodeVersionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *NodeVersionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.NodeVersion, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *NodeVersionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *NodeVersionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (NodeVersion).
+func (m *NodeVersionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *NodeVersionMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, nodeversion.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, nodeversion.FieldUpdatedAt)
+	}
+	if m.node != nil {
+		fields = append(fields, nodeversion.FieldNodeID)
+	}
+	if m.author != nil {
+		fields = append(fields, nodeversion.FieldAuthorID)
+	}
+	if m.status != nil {
+		fields = append(fields, nodeversion.FieldStatus)
+	}
+	if m.name != nil {
+		fields = append(fields, nodeversion.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, nodeversion.FieldSlug)
+	}
+	if m.description != nil {
+		fields = append(fields, nodeversion.FieldDescription)
+	}
+	if m.content != nil {
+		fields = append(fields, nodeversion.FieldContent)
+	}
+	if m.properties_snapshot != nil {
+		fields = append(fields, nodeversion.FieldPropertiesSnapshot)
+	}
+	if m.metadata != nil {
+		fields = append(fields, nodeversion.FieldMetadata)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *NodeVersionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case nodeversion.FieldCreatedAt:
+		return m.CreatedAt()
+	case nodeversion.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case nodeversion.FieldNodeID:
+		return m.NodeID()
+	case nodeversion.FieldAuthorID:
+		return m.AuthorID()
+	case nodeversion.FieldStatus:
+		return m.Status()
+	case nodeversion.FieldName:
+		return m.Name()
+	case nodeversion.FieldSlug:
+		return m.Slug()
+	case nodeversion.FieldDescription:
+		return m.Description()
+	case nodeversion.FieldContent:
+		return m.Content()
+	case nodeversion.FieldPropertiesSnapshot:
+		return m.PropertiesSnapshot()
+	case nodeversion.FieldMetadata:
+		return m.Metadata()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *NodeVersionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case nodeversion.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case nodeversion.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case nodeversion.FieldNodeID:
+		return m.OldNodeID(ctx)
+	case nodeversion.FieldAuthorID:
+		return m.OldAuthorID(ctx)
+	case nodeversion.FieldStatus:
+		return m.OldStatus(ctx)
+	case nodeversion.FieldName:
+		return m.OldName(ctx)
+	case nodeversion.FieldSlug:
+		return m.OldSlug(ctx)
+	case nodeversion.FieldDescription:
+		return m.OldDescription(ctx)
+	case nodeversion.FieldContent:
+		return m.OldContent(ctx)
+	case nodeversion.FieldPropertiesSnapshot:
+		return m.OldPropertiesSnapshot(ctx)
+	case nodeversion.FieldMetadata:
+		return m.OldMetadata(ctx)
+	}
+	return nil, fmt.Errorf("unknown NodeVersion field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NodeVersionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case nodeversion.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case nodeversion.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case nodeversion.FieldNodeID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeID(v)
+		return nil
+	case nodeversion.FieldAuthorID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorID(v)
+		return nil
+	case nodeversion.FieldStatus:
+		v, ok := value.(nodeversion.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case nodeversion.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case nodeversion.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case nodeversion.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case nodeversion.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	case nodeversion.FieldPropertiesSnapshot:
+		v, ok := value.(schema.PropertySnapshot)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPropertiesSnapshot(v)
+		return nil
+	case nodeversion.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	}
+	return fmt.Errorf("unknown NodeVersion field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *NodeVersionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *NodeVersionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *NodeVersionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown NodeVersion numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *NodeVersionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(nodeversion.FieldDescription) {
+		fields = append(fields, nodeversion.FieldDescription)
+	}
+	if m.FieldCleared(nodeversion.FieldContent) {
+		fields = append(fields, nodeversion.FieldContent)
+	}
+	if m.FieldCleared(nodeversion.FieldPropertiesSnapshot) {
+		fields = append(fields, nodeversion.FieldPropertiesSnapshot)
+	}
+	if m.FieldCleared(nodeversion.FieldMetadata) {
+		fields = append(fields, nodeversion.FieldMetadata)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *NodeVersionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *NodeVersionMutation) ClearField(name string) error {
+	switch name {
+	case nodeversion.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case nodeversion.FieldContent:
+		m.ClearContent()
+		return nil
+	case nodeversion.FieldPropertiesSnapshot:
+		m.ClearPropertiesSnapshot()
+		return nil
+	case nodeversion.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown NodeVersion nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *NodeVersionMutation) ResetField(name string) error {
+	switch name {
+	case nodeversion.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case nodeversion.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case nodeversion.FieldNodeID:
+		m.ResetNodeID()
+		return nil
+	case nodeversion.FieldAuthorID:
+		m.ResetAuthorID()
+		return nil
+	case nodeversion.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case nodeversion.FieldName:
+		m.ResetName()
+		return nil
+	case nodeversion.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case nodeversion.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case nodeversion.FieldContent:
+		m.ResetContent()
+		return nil
+	case nodeversion.FieldPropertiesSnapshot:
+		m.ResetPropertiesSnapshot()
+		return nil
+	case nodeversion.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown NodeVersion field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *NodeVersionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.node != nil {
+		edges = append(edges, nodeversion.EdgeNode)
+	}
+	if m.author != nil {
+		edges = append(edges, nodeversion.EdgeAuthor)
+	}
+	if m.current_for_nodes != nil {
+		edges = append(edges, nodeversion.EdgeCurrentForNodes)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *NodeVersionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case nodeversion.EdgeNode:
+		if id := m.node; id != nil {
+			return []ent.Value{*id}
+		}
+	case nodeversion.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	case nodeversion.EdgeCurrentForNodes:
+		ids := make([]ent.Value, 0, len(m.current_for_nodes))
+		for id := range m.current_for_nodes {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *NodeVersionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedcurrent_for_nodes != nil {
+		edges = append(edges, nodeversion.EdgeCurrentForNodes)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *NodeVersionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case nodeversion.EdgeCurrentForNodes:
+		ids := make([]ent.Value, 0, len(m.removedcurrent_for_nodes))
+		for id := range m.removedcurrent_for_nodes {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *NodeVersionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearednode {
+		edges = append(edges, nodeversion.EdgeNode)
+	}
+	if m.clearedauthor {
+		edges = append(edges, nodeversion.EdgeAuthor)
+	}
+	if m.clearedcurrent_for_nodes {
+		edges = append(edges, nodeversion.EdgeCurrentForNodes)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *NodeVersionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case nodeversion.EdgeNode:
+		return m.clearednode
+	case nodeversion.EdgeAuthor:
+		return m.clearedauthor
+	case nodeversion.EdgeCurrentForNodes:
+		return m.clearedcurrent_for_nodes
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *NodeVersionMutation) ClearEdge(name string) error {
+	switch name {
+	case nodeversion.EdgeNode:
+		m.ClearNode()
+		return nil
+	case nodeversion.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown NodeVersion unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *NodeVersionMutation) ResetEdge(name string) error {
+	switch name {
+	case nodeversion.EdgeNode:
+		m.ResetNode()
+		return nil
+	case nodeversion.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	case nodeversion.EdgeCurrentForNodes:
+		m.ResetCurrentForNodes()
+		return nil
+	}
+	return fmt.Errorf("unknown NodeVersion edge %s", name)
 }
 
 // NotificationMutation represents an operation that mutates the Notification nodes in the graph.

@@ -36,8 +36,8 @@ func TestNodesTreeQueryingVisibilityFilters(t *testing.T) {
 			// member2Ctx, _ := e2e.WithAccount(root, aw, seed.Account_008_Heimdallr)
 			// member2Session := sh.WithSession(member2Ctx)
 
-			published := openapi.Published
-			draft := openapi.Draft
+			published := openapi.VisibilityPublished
+			draft := openapi.VisibilityDraft
 
 			// SETUP: 4 published library pages
 			//

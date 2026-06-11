@@ -36,6 +36,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -105,6 +106,8 @@ type Client struct {
 	ModerationNote *ModerationNoteClient
 	// Node is the client for interacting with the Node builders.
 	Node *NodeClient
+	// NodeVersion is the client for interacting with the NodeVersion builders.
+	NodeVersion *NodeVersionClient
 	// Notification is the client for interacting with the Notification builders.
 	Notification *NotificationClient
 	// OAuthAuthorisationCode is the client for interacting with the OAuthAuthorisationCode builders.
@@ -176,6 +179,7 @@ func (c *Client) init() {
 	c.MentionProfile = NewMentionProfileClient(c.config)
 	c.ModerationNote = NewModerationNoteClient(c.config)
 	c.Node = NewNodeClient(c.config)
+	c.NodeVersion = NewNodeVersionClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.OAuthAuthorisationCode = NewOAuthAuthorisationCodeClient(c.config)
 	c.OAuthAuthorisationRequest = NewOAuthAuthorisationRequestClient(c.config)
@@ -308,6 +312,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MentionProfile:            NewMentionProfileClient(cfg),
 		ModerationNote:            NewModerationNoteClient(cfg),
 		Node:                      NewNodeClient(cfg),
+		NodeVersion:               NewNodeVersionClient(cfg),
 		Notification:              NewNotificationClient(cfg),
 		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
 		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
@@ -367,6 +372,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MentionProfile:            NewMentionProfileClient(cfg),
 		ModerationNote:            NewModerationNoteClient(cfg),
 		Node:                      NewNodeClient(cfg),
+		NodeVersion:               NewNodeVersionClient(cfg),
 		Notification:              NewNotificationClient(cfg),
 		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
 		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
@@ -419,11 +425,11 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification,
-		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
-		c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin, c.Post, c.PostRead,
-		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
-		c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
+		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
+		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin,
+		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -436,11 +442,11 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.AuditLog,
 		c.Authentication, c.Category, c.Collection, c.CollectionNode, c.CollectionPost,
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
-		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.Notification,
-		c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest, c.OAuthClient,
-		c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin, c.Post, c.PostRead,
-		c.Property, c.PropertySchema, c.PropertySchemaField, c.Question, c.React,
-		c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
+		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
+		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin,
+		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
+		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -489,6 +495,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ModerationNote.mutate(ctx, m)
 	case *NodeMutation:
 		return c.Node.mutate(ctx, m)
+	case *NodeVersionMutation:
+		return c.NodeVersion.mutate(ctx, m)
 	case *NotificationMutation:
 		return c.Notification.mutate(ctx, m)
 	case *OAuthAuthorisationCodeMutation:
@@ -1035,6 +1043,22 @@ func (c *AccountClient) QueryNodes(_m *Account) *NodeQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.NodesTable, account.NodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryNodeVersions queries the node_versions edge of a Account.
+func (c *AccountClient) QueryNodeVersions(_m *Account) *NodeVersionQuery {
+	query := (&NodeVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NodeVersionsTable, account.NodeVersionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4591,6 +4615,38 @@ func (c *NodeClient) QueryCollections(_m *Node) *CollectionQuery {
 	return query
 }
 
+// QueryVersions queries the versions edge of a Node.
+func (c *NodeClient) QueryVersions(_m *Node) *NodeVersionQuery {
+	query := (&NodeVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.VersionsTable, node.VersionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCurrentVersion queries the current_version edge of a Node.
+func (c *NodeClient) QueryCurrentVersion(_m *Node) *NodeVersionQuery {
+	query := (&NodeVersionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(nodeversion.Table, nodeversion.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.CurrentVersionTable, node.CurrentVersionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCollectionNodes queries the collection_nodes edge of a Node.
 func (c *NodeClient) QueryCollectionNodes(_m *Node) *CollectionNodeQuery {
 	query := (&CollectionNodeClient{config: c.config}).Query()
@@ -4629,6 +4685,187 @@ func (c *NodeClient) mutate(ctx context.Context, m *NodeMutation) (Value, error)
 		return (&NodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Node mutation op: %q", m.Op())
+	}
+}
+
+// NodeVersionClient is a client for the NodeVersion schema.
+type NodeVersionClient struct {
+	config
+}
+
+// NewNodeVersionClient returns a client for the NodeVersion from the given config.
+func NewNodeVersionClient(c config) *NodeVersionClient {
+	return &NodeVersionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `nodeversion.Hooks(f(g(h())))`.
+func (c *NodeVersionClient) Use(hooks ...Hook) {
+	c.hooks.NodeVersion = append(c.hooks.NodeVersion, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `nodeversion.Intercept(f(g(h())))`.
+func (c *NodeVersionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.NodeVersion = append(c.inters.NodeVersion, interceptors...)
+}
+
+// Create returns a builder for creating a NodeVersion entity.
+func (c *NodeVersionClient) Create() *NodeVersionCreate {
+	mutation := newNodeVersionMutation(c.config, OpCreate)
+	return &NodeVersionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of NodeVersion entities.
+func (c *NodeVersionClient) CreateBulk(builders ...*NodeVersionCreate) *NodeVersionCreateBulk {
+	return &NodeVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *NodeVersionClient) MapCreateBulk(slice any, setFunc func(*NodeVersionCreate, int)) *NodeVersionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &NodeVersionCreateBulk{err: fmt.Errorf("calling to NodeVersionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*NodeVersionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &NodeVersionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for NodeVersion.
+func (c *NodeVersionClient) Update() *NodeVersionUpdate {
+	mutation := newNodeVersionMutation(c.config, OpUpdate)
+	return &NodeVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *NodeVersionClient) UpdateOne(_m *NodeVersion) *NodeVersionUpdateOne {
+	mutation := newNodeVersionMutation(c.config, OpUpdateOne, withNodeVersion(_m))
+	return &NodeVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *NodeVersionClient) UpdateOneID(id xid.ID) *NodeVersionUpdateOne {
+	mutation := newNodeVersionMutation(c.config, OpUpdateOne, withNodeVersionID(id))
+	return &NodeVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for NodeVersion.
+func (c *NodeVersionClient) Delete() *NodeVersionDelete {
+	mutation := newNodeVersionMutation(c.config, OpDelete)
+	return &NodeVersionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *NodeVersionClient) DeleteOne(_m *NodeVersion) *NodeVersionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *NodeVersionClient) DeleteOneID(id xid.ID) *NodeVersionDeleteOne {
+	builder := c.Delete().Where(nodeversion.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &NodeVersionDeleteOne{builder}
+}
+
+// Query returns a query builder for NodeVersion.
+func (c *NodeVersionClient) Query() *NodeVersionQuery {
+	return &NodeVersionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeNodeVersion},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a NodeVersion entity by its id.
+func (c *NodeVersionClient) Get(ctx context.Context, id xid.ID) (*NodeVersion, error) {
+	return c.Query().Where(nodeversion.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *NodeVersionClient) GetX(ctx context.Context, id xid.ID) *NodeVersion {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryNode queries the node edge of a NodeVersion.
+func (c *NodeVersionClient) QueryNode(_m *NodeVersion) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nodeversion.Table, nodeversion.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, nodeversion.NodeTable, nodeversion.NodeColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthor queries the author edge of a NodeVersion.
+func (c *NodeVersionClient) QueryAuthor(_m *NodeVersion) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nodeversion.Table, nodeversion.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, nodeversion.AuthorTable, nodeversion.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCurrentForNodes queries the current_for_nodes edge of a NodeVersion.
+func (c *NodeVersionClient) QueryCurrentForNodes(_m *NodeVersion) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(nodeversion.Table, nodeversion.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, nodeversion.CurrentForNodesTable, nodeversion.CurrentForNodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *NodeVersionClient) Hooks() []Hook {
+	return c.hooks.NodeVersion
+}
+
+// Interceptors returns the client interceptors.
+func (c *NodeVersionClient) Interceptors() []Interceptor {
+	return c.inters.NodeVersion
+}
+
+func (c *NodeVersionClient) mutate(ctx context.Context, m *NodeVersionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&NodeVersionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&NodeVersionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&NodeVersionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&NodeVersionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown NodeVersion mutation op: %q", m.Op())
 	}
 }
 
@@ -8226,19 +8463,21 @@ type (
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, Notification, OAuthAuthorisationCode, OAuthAuthorisationRequest,
-		OAuthClient, OAuthDeviceAuthorisation, OAuthRefreshToken, Plugin, Post,
-		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Role, Session, Setting, Tag, Warning []ent.Hook
+		Node, NodeVersion, Notification, OAuthAuthorisationCode,
+		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
+		OAuthRefreshToken, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
+		Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, EmailQueue, Event,
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
-		Node, Notification, OAuthAuthorisationCode, OAuthAuthorisationRequest,
-		OAuthClient, OAuthDeviceAuthorisation, OAuthRefreshToken, Plugin, Post,
-		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Role, Session, Setting, Tag, Warning []ent.Interceptor
+		Node, NodeVersion, Notification, OAuthAuthorisationCode,
+		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
+		OAuthRefreshToken, Plugin, Post, PostRead, Property, PropertySchema,
+		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
+		Warning []ent.Interceptor
 	}
 )
 

@@ -61,7 +61,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>this is a thread</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread testing",
 					}, session1),
 				)(t, http.StatusOK)
@@ -121,7 +121,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread for nested replies</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Reply-to-reply testing",
 					}, session1),
 				)(t, http.StatusOK)
@@ -171,7 +171,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread one</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "1",
 					}, session1),
 				)(t, http.StatusOK)
@@ -180,7 +180,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread two</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "2",
 					}, session1),
 				)(t, http.StatusOK)
@@ -264,7 +264,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread A</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread A",
 					}, session1),
 				)(t, http.StatusOK)
@@ -280,7 +280,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>thread B</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread B",
 					}, session1),
 				)(t, http.StatusOK)
@@ -319,7 +319,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>t1</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "t1",
 					}, session1),
 				)(t, http.StatusOK)
@@ -370,7 +370,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>this is a thread</p>").Ptr(),
 						Category:   opt.New(cat.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread URL link aggregation",
 						Url:        &url,
 					}, session))(t, http.StatusOK)
@@ -432,7 +432,7 @@ func TestThreads(t *testing.T) {
 				threadCreate := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-						Visibility: opt.New(openapi.Draft).Ptr(),
+						Visibility: opt.New(openapi.VisibilityDraft).Ptr(),
 						Title:      "Thread without category",
 					}, session1),
 				)(t, http.StatusOK)
@@ -450,14 +450,14 @@ func TestThreads(t *testing.T) {
 					r.Len(threadCreate.JSON200.Replies.Replies, 0, "a newly created thread has zero replies")
 					a.Equal(threadCreate.JSON200.ReplyStatus.Replies, 0)
 					a.Equal(threadCreate.JSON200.ReplyStatus.Replied, 0)
-					// a.Equal(string(openapi.Draft), threadCreate.JSON200.Visibility)
+					a.Equal(openapi.VisibilityDraft, threadCreate.JSON200.Visibility)
 				}
 
 				// Update the thread to add a category and change visibility to published
 				threadUpdate := tests.AssertRequest(
 					cl.ThreadUpdateWithResponse(root, threadCreate.JSON200.Slug, openapi.ThreadMutableProps{
 						Category:   &cat1create.JSON200.Id,
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					}, session1),
 				)(t, http.StatusOK)
 
@@ -467,7 +467,7 @@ func TestThreads(t *testing.T) {
 					a.NotNil(threadUpdate.JSON200.Category, "thread should now have a category")
 					a.Equal(cat1create.JSON200.Id, threadUpdate.JSON200.Category.Id)
 					a.Equal(cat1create.JSON200.Name, threadUpdate.JSON200.Category.Name)
-					a.Equal(openapi.Published, threadUpdate.JSON200.Visibility)
+					a.Equal(openapi.VisibilityPublished, threadUpdate.JSON200.Visibility)
 				}
 
 				{
@@ -479,7 +479,7 @@ func TestThreads(t *testing.T) {
 					a.NotNil(threadGet.JSON200.Category, "thread should have a category after update")
 					a.Equal(cat1create.JSON200.Id, threadGet.JSON200.Category.Id)
 					a.Equal(cat1create.JSON200.Name, threadGet.JSON200.Category.Name)
-					a.Equal(openapi.Published, threadGet.JSON200.Visibility)
+					a.Equal(openapi.VisibilityPublished, threadGet.JSON200.Visibility)
 				}
 
 				{
@@ -520,7 +520,7 @@ func TestThreads(t *testing.T) {
 				categorisedThread := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread without category",
 						Category:   opt.New(uncatCat.JSON200.Id).Ptr(),
 					}, session1),
@@ -528,7 +528,7 @@ func TestThreads(t *testing.T) {
 				uncategorisedThread := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Thread without category",
 					}, session1),
 				)(t, http.StatusOK)
@@ -580,7 +580,7 @@ func TestThreads(t *testing.T) {
 				pinnedThread := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>pinned thread</p>").Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Pinned thread " + uuid.NewString(),
 						Category:   opt.New(pinCategory.JSON200.Id).Ptr(),
 						Pinned:     opt.New(openapi.PinnedRank(1)).Ptr(),
@@ -591,7 +591,7 @@ func TestThreads(t *testing.T) {
 				standardThread := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>standard thread</p>").Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Standard thread " + uuid.NewString(),
 						Category:   opt.New(pinCategory.JSON200.Id).Ptr(),
 					}, session1),
@@ -631,7 +631,7 @@ func TestThreads(t *testing.T) {
 				threadCreate := tests.AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>non-moderator thread</p>").Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Cannot pin thread",
 					}, session2),
 				)(t, http.StatusOK)
@@ -657,7 +657,7 @@ func TestThreads(t *testing.T) {
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 						Body:       opt.New("<p>test content</p>").Ptr(),
 						Category:   opt.New(cat1create.JSON200.Id).Ptr(),
-						Visibility: opt.New(openapi.Published).Ptr(),
+						Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 						Title:      "Бабочки",
 					}, session1),
 				)(t, http.StatusOK)

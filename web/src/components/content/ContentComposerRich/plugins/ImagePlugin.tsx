@@ -37,15 +37,21 @@ function Component(props: NodeViewProps) {
   const uploadId = props.node.attrs["data-upload-id"];
   const uploadProgress = props.node.attrs["data-upload-progress"];
   const progressPercent = uploadProgress ? parseInt(uploadProgress, 10) : 0;
+  const dataDiff = props.node.attrs["data-diff"] as
+    | "insertion"
+    | "deletion"
+    | undefined;
 
   const isEditable = props.editor.isEditable;
   const isSelected = props.selected && isEditable;
 
   const { handleRetry, handleCancel } = props.extension.options as Options;
+  const diffClass = dataDiff ? `diff-node-${dataDiff}` : "";
 
   return (
     <NodeViewWrapper
-      className={css({
+      data-diff={dataDiff}
+      className={`${diffClass} ${css({
         position: "relative",
         display: "inline-block",
         cursor: "pointer",
@@ -58,7 +64,7 @@ function Component(props: NodeViewProps) {
         filter: "auto",
         background: isSelected && !isUploading ? "blue.5" : "transparent",
         mixBlendMode: isSelected && !isUploading ? "screen" : "normal",
-      })}
+      })}`}
     >
       <styled.img
         borderRadius="lg"
@@ -182,6 +188,18 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
           }
           return {
             "data-upload-progress": attributes["data-upload-progress"],
+          };
+        },
+      },
+      "data-diff": {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-diff"),
+        renderHTML: (attributes) => {
+          if (!attributes["data-diff"]) {
+            return {};
+          }
+          return {
+            "data-diff": attributes["data-diff"],
           };
         },
       },

@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/library/node_version/node_version_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -42,23 +43,34 @@ type Partial struct {
 	AssetSources opt.Optional[[]string]
 }
 
+func (p Partial) HasVersionedFields() bool {
+	return p.Name.Ok() ||
+		p.Slug.Ok() ||
+		p.Description.Ok() ||
+		p.Content.Ok() ||
+		p.Properties.Ok() ||
+		p.Metadata.Ok()
+}
+
 type Manager struct {
-	nodeQuerier  *node_querier.Querier
-	nodeWriter   *node_writer.Writer
-	schemaWriter *node_properties.SchemaWriter
-	propWriter   *node_properties.Writer
-	tagWriter    *tag_writer.Writer
-	titler       generative.Titler
-	tagger       *autotagger.Tagger
-	nc           *node_children.Writer
-	fetcher      *fetcher.Fetcher
-	summariser   generative.Summariser
-	cache        *node_cache.Cache
-	bus          *pubsub.Bus
+	nodeQuerier    *node_querier.Querier
+	versionQuerier *node_version_querier.Querier
+	nodeWriter     *node_writer.Writer
+	schemaWriter   *node_properties.SchemaWriter
+	propWriter     *node_properties.Writer
+	tagWriter      *tag_writer.Writer
+	titler         generative.Titler
+	tagger         *autotagger.Tagger
+	nc             *node_children.Writer
+	fetcher        *fetcher.Fetcher
+	summariser     generative.Summariser
+	cache          *node_cache.Cache
+	bus            *pubsub.Bus
 }
 
 func New(
 	nodeQuerier *node_querier.Querier,
+	versionQuerier *node_version_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	schemaWriter *node_properties.SchemaWriter,
 	propWriter *node_properties.Writer,
@@ -72,17 +84,18 @@ func New(
 	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
-		nodeQuerier:  nodeQuerier,
-		nodeWriter:   nodeWriter,
-		schemaWriter: schemaWriter,
-		propWriter:   propWriter,
-		tagWriter:    tagWriter,
-		titler:       titler,
-		tagger:       tagger,
-		nc:           nc,
-		fetcher:      fetcher,
-		summariser:   summariser,
-		cache:        cache,
-		bus:          bus,
+		nodeQuerier:    nodeQuerier,
+		versionQuerier: versionQuerier,
+		nodeWriter:     nodeWriter,
+		schemaWriter:   schemaWriter,
+		propWriter:     propWriter,
+		tagWriter:      tagWriter,
+		titler:         titler,
+		tagger:         tagger,
+		nc:             nc,
+		fetcher:        fetcher,
+		summariser:     summariser,
+		cache:          cache,
+		bus:            bus,
 	}
 }

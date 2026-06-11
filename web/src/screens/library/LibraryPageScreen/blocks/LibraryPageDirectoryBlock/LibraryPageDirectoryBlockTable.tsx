@@ -59,13 +59,14 @@ export function LibraryPageDirectoryBlockTable({
   currentChildPropertySchema,
 }: Props) {
   const { nodeID, store } = useLibraryPageContext();
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
   const { sort, handleSort, handleMutateChildren } = useDirectoryBlockContext();
   const session = useSession();
 
   const { setChildPropertyValue } = store.getState();
 
-  const canManageLibrary = hasPermission(session, Permission.MANAGE_LIBRARY);
+  const canManageLibrary =
+    isDirectEditing && hasPermission(session, Permission.MANAGE_LIBRARY);
 
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
@@ -168,7 +169,7 @@ export function LibraryPageDirectoryBlockTable({
                   child={child}
                   columns={columns}
                   onFieldValueChange={handleChildFieldValueChange}
-                  editing={editing}
+                  editing={isDirectEditing}
                 />
               );
             })}

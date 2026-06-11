@@ -28,6 +28,10 @@ export type Event =
   | "EventNodePublished"
   | "EventNodeSubmittedForReview"
   | "EventNodeUnpublished"
+  | "EventNodeVersionDraftCreated"
+  | "EventNodeVersionDraftUpdated"
+  | "EventNodeVersionDraftDeleted"
+  | "EventNodeVersionDraftApplied"
   | "EventAccountCreated"
   | "EventAccountUpdated"
   | "EventAccountSuspended"
@@ -246,6 +250,58 @@ export interface EventNodeUnpublished {
   slug: string;
 }
 
+// Emitted when a draft version is created for a library node.
+export interface EventNodeVersionDraftCreated {
+  event: "EventNodeVersionDraftCreated";
+  // Draft author account ID
+  author_id: string;
+  // Library node ID
+  node_id: string;
+  // Node slug
+  node_slug: string;
+  // Draft version ID
+  version_id: string;
+}
+
+// Emitted when a draft version is updated.
+export interface EventNodeVersionDraftUpdated {
+  event: "EventNodeVersionDraftUpdated";
+  // Draft author account ID
+  author_id: string;
+  // Library node ID
+  node_id: string;
+  // Node slug
+  node_slug: string;
+  // Draft version ID
+  version_id: string;
+}
+
+// Emitted when a draft version is discarded.
+export interface EventNodeVersionDraftDeleted {
+  event: "EventNodeVersionDraftDeleted";
+  // Draft author account ID
+  author_id: string;
+  // Library node ID
+  node_id: string;
+  // Node slug
+  node_slug: string;
+  // Draft version ID
+  version_id: string;
+}
+
+// Emitted when a draft version is applied to a library node.
+export interface EventNodeVersionDraftApplied {
+  event: "EventNodeVersionDraftApplied";
+  // Draft author account ID
+  author_id: string;
+  // Library node ID
+  node_id: string;
+  // Node slug
+  node_slug: string;
+  // Draft version ID
+  version_id: string;
+}
+
 // Emitted after a new account is created.
 export interface EventAccountCreated {
   event: "EventAccountCreated";
@@ -413,6 +469,10 @@ export type EventPayload =
   | EventNodePublished
   | EventNodeSubmittedForReview
   | EventNodeUnpublished
+  | EventNodeVersionDraftCreated
+  | EventNodeVersionDraftUpdated
+  | EventNodeVersionDraftDeleted
+  | EventNodeVersionDraftApplied
   | EventAccountCreated
   | EventAccountUpdated
   | EventAccountSuspended
@@ -516,6 +576,22 @@ export function isEventNodeSubmittedForReview(value: EventPayload): value is Eve
 
 export function isEventNodeUnpublished(value: EventPayload): value is EventNodeUnpublished {
   return value.event === "EventNodeUnpublished";
+}
+
+export function isEventNodeVersionDraftCreated(value: EventPayload): value is EventNodeVersionDraftCreated {
+  return value.event === "EventNodeVersionDraftCreated";
+}
+
+export function isEventNodeVersionDraftUpdated(value: EventPayload): value is EventNodeVersionDraftUpdated {
+  return value.event === "EventNodeVersionDraftUpdated";
+}
+
+export function isEventNodeVersionDraftDeleted(value: EventPayload): value is EventNodeVersionDraftDeleted {
+  return value.event === "EventNodeVersionDraftDeleted";
+}
+
+export function isEventNodeVersionDraftApplied(value: EventPayload): value is EventNodeVersionDraftApplied {
+  return value.event === "EventNodeVersionDraftApplied";
 }
 
 export function isEventAccountCreated(value: EventPayload): value is EventAccountCreated {

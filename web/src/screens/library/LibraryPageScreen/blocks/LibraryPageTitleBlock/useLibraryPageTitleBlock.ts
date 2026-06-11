@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { handle } from "@/api/client";
 import { InstanceCapability } from "@/api/openapi-schema";
@@ -6,18 +6,27 @@ import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
 import { useLibraryPageContext } from "../../Context";
+import { useEditState } from "../../useEditState";
 import { useWatch } from "../../store";
 
 export function useLibraryPageTitleBlock() {
   const { store } = useLibraryPageContext();
-  const { draft, setName, setSlug } = store.getState();
+  const { draft, setName } = store.getState();
+  const { editorSourceKey } = useEditState();
+  const [titleResetVersion, setTitleResetVersion] = useState(0);
 
   const { suggestTitle } = useLibraryMutation(draft);
   const [isLoading, setLoading] = useState(false);
   const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
-  const defaultValue = store.getInitialState().draft.name;
   const value = useWatch((s) => s.draft.name);
+  const titleInputKey = `${editorSourceKey}:${titleResetVersion}`;
+  const defaultValueRef = useRef<{ key: string; value: string } | null>(null);
+  if (defaultValueRef.current?.key !== titleInputKey) {
+    defaultValueRef.current = { key: titleInputKey, value };
+  }
+
+  const defaultValue = defaultValueRef.current.value;
   const content = useWatch((s) => s.draft.content);
 
   async function handleSuggest() {
@@ -39,6 +48,7 @@ export function useLibraryPageTitleBlock() {
         }
 
         setName(title);
+        setTitleResetVersion((version) => version + 1);
       },
       {
         cleanup: async () => setLoading(false),
@@ -53,7 +63,7 @@ export function useLibraryPageTitleBlock() {
   return {
     defaultValue,
     isTitleSuggestEnabled,
-    value,
+    titleInputKey,
     isLoading,
     handleSuggest,
     handleChange,

@@ -1,10 +1,11 @@
 import { ark } from "@ark-ui/react/factory";
 import type { ComponentProps } from "react";
-import { forwardRef } from "react";
+import { forwardRef, useMemo } from "react";
 
 import { styled } from "@/styled-system/jsx";
 import { ButtonVariantProps, button } from "@/styled-system/recipes";
 
+import { useButtonPropsContext } from "./button";
 import { Spinner } from "./Spinner";
 
 export type StyledIconButtonProps = ComponentProps<typeof StyledIconButton>;
@@ -17,13 +18,19 @@ interface IconButtonLoadingProps {
   loadingText?: React.ReactNode;
 }
 
-export interface ButtonProps
+export interface IconButtonProps
   extends StyledIconButtonProps,
     IconButtonLoadingProps {}
 
-export const IconButton = forwardRef<HTMLButtonElement, ButtonProps>(
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (props, ref) => {
-    const { loading, disabled, loadingText, children, ...rest } = props;
+    const propsContext = useButtonPropsContext();
+    const iconButtonProps = useMemo(
+      () => ({ ...propsContext, ...props }),
+      [propsContext, props],
+    );
+    const { loading, disabled, loadingText, children, ...rest } =
+      iconButtonProps;
 
     const trulyDisabled = loading || disabled;
 

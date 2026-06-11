@@ -26,13 +26,13 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
     setChildPropertyName,
     removeChildPropertyByID,
   } = store.getState();
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
   const [open, setOpen] = useState(false);
 
   function handleOpenChange(open: MenuOpenChangeDetails) {
     // TODO: When not editing, we still need to show some kind of menu for stuff
     // like filtering etc for non-editor members. For now, show nothing.
-    if (!editing) {
+    if (!isDirectEditing) {
       return;
     }
 

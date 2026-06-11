@@ -57,7 +57,7 @@ func TestThreadReadState(t *testing.T) {
 				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>original thread</p>").Ptr(),
 					Category:   opt.New(catCreate.JSON200.Id).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Read State Test Thread",
 				}, session1)
 				tests.Ok(t, err, threadCreate)

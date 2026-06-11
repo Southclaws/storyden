@@ -24,44 +24,48 @@ type DatagraphRef struct {
 type Event string
 
 const (
-	EventEventThreadPublished        Event = "EventThreadPublished"
-	EventEventThreadUnpublished      Event = "EventThreadUnpublished"
-	EventEventThreadUpdated          Event = "EventThreadUpdated"
-	EventEventThreadDeleted          Event = "EventThreadDeleted"
-	EventEventThreadReplyCreated     Event = "EventThreadReplyCreated"
-	EventEventThreadReplyDeleted     Event = "EventThreadReplyDeleted"
-	EventEventThreadReplyUpdated     Event = "EventThreadReplyUpdated"
-	EventEventThreadReplyPublished   Event = "EventThreadReplyPublished"
-	EventEventThreadReplyUnpublished Event = "EventThreadReplyUnpublished"
-	EventEventPostLiked              Event = "EventPostLiked"
-	EventEventPostUnliked            Event = "EventPostUnliked"
-	EventEventPostReacted            Event = "EventPostReacted"
-	EventEventPostUnreacted          Event = "EventPostUnreacted"
-	EventEventCategoryUpdated        Event = "EventCategoryUpdated"
-	EventEventCategoryDeleted        Event = "EventCategoryDeleted"
-	EventEventMemberMentioned        Event = "EventMemberMentioned"
-	EventEventNodeCreated            Event = "EventNodeCreated"
-	EventEventNodeUpdated            Event = "EventNodeUpdated"
-	EventEventNodeDeleted            Event = "EventNodeDeleted"
-	EventEventNodePublished          Event = "EventNodePublished"
-	EventEventNodeSubmittedForReview Event = "EventNodeSubmittedForReview"
-	EventEventNodeUnpublished        Event = "EventNodeUnpublished"
-	EventEventAccountCreated         Event = "EventAccountCreated"
-	EventEventAccountUpdated         Event = "EventAccountUpdated"
-	EventEventAccountSuspended       Event = "EventAccountSuspended"
-	EventEventAccountUnsuspended     Event = "EventAccountUnsuspended"
-	EventEventModerationNoteCreated  Event = "EventModerationNoteCreated"
-	EventEventModerationNoteDeleted  Event = "EventModerationNoteDeleted"
-	EventEventAccountWarned          Event = "EventAccountWarned"
-	EventEventAccountWarningUpdated  Event = "EventAccountWarningUpdated"
-	EventEventAccountWarningDeleted  Event = "EventAccountWarningDeleted"
-	EventEventReportCreated          Event = "EventReportCreated"
-	EventEventReportUpdated          Event = "EventReportUpdated"
-	EventEventActivityCreated        Event = "EventActivityCreated"
-	EventEventActivityUpdated        Event = "EventActivityUpdated"
-	EventEventActivityDeleted        Event = "EventActivityDeleted"
-	EventEventActivityPublished      Event = "EventActivityPublished"
-	EventEventSettingsUpdated        Event = "EventSettingsUpdated"
+	EventEventThreadPublished         Event = "EventThreadPublished"
+	EventEventThreadUnpublished       Event = "EventThreadUnpublished"
+	EventEventThreadUpdated           Event = "EventThreadUpdated"
+	EventEventThreadDeleted           Event = "EventThreadDeleted"
+	EventEventThreadReplyCreated      Event = "EventThreadReplyCreated"
+	EventEventThreadReplyDeleted      Event = "EventThreadReplyDeleted"
+	EventEventThreadReplyUpdated      Event = "EventThreadReplyUpdated"
+	EventEventThreadReplyPublished    Event = "EventThreadReplyPublished"
+	EventEventThreadReplyUnpublished  Event = "EventThreadReplyUnpublished"
+	EventEventPostLiked               Event = "EventPostLiked"
+	EventEventPostUnliked             Event = "EventPostUnliked"
+	EventEventPostReacted             Event = "EventPostReacted"
+	EventEventPostUnreacted           Event = "EventPostUnreacted"
+	EventEventCategoryUpdated         Event = "EventCategoryUpdated"
+	EventEventCategoryDeleted         Event = "EventCategoryDeleted"
+	EventEventMemberMentioned         Event = "EventMemberMentioned"
+	EventEventNodeCreated             Event = "EventNodeCreated"
+	EventEventNodeUpdated             Event = "EventNodeUpdated"
+	EventEventNodeDeleted             Event = "EventNodeDeleted"
+	EventEventNodePublished           Event = "EventNodePublished"
+	EventEventNodeSubmittedForReview  Event = "EventNodeSubmittedForReview"
+	EventEventNodeUnpublished         Event = "EventNodeUnpublished"
+	EventEventNodeVersionDraftCreated Event = "EventNodeVersionDraftCreated"
+	EventEventNodeVersionDraftUpdated Event = "EventNodeVersionDraftUpdated"
+	EventEventNodeVersionDraftDeleted Event = "EventNodeVersionDraftDeleted"
+	EventEventNodeVersionDraftApplied Event = "EventNodeVersionDraftApplied"
+	EventEventAccountCreated          Event = "EventAccountCreated"
+	EventEventAccountUpdated          Event = "EventAccountUpdated"
+	EventEventAccountSuspended        Event = "EventAccountSuspended"
+	EventEventAccountUnsuspended      Event = "EventAccountUnsuspended"
+	EventEventModerationNoteCreated   Event = "EventModerationNoteCreated"
+	EventEventModerationNoteDeleted   Event = "EventModerationNoteDeleted"
+	EventEventAccountWarned           Event = "EventAccountWarned"
+	EventEventAccountWarningUpdated   Event = "EventAccountWarningUpdated"
+	EventEventAccountWarningDeleted   Event = "EventAccountWarningDeleted"
+	EventEventReportCreated           Event = "EventReportCreated"
+	EventEventReportUpdated           Event = "EventReportUpdated"
+	EventEventActivityCreated         Event = "EventActivityCreated"
+	EventEventActivityUpdated         Event = "EventActivityUpdated"
+	EventEventActivityDeleted         Event = "EventActivityDeleted"
+	EventEventActivityPublished       Event = "EventActivityPublished"
+	EventEventSettingsUpdated         Event = "EventSettingsUpdated"
 )
 
 var EventValues = []Event{
@@ -87,6 +91,10 @@ var EventValues = []Event{
 	EventEventNodePublished,
 	EventEventNodeSubmittedForReview,
 	EventEventNodeUnpublished,
+	EventEventNodeVersionDraftCreated,
+	EventEventNodeVersionDraftUpdated,
+	EventEventNodeVersionDraftDeleted,
+	EventEventNodeVersionDraftApplied,
 	EventEventAccountCreated,
 	EventEventAccountUpdated,
 	EventEventAccountSuspended,
@@ -184,6 +192,14 @@ func (w *EventPayload) UnmarshalJSON(data []byte) error {
 		v = &EventNodeSubmittedForReview{}
 	case "EventNodeUnpublished":
 		v = &EventNodeUnpublished{}
+	case "EventNodeVersionDraftCreated":
+		v = &EventNodeVersionDraftCreated{}
+	case "EventNodeVersionDraftUpdated":
+		v = &EventNodeVersionDraftUpdated{}
+	case "EventNodeVersionDraftDeleted":
+		v = &EventNodeVersionDraftDeleted{}
+	case "EventNodeVersionDraftApplied":
+		v = &EventNodeVersionDraftApplied{}
 	case "EventAccountCreated":
 		v = &EventAccountCreated{}
 	case "EventAccountUpdated":
@@ -515,6 +531,74 @@ type EventNodeUnpublished struct {
 func (EventNodeUnpublished) isEventPayload() {}
 
 func (EventNodeUnpublished) EventPayloadType() string { return "EventNodeUnpublished" }
+
+// Emitted when a draft version is created for a library node.
+type EventNodeVersionDraftCreated struct {
+	// Draft author account ID
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Library node ID
+	NodeID library.NodeID `json:"node_id"`
+	// Node slug
+	NodeSlug string `json:"node_slug"`
+	// Draft version ID
+	VersionID string `json:"version_id"`
+}
+
+func (EventNodeVersionDraftCreated) isEventPayload() {}
+
+func (EventNodeVersionDraftCreated) EventPayloadType() string { return "EventNodeVersionDraftCreated" }
+
+// Emitted when a draft version is updated.
+type EventNodeVersionDraftUpdated struct {
+	// Draft author account ID
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Library node ID
+	NodeID library.NodeID `json:"node_id"`
+	// Node slug
+	NodeSlug string `json:"node_slug"`
+	// Draft version ID
+	VersionID string `json:"version_id"`
+}
+
+func (EventNodeVersionDraftUpdated) isEventPayload() {}
+
+func (EventNodeVersionDraftUpdated) EventPayloadType() string { return "EventNodeVersionDraftUpdated" }
+
+// Emitted when a draft version is discarded.
+type EventNodeVersionDraftDeleted struct {
+	// Draft author account ID
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Library node ID
+	NodeID library.NodeID `json:"node_id"`
+	// Node slug
+	NodeSlug string `json:"node_slug"`
+	// Draft version ID
+	VersionID string `json:"version_id"`
+}
+
+func (EventNodeVersionDraftDeleted) isEventPayload() {}
+
+func (EventNodeVersionDraftDeleted) EventPayloadType() string { return "EventNodeVersionDraftDeleted" }
+
+// Emitted when a draft version is applied to a library node.
+type EventNodeVersionDraftApplied struct {
+	// Draft author account ID
+	AuthorID account.AccountID `json:"author_id"`
+	Event    string            `json:"event"`
+	// Library node ID
+	NodeID library.NodeID `json:"node_id"`
+	// Node slug
+	NodeSlug string `json:"node_slug"`
+	// Draft version ID
+	VersionID string `json:"version_id"`
+}
+
+func (EventNodeVersionDraftApplied) isEventPayload() {}
+
+func (EventNodeVersionDraftApplied) EventPayloadType() string { return "EventNodeVersionDraftApplied" }
 
 // Emitted after a new account is created.
 type EventAccountCreated struct {

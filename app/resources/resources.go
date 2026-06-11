@@ -42,6 +42,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/library/node_version/node_version_querier"
+	"github.com/Southclaws/storyden/app/resources/library/node_version/node_version_writer"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
@@ -126,6 +128,8 @@ func Build() fx.Option {
 			node_cache.New,
 			node_querier.New,
 			node_writer.New,
+			node_version_querier.New,
+			node_version_writer.New,
 			node_traversal.New,
 			node_children.New,
 			node_search.New,

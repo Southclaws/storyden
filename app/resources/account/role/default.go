@@ -25,6 +25,7 @@ var DefaultRoleMember = Role{
 		rbac.PermissionCreateReaction,
 		rbac.PermissionReadPublishedLibrary,
 		rbac.PermissionSubmitLibraryNode,
+		rbac.PermissionSubmitLibraryNodeChanges,
 		rbac.PermissionUploadAsset,
 		rbac.PermissionListProfiles,
 		rbac.PermissionReadProfile,

@@ -109,7 +109,7 @@ func TestPluginErrorStates(t *testing.T) {
 			threadCreate := tests.AssertRequest(
 				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>test plugin crash handling</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      threadTitle,
 				}, adminSession),
 			)(t, http.StatusOK)

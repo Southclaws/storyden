@@ -29,6 +29,10 @@ $defs:
       - EventNodePublished
       - EventNodeSubmittedForReview
       - EventNodeUnpublished
+      - EventNodeVersionDraftCreated
+      - EventNodeVersionDraftUpdated
+      - EventNodeVersionDraftDeleted
+      - EventNodeVersionDraftApplied
       - EventAccountCreated
       - EventAccountUpdated
       - EventAccountSuspended
@@ -71,6 +75,10 @@ $defs:
       - $ref: "#/$defs/EventNodePublished"
       - $ref: "#/$defs/EventNodeSubmittedForReview"
       - $ref: "#/$defs/EventNodeUnpublished"
+      - $ref: "#/$defs/EventNodeVersionDraftCreated"
+      - $ref: "#/$defs/EventNodeVersionDraftUpdated"
+      - $ref: "#/$defs/EventNodeVersionDraftDeleted"
+      - $ref: "#/$defs/EventNodeVersionDraftApplied"
       - $ref: "#/$defs/EventAccountCreated"
       - $ref: "#/$defs/EventAccountUpdated"
       - $ref: "#/$defs/EventAccountSuspended"
@@ -420,6 +428,96 @@ $defs:
       slug:
         type: string
         description: "Node slug"
+
+  # Library node version draft events
+
+  EventNodeVersionDraftCreated:
+    type: object
+    description: "Emitted when a draft version is created for a library node."
+    required: ["event", "node_id", "node_slug", "version_id", "author_id"]
+    properties:
+      event: { type: string, const: "EventNodeVersionDraftCreated" }
+      node_id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      node_slug:
+        type: string
+        description: "Node slug"
+      version_id:
+        type: string
+        format: versionID
+        description: "Draft version ID"
+      author_id:
+        type: string
+        format: accountID
+        description: "Draft author account ID"
+
+  EventNodeVersionDraftUpdated:
+    type: object
+    description: "Emitted when a draft version is updated."
+    required: ["event", "node_id", "node_slug", "version_id", "author_id"]
+    properties:
+      event: { type: string, const: "EventNodeVersionDraftUpdated" }
+      node_id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      node_slug:
+        type: string
+        description: "Node slug"
+      version_id:
+        type: string
+        format: versionID
+        description: "Draft version ID"
+      author_id:
+        type: string
+        format: accountID
+        description: "Draft author account ID"
+
+  EventNodeVersionDraftDeleted:
+    type: object
+    description: "Emitted when a draft version is discarded."
+    required: ["event", "node_id", "node_slug", "version_id", "author_id"]
+    properties:
+      event: { type: string, const: "EventNodeVersionDraftDeleted" }
+      node_id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      node_slug:
+        type: string
+        description: "Node slug"
+      version_id:
+        type: string
+        format: versionID
+        description: "Draft version ID"
+      author_id:
+        type: string
+        format: accountID
+        description: "Draft author account ID"
+
+  EventNodeVersionDraftApplied:
+    type: object
+    description: "Emitted when a draft version is applied to a library node."
+    required: ["event", "node_id", "node_slug", "version_id", "author_id"]
+    properties:
+      event: { type: string, const: "EventNodeVersionDraftApplied" }
+      node_id:
+        type: string
+        format: nodeID
+        description: "Library node ID"
+      node_slug:
+        type: string
+        description: "Node slug"
+      version_id:
+        type: string
+        format: versionID
+        description: "Draft version ID"
+      author_id:
+        type: string
+        format: accountID
+        description: "Draft author account ID"
 
   # Account events
 

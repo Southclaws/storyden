@@ -176,6 +176,7 @@ var (
 	OperationIDCollectionRemoveNode                   = OperationID{`CollectionRemoveNode`}
 	OperationIDNodeCreate                             = OperationID{`NodeCreate`}
 	OperationIDNodeList                               = OperationID{`NodeList`}
+	OperationIDNodeDraftList                          = OperationID{`NodeDraftList`}
 	OperationIDNodeGet                                = OperationID{`NodeGet`}
 	OperationIDNodeUpdate                             = OperationID{`NodeUpdate`}
 	OperationIDNodeDelete                             = OperationID{`NodeDelete`}
@@ -187,6 +188,14 @@ var (
 	OperationIDNodeUpdatePropertySchema               = OperationID{`NodeUpdatePropertySchema`}
 	OperationIDNodeUpdateProperties                   = OperationID{`NodeUpdateProperties`}
 	OperationIDNodeUpdateVisibility                   = OperationID{`NodeUpdateVisibility`}
+	OperationIDNodeVersionList                        = OperationID{`NodeVersionList`}
+	OperationIDNodeVersionCreate                      = OperationID{`NodeVersionCreate`}
+	OperationIDNodeVersionDraftGet                    = OperationID{`NodeVersionDraftGet`}
+	OperationIDNodeVersionDraftUpdate                 = OperationID{`NodeVersionDraftUpdate`}
+	OperationIDNodeVersionGet                         = OperationID{`NodeVersionGet`}
+	OperationIDNodeVersionUpdate                      = OperationID{`NodeVersionUpdate`}
+	OperationIDNodeVersionDelete                      = OperationID{`NodeVersionDelete`}
+	OperationIDNodeVersionUpdateStatus                = OperationID{`NodeVersionUpdateStatus`}
 	OperationIDNodeAddAsset                           = OperationID{`NodeAddAsset`}
 	OperationIDNodeRemoveAsset                        = OperationID{`NodeRemoveAsset`}
 	OperationIDNodeAddNode                            = OperationID{`NodeAddNode`}
@@ -572,6 +581,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDNodeCreate, nil
 	case string(`NodeList`):
 		return OperationIDNodeList, nil
+	case string(`NodeDraftList`):
+		return OperationIDNodeDraftList, nil
 	case string(`NodeGet`):
 		return OperationIDNodeGet, nil
 	case string(`NodeUpdate`):
@@ -594,6 +605,22 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDNodeUpdateProperties, nil
 	case string(`NodeUpdateVisibility`):
 		return OperationIDNodeUpdateVisibility, nil
+	case string(`NodeVersionList`):
+		return OperationIDNodeVersionList, nil
+	case string(`NodeVersionCreate`):
+		return OperationIDNodeVersionCreate, nil
+	case string(`NodeVersionDraftGet`):
+		return OperationIDNodeVersionDraftGet, nil
+	case string(`NodeVersionDraftUpdate`):
+		return OperationIDNodeVersionDraftUpdate, nil
+	case string(`NodeVersionGet`):
+		return OperationIDNodeVersionGet, nil
+	case string(`NodeVersionUpdate`):
+		return OperationIDNodeVersionUpdate, nil
+	case string(`NodeVersionDelete`):
+		return OperationIDNodeVersionDelete, nil
+	case string(`NodeVersionUpdateStatus`):
+		return OperationIDNodeVersionUpdateStatus, nil
 	case string(`NodeAddAsset`):
 		return OperationIDNodeAddAsset, nil
 	case string(`NodeRemoveAsset`):

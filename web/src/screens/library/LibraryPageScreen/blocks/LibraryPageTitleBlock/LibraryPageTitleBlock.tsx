@@ -3,14 +3,13 @@ import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
 import { LStack, WStack } from "@/styled-system/jsx";
 
-import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
 import { useLibraryPageTitleBlock } from "./useLibraryPageTitleBlock";
 
 export function LibraryPageTitleBlock() {
-  const { store } = useLibraryPageContext();
-  const { draft } = store.getState();
+  const name = useWatch((s) => s.draft.name);
   const { editing } = useEditState();
 
   if (editing) {
@@ -19,7 +18,7 @@ export function LibraryPageTitleBlock() {
 
   return (
     <Heading fontSize="heading.2" fontWeight="bold">
-      {draft.name || "(untitled)"}
+      {name || "(untitled)"}
     </Heading>
   );
 }
@@ -28,7 +27,7 @@ function LibraryPageTitleBlockEditing() {
   const {
     defaultValue,
     isTitleSuggestEnabled,
-    value,
+    titleInputKey,
     isLoading,
     handleSuggest,
     handleChange,
@@ -43,13 +42,13 @@ function LibraryPageTitleBlockEditing() {
       <LStack minW="0">
         <WStack alignItems="end">
           <HeadingInput
+            key={`title:${titleInputKey}`}
             id="name-input"
             size={"2xl" as any}
             fontWeight="bold"
             placeholder="Name..."
             onValueChange={handleChangeAndReset}
             defaultValue={defaultValue}
-            value={value}
           />
           {isTitleSuggestEnabled && (
             <IntelligenceAction

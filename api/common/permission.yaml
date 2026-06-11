@@ -14,6 +14,7 @@ oneOf:
   - $ref: "#/$defs/READ_PUBLISHED_LIBRARY"
   - $ref: "#/$defs/MANAGE_LIBRARY"
   - $ref: "#/$defs/SUBMIT_LIBRARY_NODE"
+  - $ref: "#/$defs/SUBMIT_LIBRARY_NODE_CHANGES"
   - $ref: "#/$defs/UPLOAD_ASSET"
   - $ref: "#/$defs/MANAGE_EVENTS"
   - $ref: "#/$defs/LIST_PROFILES"
@@ -90,6 +91,12 @@ $defs:
     const: SUBMIT_LIBRARY_NODE
     title: Submit to library
     description: Submit new pages to the library.
+
+  SUBMIT_LIBRARY_NODE_CHANGES:
+    type: string
+    const: SUBMIT_LIBRARY_NODE_CHANGES
+    title: Submit library page changes
+    description: Submit proposed edits to existing library pages.
 
   UPLOAD_ASSET:
     type: string

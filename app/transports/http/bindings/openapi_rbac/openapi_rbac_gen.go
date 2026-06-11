@@ -167,6 +167,7 @@ type OperationPermissions interface {
 	CollectionRemoveNode() (bool, *rbac.Permission)
 	NodeCreate() (bool, *rbac.Permission)
 	NodeList() (bool, *rbac.Permission)
+	NodeDraftList() (bool, *rbac.Permission)
 	NodeGet() (bool, *rbac.Permission)
 	NodeUpdate() (bool, *rbac.Permission)
 	NodeDelete() (bool, *rbac.Permission)
@@ -178,6 +179,14 @@ type OperationPermissions interface {
 	NodeUpdatePropertySchema() (bool, *rbac.Permission)
 	NodeUpdateProperties() (bool, *rbac.Permission)
 	NodeUpdateVisibility() (bool, *rbac.Permission)
+	NodeVersionList() (bool, *rbac.Permission)
+	NodeVersionCreate() (bool, *rbac.Permission)
+	NodeVersionDraftGet() (bool, *rbac.Permission)
+	NodeVersionDraftUpdate() (bool, *rbac.Permission)
+	NodeVersionGet() (bool, *rbac.Permission)
+	NodeVersionUpdate() (bool, *rbac.Permission)
+	NodeVersionDelete() (bool, *rbac.Permission)
+	NodeVersionUpdateStatus() (bool, *rbac.Permission)
 	NodeAddAsset() (bool, *rbac.Permission)
 	NodeRemoveAsset() (bool, *rbac.Permission)
 	NodeAddNode() (bool, *rbac.Permission)
@@ -528,6 +537,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeCreate()
 	case "NodeList":
 		return optable.NodeList()
+	case "NodeDraftList":
+		return optable.NodeDraftList()
 	case "NodeGet":
 		return optable.NodeGet()
 	case "NodeUpdate":
@@ -550,6 +561,22 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeUpdateProperties()
 	case "NodeUpdateVisibility":
 		return optable.NodeUpdateVisibility()
+	case "NodeVersionList":
+		return optable.NodeVersionList()
+	case "NodeVersionCreate":
+		return optable.NodeVersionCreate()
+	case "NodeVersionDraftGet":
+		return optable.NodeVersionDraftGet()
+	case "NodeVersionDraftUpdate":
+		return optable.NodeVersionDraftUpdate()
+	case "NodeVersionGet":
+		return optable.NodeVersionGet()
+	case "NodeVersionUpdate":
+		return optable.NodeVersionUpdate()
+	case "NodeVersionDelete":
+		return optable.NodeVersionDelete()
+	case "NodeVersionUpdateStatus":
+		return optable.NodeVersionUpdateStatus()
 	case "NodeAddAsset":
 		return optable.NodeAddAsset()
 	case "NodeRemoveAsset":

@@ -71,7 +71,7 @@ func TestExternalPluginEventSubscription(t *testing.T) {
 			thread := tests.AssertRequest(
 				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>external plugin event test</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "External Plugin Event " + xid.New().String(),
 				}, adminSession),
 			)(t, http.StatusOK)
@@ -243,7 +243,7 @@ func TestExternalPluginManifestUpdateReconnectsWithNewSubscriptions(t *testing.T
 			thread1 := tests.AssertRequest(
 				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>manifest update before change</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Manifest Update Before " + xid.New().String(),
 				}, adminSession),
 			)(t, http.StatusOK)
@@ -293,7 +293,7 @@ func TestExternalPluginManifestUpdateReconnectsWithNewSubscriptions(t *testing.T
 			tests.AssertRequest(
 				cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>manifest update after change</p>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Title:      "Manifest Update After " + xid.New().String(),
 				}, adminSession),
 			)(t, http.StatusOK)

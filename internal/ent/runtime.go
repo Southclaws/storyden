@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/moderationnote"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/nodeversion"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -873,7 +874,7 @@ func init() {
 	// node.DefaultHideChildTree holds the default value on creation for the hide_child_tree field.
 	node.DefaultHideChildTree = nodeDescHideChildTree.Default.(bool)
 	// nodeDescSort is the schema descriptor for sort field.
-	nodeDescSort := nodeFields[11].Descriptor()
+	nodeDescSort := nodeFields[12].Descriptor()
 	// node.DefaultSort holds the default value on creation for the sort field.
 	node.DefaultSort = nodeDescSort.Default.(func() lexorank.Key)
 	// nodeDescID is the schema descriptor for id field.
@@ -883,6 +884,45 @@ func init() {
 	// node.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	node.IDValidator = func() func(string) error {
 		validators := nodeDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	nodeversionMixin := schema.NodeVersion{}.Mixin()
+	nodeversionMixinFields0 := nodeversionMixin[0].Fields()
+	_ = nodeversionMixinFields0
+	nodeversionMixinFields1 := nodeversionMixin[1].Fields()
+	_ = nodeversionMixinFields1
+	nodeversionMixinFields2 := nodeversionMixin[2].Fields()
+	_ = nodeversionMixinFields2
+	nodeversionFields := schema.NodeVersion{}.Fields()
+	_ = nodeversionFields
+	// nodeversionDescCreatedAt is the schema descriptor for created_at field.
+	nodeversionDescCreatedAt := nodeversionMixinFields1[0].Descriptor()
+	// nodeversion.DefaultCreatedAt holds the default value on creation for the created_at field.
+	nodeversion.DefaultCreatedAt = nodeversionDescCreatedAt.Default.(func() time.Time)
+	// nodeversionDescUpdatedAt is the schema descriptor for updated_at field.
+	nodeversionDescUpdatedAt := nodeversionMixinFields2[0].Descriptor()
+	// nodeversion.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	nodeversion.DefaultUpdatedAt = nodeversionDescUpdatedAt.Default.(func() time.Time)
+	// nodeversion.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	nodeversion.UpdateDefaultUpdatedAt = nodeversionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// nodeversionDescID is the schema descriptor for id field.
+	nodeversionDescID := nodeversionMixinFields0[0].Descriptor()
+	// nodeversion.DefaultID holds the default value on creation for the id field.
+	nodeversion.DefaultID = nodeversionDescID.Default.(func() xid.ID)
+	// nodeversion.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	nodeversion.IDValidator = func() func(string) error {
+		validators := nodeversionDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

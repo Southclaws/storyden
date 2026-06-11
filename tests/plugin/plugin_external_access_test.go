@@ -209,14 +209,14 @@ func TestExternalPluginAccessSubmitLibraryNodeInEmailMode(t *testing.T) {
 			r.NoError(err)
 			accessAuth := accessKeyAuth(access.AccessKey)
 
-			review := openapi.Review
+			review := openapi.VisibilityReview
 			nodeCreate := tests.AssertRequest(
 				cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "plugin-submit-review-" + xid.New().String(),
 					Visibility: &review,
 				}, accessAuth),
 			)(t, http.StatusOK)
-			r.Equal(openapi.Review, nodeCreate.JSON200.Visibility)
+			r.Equal(openapi.VisibilityReview, nodeCreate.JSON200.Visibility)
 		}))
 	}))
 }

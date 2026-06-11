@@ -175,7 +175,7 @@ func visibilityUpdateError(response *openapi.NodeUpdateVisibilityResponse) error
 
 func validateVisibility(visibility string) error {
 	switch openapi.Visibility(visibility) {
-	case openapi.Draft, openapi.Review, openapi.Published, openapi.Unlisted:
+	case openapi.VisibilityDraft, openapi.VisibilityReview, openapi.VisibilityPublished, openapi.VisibilityUnlisted:
 		return nil
 	default:
 		return fmt.Errorf("invalid visibility %q; must be one of: draft, review, published, unlisted", visibility)

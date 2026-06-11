@@ -102,7 +102,6 @@ func TestAuditEventList(t *testing.T) {
 				r.NoError(err)
 				r.Equal(http.StatusForbidden, list.StatusCode())
 			})
-
 		}))
 	}))
 }
@@ -175,9 +174,9 @@ func TestAccountWarningUpdateAuditEvent(t *testing.T) {
 			a.Equal(createResp.JSON200.Id, updatedTyped.WarningId)
 			a.Equal("initial warning reason", updatedTyped.PreviousReason)
 			a.Equal("updated warning reason", updatedTyped.Reason)
-			}))
 		}))
-	}
+	}))
+}
 
 func TestAuditEventGet(t *testing.T) {
 	t.Parallel()
@@ -264,7 +263,7 @@ func TestAuditLogging(t *testing.T) {
 				memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				memberSession := sh.WithSession(memberCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				createThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
 					Title:      "Test Thread",
 					Body:       opt.New("<p>Test content</p>").Ptr(),
@@ -308,7 +307,7 @@ func TestAuditLogging(t *testing.T) {
 				memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				memberSession := sh.WithSession(memberCtx)
 
-				vis := openapi.Published
+				vis := openapi.VisibilityPublished
 				createThread, err := cl.ThreadCreateWithResponse(memberCtx, openapi.ThreadInitialProps{
 					Title:      "Test Thread for Replies",
 					Body:       opt.New("<p>Test content</p>").Ptr(),

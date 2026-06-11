@@ -2,15 +2,14 @@ import { InputEvent, useState } from "react";
 
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
-import { CancelAction } from "@/components/site/Action/Cancel";
-import { EditAction } from "@/components/site/Action/Edit";
+import { ButtonGroup } from "@/components/ui/button";
 import { isSlugReady, processMarkInput } from "@/lib/mark/mark";
 import { HStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPath } from "../useLibraryPath";
 
 import { useLibraryPageContext } from "./Context";
-import { useLibraryPagePermissions } from "./permissions";
+import { LibraryPageEditMenu } from "./LibraryPageEditMenu";
 import { useWatch } from "./store";
 import { useEditState } from "./useEditState";
 
@@ -25,7 +24,6 @@ function useLibraryPageControls() {
   // Ensure the final item is the real slug, not the cached copy
   const updatedLibraryPath = [...libraryPath.slice(0, -1), slug];
 
-  const { isAllowedToEdit } = useLibraryPagePermissions();
   const { editing } = useEditState();
 
   const [isSlugInvalid, setSlugInvalid] = useState(true);
@@ -45,7 +43,6 @@ function useLibraryPageControls() {
     isSlugInvalid,
     visibility,
     setSlug,
-    isAllowedToEdit,
     editing,
     handleSlugChange,
   };
@@ -58,7 +55,6 @@ export function LibraryPageControls() {
     slug,
     visibility,
     isSlugInvalid,
-    isAllowedToEdit,
     editing,
     handleSlugChange,
   } = useLibraryPageControls();
@@ -74,35 +70,19 @@ export function LibraryPageControls() {
         invalid={isSlugInvalid}
         onChange={handleSlugChange}
       />
+
       <HStack>
-        {isAllowedToEdit && <EditControls />}
-        <LibraryPageMenu node={draft} />
+        <ButtonGroup variant="subtle" size="xs" attached>
+          <EditMenuControls />
+          <LibraryPageMenu node={draft} />
+        </ButtonGroup>
       </HStack>
     </WStack>
   );
 }
 
-function EditControls() {
-  const { editing, saving, handleToggleEditMode } = useEditState();
+function EditMenuControls() {
+  const { initialNode } = useLibraryPageContext();
 
-  if (!editing) {
-    return (
-      <EditAction type="button" onClick={handleToggleEditMode}>
-        Edit
-      </EditAction>
-    );
-  }
-
-  return (
-    <>
-      <CancelAction
-        type="button"
-        loading={saving}
-        disabled={saving}
-        onClick={handleToggleEditMode}
-      >
-        View
-      </CancelAction>
-    </>
-  );
+  return <LibraryPageEditMenu node={initialNode} />;
 }

@@ -15,12 +15,15 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 import { fetcher } from "../client";
 import type {
   BadRequestResponse,
+  ConflictResponse,
   InternalServerErrorResponse,
   NodeAddChildOKResponse,
   NodeCreateBody,
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
   NodeDeleteParams,
+  NodeDraftListOKResponse,
+  NodeDraftListParams,
   NodeGenerateContentBody,
   NodeGenerateContentOKResponse,
   NodeGenerateTagsBody,
@@ -40,6 +43,15 @@ import type {
   NodeUpdatePropertiesOKResponse,
   NodeUpdatePropertySchemaBody,
   NodeUpdatePropertySchemaOKResponse,
+  NodeVersionCreateBody,
+  NodeVersionCreateOKResponse,
+  NodeVersionDeleteOKResponse,
+  NodeVersionGetOKResponse,
+  NodeVersionListOKResponse,
+  NodeVersionListParams,
+  NodeVersionUpdateBody,
+  NodeVersionUpdateOKResponse,
+  NodeVersionUpdateStatusBody,
   NotFoundResponse,
   NotImplementedResponse,
   NotModifiedResponse,
@@ -146,6 +158,70 @@ export const useNodeList = <
   };
 };
 /**
+ * List all draft versions across all nodes visible to the caller.
+
+This endpoint is designed for moderation and queue screens where you need
+to see all pending draft proposals in one request. Each draft includes a
+reference to its target node for context.
+
+Drafts are visible based on the caller's permissions:
+- Draft authors can see their own drafts
+- Members with `MANAGE_LIBRARY` can see all drafts
+- Unauthenticated requests receive 401 Unauthorized
+
+Results are ordered by `updated_at` descending so recently updated drafts
+appear first.
+
+ */
+export const nodeDraftList = (params?: NodeDraftListParams) => {
+  return fetcher<NodeDraftListOKResponse>({
+    url: `/nodes/drafts`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getNodeDraftListKey = (params?: NodeDraftListParams) =>
+  [`/nodes/drafts`, ...(params ? [params] : [])] as const;
+
+export type NodeDraftListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeDraftList>>
+>;
+export type NodeDraftListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useNodeDraftList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(
+  params?: NodeDraftListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeDraftList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeDraftListKey(params) : null));
+  const swrFn = () => nodeDraftList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
  * Get a node by its URL slug.
  */
 export const nodeGet = (nodeSlug: string, params?: NodeGetParams) => {
@@ -204,7 +280,16 @@ export const useNodeGet = <
   };
 };
 /**
- * Update a node.
+ * Update a node directly.
+
+Direct updates are intended for fast edits by members who can manage
+the target node. If a node has a working draft version, direct updates
+to versioned page fields are rejected until the draft is applied or
+deleted. When a direct update changes versioned page fields and no
+draft exists, the node's `current_version_id` pointer is cleared
+because the live node no longer exactly represents an applied
+checkpoint.
+
  */
 export const nodeUpdate = (
   nodeSlug: string,
@@ -879,6 +964,609 @@ export const useNodeUpdateVisibility = <
   const swrKey =
     swrOptions?.swrKey ?? getNodeUpdateVisibilityMutationKey(nodeSlug);
   const swrFn = getNodeUpdateVisibilityMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List edit versions for a node.
+
+Versions have two states: draft and applied. A version is a draft when
+it is pre-published. There can only be a single draft of a node. 
+
+Applied versions are immutable historical snapshots of the page fields
+that were copied into the node. The single draft version, when present,
+is the working snapshot ahead of the live node and is visible only to
+its author and members with `MANAGE_LIBRARY`.
+
+Results are ordered by `updated_at` descending so draft autosaves and
+recently applied checkpoints appear before older history.
+
+ */
+export const nodeVersionList = (
+  nodeSlug: string,
+  params?: NodeVersionListParams,
+) => {
+  return fetcher<NodeVersionListOKResponse>({
+    url: `/nodes/${nodeSlug}/versions`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getNodeVersionListKey = (
+  nodeSlug: string,
+  params?: NodeVersionListParams,
+) => [`/nodes/${nodeSlug}/versions`, ...(params ? [params] : [])] as const;
+
+export type NodeVersionListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionList>>
+>;
+export type NodeVersionListQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionList = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  params?: NodeVersionListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeVersionList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeVersionListKey(nodeSlug, params) : null));
+  const swrFn = () => nodeVersionList(nodeSlug, params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create the single mutable draft checkpoint for a node.
+
+This operation requires either `SUBMIT_LIBRARY_NODE_CHANGES` or
+`MANAGE_LIBRARY` permission. The draft starts as a full snapshot of the
+node's current versioned page fields. Fields supplied in the request
+overlay that snapshot, omitted fields keep the snapshotted value, and
+explicit null values clear nullable fields.
+
+A node can have only one draft. If a draft already exists for the node,
+this operation returns a conflict. Drafts do not mutate the target node
+until the draft is applied through the version status endpoint by a
+member with `MANAGE_LIBRARY`.
+
+ */
+export const nodeVersionCreate = (
+  nodeSlug: string,
+  nodeVersionCreateBody: NodeVersionCreateBody,
+) => {
+  return fetcher<NodeVersionCreateOKResponse>({
+    url: `/nodes/${nodeSlug}/versions`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: nodeVersionCreateBody,
+  });
+};
+
+export const getNodeVersionCreateMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeVersionCreateBody },
+  ): Promise<NodeVersionCreateOKResponse> => {
+    return nodeVersionCreate(nodeSlug, arg);
+  };
+};
+export const getNodeVersionCreateMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/versions`] as const;
+
+export type NodeVersionCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionCreate>>
+>;
+export type NodeVersionCreateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | ConflictResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeVersionCreate>>,
+      TError,
+      Key,
+      NodeVersionCreateBody,
+      Awaited<ReturnType<typeof nodeVersionCreate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeVersionCreateMutationKey(nodeSlug);
+  const swrFn = getNodeVersionCreateMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get the node's single working draft checkpoint.
+
+This is a stable alias for the draft version of a node. It allows
+clients to read "the draft" without listing versions and inspecting
+status values. If the node has no draft, or the draft is not visible to
+the caller, this operation returns not found.
+
+The draft is visible only to its author and members with
+`MANAGE_LIBRARY`.
+
+ */
+export const nodeVersionDraftGet = (nodeSlug: string) => {
+  return fetcher<NodeVersionGetOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/draft`,
+    method: "GET",
+  });
+};
+
+export const getNodeVersionDraftGetKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/versions/draft`] as const;
+
+export type NodeVersionDraftGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionDraftGet>>
+>;
+export type NodeVersionDraftGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionDraftGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeVersionDraftGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeVersionDraftGetKey(nodeSlug) : null));
+  const swrFn = () => nodeVersionDraftGet(nodeSlug);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the node's single working draft checkpoint.
+
+This is a stable alias for patching the draft version of a node without
+first listing versions or knowing the draft version identifier. The
+node must already have a draft visible to the caller. This operation
+does not create a draft and does not apply the draft to the target node.
+
+The caller must be the draft author or have `MANAGE_LIBRARY`. Fields
+omitted from the request are left unchanged on the draft snapshot.
+Explicit null values clear nullable fields. Properties are a complete
+desired-state list for the target node properties.
+
+ */
+export const nodeVersionDraftUpdate = (
+  nodeSlug: string,
+  nodeVersionUpdateBody: NodeVersionUpdateBody,
+) => {
+  return fetcher<NodeVersionUpdateOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/draft`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeVersionUpdateBody,
+  });
+};
+
+export const getNodeVersionDraftUpdateMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeVersionUpdateBody },
+  ): Promise<NodeVersionUpdateOKResponse> => {
+    return nodeVersionDraftUpdate(nodeSlug, arg);
+  };
+};
+export const getNodeVersionDraftUpdateMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/versions/draft`] as const;
+
+export type NodeVersionDraftUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionDraftUpdate>>
+>;
+export type NodeVersionDraftUpdateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | ConflictResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionDraftUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeVersionDraftUpdate>>,
+      TError,
+      Key,
+      NodeVersionUpdateBody,
+      Awaited<ReturnType<typeof nodeVersionDraftUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeVersionDraftUpdateMutationKey(nodeSlug);
+  const swrFn = getNodeVersionDraftUpdateMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get an edit version for a node.
+
+The version must belong to the node identified by `node_slug`. Applied
+versions are immutable historical snapshots and are visible to callers
+who can read the target node. The draft version is visible only to its
+author and members with `MANAGE_LIBRARY`.
+
+ */
+export const nodeVersionGet = (nodeSlug: string, versionId: string) => {
+  return fetcher<NodeVersionGetOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/${versionId}`,
+    method: "GET",
+  });
+};
+
+export const getNodeVersionGetKey = (nodeSlug: string, versionId: string) =>
+  [`/nodes/${nodeSlug}/versions/${versionId}`] as const;
+
+export type NodeVersionGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionGet>>
+>;
+export type NodeVersionGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  versionId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeVersionGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!(nodeSlug && versionId);
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeVersionGetKey(nodeSlug, versionId) : null));
+  const swrFn = () => nodeVersionGet(nodeSlug, versionId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the node's single draft checkpoint.
+
+This operation is for draft autosave and editing only. It does not
+change version status and cannot apply a version to the target node.
+The version must still have draft status and the caller must be the
+draft author or have `MANAGE_LIBRARY`.
+
+Fields omitted from the request are left unchanged on the draft
+snapshot. Explicit null values clear nullable fields. Properties are a
+complete desired-state list for the target node properties: when the
+version is applied, the list replaces the node's existing property set
+rather than merging with it.
+
+ */
+export const nodeVersionUpdate = (
+  nodeSlug: string,
+  versionId: string,
+  nodeVersionUpdateBody: NodeVersionUpdateBody,
+) => {
+  return fetcher<NodeVersionUpdateOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/${versionId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeVersionUpdateBody,
+  });
+};
+
+export const getNodeVersionUpdateMutationFetcher = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeVersionUpdateBody },
+  ): Promise<NodeVersionUpdateOKResponse> => {
+    return nodeVersionUpdate(nodeSlug, versionId, arg);
+  };
+};
+export const getNodeVersionUpdateMutationKey = (
+  nodeSlug: string,
+  versionId: string,
+) => [`/nodes/${nodeSlug}/versions/${versionId}`] as const;
+
+export type NodeVersionUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionUpdate>>
+>;
+export type NodeVersionUpdateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | ConflictResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  versionId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeVersionUpdate>>,
+      TError,
+      Key,
+      NodeVersionUpdateBody,
+      Awaited<ReturnType<typeof nodeVersionUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeVersionUpdateMutationKey(nodeSlug, versionId);
+  const swrFn = getNodeVersionUpdateMutationFetcher(nodeSlug, versionId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete the working draft checkpoint.
+
+A draft author can discard their own draft. Members with `MANAGE_LIBRARY`
+permission can discard any draft for the node. The draft row is removed
+from history. Applied versions are immutable history entries and cannot
+be deleted through this endpoint.
+
+ */
+export const nodeVersionDelete = (nodeSlug: string, versionId: string) => {
+  return fetcher<NodeVersionDeleteOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/${versionId}`,
+    method: "DELETE",
+  });
+};
+
+export const getNodeVersionDeleteMutationFetcher = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return (
+    _: Key,
+    __: { arg: Arguments },
+  ): Promise<NodeVersionDeleteOKResponse> => {
+    return nodeVersionDelete(nodeSlug, versionId);
+  };
+};
+export const getNodeVersionDeleteMutationKey = (
+  nodeSlug: string,
+  versionId: string,
+) => [`/nodes/${nodeSlug}/versions/${versionId}`] as const;
+
+export type NodeVersionDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionDelete>>
+>;
+export type NodeVersionDeleteMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionDelete = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  versionId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeVersionDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof nodeVersionDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeVersionDeleteMutationKey(nodeSlug, versionId);
+  const swrFn = getNodeVersionDeleteMutationFetcher(nodeSlug, versionId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the lifecycle status of a checkpoint.
+
+This endpoint is separate from the content patch endpoint because status
+changes have side effects. For the initial checkpoint workflow, the
+only supported transition is draft to applied. Applying a version is
+restricted to members with `MANAGE_LIBRARY`.
+
+Applying a draft copies the full draft snapshot into the target node,
+applies properties as a complete desired-state list, marks the version
+immutable, and updates the node's `current_version_id` pointer to the
+applied version. This is a linear operation; applying a draft does not
+merge against other draft or historical versions.
+
+Clients must use this endpoint for lifecycle transitions and must not
+combine status changes with regular draft content updates.
+
+ */
+export const nodeVersionUpdateStatus = (
+  nodeSlug: string,
+  versionId: string,
+  nodeVersionUpdateStatusBody: NodeVersionUpdateStatusBody,
+) => {
+  return fetcher<NodeVersionUpdateOKResponse>({
+    url: `/nodes/${nodeSlug}/versions/${versionId}/status`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeVersionUpdateStatusBody,
+  });
+};
+
+export const getNodeVersionUpdateStatusMutationFetcher = (
+  nodeSlug: string,
+  versionId: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeVersionUpdateStatusBody },
+  ): Promise<NodeVersionUpdateOKResponse> => {
+    return nodeVersionUpdateStatus(nodeSlug, versionId, arg);
+  };
+};
+export const getNodeVersionUpdateStatusMutationKey = (
+  nodeSlug: string,
+  versionId: string,
+) => [`/nodes/${nodeSlug}/versions/${versionId}/status`] as const;
+
+export type NodeVersionUpdateStatusMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeVersionUpdateStatus>>
+>;
+export type NodeVersionUpdateStatusMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeVersionUpdateStatus = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  versionId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeVersionUpdateStatus>>,
+      TError,
+      Key,
+      NodeVersionUpdateStatusBody,
+      Awaited<ReturnType<typeof nodeVersionUpdateStatus>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getNodeVersionUpdateStatusMutationKey(nodeSlug, versionId);
+  const swrFn = getNodeVersionUpdateStatusMutationFetcher(nodeSlug, versionId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

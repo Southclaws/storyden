@@ -29,32 +29,6 @@ export const visibility = {
     bg: {
       DEFAULT: {
         value: {
-          _osLight: "{colors.green.light.3}",
-          _osDark: "{colors.green.dark.3}",
-        },
-      },
-    },
-    fg: {
-      DEFAULT: {
-        value: {
-          _osLight: "{colors.green.light.11}",
-          _osDark: "{colors.green.dark.11}",
-        },
-      },
-    },
-    border: {
-      DEFAULT: {
-        value: {
-          _osLight: "{colors.green.light.6}",
-          _osDark: "{colors.green.dark.7}",
-        },
-      },
-    },
-  },
-  review: {
-    bg: {
-      DEFAULT: {
-        value: {
           _osLight: "{colors.blue.light.3}",
           _osDark: "{colors.blue.dark.3}",
         },
@@ -73,6 +47,32 @@ export const visibility = {
         value: {
           _osLight: "{colors.blue.light.6}",
           _osDark: "{colors.blue.dark.7}",
+        },
+      },
+    },
+  },
+  review: {
+    bg: {
+      DEFAULT: {
+        value: {
+          _osLight: "{colors.amber.light.3}",
+          _osDark: "{colors.amber.dark.3}",
+        },
+      },
+    },
+    fg: {
+      DEFAULT: {
+        value: {
+          _osLight: "{colors.amber.light.11}",
+          _osDark: "{colors.amber.dark.11}",
+        },
+      },
+    },
+    border: {
+      DEFAULT: {
+        value: {
+          _osLight: "{colors.amber.light.6}",
+          _osDark: "{colors.amber.dark.7}",
         },
       },
     },

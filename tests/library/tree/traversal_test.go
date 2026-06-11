@@ -34,7 +34,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			// SETUP
 			//
@@ -271,7 +271,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 			session := sh.WithSession(ctx)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			// SETUP
 			//

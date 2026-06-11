@@ -74,6 +74,7 @@ func TestRoleAssignment(t *testing.T) {
 				"CREATE_REACTION",
 				"READ_PUBLISHED_LIBRARY",
 				"SUBMIT_LIBRARY_NODE",
+				"SUBMIT_LIBRARY_NODE_CHANGES",
 				"UPLOAD_ASSET",
 				"LIST_PROFILES",
 				"READ_PROFILE",

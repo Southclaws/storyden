@@ -94,6 +94,8 @@ const (
 	EdgeCollections = "collections"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
 	EdgeNodes = "nodes"
+	// EdgeNodeVersions holds the string denoting the node_versions edge name in mutations.
+	EdgeNodeVersions = "node_versions"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// EdgeEvents holds the string denoting the events edge name in mutations.
@@ -289,6 +291,13 @@ const (
 	NodesInverseTable = "nodes"
 	// NodesColumn is the table column denoting the nodes relation/edge.
 	NodesColumn = "account_id"
+	// NodeVersionsTable is the table that holds the node_versions relation/edge.
+	NodeVersionsTable = "node_versions"
+	// NodeVersionsInverseTable is the table name for the NodeVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "nodeversion" package.
+	NodeVersionsInverseTable = "node_versions"
+	// NodeVersionsColumn is the table column denoting the node_versions relation/edge.
+	NodeVersionsColumn = "author_id"
 	// AssetsTable is the table that holds the assets relation/edge.
 	AssetsTable = "assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -889,6 +898,20 @@ func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByNodeVersionsCount orders the results by node_versions count.
+func ByNodeVersionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodeVersionsStep(), opts...)
+	}
+}
+
+// ByNodeVersions orders the results by node_versions terms.
+func ByNodeVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeVersionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAssetsCount orders the results by assets count.
 func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1215,6 +1238,13 @@ func newNodesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
+	)
+}
+func newNodeVersionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeVersionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NodeVersionsTable, NodeVersionsColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {

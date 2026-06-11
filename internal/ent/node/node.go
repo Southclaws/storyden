@@ -39,6 +39,8 @@ const (
 	FieldHideChildTree = "hide_child_tree"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldCurrentVersionID holds the string denoting the current_version_id field in the database.
+	FieldCurrentVersionID = "current_version_id"
 	// FieldPropertySchemaID holds the string denoting the property_schema_id field in the database.
 	FieldPropertySchemaID = "property_schema_id"
 	// FieldPrimaryAssetID holds the string denoting the primary_asset_id field in the database.
@@ -73,6 +75,10 @@ const (
 	EdgeContentLinks = "content_links"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeVersions holds the string denoting the versions edge name in mutations.
+	EdgeVersions = "versions"
+	// EdgeCurrentVersion holds the string denoting the current_version edge name in mutations.
+	EdgeCurrentVersion = "current_version"
 	// EdgeCollectionNodes holds the string denoting the collection_nodes edge name in mutations.
 	EdgeCollectionNodes = "collection_nodes"
 	// Table holds the table name of the node in the database.
@@ -140,6 +146,20 @@ const (
 	// CollectionsInverseTable is the table name for the Collection entity.
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
+	// VersionsTable is the table that holds the versions relation/edge.
+	VersionsTable = "node_versions"
+	// VersionsInverseTable is the table name for the NodeVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "nodeversion" package.
+	VersionsInverseTable = "node_versions"
+	// VersionsColumn is the table column denoting the versions relation/edge.
+	VersionsColumn = "node_id"
+	// CurrentVersionTable is the table that holds the current_version relation/edge.
+	CurrentVersionTable = "nodes"
+	// CurrentVersionInverseTable is the table name for the NodeVersion entity.
+	// It exists in this package in order to avoid circular dependency with the "nodeversion" package.
+	CurrentVersionInverseTable = "node_versions"
+	// CurrentVersionColumn is the table column denoting the current_version relation/edge.
+	CurrentVersionColumn = "current_version_id"
 	// CollectionNodesTable is the table that holds the collection_nodes relation/edge.
 	CollectionNodesTable = "collection_nodes"
 	// CollectionNodesInverseTable is the table name for the CollectionNode entity.
@@ -163,6 +183,7 @@ var Columns = []string{
 	FieldParentNodeID,
 	FieldHideChildTree,
 	FieldAccountID,
+	FieldCurrentVersionID,
 	FieldPropertySchemaID,
 	FieldPrimaryAssetID,
 	FieldLinkID,
@@ -302,6 +323,11 @@ func ByHideChildTree(opts ...sql.OrderTermOption) OrderOption {
 // ByAccountID orders the results by the account_id field.
 func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
+}
+
+// ByCurrentVersionID orders the results by the current_version_id field.
+func ByCurrentVersionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCurrentVersionID, opts...).ToFunc()
 }
 
 // ByPropertySchemaID orders the results by the property_schema_id field.
@@ -448,6 +474,27 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByVersionsCount orders the results by versions count.
+func ByVersionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVersionsStep(), opts...)
+	}
+}
+
+// ByVersions orders the results by versions terms.
+func ByVersions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVersionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCurrentVersionField orders the results by current_version field.
+func ByCurrentVersionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCurrentVersionStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByCollectionNodesCount orders the results by collection_nodes count.
 func ByCollectionNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -536,6 +583,20 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CollectionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
+	)
+}
+func newVersionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VersionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+	)
+}
+func newCurrentVersionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CurrentVersionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CurrentVersionTable, CurrentVersionColumn),
 	)
 }
 func newCollectionNodesStep() *sqlgraph.Step {

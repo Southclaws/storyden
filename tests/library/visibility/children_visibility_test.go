@@ -39,10 +39,10 @@ func TestChildrenEndpointVisibilityFiltering(t *testing.T) {
 			authorSession := sh.WithSession(ctxAuthor)
 			randoSession := sh.WithSession(ctxRando)
 
-			published := openapi.Published
-			draft := openapi.Draft
-			unlisted := openapi.Unlisted
-			review := openapi.Review
+			published := openapi.VisibilityPublished
+			draft := openapi.VisibilityDraft
+			unlisted := openapi.VisibilityUnlisted
+			review := openapi.VisibilityReview
 
 			t.Run("children_endpoint_respects_visibility_rules", func(t *testing.T) {
 				a := assert.New(t)
@@ -145,8 +145,8 @@ func TestChildrenEndpointVsTreeConsistency(t *testing.T) {
 			authorSession := sh.WithSession(ctxAuthor)
 			randoSession := sh.WithSession(ctxRando)
 
-			published := openapi.Published
-			draft := openapi.Draft
+			published := openapi.VisibilityPublished
+			draft := openapi.VisibilityDraft
 
 			t.Run("children_endpoint_matches_tree_visibility", func(t *testing.T) {
 				a := assert.New(t)

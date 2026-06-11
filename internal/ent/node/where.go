@@ -112,6 +112,11 @@ func AccountID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldAccountID, v))
 }
 
+// CurrentVersionID applies equality check predicate on the "current_version_id" field. It's identical to CurrentVersionIDEQ.
+func CurrentVersionID(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldCurrentVersionID, v))
+}
+
 // PropertySchemaID applies equality check predicate on the "property_schema_id" field. It's identical to PropertySchemaIDEQ.
 func PropertySchemaID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldPropertySchemaID, v))
@@ -752,6 +757,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// CurrentVersionIDEQ applies the EQ predicate on the "current_version_id" field.
+func CurrentVersionIDEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDNEQ applies the NEQ predicate on the "current_version_id" field.
+func CurrentVersionIDNEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDIn applies the In predicate on the "current_version_id" field.
+func CurrentVersionIDIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldCurrentVersionID, vs...))
+}
+
+// CurrentVersionIDNotIn applies the NotIn predicate on the "current_version_id" field.
+func CurrentVersionIDNotIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldCurrentVersionID, vs...))
+}
+
+// CurrentVersionIDGT applies the GT predicate on the "current_version_id" field.
+func CurrentVersionIDGT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDGTE applies the GTE predicate on the "current_version_id" field.
+func CurrentVersionIDGTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDLT applies the LT predicate on the "current_version_id" field.
+func CurrentVersionIDLT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDLTE applies the LTE predicate on the "current_version_id" field.
+func CurrentVersionIDLTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldCurrentVersionID, v))
+}
+
+// CurrentVersionIDContains applies the Contains predicate on the "current_version_id" field.
+func CurrentVersionIDContains(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContains(FieldCurrentVersionID, vc))
+}
+
+// CurrentVersionIDHasPrefix applies the HasPrefix predicate on the "current_version_id" field.
+func CurrentVersionIDHasPrefix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasPrefix(FieldCurrentVersionID, vc))
+}
+
+// CurrentVersionIDHasSuffix applies the HasSuffix predicate on the "current_version_id" field.
+func CurrentVersionIDHasSuffix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasSuffix(FieldCurrentVersionID, vc))
+}
+
+// CurrentVersionIDIsNil applies the IsNil predicate on the "current_version_id" field.
+func CurrentVersionIDIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldCurrentVersionID))
+}
+
+// CurrentVersionIDNotNil applies the NotNil predicate on the "current_version_id" field.
+func CurrentVersionIDNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldCurrentVersionID))
+}
+
+// CurrentVersionIDEqualFold applies the EqualFold predicate on the "current_version_id" field.
+func CurrentVersionIDEqualFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldEqualFold(FieldCurrentVersionID, vc))
+}
+
+// CurrentVersionIDContainsFold applies the ContainsFold predicate on the "current_version_id" field.
+func CurrentVersionIDContainsFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContainsFold(FieldCurrentVersionID, vc))
+}
+
 // PropertySchemaIDEQ applies the EQ predicate on the "property_schema_id" field.
 func PropertySchemaIDEQ(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldPropertySchemaID, v))
@@ -1337,6 +1422,52 @@ func HasCollections() predicate.Node {
 func HasCollectionsWith(preds ...predicate.Collection) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := newCollectionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVersions applies the HasEdge predicate on the "versions" edge.
+func HasVersions() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VersionsTable, VersionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVersionsWith applies the HasEdge predicate on the "versions" edge with a given conditions (other predicates).
+func HasVersionsWith(preds ...predicate.NodeVersion) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newVersionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCurrentVersion applies the HasEdge predicate on the "current_version" edge.
+func HasCurrentVersion() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CurrentVersionTable, CurrentVersionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCurrentVersionWith applies the HasEdge predicate on the "current_version" edge with a given conditions (other predicates).
+func HasCurrentVersionWith(preds ...predicate.NodeVersion) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newCurrentVersionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

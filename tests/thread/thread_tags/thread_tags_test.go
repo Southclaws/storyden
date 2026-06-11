@@ -53,7 +53,7 @@ func TestThreadTags(t *testing.T) {
 				create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create)
@@ -78,7 +78,7 @@ func TestThreadTags(t *testing.T) {
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Tags:       &n1tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)
@@ -88,7 +88,7 @@ func TestThreadTags(t *testing.T) {
 				create2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Tags:       &n2tags,
 				}, adminSession)
 				tests.Ok(t, err, create2)
@@ -114,7 +114,7 @@ func TestThreadTags(t *testing.T) {
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)
@@ -150,7 +150,7 @@ func TestThreadTags(t *testing.T) {
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
 					Category:   opt.New(catID).Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)

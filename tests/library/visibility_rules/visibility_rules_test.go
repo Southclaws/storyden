@@ -34,10 +34,10 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
 			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
-			draft := openapi.Draft
-			unlisted := openapi.Unlisted
-			review := openapi.Review
-			published := openapi.Published
+			draft := openapi.VisibilityDraft
+			unlisted := openapi.VisibilityUnlisted
+			review := openapi.VisibilityReview
+			published := openapi.VisibilityPublished
 
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
@@ -95,10 +95,10 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
 			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
-			draft := openapi.Draft
-			unlisted := openapi.Unlisted
-			review := openapi.Review
-			published := openapi.Published
+			draft := openapi.VisibilityDraft
+			unlisted := openapi.VisibilityUnlisted
+			review := openapi.VisibilityReview
+			published := openapi.VisibilityPublished
 
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
@@ -156,10 +156,10 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
 			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
-			draft := openapi.Draft
-			unlisted := openapi.Unlisted
-			review := openapi.Review
-			published := openapi.Published
+			draft := openapi.VisibilityDraft
+			unlisted := openapi.VisibilityUnlisted
+			review := openapi.VisibilityReview
+			published := openapi.VisibilityPublished
 
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
@@ -217,10 +217,10 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			ctxAuthor, _ := e2e.WithAccount(ctx, aw, seed.Account_003_Baldur)
 			ctxRando, _ := e2e.WithAccount(ctx, aw, seed.Account_004_Loki)
 
-			draft := openapi.Draft
-			unlisted := openapi.Unlisted
-			review := openapi.Review
-			published := openapi.Published
+			draft := openapi.VisibilityDraft
+			unlisted := openapi.VisibilityUnlisted
+			review := openapi.VisibilityReview
+			published := openapi.VisibilityPublished
 
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 

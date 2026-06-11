@@ -39,6 +39,10 @@ class Event(str, Enum):
     EVENTNODEPUBLISHED = "EventNodePublished"
     EVENTNODESUBMITTEDFORREVIEW = "EventNodeSubmittedForReview"
     EVENTNODEUNPUBLISHED = "EventNodeUnpublished"
+    EVENTNODEVERSIONDRAFTCREATED = "EventNodeVersionDraftCreated"
+    EVENTNODEVERSIONDRAFTUPDATED = "EventNodeVersionDraftUpdated"
+    EVENTNODEVERSIONDRAFTDELETED = "EventNodeVersionDraftDeleted"
+    EVENTNODEVERSIONDRAFTAPPLIED = "EventNodeVersionDraftApplied"
     EVENTACCOUNTCREATED = "EventAccountCreated"
     EVENTACCOUNTUPDATED = "EventAccountUpdated"
     EVENTACCOUNTSUSPENDED = "EventAccountSuspended"
@@ -301,6 +305,66 @@ class EventNodeUnpublished(BaseModel):
     slug: str
 
 
+"""Emitted when a draft version is created for a library node."""
+
+class EventNodeVersionDraftCreated(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventNodeVersionDraftCreated"]
+    """Draft author account ID"""
+    author_id: str
+    """Library node ID"""
+    node_id: str
+    """Node slug"""
+    node_slug: str
+    """Draft version ID"""
+    version_id: str
+
+
+"""Emitted when a draft version is updated."""
+
+class EventNodeVersionDraftUpdated(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventNodeVersionDraftUpdated"]
+    """Draft author account ID"""
+    author_id: str
+    """Library node ID"""
+    node_id: str
+    """Node slug"""
+    node_slug: str
+    """Draft version ID"""
+    version_id: str
+
+
+"""Emitted when a draft version is discarded."""
+
+class EventNodeVersionDraftDeleted(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventNodeVersionDraftDeleted"]
+    """Draft author account ID"""
+    author_id: str
+    """Library node ID"""
+    node_id: str
+    """Node slug"""
+    node_slug: str
+    """Draft version ID"""
+    version_id: str
+
+
+"""Emitted when a draft version is applied to a library node."""
+
+class EventNodeVersionDraftApplied(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event: Literal["EventNodeVersionDraftApplied"]
+    """Draft author account ID"""
+    author_id: str
+    """Library node ID"""
+    node_id: str
+    """Node slug"""
+    node_slug: str
+    """Draft version ID"""
+    version_id: str
+
+
 """Emitted after a new account is created."""
 
 class EventAccountCreated(BaseModel):
@@ -477,7 +541,7 @@ class EventSettingsUpdated(BaseModel):
     settings: Dict[str, Any]
 
 EventPayload = Annotated[
-    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventAccountWarned, EventAccountWarningUpdated, EventAccountWarningDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
+    Union[EventThreadPublished, EventThreadUnpublished, EventThreadUpdated, EventThreadDeleted, EventThreadReplyCreated, EventThreadReplyDeleted, EventThreadReplyUpdated, EventThreadReplyPublished, EventThreadReplyUnpublished, EventPostLiked, EventPostUnliked, EventPostReacted, EventPostUnreacted, EventCategoryUpdated, EventCategoryDeleted, EventMemberMentioned, EventNodeCreated, EventNodeUpdated, EventNodeDeleted, EventNodePublished, EventNodeSubmittedForReview, EventNodeUnpublished, EventNodeVersionDraftCreated, EventNodeVersionDraftUpdated, EventNodeVersionDraftDeleted, EventNodeVersionDraftApplied, EventAccountCreated, EventAccountUpdated, EventAccountSuspended, EventAccountUnsuspended, EventModerationNoteCreated, EventModerationNoteDeleted, EventAccountWarned, EventAccountWarningUpdated, EventAccountWarningDeleted, EventReportCreated, EventReportUpdated, EventActivityCreated, EventActivityUpdated, EventActivityDeleted, EventActivityPublished, EventSettingsUpdated],
     Field(discriminator="event"),
 ]
 

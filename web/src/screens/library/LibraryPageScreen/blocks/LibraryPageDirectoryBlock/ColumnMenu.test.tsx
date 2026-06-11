@@ -22,7 +22,7 @@ vi.mock("../../Context", () => ({
 
 vi.mock("../../useEditState", () => ({
   useEditState: () => ({
-    editing: editingMock,
+    isDirectEditing: editingMock,
   }),
 }));
 

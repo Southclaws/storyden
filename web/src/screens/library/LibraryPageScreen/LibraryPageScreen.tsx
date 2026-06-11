@@ -2,7 +2,7 @@
 
 import { last } from "lodash";
 import { useParams } from "next/navigation";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { memo } from "react";
 
 import { useNodeGet } from "@/api/openapi-client/nodes";
@@ -11,9 +11,13 @@ import { LStack } from "@/styled-system/jsx";
 
 import { Params } from "../library-path";
 
-import { LibraryPageProvider, Props } from "./Context";
+import { LibraryPageProvider, Props, useLibraryPageContext } from "./Context";
+import { EditingDraftWarning } from "./EditingDraftWarning";
+import { LibraryPageAutosaveController } from "./LibraryPageAutosaveController";
 import { LibraryPageControls } from "./LibraryPageControls";
+import { LibraryPageVersionReview } from "./LibraryPageVersionReview";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
+import { LibraryPageEditProvider, useEditState } from "./useEditState";
 
 export function LibraryPageScreen(props: Props) {
   const { slug } = useParams<Params>();
@@ -46,17 +50,39 @@ export function LibraryPageScreen(props: Props) {
 const LibraryPageForm = memo((props: Props) => {
   return (
     <LibraryPageProvider node={props.node} childNodes={props.childNodes}>
-      <LibraryPage />
+      <LibraryPageEditProvider>
+        <LibraryPageAutosaveController />
+        <LibraryPage />
+      </LibraryPageEditProvider>
     </LibraryPageProvider>
   );
 });
 LibraryPageForm.displayName = "LibraryPageForm";
 
 export function LibraryPage() {
+  const { initialNode, revalidate } = useLibraryPageContext();
+  const [versionID] = useQueryState("version", {
+    ...parseAsString,
+    clearOnDefault: true,
+  });
+
+  const { editMode } = useEditState();
+
+  const editingDraft = editMode === "proposal";
+
   return (
     <LStack h="full" gap="3" alignItems="start">
       <LibraryPageControls />
-      <LibraryPageBlocks />
+      {editingDraft && <EditingDraftWarning />}
+      {versionID ? (
+        <LibraryPageVersionReview
+          node={initialNode}
+          versionID={versionID}
+          onApplied={revalidate}
+        />
+      ) : (
+        <LibraryPageBlocks />
+      )}
     </LStack>
   );
 }

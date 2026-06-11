@@ -47,8 +47,8 @@ func TestGuestRolePermissions(t *testing.T) {
 			}, adminSession))(t, http.StatusOK)
 
 			// Helper values for pointers
-			published := openapi.Published
-			review := openapi.Review
+			published := openapi.VisibilityPublished
+			review := openapi.VisibilityReview
 			content := "<body>This is a test node.</body>"
 
 			// Remove all permissions from the guest role to test restrictions
@@ -77,7 +77,7 @@ func TestGuestRolePermissions(t *testing.T) {
 				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
@@ -177,7 +177,7 @@ func TestGuestRolePermissions(t *testing.T) {
 				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_collection_item",
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
@@ -221,7 +221,7 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 			}, adminSession))(t, http.StatusOK)
 
 			// Helper values for pointers
-			published := openapi.Published
+			published := openapi.VisibilityPublished
 			content := "<body>This is a test node.</body>"
 
 			// Grant read permissions to guest role
@@ -243,7 +243,7 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_can_read_published_threads" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
@@ -332,8 +332,8 @@ func TestMemberRolePermissions(t *testing.T) {
 			}, adminSession))(t, http.StatusOK)
 
 			// Helper values for pointers
-			published := openapi.Published
-			review := openapi.Review
+			published := openapi.VisibilityPublished
+			review := openapi.VisibilityReview
 			content := "<body>This is a test node.</body>"
 
 			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
@@ -365,7 +365,7 @@ func TestMemberRolePermissions(t *testing.T) {
 				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_reaction" + uuid.NewString(),
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
@@ -469,7 +469,7 @@ func TestMemberRolePermissions(t *testing.T) {
 				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_collection_item",
 					Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-					Visibility: opt.New(openapi.Published).Ptr(),
+					Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 					Category:   opt.New(cat.JSON200.Id).Ptr(),
 				}, adminSession))(t, http.StatusOK)
 
@@ -515,13 +515,13 @@ func TestGuestVsMemberAccess(t *testing.T) {
 			AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 				Body:       opt.New("<body>This is a test thread.</body>").Ptr(),
-				Visibility: opt.New(openapi.Published).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
 				Category:   opt.New(cat.JSON200.Id).Ptr(),
 			}, adminSession))(t, http.StatusOK)
 
 			// Helper values for pointers
-			published := openapi.Published
-			// review := openapi.Review
+			published := openapi.VisibilityPublished
+			// review := openapi.VisibilityReview
 			content := "<body>This is a test node.</body>"
 
 			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)

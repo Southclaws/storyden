@@ -57,6 +57,11 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     name: "Submit to library",
     description: "Submit new pages to the library.",
   },
+  [Permission.SUBMIT_LIBRARY_NODE_CHANGES]: {
+    value: Permission.SUBMIT_LIBRARY_NODE_CHANGES,
+    name: "Submit library page changes",
+    description: "Submit proposed changes to existing library pages.",
+  },
   [Permission.UPLOAD_ASSET]: {
     value: Permission.UPLOAD_ASSET,
     name: "Upload assets",

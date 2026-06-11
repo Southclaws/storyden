@@ -32,7 +32,7 @@ func TestNodesTreeMutations(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
-			visibility := openapi.Published
+			visibility := openapi.VisibilityPublished
 
 			// SETUP
 			//

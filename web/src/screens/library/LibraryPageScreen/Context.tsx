@@ -1,7 +1,9 @@
-import { debounce, entries, toPairs } from "lodash";
 import {
+  Dispatch,
   PropsWithChildren,
+  SetStateAction,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -15,15 +17,9 @@ import {
   NodeWithChildren,
 } from "src/api/openapi-schema";
 
-import {
-  nodeUpdate,
-  nodeUpdateChildrenPropertySchema,
-} from "@/api/openapi-client/nodes";
-import { MutationSet } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 import { deepEqual } from "@/utils/equality";
-import { deriveError } from "@/utils/error";
 
 import { NodeStoreAPI, createNodeStore } from "./store";
 
@@ -33,7 +29,10 @@ type LibraryPageContext = {
   initialChildren?: NodeListResult;
   store: NodeStoreAPI;
   saving: boolean;
-  revalidate: () => void;
+  setSaving: Dispatch<SetStateAction<boolean>>;
+  revalidate: (updated?: NodeWithChildren) => Promise<void>;
+  suppressAutosave: (callback: () => void) => void;
+  isAutosaveSuppressed: () => boolean;
 };
 
 const Context = createContext<LibraryPageContext | null>(null);
@@ -62,6 +61,7 @@ export function LibraryPageProvider({
   const [saving, setSaving] = useState(false);
   const nodeWithMeta = useMemo(() => hydrateNode(node), [node]);
   const { revalidate } = useLibraryMutation(node);
+  const suppressAutosaveRef = useRef(false);
 
   const storeRef = useRef<NodeStoreAPI | null>(null);
   if (storeRef.current === null) {
@@ -71,88 +71,19 @@ export function LibraryPageProvider({
     });
   }
 
-  const saveDraft = useRef(
-    debounce(() => {
-      if (!storeRef.current) {
-        return;
-      }
-
-      const state = storeRef.current.getState();
-
-      state.commit(async (mutation: MutationSet) => {
-        try {
-          setSaving(() => true);
-
-          if (mutation.childPropertySchemaMutation) {
-            await nodeUpdateChildrenPropertySchema(
-              node.id,
-              mutation.childPropertySchemaMutation,
-            );
-          }
-
-          if (mutation.childMutation) {
-            const collapsed = Object.fromEntries(
-              Object.entries(mutation.childMutation).map(([id, changes]) => [
-                id,
-                changes.at(-1)!,
-              ]),
-            );
-
-            const operations = entries(collapsed);
-
-            console.debug("Updating child nodes", operations);
-
-            await Promise.all(
-              operations.map(([childNodeID, child]) =>
-                nodeUpdate(childNodeID, child),
-              ),
-            );
-          }
-
-          const updated = await nodeUpdate(node.id, mutation.nodeMutation);
-          await revalidate(updated);
-
-          const slugChanged = updated.slug !== state.original.slug;
-          if (slugChanged) {
-            window.history.replaceState(
-              null,
-              "",
-              `/l/${updated.slug}?edit=true`,
-            );
-          }
-
-          return updated;
-        } catch (error) {
-          throw new Error(deriveError(error), { cause: error });
-        } finally {
-          setTimeout(() => {
-            setSaving(() => false);
-          }, 500);
-        }
-      });
-    }, 500),
-  ).current;
-
-  useEffect(() => {
-    if (!storeRef.current) {
-      return;
+  const suppressAutosave = useCallback((callback: () => void) => {
+    suppressAutosaveRef.current = true;
+    try {
+      callback();
+    } finally {
+      suppressAutosaveRef.current = false;
     }
-
-    const unsub = storeRef.current.subscribe((state, prev) => {
-      if (!deepEqual(state.draft, prev.draft)) {
-        saveDraft();
-      }
-    });
-
-    return unsub;
-  }, [saveDraft]);
-
-  // Cancel the saveDraft debounce when the component unmounts.
-  useEffect(() => {
-    return () => {
-      saveDraft.cancel();
-    };
   }, []);
+
+  const isAutosaveSuppressed = useCallback(
+    () => suppressAutosaveRef.current,
+    [],
+  );
 
   // Handle external changes to the original node state. This happens if another
   // source triggers a mutation+revalidation via SWR and the initial must update
@@ -170,16 +101,18 @@ export function LibraryPageProvider({
     const equalToOriginal = deepEqual(original, node);
     const equalToDraft = deepEqual(draft, nodeWithMeta);
 
-    storeRef.current.setState((state) => {
-      if (!equalToOriginal) {
-        state.original = node;
-      }
+    suppressAutosave(() => {
+      storeRef.current?.setState((state) => {
+        if (!equalToOriginal) {
+          state.original = nodeWithMeta;
+        }
 
-      if (!equalToDraft) {
-        state.draft = nodeWithMeta;
-      }
+        if (!equalToDraft) {
+          state.draft = nodeWithMeta;
+        }
+      });
     });
-  }, [node, nodeWithMeta]);
+  }, [node, nodeWithMeta, suppressAutosave]);
 
   return (
     <Context.Provider
@@ -189,7 +122,10 @@ export function LibraryPageProvider({
         initialChildren: childNodes,
         store: storeRef.current,
         saving,
+        setSaving,
         revalidate,
+        suppressAutosave,
+        isAutosaveSuppressed,
       }}
     >
       {children}

@@ -42,7 +42,7 @@ export function LibraryPageDirectoryBlockContents() {
     childrenSort,
   } = useDirectoryBlockContext();
   const { nodeID, initialChildren } = useLibraryPageContext();
-  const { editing } = useEditState();
+  const { isDirectEditing } = useEditState();
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     handleSearch(event.target.value);
@@ -80,7 +80,7 @@ export function LibraryPageDirectoryBlockContents() {
             flexShrink="1"
           />
 
-          {editing && (
+          {isDirectEditing && (
             <HStack gap="1">
               <AddPropertyMenu unavailable={!hasChildren}>
                 <IconButton

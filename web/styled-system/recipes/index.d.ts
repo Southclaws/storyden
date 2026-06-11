@@ -2,6 +2,7 @@
 export * from './badge';
 export * from './checkbox';
 export * from './button';
+export * from './group';
 export * from './input';
 export * from './switch-recipe';
 export * from './text';

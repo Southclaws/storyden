@@ -2892,6 +2892,31 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/NodeListOK" }
 
+  /nodes/drafts:
+    get:
+      operationId: NodeDraftList
+      description: |
+        List all draft versions across all nodes visible to the caller.
+
+        This endpoint is designed for moderation and queue screens where you need
+        to see all pending draft proposals in one request. Each draft includes a
+        reference to its target node for context.
+
+        Drafts are visible based on the caller's permissions:
+        - Draft authors can see their own drafts
+        - Members with `MANAGE_LIBRARY` can see all drafts
+        - Unauthenticated requests receive 401 Unauthorized
+
+        Results are ordered by `updated_at` descending so recently updated drafts
+        appear first.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeDraftListOK" }
+
   /nodes/{node_slug}:
     get:
       operationId: NodeGet
@@ -2909,7 +2934,16 @@ paths:
         "200": { $ref: "#/components/responses/NodeGetOK" }
     patch:
       operationId: NodeUpdate
-      description: Update a node.
+      description: |
+        Update a node directly.
+
+        Direct updates are intended for fast edits by members who can manage
+        the target node. If a node has a working draft version, direct updates
+        to versioned page fields are rejected until the draft is applied or
+        deleted. When a direct update changes versioned page fields and no
+        draft exists, the node's `current_version_id` pointer is cleared
+        because the live node no longer exactly represents an applied
+        checkpoint.
       tags: [nodes]
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
@@ -3080,6 +3114,199 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeUpdateOK" }
+
+  /nodes/{node_slug}/versions:
+    get:
+      operationId: NodeVersionList
+      description: |
+        List edit versions for a node.
+
+        Versions have two states: draft and applied. A version is a draft when
+        it is pre-published. There can only be a single draft of a node. 
+
+        Applied versions are immutable historical snapshots of the page fields
+        that were copied into the node. The single draft version, when present,
+        is the working snapshot ahead of the live node and is visible only to
+        its author and members with `MANAGE_LIBRARY`.
+
+        Results are ordered by `updated_at` descending so draft autosaves and
+        recently applied checkpoints appear before older history.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeVersionListOK" }
+    post:
+      operationId: NodeVersionCreate
+      description: |
+        Create the single mutable draft checkpoint for a node.
+
+        This operation requires either `SUBMIT_LIBRARY_NODE_CHANGES` or
+        `MANAGE_LIBRARY` permission. The draft starts as a full snapshot of the
+        node's current versioned page fields. Fields supplied in the request
+        overlay that snapshot, omitted fields keep the snapshotted value, and
+        explicit null values clear nullable fields.
+
+        A node can have only one draft. If a draft already exists for the node,
+        this operation returns a conflict. Drafts do not mutate the target node
+        until the draft is applied through the version status endpoint by a
+        member with `MANAGE_LIBRARY`.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeVersionCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeVersionCreateOK" }
+
+  /nodes/{node_slug}/versions/draft:
+    get:
+      operationId: NodeVersionDraftGet
+      description: |
+        Get the node's single working draft checkpoint.
+
+        This is a stable alias for the draft version of a node. It allows
+        clients to read "the draft" without listing versions and inspecting
+        status values. If the node has no draft, or the draft is not visible to
+        the caller, this operation returns not found.
+
+        The draft is visible only to its author and members with
+        `MANAGE_LIBRARY`.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeVersionGetOK" }
+    patch:
+      operationId: NodeVersionDraftUpdate
+      description: |
+        Update the node's single working draft checkpoint.
+
+        This is a stable alias for patching the draft version of a node without
+        first listing versions or knowing the draft version identifier. The
+        node must already have a draft visible to the caller. This operation
+        does not create a draft and does not apply the draft to the target node.
+
+        The caller must be the draft author or have `MANAGE_LIBRARY`. Fields
+        omitted from the request are left unchanged on the draft snapshot.
+        Explicit null values clear nullable fields. Properties are a complete
+        desired-state list for the target node properties.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeVersionUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeVersionUpdateOK" }
+
+  /nodes/{node_slug}/versions/{version_id}:
+    get:
+      operationId: NodeVersionGet
+      description: |
+        Get an edit version for a node.
+
+        The version must belong to the node identified by `node_slug`. Applied
+        versions are immutable historical snapshots and are visible to callers
+        who can read the target node. The draft version is visible only to its
+        author and members with `MANAGE_LIBRARY`.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeVersionIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeVersionGetOK" }
+    patch:
+      operationId: NodeVersionUpdate
+      description: |
+        Update the node's single draft checkpoint.
+
+        This operation is for draft autosave and editing only. It does not
+        change version status and cannot apply a version to the target node.
+        The version must still have draft status and the caller must be the
+        draft author or have `MANAGE_LIBRARY`.
+
+        Fields omitted from the request are left unchanged on the draft
+        snapshot. Explicit null values clear nullable fields. Properties are a
+        complete desired-state list for the target node properties: when the
+        version is applied, the list replaces the node's existing property set
+        rather than merging with it.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeVersionIDParam"
+      requestBody: { $ref: "#/components/requestBodies/NodeVersionUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeVersionUpdateOK" }
+    delete:
+      operationId: NodeVersionDelete
+      description: |
+        Delete the working draft checkpoint.
+
+        A draft author can discard their own draft. Members with `MANAGE_LIBRARY`
+        permission can discard any draft for the node. The draft row is removed
+        from history. Applied versions are immutable history entries and cannot
+        be deleted through this endpoint.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeVersionIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeVersionDeleteOK" }
+
+  /nodes/{node_slug}/versions/{version_id}/status:
+    patch:
+      operationId: NodeVersionUpdateStatus
+      description: |
+        Update the lifecycle status of a checkpoint.
+
+        This endpoint is separate from the content patch endpoint because status
+        changes have side effects. For the initial checkpoint workflow, the
+        only supported transition is draft to applied. Applying a version is
+        restricted to members with `MANAGE_LIBRARY`.
+
+        Applying a draft copies the full draft snapshot into the target node,
+        applies properties as a complete desired-state list, marks the version
+        immutable, and updates the node's `current_version_id` pointer to the
+        applied version. This is a linear operation; applying a draft does not
+        merge against other draft or historical versions.
+
+        Clients must use this endpoint for lifecycle transitions and must not
+        combine status changes with regular draft content updates.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeVersionIDParam"
+      requestBody:
+        { $ref: "#/components/requestBodies/NodeVersionUpdateStatus" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeVersionUpdateOK" }
 
   /nodes/{node_slug}/assets/{asset_id}:
     put:
@@ -4007,6 +4234,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    NodeVersionIDParam:
+      description: Node version ID.
+      name: version_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     NodeChildrenSortParam:
       description: |
         The field (either in schema or in property schema) to sort by.
@@ -4438,6 +4673,22 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/NodeMutableProps" }
+
+    NodeVersionCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeVersionInitialProps" }
+
+    NodeVersionUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeVersionMutableProps" }
+
+    NodeVersionUpdateStatus:
+      content:
+        application/json:
+          schema:
+            { $ref: "#/components/schemas/NodeVersionStatusMutationProps" }
 
     NodeGenerateTitle:
       content:
@@ -5270,6 +5521,44 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/NodeWithChildren"
+
+    NodeVersionListOK:
+      description: Node versions listed.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NodeVersionListResult"
+
+    NodeDraftListOK:
+      description: All draft versions listed.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NodeDraftListResult"
+
+    NodeVersionCreateOK:
+      description: Node version created.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NodeVersion"
+
+    NodeVersionGetOK:
+      description: Node version retrieved.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NodeVersion"
+
+    NodeVersionUpdateOK:
+      description: Node version updated.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NodeVersion"
+
+    NodeVersionDeleteOK:
+      description: Node version deleted.
 
     NodeGenerateTitleOK:
       description: Node title generated.
@@ -6849,6 +7138,7 @@ components:
         - "READ_PUBLISHED_LIBRARY"
         - "MANAGE_LIBRARY"
         - "SUBMIT_LIBRARY_NODE"
+        - "SUBMIT_LIBRARY_NODE_CHANGES"
         # Assets
         - "UPLOAD_ASSET"
         # Events
@@ -8315,6 +8605,9 @@ components:
         - report_submitted
         - report_updated
         - warning_issued
+        - node_version_created
+        - node_version_applied
+        - node_version_deleted
 
     NotificationStatus:
       type: string
@@ -9399,6 +9692,12 @@ components:
       properties:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
+        current_version_id:
+          description: |
+            The applied checkpoint that the live node currently represents. If
+            this is unset, the node either has no applied checkpoint history or
+            has been directly edited since the last applied checkpoint.
+          $ref: "#/components/schemas/Identifier"
         assets: { $ref: "#/components/schemas/AssetList" }
         link: { $ref: "#/components/schemas/LinkReference" }
         description: { $ref: "#/components/schemas/NodeDescription" }
@@ -9478,6 +9777,156 @@ components:
         properties: { $ref: "#/components/schemas/PropertyMutationList" }
         tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
+
+    NodeVersion:
+      description: |
+        A draft or applied edit for a library node. Draft versions are mutable
+        working snapshots. Applied versions are immutable snapshots that were
+        copied into the target node upon publishing of the changes.
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - node_id
+        - author
+        - status
+        - name
+        - slug
+        - properties
+        - meta
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        node_id: { $ref: "#/components/schemas/Identifier" }
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        status: { $ref: "#/components/schemas/NodeVersionStatus" }
+        previous:
+          description: |
+            Previous applied version for historical comparison. Only present
+            when retrieving an individual applied version and an earlier
+            applied version exists.
+          $ref: "#/components/schemas/NodeVersionReference"
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
+        description:
+          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
+          nullable: true
+        content:
+          allOf: [{ $ref: "#/components/schemas/PostContent" }]
+          nullable: true
+        properties:
+          description: |
+            Complete desired-state property list for the target node.
+            Properties are replace-all and are not merged with existing values
+            when the version is applied.
+          $ref: "#/components/schemas/PropertyMutationList"
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    NodeVersionReference:
+      description: |
+        Lightweight reference to a tracked library node version.
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - author
+        - status
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        status: { $ref: "#/components/schemas/NodeVersionStatus" }
+
+    NodeVersionStatus:
+      type: string
+      enum:
+        - draft
+        - applied
+
+    NodeVersionList:
+      type: array
+      items: { $ref: "#/components/schemas/NodeVersion" }
+
+    NodeVersionListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [versions]
+          properties:
+            versions: { $ref: "#/components/schemas/NodeVersionList" }
+
+    NodeDraftListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [drafts]
+          properties:
+            drafts: { $ref: "#/components/schemas/NodeDraftList" }
+
+    NodeDraftList:
+      type: array
+      items: { $ref: "#/components/schemas/NodeDraft" }
+
+    NodeDraft:
+      description: |
+        A draft version with its target node reference. This combines the version
+        data with enough node context to display the draft in a queue or list view.
+      allOf:
+        - { $ref: "#/components/schemas/NodeVersion" }
+        - type: object
+          required: [node]
+          properties:
+            node:
+              description: Reference to the target node being edited by this draft
+              $ref: "#/components/schemas/Node"
+
+    NodeVersionInitialProps:
+      description: |
+        Initial overlay for a draft checkpoint. Omitted fields keep the target
+        node's current value in the new draft snapshot. Nullable fields can be
+        set to null to clear them. Properties are replace-all and are not merged
+        with existing values when the version is applied.
+      type: object
+      properties:
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
+        description:
+          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
+          nullable: true
+        content:
+          allOf: [{ $ref: "#/components/schemas/PostContent" }]
+          nullable: true
+        properties: { $ref: "#/components/schemas/PropertyMutationList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    NodeVersionMutableProps:
+      description: |
+        Updates to a draft checkpoint snapshot. This does not change version
+        status. Omitted fields keep the current draft value. Nullable fields can
+        be set to null to clear them. Properties are replace-all and are not
+        merged with existing values when the version is applied.
+      type: object
+      properties:
+        name: { $ref: "#/components/schemas/NodeName" }
+        slug: { $ref: "#/components/schemas/NodeSlug" }
+        description:
+          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
+          nullable: true
+        content:
+          allOf: [{ $ref: "#/components/schemas/PostContent" }]
+          nullable: true
+        properties: { $ref: "#/components/schemas/PropertyMutationList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    NodeVersionStatusMutationProps:
+      type: object
+      required: [status]
+      properties:
+        status: { $ref: "#/components/schemas/NodeVersionStatus" }
 
     NodeGenerateTitleRequest:
       description: |
