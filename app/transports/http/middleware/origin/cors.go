@@ -2,6 +2,8 @@ package origin
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 
 	"github.com/rs/cors"
 	"github.com/samber/lo"
@@ -46,36 +48,55 @@ func (m *Middleware) WithCORS() func(next http.Handler) http.Handler {
 		"X-Ratelimit-Reset",
 	}
 
+	table := lo.SliceToMap(allowedOrigins(m.cfg), func(s string) (string, struct{}) { return s, struct{}{} })
+
+	corsConfig := cors.New(cors.Options{
+		AllowOriginFunc: func(origin string) bool {
+			_, present := table[normaliseOrigin(origin)]
+			return present
+		},
+		AllowedMethods:   allowedMethods,
+		AllowedHeaders:   allowedHeaders,
+		ExposedHeaders:   exposedHeaders,
+		AllowCredentials: true,
+		MaxAge:           300,
+	})
+
 	return func(next http.Handler) http.Handler {
+		handler := corsConfig.Handler(next)
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			origin := r.Header.Get("Origin")
-
-			// TODO: Provide a way to set multiple allowed origins via config.
-			// NOTE: Currently, we allow all origins but not via "*".
-			allowedOrigins := []string{
-				"http://localhost:3000",
-				origin,
-			}
-
-			table := lo.SliceToMap(allowedOrigins, func(s string) (string, struct{}) { return s, struct{}{} })
-
-			allowOriginFunc := func(origin string) bool {
-				_, present := table[origin]
-				return present
-			}
-
-			corsConfig := cors.New(cors.Options{
-				AllowOriginFunc:  allowOriginFunc,
-				AllowedMethods:   allowedMethods,
-				AllowedHeaders:   allowedHeaders,
-				ExposedHeaders:   exposedHeaders,
-				AllowCredentials: true,
-				MaxAge:           300,
-			})
-
-			ctx := setOriginContext(r.Context(), origin)
-
-			corsConfig.Handler(next).ServeHTTP(w, r.WithContext(ctx))
+			ctx := setOriginContext(r.Context(), r.Header.Get("Origin"))
+			handler.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
+}
+
+func allowedOrigins(cfg config.Config) []string {
+	origins := []string{
+		originOf(cfg.PublicWebAddress.Scheme, cfg.PublicWebAddress.Host),
+		originOf(cfg.PublicAPIAddress.Scheme, cfg.PublicAPIAddress.Host),
+	}
+
+	for _, raw := range cfg.CORSAllowedOrigins {
+		origins = append(origins, normaliseOrigin(raw))
+	}
+
+	return lo.Filter(lo.Uniq(origins), func(s string, _ int) bool { return s != "" })
+}
+
+func normaliseOrigin(raw string) string {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil {
+		return ""
+	}
+
+	return originOf(u.Scheme, u.Host)
+}
+
+func originOf(scheme, host string) string {
+	if scheme == "" || host == "" {
+		return ""
+	}
+
+	return strings.ToLower(scheme) + "://" + strings.ToLower(host)
 }

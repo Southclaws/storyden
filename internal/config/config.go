@@ -117,6 +117,12 @@ type Config struct {
 	   Please note that both the public API address and public web address must share the same root domain name as Storyden cookies are configured to be issued under this assumption. It also makes a lot of cross-origin and cookie configurations easier to make secure.
 	*/
 	PublicAPIAddress url.URL `default:"http://localhost:8000" envconfig:"PUBLIC_API_ADDRESS"`
+	/*
+	   Additional browser origins permitted to make credentialed cross-origin requests.
+
+	   The public web and API addresses are always trusted. Set this only when other first-party frontends (such as a separate marketing site or admin console) must call the API from the browser with cookies. Each entry is an origin (`scheme://host[:port]`), comma-separated. Arbitrary third-party origins must not be added here; programmatic clients should authenticate with bearer tokens, which do not depend on CORS credentials.
+	*/
+	CORSAllowedOrigins []string `envconfig:"CORS_ALLOWED_ORIGINS"`
 
 	// -
 	// Rate limiting
