@@ -310,7 +310,19 @@ type Config struct {
 	// Optional JWT key ID (kid) for OAuth signing keys.
 	OAuthSigningKeyID string `envconfig:"OAUTH_SIGNING_KEY_ID"`
 	// Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
-	OAuthDynamicRegistrationEnabled bool `envconfig:"OAUTH_DYNAMIC_REGISTRATION_ENABLED"`
+	OAuthDynamicRegistrationEnabled bool `default:"false" envconfig:"OAUTH_DYNAMIC_REGISTRATION_ENABLED"`
+	// Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients identify themselves with an https URL client_id that resolves to a hosted metadata document instead of pre-registering.
+	OAuthClientIDMetadataDocumentEnabled bool `default:"false" envconfig:"OAUTH_CIMD_ENABLED"`
+	// Comma-separated list of permission scopes a CIMD client may request. Empty uses a conservative read-only default. Privileged scopes are still gated by OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES.
+	OAuthCIMDAllowedScopes []string `envconfig:"OAUTH_CIMD_ALLOWED_SCOPES"`
+	/*
+	   Allow privileged/administrative permission scopes to be granted to CIMD clients.
+
+	   Off by default; only enable for trusted, controlled deployments.
+	*/
+	OAuthCIMDAllowPrivilegedScopes bool `envconfig:"OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES"`
+	// Relax CIMD metadata fetching restrictions (allow http, private hosts and skip TLS verification). For local development and testing only; never set in production.
+	OAuthCIMDAllowInsecureFetch bool `envconfig:"OAUTH_CIMD_ALLOW_INSECURE_FETCH"`
 
 	// -
 	// SMS

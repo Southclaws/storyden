@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -58,10 +60,14 @@ func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*Autho
 		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
-	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
+	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if oauthErr != nil {
+		return nil, oauthErr, err
+	}
+
 	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
 	}

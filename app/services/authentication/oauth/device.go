@@ -5,6 +5,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -114,31 +116,40 @@ func (s *Service) getClientForDeviceAuthorization(ctx context.Context, clientID 
 		return cl, nil
 	}
 
-	if clientID != StorydenCLIClientID {
-		return nil, err
-	}
-
-	_, err = s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
-		AccountID:        opt.NewEmpty[account.AccountID](),
-		ClientID:         StorydenCLIClientID,
-		ClientSecretHash: opt.NewEmpty[string](),
-		Name:             "Storyden",
-		Type:             oauthresource.ClientTypePublic,
-		ScopePolicy:      opt.New(oauthresource.ScopePolicyInheritUserPermissions),
-		RedirectURIs:     []string{},
-		AllowedScopes:    supportedScopes(),
-		AllowedGrants:    []string{GrantTypeDeviceCode, GrantTypeRefreshToken},
-	})
-	if err != nil {
-		cl, readErr := s.clients.GetClientByClientID(ctx, clientID)
-		if readErr == nil {
-			return cl, nil
+	if clientID == StorydenCLIClientID {
+		_, err = s.tokens.CreateClient(ctx, oauth_writer.ClientCreate{
+			AccountID:        opt.NewEmpty[account.AccountID](),
+			ClientID:         StorydenCLIClientID,
+			ClientSecretHash: opt.NewEmpty[string](),
+			Name:             "Storyden",
+			Type:             oauthresource.ClientTypePublic,
+			ScopePolicy:      opt.New(oauthresource.ScopePolicyInheritUserPermissions),
+			RedirectURIs:     []string{},
+			AllowedScopes:    supportedScopes(),
+			AllowedGrants:    []string{GrantTypeDeviceCode, GrantTypeRefreshToken},
+		})
+		if err != nil {
+			cl, readErr := s.clients.GetClientByClientID(ctx, clientID)
+			if readErr == nil {
+				return cl, nil
+			}
+			return nil, err
 		}
-
-		return nil, err
+		return s.clients.GetClientByClientID(ctx, clientID)
 	}
 
-	return s.clients.GetClientByClientID(ctx, clientID)
+	if isCIMDClientID(clientID) {
+		cl, oauthErr, err := s.resolveCIMDClient(ctx, clientID)
+		if oauthErr != nil || err != nil {
+			if err != nil {
+				return nil, err
+			}
+			return nil, fault.New("invalid CIMD client for device authorization")
+		}
+		return cl, nil
+	}
+
+	return nil, err
 }
 
 func (s *Service) GetDeviceConsent(ctx context.Context, accountID account.AccountID, accountPermissions rbac.Permissions, userCode string) (*DeviceConsent, *Error, error) {
@@ -249,10 +260,14 @@ func (s *Service) exchangeDeviceCode(ctx context.Context, input TokenRequest) (*
 		return nil, oauthError("invalid_request", "Missing device_code"), nil
 	}
 
-	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
+	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if oauthErr != nil {
+		return nil, oauthErr, err
+	}
+
 	if cl.Type == oauthresource.ClientTypeConfidential || !contains(cl.AllowedGrants, GrantTypeDeviceCode) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for device_code grant"), nil
 	}
