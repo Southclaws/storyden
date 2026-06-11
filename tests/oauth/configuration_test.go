@@ -156,7 +156,7 @@ func TestOAuthDisabledConfiguration(t *testing.T) {
 					DeviceCode: &deviceCode,
 				}))(t, http.StatusBadRequest)
 				r.NotNil(resp.JSON400)
-				a.Equal("temporarily_unavailable", resp.JSON400.Error)
+				a.Equal("invalid_request", resp.JSON400.Error)
 			})
 
 			t.Run("authorization_code_endpoint_returns_oauth_error_for_signed_in_users", func(t *testing.T) {

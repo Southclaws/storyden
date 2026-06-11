@@ -21,15 +21,17 @@ import (
 	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 type OAuth struct {
 	oauth *oauthservice.Service
+	cfg   config.Config
 }
 
-func NewOAuth(oauth *oauthservice.Service, router *echo.Echo) OAuth {
+func NewOAuth(cfg config.Config, oauth *oauthservice.Service, router *echo.Echo) OAuth {
 	router.Use(oauthTokenClientAuth)
-	return OAuth{oauth: oauth}
+	return OAuth{oauth: oauth, cfg: cfg}
 }
 
 // clientAuth carries credentials extracted from Authorization: Basic for the
@@ -482,8 +484,10 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 
 	var clientID string
 	var clientSecret opt.Optional[string]
+	var usedBasicAuth bool
 
 	if ca, ok := ctx.Value(clientAuthKey).(clientAuth); ok {
+		usedBasicAuth = true
 		if req.Body.ClientId != "" || req.Body.ClientSecret != nil {
 			desc := "multiple client authentication methods used"
 			return &openapi.OAuthToken400JSONResponse{
@@ -516,6 +520,23 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 		return nil, err
 	}
 	if oauthErr != nil {
+		// RFC 6749 §5.2: when a client that authenticated via the Authorization
+		// header fails client authentication, respond 401 with a matching
+		// WWW-Authenticate challenge instead of a plain 400.
+		if oauthErr.Code == "invalid_client" && usedBasicAuth {
+			return openapi.OAuthToken401JSONResponse{
+				OAuthTokenUnauthorisedJSONResponse: openapi.OAuthTokenUnauthorisedJSONResponse{
+					Body: openapi.OAuthError{
+						Error:            oauthErr.Code,
+						ErrorDescription: &oauthErr.Description,
+					},
+					Headers: openapi.OAuthTokenUnauthorisedResponseHeaders{
+						WWWAuthenticate: `Basic realm="` + o.cfg.PublicAPIAddress.Hostname() + `"`,
+					},
+				},
+			}, nil
+		}
+
 		return openapi.OAuthToken400JSONResponse{
 			OAuthTokenErrorJSONResponse: openapi.OAuthTokenErrorJSONResponse(openapi.OAuthError{
 				Error:            oauthErr.Code,

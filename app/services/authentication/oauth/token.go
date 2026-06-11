@@ -38,7 +38,11 @@ type Token struct {
 
 func (s *Service) ExchangeToken(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
 	if !s.Enabled() {
-		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
+		return nil, oauthError("invalid_request", "OAuth is not enabled on this instance"), nil
+	}
+
+	if input.GrantType == "" {
+		return nil, oauthError("invalid_request", "Missing grant_type"), nil
 	}
 
 	switch input.GrantType {

@@ -268,6 +268,31 @@ func mount(
 		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(resource))
 	})
 
+	// RFC 6750 §3 / RFC 9728 §5.1: bearer-protected OAuth resources must answer
+	// 401s with a WWW-Authenticate challenge pointing clients at the protected
+	// resource metadata document for discovery.
+	resourceMetadataURL := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/") + "/.well-known/oauth-protected-resource/api"
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			switch c.Path() {
+			case "/api/oauth/userinfo":
+				c.Response().Before(func() {
+					if c.Response().Status == http.StatusUnauthorized && c.Response().Header().Get("WWW-Authenticate") == "" {
+						c.Response().Header().Set("WWW-Authenticate", `Bearer resource_metadata="`+resourceMetadataURL+`"`)
+					}
+				})
+
+			case "/api/oauth/token", "/api/oauth/register":
+				// RFC 6749 §5.1: responses carrying tokens or credentials must
+				// not be cached.
+				c.Response().Header().Set("Cache-Control", "no-store")
+				c.Response().Header().Set("Pragma", "no-cache")
+			}
+
+			return next(c)
+		}
+	})
+
 	router.Use(
 		requestValidatorMiddleware,
 		openapi.ParameterContext,

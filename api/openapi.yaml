@@ -1262,6 +1262,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/OAuthTokenOK" }
         "400": { $ref: "#/components/responses/OAuthTokenError" }
+        "401": { $ref: "#/components/responses/OAuthTokenUnauthorised" }
 
   /oauth/userinfo:
     get:
@@ -4746,6 +4747,18 @@ components:
           schema:
             $ref: "#/components/schemas/OAuthError"
 
+    OAuthTokenUnauthorised:
+      description: |
+        OAuth token error response for `invalid_client` when the client
+        attempted authentication via the `Authorization` header (RFC 6749
+        §5.2). Carries a `WWW-Authenticate` Bearer challenge.
+      headers:
+        WWW-Authenticate: { $ref: "#/components/headers/WWW-Authenticate" }
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthError"
+
     OAuthUserInfoOK:
       description: User info claims.
       content:
@@ -5394,6 +5407,13 @@ components:
         type: string
         format: RFC1123
     ETag:
+      schema:
+        type: string
+    WWW-Authenticate:
+      description: |
+        RFC 6750 Bearer authentication challenge. Present on 401 responses from
+        OAuth-protected resources, optionally carrying a `resource_metadata`
+        pointer per RFC 9728.
       schema:
         type: string
 

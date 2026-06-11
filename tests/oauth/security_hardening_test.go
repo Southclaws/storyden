@@ -320,6 +320,33 @@ func TestOAuthProtectedResourceMCPScopesWhenMCPEnabled(t *testing.T) {
 	}))
 }
 
+func TestOAuthUserInfoUnauthorisedChallenge(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+			r := require.New(t)
+
+			req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/api/oauth/userinfo", nil)
+			r.NoError(err)
+			resp, err := http.DefaultClient.Do(req)
+			r.NoError(err)
+			defer resp.Body.Close()
+
+			r.Equal(http.StatusUnauthorized, resp.StatusCode)
+			a.Equal(
+				`Bearer resource_metadata="http://localhost:8000/.well-known/oauth-protected-resource/api"`,
+				resp.Header.Get("WWW-Authenticate"),
+			)
+		}))
+	}))
+}
+
 func TestOAuthSecurityHardeningUserInfoScopes(t *testing.T) {
 	t.Parallel()
 
