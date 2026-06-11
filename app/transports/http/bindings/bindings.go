@@ -43,6 +43,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 // Everything in this package is mounted under this path. Any handlers outside
@@ -156,6 +157,7 @@ func bindings(s Bindings) openapi.StrictServerInterface {
 // is outside of the `/api` path is considered separate from the OpenAPI spec.
 func mount(
 	logger *slog.Logger,
+	cfg config.Config,
 	router *echo.Echo,
 	auth *Authorisation,
 	si openapi.StrictServerInterface,
@@ -219,6 +221,8 @@ func mount(
 			return oauthDisabledError(c.Request().Context())
 		}
 
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
+
 		return c.JSON(http.StatusOK, oauthBinding.OAuthDiscovery(c.Request().Context()))
 	})
 
@@ -226,6 +230,8 @@ func mount(
 		if !oauthBinding.oauth.Enabled() {
 			return oauthDisabledError(c.Request().Context())
 		}
+
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
 
 		return c.JSON(http.StatusOK, oauthBinding.OAuthAuthorizationServerMetadata(c.Request().Context()))
 	})
@@ -255,7 +261,7 @@ func mount(
 
 		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
 
-		if suffix == "/api" || suffix == "/mcp/sse" {
+		if suffix == "/api" || (suffix == "/mcp/sse" && cfg.MCPEnabled) {
 			return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadataWithScopes(resource))
 		}
 

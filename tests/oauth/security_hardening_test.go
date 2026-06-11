@@ -167,13 +167,15 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.NoError(err)
 			defer resp.Body.Close()
 			r.Equal(http.StatusOK, resp.StatusCode)
+			a.Equal("public, max-age=3600", resp.Header.Get("Cache-Control"))
 
 			var discovery struct {
-				Issuer                      string `json:"issuer"`
-				DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint"`
-				TokenEndpoint               string `json:"token_endpoint"`
-				UserinfoEndpoint            string `json:"userinfo_endpoint"`
-				JWKSURI                     string `json:"jwks_uri"`
+				Issuer                            string   `json:"issuer"`
+				DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
+				TokenEndpoint                     string   `json:"token_endpoint"`
+				UserinfoEndpoint                  string   `json:"userinfo_endpoint"`
+				JWKSURI                           string   `json:"jwks_uri"`
+				TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 			}
 			r.NoError(json.NewDecoder(resp.Body).Decode(&discovery))
 			a.Equal("http://localhost:8000", discovery.Issuer)
@@ -181,6 +183,7 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000/api/oauth/token", discovery.TokenEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/userinfo", discovery.UserinfoEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/jwks", discovery.JWKSURI)
+			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post"}, discovery.TokenEndpointAuthMethodsSupported)
 
 			req2, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-authorization-server", nil)
 			r.NoError(err)
@@ -188,13 +191,15 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.NoError(err)
 			defer resp2.Body.Close()
 			r.Equal(http.StatusOK, resp2.StatusCode)
+			a.Equal("public, max-age=3600", resp2.Header.Get("Cache-Control"))
 
 			var metadata struct {
-				Issuer                      string `json:"issuer"`
-				AuthorizationEndpoint       string `json:"authorization_endpoint"`
-				TokenEndpoint               string `json:"token_endpoint"`
-				JWKSURI                     string `json:"jwks_uri"`
-				DeviceAuthorizationEndpoint string `json:"device_authorization_endpoint"`
+				Issuer                            string   `json:"issuer"`
+				AuthorizationEndpoint             string   `json:"authorization_endpoint"`
+				TokenEndpoint                     string   `json:"token_endpoint"`
+				JWKSURI                           string   `json:"jwks_uri"`
+				DeviceAuthorizationEndpoint       string   `json:"device_authorization_endpoint"`
+				TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported"`
 			}
 			body2, err := io.ReadAll(resp2.Body)
 			r.NoError(err)
@@ -202,6 +207,7 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000", metadata.Issuer)
 			a.Equal("http://localhost:8000/api/oauth/authorize", metadata.AuthorizationEndpoint)
 			a.Equal("http://localhost:8000/api/oauth/token", metadata.TokenEndpoint)
+			a.ElementsMatch([]string{"none", "client_secret_basic", "client_secret_post"}, metadata.TokenEndpointAuthMethodsSupported)
 			a.Equal("http://localhost:8000/api/oauth/jwks", metadata.JWKSURI)
 			a.Equal("http://localhost:8000/api/oauth/device_authorization", metadata.DeviceAuthorizationEndpoint)
 
@@ -256,7 +262,8 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			r.Contains(prmAPI.ScopesSupported, "email")
 			r.Contains(prmAPI.ScopesSupported, "offline_access")
 
-			// MCP SSE resource
+			// MCP SSE resource. MCP is disabled in this config, so the resource
+			// must not advertise scopes (it is not a live protected resource).
 			req5, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp/sse", nil)
 			r.NoError(err)
 			resp5, err := http.DefaultClient.Do(req5)
@@ -275,6 +282,39 @@ func TestOAuthSecurityHardeningDiscoveryURLs(t *testing.T) {
 			a.Equal("http://localhost:8000/mcp/sse", prmMCP.Resource)
 			r.Len(prmMCP.AuthorizationServers, 1)
 			a.Equal("http://localhost:8000", prmMCP.AuthorizationServers[0])
+			a.Empty(prmMCP.ScopesSupported)
+		}))
+	}))
+}
+
+func TestOAuthProtectedResourceMCPScopesWhenMCPEnabled(t *testing.T) {
+	t.Parallel()
+
+	cfg := oauthConfig(t)
+	cfg.MCPEnabled = true
+
+	integration.Test(t, cfg, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+			r := require.New(t)
+
+			req, err := http.NewRequestWithContext(root, http.MethodGet, ts.URL+"/.well-known/oauth-protected-resource/mcp/sse", nil)
+			r.NoError(err)
+			resp, err := http.DefaultClient.Do(req)
+			r.NoError(err)
+			defer resp.Body.Close()
+			r.Equal(http.StatusOK, resp.StatusCode)
+
+			var prmMCP struct {
+				Resource        string   `json:"resource"`
+				ScopesSupported []string `json:"scopes_supported"`
+			}
+			r.NoError(json.NewDecoder(resp.Body).Decode(&prmMCP))
+			a.Equal("http://localhost:8000/mcp/sse", prmMCP.Resource)
 			r.Contains(prmMCP.ScopesSupported, "openid")
 		}))
 	}))
