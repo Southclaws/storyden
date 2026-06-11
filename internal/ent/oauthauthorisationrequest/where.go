@@ -91,6 +91,11 @@ func State(v string) predicate.OAuthAuthorisationRequest {
 	return predicate.OAuthAuthorisationRequest(sql.FieldEQ(FieldState, v))
 }
 
+// Nonce applies equality check predicate on the "nonce" field. It's identical to NonceEQ.
+func Nonce(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldEQ(FieldNonce, v))
+}
+
 // CodeChallenge applies equality check predicate on the "code_challenge" field. It's identical to CodeChallengeEQ.
 func CodeChallenge(v string) predicate.OAuthAuthorisationRequest {
 	return predicate.OAuthAuthorisationRequest(sql.FieldEQ(FieldCodeChallenge, v))
@@ -559,6 +564,81 @@ func StateEqualFold(v string) predicate.OAuthAuthorisationRequest {
 // StateContainsFold applies the ContainsFold predicate on the "state" field.
 func StateContainsFold(v string) predicate.OAuthAuthorisationRequest {
 	return predicate.OAuthAuthorisationRequest(sql.FieldContainsFold(FieldState, v))
+}
+
+// NonceEQ applies the EQ predicate on the "nonce" field.
+func NonceEQ(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldEQ(FieldNonce, v))
+}
+
+// NonceNEQ applies the NEQ predicate on the "nonce" field.
+func NonceNEQ(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldNEQ(FieldNonce, v))
+}
+
+// NonceIn applies the In predicate on the "nonce" field.
+func NonceIn(vs ...string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldIn(FieldNonce, vs...))
+}
+
+// NonceNotIn applies the NotIn predicate on the "nonce" field.
+func NonceNotIn(vs ...string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldNotIn(FieldNonce, vs...))
+}
+
+// NonceGT applies the GT predicate on the "nonce" field.
+func NonceGT(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldGT(FieldNonce, v))
+}
+
+// NonceGTE applies the GTE predicate on the "nonce" field.
+func NonceGTE(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldGTE(FieldNonce, v))
+}
+
+// NonceLT applies the LT predicate on the "nonce" field.
+func NonceLT(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldLT(FieldNonce, v))
+}
+
+// NonceLTE applies the LTE predicate on the "nonce" field.
+func NonceLTE(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldLTE(FieldNonce, v))
+}
+
+// NonceContains applies the Contains predicate on the "nonce" field.
+func NonceContains(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldContains(FieldNonce, v))
+}
+
+// NonceHasPrefix applies the HasPrefix predicate on the "nonce" field.
+func NonceHasPrefix(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldHasPrefix(FieldNonce, v))
+}
+
+// NonceHasSuffix applies the HasSuffix predicate on the "nonce" field.
+func NonceHasSuffix(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldHasSuffix(FieldNonce, v))
+}
+
+// NonceIsNil applies the IsNil predicate on the "nonce" field.
+func NonceIsNil() predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldIsNull(FieldNonce))
+}
+
+// NonceNotNil applies the NotNil predicate on the "nonce" field.
+func NonceNotNil() predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldNotNull(FieldNonce))
+}
+
+// NonceEqualFold applies the EqualFold predicate on the "nonce" field.
+func NonceEqualFold(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldEqualFold(FieldNonce, v))
+}
+
+// NonceContainsFold applies the ContainsFold predicate on the "nonce" field.
+func NonceContainsFold(v string) predicate.OAuthAuthorisationRequest {
+	return predicate.OAuthAuthorisationRequest(sql.FieldContainsFold(FieldNonce, v))
 }
 
 // CodeChallengeEQ applies the EQ predicate on the "code_challenge" field.

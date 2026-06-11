@@ -947,7 +947,7 @@ func init() {
 	// oauthauthorisationcode.RedirectURIValidator is a validator for the "redirect_uri" field. It is called by the builders before save.
 	oauthauthorisationcode.RedirectURIValidator = oauthauthorisationcodeDescRedirectURI.Validators[0].(func(string) error)
 	// oauthauthorisationcodeDescCodeChallenge is the schema descriptor for code_challenge field.
-	oauthauthorisationcodeDescCodeChallenge := oauthauthorisationcodeFields[5].Descriptor()
+	oauthauthorisationcodeDescCodeChallenge := oauthauthorisationcodeFields[6].Descriptor()
 	// oauthauthorisationcode.CodeChallengeValidator is a validator for the "code_challenge" field. It is called by the builders before save.
 	oauthauthorisationcode.CodeChallengeValidator = oauthauthorisationcodeDescCodeChallenge.Validators[0].(func(string) error)
 	// oauthauthorisationcodeDescID is the schema descriptor for id field.
@@ -990,7 +990,7 @@ func init() {
 	// oauthauthorisationrequest.RedirectURIValidator is a validator for the "redirect_uri" field. It is called by the builders before save.
 	oauthauthorisationrequest.RedirectURIValidator = oauthauthorisationrequestDescRedirectURI.Validators[0].(func(string) error)
 	// oauthauthorisationrequestDescCodeChallenge is the schema descriptor for code_challenge field.
-	oauthauthorisationrequestDescCodeChallenge := oauthauthorisationrequestFields[6].Descriptor()
+	oauthauthorisationrequestDescCodeChallenge := oauthauthorisationrequestFields[7].Descriptor()
 	// oauthauthorisationrequest.CodeChallengeValidator is a validator for the "code_challenge" field. It is called by the builders before save.
 	oauthauthorisationrequest.CodeChallengeValidator = oauthauthorisationrequestDescCodeChallenge.Validators[0].(func(string) error)
 	// oauthauthorisationrequestDescID is the schema descriptor for id field.

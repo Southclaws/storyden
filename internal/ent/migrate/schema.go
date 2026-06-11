@@ -749,6 +749,7 @@ var (
 		{Name: "code_hash", Type: field.TypeString},
 		{Name: "redirect_uri", Type: field.TypeString},
 		{Name: "scope", Type: field.TypeString},
+		{Name: "nonce", Type: field.TypeString, Nullable: true},
 		{Name: "code_challenge", Type: field.TypeString},
 		{Name: "code_challenge_method", Type: field.TypeEnum, Enums: []string{"S256"}, Default: "S256"},
 		{Name: "expires_at", Type: field.TypeTime},
@@ -764,13 +765,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "oauth_authorisation_codes_accounts_oauth_authorisation_codes",
-				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[9]},
+				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "oauth_authorisation_codes_oauth_clients_authorisation_codes",
-				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[10]},
+				Columns:    []*schema.Column{OauthAuthorisationCodesColumns[11]},
 				RefColumns: []*schema.Column{OauthClientsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -791,6 +792,7 @@ var (
 		{Name: "redirect_uri", Type: field.TypeString},
 		{Name: "scope", Type: field.TypeString},
 		{Name: "state", Type: field.TypeString, Nullable: true},
+		{Name: "nonce", Type: field.TypeString, Nullable: true},
 		{Name: "code_challenge", Type: field.TypeString},
 		{Name: "code_challenge_method", Type: field.TypeEnum, Enums: []string{"S256"}, Default: "S256"},
 		{Name: "expires_at", Type: field.TypeTime},
@@ -807,13 +809,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "oauth_authorisation_requests_accounts_oauth_authorisation_requests",
-				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[11]},
+				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[12]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "oauth_authorisation_requests_oauth_clients_authorisation_requests",
-				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[12]},
+				Columns:    []*schema.Column{OauthAuthorisationRequestsColumns[13]},
 				RefColumns: []*schema.Column{OauthClientsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

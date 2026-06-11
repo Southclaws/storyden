@@ -34,6 +34,8 @@ type OAuthAuthorisationRequest struct {
 	Scope string `json:"scope,omitempty"`
 	// State holds the value of the "state" field.
 	State *string `json:"state,omitempty"`
+	// Nonce holds the value of the "nonce" field.
+	Nonce *string `json:"nonce,omitempty"`
 	// CodeChallenge holds the value of the "code_challenge" field.
 	CodeChallenge string `json:"code_challenge,omitempty"`
 	// CodeChallengeMethod holds the value of the "code_challenge_method" field.
@@ -88,7 +90,7 @@ func (*OAuthAuthorisationRequest) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case oauthauthorisationrequest.FieldRequestIDHash, oauthauthorisationrequest.FieldRedirectURI, oauthauthorisationrequest.FieldScope, oauthauthorisationrequest.FieldState, oauthauthorisationrequest.FieldCodeChallenge, oauthauthorisationrequest.FieldCodeChallengeMethod:
+		case oauthauthorisationrequest.FieldRequestIDHash, oauthauthorisationrequest.FieldRedirectURI, oauthauthorisationrequest.FieldScope, oauthauthorisationrequest.FieldState, oauthauthorisationrequest.FieldNonce, oauthauthorisationrequest.FieldCodeChallenge, oauthauthorisationrequest.FieldCodeChallengeMethod:
 			values[i] = new(sql.NullString)
 		case oauthauthorisationrequest.FieldCreatedAt, oauthauthorisationrequest.FieldExpiresAt, oauthauthorisationrequest.FieldApprovedAt, oauthauthorisationrequest.FieldDeniedAt:
 			values[i] = new(sql.NullTime)
@@ -157,6 +159,13 @@ func (_m *OAuthAuthorisationRequest) assignValues(columns []string, values []any
 			} else if value.Valid {
 				_m.State = new(string)
 				*_m.State = value.String
+			}
+		case oauthauthorisationrequest.FieldNonce:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field nonce", values[i])
+			} else if value.Valid {
+				_m.Nonce = new(string)
+				*_m.Nonce = value.String
 			}
 		case oauthauthorisationrequest.FieldCodeChallenge:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -256,6 +265,11 @@ func (_m *OAuthAuthorisationRequest) String() string {
 	builder.WriteString(", ")
 	if v := _m.State; v != nil {
 		builder.WriteString("state=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := _m.Nonce; v != nil {
+		builder.WriteString("nonce=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")

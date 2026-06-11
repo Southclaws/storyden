@@ -23,6 +23,7 @@ func (OAuthAuthorisationCode) Fields() []ent.Field {
 		field.String("code_hash").NotEmpty().Immutable(),
 		field.String("redirect_uri").NotEmpty().Immutable(),
 		field.String("scope"),
+		field.String("nonce").Optional().Nillable().Immutable(),
 		field.String("code_challenge").NotEmpty().Immutable(),
 		field.Enum("code_challenge_method").Values("S256").Default("S256").Immutable(),
 		field.Time("expires_at").Immutable(),

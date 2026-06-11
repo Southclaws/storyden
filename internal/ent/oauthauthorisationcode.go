@@ -32,6 +32,8 @@ type OAuthAuthorisationCode struct {
 	RedirectURI string `json:"redirect_uri,omitempty"`
 	// Scope holds the value of the "scope" field.
 	Scope string `json:"scope,omitempty"`
+	// Nonce holds the value of the "nonce" field.
+	Nonce *string `json:"nonce,omitempty"`
 	// CodeChallenge holds the value of the "code_challenge" field.
 	CodeChallenge string `json:"code_challenge,omitempty"`
 	// CodeChallengeMethod holds the value of the "code_challenge_method" field.
@@ -84,7 +86,7 @@ func (*OAuthAuthorisationCode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case oauthauthorisationcode.FieldCodeHash, oauthauthorisationcode.FieldRedirectURI, oauthauthorisationcode.FieldScope, oauthauthorisationcode.FieldCodeChallenge, oauthauthorisationcode.FieldCodeChallengeMethod:
+		case oauthauthorisationcode.FieldCodeHash, oauthauthorisationcode.FieldRedirectURI, oauthauthorisationcode.FieldScope, oauthauthorisationcode.FieldNonce, oauthauthorisationcode.FieldCodeChallenge, oauthauthorisationcode.FieldCodeChallengeMethod:
 			values[i] = new(sql.NullString)
 		case oauthauthorisationcode.FieldCreatedAt, oauthauthorisationcode.FieldExpiresAt, oauthauthorisationcode.FieldConsumedAt:
 			values[i] = new(sql.NullTime)
@@ -146,6 +148,13 @@ func (_m *OAuthAuthorisationCode) assignValues(columns []string, values []any) e
 				return fmt.Errorf("unexpected type %T for field scope", values[i])
 			} else if value.Valid {
 				_m.Scope = value.String
+			}
+		case oauthauthorisationcode.FieldNonce:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field nonce", values[i])
+			} else if value.Valid {
+				_m.Nonce = new(string)
+				*_m.Nonce = value.String
 			}
 		case oauthauthorisationcode.FieldCodeChallenge:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -235,6 +244,11 @@ func (_m *OAuthAuthorisationCode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("scope=")
 	builder.WriteString(_m.Scope)
+	builder.WriteString(", ")
+	if v := _m.Nonce; v != nil {
+		builder.WriteString("nonce=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("code_challenge=")
 	builder.WriteString(_m.CodeChallenge)

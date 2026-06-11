@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { OAuthClientIDQueryParameter } from "./oAuthClientIDQueryParameter";
 import type { OAuthCodeChallengeMethodQueryParameter } from "./oAuthCodeChallengeMethodQueryParameter";
 import type { OAuthCodeChallengeQueryParameter } from "./oAuthCodeChallengeQueryParameter";
+import type { OAuthNonceQueryParameter } from "./oAuthNonceQueryParameter";
 import type { OAuthRedirectURIQueryParameter } from "./oAuthRedirectURIQueryParameter";
 import type { OAuthResponseTypeQueryParameter } from "./oAuthResponseTypeQueryParameter";
 import type { OAuthScopeQueryParameter } from "./oAuthScopeQueryParameter";
@@ -36,6 +37,12 @@ export type OAuthAuthoriseParams = {
    * Client-provided opaque state returned to the redirect URI.
    */
   state?: OAuthStateQueryParameter;
+  /**
+ * OpenID Connect nonce. When provided, it is returned unmodified as the
+`nonce` claim in the issued ID token (OIDC Core §3.1.2).
+
+ */
+  nonce?: OAuthNonceQueryParameter;
   /**
    * PKCE code challenge.
    */

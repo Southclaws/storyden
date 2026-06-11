@@ -361,6 +361,7 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 		RedirectURI:         string(req.Params.RedirectUri),
 		Scope:               opt.NewPtr(req.Params.Scope),
 		State:               opt.NewPtr(req.Params.State),
+		Nonce:               opt.NewPtr(req.Params.Nonce),
 		CodeChallenge:       string(req.Params.CodeChallenge),
 		CodeChallengeMethod: string(req.Params.CodeChallengeMethod),
 		AccountID:           account.AccountID(acc),

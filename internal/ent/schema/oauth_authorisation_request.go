@@ -24,6 +24,7 @@ func (OAuthAuthorisationRequest) Fields() []ent.Field {
 		field.String("redirect_uri").NotEmpty().Immutable(),
 		field.String("scope"),
 		field.String("state").Optional().Nillable().Immutable(),
+		field.String("nonce").Optional().Nillable().Immutable(),
 		field.String("code_challenge").NotEmpty().Immutable(),
 		field.Enum("code_challenge_method").Values("S256").Default("S256").Immutable(),
 		field.Time("expires_at").Immutable(),

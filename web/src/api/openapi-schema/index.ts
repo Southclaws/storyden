@@ -503,6 +503,7 @@ export * from "./oAuthErrorResponse";
 export * from "./oAuthJWK";
 export * from "./oAuthJWKS";
 export * from "./oAuthJWKSOKResponse";
+export * from "./oAuthNonceQueryParameter";
 export * from "./oAuthProviderCallbackBody";
 export * from "./oAuthRedirectURIQueryParameter";
 export * from "./oAuthRefreshToken";

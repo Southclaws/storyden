@@ -127,6 +127,9 @@ func (_u *OAuthAuthorisationCodeUpdate) sqlSave(ctx context.Context) (_node int,
 	if value, ok := _u.mutation.Scope(); ok {
 		_spec.SetField(oauthauthorisationcode.FieldScope, field.TypeString, value)
 	}
+	if _u.mutation.NonceCleared() {
+		_spec.ClearField(oauthauthorisationcode.FieldNonce, field.TypeString)
+	}
 	if value, ok := _u.mutation.ConsumedAt(); ok {
 		_spec.SetField(oauthauthorisationcode.FieldConsumedAt, field.TypeTime, value)
 	}
@@ -282,6 +285,9 @@ func (_u *OAuthAuthorisationCodeUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if value, ok := _u.mutation.Scope(); ok {
 		_spec.SetField(oauthauthorisationcode.FieldScope, field.TypeString, value)
+	}
+	if _u.mutation.NonceCleared() {
+		_spec.ClearField(oauthauthorisationcode.FieldNonce, field.TypeString)
 	}
 	if value, ok := _u.mutation.ConsumedAt(); ok {
 		_spec.SetField(oauthauthorisationcode.FieldConsumedAt, field.TypeTime, value)
