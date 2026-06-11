@@ -56,28 +56,34 @@ func (s *Service) Authorise(ctx context.Context, input AuthoriseRequest) (*Autho
 	if input.ResponseType != "code" || input.CodeChallengeMethod != CodeChallengeMethodS256 || !validCodeVerifier(input.CodeChallenge) {
 		return nil, oauthError("invalid_request", "Invalid response_type, code_challenge_method, or code_challenge"), nil
 	}
-	if !canAuthoriseOAuthClients(input.AccountPermissions) {
-		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
-	}
 
+	// RFC 6749 §4.1.2.1: the client identifier and redirect URI must be
+	// validated first and, if invalid, the error is shown directly because the
+	// redirect target cannot be trusted. Every error after this point is
+	// delivered to the client by redirecting to its registered redirect_uri.
 	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if oauthErr != nil {
-		return nil, oauthErr, err
+		return nil, oauthErr, nil
 	}
 
-	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
-		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
-	}
 	if !contains(cl.RedirectURIs, input.RedirectURI) {
 		return nil, oauthError("invalid_request", "Redirect URI is not registered for this client"), nil
 	}
 
+	if !canAuthoriseOAuthClients(input.AccountPermissions) {
+		return authoriseErrorRedirect(input, "access_denied", "Account is not permitted to authorise OAuth clients"), nil, nil
+	}
+
+	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
+		return authoriseErrorRedirect(input, "unauthorized_client", "Client is not authorized for authorization_code grant"), nil, nil
+	}
+
 	scope := strings.TrimSpace(input.Scope.OrZero())
 	if _, err := grantScope(scope, cl, input.AccountPermissions); err != nil {
-		return nil, oauthError("invalid_scope", "Requested scope is not permitted for this account"), nil
+		return authoriseErrorRedirect(input, "invalid_scope", "Requested scope is not permitted for this account"), nil, nil
 	}
 
 	requestID, err := randomToken(32)
@@ -159,7 +165,7 @@ func (s *Service) SubmitAuthorisationConsent(ctx context.Context, accountID acco
 
 		return &AuthorisationConsentResult{
 			Status:   "denied",
-			Location: authorizationErrorRedirect(rec.RedirectURI, "access_denied", rec.State),
+			Location: authorizationErrorRedirect(rec.RedirectURI, "access_denied", "", rec.State),
 		}, nil, nil
 	}
 	if !canAuthoriseOAuthClients(accountPermissions) {
@@ -232,10 +238,23 @@ func authorizationCodeRedirect(redirectURI string, code string, state opt.Option
 	return u.String()
 }
 
-func authorizationErrorRedirect(redirectURI string, errorCode string, state opt.Optional[string]) string {
+// authoriseErrorRedirect builds an AuthoriseResult that redirects the browser
+// back to the client's registered redirect_uri carrying an OAuth error, per RFC
+// 6749 §4.1.2.1. It is only safe to call once the redirect_uri has been
+// validated against the client's registered set.
+func authoriseErrorRedirect(input AuthoriseRequest, errorCode string, errorDescription string) *AuthoriseResult {
+	return &AuthoriseResult{
+		Location: authorizationErrorRedirect(input.RedirectURI, errorCode, errorDescription, input.State),
+	}
+}
+
+func authorizationErrorRedirect(redirectURI string, errorCode string, errorDescription string, state opt.Optional[string]) string {
 	u, _ := url.Parse(redirectURI)
 	q := u.Query()
 	q.Set("error", errorCode)
+	if errorDescription != "" {
+		q.Set("error_description", errorDescription)
+	}
 	state.Call(func(value string) {
 		q.Set("state", value)
 	})

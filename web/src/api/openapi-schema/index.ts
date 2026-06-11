@@ -517,6 +517,7 @@ export * from "./oAuthTokenBody";
 export * from "./oAuthTokenErrorResponse";
 export * from "./oAuthTokenOKResponse";
 export * from "./oAuthTokenProps";
+export * from "./oAuthTokenUnauthorisedResponse";
 export * from "./oAuthUserCodeQueryParameter";
 export * from "./oAuthUserInfo";
 export * from "./oAuthUserInfoOKResponse";

@@ -231,6 +231,20 @@ func authorizeRedirect(t *testing.T, ctx context.Context, ts *httptest.Server, s
 	return location
 }
 
+// assertAuthorizeErrorRedirect asserts an RFC 6749 §4.1.2.1 error redirect: a
+// 302 back to the client's registered redirect_uri carrying error and state.
+func assertAuthorizeErrorRedirect(t *testing.T, resp *http.Response, wantRedirectURI, wantError, wantState string) {
+	t.Helper()
+
+	require.Equal(t, http.StatusFound, resp.StatusCode)
+
+	loc, err := url.Parse(resp.Header.Get("Location"))
+	require.NoError(t, err)
+	require.Equal(t, wantRedirectURI, loc.Scheme+"://"+loc.Host+loc.Path)
+	require.Equal(t, wantError, loc.Query().Get("error"))
+	require.Equal(t, wantState, loc.Query().Get("state"))
+}
+
 func authorizeHTTPResponse(t *testing.T, ctx context.Context, ts *httptest.Server, session openapi.RequestEditorFn, req authorizeRequest) *http.Response {
 	t.Helper()
 

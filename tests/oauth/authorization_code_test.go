@@ -172,27 +172,23 @@ func TestOAuthAuthorizationCodeFlow(t *testing.T) {
 			})
 
 			t.Run("authorize_rejects_clients_without_authorization_code_grant", func(t *testing.T) {
-				a := assert.New(t)
-				r := require.New(t)
-
 				clientID := "auth-code-grant-blocked-" + uuid.NewString()
 				clientSecret := "secret-" + uuid.NewString()
 				redirectURI := "https://client.example/callback"
+				state := "state-" + uuid.NewString()
 				createClient(t, root, ow, owner.ID, clientID, oauthresource.ClientTypeConfidential, oauthresource.ScopePolicyExplicit, opt.New(clientSecretHash(t, clientSecret)), append(standardScopes(), rbac.PermissionCreatePost.String()), []string{oauthGrantRefreshToken})
 
 				resp := authorizeHTTPResponse(t, root, ts, memberSession, authorizeRequest{
 					ClientID:            clientID,
 					RedirectURI:         redirectURI,
 					Scope:               "openid profile CREATE_POST",
-					State:               "state-" + uuid.NewString(),
+					State:               state,
 					CodeChallenge:       codeChallenge(strings.Repeat("b", 43)),
 					CodeChallengeMethod: "S256",
 				})
 				defer resp.Body.Close()
 
-				a.Equal(http.StatusBadRequest, resp.StatusCode)
-				a.Empty(resp.Header.Get("Location"))
-				r.NotNil(resp.Body)
+				assertAuthorizeErrorRedirect(t, resp, redirectURI, "unauthorized_client", state)
 			})
 
 			t.Run("token_exchange_rejects_clients_without_authorization_code_grant", func(t *testing.T) {
@@ -307,30 +303,26 @@ func TestOAuthAuthorizationCodeRequiresOAuthClientPermission(t *testing.T) {
 			_, owner := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 
 			t.Run("member_without_permission_cannot_start_authorization_code_consent", func(t *testing.T) {
-				a := assert.New(t)
-				r := require.New(t)
-
 				memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				memberSession := sh.WithSession(memberCtx)
 
 				clientID := "auth-code-permission-required-" + uuid.NewString()
 				clientSecret := "secret-" + uuid.NewString()
 				redirectURI := "https://client.example/callback"
+				state := "state-" + uuid.NewString()
 				createClient(t, root, ow, owner.ID, clientID, oauthresource.ClientTypeConfidential, oauthresource.ScopePolicyExplicit, opt.New(clientSecretHash(t, clientSecret)), append(standardScopes(), rbac.PermissionCreatePost.String()), []string{oauthGrantAuthorizationCode, oauthGrantRefreshToken})
 
 				resp := authorizeHTTPResponse(t, root, ts, memberSession, authorizeRequest{
 					ClientID:            clientID,
 					RedirectURI:         redirectURI,
 					Scope:               "openid profile CREATE_POST",
-					State:               "state-" + uuid.NewString(),
+					State:               state,
 					CodeChallenge:       codeChallenge(strings.Repeat("g", 43)),
 					CodeChallengeMethod: "S256",
 				})
 				defer resp.Body.Close()
 
-				a.Equal(http.StatusBadRequest, resp.StatusCode)
-				a.Empty(resp.Header.Get("Location"))
-				r.NotNil(resp.Body)
+				assertAuthorizeErrorRedirect(t, resp, redirectURI, "access_denied", state)
 			})
 
 			t.Run("permission_revocation_blocks_pending_authorization_code_approval", func(t *testing.T) {

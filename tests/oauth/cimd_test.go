@@ -169,22 +169,20 @@ func TestOAuthCIMDAuthorizationFlow(t *testing.T) {
 			})
 
 			t.Run("unknown_scope_is_rejected", func(t *testing.T) {
-				a := assert.New(t)
-
 				cm := newCIMDMetadataServer(t)
+				state := "state-" + uuid.NewString()
 
 				resp := authorizeHTTPResponse(t, root, ts, memberSession, authorizeRequest{
 					ClientID:            cm.clientID(),
 					RedirectURI:         "https://client.example/callback",
 					Scope:               "openid NONEXISTENT_SCOPE",
-					State:               "state-" + uuid.NewString(),
+					State:               state,
 					CodeChallenge:       codeChallenge(strings.Repeat("c", 43)),
 					CodeChallengeMethod: "S256",
 				})
 				defer resp.Body.Close()
 
-				a.Equal(http.StatusBadRequest, resp.StatusCode)
-				a.Empty(resp.Header.Get("Location"))
+				assertAuthorizeErrorRedirect(t, resp, "https://client.example/callback", "invalid_scope", state)
 			})
 
 			t.Run("admin_scope_is_rejected_by_default", func(t *testing.T) {
