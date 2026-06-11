@@ -21,6 +21,12 @@ kill_timeout = 5
 
   ASSET_STORAGE_TYPE = "s3"
 
+  DATABASE_URL = "sqlite:///storyden/data/data.db?_pragma=foreign_keys(1)"
+
+[mounts]
+  destination = "/storyden/data"
+  source      = "storyden_data"
+
 [[services]]
   http_checks = [
     { interval = 10000, grace_period = "5s", method = "get", path = "/healthz", protocol = "http", timeout = 2000 },
