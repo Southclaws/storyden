@@ -182,7 +182,20 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 	}
 
 	rec, err := s.clients.GetRefreshTokenByTokenHash(ctx, hashString(refreshToken))
-	if err != nil || rec.ClientID != cl.ID || rec.ExpiresAt.Before(time.Now()) || rec.RevokedAt.Ok() {
+	if err != nil || rec.ClientID != cl.ID || rec.ExpiresAt.Before(time.Now()) {
+		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
+	}
+	if rec.RevokedAt.Ok() {
+		// RFC 9700 §4.14.2: presenting a refresh token that was already rotated
+		// (was invalidated by rotation) signals theft of a token from rotation
+		// family. Revoke every descendant so the currently-active token is
+		// invalidated too. A token revoked without a replacement (e.g. an admin
+		// or self revocation) has no family to cascade and is simply rejected.
+		if rec.ReplacedByTokenID.Ok() {
+			if err := s.revokeRefreshTokenFamily(ctx, rec); err != nil {
+				return nil, nil, err
+			}
+		}
 		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
 	}
 
@@ -216,6 +229,36 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 	}
 
 	return token, nil, nil
+}
+
+// revokeRefreshTokenFamily walks the rotation chain forward from a reused token,
+// revoking every descendant so the currently-active token is neutralised. The
+// visited set guards against cycles in malformed data.
+// NOTE: A bit heavy on reads here, could be done with a CTE.
+func (s *Service) revokeRefreshTokenFamily(ctx context.Context, reused *oauthresource.RefreshToken) error {
+	now := time.Now()
+	visited := map[oauthresource.RefreshTokenID]struct{}{reused.ID: {}}
+
+	nextID, ok := reused.ReplacedByTokenID.Get()
+	for ok {
+		if _, seen := visited[nextID]; seen {
+			break
+		}
+		visited[nextID] = struct{}{}
+
+		if _, err := s.tokens.RevokeRefreshToken(ctx, nextID, now, opt.NewEmpty[oauthresource.RefreshTokenID]()); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		next, err := s.clients.GetRefreshToken(ctx, nextID)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		nextID, ok = next.ReplacedByTokenID.Get()
+	}
+
+	return nil
 }
 
 func (s *Service) accountPermissions(ctx context.Context, accountID account.AccountID) (rbac.Permissions, error) {
