@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
 const (
@@ -416,8 +417,15 @@ func resolveDCRScopes(scope string) ([]string, *Error) {
 	seen := map[string]struct{}{}
 	out := []string{}
 	for _, sc := range requested {
-		if !contains(dcrDefaultScopes, sc) {
-			return nil, oauthError("invalid_client_metadata", "Scope is not permitted for dynamic client registration")
+		if _, ok := standardScopes[sc]; !ok {
+			p, err := rbac.NewPermission(sc)
+			if err != nil {
+				return nil, oauthError("invalid_client_metadata", "Scope is not permitted for dynamic client registration")
+			}
+
+			if p == rbac.PermissionAdministrator {
+				return nil, oauthError("invalid_client_metadata", "Administrator scope is not permitted for dynamic client registration")
+			}
 		}
 		if _, ok := seen[sc]; ok {
 			continue

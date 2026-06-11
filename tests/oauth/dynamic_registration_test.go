@@ -280,6 +280,18 @@ func TestOAuthDynamicClientRegistration(t *testing.T) {
 				r.NotNil(resp.JSON201)
 			})
 
+			t.Run("allows_permissions_scopes", func(t *testing.T) {
+				r := require.New(t)
+
+				resp := tests.AssertRequest(cl.OAuthClientRegisterWithResponse(root, openapi.OAuthClientRegisterJSONRequestBody{
+					ClientName:              ptr("Post reader writer"),
+					RedirectUris:            &[]string{"https://app.example/callback"},
+					TokenEndpointAuthMethod: ptr("none"),
+					Scope:                   ptr("openid CREATE_POST READ_PUBLISHED_THREADS"),
+				}, memberSession))(t, http.StatusCreated)
+				r.NotNil(resp.JSON201)
+			})
+
 			t.Run("rejects_unknown_scopes", func(t *testing.T) {
 				a := assert.New(t)
 				r := require.New(t)
