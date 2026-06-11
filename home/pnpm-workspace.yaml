@@ -5,3 +5,5 @@ minimumReleaseAge: 10080
 allowBuilds:
   esbuild: true
   sharp: true
+minimumReleaseAgeExclude:
+  - '@fuma-translate/react@0.0.3'
