@@ -1,0 +1,59 @@
+---
+title: Routing and Resources
+description: How the API and frontend work together to point users at the right pages.
+---
+
+The API is deliberately decoupled from any particular frontend's route structure: it can tell you the ID, slug and [kind](/docs/introduction/datagraph) of a resource, but it will never hand you a fully-formed URL to a page, because it cannot know how the frontend lays out its routes.
+
+This is especially important if you implement your own frontend!
+
+### The resolve route
+
+There are still cases where the API needs to point a human (or an agent) at the canonical UI representation of a resource: notification emails, MCP tool responses, CLI output and so on. To keep the API frontend-agnostic while still supporting this, Storyden defines a single scoped redirect convention that every frontend is expected to implement:
+
+```
+
+/_/resolve/<datagraph kind>/<id or slug>
+
+```
+
+When the API needs to emit a canonical link it builds a URL under this prefix
+using the [public web address](/docs/introduction/vps). The frontend implements
+`/_/resolve/...` as a route that inspects the datagraph kind and the
+[mark](/docs/introduction/marks) and redirects the visitor to the correct page.
+
+For example, a link to a thread is emitted as:
+
+```
+
+https://example.com/_/resolve/thread/crk0h7afunp7891n7cg0-very-demure
+
+```
+
+and the reference frontend redirects this to `/t/crk0h7afunp7891n7cg0-very-demure`.
+
+## Mapping
+
+The reference frontend maps each datagraph kind to a route as follows. A custom
+frontend is free to use different routes, but it must implement `/_/resolve` so
+that links emitted by the API continue to work.
+
+| Kind         | Redirect target      |
+| ------------ | -------------------- |
+| `post`       | `/t/locate/<slug>`\* |
+| `thread`     | `/t/<slug>`          |
+| `reply`      | `/t/locate/<id>`     |
+| `node`       | `/l/<slug>`          |
+| `collection` | `/c/<slug>`          |
+| `profile`    | `/m/<handle>`        |
+
+<Callout type="info">
+  \* The `post` kind is used for either threads or replies, in cases where the
+  API doesn't know which. In these cases, the frontend should call the
+  [`PostLocationGet`](/docs/api/posts/PostLocationGet) endpoint. This will tell
+  you if the post is a thread or a reply, and if it's a reply it'll give you the
+  parent thread's slug and even tell you which page it's on!
+</Callout>
+
+Any query parameters on the resolve URL are forwarded to the redirect target.
+Kinds the frontend does not have a page for should respond with a not-found.

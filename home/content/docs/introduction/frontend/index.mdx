@@ -1,0 +1,31 @@
+---
+title: Frontend
+description: Build your own frontend against the Storyden API. Its kinda like a CMS without a head.
+---
+
+Storyden is [API-driven](/docs/introduction/api), so you can build an entirely custom frontend for the web, mobile or embed it into existing software.
+
+You can get started by generating an API client from the [OpenAPI specification](https://github.com/Southclaws/storyden/blob/main/api/openapi.yaml) in your chosen language. For TypeScript, we recommend using [Orval](https://orval.dev/).
+
+There are some examples on the Storyden GitHub page for different languages and the setup shape for your project: https://github.com/storyden
+
+It's roughly:
+
+- Run Storyden locally in a container or on your computer
+  - Use the full-stack variant for development so you can still use Storyden's frontend to edit data.
+- Generate an API client from the OpenAPI spec
+- Build your frontend against `localhost:8000/api`
+- For production, either:
+  - deploy two separate containers: one running purely Storyden's headless image and the other running your frontend;
+  - or, build them into the same Docker image
+
+<Callout type="info">
+  Storyden *can* run a frontend itself (it acts as the process manager) however
+  this feature is not yet ready for non-Next.js or non-JavaScript based
+  frontends. This will change in future though!
+
+(it's also undocumented...)
+
+</Callout>
+
+<Callout type="warn">This documentation is incomplete.</Callout>
