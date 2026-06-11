@@ -65,6 +65,7 @@ import type {
   OAuthTokenBody,
   OAuthTokenErrorResponse,
   OAuthTokenOKResponse,
+  OAuthTokenUnauthorisedResponse,
   OAuthUserInfoOKResponse,
   PhoneRequestCodeBody,
   PhoneRequestCodeParams,
@@ -1419,10 +1420,14 @@ export type OAuthTokenMutationResult = NonNullable<
 >;
 export type OAuthTokenMutationError =
   | OAuthTokenErrorResponse
+  | OAuthTokenUnauthorisedResponse
   | InternalServerErrorResponse;
 
 export const useOAuthToken = <
-  TError = OAuthTokenErrorResponse | InternalServerErrorResponse,
+  TError =
+    | OAuthTokenErrorResponse
+    | OAuthTokenUnauthorisedResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof oAuthToken>>,
