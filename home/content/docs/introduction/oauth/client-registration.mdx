@@ -1,0 +1,97 @@
+---
+title: Client Registration
+description: "How OAuth clients identify themselves to Storyden: pre-registered clients, Dynamic Client Registration (DCR), and Client ID Metadata Documents (CIMD) for MCP connectors."
+---
+
+Before an application can run an authorisation flow, the authorisation server needs to know who the client is: its name, where it is allowed to redirect users back to, and what it is allowed to ask for. Storyden supports three ways for a client to be known.
+
+| Mechanism                                               | Who creates the client                    | Secret?  | Best for                                     |
+| ------------------------------------------------------- | ----------------------------------------- | -------- | -------------------------------------------- |
+| [User-defined client](/docs/introduction/oauth/clients) | An administrator, ahead of time           | Optional | Trusted, long-lived integrations you control |
+| Dynamic Client Registration (DCR)                       | The client, at runtime, via an API        | Issued   | Clients that self-register before first use  |
+| Client ID Metadata Documents (CIMD)                     | Nobody, the client hosts its own metadata | No       | MCP connectors, web-native public clients    |
+
+## User-defined OAuth clients
+
+This is the classic model. An administrator registers a client in advance and receives a `client_id` (and, for confidential clients, a `client_secret`). The application is configured with these values. Storyden validates the redirect URI, allowed scopes, and allowed grants against the stored record.
+
+See [OAuth Clients](/docs/introduction/oauth/clients) for the full lifecycle.
+
+Use this when you own the integration and want explicit, audited control over exactly which application can connect and what it can request.
+
+## Dynamic Client Registration (DCR)
+
+[RFC 7591](https://datatracker.ietf.org/doc/html/rfc7591) Dynamic Client Registration lets a client register itself at runtime by POSTing its metadata to a registration endpoint, receiving a freshly minted `client_id` (and secret) in return. The authorisation server advertises support by publishing a `registration_endpoint` in its discovery metadata.
+
+DCR removes the manual setup step, which is convenient for clients that connect to many servers. The trade-off is that _any_ caller can create a client record, so the server takes on the cost of storing, rate-limiting, and (ideally) garbage-collecting these registrations, and must decide how much to trust a self-asserted identity.
+
+## Client ID Metadata Documents (CIMD)
+
+<Callout type="warn" title="Draft specification">
+  Client ID Metadata Documents (CIMD) are defined by an IETF draft
+  specification. Both the specification and Storyden's implementation of it are
+  subject to change.
+</Callout>
+
+[Client ID Metadata Documents](https://drafts.oauth.net/draft-ietf-oauth-client-id-metadata-document/draft-ietf-oauth-client-id-metadata-document.html) are a web-native alternative to pre-registration or Dynamic Client Registration. This is the mechanism used by ChatGPT's MCP connector and is referenced by the [MCP authorization specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization).
+
+Instead of registering ahead of time, the client uses an **`https` URL as its `client_id`**. That URL hosts a JSON document containing the client's metadata. When Storyden sees an authorisation request with a URL as the `client_id`, it fetches the document, validates it, and uses the declared `redirect_uris`, grants, and scopes for the flow.
+
+Storyden advertises support via the `client_id_metadata_document_supported` flag in its OAuth and OpenID Connect discovery documents.
+
+### The metadata document
+
+The document lives at the `client_id` URL itself. A minimal example:
+
+```json
+{
+  "client_id": "https://app.example/oauth/client.json",
+  "client_name": "Example Connector",
+  "redirect_uris": ["https://app.example/oauth/callback"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "scope": "openid profile",
+  "token_endpoint_auth_method": "none"
+}
+```
+
+Storyden requires:
+
+- The `client_id` value inside the document **exactly matches** the URL the document was fetched from.
+- At least one `redirect_uri` is present, and the `redirect_uri` in the authorisation request must be an exact match (no wildcards).
+
+Additional fields from the OAuth Dynamic Client Registration metadata registry (such as `logo_uri`, `client_uri`, etc.) are accepted but not required.
+
+### How Storyden treats CIMD clients
+
+- **Public clients (current implementation).** Storyden currently treats all CIMD clients as public clients. They must use the Authorization Code flow with PKCE (S256). The `token_endpoint_auth_method` in the document must be `"none"` (or omitted).
+- **Conservative scopes.** CIMD clients may only request scopes from a server-controlled allowlist. By default this includes the common OIDC scopes plus a small set of read-only permission scopes. Privileged scopes are never granted unless `OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES` is enabled.
+- **Refresh tokens.** Issued only when the document lists the `refresh_token` grant _and_ `offline_access` is present in the allowed scopes for that client.
+- **Dynamic resolution with caching.** Storyden fetches the metadata document on first use for a given `client_id` URL and caches the result. It honours `Cache-Control` headers from the document response (with a default TTL of 5 minutes and an upper bound of 1 hour). A snapshot is also stored in the database. On cache miss (TTL expiry or process restart) the document is re-fetched, so updates to `redirect_uris`, grants, or scopes published by the client can take effect. Some providers include a query string in the `client_id` URL (e.g. `?token_endpoint_auth_method=none`); Storyden supports this and uses the full URL (including query) for fetching and for the `client_id` match.
+
+### Security: fetching metadata safely
+
+Because the `client_id` is an arbitrary URL supplied by an unauthenticated client, fetching it is a potential SSRF vector. Storyden applies the following hardening:
+
+- **HTTPS only** (unless `OAUTH_CIMD_ALLOW_INSECURE_FETCH` is enabled for development).
+- **No private or special-use networks.** Requests to loopback, link-local, multicast, and RFC 1918 / unique-local addresses are blocked, both on the hostname and on the addresses it resolves to (DNS rebinding protection).
+- **No redirects** are followed when fetching the metadata document.
+- **Bounded responses.** Requests time out quickly (10s), are limited to 5 KiB, and must return a JSON content type.
+
+The insecure fetch mode must never be enabled in production.
+
+### Server policy
+
+| Setting                              | Default             | Purpose                                                          |
+| ------------------------------------ | ------------------- | ---------------------------------------------------------------- |
+| `OAUTH_CIMD_ENABLED`                 | `true`              | Advertise and accept CIMD clients.                               |
+| `OAUTH_CIMD_ALLOWED_SCOPES`          | _read-only default_ | Permission scopes a CIMD client may request.                     |
+| `OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES` | `false`             | Permit administrative scopes for CIMD clients (not recommended). |
+| `OAUTH_CIMD_ALLOW_INSECURE_FETCH`    | `false`             | Relax fetch restrictions for local development only.             |
+
+## Choosing a mechanism
+
+- **You control the integration** and want explicit control and auditing → use a [user-defined client](/docs/introduction/oauth/clients), preferably confidential.
+- **You are connecting an MCP client or ChatGPT-style connector** → CIMD is the intended path. Use a conservative scope allowlist.
+- **Clients need to self-register without hosting their own metadata** → DCR (with the usual storage, rate-limiting, and trust considerations).
+
+For most new public or agent-style integrations, CIMD with a conservative allowlist (and privileged scopes disabled) is the recommended starting point. The client controls its own identity document at a stable HTTPS URL, while Storyden still enforces exact redirect URI matching and scoped grants.

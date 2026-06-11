@@ -6,6 +6,7 @@
         "device-flow",
         "authorization-code",
         "scopes",
-        "clients"
+        "clients",
+        "client-registration"
     ]
 }

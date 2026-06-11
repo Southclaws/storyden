@@ -56,10 +56,14 @@ func (s *Service) ExchangeToken(ctx context.Context, input TokenRequest) (*Token
 }
 
 func (s *Service) exchangeClientCredentials(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
-	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
+	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if oauthErr != nil {
+		return nil, oauthErr, err
+	}
+
 	if cl.Type != oauthresource.ClientTypeConfidential {
 		return nil, oauthError("unauthorized_client", "Client is not confidential"), nil
 	}
@@ -107,10 +111,14 @@ func (s *Service) exchangeAuthorizationCode(ctx context.Context, input TokenRequ
 		return nil, oauthError("invalid_request", "Missing code_verifier"), nil
 	}
 
-	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
+	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if oauthErr != nil {
+		return nil, oauthErr, err
+	}
+
 	if !contains(cl.AllowedGrants, GrantTypeAuthorizationCode) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for authorization_code grant"), nil
 	}
@@ -154,10 +162,14 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 		return nil, oauthError("invalid_request", "Missing refresh_token"), nil
 	}
 
-	cl, err := s.clients.GetClientByClientID(ctx, input.ClientID)
+	cl, oauthErr, err := s.resolveClient(ctx, input.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if oauthErr != nil {
+		return nil, oauthErr, err
+	}
+
 	if !contains(cl.AllowedGrants, GrantTypeRefreshToken) {
 		return nil, oauthError("unauthorized_client", "Client is not authorized for refresh_token grant"), nil
 	}

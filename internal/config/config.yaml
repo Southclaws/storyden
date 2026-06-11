@@ -482,8 +482,36 @@
     - env: OAUTH_DYNAMIC_REGISTRATION_ENABLED
       name: OAuthDynamicRegistrationEnabled
       type: bool
+      default: "false"
       description: |-
         Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
+
+    - env: OAUTH_CIMD_ENABLED
+      name: OAuthClientIDMetadataDocumentEnabled
+      type: bool
+      default: "false"
+      description: |-
+        Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients identify themselves with an https URL client_id that resolves to a hosted metadata document instead of pre-registering.
+
+    - env: OAUTH_CIMD_ALLOWED_SCOPES
+      name: OAuthCIMDAllowedScopes
+      type: "[]string"
+      description: |-
+        Comma-separated list of permission scopes a CIMD client may request. Empty uses a conservative read-only default. Privileged scopes are still gated by OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES.
+
+    - env: OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES
+      name: OAuthCIMDAllowPrivilegedScopes
+      type: bool
+      description: |-
+        Allow privileged/administrative permission scopes to be granted to CIMD clients.
+
+        Off by default; only enable for trusted, controlled deployments.
+
+    - env: OAUTH_CIMD_ALLOW_INSECURE_FETCH
+      name: OAuthCIMDAllowInsecureFetch
+      type: bool
+      description: |-
+        Relax CIMD metadata fetching restrictions (allow http, private hosts and skip TLS verification). For local development and testing only; never set in production.
 
 - section: SMS
   description: |-

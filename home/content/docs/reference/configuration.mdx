@@ -630,10 +630,48 @@ Optional JWT key ID (kid) for OAuth signing keys.
 
 <table>
 <tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+<tr><td>default</td><td>`false`</td></tr>
 </table>
 
 Enable RFC 7591 OAuth 2.0 Dynamic Client Registration.
+
+### `OAUTH_CIMD_ENABLED`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>`false`</td></tr>
+</table>
+
+Advertise and accept OAuth Client ID Metadata Documents (CIMD), letting clients identify themselves with an https URL client_id that resolves to a hosted metadata document instead of pre-registering.
+
+### `OAUTH_CIMD_ALLOWED_SCOPES`
+
+<table>
+<tr><td>type</td><td>`[]string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Comma-separated list of permission scopes a CIMD client may request. Empty uses a conservative read-only default. Privileged scopes are still gated by OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES.
+
+### `OAUTH_CIMD_ALLOW_PRIVILEGED_SCOPES`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Allow privileged/administrative permission scopes to be granted to CIMD clients.
+
+Off by default; only enable for trusted, controlled deployments.
+
+### `OAUTH_CIMD_ALLOW_INSECURE_FETCH`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Relax CIMD metadata fetching restrictions (allow http, private hosts and skip TLS verification). For local development and testing only; never set in production.
 
 ## SMS
 

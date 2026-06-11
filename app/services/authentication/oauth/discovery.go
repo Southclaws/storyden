@@ -3,19 +3,20 @@ package oauth
 import "strings"
 
 type Discovery struct {
-	Issuer                           string
-	AuthorizationEndpoint            string
-	DeviceAuthorizationEndpoint      string
-	TokenEndpoint                    string
-	UserinfoEndpoint                 string
-	RegistrationEndpoint             string
-	JWKSURI                          string
-	ResponseTypesSupported           []string
-	GrantTypesSupported              []string
-	CodeChallengeMethodsSupported    []string
-	ScopesSupported                  []string
-	SubjectTypesSupported            []string
-	IDTokenSigningAlgValuesSupported []string
+	Issuer                            string
+	AuthorizationEndpoint             string
+	DeviceAuthorizationEndpoint       string
+	TokenEndpoint                     string
+	UserinfoEndpoint                  string
+	RegistrationEndpoint              string
+	JWKSURI                           string
+	ResponseTypesSupported            []string
+	GrantTypesSupported               []string
+	CodeChallengeMethodsSupported     []string
+	ScopesSupported                   []string
+	SubjectTypesSupported             []string
+	IDTokenSigningAlgValuesSupported  []string
+	ClientIDMetadataDocumentSupported bool
 }
 
 func (s *Service) Discovery() Discovery {
@@ -27,19 +28,20 @@ func (s *Service) Discovery() Discovery {
 	}
 
 	return Discovery{
-		Issuer:                           s.issuer,
-		AuthorizationEndpoint:            endpointBase + "/oauth/authorize",
-		DeviceAuthorizationEndpoint:      endpointBase + "/oauth/device_authorization",
-		TokenEndpoint:                    endpointBase + "/oauth/token",
-		UserinfoEndpoint:                 endpointBase + "/oauth/userinfo",
-		RegistrationEndpoint:             registrationEndpoint,
-		JWKSURI:                          endpointBase + "/oauth/jwks",
-		ResponseTypesSupported:           []string{"code"},
-		GrantTypesSupported:              []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken, GrantTypeClientCredentials, GrantTypeDeviceCode},
-		CodeChallengeMethodsSupported:    []string{CodeChallengeMethodS256},
-		ScopesSupported:                  supportedScopes(),
-		SubjectTypesSupported:            []string{"public"},
-		IDTokenSigningAlgValuesSupported: []string{"RS256"},
+		Issuer:                            s.issuer,
+		AuthorizationEndpoint:             endpointBase + "/oauth/authorize",
+		DeviceAuthorizationEndpoint:       endpointBase + "/oauth/device_authorization",
+		TokenEndpoint:                     endpointBase + "/oauth/token",
+		UserinfoEndpoint:                  endpointBase + "/oauth/userinfo",
+		RegistrationEndpoint:              registrationEndpoint,
+		JWKSURI:                           endpointBase + "/oauth/jwks",
+		ResponseTypesSupported:            []string{"code"},
+		GrantTypesSupported:               []string{GrantTypeAuthorizationCode, GrantTypeRefreshToken, GrantTypeClientCredentials, GrantTypeDeviceCode},
+		CodeChallengeMethodsSupported:     []string{CodeChallengeMethodS256},
+		ScopesSupported:                   supportedScopes(),
+		SubjectTypesSupported:             []string{"public"},
+		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
+		ClientIDMetadataDocumentSupported: s.cimdEnabled(),
 	}
 }
 

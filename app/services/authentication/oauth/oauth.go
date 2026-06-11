@@ -43,13 +43,14 @@ type Error struct {
 }
 
 type Service struct {
-	cfg     config.Config
-	clients *oauth_querier.Querier
-	tokens  *oauth_writer.Writer
-	account *account_querier.Querier
-	signer  *rsa.PrivateKey
-	kid     string
-	issuer  string
+	cfg       config.Config
+	clients   *oauth_querier.Querier
+	tokens    *oauth_writer.Writer
+	account   *account_querier.Querier
+	signer    *rsa.PrivateKey
+	kid       string
+	issuer    string
+	cimdCache *cimdCache
 }
 
 func (s *Service) Enabled() bool {
@@ -72,11 +73,12 @@ func New(
 
 	if !cfg.OAuthEnabled {
 		service := &Service{
-			cfg:     cfg,
-			clients: clients,
-			tokens:  tokens,
-			account: account,
-			issuer:  issuer,
+			cfg:       cfg,
+			clients:   clients,
+			tokens:    tokens,
+			account:   account,
+			issuer:    issuer,
+			cimdCache: newCIMDCache(),
 		}
 		service.registerCleanupJob(lc, logger)
 
@@ -114,13 +116,14 @@ func New(
 	}
 
 	service := &Service{
-		cfg:     cfg,
-		clients: clients,
-		tokens:  tokens,
-		account: account,
-		signer:  pk,
-		kid:     kid,
-		issuer:  issuer,
+		cfg:       cfg,
+		clients:   clients,
+		tokens:    tokens,
+		account:   account,
+		signer:    pk,
+		kid:       kid,
+		issuer:    issuer,
+		cimdCache: newCIMDCache(),
 	}
 	service.registerCleanupJob(lc, logger)
 
