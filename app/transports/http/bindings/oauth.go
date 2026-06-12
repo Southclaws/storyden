@@ -25,13 +25,18 @@ import (
 )
 
 type OAuth struct {
-	oauth *oauthservice.Service
-	cfg   config.Config
+	oauth      *oauthservice.Service
+	apiAddress url.URL
+	webAddress url.URL
 }
 
 func NewOAuth(cfg config.Config, oauth *oauthservice.Service, router *echo.Echo) OAuth {
 	router.Use(oauthTokenClientAuth)
-	return OAuth{oauth: oauth, cfg: cfg}
+	return OAuth{
+		oauth:      oauth,
+		apiAddress: cfg.PublicAPIAddress,
+		webAddress: cfg.PublicWebAddress,
+	}
 }
 
 // clientAuth carries credentials extracted from Authorization: Basic for the
@@ -347,7 +352,11 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 	acc, err := session.GetAccountID(ctx)
 	if err != nil {
 		return openapi.OAuthAuthorise302Response{
-			Headers: openapi.OAuthAuthoriseFoundResponseHeaders{Location: "/login"},
+			Headers: openapi.OAuthAuthoriseFoundResponseHeaders{
+				// TODO: Make this configurable, the API should not depend on
+				// frontend implementation path design and route layout etc.
+				Location: o.webAddress.String() + "/login",
+			},
 		}, nil
 	}
 	permissions, err := session.GetPermissions(ctx)
@@ -532,7 +541,7 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 						ErrorDescription: &oauthErr.Description,
 					},
 					Headers: openapi.OAuthTokenUnauthorisedResponseHeaders{
-						WWWAuthenticate: `Basic realm="` + o.cfg.PublicAPIAddress.Hostname() + `"`,
+						WWWAuthenticate: `Basic realm="` + o.apiAddress.Hostname() + `"`,
 					},
 				},
 			}, nil

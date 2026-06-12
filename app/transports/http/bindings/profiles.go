@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -32,7 +31,6 @@ import (
 )
 
 type Profiles struct {
-	apiAddress    url.URL
 	profileQuery  *profile_querier.Querier
 	profile_cache *profile_cache.Cache
 	ps            *profile_search.Querier
@@ -49,7 +47,6 @@ func NewProfiles(
 	followManager *following.FollowManager,
 ) Profiles {
 	return Profiles{
-		apiAddress:    cfg.PublicWebAddress,
 		profileQuery:  profileQuery,
 		profile_cache: profile_cache,
 		ps:            ps,
