@@ -418,14 +418,17 @@ func resolveDCRScopes(scope string) ([]string, *Error) {
 	out := []string{}
 	for _, sc := range requested {
 		if _, ok := standardScopes[sc]; !ok {
-			p, err := rbac.NewPermission(sc)
+			// TODO: Make allowed scopes configurable. It seems we can't change
+			// the allowed scopes based on registration method (manual vs DCR)
+			// and most clients appear to just request every scope in the well-
+			// known set. For now, just allow all scopes but this should change.
+			// Or, alternatively, we can silently strip out ADMINISTRATOR just
+			// for DCR clients instead of returning a 400 Bad Request error.
+			_, err := rbac.NewPermission(sc)
 			if err != nil {
 				return nil, oauthError("invalid_client_metadata", "Scope is not permitted for dynamic client registration")
 			}
 
-			if p == rbac.PermissionAdministrator {
-				return nil, oauthError("invalid_client_metadata", "Administrator scope is not permitted for dynamic client registration")
-			}
 		}
 		if _, ok := seen[sc]; ok {
 			continue
