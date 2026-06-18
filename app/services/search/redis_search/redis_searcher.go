@@ -322,7 +322,12 @@ func (s *RedisSearcher) Index(ctx context.Context, item datagraph.Item) error {
 }
 
 func (s *RedisSearcher) buildQuery(q string, opts searcher.Options) string {
-	escapedQuery := escapeRedisSearch(q)
+	var escapedQuery string
+	if strings.TrimSpace(q) == "" {
+		escapedQuery = "*"
+	} else {
+		escapedQuery = escapeRedisSearch(q)
+	}
 	filters := []string{}
 
 	if kinds, ok := opts.Kinds.Get(); ok && len(kinds) > 0 {

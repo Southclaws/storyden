@@ -15,6 +15,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
@@ -248,7 +249,7 @@ func fetchSearch(ctx context.Context, client *openapi.ClientWithResponses, query
 	pageQuery := openapi.PaginationQuery(strconv.Itoa(page))
 	kind := openapi.DatagraphKindQuery{openapi.DatagraphItemKind("node")}
 	params := &openapi.DatagraphSearchParams{
-		Q:    openapi.RequiredSearchQuery(query),
+		Q:    opt.New(openapi.RequiredSearchQuery(query)).Ptr(),
 		Kind: &kind,
 		Page: &pageQuery,
 	}

@@ -194,7 +194,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		Tags:       tagFilter,
 	}
 
-	r, err := d.searcher.Search(ctx, request.Params.Q, pp, opts)
+	r, err := d.searcher.Search(ctx, opt.NewPtr(request.Params.Q).Or(""), pp, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
