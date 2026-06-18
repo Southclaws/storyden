@@ -26,7 +26,7 @@ import type {
 /**
  * Query and search content.
  */
-export const datagraphSearch = (params: DatagraphSearchParams) => {
+export const datagraphSearch = (params?: DatagraphSearchParams) => {
   return fetcher<DatagraphSearchOKResponse>({
     url: `/datagraph`,
     method: "GET",
@@ -34,7 +34,7 @@ export const datagraphSearch = (params: DatagraphSearchParams) => {
   });
 };
 
-export const getDatagraphSearchKey = (params: DatagraphSearchParams) =>
+export const getDatagraphSearchKey = (params?: DatagraphSearchParams) =>
   [`/datagraph`, ...(params ? [params] : [])] as const;
 
 export type DatagraphSearchQueryResult = NonNullable<
@@ -51,7 +51,7 @@ export const useDatagraphSearch = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  params: DatagraphSearchParams,
+  params?: DatagraphSearchParams,
   options?: {
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof datagraphSearch>>,

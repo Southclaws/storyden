@@ -3457,7 +3457,7 @@ paths:
       description: Query and search content.
       tags: [datagraph]
       parameters:
-        - $ref: "#/components/parameters/RequiredSearchQuery"
+        - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/DatagraphKindQuery"
         - $ref: "#/components/parameters/DatagraphAuthorQuery"
         - $ref: "#/components/parameters/DatagraphCategoryQuery"

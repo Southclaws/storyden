@@ -14,6 +14,7 @@ import (
 	"github.com/carapace-sh/carapace"
 	"github.com/spf13/cobra"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
@@ -263,7 +264,7 @@ func limitItems(items []openapi.DatagraphItem, limit int) []openapi.DatagraphIte
 func fetchSearch(ctx context.Context, client *openapi.ClientWithResponses, opts *options, page int) (*openapi.DatagraphSearchResult, error) {
 	pageQuery := openapi.PaginationQuery(strconv.Itoa(page))
 	params := &openapi.DatagraphSearchParams{
-		Q:    openapi.RequiredSearchQuery(opts.Query),
+		Q:    opt.New(openapi.RequiredSearchQuery(opts.Query)).Ptr(),
 		Page: &pageQuery,
 	}
 

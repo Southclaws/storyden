@@ -2,6 +2,7 @@ package post_search
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Southclaws/dt"
 	"github.com/rs/xid"
@@ -58,6 +59,9 @@ func WithKinds(ks ...Kind) Filter {
 
 func WithKeywords(q string) Filter {
 	return func(pq *ent.PostQuery) {
+		if strings.TrimSpace(q) == "" {
+			return
+		}
 		pq.Where(
 			ent_post.Or(
 				ent_post.And(

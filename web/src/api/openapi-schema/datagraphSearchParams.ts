@@ -11,14 +11,14 @@ import type { DatagraphAuthorQueryParameter } from "./datagraphAuthorQueryParame
 import type { DatagraphCategoryQueryParameter } from "./datagraphCategoryQueryParameter";
 import type { DatagraphKindQueryParameter } from "./datagraphKindQueryParameter";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
-import type { RequiredSearchQueryParameter } from "./requiredSearchQueryParameter";
+import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagNameListQueryParamParameter } from "./tagNameListQueryParamParameter";
 
 export type DatagraphSearchParams = {
   /**
    * Search query string.
    */
-  q: RequiredSearchQueryParameter;
+  q?: SearchQueryParameter;
   /**
    * Datagraph item kind query.
    */

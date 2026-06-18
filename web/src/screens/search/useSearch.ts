@@ -33,7 +33,7 @@ export type Props = {
 };
 
 export const FormSchema = z.object({
-  q: z.string().min(1, { message: "Please enter a search term" }),
+  q: z.string(),
   kind: z.array(DatagraphKindSchema).optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
@@ -250,6 +250,11 @@ export function useSearchScreen(props: Props) {
     window.history.replaceState({}, "", url.toString());
   }, [kind]);
 
+  const hasActiveFilters =
+    (filters.authors?.length ?? 0) > 0 ||
+    (filters.categories?.length ?? 0) > 0 ||
+    (filters.tags?.length ?? 0) > 0;
+
   const { data, error, isLoading, mutate } = useDatagraphSearch(
     {
       q: query,
@@ -261,7 +266,7 @@ export function useSearchScreen(props: Props) {
     },
     {
       swr: {
-        enabled: !!query,
+        enabled: !!query || hasActiveFilters,
         fallbackData: props.initialResults,
       },
     },

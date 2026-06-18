@@ -345,7 +345,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Quantum Computing",
+					Q:    opt.New("Quantum Computing").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -358,7 +358,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Quick",
+					Q:    opt.New("Quick").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -371,7 +371,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "xyzabc123impossible",
+					Q:    opt.New("xyzabc123impossible").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -385,21 +385,21 @@ func TestBleveThreadSearch(t *testing.T) {
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 
 				resp1, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Quick",
+					Q:    opt.New("Quick").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp1)
 				r.NotNil(findThreadItem(resp1.JSON200.Items, threadFox.JSON200.Id))
 
 				resp2, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Quantum",
+					Q:    opt.New("Quantum").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp2)
 				r.NotNil(findThreadItem(resp2.JSON200.Items, threadQuantum.JSON200.Id))
 
 				resp3, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Pancakes",
+					Q:    opt.New("Pancakes").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp3)
@@ -412,7 +412,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "机器学习",
+					Q:    opt.New("机器学习").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -427,7 +427,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "深度学习",
+					Q:    opt.New("深度学习").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -442,7 +442,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Программирование",
+					Q:    opt.New("Программирование").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -457,7 +457,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "веб-разработки",
+					Q:    opt.New("веб-разработки").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -472,7 +472,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "تطوير",
+					Q:    opt.New("تطوير").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -487,7 +487,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Cocina",
+					Q:    opt.New("Cocina").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -502,7 +502,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Architecture",
+					Q:    opt.New("Architecture").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -517,7 +517,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Wandern",
+					Q:    opt.New("Wandern").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -532,7 +532,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Música",
+					Q:    opt.New("Música").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -547,7 +547,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Φιλοσοφία",
+					Q:    opt.New("Φιλοσοφία").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -562,7 +562,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Mutfağı",
+					Q:    opt.New("Mutfağı").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -577,7 +577,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "სიმღერები",
+					Q:    opt.New("სიმღერები").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -592,7 +592,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "संगीत",
+					Q:    opt.New("संगीत").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -607,7 +607,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Hadithi",
+					Q:    opt.New("Hadithi").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -622,7 +622,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Խոհանոց",
+					Q:    opt.New("Խոհանոց").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -637,7 +637,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "ספרות",
+					Q:    opt.New("ספרות").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -652,7 +652,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "شعر",
+					Q:    opt.New("شعر").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -667,7 +667,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "شاعری",
+					Q:    opt.New("شاعری").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -682,7 +682,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "ਲੋਕ",
+					Q:    opt.New("ਲੋਕ").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -697,7 +697,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "पर्वतारोहण",
+					Q:    opt.New("पर्वतारोहण").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -712,7 +712,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Àṣà",
+					Q:    opt.New("Àṣà").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -727,7 +727,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Omenala",
+					Q:    opt.New("Omenala").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -742,7 +742,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Tarihin",
+					Q:    opt.New("Tarihin").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -757,7 +757,7 @@ func TestBleveThreadSearch(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "Atetesɛm",
+					Q:    opt.New("Atetesɛm").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -774,7 +774,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:       "keyword",
+					Q:       opt.New("keyword").Ptr(),
 					Kind:    &threadKind,
 					Authors: &[]openapi.Identifier{openapi.Identifier(authorOne.ID.String())},
 				}, session1)
@@ -789,7 +789,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:          "keyword",
+					Q:          opt.New("keyword").Ptr(),
 					Kind:       &threadKind,
 					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
 				}, session1)
@@ -804,7 +804,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "keyword",
+					Q:    opt.New("keyword").Ptr(),
 					Kind: &threadKind,
 					Tags: &[]openapi.TagName{"sharing"},
 				}, session1)
@@ -819,7 +819,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "keyword",
+					Q:    opt.New("keyword").Ptr(),
 					Kind: &threadKind,
 					Tags: &[]openapi.TagName{"sharing", "tips"},
 				}, session1)
@@ -834,7 +834,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "keyword",
+					Q:    opt.New("keyword").Ptr(),
 					Kind: &threadKind,
 					Authors: &[]openapi.Identifier{
 						openapi.Identifier(authorOne.ID.String()),
@@ -852,7 +852,7 @@ func TestBleveThreadSearch(t *testing.T) {
 				r := require.New(t)
 
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:          "keyword",
+					Q:          opt.New("keyword").Ptr(),
 					Kind:       &threadKind,
 					Authors:    &[]openapi.Identifier{openapi.Identifier(authorOne.ID.String())},
 					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},

@@ -87,7 +87,7 @@ func TestSearchMultipleKinds(t *testing.T) {
 				a := assert.New(t)
 
 				search1, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q: "keyword",
+					Q: opt.New("keyword").Ptr(),
 				}, session1)
 				tests.Ok(t, err, search1)
 
@@ -126,7 +126,7 @@ func TestSearchMultipleKinds(t *testing.T) {
 				a := assert.New(t)
 
 				search1, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q: "keyword",
+					Q: opt.New("keyword").Ptr(),
 					Kind: &[]openapi.DatagraphItemKind{
 						openapi.DatagraphItemKindThread,
 					},
@@ -160,7 +160,7 @@ func TestSearchMultipleKinds(t *testing.T) {
 				a := assert.New(t)
 
 				search1, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q: "keyword",
+					Q: opt.New("keyword").Ptr(),
 					Kind: &[]openapi.DatagraphItemKind{
 						openapi.DatagraphItemKindNode,
 					},
@@ -255,7 +255,7 @@ func TestSearchVisibilityRules(t *testing.T) {
 				a := assert.New(t)
 
 				search1, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q: "keyword",
+					Q: opt.New("keyword").Ptr(),
 				}, session1)
 				tests.Ok(t, err, search1)
 
@@ -272,6 +272,110 @@ func TestSearchVisibilityRules(t *testing.T) {
 
 				foundn2 := findItem(search1.JSON200.Items, n2.JSON200.Id)
 				r.Nil(foundn2)
+			})
+		}))
+	}))
+}
+
+func TestSearchEmptyQueryWithAuthorFilter(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, &config.Config{}, e2e.Setup(), fx.Invoke(func(
+		root context.Context,
+		lc fx.Lifecycle,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+			ctx1, acc1 := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+			session1 := sh.WithSession(ctx1)
+			ctx2, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			session2 := sh.WithSession(ctx2)
+
+			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
+			tests.Ok(t, err, cat1)
+
+			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>a thread by baldur</p>").Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
+				Title:      "baldur thread " + uuid.NewString(),
+			}, session1)
+			tests.Ok(t, err, t1)
+
+			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Body:       opt.New("<p>a thread by loki</p>").Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
+				Title:      "loki thread " + uuid.NewString(),
+			}, session2)
+			tests.Ok(t, err, t2)
+
+			t.Run("empty_query_author_filter_returns_only_that_authors_posts", func(t *testing.T) {
+				r := require.New(t)
+
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Authors: &[]openapi.Identifier{openapi.Identifier(acc1.ID.String())},
+				}, session1)
+				tests.Ok(t, err, search)
+
+				r.NotNil(findItem(search.JSON200.Items, t1.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, t2.JSON200.Id))
+			})
+		}))
+	}))
+}
+
+func TestSearchNodeQueryDoesNotMatchAll(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, &config.Config{}, e2e.Setup(), fx.Invoke(func(
+		root context.Context,
+		lc fx.Lifecycle,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			published := openapi.VisibilityPublished
+
+			keyword := uuid.NewString()
+			matchingContent := "<p>this node mentions " + keyword + " in its body</p>"
+			unrelatedContent := "<p>this node has entirely different words</p>"
+
+			matching, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				Name:       "matching node " + uuid.NewString(),
+				Content:    &matchingContent,
+				Visibility: &published,
+			}, adminSession)
+			tests.Ok(t, err, matching)
+
+			unrelated, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				Name:       "unrelated node " + uuid.NewString(),
+				Content:    &unrelatedContent,
+				Visibility: &published,
+			}, adminSession)
+			tests.Ok(t, err, unrelated)
+
+			t.Run("keyword_query_excludes_non_matching_nodes", func(t *testing.T) {
+				r := require.New(t)
+
+				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
+					Q: opt.New(keyword).Ptr(),
+					Kind: &[]openapi.DatagraphItemKind{
+						openapi.DatagraphItemKindNode,
+					},
+				}, adminSession)
+				tests.Ok(t, err, search)
+
+				r.NotNil(findItem(search.JSON200.Items, matching.JSON200.Id))
+				r.Nil(findItem(search.JSON200.Items, unrelated.JSON200.Id))
 			})
 		}))
 	}))
@@ -388,7 +492,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for threads by Baldur
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:       "keyword",
+					Q:       opt.New("keyword").Ptr(),
 					Authors: &[]openapi.Identifier{openapi.Identifier(acc1.ID.String())},
 				}, session1)
 				tests.Ok(t, err, search)
@@ -407,7 +511,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for threads in Tech category
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:          "keyword",
+					Q:          opt.New("keyword").Ptr(),
 					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
 				}, session1)
 				tests.Ok(t, err, search)
@@ -424,7 +528,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for items with "sharing" tag
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "keyword",
+					Q:    opt.New("keyword").Ptr(),
 					Tags: &[]openapi.TagName{"sharing"},
 				}, session1)
 				tests.Ok(t, err, search)
@@ -443,7 +547,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for items with BOTH "sharing" AND "tips" tags
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "keyword",
+					Q:    opt.New("keyword").Ptr(),
 					Tags: &[]openapi.TagName{"sharing", "tips"},
 				}, session1)
 				tests.Ok(t, err, search)
@@ -462,7 +566,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for threads by Baldur OR Loki
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q: "keyword",
+					Q: opt.New("keyword").Ptr(),
 					Authors: &[]openapi.Identifier{
 						openapi.Identifier(acc1.ID.String()),
 						openapi.Identifier(acc2.ID.String()),
@@ -484,7 +588,7 @@ func TestSearchFilters(t *testing.T) {
 
 				// Search for: Baldur AND Tech category AND "sharing" tag
 				search, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:          "keyword",
+					Q:          opt.New("keyword").Ptr(),
 					Authors:    &[]openapi.Identifier{openapi.Identifier(acc1.ID.String())},
 					Categories: &[]openapi.CategorySlug{openapi.CategorySlug(cat1.JSON200.Id)},
 					Tags:       &[]openapi.TagName{"sharing"},

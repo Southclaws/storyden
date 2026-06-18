@@ -2,6 +2,7 @@ package node_search
 
 import (
 	"context"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
@@ -88,13 +89,19 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 	}
 
 	baseQuery := s.db.Node.Query().Where(
-		node.Or(
-			node.NameContainsFold(q.nameContains),
-			node.ContentContainsFold(q.contentContains),
-		),
 		node.VisibilityEQ(node.VisibilityPublished),
 		node.DeletedAtIsNil(),
 	)
+
+	nameContains := strings.TrimSpace(q.nameContains)
+	contentContains := strings.TrimSpace(q.contentContains)
+
+	if nameContains != "" || contentContains != "" {
+		baseQuery = baseQuery.Where(node.Or(
+			node.NameContainsFold(nameContains),
+			node.ContentContainsFold(contentContains),
+		))
+	}
 
 	if len(q.authors) > 0 {
 		authorIDs := dt.Map(q.authors, func(id account.AccountID) xid.ID {

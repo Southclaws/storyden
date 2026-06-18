@@ -61,7 +61,7 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 
 				threadKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindThread}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "programming",
+					Q:    opt.New("programming").Ptr(),
 					Kind: &threadKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -83,7 +83,7 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 
 				replyKind := []openapi.DatagraphItemKind{openapi.DatagraphItemKindReply}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "programming",
+					Q:    opt.New("programming").Ptr(),
 					Kind: &replyKind,
 				}, adminSession)
 				tests.Ok(t, err, resp)
@@ -111,7 +111,7 @@ func TestSimpleSearchThreadReplyFiltering(t *testing.T) {
 					openapi.DatagraphItemKindReply,
 				}
 				resp, err := cl.DatagraphSearchWithResponse(root, &openapi.DatagraphSearchParams{
-					Q:    "programming",
+					Q:    opt.New("programming").Ptr(),
 					Kind: &bothKinds,
 				}, adminSession)
 				tests.Ok(t, err, resp)
