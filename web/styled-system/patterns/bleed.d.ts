@@ -1,21 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface BleedProperties {
-   inline?: SystemProperties["marginInline"]
-	block?: SystemProperties["marginBlock"]
+  block?: SystemProperties["marginBlock"]
+  inline?: SystemProperties["marginInline"]
+  className?: string
 }
 
-interface BleedStyles extends BleedProperties, DistributiveOmit<SystemStyleObject, keyof BleedProperties > {}
+type BleedRestStyles = Omit<SystemStyleObject, keyof BleedProperties>
+
+interface BleedStyles extends BleedProperties, BleedRestStyles {}
 
 interface BleedPatternFn {
   (styles?: BleedStyles): string
   raw: (styles?: BleedStyles) => SystemStyleObject
 }
 
+export declare function bleedRaw(styles?: BleedStyles): SystemStyleObject;
 
 export declare const bleed: BleedPatternFn;

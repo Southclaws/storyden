@@ -1,38 +1,17 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ButtonVariant {
-  /**
- * @default "solid"
- */
-variant: "solid" | "outline" | "ghost" | "link" | "subtle"
-/**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+export type ButtonVariant = {
+  size?: "2xl" | "lg" | "md" | "sm" | "xl" | "xs"
+  variant?: "ghost" | "link" | "outline" | "solid" | "subtle"
 }
-
-type ButtonVariantMap = {
-  [key in keyof ButtonVariant]: Array<ButtonVariant[key]>
-}
-
-
 
 export type ButtonVariantProps = {
-  [key in keyof ButtonVariant]?: ConditionalValue<ButtonVariant[key]> | undefined
+  [K in keyof ButtonVariant]?: ConditionalValue<ButtonVariant[K]>
 }
 
-export interface ButtonRecipe {
-  
-  __type: ButtonVariantProps
-  (props?: ButtonVariantProps): string
-  raw: (props?: ButtonVariantProps) => ButtonVariantProps
-  variantMap: ButtonVariantMap
-  variantKeys: Array<keyof ButtonVariant>
-  splitVariantProps<Props extends ButtonVariantProps>(props: Props): [ButtonVariantProps, Pretty<DistributiveOmit<Props, keyof ButtonVariantProps>>]
-  getVariantProps: (props?: ButtonVariantProps) => ButtonVariantProps
-}
+export type ButtonVariantMap = RecipeVariantMap<ButtonVariant>
 
+export type ButtonRecipe = RecipeRuntimeFn<ButtonVariantProps, ButtonVariantMap>
 
-export declare const button: ButtonRecipe
+export declare const button: ButtonRecipe;

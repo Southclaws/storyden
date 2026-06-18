@@ -1,26 +1,26 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface FlexProperties {
-   align?: SystemProperties["alignItems"]
-	justify?: SystemProperties["justifyContent"]
-	direction?: SystemProperties["flexDirection"]
-	wrap?: SystemProperties["flexWrap"]
-	basis?: SystemProperties["flexBasis"]
-	grow?: SystemProperties["flexGrow"]
-	shrink?: SystemProperties["flexShrink"]
+  align?: SystemProperties["alignItems"]
+  basis?: SystemProperties["flexBasis"]
+  direction?: SystemProperties["flexDirection"]
+  grow?: SystemProperties["flexGrow"]
+  justify?: SystemProperties["justifyContent"]
+  shrink?: SystemProperties["flexShrink"]
+  wrap?: SystemProperties["flexWrap"]
+  className?: string
 }
 
-interface FlexStyles extends FlexProperties, DistributiveOmit<SystemStyleObject, keyof FlexProperties > {}
+type FlexRestStyles = Omit<SystemStyleObject, keyof FlexProperties>
+
+interface FlexStyles extends FlexProperties, FlexRestStyles {}
 
 interface FlexPatternFn {
   (styles?: FlexStyles): string
   raw: (styles?: FlexStyles) => SystemStyleObject
 }
 
+export declare function flexRaw(styles?: FlexStyles): SystemStyleObject;
 
 export declare const flex: FlexPatternFn;

@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ProgressVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
+export type ProgressVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type ProgressVariantMap = {
-  [key in keyof ProgressVariant]: Array<ProgressVariant[key]>
-}
-
-type ProgressSlot = "root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange"
 
 export type ProgressVariantProps = {
-  [key in keyof ProgressVariant]?: ConditionalValue<ProgressVariant[key]> | undefined
+  [K in keyof ProgressVariant]?: ConditionalValue<ProgressVariant[K]>
 }
 
-export interface ProgressRecipe {
-  __slot: ProgressSlot
-  __type: ProgressVariantProps
-  (props?: ProgressVariantProps): Pretty<Record<ProgressSlot, string>>
-  raw: (props?: ProgressVariantProps) => ProgressVariantProps
-  variantMap: ProgressVariantMap
-  variantKeys: Array<keyof ProgressVariant>
-  splitVariantProps<Props extends ProgressVariantProps>(props: Props): [ProgressVariantProps, Pretty<DistributiveOmit<Props, keyof ProgressVariantProps>>]
-  getVariantProps: (props?: ProgressVariantProps) => ProgressVariantProps
-}
+export type ProgressVariantMap = RecipeVariantMap<ProgressVariant>
 
+export type ProgressSlot = "root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange"
 
-export declare const progress: ProgressRecipe
+export type ProgressRecipe = SlotRecipeRuntimeFn<ProgressSlot, ProgressVariantProps, ProgressVariantMap>
+
+export declare const progress: ProgressRecipe;

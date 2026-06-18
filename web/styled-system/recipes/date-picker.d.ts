@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface DatePickerVariant {
-  
-}
-
-type DatePickerVariantMap = {
-  [key in keyof DatePickerVariant]: Array<DatePickerVariant[key]>
-}
-
-type DatePickerSlot = "clearTrigger" | "content" | "control" | "input" | "label" | "monthSelect" | "nextTrigger" | "positioner" | "presetTrigger" | "prevTrigger" | "rangeText" | "root" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "view" | "viewControl" | "viewTrigger" | "yearSelect" | "view"
+export type DatePickerVariant = {}
 
 export type DatePickerVariantProps = {
-  [key in keyof DatePickerVariant]?: ConditionalValue<DatePickerVariant[key]> | undefined
+  [K in keyof DatePickerVariant]?: ConditionalValue<DatePickerVariant[K]>
 }
 
-export interface DatePickerRecipe {
-  __slot: DatePickerSlot
-  __type: DatePickerVariantProps
-  (props?: DatePickerVariantProps): Pretty<Record<DatePickerSlot, string>>
-  raw: (props?: DatePickerVariantProps) => DatePickerVariantProps
-  variantMap: DatePickerVariantMap
-  variantKeys: Array<keyof DatePickerVariant>
-  splitVariantProps<Props extends DatePickerVariantProps>(props: Props): [DatePickerVariantProps, Pretty<DistributiveOmit<Props, keyof DatePickerVariantProps>>]
-  getVariantProps: (props?: DatePickerVariantProps) => DatePickerVariantProps
-}
+export type DatePickerVariantMap = RecipeVariantMap<DatePickerVariant>
 
+export type DatePickerSlot = "clearTrigger" | "content" | "control" | "input" | "label" | "monthSelect" | "nextTrigger" | "positioner" | "presetTrigger" | "prevTrigger" | "rangeText" | "root" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "view" | "viewControl" | "viewTrigger" | "yearSelect" | "view"
 
-export declare const datePicker: DatePickerRecipe
+export type DatePickerRecipe = SlotRecipeRuntimeFn<DatePickerSlot, DatePickerVariantProps, DatePickerVariantMap>
+
+export declare const datePicker: DatePickerRecipe;

@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface FileUploadVariant {
-  
-}
-
-type FileUploadVariantMap = {
-  [key in keyof FileUploadVariant]: Array<FileUploadVariant[key]>
-}
-
-type FileUploadSlot = "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "clearTrigger"
+export type FileUploadVariant = {}
 
 export type FileUploadVariantProps = {
-  [key in keyof FileUploadVariant]?: ConditionalValue<FileUploadVariant[key]> | undefined
+  [K in keyof FileUploadVariant]?: ConditionalValue<FileUploadVariant[K]>
 }
 
-export interface FileUploadRecipe {
-  __slot: FileUploadSlot
-  __type: FileUploadVariantProps
-  (props?: FileUploadVariantProps): Pretty<Record<FileUploadSlot, string>>
-  raw: (props?: FileUploadVariantProps) => FileUploadVariantProps
-  variantMap: FileUploadVariantMap
-  variantKeys: Array<keyof FileUploadVariant>
-  splitVariantProps<Props extends FileUploadVariantProps>(props: Props): [FileUploadVariantProps, Pretty<DistributiveOmit<Props, keyof FileUploadVariantProps>>]
-  getVariantProps: (props?: FileUploadVariantProps) => FileUploadVariantProps
-}
+export type FileUploadVariantMap = RecipeVariantMap<FileUploadVariant>
 
+export type FileUploadSlot = "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "clearTrigger"
 
-export declare const fileUpload: FileUploadRecipe
+export type FileUploadRecipe = SlotRecipeRuntimeFn<FileUploadSlot, FileUploadVariantProps, FileUploadVariantMap>
+
+export declare const fileUpload: FileUploadRecipe;

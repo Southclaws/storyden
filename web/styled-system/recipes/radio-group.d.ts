@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface RadioGroupVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
+export type RadioGroupVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type RadioGroupVariantMap = {
-  [key in keyof RadioGroupVariant]: Array<RadioGroupVariant[key]>
-}
-
-type RadioGroupSlot = "root" | "label" | "item" | "itemText" | "itemControl" | "indicator"
 
 export type RadioGroupVariantProps = {
-  [key in keyof RadioGroupVariant]?: ConditionalValue<RadioGroupVariant[key]> | undefined
+  [K in keyof RadioGroupVariant]?: ConditionalValue<RadioGroupVariant[K]>
 }
 
-export interface RadioGroupRecipe {
-  __slot: RadioGroupSlot
-  __type: RadioGroupVariantProps
-  (props?: RadioGroupVariantProps): Pretty<Record<RadioGroupSlot, string>>
-  raw: (props?: RadioGroupVariantProps) => RadioGroupVariantProps
-  variantMap: RadioGroupVariantMap
-  variantKeys: Array<keyof RadioGroupVariant>
-  splitVariantProps<Props extends RadioGroupVariantProps>(props: Props): [RadioGroupVariantProps, Pretty<DistributiveOmit<Props, keyof RadioGroupVariantProps>>]
-  getVariantProps: (props?: RadioGroupVariantProps) => RadioGroupVariantProps
-}
+export type RadioGroupVariantMap = RecipeVariantMap<RadioGroupVariant>
 
+export type RadioGroupSlot = "root" | "label" | "item" | "itemText" | "itemControl" | "indicator"
 
-export declare const radioGroup: RadioGroupRecipe
+export type RadioGroupRecipe = SlotRecipeRuntimeFn<RadioGroupSlot, RadioGroupVariantProps, RadioGroupVariantMap>
+
+export declare const radioGroup: RadioGroupRecipe;

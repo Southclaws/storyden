@@ -1,38 +1,19 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface NumberInputVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg" | "xl"
-/**
- * @default "outline"
- */
-variant: "outline" | "ghost"
+export type NumberInputVariant = {
+  size?: "lg" | "md" | "sm" | "xl"
+  variant?: "ghost" | "outline"
 }
-
-type NumberInputVariantMap = {
-  [key in keyof NumberInputVariant]: Array<NumberInputVariant[key]>
-}
-
-type NumberInputSlot = "root" | "label" | "input" | "control" | "valueText" | "incrementTrigger" | "decrementTrigger" | "scrubber"
 
 export type NumberInputVariantProps = {
-  [key in keyof NumberInputVariant]?: ConditionalValue<NumberInputVariant[key]> | undefined
+  [K in keyof NumberInputVariant]?: ConditionalValue<NumberInputVariant[K]>
 }
 
-export interface NumberInputRecipe {
-  __slot: NumberInputSlot
-  __type: NumberInputVariantProps
-  (props?: NumberInputVariantProps): Pretty<Record<NumberInputSlot, string>>
-  raw: (props?: NumberInputVariantProps) => NumberInputVariantProps
-  variantMap: NumberInputVariantMap
-  variantKeys: Array<keyof NumberInputVariant>
-  splitVariantProps<Props extends NumberInputVariantProps>(props: Props): [NumberInputVariantProps, Pretty<DistributiveOmit<Props, keyof NumberInputVariantProps>>]
-  getVariantProps: (props?: NumberInputVariantProps) => NumberInputVariantProps
-}
+export type NumberInputVariantMap = RecipeVariantMap<NumberInputVariant>
 
+export type NumberInputSlot = "root" | "label" | "input" | "control" | "valueText" | "incrementTrigger" | "decrementTrigger" | "scrubber"
 
-export declare const numberInput: NumberInputRecipe
+export type NumberInputRecipe = SlotRecipeRuntimeFn<NumberInputSlot, NumberInputVariantProps, NumberInputVariantMap>
+
+export declare const numberInput: NumberInputRecipe;

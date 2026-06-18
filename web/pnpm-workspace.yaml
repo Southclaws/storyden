@@ -2,7 +2,27 @@ packages:
   - "."
 
 minimumReleaseAge: 10080
+minimumReleaseAgeExclude:
+  - "@pandacss/dev@2.0.0-beta.1"
+  - "@pandacss/types@2.0.0-beta.1"
+  - "@pandacss/cli@2.0.0-beta.1"
+  - "@pandacss/compiler@2.0.0-beta.1"
+  - "@pandacss/compiler-shared@2.0.0-beta.1"
+  - "@pandacss/compiler-linux-x64-gnu@2.0.0-beta.1"
+  - "@pandacss/compiler-linux-x64-musl@2.0.0-beta.1"
+  - "@pandacss/compiler-linux-arm64-gnu@2.0.0-beta.1"
+  - "@pandacss/compiler-linux-arm64-musl@2.0.0-beta.1"
+  - "@pandacss/compiler-darwin-arm64@2.0.0-beta.1"
+  - "@pandacss/compiler-darwin-x64@2.0.0-beta.1"
+  - "@pandacss/compiler-win32-x64-msvc@2.0.0-beta.1"
+  - "@pandacss/compiler-win32-arm64-msvc@2.0.0-beta.1"
+  - "@pandacss/config@2.0.0-beta.1"
+  - "@pandacss/postcss@2.0.0-beta.1"
+  - "@pandacss/preset-base@2.0.0-beta.1"
+  - "@pandacss/preset-panda@2.0.0-beta.1"
+  - "acorn@8.17.0"
 allowBuilds:
+  '@parcel/watcher': true
   esbuild: true
   sharp: true
   unrs-resolver: true

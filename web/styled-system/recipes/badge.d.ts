@@ -1,38 +1,17 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface BadgeVariant {
-  /**
- * @default "subtle"
- */
-variant: "solid" | "subtle" | "outline"
-/**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
+export type BadgeVariant = {
+  size?: "lg" | "md" | "sm"
+  variant?: "outline" | "solid" | "subtle"
 }
-
-type BadgeVariantMap = {
-  [key in keyof BadgeVariant]: Array<BadgeVariant[key]>
-}
-
-
 
 export type BadgeVariantProps = {
-  [key in keyof BadgeVariant]?: ConditionalValue<BadgeVariant[key]> | undefined
+  [K in keyof BadgeVariant]?: ConditionalValue<BadgeVariant[K]>
 }
 
-export interface BadgeRecipe {
-  
-  __type: BadgeVariantProps
-  (props?: BadgeVariantProps): string
-  raw: (props?: BadgeVariantProps) => BadgeVariantProps
-  variantMap: BadgeVariantMap
-  variantKeys: Array<keyof BadgeVariant>
-  splitVariantProps<Props extends BadgeVariantProps>(props: Props): [BadgeVariantProps, Pretty<DistributiveOmit<Props, keyof BadgeVariantProps>>]
-  getVariantProps: (props?: BadgeVariantProps) => BadgeVariantProps
-}
+export type BadgeVariantMap = RecipeVariantMap<BadgeVariant>
 
+export type BadgeRecipe = RecipeRuntimeFn<BadgeVariantProps, BadgeVariantMap>
 
-export declare const badge: BadgeRecipe
+export declare const badge: BadgeRecipe;

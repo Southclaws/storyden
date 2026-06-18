@@ -1,22 +1,19 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
 export interface FloatingProperties {
-   
+  className?: string
 }
 
-interface FloatingStyles extends FloatingProperties, DistributiveOmit<SystemStyleObject, keyof FloatingProperties > {}
+type FloatingRestStyles = Omit<SystemStyleObject, keyof FloatingProperties>
+
+interface FloatingStyles extends FloatingProperties, FloatingRestStyles {}
 
 interface FloatingPatternFn {
   (styles?: FloatingStyles): string
   raw: (styles?: FloatingStyles) => SystemStyleObject
 }
 
-/**
- * Floating overlay elements.
- */
+export declare function FloatingRaw(styles?: FloatingStyles): SystemStyleObject;
+
 export declare const Floating: FloatingPatternFn;

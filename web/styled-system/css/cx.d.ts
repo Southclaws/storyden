@@ -1,5 +1,6 @@
-/* eslint-disable */
-type Argument = string | boolean | null | undefined
+type Argument = string | boolean | null | undefined;
 
-/** Conditionally join classNames into a single string */
-export declare function cx(...args: Argument[]): string
+/**
+ * Conditionally join classNames into a single string
+ */
+export declare function cx(...args: Argument[]): string;

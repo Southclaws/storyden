@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ClipboardVariant {
-  
-}
-
-type ClipboardVariantMap = {
-  [key in keyof ClipboardVariant]: Array<ClipboardVariant[key]>
-}
-
-type ClipboardSlot = "root" | "control" | "trigger" | "indicator" | "input" | "label"
+export type ClipboardVariant = {}
 
 export type ClipboardVariantProps = {
-  [key in keyof ClipboardVariant]?: ConditionalValue<ClipboardVariant[key]> | undefined
+  [K in keyof ClipboardVariant]?: ConditionalValue<ClipboardVariant[K]>
 }
 
-export interface ClipboardRecipe {
-  __slot: ClipboardSlot
-  __type: ClipboardVariantProps
-  (props?: ClipboardVariantProps): Pretty<Record<ClipboardSlot, string>>
-  raw: (props?: ClipboardVariantProps) => ClipboardVariantProps
-  variantMap: ClipboardVariantMap
-  variantKeys: Array<keyof ClipboardVariant>
-  splitVariantProps<Props extends ClipboardVariantProps>(props: Props): [ClipboardVariantProps, Pretty<DistributiveOmit<Props, keyof ClipboardVariantProps>>]
-  getVariantProps: (props?: ClipboardVariantProps) => ClipboardVariantProps
-}
+export type ClipboardVariantMap = RecipeVariantMap<ClipboardVariant>
 
+export type ClipboardSlot = "root" | "control" | "trigger" | "indicator" | "input" | "label"
 
-export declare const clipboard: ClipboardRecipe
+export type ClipboardRecipe = SlotRecipeRuntimeFn<ClipboardSlot, ClipboardVariantProps, ClipboardVariantMap>
+
+export declare const clipboard: ClipboardRecipe;

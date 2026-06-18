@@ -1,23 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { ConditionalValue, SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface CardBoxProperties {
-   kind?: ConditionalValue<"edge" | "default">
-	display?: SystemProperties["display"]
+  display?: SystemProperties["display"]
+  kind?: ConditionalValue<"edge" | "default">
+  className?: string
 }
 
-interface CardBoxStyles extends CardBoxProperties, DistributiveOmit<SystemStyleObject, keyof CardBoxProperties > {}
+type CardBoxRestStyles = Omit<SystemStyleObject, keyof CardBoxProperties>
+
+interface CardBoxStyles extends CardBoxProperties, CardBoxRestStyles {}
 
 interface CardBoxPatternFn {
   (styles?: CardBoxStyles): string
   raw: (styles?: CardBoxStyles) => SystemStyleObject
 }
 
-/**
- * A card component that can be used to display content in a container with a border and a shadow.
- */
+export declare function CardBoxRaw(styles?: CardBoxStyles): SystemStyleObject;
+
 export declare const CardBox: CardBoxPatternFn;

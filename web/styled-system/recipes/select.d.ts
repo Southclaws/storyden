@@ -1,38 +1,19 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface SelectVariant {
-  /**
- * @default "outline"
- */
-variant: "outline" | "ghost"
-/**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg"
+export type SelectVariant = {
+  size?: "lg" | "md" | "sm" | "xs"
+  variant?: "ghost" | "outline"
 }
-
-type SelectVariantMap = {
-  [key in keyof SelectVariant]: Array<SelectVariant[key]>
-}
-
-type SelectSlot = "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText"
 
 export type SelectVariantProps = {
-  [key in keyof SelectVariant]?: ConditionalValue<SelectVariant[key]> | undefined
+  [K in keyof SelectVariant]?: ConditionalValue<SelectVariant[K]>
 }
 
-export interface SelectRecipe {
-  __slot: SelectSlot
-  __type: SelectVariantProps
-  (props?: SelectVariantProps): Pretty<Record<SelectSlot, string>>
-  raw: (props?: SelectVariantProps) => SelectVariantProps
-  variantMap: SelectVariantMap
-  variantKeys: Array<keyof SelectVariant>
-  splitVariantProps<Props extends SelectVariantProps>(props: Props): [SelectVariantProps, Pretty<DistributiveOmit<Props, keyof SelectVariantProps>>]
-  getVariantProps: (props?: SelectVariantProps) => SelectVariantProps
-}
+export type SelectVariantMap = RecipeVariantMap<SelectVariant>
 
+export type SelectSlot = "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText"
 
-export declare const select: SelectRecipe
+export type SelectRecipe = SlotRecipeRuntimeFn<SelectSlot, SelectVariantProps, SelectVariantMap>
+
+export declare const select: SelectRecipe;

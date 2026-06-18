@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ColorPickerVariant {
-  
-}
-
-type ColorPickerVariantMap = {
-  [key in keyof ColorPickerVariant]: Array<ColorPickerVariant[key]>
-}
-
-type ColorPickerSlot = "root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view"
+export type ColorPickerVariant = {}
 
 export type ColorPickerVariantProps = {
-  [key in keyof ColorPickerVariant]?: ConditionalValue<ColorPickerVariant[key]> | undefined
+  [K in keyof ColorPickerVariant]?: ConditionalValue<ColorPickerVariant[K]>
 }
 
-export interface ColorPickerRecipe {
-  __slot: ColorPickerSlot
-  __type: ColorPickerVariantProps
-  (props?: ColorPickerVariantProps): Pretty<Record<ColorPickerSlot, string>>
-  raw: (props?: ColorPickerVariantProps) => ColorPickerVariantProps
-  variantMap: ColorPickerVariantMap
-  variantKeys: Array<keyof ColorPickerVariant>
-  splitVariantProps<Props extends ColorPickerVariantProps>(props: Props): [ColorPickerVariantProps, Pretty<DistributiveOmit<Props, keyof ColorPickerVariantProps>>]
-  getVariantProps: (props?: ColorPickerVariantProps) => ColorPickerVariantProps
-}
+export type ColorPickerVariantMap = RecipeVariantMap<ColorPickerVariant>
 
+export type ColorPickerSlot = "root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view"
 
-export declare const colorPicker: ColorPickerRecipe
+export type ColorPickerRecipe = SlotRecipeRuntimeFn<ColorPickerSlot, ColorPickerVariantProps, ColorPickerVariantMap>
+
+export declare const colorPicker: ColorPickerRecipe;

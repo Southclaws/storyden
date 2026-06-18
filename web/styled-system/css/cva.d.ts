@@ -1,6 +1,5 @@
-/* eslint-disable */
 import type { RecipeCreatorFn } from '../types/recipe';
 
-export declare const cva: RecipeCreatorFn
+export declare const cva: RecipeCreatorFn;
 
-export type { RecipeVariant, RecipeVariantProps } from '../types/recipe';
+export { RecipeVariant, RecipeVariantProps } from '../types/recipe';

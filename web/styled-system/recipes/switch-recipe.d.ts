@@ -1,34 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface SwitchRecipeVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
+export type SwitchRecipeVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type SwitchRecipeVariantMap = {
-  [key in keyof SwitchRecipeVariant]: Array<SwitchRecipeVariant[key]>
-}
-
-type SwitchRecipeSlot = "root" | "label" | "control" | "thumb"
 
 export type SwitchRecipeVariantProps = {
-  [key in keyof SwitchRecipeVariant]?: ConditionalValue<SwitchRecipeVariant[key]> | undefined
+  [K in keyof SwitchRecipeVariant]?: ConditionalValue<SwitchRecipeVariant[K]>
 }
 
-export interface SwitchRecipeRecipe {
-  __slot: SwitchRecipeSlot
-  __type: SwitchRecipeVariantProps
-  (props?: SwitchRecipeVariantProps): Pretty<Record<SwitchRecipeSlot, string>>
-  raw: (props?: SwitchRecipeVariantProps) => SwitchRecipeVariantProps
-  variantMap: SwitchRecipeVariantMap
-  variantKeys: Array<keyof SwitchRecipeVariant>
-  splitVariantProps<Props extends SwitchRecipeVariantProps>(props: Props): [SwitchRecipeVariantProps, Pretty<DistributiveOmit<Props, keyof SwitchRecipeVariantProps>>]
-  getVariantProps: (props?: SwitchRecipeVariantProps) => SwitchRecipeVariantProps
-}
+export type SwitchRecipeVariantMap = RecipeVariantMap<SwitchRecipeVariant>
 
+export type SwitchRecipeRecipe = RecipeRuntimeFn<SwitchRecipeVariantProps, SwitchRecipeVariantMap>
 
-export declare const switchRecipe: SwitchRecipeRecipe
+export declare const switchRecipe: SwitchRecipeRecipe;

@@ -1,21 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface HstackProperties {
-   justify?: SystemProperties["justifyContent"]
-	gap?: SystemProperties["gap"]
+  gap?: SystemProperties["gap"]
+  justify?: SystemProperties["justifyContent"]
+  className?: string
 }
 
-interface HstackStyles extends HstackProperties, DistributiveOmit<SystemStyleObject, keyof HstackProperties > {}
+type HstackRestStyles = Omit<SystemStyleObject, keyof HstackProperties>
+
+interface HstackStyles extends HstackProperties, HstackRestStyles {}
 
 interface HstackPatternFn {
   (styles?: HstackStyles): string
   raw: (styles?: HstackStyles) => SystemStyleObject
 }
 
+export declare function hstackRaw(styles?: HstackStyles): SystemStyleObject;
 
 export declare const hstack: HstackPatternFn;

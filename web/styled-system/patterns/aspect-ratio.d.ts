@@ -1,20 +1,20 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { ConditionalValue, SystemStyleObject } from '../types/system';
 
 export interface AspectRatioProperties {
-   ratio?: ConditionalValue<number>
+  ratio?: ConditionalValue<number>
+  className?: string
 }
 
-interface AspectRatioStyles extends AspectRatioProperties, DistributiveOmit<SystemStyleObject, keyof AspectRatioProperties | 'aspectRatio'> {}
+type AspectRatioRestStyles = Omit<SystemStyleObject, keyof AspectRatioProperties | "aspectRatio">
+
+interface AspectRatioStyles extends AspectRatioProperties, AspectRatioRestStyles {}
 
 interface AspectRatioPatternFn {
   (styles?: AspectRatioStyles): string
   raw: (styles?: AspectRatioStyles) => SystemStyleObject
 }
 
+export declare function aspectRatioRaw(styles?: AspectRatioStyles): SystemStyleObject;
 
 export declare const aspectRatio: AspectRatioPatternFn;

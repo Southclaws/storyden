@@ -1,22 +1,19 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
 export interface FrostedGlassProperties {
-   
+  className?: string
 }
 
-interface FrostedGlassStyles extends FrostedGlassProperties, DistributiveOmit<SystemStyleObject, keyof FrostedGlassProperties > {}
+type FrostedGlassRestStyles = Omit<SystemStyleObject, keyof FrostedGlassProperties>
+
+interface FrostedGlassStyles extends FrostedGlassProperties, FrostedGlassRestStyles {}
 
 interface FrostedGlassPatternFn {
   (styles?: FrostedGlassStyles): string
   raw: (styles?: FrostedGlassStyles) => SystemStyleObject
 }
 
-/**
- * A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.
- */
+export declare function FrostedGlassRaw(styles?: FrostedGlassStyles): SystemStyleObject;
+
 export declare const FrostedGlass: FrostedGlassPatternFn;

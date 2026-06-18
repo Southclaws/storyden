@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface PinInputVariant {
-  /**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+export type PinInputVariant = {
+  size?: "2xl" | "lg" | "md" | "sm" | "xl" | "xs"
 }
-
-type PinInputVariantMap = {
-  [key in keyof PinInputVariant]: Array<PinInputVariant[key]>
-}
-
-type PinInputSlot = "root" | "label" | "input" | "control"
 
 export type PinInputVariantProps = {
-  [key in keyof PinInputVariant]?: ConditionalValue<PinInputVariant[key]> | undefined
+  [K in keyof PinInputVariant]?: ConditionalValue<PinInputVariant[K]>
 }
 
-export interface PinInputRecipe {
-  __slot: PinInputSlot
-  __type: PinInputVariantProps
-  (props?: PinInputVariantProps): Pretty<Record<PinInputSlot, string>>
-  raw: (props?: PinInputVariantProps) => PinInputVariantProps
-  variantMap: PinInputVariantMap
-  variantKeys: Array<keyof PinInputVariant>
-  splitVariantProps<Props extends PinInputVariantProps>(props: Props): [PinInputVariantProps, Pretty<DistributiveOmit<Props, keyof PinInputVariantProps>>]
-  getVariantProps: (props?: PinInputVariantProps) => PinInputVariantProps
-}
+export type PinInputVariantMap = RecipeVariantMap<PinInputVariant>
 
+export type PinInputSlot = "root" | "label" | "input" | "control"
 
-export declare const pinInput: PinInputRecipe
+export type PinInputRecipe = SlotRecipeRuntimeFn<PinInputSlot, PinInputVariantProps, PinInputVariantMap>
+
+export declare const pinInput: PinInputRecipe;

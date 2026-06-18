@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface SliderVariant {
-  /**
- * @default "md"
- */
-size: "sm" | "md" | "lg"
+export type SliderVariant = {
+  size?: "lg" | "md" | "sm"
 }
-
-type SliderVariantMap = {
-  [key in keyof SliderVariant]: Array<SliderVariant[key]>
-}
-
-type SliderSlot = "root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker" | "draggingIndicator"
 
 export type SliderVariantProps = {
-  [key in keyof SliderVariant]?: ConditionalValue<SliderVariant[key]> | undefined
+  [K in keyof SliderVariant]?: ConditionalValue<SliderVariant[K]>
 }
 
-export interface SliderRecipe {
-  __slot: SliderSlot
-  __type: SliderVariantProps
-  (props?: SliderVariantProps): Pretty<Record<SliderSlot, string>>
-  raw: (props?: SliderVariantProps) => SliderVariantProps
-  variantMap: SliderVariantMap
-  variantKeys: Array<keyof SliderVariant>
-  splitVariantProps<Props extends SliderVariantProps>(props: Props): [SliderVariantProps, Pretty<DistributiveOmit<Props, keyof SliderVariantProps>>]
-  getVariantProps: (props?: SliderVariantProps) => SliderVariantProps
-}
+export type SliderVariantMap = RecipeVariantMap<SliderVariant>
 
+export type SliderSlot = "root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker" | "draggingIndicator"
 
-export declare const slider: SliderRecipe
+export type SliderRecipe = SlotRecipeRuntimeFn<SliderSlot, SliderVariantProps, SliderVariantMap>
+
+export declare const slider: SliderRecipe;

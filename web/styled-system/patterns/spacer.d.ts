@@ -1,20 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { TokenValue } from '../types/tokens';
+import type { ConditionalValue, SystemStyleObject } from '../types/system';
 
 export interface SpacerProperties {
-   size?: ConditionalValue<Tokens["spacing"]>
+  size?: ConditionalValue<TokenValue<"spacing">>
+  className?: string
 }
 
-interface SpacerStyles extends SpacerProperties, DistributiveOmit<SystemStyleObject, keyof SpacerProperties > {}
+type SpacerRestStyles = Omit<SystemStyleObject, keyof SpacerProperties>
+
+interface SpacerStyles extends SpacerProperties, SpacerRestStyles {}
 
 interface SpacerPatternFn {
   (styles?: SpacerStyles): string
   raw: (styles?: SpacerStyles) => SystemStyleObject
 }
 
+export declare function spacerRaw(styles?: SpacerStyles): SystemStyleObject;
 
 export declare const spacer: SpacerPatternFn;

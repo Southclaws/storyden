@@ -1,34 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface TypographyHeadingVariant {
-  /**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+export type TypographyHeadingVariant = {
+  size?: "2xl" | "lg" | "md" | "sm" | "xl" | "xs"
 }
-
-type TypographyHeadingVariantMap = {
-  [key in keyof TypographyHeadingVariant]: Array<TypographyHeadingVariant[key]>
-}
-
-
 
 export type TypographyHeadingVariantProps = {
-  [key in keyof TypographyHeadingVariant]?: ConditionalValue<TypographyHeadingVariant[key]> | undefined
+  [K in keyof TypographyHeadingVariant]?: ConditionalValue<TypographyHeadingVariant[K]>
 }
 
-export interface TypographyHeadingRecipe {
-  
-  __type: TypographyHeadingVariantProps
-  (props?: TypographyHeadingVariantProps): string
-  raw: (props?: TypographyHeadingVariantProps) => TypographyHeadingVariantProps
-  variantMap: TypographyHeadingVariantMap
-  variantKeys: Array<keyof TypographyHeadingVariant>
-  splitVariantProps<Props extends TypographyHeadingVariantProps>(props: Props): [TypographyHeadingVariantProps, Pretty<DistributiveOmit<Props, keyof TypographyHeadingVariantProps>>]
-  getVariantProps: (props?: TypographyHeadingVariantProps) => TypographyHeadingVariantProps
-}
+export type TypographyHeadingVariantMap = RecipeVariantMap<TypographyHeadingVariant>
 
+export type TypographyHeadingRecipe = RecipeRuntimeFn<TypographyHeadingVariantProps, TypographyHeadingVariantMap>
 
-export declare const typographyHeading: TypographyHeadingRecipe
+export declare const typographyHeading: TypographyHeadingRecipe;

@@ -1,20 +1,19 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
 export interface LinkOverlayProperties {
-   
+  className?: string
 }
 
-interface LinkOverlayStyles extends LinkOverlayProperties, DistributiveOmit<SystemStyleObject, keyof LinkOverlayProperties > {}
+type LinkOverlayRestStyles = Omit<SystemStyleObject, keyof LinkOverlayProperties>
+
+interface LinkOverlayStyles extends LinkOverlayProperties, LinkOverlayRestStyles {}
 
 interface LinkOverlayPatternFn {
   (styles?: LinkOverlayStyles): string
   raw: (styles?: LinkOverlayStyles) => SystemStyleObject
 }
 
+export declare function linkOverlayRaw(styles?: LinkOverlayStyles): SystemStyleObject;
 
 export declare const linkOverlay: LinkOverlayPatternFn;

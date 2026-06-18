@@ -1,31 +1,16 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface PopoverVariant {
-  
-}
-
-type PopoverVariantMap = {
-  [key in keyof PopoverVariant]: Array<PopoverVariant[key]>
-}
-
-type PopoverSlot = "arrow" | "arrowTip" | "anchor" | "trigger" | "indicator" | "positioner" | "content" | "title" | "description" | "closeTrigger"
+export type PopoverVariant = {}
 
 export type PopoverVariantProps = {
-  [key in keyof PopoverVariant]?: ConditionalValue<PopoverVariant[key]> | undefined
+  [K in keyof PopoverVariant]?: ConditionalValue<PopoverVariant[K]>
 }
 
-export interface PopoverRecipe {
-  __slot: PopoverSlot
-  __type: PopoverVariantProps
-  (props?: PopoverVariantProps): Pretty<Record<PopoverSlot, string>>
-  raw: (props?: PopoverVariantProps) => PopoverVariantProps
-  variantMap: PopoverVariantMap
-  variantKeys: Array<keyof PopoverVariant>
-  splitVariantProps<Props extends PopoverVariantProps>(props: Props): [PopoverVariantProps, Pretty<DistributiveOmit<Props, keyof PopoverVariantProps>>]
-  getVariantProps: (props?: PopoverVariantProps) => PopoverVariantProps
-}
+export type PopoverVariantMap = RecipeVariantMap<PopoverVariant>
 
+export type PopoverSlot = "arrow" | "arrowTip" | "anchor" | "trigger" | "indicator" | "positioner" | "content" | "title" | "description" | "closeTrigger"
 
-export declare const popover: PopoverRecipe
+export type PopoverRecipe = SlotRecipeRuntimeFn<PopoverSlot, PopoverVariantProps, PopoverVariantMap>
+
+export declare const popover: PopoverRecipe;

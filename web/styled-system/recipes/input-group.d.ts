@@ -1,34 +1,18 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface InputGroupVariant {
-  /**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg" | "xl"
+export type InputGroupVariant = {
+  size?: "lg" | "md" | "sm" | "xl" | "xs"
 }
-
-type InputGroupVariantMap = {
-  [key in keyof InputGroupVariant]: Array<InputGroupVariant[key]>
-}
-
-type InputGroupSlot = "root" | "element"
 
 export type InputGroupVariantProps = {
-  [key in keyof InputGroupVariant]?: ConditionalValue<InputGroupVariant[key]> | undefined
+  [K in keyof InputGroupVariant]?: ConditionalValue<InputGroupVariant[K]>
 }
 
-export interface InputGroupRecipe {
-  __slot: InputGroupSlot
-  __type: InputGroupVariantProps
-  (props?: InputGroupVariantProps): Pretty<Record<InputGroupSlot, string>>
-  raw: (props?: InputGroupVariantProps) => InputGroupVariantProps
-  variantMap: InputGroupVariantMap
-  variantKeys: Array<keyof InputGroupVariant>
-  splitVariantProps<Props extends InputGroupVariantProps>(props: Props): [InputGroupVariantProps, Pretty<DistributiveOmit<Props, keyof InputGroupVariantProps>>]
-  getVariantProps: (props?: InputGroupVariantProps) => InputGroupVariantProps
-}
+export type InputGroupVariantMap = RecipeVariantMap<InputGroupVariant>
 
+export type InputGroupSlot = "root" | "element"
 
-export declare const inputGroup: InputGroupRecipe
+export type InputGroupRecipe = SlotRecipeRuntimeFn<InputGroupSlot, InputGroupVariantProps, InputGroupVariantMap>
+
+export declare const inputGroup: InputGroupRecipe;

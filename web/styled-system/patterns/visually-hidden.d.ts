@@ -1,20 +1,19 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemStyleObject } from '../types/system';
 
 export interface VisuallyHiddenProperties {
-   
+  className?: string
 }
 
-interface VisuallyHiddenStyles extends VisuallyHiddenProperties, DistributiveOmit<SystemStyleObject, keyof VisuallyHiddenProperties > {}
+type VisuallyHiddenRestStyles = Omit<SystemStyleObject, keyof VisuallyHiddenProperties>
+
+interface VisuallyHiddenStyles extends VisuallyHiddenProperties, VisuallyHiddenRestStyles {}
 
 interface VisuallyHiddenPatternFn {
   (styles?: VisuallyHiddenStyles): string
   raw: (styles?: VisuallyHiddenStyles) => SystemStyleObject
 }
 
+export declare function visuallyHiddenRaw(styles?: VisuallyHiddenStyles): SystemStyleObject;
 
 export declare const visuallyHidden: VisuallyHiddenPatternFn;

@@ -1,38 +1,17 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { RecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface InputVariant {
-  /**
- * @default "md"
- */
-size: "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
-/**
- * @default "outline"
- */
-variant: "outline" | "ghost"
+export type InputVariant = {
+  size?: "2xl" | "2xs" | "lg" | "md" | "sm" | "xl" | "xs"
+  variant?: "ghost" | "outline"
 }
-
-type InputVariantMap = {
-  [key in keyof InputVariant]: Array<InputVariant[key]>
-}
-
-
 
 export type InputVariantProps = {
-  [key in keyof InputVariant]?: ConditionalValue<InputVariant[key]> | undefined
+  [K in keyof InputVariant]?: ConditionalValue<InputVariant[K]>
 }
 
-export interface InputRecipe {
-  
-  __type: InputVariantProps
-  (props?: InputVariantProps): string
-  raw: (props?: InputVariantProps) => InputVariantProps
-  variantMap: InputVariantMap
-  variantKeys: Array<keyof InputVariant>
-  splitVariantProps<Props extends InputVariantProps>(props: Props): [InputVariantProps, Pretty<DistributiveOmit<Props, keyof InputVariantProps>>]
-  getVariantProps: (props?: InputVariantProps) => InputVariantProps
-}
+export type InputVariantMap = RecipeVariantMap<InputVariant>
 
+export type InputRecipe = RecipeRuntimeFn<InputVariantProps, InputVariantMap>
 
-export declare const input: InputRecipe
+export declare const input: InputRecipe;

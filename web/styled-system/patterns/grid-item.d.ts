@@ -1,25 +1,25 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { ConditionalValue, SystemStyleObject } from '../types/system';
 
 export interface GridItemProperties {
-   colSpan?: ConditionalValue<number>
-	rowSpan?: ConditionalValue<number>
-	colStart?: ConditionalValue<number>
-	rowStart?: ConditionalValue<number>
-	colEnd?: ConditionalValue<number>
-	rowEnd?: ConditionalValue<number>
+  colEnd?: ConditionalValue<number>
+  colSpan?: ConditionalValue<number>
+  colStart?: ConditionalValue<number>
+  rowEnd?: ConditionalValue<number>
+  rowSpan?: ConditionalValue<number>
+  rowStart?: ConditionalValue<number>
+  className?: string
 }
 
-interface GridItemStyles extends GridItemProperties, DistributiveOmit<SystemStyleObject, keyof GridItemProperties > {}
+type GridItemRestStyles = Omit<SystemStyleObject, keyof GridItemProperties>
+
+interface GridItemStyles extends GridItemProperties, GridItemRestStyles {}
 
 interface GridItemPatternFn {
   (styles?: GridItemStyles): string
   raw: (styles?: GridItemStyles) => SystemStyleObject
 }
 
+export declare function gridItemRaw(styles?: GridItemStyles): SystemStyleObject;
 
 export declare const gridItem: GridItemPatternFn;

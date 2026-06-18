@@ -1,38 +1,19 @@
-/* eslint-disable */
-import type { ConditionalValue } from '../types/index';
-import type { DistributiveOmit, Pretty } from '../types/system-types';
+import type { ConditionalValue } from '../types/system';
+import type { SlotRecipeRuntimeFn, RecipeVariantMap } from '../types/recipe';
 
-interface ToggleGroupVariant {
-  /**
- * @default "outline"
- */
-variant: "outline" | "ghost"
-/**
- * @default "md"
- */
-size: "xs" | "sm" | "md" | "lg"
+export type ToggleGroupVariant = {
+  size?: "lg" | "md" | "sm" | "xs"
+  variant?: "ghost" | "outline"
 }
-
-type ToggleGroupVariantMap = {
-  [key in keyof ToggleGroupVariant]: Array<ToggleGroupVariant[key]>
-}
-
-type ToggleGroupSlot = "root" | "item"
 
 export type ToggleGroupVariantProps = {
-  [key in keyof ToggleGroupVariant]?: ToggleGroupVariant[key] | undefined
+  [K in keyof ToggleGroupVariant]?: ToggleGroupVariant[K]
 }
 
-export interface ToggleGroupRecipe {
-  __slot: ToggleGroupSlot
-  __type: ToggleGroupVariantProps
-  (props?: ToggleGroupVariantProps): Pretty<Record<ToggleGroupSlot, string>>
-  raw: (props?: ToggleGroupVariantProps) => ToggleGroupVariantProps
-  variantMap: ToggleGroupVariantMap
-  variantKeys: Array<keyof ToggleGroupVariant>
-  splitVariantProps<Props extends ToggleGroupVariantProps>(props: Props): [ToggleGroupVariantProps, Pretty<DistributiveOmit<Props, keyof ToggleGroupVariantProps>>]
-  getVariantProps: (props?: ToggleGroupVariantProps) => ToggleGroupVariantProps
-}
+export type ToggleGroupVariantMap = RecipeVariantMap<ToggleGroupVariant>
 
+export type ToggleGroupSlot = "root" | "item"
 
-export declare const toggleGroup: ToggleGroupRecipe
+export type ToggleGroupRecipe = SlotRecipeRuntimeFn<ToggleGroupSlot, ToggleGroupVariantProps, ToggleGroupVariantMap>
+
+export declare const toggleGroup: ToggleGroupRecipe;

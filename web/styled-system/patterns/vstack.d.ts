@@ -1,21 +1,21 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { SystemProperties, SystemStyleObject } from '../types/system';
 
 export interface VstackProperties {
-   justify?: SystemProperties["justifyContent"]
-	gap?: SystemProperties["gap"]
+  gap?: SystemProperties["gap"]
+  justify?: SystemProperties["justifyContent"]
+  className?: string
 }
 
-interface VstackStyles extends VstackProperties, DistributiveOmit<SystemStyleObject, keyof VstackProperties > {}
+type VstackRestStyles = Omit<SystemStyleObject, keyof VstackProperties>
+
+interface VstackStyles extends VstackProperties, VstackRestStyles {}
 
 interface VstackPatternFn {
   (styles?: VstackStyles): string
   raw: (styles?: VstackStyles) => SystemStyleObject
 }
 
+export declare function vstackRaw(styles?: VstackStyles): SystemStyleObject;
 
 export declare const vstack: VstackPatternFn;

@@ -1,20 +1,20 @@
-/* eslint-disable */
-import type { SystemStyleObject, ConditionalValue } from '../types/index';
-import type { Properties } from '../types/csstype';
-import type { SystemProperties } from '../types/style-props';
-import type { DistributiveOmit } from '../types/system-types';
-import type { Tokens } from '../tokens/index';
+import type { PatternRuntimeConfig } from '../types/pattern';
+import type { ConditionalValue, SystemStyleObject } from '../types/system';
 
 export interface CenterProperties {
-   inline?: ConditionalValue<boolean>
+  inline?: ConditionalValue<boolean>
+  className?: string
 }
 
-interface CenterStyles extends CenterProperties, DistributiveOmit<SystemStyleObject, keyof CenterProperties > {}
+type CenterRestStyles = Omit<SystemStyleObject, keyof CenterProperties>
+
+interface CenterStyles extends CenterProperties, CenterRestStyles {}
 
 interface CenterPatternFn {
   (styles?: CenterStyles): string
   raw: (styles?: CenterStyles) => SystemStyleObject
 }
 
+export declare function centerRaw(styles?: CenterStyles): SystemStyleObject;
 
 export declare const center: CenterPatternFn;
