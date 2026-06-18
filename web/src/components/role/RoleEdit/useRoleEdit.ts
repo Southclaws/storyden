@@ -77,6 +77,7 @@ export function useRoleEditScreen({ role, onSave }: Props) {
     await handle(
       async () => {
         await roleDelete(role.id);
+        onSave?.();
       },
       {
         promiseToast: {
@@ -94,6 +95,7 @@ export function useRoleEditScreen({ role, onSave }: Props) {
     await handle(
       async () => {
         await roleDelete(role.id);
+        onSave?.();
       },
       {
         promiseToast: {
