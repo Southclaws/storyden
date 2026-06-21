@@ -1,0 +1,5 @@
+steps:
+  - match:
+      any: true
+    respond:
+      error: "simulated LLM provider failure"

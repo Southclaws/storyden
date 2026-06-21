@@ -1,0 +1,74 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibrarySearchPages
+x-storyden-tool:
+  title: Search Library Pages
+  role: READ_PUBLISHED_LIBRARY
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: library_search_pages
+description: "Search for pages in the library wiki by relevance."
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibrarySearchPagesInput"
+  output:
+    $ref: "#/definitions/ToolLibrarySearchPagesOutput"
+definitions:
+  ToolLibrarySearchPagesInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: "Plain text keyword search string. Boolean operators like OR, AND, and NOT, quoted phrases, and other special query syntax are not supported. Use simple words separated by spaces, for example: robot agent automation."
+    additionalProperties: false
+  ToolLibrarySearchPagesOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of matching library pages
+        items:
+          $ref: "#/definitions/LibraryPageSearchItem"
+    additionalProperties: false
+  LibraryPageSearchItem:
+    type: object
+    required:
+      - id
+      - slug
+      - name
+      - browser_url
+    properties:
+      browser_url:
+        type: string
+        description: Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
+      id:
+        type: string
+        description: Unique identifier
+      slug:
+        type: string
+        description: URL-friendly identifier
+      name:
+        type: string
+        description: Page name/title
+      description:
+        type: string
+        description: Brief description
+      content:
+        type: string
+        description: Page content excerpt
+    additionalProperties: false

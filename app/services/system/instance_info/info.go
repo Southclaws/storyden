@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/url"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -84,6 +85,12 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		caps = append(caps, CapabilityOAuth)
 	}
 
+	if services, ok := settings.Services.Get(); ok {
+		if robots, ok := services.Robots.Get(); ok && robotsAvailable(robots) {
+			caps = append(caps, CapabilityRobots)
+		}
+	}
+
 	if p.config.PluginRuntimeProvider != plugin_runner.RuntimeProviderNone.String() {
 		caps = append(caps, CapabilityPlugins)
 	}
@@ -95,6 +102,26 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		WebAddress:       p.config.PublicWebAddress,
 		APIAddress:       p.config.PublicAPIAddress,
 	}, nil
+}
+
+func robotsAvailable(robots settings.RobotServiceSettings) bool {
+	defaultModel, ok := robots.DefaultModel.Get()
+	if !ok || defaultModel == "" {
+		return false
+	}
+
+	providers, ok := robots.Providers.Get()
+	if !ok {
+		return false
+	}
+
+	providerName, _, ok := strings.Cut(defaultModel, "/")
+	if !ok || providerName == "" {
+		return false
+	}
+
+	provider, ok := providers[providerName]
+	return ok && provider.Enabled.Or(false)
 }
 
 func (p Provider) selfHeal(ctx context.Context, set *settings.Settings) (*settings.Settings, error) {

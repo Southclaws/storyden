@@ -63,6 +63,7 @@ type ServiceSettings struct {
 	ClientIP   opt.Optional[ClientIPServiceSettings]
 	RateLimit  opt.Optional[RateLimitServiceSettings]
 	Moderation opt.Optional[ModerationServiceSettings]
+	Robots     opt.Optional[RobotServiceSettings]
 }
 
 type ClientIPServiceSettings struct {
@@ -87,6 +88,17 @@ type ModerationServiceSettings struct {
 	WordReportList      opt.Optional[[]string]
 }
 
+type RobotServiceSettings struct {
+	Enabled      opt.Optional[bool]
+	DefaultModel opt.Optional[string]
+	Providers    opt.Optional[map[string]RobotProviderSettings]
+}
+
+type RobotProviderSettings struct {
+	Enabled opt.Optional[bool]
+	APIKey  opt.Optional[string]
+}
+
 // Merge will combine "updated" into "s" while overwriting any new values.
 func (s *Settings) Merge(updated Settings) error {
 	if updated.Motd.Ok() {
@@ -102,7 +114,7 @@ func (s *Settings) Merge(updated Settings) error {
 		}
 	}
 
-	err := mergo.Merge(s, &updated, mergo.WithOverride)
+	err := mergo.Merge(s, &updated, mergo.WithOverride, mergo.WithTransformers(settingsMergeTransformer{}))
 	if err != nil {
 		return err
 	}

@@ -7,7 +7,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ALMOST NEVER write comments. We're senior engineers here, not learners.
 - NEVER run the backend or frontend manually. The human is already doing this.
 - ALWAYS test backend changes by writing either unit tests or end-to-end tests.
-- ALWAYS test frontend changes by running Playwright MCP against localhost:3000.
 
 ## Project Overview
 
@@ -57,9 +56,11 @@ Storyden follows a strict zero service dependencies production-ready deployment 
 
 ```bash
 pnpm dev
-go run
+go run ./cmd/backend
 task release
 ```
+
+Exception: the isolated Playwright harness tasks are allowed (`task test:e2e`, `task test:e2e:fresh`, `task test:e2e:ci`). Those tasks may run `go run ./cmd/e2etest` and `pnpm start` internally because they create and tear down their own test-only backend/frontend pair.
 
 ### Full-stack
 
@@ -129,12 +130,19 @@ pnpm lint
 - Run specific test: `go test -run TestName ./path/to/package`
 - Run tests with verbose output: `go test -v ./...`
 
-### Test Data
+#### Test Data
 
 - Tests use temporary SQLite databases for isolation
 - Test database files created in `tests/*/data/` directories
 - Each test gets a unique timestamped database
 - You can inspect per-test databases after a test run with `sqlite3 ./path/to/data.db`
+
+### Frontend Tests
+
+- Edit .spec.ts files in `./web/tests`
+- Run full Playwright test suite: `task test:e2e:ci`
+- Run a specific Playwright test: `task test:e2e:ci -- mytest.spec.ts`
+- Always build shared helpers over duplicate copy-paste
 
 ## Code Generation
 

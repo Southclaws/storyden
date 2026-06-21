@@ -18,6 +18,9 @@ export const select = defineSlotRecipe({
       boxShadow: "lg",
       display: "flex",
       flexDirection: "column",
+      maxHeight: "[min(24rem,calc(100vh-2rem))]",
+      maxWidth: "[calc(100vw-2rem)]",
+      overflowY: "auto",
       zIndex: "dropdown",
       _hidden: {
         display: "none",

@@ -55,6 +55,10 @@ configuration_schema:
       id: "webhook_url"
       label: "Webhook URL"
       type: "string"
+capabilities:
+  - id: "openrouter"
+    type: "robot.llm_provider"
+    version: "v1"
 ```
 
 ## Top-level fields
@@ -146,6 +150,14 @@ Optional API access configuration for this plugin. When provided, the host can p
 - Example: `object`
 
 No description provided in schema.
+
+### capabilities
+
+- Type: `array<object>`
+- Required: No
+- Example: `array[1]`
+
+Platform capabilities this plugin provides. Capabilities extend Storyden with host-defined integration points such as Robot model providers, authentication providers, or Robot tools.
 
 ## Nested objects
 

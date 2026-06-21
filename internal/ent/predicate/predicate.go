@@ -87,6 +87,12 @@ type OAuthDeviceAuthorisation func(*sql.Selector)
 // OAuthRefreshToken is the predicate function for oauthrefreshtoken builders.
 type OAuthRefreshToken func(*sql.Selector)
 
+// OAuthRemoteAuthorisationFlow is the predicate function for oauthremoteauthorisationflow builders.
+type OAuthRemoteAuthorisationFlow func(*sql.Selector)
+
+// OAuthRemoteConnection is the predicate function for oauthremoteconnection builders.
+type OAuthRemoteConnection func(*sql.Selector)
+
 // Plugin is the predicate function for plugin builders.
 type Plugin func(*sql.Selector)
 
@@ -113,6 +119,30 @@ type React func(*sql.Selector)
 
 // Report is the predicate function for report builders.
 type Report func(*sql.Selector)
+
+// Robot is the predicate function for robot builders.
+type Robot func(*sql.Selector)
+
+// RobotMCPServer is the predicate function for robotmcpserver builders.
+type RobotMCPServer func(*sql.Selector)
+
+// RobotMCPTool is the predicate function for robotmcptool builders.
+type RobotMCPTool func(*sql.Selector)
+
+// RobotProviderModel is the predicate function for robotprovidermodel builders.
+type RobotProviderModel func(*sql.Selector)
+
+// RobotSession is the predicate function for robotsession builders.
+type RobotSession func(*sql.Selector)
+
+// RobotSessionMessage is the predicate function for robotsessionmessage builders.
+type RobotSessionMessage func(*sql.Selector)
+
+// RobotWorkspace is the predicate function for robotworkspace builders.
+type RobotWorkspace func(*sql.Selector)
+
+// RobotWorkspaceInstance is the predicate function for robotworkspaceinstance builders.
+type RobotWorkspaceInstance func(*sql.Selector)
 
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)

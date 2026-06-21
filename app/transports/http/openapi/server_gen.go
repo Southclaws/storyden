@@ -102,6 +102,15 @@ const (
 	DatagraphItemKindThread     DatagraphItemKind = "thread"
 )
 
+// Defines values for DatagraphItemRefKind.
+const (
+	DatagraphItemRefKindCollection DatagraphItemRefKind = "collection"
+	DatagraphItemRefKindLink       DatagraphItemRefKind = "link"
+	DatagraphItemRefKindNode       DatagraphItemRefKind = "node"
+	DatagraphItemRefKindProfile    DatagraphItemRefKind = "profile"
+	DatagraphItemRefKindThread     DatagraphItemRefKind = "thread"
+)
+
 // Defines values for EmailQueueAttemptStatus.
 const (
 	EmailQueueAttemptStatusFailed EmailQueueAttemptStatus = "failed"
@@ -143,12 +152,18 @@ const (
 	Requested EventParticipationStatus = "requested"
 )
 
+// Defines values for FileUIPartType.
+const (
+	FileUIPartTypeFile FileUIPartType = "file"
+)
+
 // Defines values for InstanceCapability.
 const (
 	EmailClient InstanceCapability = "email_client"
 	GenAi       InstanceCapability = "gen_ai"
 	Oauth       InstanceCapability = "oauth"
 	Plugins     InstanceCapability = "plugins"
+	Robots      InstanceCapability = "robots"
 	Semdex      InstanceCapability = "semdex"
 	SmsClient   InstanceCapability = "sms_client"
 )
@@ -236,6 +251,20 @@ const (
 	OAuthDeviceDecisionDeny    OAuthDeviceDecision = "deny"
 )
 
+// Defines values for OAuthRemoteMode.
+const (
+	Cimd   OAuthRemoteMode = "cimd"
+	Dcr    OAuthRemoteMode = "dcr"
+	Manual OAuthRemoteMode = "manual"
+)
+
+// Defines values for OAuthRemoteStatus.
+const (
+	OAuthRemoteStatusConnected OAuthRemoteStatus = "connected"
+	OAuthRemoteStatusError     OAuthRemoteStatus = "error"
+	OAuthRemoteStatusPending   OAuthRemoteStatus = "pending"
+)
+
 // Defines values for OnboardingStatus.
 const (
 	Complete             OnboardingStatus = "complete"
@@ -263,6 +292,7 @@ const (
 	MANAGEMODERATIONNOTES    Permission = "MANAGE_MODERATION_NOTES"
 	MANAGEPOSTS              Permission = "MANAGE_POSTS"
 	MANAGEREPORTS            Permission = "MANAGE_REPORTS"
+	MANAGEROBOTS             Permission = "MANAGE_ROBOTS"
 	MANAGEROLES              Permission = "MANAGE_ROLES"
 	MANAGESETTINGS           Permission = "MANAGE_SETTINGS"
 	MANAGESUSPENSIONS        Permission = "MANAGE_SUSPENSIONS"
@@ -276,6 +306,7 @@ const (
 	UPLOADASSET              Permission = "UPLOAD_ASSET"
 	USEOAUTHCLIENTS          Permission = "USE_OAUTH_CLIENTS"
 	USEPERSONALACCESSKEYS    Permission = "USE_PERSONAL_ACCESS_KEYS"
+	USEROBOTS                Permission = "USE_ROBOTS"
 	VIEWACCOUNTS             Permission = "VIEW_ACCOUNTS"
 	VIEWMODERATIONNOTES      Permission = "VIEW_MODERATION_NOTES"
 )
@@ -313,7 +344,7 @@ const (
 
 // Defines values for PluginStatusActiveActiveState.
 const (
-	PluginStatusActiveActiveStateActive PluginStatusActiveActiveState = "active"
+	Active PluginStatusActiveActiveState = "active"
 )
 
 // Defines values for PluginStatusConnectingActiveState.
@@ -377,6 +408,17 @@ const (
 	PublicKey PublicKeyCredentialType = "public-key"
 )
 
+// Defines values for ReasoningUIPartState.
+const (
+	ReasoningUIPartStateDone      ReasoningUIPartState = "done"
+	ReasoningUIPartStateStreaming ReasoningUIPartState = "streaming"
+)
+
+// Defines values for ReasoningUIPartType.
+const (
+	Reasoning ReasoningUIPartType = "reasoning"
+)
+
 // Defines values for RegistrationMode.
 const (
 	RegistrationModeDisabled   RegistrationMode = "disabled"
@@ -396,6 +438,91 @@ const (
 	ResidentKeyRequirementDiscouraged ResidentKeyRequirement = "discouraged"
 	ResidentKeyRequirementPreferred   ResidentKeyRequirement = "preferred"
 	ResidentKeyRequirementRequired    ResidentKeyRequirement = "required"
+)
+
+// Defines values for RobotSessionMessageRole.
+const (
+	RobotSessionMessageRoleAssistant RobotSessionMessageRole = "assistant"
+	RobotSessionMessageRoleSystem    RobotSessionMessageRole = "system"
+	RobotSessionMessageRoleUser      RobotSessionMessageRole = "user"
+)
+
+// Defines values for RobotToolSource.
+const (
+	Mcp    RobotToolSource = "mcp"
+	Native RobotToolSource = "native"
+)
+
+// Defines values for TextUIPartState.
+const (
+	TextUIPartStateDone      TextUIPartState = "done"
+	TextUIPartStateStreaming TextUIPartState = "streaming"
+)
+
+// Defines values for TextUIPartType.
+const (
+	Text TextUIPartType = "text"
+)
+
+// Defines values for ToolUIPartBaseType.
+const (
+	ToolUIPartBaseTypeDynamicTool ToolUIPartBaseType = "dynamic-tool"
+)
+
+// Defines values for ToolUIPartInputAvailableState.
+const (
+	InputAvailable ToolUIPartInputAvailableState = "input-available"
+)
+
+// Defines values for ToolUIPartInputAvailableType.
+const (
+	ToolUIPartInputAvailableTypeDynamicTool ToolUIPartInputAvailableType = "dynamic-tool"
+)
+
+// Defines values for ToolUIPartInputStreamingState.
+const (
+	InputStreaming ToolUIPartInputStreamingState = "input-streaming"
+)
+
+// Defines values for ToolUIPartInputStreamingType.
+const (
+	ToolUIPartInputStreamingTypeDynamicTool ToolUIPartInputStreamingType = "dynamic-tool"
+)
+
+// Defines values for ToolUIPartOutputAvailableState.
+const (
+	OutputAvailable ToolUIPartOutputAvailableState = "output-available"
+)
+
+// Defines values for ToolUIPartOutputAvailableType.
+const (
+	ToolUIPartOutputAvailableTypeDynamicTool ToolUIPartOutputAvailableType = "dynamic-tool"
+)
+
+// Defines values for ToolUIPartOutputErrorState.
+const (
+	OutputError ToolUIPartOutputErrorState = "output-error"
+)
+
+// Defines values for ToolUIPartOutputErrorType.
+const (
+	DynamicTool ToolUIPartOutputErrorType = "dynamic-tool"
+)
+
+// Defines values for UIMessageRole.
+const (
+	UIMessageRoleAssistant UIMessageRole = "assistant"
+	UIMessageRoleSystem    UIMessageRole = "system"
+	UIMessageRoleUser      UIMessageRole = "user"
+)
+
+// Defines values for UIMessagePartType.
+const (
+	UIMessagePartTypeDataRenderCard UIMessagePartType = "data-render_card"
+	UIMessagePartTypeDynamicTool    UIMessagePartType = "dynamic-tool"
+	UIMessagePartTypeFile           UIMessagePartType = "file"
+	UIMessagePartTypeReasoning      UIMessagePartType = "reasoning"
+	UIMessagePartTypeText           UIMessagePartType = "text"
 )
 
 // Defines values for UserVerificationRequirement.
@@ -481,6 +608,12 @@ type APIError struct {
 
 	// Type A URI reference [RFC3986] that identifies the problem type. This specification encourages that, when dereferenced, it provide human-readable documentation for the problem type (e.g., using HTML [W3C.REC-html5-20141028]). When this member is not present, its value is assumed to be "about:blank".
 	Type *string `json:"type,omitempty"`
+}
+
+// AbortPart defines model for AbortPart.
+type AbortPart struct {
+	Reason string      `json:"reason"`
+	Type   interface{} `json:"type"`
 }
 
 // AccessKey defines model for AccessKey.
@@ -997,7 +1130,11 @@ type AdminSettingsServiceProps struct {
 	ClientIp     *ClientIPServiceSettings   `json:"client_ip,omitempty"`
 	Moderation   *ModerationServiceSettings `json:"moderation,omitempty"`
 	RateLimiting *RateLimitServiceSettings  `json:"rate_limiting,omitempty"`
+	Robots       *RobotServiceSettings      `json:"robots,omitempty"`
 }
+
+// ArbitraryData defines model for ArbitraryData.
+type ArbitraryData = interface{}
 
 // Asset defines model for Asset.
 type Asset struct {
@@ -1805,6 +1942,17 @@ type CredentialRequestOptions struct {
 	PublicKey PublicKeyCredentialRequestOptions `json:"publicKey"`
 }
 
+// DataPart defines model for DataPart.
+type DataPart struct {
+	Data ArbitraryData `json:"data"`
+
+	// Id Optional identifier for this data part.
+	Id *string `json:"id,omitempty"`
+
+	// Type Custom data part types, e.g. "data-weather".
+	Type string `json:"type"`
+}
+
 // DatagraphItem defines model for DatagraphItem.
 type DatagraphItem struct {
 	union json.RawMessage
@@ -1843,6 +1991,24 @@ type DatagraphItemProfile struct {
 	Kind DatagraphItemKind `json:"kind"`
 	Ref  PublicProfile     `json:"ref"`
 }
+
+// DatagraphItemRef defines model for DatagraphItemRef.
+type DatagraphItemRef struct {
+	// Id A unique identifier for this resource.
+	Id *Identifier `json:"id,omitempty"`
+
+	// Kind The type of datagraph item
+	Kind *DatagraphItemRefKind `json:"kind,omitempty"`
+
+	// Name Display name of the item
+	Name *string `json:"name,omitempty"`
+
+	// Slug Human-readable URL slug for the item
+	Slug *string `json:"slug,omitempty"`
+}
+
+// DatagraphItemRefKind The type of datagraph item
+type DatagraphItemRefKind string
 
 // DatagraphItemReply defines model for DatagraphItemReply.
 type DatagraphItemReply struct {
@@ -1937,6 +2103,12 @@ type EmailQueueListResult struct {
 
 // EmailQueueStatus defines model for EmailQueueStatus.
 type EmailQueueStatus string
+
+// ErrorPart defines model for ErrorPart.
+type ErrorPart struct {
+	ErrorText string      `json:"errorText"`
+	Type      interface{} `json:"type"`
+}
 
 // Event defines model for Event.
 type Event struct {
@@ -2198,8 +2370,47 @@ type EventTimeRange struct {
 	Start time.Time `json:"start"`
 }
 
+// FilePart defines model for FilePart.
+type FilePart struct {
+	// MediaType IANA media type (MIME type) such as image/png, application/pdf, text/plain.
+	MediaType MediaType   `json:"mediaType"`
+	Type      interface{} `json:"type"`
+
+	// Url A web address
+	Url URL `json:"url"`
+}
+
+// FileUIPart A file part of a message
+type FileUIPart struct {
+	// Filename Optional filename
+	Filename *string `json:"filename,omitempty"`
+
+	// MediaType IANA media type of the file
+	MediaType string         `json:"mediaType"`
+	Type      FileUIPartType `json:"type"`
+
+	// Url URL to the file (can be a data URL or hosted URL)
+	Url string `json:"url"`
+}
+
+// FileUIPartType defines model for FileUIPart.Type.
+type FileUIPartType string
+
+// FinishMessagePart defines model for FinishMessagePart.
+type FinishMessagePart struct {
+	Type interface{} `json:"type"`
+}
+
+// FinishStepPart defines model for FinishStepPart.
+type FinishStepPart struct {
+	Type interface{} `json:"type"`
+}
+
 // HasCollected A boolean indicating if the account in context has collected this item.
 type HasCollected = bool
+
+// Id defines model for Id.
+type Id = string
 
 // Identifier A unique identifier for this resource.
 type Identifier = string
@@ -2471,6 +2682,9 @@ type LinkTitle = string
 // type and are not stored in the database as-is, while IDs and slugs are.
 // The write path typically exposes slugs as writable and IDs as immutable.
 type Mark = string
+
+// MediaType IANA media type (MIME type) such as image/png, application/pdf, text/plain.
+type MediaType = string
 
 // MemberJoinedDate The time the resource was created.
 type MemberJoinedDate = time.Time
@@ -3083,6 +3297,9 @@ type NodeWithChildren struct {
 	Visibility Visibility `json:"visibility"`
 }
 
+// NonEmptyString defines model for NonEmptyString.
+type NonEmptyString = string
+
 // Notification defines model for Notification.
 type Notification struct {
 	// CreatedAt The time the resource was created.
@@ -3185,6 +3402,19 @@ type OAuthAuthoriseConsentSubmitProps struct {
 
 // OAuthAuthoriseDecision defines model for OAuthAuthoriseDecision.
 type OAuthAuthoriseDecision string
+
+// OAuthAuthorizationServerMetadata defines model for OAuthAuthorizationServerMetadata.
+type OAuthAuthorizationServerMetadata struct {
+	AuthorizationEndpoint             *string   `json:"authorization_endpoint,omitempty"`
+	ClientIdMetadataDocumentSupported *bool     `json:"client_id_metadata_document_supported,omitempty"`
+	CodeChallengeMethodsSupported     *[]string `json:"code_challenge_methods_supported,omitempty"`
+	GrantTypesSupported               *[]string `json:"grant_types_supported,omitempty"`
+	Issuer                            *string   `json:"issuer,omitempty"`
+	RegistrationEndpoint              *string   `json:"registration_endpoint,omitempty"`
+	ResponseTypesSupported            *[]string `json:"response_types_supported,omitempty"`
+	TokenEndpoint                     *string   `json:"token_endpoint,omitempty"`
+	TokenEndpointAuthMethodsSupported *[]string `json:"token_endpoint_auth_methods_supported,omitempty"`
+}
 
 // OAuthCallback defines model for OAuthCallback.
 type OAuthCallback struct {
@@ -3413,6 +3643,14 @@ type OAuthJWKS struct {
 	Keys []OAuthJWK `json:"keys"`
 }
 
+// OAuthProtectedResourceMetadata defines model for OAuthProtectedResourceMetadata.
+type OAuthProtectedResourceMetadata struct {
+	AuthorizationServers   []string  `json:"authorization_servers"`
+	BearerMethodsSupported *[]string `json:"bearer_methods_supported,omitempty"`
+	Resource               *string   `json:"resource,omitempty"`
+	ResourceName           *string   `json:"resource_name,omitempty"`
+}
+
 // OAuthRefreshToken defines model for OAuthRefreshToken.
 type OAuthRefreshToken struct {
 	// AccountId A unique identifier for this resource.
@@ -3444,6 +3682,99 @@ type OAuthRefreshTokenList = []OAuthRefreshToken
 type OAuthRefreshTokenListResult struct {
 	Tokens OAuthRefreshTokenList `json:"tokens"`
 }
+
+// OAuthRemoteAuthorizeResult defines model for OAuthRemoteAuthorizeResult.
+type OAuthRemoteAuthorizeResult struct {
+	AuthorizationUrl string                `json:"authorization_url"`
+	Connection       OAuthRemoteConnection `json:"connection"`
+}
+
+// OAuthRemoteCallbackResult defines model for OAuthRemoteCallbackResult.
+type OAuthRemoteCallbackResult struct {
+	Connection OAuthRemoteConnection `json:"connection"`
+}
+
+// OAuthRemoteConnection defines model for OAuthRemoteConnection.
+type OAuthRemoteConnection struct {
+	AuthorizationEndpoint *string `json:"authorization_endpoint,omitempty"`
+	AuthorizationServer   *string `json:"authorization_server,omitempty"`
+	ClientId              *string `json:"client_id,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt       CreatedAt `json:"createdAt"`
+	HasAccessToken  bool      `json:"has_access_token"`
+	HasClientSecret bool      `json:"has_client_secret"`
+	HasRefreshToken bool      `json:"has_refresh_token"`
+
+	// Id A unique identifier for this resource.
+	Id                      Identifier        `json:"id"`
+	LastError               *string           `json:"last_error,omitempty"`
+	Mode                    OAuthRemoteMode   `json:"mode"`
+	RedirectUri             *string           `json:"redirect_uri,omitempty"`
+	RedirectUris            *[]string         `json:"redirect_uris,omitempty"`
+	RegistrationEndpoint    *string           `json:"registration_endpoint,omitempty"`
+	Resource                *string           `json:"resource,omitempty"`
+	ResourceName            *string           `json:"resource_name,omitempty"`
+	ResourceUrl             string            `json:"resource_url"`
+	Scope                   *string           `json:"scope,omitempty"`
+	Status                  OAuthRemoteStatus `json:"status"`
+	TokenEndpoint           *string           `json:"token_endpoint,omitempty"`
+	TokenEndpointAuthMethod *string           `json:"token_endpoint_auth_method,omitempty"`
+	TokenExpiry             *time.Time        `json:"token_expiry,omitempty"`
+	TokenType               *string           `json:"token_type,omitempty"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt UpdatedAt `json:"updatedAt"`
+}
+
+// OAuthRemoteConnectionCreateProps defines model for OAuthRemoteConnectionCreateProps.
+type OAuthRemoteConnectionCreateProps struct {
+	Manual      *OAuthRemoteManualConfig `json:"manual,omitempty"`
+	Mode        *OAuthRemoteMode         `json:"mode,omitempty"`
+	ResourceUrl string                   `json:"resource_url"`
+	Scope       *string                  `json:"scope,omitempty"`
+}
+
+// OAuthRemoteConnectionList defines model for OAuthRemoteConnectionList.
+type OAuthRemoteConnectionList = []OAuthRemoteConnection
+
+// OAuthRemoteConnectionListResult defines model for OAuthRemoteConnectionListResult.
+type OAuthRemoteConnectionListResult struct {
+	Connections OAuthRemoteConnectionList `json:"connections"`
+}
+
+// OAuthRemoteDiscoverProps defines model for OAuthRemoteDiscoverProps.
+type OAuthRemoteDiscoverProps struct {
+	ResourceUrl string `json:"resource_url"`
+}
+
+// OAuthRemoteDiscoveryResult defines model for OAuthRemoteDiscoveryResult.
+type OAuthRemoteDiscoveryResult struct {
+	AuthorizationServer         string                           `json:"authorization_server"`
+	AuthorizationServerMetadata OAuthAuthorizationServerMetadata `json:"authorization_server_metadata"`
+	ClientId                    string                           `json:"client_id"`
+	Mode                        OAuthRemoteMode                  `json:"mode"`
+	ProtectedResourceMetadata   OAuthProtectedResourceMetadata   `json:"protected_resource_metadata"`
+	RedirectUri                 string                           `json:"redirect_uri"`
+	ResourceUrl                 string                           `json:"resource_url"`
+}
+
+// OAuthRemoteManualConfig defines model for OAuthRemoteManualConfig.
+type OAuthRemoteManualConfig struct {
+	AuthorizationEndpoint *string `json:"authorization_endpoint,omitempty"`
+	AuthorizationServer   *string `json:"authorization_server,omitempty"`
+	ClientId              *string `json:"client_id,omitempty"`
+	ClientSecret          *string `json:"client_secret,omitempty"`
+	RedirectUri           *string `json:"redirect_uri,omitempty"`
+	Scope                 *string `json:"scope,omitempty"`
+	TokenEndpoint         *string `json:"token_endpoint,omitempty"`
+}
+
+// OAuthRemoteMode defines model for OAuthRemoteMode.
+type OAuthRemoteMode string
+
+// OAuthRemoteStatus defines model for OAuthRemoteStatus.
+type OAuthRemoteStatus string
 
 // OAuthToken defines model for OAuthToken.
 type OAuthToken struct {
@@ -3536,6 +3867,16 @@ type PaginatedResult struct {
 	PageSize    int  `json:"page_size"`
 	Results     int  `json:"results"`
 	TotalPages  int  `json:"total_pages"`
+}
+
+// PaginatedRobotMessageList defines model for PaginatedRobotMessageList.
+type PaginatedRobotMessageList struct {
+	Messages RobotSessionMessageList `json:"messages"`
+
+	// NextBefore A unique identifier for this resource.
+	NextBefore *Identifier `json:"next_before,omitempty"`
+	PageSize   int         `json:"page_size"`
+	Results    int         `json:"results"`
 }
 
 // Permission defines model for Permission.
@@ -4508,6 +4849,41 @@ type ReadStatus struct {
 	RepliesSince int `json:"replies_since"`
 }
 
+// ReasoningDeltaPart defines model for ReasoningDeltaPart.
+type ReasoningDeltaPart struct {
+	Delta string      `json:"delta"`
+	Id    Id          `json:"id"`
+	Type  interface{} `json:"type"`
+}
+
+// ReasoningEndPart defines model for ReasoningEndPart.
+type ReasoningEndPart struct {
+	Id   Id          `json:"id"`
+	Type interface{} `json:"type"`
+}
+
+// ReasoningStartPart defines model for ReasoningStartPart.
+type ReasoningStartPart struct {
+	Id   Id          `json:"id"`
+	Type interface{} `json:"type"`
+}
+
+// ReasoningUIPart A reasoning part of a message (extended thinking/reasoning)
+type ReasoningUIPart struct {
+	// State The state of the reasoning part
+	State *ReasoningUIPartState `json:"state,omitempty"`
+
+	// Text The reasoning text
+	Text string              `json:"text"`
+	Type ReasoningUIPartType `json:"type"`
+}
+
+// ReasoningUIPartState The state of the reasoning part
+type ReasoningUIPartState string
+
+// ReasoningUIPartType defines model for ReasoningUIPart.Type.
+type ReasoningUIPartType string
+
 // RegistrationMode The mode of registration for the instance, which determines how new
 // accounts can be created. This is a global setting that affects the whole
 // instance and is used to control whether new users can register on their
@@ -4735,6 +5111,737 @@ type ReportStatus string
 // ResidentKeyRequirement https://www.w3.org/TR/webauthn-2/#enumdef-residentkeyrequirement
 type ResidentKeyRequirement string
 
+// Robot defines model for Robot.
+type Robot struct {
+	// Author A minimal reference to an account.
+	Author ProfileReference `json:"author"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Description Human-readable description of the robot's purpose
+	Description string `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+
+	// Model Fully-qualified Robot model reference in provider/model format.
+	Model RobotModelRef `json:"model"`
+
+	// Name The name of the robot
+	Name string `json:"name"`
+
+	// Playbook The directive/system prompt that defines the robot's behavior
+	Playbook string `json:"playbook"`
+
+	// Tools A list of tool names that the robot can use.
+	Tools RobotToolNameList `json:"tools"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// WorkspaceId Optional default workspace template for this robot.
+	WorkspaceId nullable.Nullable[NullableIdentifier] `json:"workspace_id,omitempty"`
+}
+
+// RobotChatContext defines model for RobotChatContext.
+type RobotChatContext struct {
+	DatagraphItem *DatagraphItemRef `json:"datagraph_item,omitempty"`
+
+	// PageType Human-readable page type if not viewing a specific datagraph item
+	PageType *string `json:"page_type,omitempty"`
+}
+
+// RobotChatRequest defines model for RobotChatRequest.
+type RobotChatRequest struct {
+	Context *RobotChatContext `json:"context,omitempty"`
+
+	// Data Additional data for the chat request
+	Data *map[string]interface{} `json:"data,omitempty"`
+
+	// Id Unique identifier for this chat request
+	Id string `json:"id"`
+
+	// Messages Array of chat messages in the conversation
+	Messages []UIMessage `json:"messages"`
+
+	// RobotId Specific robot ID to use for this message
+	RobotId *string `json:"robotId,omitempty"`
+
+	// SessionId Session ID to continue an existing conversation
+	SessionId *string `json:"sessionId,omitempty"`
+
+	// ThreadId Optional thread ID if this chat is part of a thread context
+	ThreadId *string `json:"threadId,omitempty"`
+
+	// Workspace Workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
+	Workspace *RobotWorkspaceMountRequest `json:"workspace,omitempty"`
+}
+
+// RobotInitialProps defines model for RobotInitialProps.
+type RobotInitialProps struct {
+	// Description Human-readable description of the robot's purpose
+	Description string `json:"description"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Model Fully-qualified Robot model reference in provider/model format.
+	Model *RobotModelRef `json:"model,omitempty"`
+
+	// Name The name of the robot
+	Name string `json:"name"`
+
+	// Playbook The directive/system prompt that defines the robot's behavior
+	Playbook string `json:"playbook"`
+
+	// Tools A list of tool names that the robot can use.
+	Tools *RobotToolNameList `json:"tools,omitempty"`
+
+	// WorkspaceId A unique identifier for this resource.
+	WorkspaceId *Identifier `json:"workspace_id,omitempty"`
+}
+
+// RobotList defines model for RobotList.
+type RobotList = []Robot
+
+// RobotMCPServer defines model for RobotMCPServer.
+type RobotMCPServer struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt   *time.Time `json:"deletedAt,omitempty"`
+	Description string     `json:"description"`
+	Enabled     bool       `json:"enabled"`
+	EndpointUrl string     `json:"endpoint_url"`
+
+	// HasBearerToken Whether this server has a stored Bearer token. The token value
+	// is never returned.
+	HasBearerToken bool `json:"has_bearer_token"`
+
+	// HasOauthToken Whether this server is linked to a remote OAuth connection with
+	// a stored access token.
+	HasOauthToken bool `json:"has_oauth_token"`
+
+	// Id A unique identifier for this resource.
+	Id              Identifier `json:"id"`
+	LastError       *string    `json:"last_error,omitempty"`
+	LastRefreshedAt *time.Time `json:"last_refreshed_at,omitempty"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name string                  `json:"name"`
+
+	// OauthRemoteConnectionId A unique identifier for this resource.
+	OauthRemoteConnectionId *Identifier `json:"oauth_remote_connection_id,omitempty"`
+
+	// Slug Immutable namespace used in MCP tool IDs.
+	Slug  string           `json:"slug"`
+	Tools RobotMCPToolList `json:"tools"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// RobotMCPServerCard defines model for RobotMCPServerCard.
+type RobotMCPServerCard struct {
+	Description string                      `json:"description"`
+	Name        string                      `json:"name"`
+	Remotes     *[]RobotMCPServerCardRemote `json:"remotes,omitempty"`
+	Title       *string                     `json:"title,omitempty"`
+	Version     string                      `json:"version"`
+	WebsiteUrl  *string                     `json:"websiteUrl,omitempty"`
+}
+
+// RobotMCPServerCardRemote defines model for RobotMCPServerCardRemote.
+type RobotMCPServerCardRemote struct {
+	SupportedProtocolVersions *[]string `json:"supportedProtocolVersions,omitempty"`
+	Type                      string    `json:"type"`
+	Url                       string    `json:"url"`
+}
+
+// RobotMCPServerInitialProps defines model for RobotMCPServerInitialProps.
+type RobotMCPServerInitialProps struct {
+	// BearerToken Write-only Bearer token for the MCP server.
+	BearerToken *string `json:"bearer_token,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Enabled     *bool   `json:"enabled,omitempty"`
+	EndpointUrl string  `json:"endpoint_url"`
+	Name        string  `json:"name"`
+
+	// OauthRemoteConnectionId A unique identifier for this resource.
+	OauthRemoteConnectionId *Identifier `json:"oauth_remote_connection_id,omitempty"`
+
+	// Slug Optional immutable namespace. If omitted, Storyden derives one from the name.
+	Slug *string `json:"slug,omitempty"`
+}
+
+// RobotMCPServerList defines model for RobotMCPServerList.
+type RobotMCPServerList = []RobotMCPServer
+
+// RobotMCPServerListResult defines model for RobotMCPServerListResult.
+type RobotMCPServerListResult struct {
+	Servers RobotMCPServerList `json:"servers"`
+}
+
+// RobotMCPServerMutableProps defines model for RobotMCPServerMutableProps.
+type RobotMCPServerMutableProps struct {
+	// BearerToken Write-only Bearer token. Omit to preserve the current token.
+	BearerToken *string `json:"bearer_token,omitempty"`
+
+	// ClearBearerToken Remove the stored Bearer token.
+	ClearBearerToken *bool   `json:"clear_bearer_token,omitempty"`
+	Description      *string `json:"description,omitempty"`
+	Enabled          *bool   `json:"enabled,omitempty"`
+	EndpointUrl      *string `json:"endpoint_url,omitempty"`
+	Name             *string `json:"name,omitempty"`
+}
+
+// RobotMCPServerProbeProps defines model for RobotMCPServerProbeProps.
+type RobotMCPServerProbeProps struct {
+	// BearerToken Optional Bearer token to use for the active probe.
+	BearerToken *string `json:"bearer_token,omitempty"`
+
+	// Url User-provided MCP URL. This may be a root domain when the host
+	// exposes an MCP Server Card.
+	Url string `json:"url"`
+}
+
+// RobotMCPServerProbeResult defines model for RobotMCPServerProbeResult.
+type RobotMCPServerProbeResult struct {
+	Active        bool                `json:"active"`
+	EndpointUrl   string              `json:"endpoint_url"`
+	InputUrl      string              `json:"input_url"`
+	ProbeError    *string             `json:"probe_error,omitempty"`
+	RemoteType    *string             `json:"remote_type,omitempty"`
+	ServerCard    *RobotMCPServerCard `json:"server_card,omitempty"`
+	ServerCardUrl *string             `json:"server_card_url,omitempty"`
+}
+
+// RobotMCPTool defines model for RobotMCPTool.
+type RobotMCPTool struct {
+	Available    bool      `json:"available"`
+	CallableName string    `json:"callable_name"`
+	Description  string    `json:"description"`
+	Enabled      bool      `json:"enabled"`
+	Id           string    `json:"id"`
+	LastSeenAt   time.Time `json:"last_seen_at"`
+	RemoteName   string    `json:"remote_name"`
+	Title        *string   `json:"title,omitempty"`
+}
+
+// RobotMCPToolList defines model for RobotMCPToolList.
+type RobotMCPToolList = []RobotMCPTool
+
+// RobotModelCacheStatus defines model for RobotModelCacheStatus.
+type RobotModelCacheStatus struct {
+	LastError       *string    `json:"last_error,omitempty"`
+	LastRefreshedAt *time.Time `json:"last_refreshed_at,omitempty"`
+	Stale           bool       `json:"stale"`
+}
+
+// RobotModelInfo defines model for RobotModelInfo.
+type RobotModelInfo struct {
+	// Model The provider-local model name.
+	Model RobotModelName `json:"model"`
+
+	// Provider The model provider namespace, such as openai, anthropic, or a plugin-declared provider.
+	Provider RobotModelProvider `json:"provider"`
+
+	// Ref Fully-qualified Robot model reference in provider/model format.
+	Ref RobotModelRef `json:"ref"`
+}
+
+// RobotModelInfoList defines model for RobotModelInfoList.
+type RobotModelInfoList = []RobotModelInfo
+
+// RobotModelListResult defines model for RobotModelListResult.
+type RobotModelListResult struct {
+	Models RobotModelInfoList `json:"models"`
+}
+
+// RobotModelName The provider-local model name.
+type RobotModelName = string
+
+// RobotModelProvider The model provider namespace, such as openai, anthropic, or a plugin-declared provider.
+type RobotModelProvider = string
+
+// RobotModelRef Fully-qualified Robot model reference in provider/model format.
+type RobotModelRef = string
+
+// RobotMutableProps defines model for RobotMutableProps.
+type RobotMutableProps struct {
+	// Description Human-readable description of the robot's purpose
+	Description *string `json:"description,omitempty"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Model Fully-qualified Robot model reference in provider/model format.
+	Model *RobotModelRef `json:"model,omitempty"`
+
+	// Name The name of the robot
+	Name *string `json:"name,omitempty"`
+
+	// Playbook The directive/system prompt that defines the robot's behavior
+	Playbook *string `json:"playbook,omitempty"`
+
+	// Tools A list of tool names that the robot can use.
+	Tools       *RobotToolNameList                    `json:"tools,omitempty"`
+	WorkspaceId nullable.Nullable[NullableIdentifier] `json:"workspace_id,omitempty"`
+}
+
+// RobotProps defines model for RobotProps.
+type RobotProps struct {
+	// Author A minimal reference to an account.
+	Author ProfileReference `json:"author"`
+
+	// Description Human-readable description of the robot's purpose
+	Description string `json:"description"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Model Fully-qualified Robot model reference in provider/model format.
+	Model RobotModelRef `json:"model"`
+
+	// Name The name of the robot
+	Name string `json:"name"`
+
+	// Playbook The directive/system prompt that defines the robot's behavior
+	Playbook string `json:"playbook"`
+
+	// Tools A list of tool names that the robot can use.
+	Tools RobotToolNameList `json:"tools"`
+
+	// WorkspaceId Optional default workspace template for this robot.
+	WorkspaceId nullable.Nullable[NullableIdentifier] `json:"workspace_id,omitempty"`
+}
+
+// RobotProviderListResult defines model for RobotProviderListResult.
+type RobotProviderListResult struct {
+	Providers RobotProviderStatusList `json:"providers"`
+}
+
+// RobotProviderMutableSettings defines model for RobotProviderMutableSettings.
+type RobotProviderMutableSettings struct {
+	// ApiKey Write-only provider API key. Omit to preserve the current key.
+	ApiKey *string `json:"api_key,omitempty"`
+
+	// ClearApiKey Remove the stored provider API key.
+	ClearApiKey *bool `json:"clear_api_key,omitempty"`
+	Enabled     *bool `json:"enabled,omitempty"`
+}
+
+// RobotProviderSettings defines model for RobotProviderSettings.
+type RobotProviderSettings struct {
+	Enabled bool `json:"enabled"`
+
+	// HasApiKey Whether this provider has an API key configured. The key value is never returned.
+	HasApiKey bool `json:"has_api_key"`
+
+	// RequiresApiKey Whether this provider expects API key configuration through the Robots provider settings API.
+	RequiresApiKey bool `json:"requires_api_key"`
+}
+
+// RobotProviderStatus defines model for RobotProviderStatus.
+type RobotProviderStatus struct {
+	Cache  RobotModelCacheStatus `json:"cache"`
+	Models RobotModelInfoList    `json:"models"`
+
+	// Provider The model provider namespace, such as openai, anthropic, or a plugin-declared provider.
+	Provider  RobotModelProvider    `json:"provider"`
+	Settings  RobotProviderSettings `json:"settings"`
+	Supported bool                  `json:"supported"`
+}
+
+// RobotProviderStatusList defines model for RobotProviderStatusList.
+type RobotProviderStatusList = []RobotProviderStatus
+
+// RobotReference A minimal reference to a Robot for message attribution.
+type RobotReference struct {
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Name The name of the robot
+	Name string `json:"name"`
+}
+
+// RobotServiceSettings defines model for RobotServiceSettings.
+type RobotServiceSettings struct {
+	// DefaultModel Fully-qualified Robot model reference in provider/model format.
+	DefaultModel *RobotModelRef `json:"default_model,omitempty"`
+}
+
+// RobotSession defines model for RobotSession.
+type RobotSession struct {
+	// ActiveRobotId Most recently active Robot ID for this session, including built-in Robot IDs.
+	ActiveRobotId   *string              `json:"active_robot_id,omitempty"`
+	ActiveWorkspace *RobotWorkspaceMount `json:"active_workspace,omitempty"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id          Identifier                `json:"id"`
+	MessageList PaginatedRobotMessageList `json:"message_list"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name string                  `json:"name"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// RobotSessionList defines model for RobotSessionList.
+type RobotSessionList = []RobotSessionRef
+
+// RobotSessionMessage defines model for RobotSessionMessage.
+type RobotSessionMessage struct {
+	// Author A minimal reference to an account.
+	Author *ProfileReference `json:"author,omitempty"`
+
+	// CreatedAt When the message was sent
+	CreatedAt time.Time `json:"created_at"`
+
+	// Id Unique message identifier
+	Id string `json:"id"`
+
+	// Metadata Optional metadata associated with the message
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
+	// Parts The parts that make up the message content
+	Parts []UIMessagePart `json:"parts"`
+
+	// Robot A minimal reference to a Robot for message attribution.
+	Robot *RobotReference `json:"robot,omitempty"`
+
+	// Role The role of the message sender
+	Role RobotSessionMessageRole `json:"role"`
+}
+
+// RobotSessionMessageRole The role of the message sender
+type RobotSessionMessageRole string
+
+// RobotSessionMessageList defines model for RobotSessionMessageList.
+type RobotSessionMessageList = []RobotSessionMessage
+
+// RobotSessionProps defines model for RobotSessionProps.
+type RobotSessionProps struct {
+	// ActiveRobotId Most recently active Robot ID for this session, including built-in Robot IDs.
+	ActiveRobotId   *string                   `json:"active_robot_id,omitempty"`
+	ActiveWorkspace *RobotWorkspaceMount      `json:"active_workspace,omitempty"`
+	MessageList     PaginatedRobotMessageList `json:"message_list"`
+}
+
+// RobotSessionRef defines model for RobotSessionRef.
+type RobotSessionRef struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+	Name string                  `json:"name"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// RobotSessionRefProps defines model for RobotSessionRefProps.
+type RobotSessionRefProps struct {
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+	Name      string           `json:"name"`
+}
+
+// RobotSessionsListResult defines model for RobotSessionsListResult.
+type RobotSessionsListResult struct {
+	CurrentPage int              `json:"current_page"`
+	NextPage    *int             `json:"next_page,omitempty"`
+	PageSize    int              `json:"page_size"`
+	Results     int              `json:"results"`
+	Sessions    RobotSessionList `json:"sessions"`
+	TotalPages  int              `json:"total_pages"`
+}
+
+// RobotToolInfo defines model for RobotToolInfo.
+type RobotToolInfo struct {
+	// Available Whether the tool can currently be attached to a Robot run.
+	Available bool `json:"available"`
+
+	// CallableName ADK/model-safe function name used at runtime.
+	CallableName string `json:"callable_name"`
+	Description  string `json:"description"`
+
+	// Id Stable tool ID stored on Robot configurations.
+	Id string `json:"id"`
+
+	// Name Human-readable tool title.
+	Name   *string         `json:"name,omitempty"`
+	Source RobotToolSource `json:"source"`
+}
+
+// RobotToolInfoList defines model for RobotToolInfoList.
+type RobotToolInfoList = []RobotToolInfo
+
+// RobotToolListResult defines model for RobotToolListResult.
+type RobotToolListResult struct {
+	Tools RobotToolInfoList `json:"tools"`
+}
+
+// RobotToolNameList A list of tool names that the robot can use.
+type RobotToolNameList = []string
+
+// RobotToolSource defines model for RobotToolSource.
+type RobotToolSource string
+
+// RobotWorkspace defines model for RobotWorkspace.
+type RobotWorkspace struct {
+	// Config Provider-specific template configuration.
+	Config map[string]interface{} `json:"config"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Description Human-readable description of the workspace template.
+	Description string `json:"description"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta Metadata `json:"meta"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+
+	// Name The name of the workspace template.
+	Name string `json:"name"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// RobotWorkspaceInitialProps defines model for RobotWorkspaceInitialProps.
+type RobotWorkspaceInitialProps struct {
+	// Config Provider-specific template configuration.
+	Config *map[string]interface{} `json:"config,omitempty"`
+
+	// Description Human-readable description of the workspace template.
+	Description string `json:"description"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Name The name of the workspace template.
+	Name string `json:"name"`
+
+	// Provider Robot workspace provider type.
+	Provider *RobotWorkspaceProvider `json:"provider,omitempty"`
+}
+
+// RobotWorkspaceInstance defines model for RobotWorkspaceInstance.
+type RobotWorkspaceInstance struct {
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta Metadata `json:"meta"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc *map[string]interface{} `json:"misc,omitempty"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+
+	// ProviderState Provider-specific live instance state.
+	ProviderState map[string]interface{} `json:"provider_state"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// WorkspaceId A unique identifier for this resource.
+	WorkspaceId Identifier `json:"workspace_id"`
+}
+
+// RobotWorkspaceInstanceList defines model for RobotWorkspaceInstanceList.
+type RobotWorkspaceInstanceList = []RobotWorkspaceInstance
+
+// RobotWorkspaceInstanceProps defines model for RobotWorkspaceInstanceProps.
+type RobotWorkspaceInstanceProps struct {
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta Metadata `json:"meta"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+
+	// ProviderState Provider-specific live instance state.
+	ProviderState map[string]interface{} `json:"provider_state"`
+
+	// WorkspaceId A unique identifier for this resource.
+	WorkspaceId Identifier `json:"workspace_id"`
+}
+
+// RobotWorkspaceInstancesListResult defines model for RobotWorkspaceInstancesListResult.
+type RobotWorkspaceInstancesListResult struct {
+	CurrentPage        int                        `json:"current_page"`
+	NextPage           *int                       `json:"next_page,omitempty"`
+	PageSize           int                        `json:"page_size"`
+	Results            int                        `json:"results"`
+	TotalPages         int                        `json:"total_pages"`
+	WorkspaceInstances RobotWorkspaceInstanceList `json:"workspace_instances"`
+}
+
+// RobotWorkspaceList defines model for RobotWorkspaceList.
+type RobotWorkspaceList = []RobotWorkspace
+
+// RobotWorkspaceMount defines model for RobotWorkspaceMount.
+type RobotWorkspaceMount struct {
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+
+	// WorkspaceId A unique identifier for this resource.
+	WorkspaceId Identifier `json:"workspace_id"`
+
+	// WorkspaceInstanceId A unique identifier for this resource.
+	WorkspaceInstanceId Identifier `json:"workspace_instance_id"`
+}
+
+// RobotWorkspaceMountRequest Workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
+type RobotWorkspaceMountRequest struct {
+	// WorkspaceId A unique identifier for this resource.
+	WorkspaceId *Identifier `json:"workspace_id,omitempty"`
+
+	// WorkspaceInstanceId A unique identifier for this resource.
+	WorkspaceInstanceId *Identifier `json:"workspace_instance_id,omitempty"`
+}
+
+// RobotWorkspaceMutableProps defines model for RobotWorkspaceMutableProps.
+type RobotWorkspaceMutableProps struct {
+	// Config Provider-specific template configuration.
+	Config *map[string]interface{} `json:"config,omitempty"`
+
+	// Description Human-readable description of the workspace template.
+	Description *string `json:"description,omitempty"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta *Metadata `json:"meta,omitempty"`
+
+	// Name The name of the workspace template.
+	Name *string `json:"name,omitempty"`
+}
+
+// RobotWorkspaceProps defines model for RobotWorkspaceProps.
+type RobotWorkspaceProps struct {
+	// Config Provider-specific template configuration.
+	Config map[string]interface{} `json:"config"`
+
+	// CreatedBy A minimal reference to an account.
+	CreatedBy ProfileReference `json:"created_by"`
+
+	// Description Human-readable description of the workspace template.
+	Description string `json:"description"`
+
+	// Meta Arbitrary metadata for the resource.
+	Meta Metadata `json:"meta"`
+
+	// Name The name of the workspace template.
+	Name string `json:"name"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+}
+
+// RobotWorkspaceProvider Robot workspace provider type.
+type RobotWorkspaceProvider = string
+
+// RobotWorkspaceProviderInfo defines model for RobotWorkspaceProviderInfo.
+type RobotWorkspaceProviderInfo struct {
+	// Name Display name for the workspace provider.
+	Name string `json:"name"`
+
+	// Provider Robot workspace provider type.
+	Provider RobotWorkspaceProvider `json:"provider"`
+}
+
+// RobotWorkspaceProviderList defines model for RobotWorkspaceProviderList.
+type RobotWorkspaceProviderList = []RobotWorkspaceProviderInfo
+
+// RobotWorkspaceProviderListResult defines model for RobotWorkspaceProviderListResult.
+type RobotWorkspaceProviderListResult struct {
+	Providers RobotWorkspaceProviderList `json:"providers"`
+}
+
+// RobotWorkspacesListResult defines model for RobotWorkspacesListResult.
+type RobotWorkspacesListResult struct {
+	CurrentPage int                `json:"current_page"`
+	NextPage    *int               `json:"next_page,omitempty"`
+	PageSize    int                `json:"page_size"`
+	Results     int                `json:"results"`
+	TotalPages  int                `json:"total_pages"`
+	Workspaces  RobotWorkspaceList `json:"workspaces"`
+}
+
+// RobotsListResult defines model for RobotsListResult.
+type RobotsListResult struct {
+	CurrentPage int       `json:"current_page"`
+	NextPage    *int      `json:"next_page,omitempty"`
+	PageSize    int       `json:"page_size"`
+	Results     int       `json:"results"`
+	Robots      RobotList `json:"robots"`
+	TotalPages  int       `json:"total_pages"`
+}
+
 // Role defines model for Role.
 type Role struct {
 	Colour string `json:"colour"`
@@ -4819,6 +5926,44 @@ type SessionInfo struct {
 // Slug A URL-safe slug for uniquely identifying resources.
 type Slug = string
 
+// SourceDocumentPart defines model for SourceDocumentPart.
+type SourceDocumentPart struct {
+	// MediaType Protocol doc example uses "file" here. Kept as a non-empty string to avoid over-constraining.
+	MediaType string         `json:"mediaType"`
+	SourceId  NonEmptyString `json:"sourceId"`
+	Title     NonEmptyString `json:"title"`
+	Type      interface{}    `json:"type"`
+
+	// Url A web address
+	Url *URL `json:"url,omitempty"`
+}
+
+// SourceUrlPart defines model for SourceUrlPart.
+type SourceUrlPart struct {
+	SourceId NonEmptyString `json:"sourceId"`
+	Type     interface{}    `json:"type"`
+
+	// Url A web address
+	Url URL `json:"url"`
+}
+
+// StartPart defines model for StartPart.
+type StartPart struct {
+	MessageId Id          `json:"messageId"`
+	Type      interface{} `json:"type"`
+}
+
+// StartStepPart defines model for StartStepPart.
+type StartStepPart struct {
+	Type interface{} `json:"type"`
+}
+
+// StreamPart defines model for StreamPart.
+type StreamPart struct {
+	Type  NonEmptyString `json:"type"`
+	union json.RawMessage
+}
+
 // Tag defines model for Tag.
 type Tag struct {
 	// Colour The colour of a tag.
@@ -4880,6 +6025,41 @@ type TagReferenceProps struct {
 	// Name The name of a tag.
 	Name TagName `json:"name"`
 }
+
+// TextDeltaPart defines model for TextDeltaPart.
+type TextDeltaPart struct {
+	Delta string      `json:"delta"`
+	Id    Id          `json:"id"`
+	Type  interface{} `json:"type"`
+}
+
+// TextEndPart defines model for TextEndPart.
+type TextEndPart struct {
+	Id   Id          `json:"id"`
+	Type interface{} `json:"type"`
+}
+
+// TextStartPart defines model for TextStartPart.
+type TextStartPart struct {
+	Id   Id          `json:"id"`
+	Type interface{} `json:"type"`
+}
+
+// TextUIPart A text part of a message
+type TextUIPart struct {
+	// State The state of the text part
+	State *TextUIPartState `json:"state,omitempty"`
+
+	// Text The text content
+	Text string         `json:"text"`
+	Type TextUIPartType `json:"type"`
+}
+
+// TextUIPartState The state of the text part
+type TextUIPartState string
+
+// TextUIPartType defines model for TextUIPart.Type.
+type TextUIPartType string
 
 // Thread defines model for Thread.
 type Thread struct {
@@ -5140,6 +6320,212 @@ type ThreadReferenceProps struct {
 // ThreadTitle The title of a thread.
 type ThreadTitle = string
 
+// ToolInputAvailablePart defines model for ToolInputAvailablePart.
+type ToolInputAvailablePart struct {
+	Input      ArbitraryData  `json:"input"`
+	ToolCallId Id             `json:"toolCallId"`
+	ToolName   NonEmptyString `json:"toolName"`
+	Type       interface{}    `json:"type"`
+}
+
+// ToolInputDeltaPart defines model for ToolInputDeltaPart.
+type ToolInputDeltaPart struct {
+	InputTextDelta string      `json:"inputTextDelta"`
+	ToolCallId     Id          `json:"toolCallId"`
+	Type           interface{} `json:"type"`
+}
+
+// ToolInputStartPart defines model for ToolInputStartPart.
+type ToolInputStartPart struct {
+	ToolCallId Id             `json:"toolCallId"`
+	ToolName   NonEmptyString `json:"toolName"`
+	Type       interface{}    `json:"type"`
+}
+
+// ToolOutputAvailablePart defines model for ToolOutputAvailablePart.
+type ToolOutputAvailablePart struct {
+	Output     ArbitraryData `json:"output"`
+	ToolCallId Id            `json:"toolCallId"`
+	Type       interface{}   `json:"type"`
+}
+
+// ToolUIPart A tool invocation part (dynamic-tool format matching Vercel AI SDK)
+type ToolUIPart struct {
+	union json.RawMessage
+}
+
+// ToolUIPartBase defines model for ToolUIPartBase.
+type ToolUIPartBase struct {
+	// ProviderExecuted Whether the tool was executed by the provider
+	ProviderExecuted *bool `json:"providerExecuted,omitempty"`
+
+	// Title Optional title for the tool call
+	Title *string `json:"title,omitempty"`
+
+	// ToolCallId Unique ID for this tool call
+	ToolCallId string `json:"toolCallId"`
+
+	// ToolName Name of the tool being called
+	ToolName string `json:"toolName"`
+
+	// Type Type identifier for dynamic tool calls
+	Type ToolUIPartBaseType `json:"type"`
+}
+
+// ToolUIPartBaseType Type identifier for dynamic tool calls
+type ToolUIPartBaseType string
+
+// ToolUIPartInputAvailable defines model for ToolUIPartInputAvailable.
+type ToolUIPartInputAvailable struct {
+	// Input Complete input arguments
+	Input map[string]interface{} `json:"input"`
+
+	// ProviderExecuted Whether the tool was executed by the provider
+	ProviderExecuted *bool                         `json:"providerExecuted,omitempty"`
+	State            ToolUIPartInputAvailableState `json:"state"`
+
+	// Title Optional title for the tool call
+	Title *string `json:"title,omitempty"`
+
+	// ToolCallId Unique ID for this tool call
+	ToolCallId string `json:"toolCallId"`
+
+	// ToolName Name of the tool being called
+	ToolName string `json:"toolName"`
+
+	// Type Type identifier for dynamic tool calls
+	Type ToolUIPartInputAvailableType `json:"type"`
+}
+
+// ToolUIPartInputAvailableState defines model for ToolUIPartInputAvailable.State.
+type ToolUIPartInputAvailableState string
+
+// ToolUIPartInputAvailableType Type identifier for dynamic tool calls
+type ToolUIPartInputAvailableType string
+
+// ToolUIPartInputStreaming defines model for ToolUIPartInputStreaming.
+type ToolUIPartInputStreaming struct {
+	// Input Partial input (streaming)
+	Input map[string]interface{} `json:"input"`
+
+	// ProviderExecuted Whether the tool was executed by the provider
+	ProviderExecuted *bool                         `json:"providerExecuted,omitempty"`
+	State            ToolUIPartInputStreamingState `json:"state"`
+
+	// Title Optional title for the tool call
+	Title *string `json:"title,omitempty"`
+
+	// ToolCallId Unique ID for this tool call
+	ToolCallId string `json:"toolCallId"`
+
+	// ToolName Name of the tool being called
+	ToolName string `json:"toolName"`
+
+	// Type Type identifier for dynamic tool calls
+	Type ToolUIPartInputStreamingType `json:"type"`
+}
+
+// ToolUIPartInputStreamingState defines model for ToolUIPartInputStreaming.State.
+type ToolUIPartInputStreamingState string
+
+// ToolUIPartInputStreamingType Type identifier for dynamic tool calls
+type ToolUIPartInputStreamingType string
+
+// ToolUIPartOutputAvailable defines model for ToolUIPartOutputAvailable.
+type ToolUIPartOutputAvailable struct {
+	// Input Input arguments used
+	Input map[string]interface{} `json:"input"`
+
+	// Output Output result from the tool
+	Output map[string]interface{} `json:"output"`
+
+	// Preliminary Whether this is a preliminary result
+	Preliminary *bool `json:"preliminary,omitempty"`
+
+	// ProviderExecuted Whether the tool was executed by the provider
+	ProviderExecuted *bool                          `json:"providerExecuted,omitempty"`
+	State            ToolUIPartOutputAvailableState `json:"state"`
+
+	// Title Optional title for the tool call
+	Title *string `json:"title,omitempty"`
+
+	// ToolCallId Unique ID for this tool call
+	ToolCallId string `json:"toolCallId"`
+
+	// ToolName Name of the tool being called
+	ToolName string `json:"toolName"`
+
+	// Type Type identifier for dynamic tool calls
+	Type ToolUIPartOutputAvailableType `json:"type"`
+}
+
+// ToolUIPartOutputAvailableState defines model for ToolUIPartOutputAvailable.State.
+type ToolUIPartOutputAvailableState string
+
+// ToolUIPartOutputAvailableType Type identifier for dynamic tool calls
+type ToolUIPartOutputAvailableType string
+
+// ToolUIPartOutputError defines model for ToolUIPartOutputError.
+type ToolUIPartOutputError struct {
+	// ErrorText Error message
+	ErrorText string `json:"errorText"`
+
+	// Input Input that caused the error
+	Input map[string]interface{} `json:"input"`
+
+	// ProviderExecuted Whether the tool was executed by the provider
+	ProviderExecuted *bool                      `json:"providerExecuted,omitempty"`
+	State            ToolUIPartOutputErrorState `json:"state"`
+
+	// Title Optional title for the tool call
+	Title *string `json:"title,omitempty"`
+
+	// ToolCallId Unique ID for this tool call
+	ToolCallId string `json:"toolCallId"`
+
+	// ToolName Name of the tool being called
+	ToolName string `json:"toolName"`
+
+	// Type Type identifier for dynamic tool calls
+	Type ToolUIPartOutputErrorType `json:"type"`
+}
+
+// ToolUIPartOutputErrorState defines model for ToolUIPartOutputError.State.
+type ToolUIPartOutputErrorState string
+
+// ToolUIPartOutputErrorType Type identifier for dynamic tool calls
+type ToolUIPartOutputErrorType string
+
+// UIMessage A message in the Vercel AI SDK format. This is compatible with the
+// UIMessage interface from @ai-sdk/react and can be used directly with
+// the useChat hook.
+type UIMessage struct {
+	// Id Unique message identifier
+	Id string `json:"id"`
+
+	// Metadata Optional metadata associated with the message
+	Metadata *map[string]interface{} `json:"metadata,omitempty"`
+
+	// Parts The parts that make up the message content
+	Parts []UIMessagePart `json:"parts"`
+
+	// Role The role of the message sender
+	Role UIMessageRole `json:"role"`
+}
+
+// UIMessageRole The role of the message sender
+type UIMessageRole string
+
+// UIMessagePart A part of a UIMessage. Can be text, reasoning, tool invocation, file, or custom data.
+type UIMessagePart struct {
+	// Type The type of the message part
+	Type  UIMessagePartType `json:"type"`
+	union json.RawMessage
+}
+
+// UIMessagePartType The type of the message part
+type UIMessagePartType string
+
 // URL A web address
 type URL = string
 
@@ -5366,6 +6752,9 @@ type OAuthCodeChallengeMethodQuery string
 // OAuthCodeChallengeQuery defines model for OAuthCodeChallengeQuery.
 type OAuthCodeChallengeQuery = string
 
+// OAuthCodeQuery defines model for OAuthCodeQuery.
+type OAuthCodeQuery = string
+
 // OAuthNonceQuery defines model for OAuthNonceQuery.
 type OAuthNonceQuery = string
 
@@ -5377,6 +6766,9 @@ type OAuthRedirectURIQuery = string
 
 // OAuthRefreshTokenIDParam A unique identifier for this resource.
 type OAuthRefreshTokenIDParam = Identifier
+
+// OAuthRemoteConnectionIDParam A unique identifier for this resource.
+type OAuthRemoteConnectionIDParam = Identifier
 
 // OAuthResponseTypeQuery defines model for OAuthResponseTypeQuery.
 type OAuthResponseTypeQuery string
@@ -5431,6 +6823,30 @@ type ReportStatusQuery = ReportStatus
 
 // RequiredSearchQuery defines model for RequiredSearchQuery.
 type RequiredSearchQuery = string
+
+// RobotIDParam A unique identifier for this resource.
+type RobotIDParam = Identifier
+
+// RobotMCPServerIDParam A unique identifier for this resource.
+type RobotMCPServerIDParam = Identifier
+
+// RobotModelProviderParam The model provider namespace, such as openai, anthropic, or a plugin-declared provider.
+type RobotModelProviderParam = RobotModelProvider
+
+// RobotSessionIDParam A unique identifier for this resource.
+type RobotSessionIDParam = Identifier
+
+// RobotSessionMessageBeforeQuery A unique identifier for this resource.
+type RobotSessionMessageBeforeQuery = Identifier
+
+// RobotSessionMessageLimitQuery defines model for RobotSessionMessageLimitQuery.
+type RobotSessionMessageLimitQuery = string
+
+// RobotWorkspaceIDParam A unique identifier for this resource.
+type RobotWorkspaceIDParam = Identifier
+
+// RobotWorkspaceInstanceIDParam A unique identifier for this resource.
+type RobotWorkspaceInstanceIDParam = Identifier
 
 // RoleIDParam A unique identifier for this resource.
 type RoleIDParam = Identifier
@@ -5789,6 +7205,21 @@ type OAuthJWKSOK = OAuthJWKS
 // OAuthRefreshTokenListOK defines model for OAuthRefreshTokenListOK.
 type OAuthRefreshTokenListOK = OAuthRefreshTokenListResult
 
+// OAuthRemoteAuthorizeOK defines model for OAuthRemoteAuthorizeOK.
+type OAuthRemoteAuthorizeOK = OAuthRemoteAuthorizeResult
+
+// OAuthRemoteCallbackOK defines model for OAuthRemoteCallbackOK.
+type OAuthRemoteCallbackOK = OAuthRemoteCallbackResult
+
+// OAuthRemoteConnectionListOK defines model for OAuthRemoteConnectionListOK.
+type OAuthRemoteConnectionListOK = OAuthRemoteConnectionListResult
+
+// OAuthRemoteConnectionOK defines model for OAuthRemoteConnectionOK.
+type OAuthRemoteConnectionOK = OAuthRemoteConnection
+
+// OAuthRemoteDiscoverOK defines model for OAuthRemoteDiscoverOK.
+type OAuthRemoteDiscoverOK = OAuthRemoteDiscoveryResult
+
 // OAuthTokenError OAuth-compatible error object.
 type OAuthTokenError = OAuthError
 
@@ -5862,6 +7293,69 @@ type ReportListOK = ReportListResult
 
 // ReportUpdateOK defines model for ReportUpdateOK.
 type ReportUpdateOK = Report
+
+// RobotCreateOK defines model for RobotCreateOK.
+type RobotCreateOK = Robot
+
+// RobotGetOK defines model for RobotGetOK.
+type RobotGetOK = Robot
+
+// RobotMCPServerCreateOK defines model for RobotMCPServerCreateOK.
+type RobotMCPServerCreateOK = RobotMCPServer
+
+// RobotMCPServerGetOK defines model for RobotMCPServerGetOK.
+type RobotMCPServerGetOK = RobotMCPServer
+
+// RobotMCPServerProbeOK defines model for RobotMCPServerProbeOK.
+type RobotMCPServerProbeOK = RobotMCPServerProbeResult
+
+// RobotMCPServerRefreshOK defines model for RobotMCPServerRefreshOK.
+type RobotMCPServerRefreshOK = RobotMCPServer
+
+// RobotMCPServerUpdateOK defines model for RobotMCPServerUpdateOK.
+type RobotMCPServerUpdateOK = RobotMCPServer
+
+// RobotMCPServersListOK defines model for RobotMCPServersListOK.
+type RobotMCPServersListOK = RobotMCPServerListResult
+
+// RobotModelsListOK defines model for RobotModelsListOK.
+type RobotModelsListOK = RobotModelListResult
+
+// RobotProviderGetOK defines model for RobotProviderGetOK.
+type RobotProviderGetOK = RobotProviderStatus
+
+// RobotProvidersListOK defines model for RobotProvidersListOK.
+type RobotProvidersListOK = RobotProviderListResult
+
+// RobotSessionGetOK defines model for RobotSessionGetOK.
+type RobotSessionGetOK = RobotSession
+
+// RobotSessionsListOK defines model for RobotSessionsListOK.
+type RobotSessionsListOK = RobotSessionsListResult
+
+// RobotToolsListOK defines model for RobotToolsListOK.
+type RobotToolsListOK = RobotToolListResult
+
+// RobotWorkspaceCreateOK defines model for RobotWorkspaceCreateOK.
+type RobotWorkspaceCreateOK = RobotWorkspace
+
+// RobotWorkspaceGetOK defines model for RobotWorkspaceGetOK.
+type RobotWorkspaceGetOK = RobotWorkspace
+
+// RobotWorkspaceInstanceGetOK defines model for RobotWorkspaceInstanceGetOK.
+type RobotWorkspaceInstanceGetOK = RobotWorkspaceInstance
+
+// RobotWorkspaceInstancesListOK defines model for RobotWorkspaceInstancesListOK.
+type RobotWorkspaceInstancesListOK = RobotWorkspaceInstancesListResult
+
+// RobotWorkspaceProvidersListOK defines model for RobotWorkspaceProvidersListOK.
+type RobotWorkspaceProvidersListOK = RobotWorkspaceProviderListResult
+
+// RobotWorkspacesListOK defines model for RobotWorkspacesListOK.
+type RobotWorkspacesListOK = RobotWorkspacesListResult
+
+// RobotsListOK defines model for RobotsListOK.
+type RobotsListOK = RobotsListResult
 
 // RoleCreateOK defines model for RoleCreateOK.
 type RoleCreateOK = Role
@@ -6076,6 +7570,12 @@ type OAuthDeviceConsentSubmit = OAuthDeviceConsentSubmitProps
 // OAuthProviderCallback defines model for OAuthProviderCallback.
 type OAuthProviderCallback = OAuthCallback
 
+// OAuthRemoteConnectionCreate defines model for OAuthRemoteConnectionCreate.
+type OAuthRemoteConnectionCreate = OAuthRemoteConnectionCreateProps
+
+// OAuthRemoteDiscover defines model for OAuthRemoteDiscover.
+type OAuthRemoteDiscover = OAuthRemoteDiscoverProps
+
 // PhoneRequestCode The phone number request payload.
 type PhoneRequestCode = PhoneRequestCodeProps
 
@@ -6128,6 +7628,33 @@ type ReportCreate = ReportInitialProps
 
 // ReportUpdate defines model for ReportUpdate.
 type ReportUpdate = ReportMutableProps
+
+// RobotChatStart defines model for RobotChatStart.
+type RobotChatStart = RobotChatRequest
+
+// RobotCreate defines model for RobotCreate.
+type RobotCreate = RobotInitialProps
+
+// RobotMCPServerCreate defines model for RobotMCPServerCreate.
+type RobotMCPServerCreate = RobotMCPServerInitialProps
+
+// RobotMCPServerProbe defines model for RobotMCPServerProbe.
+type RobotMCPServerProbe = RobotMCPServerProbeProps
+
+// RobotMCPServerUpdate defines model for RobotMCPServerUpdate.
+type RobotMCPServerUpdate = RobotMCPServerMutableProps
+
+// RobotProviderUpdate defines model for RobotProviderUpdate.
+type RobotProviderUpdate = RobotProviderMutableSettings
+
+// RobotUpdate defines model for RobotUpdate.
+type RobotUpdate = RobotMutableProps
+
+// RobotWorkspaceCreate defines model for RobotWorkspaceCreate.
+type RobotWorkspaceCreate = RobotWorkspaceInitialProps
+
+// RobotWorkspaceUpdate defines model for RobotWorkspaceUpdate.
+type RobotWorkspaceUpdate = RobotWorkspaceMutableProps
 
 // RoleCreate defines model for RoleCreate.
 type RoleCreate = RoleInitialProps
@@ -6465,6 +7992,15 @@ type OAuthDeviceConsentParams struct {
 	UserCode *OAuthUserCodeQuery `form:"user_code,omitempty" json:"user_code,omitempty"`
 }
 
+// OAuthRemoteCallbackParams defines parameters for OAuthRemoteCallback.
+type OAuthRemoteCallbackParams struct {
+	// State Client-provided opaque state returned to the redirect URI.
+	State *OAuthStateQuery `form:"state,omitempty" json:"state,omitempty"`
+
+	// Code OAuth authorization code returned to the redirect URI.
+	Code OAuthCodeQuery `form:"code" json:"code"`
+}
+
 // PostLocationGetParams defines parameters for PostLocationGet.
 type PostLocationGetParams struct {
 	// Id The post ID to locate
@@ -6514,6 +8050,42 @@ type ReportListParams struct {
 
 	// Kind Report target kind filter.
 	Kind *ReportKindQuery `form:"kind,omitempty" json:"kind,omitempty"`
+}
+
+// RobotsListParams defines parameters for RobotsList.
+type RobotsListParams struct {
+	// Page Pagination query parameters.
+	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
+}
+
+// RobotSessionsListParams defines parameters for RobotSessionsList.
+type RobotSessionsListParams struct {
+	// Page Pagination query parameters.
+	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
+
+	// AccountId Account ID.
+	AccountId *AccountIDQueryParam `form:"account_id,omitempty" json:"account_id,omitempty"`
+}
+
+// RobotSessionGetParams defines parameters for RobotSessionGet.
+type RobotSessionGetParams struct {
+	// Before Load messages older than this message ID.
+	Before *RobotSessionMessageBeforeQuery `form:"before,omitempty" json:"before,omitempty"`
+
+	// Limit Maximum number of messages to return.
+	Limit *RobotSessionMessageLimitQuery `form:"limit,omitempty" json:"limit,omitempty"`
+}
+
+// RobotWorkspaceInstancesListParams defines parameters for RobotWorkspaceInstancesList.
+type RobotWorkspaceInstancesListParams struct {
+	// Page Pagination query parameters.
+	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
+}
+
+// RobotWorkspacesListParams defines parameters for RobotWorkspacesList.
+type RobotWorkspacesListParams struct {
+	// Page Pagination query parameters.
+	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
 }
 
 // TagListParams defines parameters for TagList.
@@ -6602,6 +8174,12 @@ type AdminOAuthClientCreateJSONRequestBody = OAuthClientCreateProps
 
 // AdminOAuthClientUpdateJSONRequestBody defines body for AdminOAuthClientUpdate for application/json ContentType.
 type AdminOAuthClientUpdateJSONRequestBody = OAuthClientUpdateProps
+
+// OAuthRemoteConnectionCreateJSONRequestBody defines body for OAuthRemoteConnectionCreate for application/json ContentType.
+type OAuthRemoteConnectionCreateJSONRequestBody = OAuthRemoteConnectionCreateProps
+
+// OAuthRemoteDiscoverJSONRequestBody defines body for OAuthRemoteDiscover for application/json ContentType.
+type OAuthRemoteDiscoverJSONRequestBody = OAuthRemoteDiscoverProps
 
 // AccessKeyCreateJSONRequestBody defines body for AccessKeyCreate for application/json ContentType.
 type AccessKeyCreateJSONRequestBody = AccessKeyInitialProps
@@ -6782,6 +8360,33 @@ type ReportCreateJSONRequestBody = ReportInitialProps
 
 // ReportUpdateJSONRequestBody defines body for ReportUpdate for application/json ContentType.
 type ReportUpdateJSONRequestBody = ReportMutableProps
+
+// RobotCreateJSONRequestBody defines body for RobotCreate for application/json ContentType.
+type RobotCreateJSONRequestBody = RobotInitialProps
+
+// RobotChatSSEJSONRequestBody defines body for RobotChatSSE for application/json ContentType.
+type RobotChatSSEJSONRequestBody = RobotChatRequest
+
+// RobotMCPServerCreateJSONRequestBody defines body for RobotMCPServerCreate for application/json ContentType.
+type RobotMCPServerCreateJSONRequestBody = RobotMCPServerInitialProps
+
+// RobotMCPServerProbeJSONRequestBody defines body for RobotMCPServerProbe for application/json ContentType.
+type RobotMCPServerProbeJSONRequestBody = RobotMCPServerProbeProps
+
+// RobotMCPServerUpdateJSONRequestBody defines body for RobotMCPServerUpdate for application/json ContentType.
+type RobotMCPServerUpdateJSONRequestBody = RobotMCPServerMutableProps
+
+// RobotProviderUpdateJSONRequestBody defines body for RobotProviderUpdate for application/json ContentType.
+type RobotProviderUpdateJSONRequestBody = RobotProviderMutableSettings
+
+// RobotWorkspaceCreateJSONRequestBody defines body for RobotWorkspaceCreate for application/json ContentType.
+type RobotWorkspaceCreateJSONRequestBody = RobotWorkspaceInitialProps
+
+// RobotWorkspaceUpdateJSONRequestBody defines body for RobotWorkspaceUpdate for application/json ContentType.
+type RobotWorkspaceUpdateJSONRequestBody = RobotWorkspaceMutableProps
+
+// RobotUpdateJSONRequestBody defines body for RobotUpdate for application/json ContentType.
+type RobotUpdateJSONRequestBody = RobotMutableProps
 
 // RoleCreateJSONRequestBody defines body for RoleCreate for application/json ContentType.
 type RoleCreateJSONRequestBody = RoleInitialProps
@@ -8566,6 +10171,1079 @@ func (t *PluginStatus) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+// AsStartPart returns the union data inside the StreamPart as a StartPart
+func (t StreamPart) AsStartPart() (StartPart, error) {
+	var body StartPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStartPart overwrites any union data inside the StreamPart as the provided StartPart
+func (t *StreamPart) FromStartPart(v StartPart) error {
+	t.Type = "start"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStartPart performs a merge with any union data inside the StreamPart, using the provided StartPart
+func (t *StreamPart) MergeStartPart(v StartPart) error {
+	t.Type = "start"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsTextStartPart returns the union data inside the StreamPart as a TextStartPart
+func (t StreamPart) AsTextStartPart() (TextStartPart, error) {
+	var body TextStartPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextStartPart overwrites any union data inside the StreamPart as the provided TextStartPart
+func (t *StreamPart) FromTextStartPart(v TextStartPart) error {
+	t.Type = "text-start"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextStartPart performs a merge with any union data inside the StreamPart, using the provided TextStartPart
+func (t *StreamPart) MergeTextStartPart(v TextStartPart) error {
+	t.Type = "text-start"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsTextDeltaPart returns the union data inside the StreamPart as a TextDeltaPart
+func (t StreamPart) AsTextDeltaPart() (TextDeltaPart, error) {
+	var body TextDeltaPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextDeltaPart overwrites any union data inside the StreamPart as the provided TextDeltaPart
+func (t *StreamPart) FromTextDeltaPart(v TextDeltaPart) error {
+	t.Type = "text-delta"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextDeltaPart performs a merge with any union data inside the StreamPart, using the provided TextDeltaPart
+func (t *StreamPart) MergeTextDeltaPart(v TextDeltaPart) error {
+	t.Type = "text-delta"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsTextEndPart returns the union data inside the StreamPart as a TextEndPart
+func (t StreamPart) AsTextEndPart() (TextEndPart, error) {
+	var body TextEndPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextEndPart overwrites any union data inside the StreamPart as the provided TextEndPart
+func (t *StreamPart) FromTextEndPart(v TextEndPart) error {
+	t.Type = "text-end"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextEndPart performs a merge with any union data inside the StreamPart, using the provided TextEndPart
+func (t *StreamPart) MergeTextEndPart(v TextEndPart) error {
+	t.Type = "text-end"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReasoningStartPart returns the union data inside the StreamPart as a ReasoningStartPart
+func (t StreamPart) AsReasoningStartPart() (ReasoningStartPart, error) {
+	var body ReasoningStartPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReasoningStartPart overwrites any union data inside the StreamPart as the provided ReasoningStartPart
+func (t *StreamPart) FromReasoningStartPart(v ReasoningStartPart) error {
+	t.Type = "reasoning-start"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReasoningStartPart performs a merge with any union data inside the StreamPart, using the provided ReasoningStartPart
+func (t *StreamPart) MergeReasoningStartPart(v ReasoningStartPart) error {
+	t.Type = "reasoning-start"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReasoningDeltaPart returns the union data inside the StreamPart as a ReasoningDeltaPart
+func (t StreamPart) AsReasoningDeltaPart() (ReasoningDeltaPart, error) {
+	var body ReasoningDeltaPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReasoningDeltaPart overwrites any union data inside the StreamPart as the provided ReasoningDeltaPart
+func (t *StreamPart) FromReasoningDeltaPart(v ReasoningDeltaPart) error {
+	t.Type = "reasoning-delta"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReasoningDeltaPart performs a merge with any union data inside the StreamPart, using the provided ReasoningDeltaPart
+func (t *StreamPart) MergeReasoningDeltaPart(v ReasoningDeltaPart) error {
+	t.Type = "reasoning-delta"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReasoningEndPart returns the union data inside the StreamPart as a ReasoningEndPart
+func (t StreamPart) AsReasoningEndPart() (ReasoningEndPart, error) {
+	var body ReasoningEndPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReasoningEndPart overwrites any union data inside the StreamPart as the provided ReasoningEndPart
+func (t *StreamPart) FromReasoningEndPart(v ReasoningEndPart) error {
+	t.Type = "reasoning-end"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReasoningEndPart performs a merge with any union data inside the StreamPart, using the provided ReasoningEndPart
+func (t *StreamPart) MergeReasoningEndPart(v ReasoningEndPart) error {
+	t.Type = "reasoning-end"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsSourceUrlPart returns the union data inside the StreamPart as a SourceUrlPart
+func (t StreamPart) AsSourceUrlPart() (SourceUrlPart, error) {
+	var body SourceUrlPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromSourceUrlPart overwrites any union data inside the StreamPart as the provided SourceUrlPart
+func (t *StreamPart) FromSourceUrlPart(v SourceUrlPart) error {
+	t.Type = "source-url"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeSourceUrlPart performs a merge with any union data inside the StreamPart, using the provided SourceUrlPart
+func (t *StreamPart) MergeSourceUrlPart(v SourceUrlPart) error {
+	t.Type = "source-url"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsSourceDocumentPart returns the union data inside the StreamPart as a SourceDocumentPart
+func (t StreamPart) AsSourceDocumentPart() (SourceDocumentPart, error) {
+	var body SourceDocumentPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromSourceDocumentPart overwrites any union data inside the StreamPart as the provided SourceDocumentPart
+func (t *StreamPart) FromSourceDocumentPart(v SourceDocumentPart) error {
+	t.Type = "source-document"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeSourceDocumentPart performs a merge with any union data inside the StreamPart, using the provided SourceDocumentPart
+func (t *StreamPart) MergeSourceDocumentPart(v SourceDocumentPart) error {
+	t.Type = "source-document"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsFilePart returns the union data inside the StreamPart as a FilePart
+func (t StreamPart) AsFilePart() (FilePart, error) {
+	var body FilePart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromFilePart overwrites any union data inside the StreamPart as the provided FilePart
+func (t *StreamPart) FromFilePart(v FilePart) error {
+	t.Type = "file"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeFilePart performs a merge with any union data inside the StreamPart, using the provided FilePart
+func (t *StreamPart) MergeFilePart(v FilePart) error {
+	t.Type = "file"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataPart returns the union data inside the StreamPart as a DataPart
+func (t StreamPart) AsDataPart() (DataPart, error) {
+	var body DataPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataPart overwrites any union data inside the StreamPart as the provided DataPart
+func (t *StreamPart) FromDataPart(v DataPart) error {
+	t.Type = "DataPart"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataPart performs a merge with any union data inside the StreamPart, using the provided DataPart
+func (t *StreamPart) MergeDataPart(v DataPart) error {
+	t.Type = "DataPart"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsErrorPart returns the union data inside the StreamPart as a ErrorPart
+func (t StreamPart) AsErrorPart() (ErrorPart, error) {
+	var body ErrorPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromErrorPart overwrites any union data inside the StreamPart as the provided ErrorPart
+func (t *StreamPart) FromErrorPart(v ErrorPart) error {
+	t.Type = "error"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeErrorPart performs a merge with any union data inside the StreamPart, using the provided ErrorPart
+func (t *StreamPart) MergeErrorPart(v ErrorPart) error {
+	t.Type = "error"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolInputStartPart returns the union data inside the StreamPart as a ToolInputStartPart
+func (t StreamPart) AsToolInputStartPart() (ToolInputStartPart, error) {
+	var body ToolInputStartPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolInputStartPart overwrites any union data inside the StreamPart as the provided ToolInputStartPart
+func (t *StreamPart) FromToolInputStartPart(v ToolInputStartPart) error {
+	t.Type = "tool-input-start"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolInputStartPart performs a merge with any union data inside the StreamPart, using the provided ToolInputStartPart
+func (t *StreamPart) MergeToolInputStartPart(v ToolInputStartPart) error {
+	t.Type = "tool-input-start"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolInputDeltaPart returns the union data inside the StreamPart as a ToolInputDeltaPart
+func (t StreamPart) AsToolInputDeltaPart() (ToolInputDeltaPart, error) {
+	var body ToolInputDeltaPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolInputDeltaPart overwrites any union data inside the StreamPart as the provided ToolInputDeltaPart
+func (t *StreamPart) FromToolInputDeltaPart(v ToolInputDeltaPart) error {
+	t.Type = "tool-input-delta"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolInputDeltaPart performs a merge with any union data inside the StreamPart, using the provided ToolInputDeltaPart
+func (t *StreamPart) MergeToolInputDeltaPart(v ToolInputDeltaPart) error {
+	t.Type = "tool-input-delta"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolInputAvailablePart returns the union data inside the StreamPart as a ToolInputAvailablePart
+func (t StreamPart) AsToolInputAvailablePart() (ToolInputAvailablePart, error) {
+	var body ToolInputAvailablePart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolInputAvailablePart overwrites any union data inside the StreamPart as the provided ToolInputAvailablePart
+func (t *StreamPart) FromToolInputAvailablePart(v ToolInputAvailablePart) error {
+	t.Type = "tool-input-available"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolInputAvailablePart performs a merge with any union data inside the StreamPart, using the provided ToolInputAvailablePart
+func (t *StreamPart) MergeToolInputAvailablePart(v ToolInputAvailablePart) error {
+	t.Type = "tool-input-available"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolOutputAvailablePart returns the union data inside the StreamPart as a ToolOutputAvailablePart
+func (t StreamPart) AsToolOutputAvailablePart() (ToolOutputAvailablePart, error) {
+	var body ToolOutputAvailablePart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolOutputAvailablePart overwrites any union data inside the StreamPart as the provided ToolOutputAvailablePart
+func (t *StreamPart) FromToolOutputAvailablePart(v ToolOutputAvailablePart) error {
+	t.Type = "tool-output-available"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolOutputAvailablePart performs a merge with any union data inside the StreamPart, using the provided ToolOutputAvailablePart
+func (t *StreamPart) MergeToolOutputAvailablePart(v ToolOutputAvailablePart) error {
+	t.Type = "tool-output-available"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsStartStepPart returns the union data inside the StreamPart as a StartStepPart
+func (t StreamPart) AsStartStepPart() (StartStepPart, error) {
+	var body StartStepPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStartStepPart overwrites any union data inside the StreamPart as the provided StartStepPart
+func (t *StreamPart) FromStartStepPart(v StartStepPart) error {
+	t.Type = "start-step"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStartStepPart performs a merge with any union data inside the StreamPart, using the provided StartStepPart
+func (t *StreamPart) MergeStartStepPart(v StartStepPart) error {
+	t.Type = "start-step"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsFinishStepPart returns the union data inside the StreamPart as a FinishStepPart
+func (t StreamPart) AsFinishStepPart() (FinishStepPart, error) {
+	var body FinishStepPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromFinishStepPart overwrites any union data inside the StreamPart as the provided FinishStepPart
+func (t *StreamPart) FromFinishStepPart(v FinishStepPart) error {
+	t.Type = "finish-step"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeFinishStepPart performs a merge with any union data inside the StreamPart, using the provided FinishStepPart
+func (t *StreamPart) MergeFinishStepPart(v FinishStepPart) error {
+	t.Type = "finish-step"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsFinishMessagePart returns the union data inside the StreamPart as a FinishMessagePart
+func (t StreamPart) AsFinishMessagePart() (FinishMessagePart, error) {
+	var body FinishMessagePart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromFinishMessagePart overwrites any union data inside the StreamPart as the provided FinishMessagePart
+func (t *StreamPart) FromFinishMessagePart(v FinishMessagePart) error {
+	t.Type = "finish"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeFinishMessagePart performs a merge with any union data inside the StreamPart, using the provided FinishMessagePart
+func (t *StreamPart) MergeFinishMessagePart(v FinishMessagePart) error {
+	t.Type = "finish"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsAbortPart returns the union data inside the StreamPart as a AbortPart
+func (t StreamPart) AsAbortPart() (AbortPart, error) {
+	var body AbortPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromAbortPart overwrites any union data inside the StreamPart as the provided AbortPart
+func (t *StreamPart) FromAbortPart(v AbortPart) error {
+	t.Type = "abort"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeAbortPart performs a merge with any union data inside the StreamPart, using the provided AbortPart
+func (t *StreamPart) MergeAbortPart(v AbortPart) error {
+	t.Type = "abort"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t StreamPart) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t StreamPart) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "DataPart":
+		return t.AsDataPart()
+	case "abort":
+		return t.AsAbortPart()
+	case "error":
+		return t.AsErrorPart()
+	case "file":
+		return t.AsFilePart()
+	case "finish":
+		return t.AsFinishMessagePart()
+	case "finish-step":
+		return t.AsFinishStepPart()
+	case "reasoning-delta":
+		return t.AsReasoningDeltaPart()
+	case "reasoning-end":
+		return t.AsReasoningEndPart()
+	case "reasoning-start":
+		return t.AsReasoningStartPart()
+	case "source-document":
+		return t.AsSourceDocumentPart()
+	case "source-url":
+		return t.AsSourceUrlPart()
+	case "start":
+		return t.AsStartPart()
+	case "start-step":
+		return t.AsStartStepPart()
+	case "text-delta":
+		return t.AsTextDeltaPart()
+	case "text-end":
+		return t.AsTextEndPart()
+	case "text-start":
+		return t.AsTextStartPart()
+	case "tool-input-available":
+		return t.AsToolInputAvailablePart()
+	case "tool-input-delta":
+		return t.AsToolInputDeltaPart()
+	case "tool-input-start":
+		return t.AsToolInputStartPart()
+	case "tool-output-available":
+		return t.AsToolOutputAvailablePart()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t StreamPart) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	object := make(map[string]json.RawMessage)
+	if t.union != nil {
+		err = json.Unmarshal(b, &object)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	object["type"], err = json.Marshal(t.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	b, err = json.Marshal(object)
+	return b, err
+}
+
+func (t *StreamPart) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	if err != nil {
+		return err
+	}
+	object := make(map[string]json.RawMessage)
+	err = json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &t.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+	}
+
+	return err
+}
+
+// AsToolUIPartInputStreaming returns the union data inside the ToolUIPart as a ToolUIPartInputStreaming
+func (t ToolUIPart) AsToolUIPartInputStreaming() (ToolUIPartInputStreaming, error) {
+	var body ToolUIPartInputStreaming
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolUIPartInputStreaming overwrites any union data inside the ToolUIPart as the provided ToolUIPartInputStreaming
+func (t *ToolUIPart) FromToolUIPartInputStreaming(v ToolUIPartInputStreaming) error {
+	v.State = "input-streaming"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolUIPartInputStreaming performs a merge with any union data inside the ToolUIPart, using the provided ToolUIPartInputStreaming
+func (t *ToolUIPart) MergeToolUIPartInputStreaming(v ToolUIPartInputStreaming) error {
+	v.State = "input-streaming"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolUIPartInputAvailable returns the union data inside the ToolUIPart as a ToolUIPartInputAvailable
+func (t ToolUIPart) AsToolUIPartInputAvailable() (ToolUIPartInputAvailable, error) {
+	var body ToolUIPartInputAvailable
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolUIPartInputAvailable overwrites any union data inside the ToolUIPart as the provided ToolUIPartInputAvailable
+func (t *ToolUIPart) FromToolUIPartInputAvailable(v ToolUIPartInputAvailable) error {
+	v.State = "input-available"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolUIPartInputAvailable performs a merge with any union data inside the ToolUIPart, using the provided ToolUIPartInputAvailable
+func (t *ToolUIPart) MergeToolUIPartInputAvailable(v ToolUIPartInputAvailable) error {
+	v.State = "input-available"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolUIPartOutputAvailable returns the union data inside the ToolUIPart as a ToolUIPartOutputAvailable
+func (t ToolUIPart) AsToolUIPartOutputAvailable() (ToolUIPartOutputAvailable, error) {
+	var body ToolUIPartOutputAvailable
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolUIPartOutputAvailable overwrites any union data inside the ToolUIPart as the provided ToolUIPartOutputAvailable
+func (t *ToolUIPart) FromToolUIPartOutputAvailable(v ToolUIPartOutputAvailable) error {
+	v.State = "output-available"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolUIPartOutputAvailable performs a merge with any union data inside the ToolUIPart, using the provided ToolUIPartOutputAvailable
+func (t *ToolUIPart) MergeToolUIPartOutputAvailable(v ToolUIPartOutputAvailable) error {
+	v.State = "output-available"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolUIPartOutputError returns the union data inside the ToolUIPart as a ToolUIPartOutputError
+func (t ToolUIPart) AsToolUIPartOutputError() (ToolUIPartOutputError, error) {
+	var body ToolUIPartOutputError
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolUIPartOutputError overwrites any union data inside the ToolUIPart as the provided ToolUIPartOutputError
+func (t *ToolUIPart) FromToolUIPartOutputError(v ToolUIPartOutputError) error {
+	v.State = "output-error"
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolUIPartOutputError performs a merge with any union data inside the ToolUIPart, using the provided ToolUIPartOutputError
+func (t *ToolUIPart) MergeToolUIPartOutputError(v ToolUIPartOutputError) error {
+	v.State = "output-error"
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t ToolUIPart) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"state"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t ToolUIPart) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "input-available":
+		return t.AsToolUIPartInputAvailable()
+	case "input-streaming":
+		return t.AsToolUIPartInputStreaming()
+	case "output-available":
+		return t.AsToolUIPartOutputAvailable()
+	case "output-error":
+		return t.AsToolUIPartOutputError()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t ToolUIPart) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *ToolUIPart) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsTextUIPart returns the union data inside the UIMessagePart as a TextUIPart
+func (t UIMessagePart) AsTextUIPart() (TextUIPart, error) {
+	var body TextUIPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromTextUIPart overwrites any union data inside the UIMessagePart as the provided TextUIPart
+func (t *UIMessagePart) FromTextUIPart(v TextUIPart) error {
+	t.Type = "text"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeTextUIPart performs a merge with any union data inside the UIMessagePart, using the provided TextUIPart
+func (t *UIMessagePart) MergeTextUIPart(v TextUIPart) error {
+	t.Type = "text"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsReasoningUIPart returns the union data inside the UIMessagePart as a ReasoningUIPart
+func (t UIMessagePart) AsReasoningUIPart() (ReasoningUIPart, error) {
+	var body ReasoningUIPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromReasoningUIPart overwrites any union data inside the UIMessagePart as the provided ReasoningUIPart
+func (t *UIMessagePart) FromReasoningUIPart(v ReasoningUIPart) error {
+	t.Type = "reasoning"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeReasoningUIPart performs a merge with any union data inside the UIMessagePart, using the provided ReasoningUIPart
+func (t *UIMessagePart) MergeReasoningUIPart(v ReasoningUIPart) error {
+	t.Type = "reasoning"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsToolUIPart returns the union data inside the UIMessagePart as a ToolUIPart
+func (t UIMessagePart) AsToolUIPart() (ToolUIPart, error) {
+	var body ToolUIPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromToolUIPart overwrites any union data inside the UIMessagePart as the provided ToolUIPart
+func (t *UIMessagePart) FromToolUIPart(v ToolUIPart) error {
+	t.Type = "dynamic-tool"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeToolUIPart performs a merge with any union data inside the UIMessagePart, using the provided ToolUIPart
+func (t *UIMessagePart) MergeToolUIPart(v ToolUIPart) error {
+	t.Type = "dynamic-tool"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsFileUIPart returns the union data inside the UIMessagePart as a FileUIPart
+func (t UIMessagePart) AsFileUIPart() (FileUIPart, error) {
+	var body FileUIPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromFileUIPart overwrites any union data inside the UIMessagePart as the provided FileUIPart
+func (t *UIMessagePart) FromFileUIPart(v FileUIPart) error {
+	t.Type = "file"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeFileUIPart performs a merge with any union data inside the UIMessagePart, using the provided FileUIPart
+func (t *UIMessagePart) MergeFileUIPart(v FileUIPart) error {
+	t.Type = "file"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataPart returns the union data inside the UIMessagePart as a DataPart
+func (t UIMessagePart) AsDataPart() (DataPart, error) {
+	var body DataPart
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataPart overwrites any union data inside the UIMessagePart as the provided DataPart
+func (t *UIMessagePart) FromDataPart(v DataPart) error {
+	t.Type = "data-render_card"
+
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataPart performs a merge with any union data inside the UIMessagePart, using the provided DataPart
+func (t *UIMessagePart) MergeDataPart(v DataPart) error {
+	t.Type = "data-render_card"
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t UIMessagePart) Discriminator() (string, error) {
+	var discriminator struct {
+		Discriminator string `json:"type"`
+	}
+	err := json.Unmarshal(t.union, &discriminator)
+	return discriminator.Discriminator, err
+}
+
+func (t UIMessagePart) ValueByDiscriminator() (interface{}, error) {
+	discriminator, err := t.Discriminator()
+	if err != nil {
+		return nil, err
+	}
+	switch discriminator {
+	case "data-render_card":
+		return t.AsDataPart()
+	case "dynamic-tool":
+		return t.AsToolUIPart()
+	case "file":
+		return t.AsFileUIPart()
+	case "reasoning":
+		return t.AsReasoningUIPart()
+	case "text":
+		return t.AsTextUIPart()
+	default:
+		return nil, errors.New("unknown discriminator value: " + discriminator)
+	}
+}
+
+func (t UIMessagePart) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+	object := make(map[string]json.RawMessage)
+	if t.union != nil {
+		err = json.Unmarshal(b, &object)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	object["type"], err = json.Marshal(t.Type)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	b, err = json.Marshal(object)
+	return b, err
+}
+
+func (t *UIMessagePart) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	if err != nil {
+		return err
+	}
+	object := make(map[string]json.RawMessage)
+	err = json.Unmarshal(b, &object)
+	if err != nil {
+		return err
+	}
+
+	if raw, found := object["type"]; found {
+		err = json.Unmarshal(raw, &t.Type)
+		if err != nil {
+			return fmt.Errorf("error reading 'type': %w", err)
+		}
+	}
+
+	return err
+}
+
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
@@ -8796,6 +11474,22 @@ type ClientInterface interface {
 
 	// AdminOAuthRefreshTokenDelete request
 	AdminOAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRemoteConnectionList request
+	OAuthRemoteConnectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRemoteConnectionCreateWithBody request with any body
+	OAuthRemoteConnectionCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthRemoteConnectionCreate(ctx context.Context, body OAuthRemoteConnectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRemoteConnectionAuthorize request
+	OAuthRemoteConnectionAuthorize(ctx context.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// OAuthRemoteDiscoverWithBody request with any body
+	OAuthRemoteDiscoverWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	OAuthRemoteDiscover(ctx context.Context, body OAuthRemoteDiscoverJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// AssetUploadWithBody request with any body
 	AssetUploadWithBody(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -9238,6 +11932,9 @@ type ClientInterface interface {
 
 	OAuthClientRegister(ctx context.Context, body OAuthClientRegisterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// OAuthRemoteCallback request
+	OAuthRemoteCallback(ctx context.Context, params *OAuthRemoteCallbackParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// OAuthTokenWithBody request with any body
 	OAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -9342,6 +12039,111 @@ type ClientInterface interface {
 	ReportUpdateWithBody(ctx context.Context, reportId ReportIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	ReportUpdate(ctx context.Context, reportId ReportIDParam, body ReportUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotsList request
+	RobotsList(ctx context.Context, params *RobotsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotCreateWithBody request with any body
+	RobotCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotCreate(ctx context.Context, body RobotCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotChatSSEWithBody request with any body
+	RobotChatSSEWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotChatSSE(ctx context.Context, body RobotChatSSEJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServersList request
+	RobotMCPServersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerCreateWithBody request with any body
+	RobotMCPServerCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotMCPServerCreate(ctx context.Context, body RobotMCPServerCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerProbeWithBody request with any body
+	RobotMCPServerProbeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotMCPServerProbe(ctx context.Context, body RobotMCPServerProbeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerDelete request
+	RobotMCPServerDelete(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerGet request
+	RobotMCPServerGet(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerUpdateWithBody request with any body
+	RobotMCPServerUpdateWithBody(ctx context.Context, mcpServerId RobotMCPServerIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotMCPServerUpdate(ctx context.Context, mcpServerId RobotMCPServerIDParam, body RobotMCPServerUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotMCPServerRefresh request
+	RobotMCPServerRefresh(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotModelsList request
+	RobotModelsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotProvidersList request
+	RobotProvidersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotProviderUpdateWithBody request with any body
+	RobotProviderUpdateWithBody(ctx context.Context, provider RobotModelProviderParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotProviderUpdate(ctx context.Context, provider RobotModelProviderParam, body RobotProviderUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotProviderModelsRefresh request
+	RobotProviderModelsRefresh(ctx context.Context, provider RobotModelProviderParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotSessionsList request
+	RobotSessionsList(ctx context.Context, params *RobotSessionsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotSessionGet request
+	RobotSessionGet(ctx context.Context, sessionId RobotSessionIDParam, params *RobotSessionGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotToolsList request
+	RobotToolsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceInstancesList request
+	RobotWorkspaceInstancesList(ctx context.Context, params *RobotWorkspaceInstancesListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceInstanceDelete request
+	RobotWorkspaceInstanceDelete(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceInstanceGet request
+	RobotWorkspaceInstanceGet(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceProvidersList request
+	RobotWorkspaceProvidersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspacesList request
+	RobotWorkspacesList(ctx context.Context, params *RobotWorkspacesListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceCreateWithBody request with any body
+	RobotWorkspaceCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotWorkspaceCreate(ctx context.Context, body RobotWorkspaceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceDelete request
+	RobotWorkspaceDelete(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceGet request
+	RobotWorkspaceGet(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotWorkspaceUpdateWithBody request with any body
+	RobotWorkspaceUpdateWithBody(ctx context.Context, workspaceId RobotWorkspaceIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotWorkspaceUpdate(ctx context.Context, workspaceId RobotWorkspaceIDParam, body RobotWorkspaceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotDelete request
+	RobotDelete(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotGet request
+	RobotGet(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RobotUpdateWithBody request with any body
+	RobotUpdateWithBody(ctx context.Context, robotId RobotIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	RobotUpdate(ctx context.Context, robotId RobotIDParam, body RobotUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RoleList request
 	RoleList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -10078,6 +12880,78 @@ func (c *Client) AdminOAuthRefreshTokenList(ctx context.Context, reqEditors ...R
 
 func (c *Client) AdminOAuthRefreshTokenDelete(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAdminOAuthRefreshTokenDeleteRequest(c.Server, oauthRefreshTokenId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteConnectionList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteConnectionListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteConnectionCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteConnectionCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteConnectionCreate(ctx context.Context, body OAuthRemoteConnectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteConnectionCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteConnectionAuthorize(ctx context.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteConnectionAuthorizeRequest(c.Server, oauthRemoteConnectionId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteDiscoverWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteDiscoverRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) OAuthRemoteDiscover(ctx context.Context, body OAuthRemoteDiscoverJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteDiscoverRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -12056,6 +14930,18 @@ func (c *Client) OAuthClientRegister(ctx context.Context, body OAuthClientRegist
 	return c.Client.Do(req)
 }
 
+func (c *Client) OAuthRemoteCallback(ctx context.Context, params *OAuthRemoteCallbackParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewOAuthRemoteCallbackRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) OAuthTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewOAuthTokenRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -12502,6 +15388,462 @@ func (c *Client) ReportUpdateWithBody(ctx context.Context, reportId ReportIDPara
 
 func (c *Client) ReportUpdate(ctx context.Context, reportId ReportIDParam, body ReportUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReportUpdateRequest(c.Server, reportId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotsList(ctx context.Context, params *RobotsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotsListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotCreate(ctx context.Context, body RobotCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotChatSSEWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotChatSSERequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotChatSSE(ctx context.Context, body RobotChatSSEJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotChatSSERequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServersListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerCreate(ctx context.Context, body RobotMCPServerCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerProbeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerProbeRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerProbe(ctx context.Context, body RobotMCPServerProbeJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerProbeRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerDelete(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerDeleteRequest(c.Server, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerGet(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerGetRequest(c.Server, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerUpdateWithBody(ctx context.Context, mcpServerId RobotMCPServerIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerUpdateRequestWithBody(c.Server, mcpServerId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerUpdate(ctx context.Context, mcpServerId RobotMCPServerIDParam, body RobotMCPServerUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerUpdateRequest(c.Server, mcpServerId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotMCPServerRefresh(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotMCPServerRefreshRequest(c.Server, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotModelsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotModelsListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotProvidersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotProvidersListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotProviderUpdateWithBody(ctx context.Context, provider RobotModelProviderParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotProviderUpdateRequestWithBody(c.Server, provider, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotProviderUpdate(ctx context.Context, provider RobotModelProviderParam, body RobotProviderUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotProviderUpdateRequest(c.Server, provider, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotProviderModelsRefresh(ctx context.Context, provider RobotModelProviderParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotProviderModelsRefreshRequest(c.Server, provider)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotSessionsList(ctx context.Context, params *RobotSessionsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotSessionsListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotSessionGet(ctx context.Context, sessionId RobotSessionIDParam, params *RobotSessionGetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotSessionGetRequest(c.Server, sessionId, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotToolsList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotToolsListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceInstancesList(ctx context.Context, params *RobotWorkspaceInstancesListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceInstancesListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceInstanceDelete(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceInstanceDeleteRequest(c.Server, workspaceInstanceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceInstanceGet(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceInstanceGetRequest(c.Server, workspaceInstanceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceProvidersList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceProvidersListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspacesList(ctx context.Context, params *RobotWorkspacesListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspacesListRequest(c.Server, params)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceCreateRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceCreate(ctx context.Context, body RobotWorkspaceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceDelete(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceDeleteRequest(c.Server, workspaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceGet(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceGetRequest(c.Server, workspaceId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceUpdateWithBody(ctx context.Context, workspaceId RobotWorkspaceIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceUpdateRequestWithBody(c.Server, workspaceId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotWorkspaceUpdate(ctx context.Context, workspaceId RobotWorkspaceIDParam, body RobotWorkspaceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotWorkspaceUpdateRequest(c.Server, workspaceId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotDelete(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotDeleteRequest(c.Server, robotId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotGet(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotGetRequest(c.Server, robotId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotUpdateWithBody(ctx context.Context, robotId RobotIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotUpdateRequestWithBody(c.Server, robotId, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RobotUpdate(ctx context.Context, robotId RobotIDParam, body RobotUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRobotUpdateRequest(c.Server, robotId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -14520,6 +17862,147 @@ func NewAdminOAuthRefreshTokenDeleteRequest(server string, oauthRefreshTokenId O
 	if err != nil {
 		return nil, err
 	}
+
+	return req, nil
+}
+
+// NewOAuthRemoteConnectionListRequest generates requests for OAuthRemoteConnectionList
+func NewOAuthRemoteConnectionListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/remote/connections")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthRemoteConnectionCreateRequest calls the generic OAuthRemoteConnectionCreate builder with application/json body
+func NewOAuthRemoteConnectionCreateRequest(server string, body OAuthRemoteConnectionCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthRemoteConnectionCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewOAuthRemoteConnectionCreateRequestWithBody generates requests for OAuthRemoteConnectionCreate with any type of body
+func NewOAuthRemoteConnectionCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/remote/connections")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewOAuthRemoteConnectionAuthorizeRequest generates requests for OAuthRemoteConnectionAuthorize
+func NewOAuthRemoteConnectionAuthorizeRequest(server string, oauthRemoteConnectionId OAuthRemoteConnectionIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "oauth_remote_connection_id", runtime.ParamLocationPath, oauthRemoteConnectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/remote/connections/%s/authorize", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewOAuthRemoteDiscoverRequest calls the generic OAuthRemoteDiscover builder with application/json body
+func NewOAuthRemoteDiscoverRequest(server string, body OAuthRemoteDiscoverJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewOAuthRemoteDiscoverRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewOAuthRemoteDiscoverRequestWithBody generates requests for OAuthRemoteDiscover with any type of body
+func NewOAuthRemoteDiscoverRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/oauth/remote/discover")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -19750,6 +23233,67 @@ func NewOAuthClientRegisterRequestWithBody(server string, contentType string, bo
 	return req, nil
 }
 
+// NewOAuthRemoteCallbackRequest generates requests for OAuthRemoteCallback
+func NewOAuthRemoteCallbackRequest(server string, params *OAuthRemoteCallbackParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/oauth/remote/callback")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.State != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "state", runtime.ParamLocationQuery, *params.State); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "code", runtime.ParamLocationQuery, params.Code); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewOAuthTokenRequestWithFormdataBody calls the generic OAuthToken builder with application/x-www-form-urlencoded body
 func NewOAuthTokenRequestWithFormdataBody(server string, body OAuthTokenFormdataRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -21017,6 +24561,1153 @@ func NewReportUpdateRequestWithBody(server string, reportId ReportIDParam, conte
 	return req, nil
 }
 
+// NewRobotsListRequest generates requests for RobotsList
+func NewRobotsListRequest(server string, params *RobotsListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotCreateRequest calls the generic RobotCreate builder with application/json body
+func NewRobotCreateRequest(server string, body RobotCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRobotCreateRequestWithBody generates requests for RobotCreate with any type of body
+func NewRobotCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotChatSSERequest calls the generic RobotChatSSE builder with application/json body
+func NewRobotChatSSERequest(server string, body RobotChatSSEJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotChatSSERequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRobotChatSSERequestWithBody generates requests for RobotChatSSE with any type of body
+func NewRobotChatSSERequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/chat/sse")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotMCPServersListRequest generates requests for RobotMCPServersList
+func NewRobotMCPServersListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotMCPServerCreateRequest calls the generic RobotMCPServerCreate builder with application/json body
+func NewRobotMCPServerCreateRequest(server string, body RobotMCPServerCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotMCPServerCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRobotMCPServerCreateRequestWithBody generates requests for RobotMCPServerCreate with any type of body
+func NewRobotMCPServerCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotMCPServerProbeRequest calls the generic RobotMCPServerProbe builder with application/json body
+func NewRobotMCPServerProbeRequest(server string, body RobotMCPServerProbeJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotMCPServerProbeRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRobotMCPServerProbeRequestWithBody generates requests for RobotMCPServerProbe with any type of body
+func NewRobotMCPServerProbeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers/probe")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotMCPServerDeleteRequest generates requests for RobotMCPServerDelete
+func NewRobotMCPServerDeleteRequest(server string, mcpServerId RobotMCPServerIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "mcp_server_id", runtime.ParamLocationPath, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotMCPServerGetRequest generates requests for RobotMCPServerGet
+func NewRobotMCPServerGetRequest(server string, mcpServerId RobotMCPServerIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "mcp_server_id", runtime.ParamLocationPath, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotMCPServerUpdateRequest calls the generic RobotMCPServerUpdate builder with application/json body
+func NewRobotMCPServerUpdateRequest(server string, mcpServerId RobotMCPServerIDParam, body RobotMCPServerUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotMCPServerUpdateRequestWithBody(server, mcpServerId, "application/json", bodyReader)
+}
+
+// NewRobotMCPServerUpdateRequestWithBody generates requests for RobotMCPServerUpdate with any type of body
+func NewRobotMCPServerUpdateRequestWithBody(server string, mcpServerId RobotMCPServerIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "mcp_server_id", runtime.ParamLocationPath, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotMCPServerRefreshRequest generates requests for RobotMCPServerRefresh
+func NewRobotMCPServerRefreshRequest(server string, mcpServerId RobotMCPServerIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "mcp_server_id", runtime.ParamLocationPath, mcpServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/mcp-servers/%s/refresh", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotModelsListRequest generates requests for RobotModelsList
+func NewRobotModelsListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/models")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotProvidersListRequest generates requests for RobotProvidersList
+func NewRobotProvidersListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/providers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotProviderUpdateRequest calls the generic RobotProviderUpdate builder with application/json body
+func NewRobotProviderUpdateRequest(server string, provider RobotModelProviderParam, body RobotProviderUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotProviderUpdateRequestWithBody(server, provider, "application/json", bodyReader)
+}
+
+// NewRobotProviderUpdateRequestWithBody generates requests for RobotProviderUpdate with any type of body
+func NewRobotProviderUpdateRequestWithBody(server string, provider RobotModelProviderParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "provider", runtime.ParamLocationPath, provider)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/providers/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotProviderModelsRefreshRequest generates requests for RobotProviderModelsRefresh
+func NewRobotProviderModelsRefreshRequest(server string, provider RobotModelProviderParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "provider", runtime.ParamLocationPath, provider)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/providers/%s/models/refresh", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotSessionsListRequest generates requests for RobotSessionsList
+func NewRobotSessionsListRequest(server string, params *RobotSessionsListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/sessions")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.AccountId != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "account_id", runtime.ParamLocationQuery, *params.AccountId); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotSessionGetRequest generates requests for RobotSessionGet
+func NewRobotSessionGetRequest(server string, sessionId RobotSessionIDParam, params *RobotSessionGetParams) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "session_id", runtime.ParamLocationPath, sessionId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/sessions/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Before != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "before", runtime.ParamLocationQuery, *params.Before); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		if params.Limit != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "limit", runtime.ParamLocationQuery, *params.Limit); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotToolsListRequest generates requests for RobotToolsList
+func NewRobotToolsListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/tools")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceInstancesListRequest generates requests for RobotWorkspaceInstancesList
+func NewRobotWorkspaceInstancesListRequest(server string, params *RobotWorkspaceInstancesListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspace-instances")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceInstanceDeleteRequest generates requests for RobotWorkspaceInstanceDelete
+func NewRobotWorkspaceInstanceDeleteRequest(server string, workspaceInstanceId RobotWorkspaceInstanceIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "workspace_instance_id", runtime.ParamLocationPath, workspaceInstanceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspace-instances/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceInstanceGetRequest generates requests for RobotWorkspaceInstanceGet
+func NewRobotWorkspaceInstanceGetRequest(server string, workspaceInstanceId RobotWorkspaceInstanceIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "workspace_instance_id", runtime.ParamLocationPath, workspaceInstanceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspace-instances/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceProvidersListRequest generates requests for RobotWorkspaceProvidersList
+func NewRobotWorkspaceProvidersListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspace-providers")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspacesListRequest generates requests for RobotWorkspacesList
+func NewRobotWorkspacesListRequest(server string, params *RobotWorkspacesListParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspaces")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if params.Page != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "page", runtime.ParamLocationQuery, *params.Page); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
+				}
+			}
+
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceCreateRequest calls the generic RobotWorkspaceCreate builder with application/json body
+func NewRobotWorkspaceCreateRequest(server string, body RobotWorkspaceCreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotWorkspaceCreateRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewRobotWorkspaceCreateRequestWithBody generates requests for RobotWorkspaceCreate with any type of body
+func NewRobotWorkspaceCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspaces")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotWorkspaceDeleteRequest generates requests for RobotWorkspaceDelete
+func NewRobotWorkspaceDeleteRequest(server string, workspaceId RobotWorkspaceIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "workspace_id", runtime.ParamLocationPath, workspaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceGetRequest generates requests for RobotWorkspaceGet
+func NewRobotWorkspaceGetRequest(server string, workspaceId RobotWorkspaceIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "workspace_id", runtime.ParamLocationPath, workspaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotWorkspaceUpdateRequest calls the generic RobotWorkspaceUpdate builder with application/json body
+func NewRobotWorkspaceUpdateRequest(server string, workspaceId RobotWorkspaceIDParam, body RobotWorkspaceUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotWorkspaceUpdateRequestWithBody(server, workspaceId, "application/json", bodyReader)
+}
+
+// NewRobotWorkspaceUpdateRequestWithBody generates requests for RobotWorkspaceUpdate with any type of body
+func NewRobotWorkspaceUpdateRequestWithBody(server string, workspaceId RobotWorkspaceIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "workspace_id", runtime.ParamLocationPath, workspaceId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/workspaces/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRobotDeleteRequest generates requests for RobotDelete
+func NewRobotDeleteRequest(server string, robotId RobotIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "robot_id", runtime.ParamLocationPath, robotId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotGetRequest generates requests for RobotGet
+func NewRobotGetRequest(server string, robotId RobotIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "robot_id", runtime.ParamLocationPath, robotId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewRobotUpdateRequest calls the generic RobotUpdate builder with application/json body
+func NewRobotUpdateRequest(server string, robotId RobotIDParam, body RobotUpdateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewRobotUpdateRequestWithBody(server, robotId, "application/json", bodyReader)
+}
+
+// NewRobotUpdateRequestWithBody generates requests for RobotUpdate with any type of body
+func NewRobotUpdateRequestWithBody(server string, robotId RobotIDParam, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "robot_id", runtime.ParamLocationPath, robotId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/robots/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewRoleListRequest generates requests for RoleList
 func NewRoleListRequest(server string) (*http.Request, error) {
 	var err error
@@ -21946,6 +26637,22 @@ type ClientWithResponsesInterface interface {
 	// AdminOAuthRefreshTokenDeleteWithResponse request
 	AdminOAuthRefreshTokenDeleteWithResponse(ctx context.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam, reqEditors ...RequestEditorFn) (*AdminOAuthRefreshTokenDeleteResponse, error)
 
+	// OAuthRemoteConnectionListWithResponse request
+	OAuthRemoteConnectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionListResponse, error)
+
+	// OAuthRemoteConnectionCreateWithBodyWithResponse request with any body
+	OAuthRemoteConnectionCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionCreateResponse, error)
+
+	OAuthRemoteConnectionCreateWithResponse(ctx context.Context, body OAuthRemoteConnectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionCreateResponse, error)
+
+	// OAuthRemoteConnectionAuthorizeWithResponse request
+	OAuthRemoteConnectionAuthorizeWithResponse(ctx context.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionAuthorizeResponse, error)
+
+	// OAuthRemoteDiscoverWithBodyWithResponse request with any body
+	OAuthRemoteDiscoverWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthRemoteDiscoverResponse, error)
+
+	OAuthRemoteDiscoverWithResponse(ctx context.Context, body OAuthRemoteDiscoverJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthRemoteDiscoverResponse, error)
+
 	// AssetUploadWithBodyWithResponse request with any body
 	AssetUploadWithBodyWithResponse(ctx context.Context, params *AssetUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AssetUploadResponse, error)
 
@@ -22387,6 +27094,9 @@ type ClientWithResponsesInterface interface {
 
 	OAuthClientRegisterWithResponse(ctx context.Context, body OAuthClientRegisterJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthClientRegisterResponse, error)
 
+	// OAuthRemoteCallbackWithResponse request
+	OAuthRemoteCallbackWithResponse(ctx context.Context, params *OAuthRemoteCallbackParams, reqEditors ...RequestEditorFn) (*OAuthRemoteCallbackResponse, error)
+
 	// OAuthTokenWithBodyWithResponse request with any body
 	OAuthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error)
 
@@ -22491,6 +27201,111 @@ type ClientWithResponsesInterface interface {
 	ReportUpdateWithBodyWithResponse(ctx context.Context, reportId ReportIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReportUpdateResponse, error)
 
 	ReportUpdateWithResponse(ctx context.Context, reportId ReportIDParam, body ReportUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ReportUpdateResponse, error)
+
+	// RobotsListWithResponse request
+	RobotsListWithResponse(ctx context.Context, params *RobotsListParams, reqEditors ...RequestEditorFn) (*RobotsListResponse, error)
+
+	// RobotCreateWithBodyWithResponse request with any body
+	RobotCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotCreateResponse, error)
+
+	RobotCreateWithResponse(ctx context.Context, body RobotCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotCreateResponse, error)
+
+	// RobotChatSSEWithBodyWithResponse request with any body
+	RobotChatSSEWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotChatSSEResponse, error)
+
+	RobotChatSSEWithResponse(ctx context.Context, body RobotChatSSEJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotChatSSEResponse, error)
+
+	// RobotMCPServersListWithResponse request
+	RobotMCPServersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotMCPServersListResponse, error)
+
+	// RobotMCPServerCreateWithBodyWithResponse request with any body
+	RobotMCPServerCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerCreateResponse, error)
+
+	RobotMCPServerCreateWithResponse(ctx context.Context, body RobotMCPServerCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerCreateResponse, error)
+
+	// RobotMCPServerProbeWithBodyWithResponse request with any body
+	RobotMCPServerProbeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerProbeResponse, error)
+
+	RobotMCPServerProbeWithResponse(ctx context.Context, body RobotMCPServerProbeJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerProbeResponse, error)
+
+	// RobotMCPServerDeleteWithResponse request
+	RobotMCPServerDeleteWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerDeleteResponse, error)
+
+	// RobotMCPServerGetWithResponse request
+	RobotMCPServerGetWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerGetResponse, error)
+
+	// RobotMCPServerUpdateWithBodyWithResponse request with any body
+	RobotMCPServerUpdateWithBodyWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerUpdateResponse, error)
+
+	RobotMCPServerUpdateWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, body RobotMCPServerUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerUpdateResponse, error)
+
+	// RobotMCPServerRefreshWithResponse request
+	RobotMCPServerRefreshWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerRefreshResponse, error)
+
+	// RobotModelsListWithResponse request
+	RobotModelsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotModelsListResponse, error)
+
+	// RobotProvidersListWithResponse request
+	RobotProvidersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotProvidersListResponse, error)
+
+	// RobotProviderUpdateWithBodyWithResponse request with any body
+	RobotProviderUpdateWithBodyWithResponse(ctx context.Context, provider RobotModelProviderParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotProviderUpdateResponse, error)
+
+	RobotProviderUpdateWithResponse(ctx context.Context, provider RobotModelProviderParam, body RobotProviderUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotProviderUpdateResponse, error)
+
+	// RobotProviderModelsRefreshWithResponse request
+	RobotProviderModelsRefreshWithResponse(ctx context.Context, provider RobotModelProviderParam, reqEditors ...RequestEditorFn) (*RobotProviderModelsRefreshResponse, error)
+
+	// RobotSessionsListWithResponse request
+	RobotSessionsListWithResponse(ctx context.Context, params *RobotSessionsListParams, reqEditors ...RequestEditorFn) (*RobotSessionsListResponse, error)
+
+	// RobotSessionGetWithResponse request
+	RobotSessionGetWithResponse(ctx context.Context, sessionId RobotSessionIDParam, params *RobotSessionGetParams, reqEditors ...RequestEditorFn) (*RobotSessionGetResponse, error)
+
+	// RobotToolsListWithResponse request
+	RobotToolsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotToolsListResponse, error)
+
+	// RobotWorkspaceInstancesListWithResponse request
+	RobotWorkspaceInstancesListWithResponse(ctx context.Context, params *RobotWorkspaceInstancesListParams, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstancesListResponse, error)
+
+	// RobotWorkspaceInstanceDeleteWithResponse request
+	RobotWorkspaceInstanceDeleteWithResponse(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstanceDeleteResponse, error)
+
+	// RobotWorkspaceInstanceGetWithResponse request
+	RobotWorkspaceInstanceGetWithResponse(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstanceGetResponse, error)
+
+	// RobotWorkspaceProvidersListWithResponse request
+	RobotWorkspaceProvidersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotWorkspaceProvidersListResponse, error)
+
+	// RobotWorkspacesListWithResponse request
+	RobotWorkspacesListWithResponse(ctx context.Context, params *RobotWorkspacesListParams, reqEditors ...RequestEditorFn) (*RobotWorkspacesListResponse, error)
+
+	// RobotWorkspaceCreateWithBodyWithResponse request with any body
+	RobotWorkspaceCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotWorkspaceCreateResponse, error)
+
+	RobotWorkspaceCreateWithResponse(ctx context.Context, body RobotWorkspaceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotWorkspaceCreateResponse, error)
+
+	// RobotWorkspaceDeleteWithResponse request
+	RobotWorkspaceDeleteWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceDeleteResponse, error)
+
+	// RobotWorkspaceGetWithResponse request
+	RobotWorkspaceGetWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceGetResponse, error)
+
+	// RobotWorkspaceUpdateWithBodyWithResponse request with any body
+	RobotWorkspaceUpdateWithBodyWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotWorkspaceUpdateResponse, error)
+
+	RobotWorkspaceUpdateWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, body RobotWorkspaceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotWorkspaceUpdateResponse, error)
+
+	// RobotDeleteWithResponse request
+	RobotDeleteWithResponse(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*RobotDeleteResponse, error)
+
+	// RobotGetWithResponse request
+	RobotGetWithResponse(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*RobotGetResponse, error)
+
+	// RobotUpdateWithBodyWithResponse request with any body
+	RobotUpdateWithBodyWithResponse(ctx context.Context, robotId RobotIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotUpdateResponse, error)
+
+	RobotUpdateWithResponse(ctx context.Context, robotId RobotIDParam, body RobotUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotUpdateResponse, error)
 
 	// RoleListWithResponse request
 	RoleListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RoleListResponse, error)
@@ -23550,6 +28365,98 @@ func (r AdminOAuthRefreshTokenDeleteResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AdminOAuthRefreshTokenDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRemoteConnectionListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRemoteConnectionListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRemoteConnectionListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRemoteConnectionListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRemoteConnectionCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRemoteConnectionOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRemoteConnectionCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRemoteConnectionCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRemoteConnectionAuthorizeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRemoteAuthorizeOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRemoteConnectionAuthorizeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRemoteConnectionAuthorizeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type OAuthRemoteDiscoverResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRemoteDiscoverOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRemoteDiscoverResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRemoteDiscoverResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -26142,6 +31049,29 @@ func (r OAuthClientRegisterResponse) StatusCode() int {
 	return 0
 }
 
+type OAuthRemoteCallbackResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *OAuthRemoteCallbackOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r OAuthRemoteCallbackResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r OAuthRemoteCallbackResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type OAuthTokenResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -26799,6 +31729,668 @@ func (r ReportUpdateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r ReportUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotsListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotCreateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotChatSSEResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotChatSSEResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotChatSSEResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServersListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServersListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServersListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServersListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServerCreateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerProbeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServerProbeOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerProbeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerProbeResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServerGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServerUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotMCPServerRefreshResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotMCPServerRefreshOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotMCPServerRefreshResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotMCPServerRefreshResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotModelsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotModelsListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotModelsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotModelsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotProvidersListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotProvidersListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotProvidersListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotProvidersListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotProviderUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotProviderGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotProviderUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotProviderUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotProviderModelsRefreshResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotProviderGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotProviderModelsRefreshResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotProviderModelsRefreshResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotSessionsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotSessionsListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotSessionsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotSessionsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotSessionGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotSessionGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotSessionGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotSessionGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotToolsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotToolsListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotToolsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotToolsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceInstancesListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceInstancesListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceInstancesListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceInstancesListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceInstanceDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceInstanceDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceInstanceDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceInstanceGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceInstanceGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceInstanceGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceInstanceGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceProvidersListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceProvidersListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceProvidersListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceProvidersListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspacesListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspacesListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspacesListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspacesListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceCreateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceCreateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceCreateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotWorkspaceUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotWorkspaceGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotWorkspaceUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotWorkspaceUpdateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotDeleteResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RobotUpdateResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RobotGetOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RobotUpdateResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RobotUpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -27668,6 +33260,58 @@ func (c *ClientWithResponses) AdminOAuthRefreshTokenDeleteWithResponse(ctx conte
 		return nil, err
 	}
 	return ParseAdminOAuthRefreshTokenDeleteResponse(rsp)
+}
+
+// OAuthRemoteConnectionListWithResponse request returning *OAuthRemoteConnectionListResponse
+func (c *ClientWithResponses) OAuthRemoteConnectionListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionListResponse, error) {
+	rsp, err := c.OAuthRemoteConnectionList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteConnectionListResponse(rsp)
+}
+
+// OAuthRemoteConnectionCreateWithBodyWithResponse request with arbitrary body returning *OAuthRemoteConnectionCreateResponse
+func (c *ClientWithResponses) OAuthRemoteConnectionCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionCreateResponse, error) {
+	rsp, err := c.OAuthRemoteConnectionCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteConnectionCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthRemoteConnectionCreateWithResponse(ctx context.Context, body OAuthRemoteConnectionCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionCreateResponse, error) {
+	rsp, err := c.OAuthRemoteConnectionCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteConnectionCreateResponse(rsp)
+}
+
+// OAuthRemoteConnectionAuthorizeWithResponse request returning *OAuthRemoteConnectionAuthorizeResponse
+func (c *ClientWithResponses) OAuthRemoteConnectionAuthorizeWithResponse(ctx context.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam, reqEditors ...RequestEditorFn) (*OAuthRemoteConnectionAuthorizeResponse, error) {
+	rsp, err := c.OAuthRemoteConnectionAuthorize(ctx, oauthRemoteConnectionId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteConnectionAuthorizeResponse(rsp)
+}
+
+// OAuthRemoteDiscoverWithBodyWithResponse request with arbitrary body returning *OAuthRemoteDiscoverResponse
+func (c *ClientWithResponses) OAuthRemoteDiscoverWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthRemoteDiscoverResponse, error) {
+	rsp, err := c.OAuthRemoteDiscoverWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteDiscoverResponse(rsp)
+}
+
+func (c *ClientWithResponses) OAuthRemoteDiscoverWithResponse(ctx context.Context, body OAuthRemoteDiscoverJSONRequestBody, reqEditors ...RequestEditorFn) (*OAuthRemoteDiscoverResponse, error) {
+	rsp, err := c.OAuthRemoteDiscover(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteDiscoverResponse(rsp)
 }
 
 // AssetUploadWithBodyWithResponse request with arbitrary body returning *AssetUploadResponse
@@ -29095,6 +34739,15 @@ func (c *ClientWithResponses) OAuthClientRegisterWithResponse(ctx context.Contex
 	return ParseOAuthClientRegisterResponse(rsp)
 }
 
+// OAuthRemoteCallbackWithResponse request returning *OAuthRemoteCallbackResponse
+func (c *ClientWithResponses) OAuthRemoteCallbackWithResponse(ctx context.Context, params *OAuthRemoteCallbackParams, reqEditors ...RequestEditorFn) (*OAuthRemoteCallbackResponse, error) {
+	rsp, err := c.OAuthRemoteCallback(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseOAuthRemoteCallbackResponse(rsp)
+}
+
 // OAuthTokenWithBodyWithResponse request with arbitrary body returning *OAuthTokenResponse
 func (c *ClientWithResponses) OAuthTokenWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*OAuthTokenResponse, error) {
 	rsp, err := c.OAuthTokenWithBody(ctx, contentType, body, reqEditors...)
@@ -29426,6 +35079,339 @@ func (c *ClientWithResponses) ReportUpdateWithResponse(ctx context.Context, repo
 		return nil, err
 	}
 	return ParseReportUpdateResponse(rsp)
+}
+
+// RobotsListWithResponse request returning *RobotsListResponse
+func (c *ClientWithResponses) RobotsListWithResponse(ctx context.Context, params *RobotsListParams, reqEditors ...RequestEditorFn) (*RobotsListResponse, error) {
+	rsp, err := c.RobotsList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotsListResponse(rsp)
+}
+
+// RobotCreateWithBodyWithResponse request with arbitrary body returning *RobotCreateResponse
+func (c *ClientWithResponses) RobotCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotCreateResponse, error) {
+	rsp, err := c.RobotCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotCreateWithResponse(ctx context.Context, body RobotCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotCreateResponse, error) {
+	rsp, err := c.RobotCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotCreateResponse(rsp)
+}
+
+// RobotChatSSEWithBodyWithResponse request with arbitrary body returning *RobotChatSSEResponse
+func (c *ClientWithResponses) RobotChatSSEWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotChatSSEResponse, error) {
+	rsp, err := c.RobotChatSSEWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotChatSSEResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotChatSSEWithResponse(ctx context.Context, body RobotChatSSEJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotChatSSEResponse, error) {
+	rsp, err := c.RobotChatSSE(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotChatSSEResponse(rsp)
+}
+
+// RobotMCPServersListWithResponse request returning *RobotMCPServersListResponse
+func (c *ClientWithResponses) RobotMCPServersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotMCPServersListResponse, error) {
+	rsp, err := c.RobotMCPServersList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServersListResponse(rsp)
+}
+
+// RobotMCPServerCreateWithBodyWithResponse request with arbitrary body returning *RobotMCPServerCreateResponse
+func (c *ClientWithResponses) RobotMCPServerCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerCreateResponse, error) {
+	rsp, err := c.RobotMCPServerCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotMCPServerCreateWithResponse(ctx context.Context, body RobotMCPServerCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerCreateResponse, error) {
+	rsp, err := c.RobotMCPServerCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerCreateResponse(rsp)
+}
+
+// RobotMCPServerProbeWithBodyWithResponse request with arbitrary body returning *RobotMCPServerProbeResponse
+func (c *ClientWithResponses) RobotMCPServerProbeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerProbeResponse, error) {
+	rsp, err := c.RobotMCPServerProbeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerProbeResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotMCPServerProbeWithResponse(ctx context.Context, body RobotMCPServerProbeJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerProbeResponse, error) {
+	rsp, err := c.RobotMCPServerProbe(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerProbeResponse(rsp)
+}
+
+// RobotMCPServerDeleteWithResponse request returning *RobotMCPServerDeleteResponse
+func (c *ClientWithResponses) RobotMCPServerDeleteWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerDeleteResponse, error) {
+	rsp, err := c.RobotMCPServerDelete(ctx, mcpServerId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerDeleteResponse(rsp)
+}
+
+// RobotMCPServerGetWithResponse request returning *RobotMCPServerGetResponse
+func (c *ClientWithResponses) RobotMCPServerGetWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerGetResponse, error) {
+	rsp, err := c.RobotMCPServerGet(ctx, mcpServerId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerGetResponse(rsp)
+}
+
+// RobotMCPServerUpdateWithBodyWithResponse request with arbitrary body returning *RobotMCPServerUpdateResponse
+func (c *ClientWithResponses) RobotMCPServerUpdateWithBodyWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotMCPServerUpdateResponse, error) {
+	rsp, err := c.RobotMCPServerUpdateWithBody(ctx, mcpServerId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotMCPServerUpdateWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, body RobotMCPServerUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotMCPServerUpdateResponse, error) {
+	rsp, err := c.RobotMCPServerUpdate(ctx, mcpServerId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerUpdateResponse(rsp)
+}
+
+// RobotMCPServerRefreshWithResponse request returning *RobotMCPServerRefreshResponse
+func (c *ClientWithResponses) RobotMCPServerRefreshWithResponse(ctx context.Context, mcpServerId RobotMCPServerIDParam, reqEditors ...RequestEditorFn) (*RobotMCPServerRefreshResponse, error) {
+	rsp, err := c.RobotMCPServerRefresh(ctx, mcpServerId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotMCPServerRefreshResponse(rsp)
+}
+
+// RobotModelsListWithResponse request returning *RobotModelsListResponse
+func (c *ClientWithResponses) RobotModelsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotModelsListResponse, error) {
+	rsp, err := c.RobotModelsList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotModelsListResponse(rsp)
+}
+
+// RobotProvidersListWithResponse request returning *RobotProvidersListResponse
+func (c *ClientWithResponses) RobotProvidersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotProvidersListResponse, error) {
+	rsp, err := c.RobotProvidersList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotProvidersListResponse(rsp)
+}
+
+// RobotProviderUpdateWithBodyWithResponse request with arbitrary body returning *RobotProviderUpdateResponse
+func (c *ClientWithResponses) RobotProviderUpdateWithBodyWithResponse(ctx context.Context, provider RobotModelProviderParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotProviderUpdateResponse, error) {
+	rsp, err := c.RobotProviderUpdateWithBody(ctx, provider, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotProviderUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotProviderUpdateWithResponse(ctx context.Context, provider RobotModelProviderParam, body RobotProviderUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotProviderUpdateResponse, error) {
+	rsp, err := c.RobotProviderUpdate(ctx, provider, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotProviderUpdateResponse(rsp)
+}
+
+// RobotProviderModelsRefreshWithResponse request returning *RobotProviderModelsRefreshResponse
+func (c *ClientWithResponses) RobotProviderModelsRefreshWithResponse(ctx context.Context, provider RobotModelProviderParam, reqEditors ...RequestEditorFn) (*RobotProviderModelsRefreshResponse, error) {
+	rsp, err := c.RobotProviderModelsRefresh(ctx, provider, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotProviderModelsRefreshResponse(rsp)
+}
+
+// RobotSessionsListWithResponse request returning *RobotSessionsListResponse
+func (c *ClientWithResponses) RobotSessionsListWithResponse(ctx context.Context, params *RobotSessionsListParams, reqEditors ...RequestEditorFn) (*RobotSessionsListResponse, error) {
+	rsp, err := c.RobotSessionsList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotSessionsListResponse(rsp)
+}
+
+// RobotSessionGetWithResponse request returning *RobotSessionGetResponse
+func (c *ClientWithResponses) RobotSessionGetWithResponse(ctx context.Context, sessionId RobotSessionIDParam, params *RobotSessionGetParams, reqEditors ...RequestEditorFn) (*RobotSessionGetResponse, error) {
+	rsp, err := c.RobotSessionGet(ctx, sessionId, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotSessionGetResponse(rsp)
+}
+
+// RobotToolsListWithResponse request returning *RobotToolsListResponse
+func (c *ClientWithResponses) RobotToolsListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotToolsListResponse, error) {
+	rsp, err := c.RobotToolsList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotToolsListResponse(rsp)
+}
+
+// RobotWorkspaceInstancesListWithResponse request returning *RobotWorkspaceInstancesListResponse
+func (c *ClientWithResponses) RobotWorkspaceInstancesListWithResponse(ctx context.Context, params *RobotWorkspaceInstancesListParams, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstancesListResponse, error) {
+	rsp, err := c.RobotWorkspaceInstancesList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceInstancesListResponse(rsp)
+}
+
+// RobotWorkspaceInstanceDeleteWithResponse request returning *RobotWorkspaceInstanceDeleteResponse
+func (c *ClientWithResponses) RobotWorkspaceInstanceDeleteWithResponse(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstanceDeleteResponse, error) {
+	rsp, err := c.RobotWorkspaceInstanceDelete(ctx, workspaceInstanceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceInstanceDeleteResponse(rsp)
+}
+
+// RobotWorkspaceInstanceGetWithResponse request returning *RobotWorkspaceInstanceGetResponse
+func (c *ClientWithResponses) RobotWorkspaceInstanceGetWithResponse(ctx context.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceInstanceGetResponse, error) {
+	rsp, err := c.RobotWorkspaceInstanceGet(ctx, workspaceInstanceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceInstanceGetResponse(rsp)
+}
+
+// RobotWorkspaceProvidersListWithResponse request returning *RobotWorkspaceProvidersListResponse
+func (c *ClientWithResponses) RobotWorkspaceProvidersListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RobotWorkspaceProvidersListResponse, error) {
+	rsp, err := c.RobotWorkspaceProvidersList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceProvidersListResponse(rsp)
+}
+
+// RobotWorkspacesListWithResponse request returning *RobotWorkspacesListResponse
+func (c *ClientWithResponses) RobotWorkspacesListWithResponse(ctx context.Context, params *RobotWorkspacesListParams, reqEditors ...RequestEditorFn) (*RobotWorkspacesListResponse, error) {
+	rsp, err := c.RobotWorkspacesList(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspacesListResponse(rsp)
+}
+
+// RobotWorkspaceCreateWithBodyWithResponse request with arbitrary body returning *RobotWorkspaceCreateResponse
+func (c *ClientWithResponses) RobotWorkspaceCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotWorkspaceCreateResponse, error) {
+	rsp, err := c.RobotWorkspaceCreateWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotWorkspaceCreateWithResponse(ctx context.Context, body RobotWorkspaceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotWorkspaceCreateResponse, error) {
+	rsp, err := c.RobotWorkspaceCreate(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceCreateResponse(rsp)
+}
+
+// RobotWorkspaceDeleteWithResponse request returning *RobotWorkspaceDeleteResponse
+func (c *ClientWithResponses) RobotWorkspaceDeleteWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceDeleteResponse, error) {
+	rsp, err := c.RobotWorkspaceDelete(ctx, workspaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceDeleteResponse(rsp)
+}
+
+// RobotWorkspaceGetWithResponse request returning *RobotWorkspaceGetResponse
+func (c *ClientWithResponses) RobotWorkspaceGetWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, reqEditors ...RequestEditorFn) (*RobotWorkspaceGetResponse, error) {
+	rsp, err := c.RobotWorkspaceGet(ctx, workspaceId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceGetResponse(rsp)
+}
+
+// RobotWorkspaceUpdateWithBodyWithResponse request with arbitrary body returning *RobotWorkspaceUpdateResponse
+func (c *ClientWithResponses) RobotWorkspaceUpdateWithBodyWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotWorkspaceUpdateResponse, error) {
+	rsp, err := c.RobotWorkspaceUpdateWithBody(ctx, workspaceId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotWorkspaceUpdateWithResponse(ctx context.Context, workspaceId RobotWorkspaceIDParam, body RobotWorkspaceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotWorkspaceUpdateResponse, error) {
+	rsp, err := c.RobotWorkspaceUpdate(ctx, workspaceId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotWorkspaceUpdateResponse(rsp)
+}
+
+// RobotDeleteWithResponse request returning *RobotDeleteResponse
+func (c *ClientWithResponses) RobotDeleteWithResponse(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*RobotDeleteResponse, error) {
+	rsp, err := c.RobotDelete(ctx, robotId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotDeleteResponse(rsp)
+}
+
+// RobotGetWithResponse request returning *RobotGetResponse
+func (c *ClientWithResponses) RobotGetWithResponse(ctx context.Context, robotId RobotIDParam, reqEditors ...RequestEditorFn) (*RobotGetResponse, error) {
+	rsp, err := c.RobotGet(ctx, robotId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotGetResponse(rsp)
+}
+
+// RobotUpdateWithBodyWithResponse request with arbitrary body returning *RobotUpdateResponse
+func (c *ClientWithResponses) RobotUpdateWithBodyWithResponse(ctx context.Context, robotId RobotIDParam, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RobotUpdateResponse, error) {
+	rsp, err := c.RobotUpdateWithBody(ctx, robotId, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotUpdateResponse(rsp)
+}
+
+func (c *ClientWithResponses) RobotUpdateWithResponse(ctx context.Context, robotId RobotIDParam, body RobotUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RobotUpdateResponse, error) {
+	rsp, err := c.RobotUpdate(ctx, robotId, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRobotUpdateResponse(rsp)
 }
 
 // RoleListWithResponse request returning *RoleListResponse
@@ -30997,6 +36983,138 @@ func ParseAdminOAuthRefreshTokenDeleteResponse(rsp *http.Response) (*AdminOAuthR
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRemoteConnectionListResponse parses an HTTP response from a OAuthRemoteConnectionListWithResponse call
+func ParseOAuthRemoteConnectionListResponse(rsp *http.Response) (*OAuthRemoteConnectionListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRemoteConnectionListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRemoteConnectionListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRemoteConnectionCreateResponse parses an HTTP response from a OAuthRemoteConnectionCreateWithResponse call
+func ParseOAuthRemoteConnectionCreateResponse(rsp *http.Response) (*OAuthRemoteConnectionCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRemoteConnectionCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRemoteConnectionOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRemoteConnectionAuthorizeResponse parses an HTTP response from a OAuthRemoteConnectionAuthorizeWithResponse call
+func ParseOAuthRemoteConnectionAuthorizeResponse(rsp *http.Response) (*OAuthRemoteConnectionAuthorizeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRemoteConnectionAuthorizeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRemoteAuthorizeOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseOAuthRemoteDiscoverResponse parses an HTTP response from a OAuthRemoteDiscoverWithResponse call
+func ParseOAuthRemoteDiscoverResponse(rsp *http.Response) (*OAuthRemoteDiscoverResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRemoteDiscoverResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRemoteDiscoverOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest InternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -34644,6 +40762,39 @@ func ParseOAuthClientRegisterResponse(rsp *http.Response) (*OAuthClientRegisterR
 	return response, nil
 }
 
+// ParseOAuthRemoteCallbackResponse parses an HTTP response from a OAuthRemoteCallbackWithResponse call
+func ParseOAuthRemoteCallbackResponse(rsp *http.Response) (*OAuthRemoteCallbackResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &OAuthRemoteCallbackResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest OAuthRemoteCallbackOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseOAuthTokenResponse parses an HTTP response from a OAuthTokenWithResponse call
 func ParseOAuthTokenResponse(rsp *http.Response) (*OAuthTokenResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -35573,6 +41724,928 @@ func ParseReportUpdateResponse(rsp *http.Response) (*ReportUpdateResponse, error
 	return response, nil
 }
 
+// ParseRobotsListResponse parses an HTTP response from a RobotsListWithResponse call
+func ParseRobotsListResponse(rsp *http.Response) (*RobotsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotsListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotCreateResponse parses an HTTP response from a RobotCreateWithResponse call
+func ParseRobotCreateResponse(rsp *http.Response) (*RobotCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotCreateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotChatSSEResponse parses an HTTP response from a RobotChatSSEWithResponse call
+func ParseRobotChatSSEResponse(rsp *http.Response) (*RobotChatSSEResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotChatSSEResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServersListResponse parses an HTTP response from a RobotMCPServersListWithResponse call
+func ParseRobotMCPServersListResponse(rsp *http.Response) (*RobotMCPServersListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServersListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServersListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerCreateResponse parses an HTTP response from a RobotMCPServerCreateWithResponse call
+func ParseRobotMCPServerCreateResponse(rsp *http.Response) (*RobotMCPServerCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServerCreateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerProbeResponse parses an HTTP response from a RobotMCPServerProbeWithResponse call
+func ParseRobotMCPServerProbeResponse(rsp *http.Response) (*RobotMCPServerProbeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerProbeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServerProbeOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerDeleteResponse parses an HTTP response from a RobotMCPServerDeleteWithResponse call
+func ParseRobotMCPServerDeleteResponse(rsp *http.Response) (*RobotMCPServerDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerGetResponse parses an HTTP response from a RobotMCPServerGetWithResponse call
+func ParseRobotMCPServerGetResponse(rsp *http.Response) (*RobotMCPServerGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServerGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerUpdateResponse parses an HTTP response from a RobotMCPServerUpdateWithResponse call
+func ParseRobotMCPServerUpdateResponse(rsp *http.Response) (*RobotMCPServerUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServerUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotMCPServerRefreshResponse parses an HTTP response from a RobotMCPServerRefreshWithResponse call
+func ParseRobotMCPServerRefreshResponse(rsp *http.Response) (*RobotMCPServerRefreshResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotMCPServerRefreshResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotMCPServerRefreshOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotModelsListResponse parses an HTTP response from a RobotModelsListWithResponse call
+func ParseRobotModelsListResponse(rsp *http.Response) (*RobotModelsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotModelsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotModelsListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotProvidersListResponse parses an HTTP response from a RobotProvidersListWithResponse call
+func ParseRobotProvidersListResponse(rsp *http.Response) (*RobotProvidersListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotProvidersListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotProvidersListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotProviderUpdateResponse parses an HTTP response from a RobotProviderUpdateWithResponse call
+func ParseRobotProviderUpdateResponse(rsp *http.Response) (*RobotProviderUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotProviderUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotProviderGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotProviderModelsRefreshResponse parses an HTTP response from a RobotProviderModelsRefreshWithResponse call
+func ParseRobotProviderModelsRefreshResponse(rsp *http.Response) (*RobotProviderModelsRefreshResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotProviderModelsRefreshResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotProviderGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotSessionsListResponse parses an HTTP response from a RobotSessionsListWithResponse call
+func ParseRobotSessionsListResponse(rsp *http.Response) (*RobotSessionsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotSessionsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotSessionsListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotSessionGetResponse parses an HTTP response from a RobotSessionGetWithResponse call
+func ParseRobotSessionGetResponse(rsp *http.Response) (*RobotSessionGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotSessionGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotSessionGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotToolsListResponse parses an HTTP response from a RobotToolsListWithResponse call
+func ParseRobotToolsListResponse(rsp *http.Response) (*RobotToolsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotToolsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotToolsListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceInstancesListResponse parses an HTTP response from a RobotWorkspaceInstancesListWithResponse call
+func ParseRobotWorkspaceInstancesListResponse(rsp *http.Response) (*RobotWorkspaceInstancesListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceInstancesListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceInstancesListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceInstanceDeleteResponse parses an HTTP response from a RobotWorkspaceInstanceDeleteWithResponse call
+func ParseRobotWorkspaceInstanceDeleteResponse(rsp *http.Response) (*RobotWorkspaceInstanceDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceInstanceDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceInstanceGetResponse parses an HTTP response from a RobotWorkspaceInstanceGetWithResponse call
+func ParseRobotWorkspaceInstanceGetResponse(rsp *http.Response) (*RobotWorkspaceInstanceGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceInstanceGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceInstanceGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceProvidersListResponse parses an HTTP response from a RobotWorkspaceProvidersListWithResponse call
+func ParseRobotWorkspaceProvidersListResponse(rsp *http.Response) (*RobotWorkspaceProvidersListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceProvidersListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceProvidersListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspacesListResponse parses an HTTP response from a RobotWorkspacesListWithResponse call
+func ParseRobotWorkspacesListResponse(rsp *http.Response) (*RobotWorkspacesListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspacesListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspacesListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceCreateResponse parses an HTTP response from a RobotWorkspaceCreateWithResponse call
+func ParseRobotWorkspaceCreateResponse(rsp *http.Response) (*RobotWorkspaceCreateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceCreateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceCreateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceDeleteResponse parses an HTTP response from a RobotWorkspaceDeleteWithResponse call
+func ParseRobotWorkspaceDeleteResponse(rsp *http.Response) (*RobotWorkspaceDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceGetResponse parses an HTTP response from a RobotWorkspaceGetWithResponse call
+func ParseRobotWorkspaceGetResponse(rsp *http.Response) (*RobotWorkspaceGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotWorkspaceUpdateResponse parses an HTTP response from a RobotWorkspaceUpdateWithResponse call
+func ParseRobotWorkspaceUpdateResponse(rsp *http.Response) (*RobotWorkspaceUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotWorkspaceUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotWorkspaceGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotDeleteResponse parses an HTTP response from a RobotDeleteWithResponse call
+func ParseRobotDeleteResponse(rsp *http.Response) (*RobotDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotGetResponse parses an HTTP response from a RobotGetWithResponse call
+func ParseRobotGetResponse(rsp *http.Response) (*RobotGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRobotUpdateResponse parses an HTTP response from a RobotUpdateWithResponse call
+func ParseRobotUpdateResponse(rsp *http.Response) (*RobotUpdateResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RobotUpdateResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RobotGetOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRoleListResponse parses an HTTP response from a RoleListWithResponse call
 func ParseRoleListResponse(rsp *http.Response) (*RoleListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -36215,6 +43288,18 @@ type ServerInterface interface {
 	// (DELETE /admin/oauth/refresh-tokens/{oauth_refresh_token_id})
 	AdminOAuthRefreshTokenDelete(ctx echo.Context, oauthRefreshTokenId OAuthRefreshTokenIDParam) error
 
+	// (GET /admin/oauth/remote/connections)
+	OAuthRemoteConnectionList(ctx echo.Context) error
+
+	// (POST /admin/oauth/remote/connections)
+	OAuthRemoteConnectionCreate(ctx echo.Context) error
+
+	// (POST /admin/oauth/remote/connections/{oauth_remote_connection_id}/authorize)
+	OAuthRemoteConnectionAuthorize(ctx echo.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam) error
+
+	// (POST /admin/oauth/remote/discover)
+	OAuthRemoteDiscover(ctx echo.Context) error
+
 	// (POST /assets)
 	AssetUpload(ctx echo.Context, params AssetUploadParams) error
 
@@ -36554,6 +43639,9 @@ type ServerInterface interface {
 	// (POST /oauth/register)
 	OAuthClientRegister(ctx echo.Context) error
 
+	// (GET /oauth/remote/callback)
+	OAuthRemoteCallback(ctx echo.Context, params OAuthRemoteCallbackParams) error
+
 	// (POST /oauth/token)
 	OAuthToken(ctx echo.Context) error
 
@@ -36640,6 +43728,93 @@ type ServerInterface interface {
 
 	// (PATCH /reports/{report_id})
 	ReportUpdate(ctx echo.Context, reportId ReportIDParam) error
+	// List robots
+	// (GET /robots)
+	RobotsList(ctx echo.Context, params RobotsListParams) error
+	// Create a robot
+	// (POST /robots)
+	RobotCreate(ctx echo.Context) error
+
+	// (POST /robots/chat/sse)
+	RobotChatSSE(ctx echo.Context) error
+	// List Robot MCP servers
+	// (GET /robots/mcp-servers)
+	RobotMCPServersList(ctx echo.Context) error
+	// Create Robot MCP server
+	// (POST /robots/mcp-servers)
+	RobotMCPServerCreate(ctx echo.Context) error
+	// Probe Robot MCP server
+	// (POST /robots/mcp-servers/probe)
+	RobotMCPServerProbe(ctx echo.Context) error
+	// Delete Robot MCP server
+	// (DELETE /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerDelete(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error
+	// Get Robot MCP server
+	// (GET /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerGet(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error
+	// Update Robot MCP server
+	// (PATCH /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerUpdate(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error
+	// Refresh Robot MCP server tools
+	// (POST /robots/mcp-servers/{mcp_server_id}/refresh)
+	RobotMCPServerRefresh(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error
+	// List robot models
+	// (GET /robots/models)
+	RobotModelsList(ctx echo.Context) error
+	// List robot providers
+	// (GET /robots/providers)
+	RobotProvidersList(ctx echo.Context) error
+	// Update a robot provider
+	// (PATCH /robots/providers/{provider})
+	RobotProviderUpdate(ctx echo.Context, provider RobotModelProviderParam) error
+	// Refresh robot provider models
+	// (POST /robots/providers/{provider}/models/refresh)
+	RobotProviderModelsRefresh(ctx echo.Context, provider RobotModelProviderParam) error
+	// List robot sessions
+	// (GET /robots/sessions)
+	RobotSessionsList(ctx echo.Context, params RobotSessionsListParams) error
+	// Get a robot session
+	// (GET /robots/sessions/{session_id})
+	RobotSessionGet(ctx echo.Context, sessionId RobotSessionIDParam, params RobotSessionGetParams) error
+	// List robot tools
+	// (GET /robots/tools)
+	RobotToolsList(ctx echo.Context) error
+	// List robot workspace instances
+	// (GET /robots/workspace-instances)
+	RobotWorkspaceInstancesList(ctx echo.Context, params RobotWorkspaceInstancesListParams) error
+	// Delete a robot workspace instance
+	// (DELETE /robots/workspace-instances/{workspace_instance_id})
+	RobotWorkspaceInstanceDelete(ctx echo.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam) error
+	// Get a robot workspace instance
+	// (GET /robots/workspace-instances/{workspace_instance_id})
+	RobotWorkspaceInstanceGet(ctx echo.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam) error
+	// List robot workspace providers
+	// (GET /robots/workspace-providers)
+	RobotWorkspaceProvidersList(ctx echo.Context) error
+	// List robot workspaces
+	// (GET /robots/workspaces)
+	RobotWorkspacesList(ctx echo.Context, params RobotWorkspacesListParams) error
+	// Create a robot workspace
+	// (POST /robots/workspaces)
+	RobotWorkspaceCreate(ctx echo.Context) error
+	// Delete a robot workspace
+	// (DELETE /robots/workspaces/{workspace_id})
+	RobotWorkspaceDelete(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error
+	// Get a robot workspace
+	// (GET /robots/workspaces/{workspace_id})
+	RobotWorkspaceGet(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error
+	// Update a robot workspace
+	// (PATCH /robots/workspaces/{workspace_id})
+	RobotWorkspaceUpdate(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error
+	// Delete a robot
+	// (DELETE /robots/{robot_id})
+	RobotDelete(ctx echo.Context, robotId RobotIDParam) error
+	// Get a robot
+	// (GET /robots/{robot_id})
+	RobotGet(ctx echo.Context, robotId RobotIDParam) error
+	// Update a robot
+	// (PATCH /robots/{robot_id})
+	RobotUpdate(ctx echo.Context, robotId RobotIDParam) error
 
 	// (GET /roles)
 	RoleList(ctx echo.Context) error
@@ -37687,6 +44862,73 @@ func (w *ServerInterfaceWrapper) AdminOAuthRefreshTokenDelete(ctx echo.Context) 
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AdminOAuthRefreshTokenDelete(ctx, oauthRefreshTokenId)
+	return err
+}
+
+// OAuthRemoteConnectionList converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRemoteConnectionList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRemoteConnectionList(ctx)
+	return err
+}
+
+// OAuthRemoteConnectionCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRemoteConnectionCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRemoteConnectionCreate(ctx)
+	return err
+}
+
+// OAuthRemoteConnectionAuthorize converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRemoteConnectionAuthorize(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "oauth_remote_connection_id" -------------
+	var oauthRemoteConnectionId OAuthRemoteConnectionIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "oauth_remote_connection_id", ctx.Param("oauth_remote_connection_id"), &oauthRemoteConnectionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter oauth_remote_connection_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRemoteConnectionAuthorize(ctx, oauthRemoteConnectionId)
+	return err
+}
+
+// OAuthRemoteDiscover converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRemoteDiscover(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRemoteDiscover(ctx)
 	return err
 }
 
@@ -40237,6 +47479,33 @@ func (w *ServerInterfaceWrapper) OAuthClientRegister(ctx echo.Context) error {
 	return err
 }
 
+// OAuthRemoteCallback converts echo context to params.
+func (w *ServerInterfaceWrapper) OAuthRemoteCallback(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OAuthRemoteCallbackParams
+	// ------------- Optional query parameter "state" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "state", ctx.QueryParams(), &params.State)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter state: %s", err))
+	}
+
+	// ------------- Required query parameter "code" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "code", ctx.QueryParams(), &params.Code)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter code: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.OAuthRemoteCallback(ctx, params)
+	return err
+}
+
 // OAuthToken converts echo context to params.
 func (w *ServerInterfaceWrapper) OAuthToken(ctx echo.Context) error {
 	var err error
@@ -40898,6 +48167,605 @@ func (w *ServerInterfaceWrapper) ReportUpdate(ctx echo.Context) error {
 	return err
 }
 
+// RobotsList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotsList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RobotsListParams
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotsList(ctx, params)
+	return err
+}
+
+// RobotCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotCreate(ctx)
+	return err
+}
+
+// RobotChatSSE converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotChatSSE(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotChatSSE(ctx)
+	return err
+}
+
+// RobotMCPServersList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServersList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServersList(ctx)
+	return err
+}
+
+// RobotMCPServerCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerCreate(ctx)
+	return err
+}
+
+// RobotMCPServerProbe converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerProbe(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerProbe(ctx)
+	return err
+}
+
+// RobotMCPServerDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "mcp_server_id" -------------
+	var mcpServerId RobotMCPServerIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "mcp_server_id", ctx.Param("mcp_server_id"), &mcpServerId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter mcp_server_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerDelete(ctx, mcpServerId)
+	return err
+}
+
+// RobotMCPServerGet converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "mcp_server_id" -------------
+	var mcpServerId RobotMCPServerIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "mcp_server_id", ctx.Param("mcp_server_id"), &mcpServerId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter mcp_server_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerGet(ctx, mcpServerId)
+	return err
+}
+
+// RobotMCPServerUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "mcp_server_id" -------------
+	var mcpServerId RobotMCPServerIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "mcp_server_id", ctx.Param("mcp_server_id"), &mcpServerId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter mcp_server_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerUpdate(ctx, mcpServerId)
+	return err
+}
+
+// RobotMCPServerRefresh converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotMCPServerRefresh(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "mcp_server_id" -------------
+	var mcpServerId RobotMCPServerIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "mcp_server_id", ctx.Param("mcp_server_id"), &mcpServerId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter mcp_server_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotMCPServerRefresh(ctx, mcpServerId)
+	return err
+}
+
+// RobotModelsList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotModelsList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotModelsList(ctx)
+	return err
+}
+
+// RobotProvidersList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotProvidersList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotProvidersList(ctx)
+	return err
+}
+
+// RobotProviderUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotProviderUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "provider" -------------
+	var provider RobotModelProviderParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "provider", ctx.Param("provider"), &provider, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter provider: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotProviderUpdate(ctx, provider)
+	return err
+}
+
+// RobotProviderModelsRefresh converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotProviderModelsRefresh(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "provider" -------------
+	var provider RobotModelProviderParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "provider", ctx.Param("provider"), &provider, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter provider: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotProviderModelsRefresh(ctx, provider)
+	return err
+}
+
+// RobotSessionsList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotSessionsList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RobotSessionsListParams
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// ------------- Optional query parameter "account_id" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "account_id", ctx.QueryParams(), &params.AccountId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotSessionsList(ctx, params)
+	return err
+}
+
+// RobotSessionGet converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotSessionGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "session_id" -------------
+	var sessionId RobotSessionIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "session_id", ctx.Param("session_id"), &sessionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter session_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RobotSessionGetParams
+	// ------------- Optional query parameter "before" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "before", ctx.QueryParams(), &params.Before)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter before: %s", err))
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", ctx.QueryParams(), &params.Limit)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter limit: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotSessionGet(ctx, sessionId, params)
+	return err
+}
+
+// RobotToolsList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotToolsList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotToolsList(ctx)
+	return err
+}
+
+// RobotWorkspaceInstancesList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceInstancesList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RobotWorkspaceInstancesListParams
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceInstancesList(ctx, params)
+	return err
+}
+
+// RobotWorkspaceInstanceDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceInstanceDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "workspace_instance_id" -------------
+	var workspaceInstanceId RobotWorkspaceInstanceIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspace_instance_id", ctx.Param("workspace_instance_id"), &workspaceInstanceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter workspace_instance_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceInstanceDelete(ctx, workspaceInstanceId)
+	return err
+}
+
+// RobotWorkspaceInstanceGet converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceInstanceGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "workspace_instance_id" -------------
+	var workspaceInstanceId RobotWorkspaceInstanceIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspace_instance_id", ctx.Param("workspace_instance_id"), &workspaceInstanceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter workspace_instance_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceInstanceGet(ctx, workspaceInstanceId)
+	return err
+}
+
+// RobotWorkspaceProvidersList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceProvidersList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceProvidersList(ctx)
+	return err
+}
+
+// RobotWorkspacesList converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspacesList(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RobotWorkspacesListParams
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", ctx.QueryParams(), &params.Page)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter page: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspacesList(ctx, params)
+	return err
+}
+
+// RobotWorkspaceCreate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceCreate(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceCreate(ctx)
+	return err
+}
+
+// RobotWorkspaceDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "workspace_id" -------------
+	var workspaceId RobotWorkspaceIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspace_id", ctx.Param("workspace_id"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter workspace_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceDelete(ctx, workspaceId)
+	return err
+}
+
+// RobotWorkspaceGet converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "workspace_id" -------------
+	var workspaceId RobotWorkspaceIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspace_id", ctx.Param("workspace_id"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter workspace_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceGet(ctx, workspaceId)
+	return err
+}
+
+// RobotWorkspaceUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotWorkspaceUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "workspace_id" -------------
+	var workspaceId RobotWorkspaceIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "workspace_id", ctx.Param("workspace_id"), &workspaceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter workspace_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotWorkspaceUpdate(ctx, workspaceId)
+	return err
+}
+
+// RobotDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "robot_id" -------------
+	var robotId RobotIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "robot_id", ctx.Param("robot_id"), &robotId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter robot_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotDelete(ctx, robotId)
+	return err
+}
+
+// RobotGet converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotGet(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "robot_id" -------------
+	var robotId RobotIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "robot_id", ctx.Param("robot_id"), &robotId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter robot_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotGet(ctx, robotId)
+	return err
+}
+
+// RobotUpdate converts echo context to params.
+func (w *ServerInterfaceWrapper) RobotUpdate(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "robot_id" -------------
+	var robotId RobotIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "robot_id", ctx.Param("robot_id"), &robotId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter robot_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	ctx.Set(Access_keyScopes, []string{})
+
+	ctx.Set(Oauth_tokenScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RobotUpdate(ctx, robotId)
+	return err
+}
+
 // RoleList converts echo context to params.
 func (w *ServerInterfaceWrapper) RoleList(ctx echo.Context) error {
 	var err error
@@ -41323,6 +49191,10 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/admin/oauth/device-authorizations", wrapper.AdminOAuthDeviceAuthorisationList)
 	router.GET(baseURL+"/admin/oauth/refresh-tokens", wrapper.AdminOAuthRefreshTokenList)
 	router.DELETE(baseURL+"/admin/oauth/refresh-tokens/:oauth_refresh_token_id", wrapper.AdminOAuthRefreshTokenDelete)
+	router.GET(baseURL+"/admin/oauth/remote/connections", wrapper.OAuthRemoteConnectionList)
+	router.POST(baseURL+"/admin/oauth/remote/connections", wrapper.OAuthRemoteConnectionCreate)
+	router.POST(baseURL+"/admin/oauth/remote/connections/:oauth_remote_connection_id/authorize", wrapper.OAuthRemoteConnectionAuthorize)
+	router.POST(baseURL+"/admin/oauth/remote/discover", wrapper.OAuthRemoteDiscover)
 	router.POST(baseURL+"/assets", wrapper.AssetUpload)
 	router.GET(baseURL+"/assets/:asset_filename", wrapper.AssetGet)
 	router.GET(baseURL+"/auth", wrapper.AuthProviderList)
@@ -41436,6 +49308,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/oauth/device_authorization", wrapper.OAuthDeviceAuthorisation)
 	router.GET(baseURL+"/oauth/jwks", wrapper.OAuthJWKS)
 	router.POST(baseURL+"/oauth/register", wrapper.OAuthClientRegister)
+	router.GET(baseURL+"/oauth/remote/callback", wrapper.OAuthRemoteCallback)
 	router.POST(baseURL+"/oauth/token", wrapper.OAuthToken)
 	router.GET(baseURL+"/oauth/userinfo", wrapper.OAuthUserInfo)
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
@@ -41465,6 +49338,35 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/reports", wrapper.ReportList)
 	router.POST(baseURL+"/reports", wrapper.ReportCreate)
 	router.PATCH(baseURL+"/reports/:report_id", wrapper.ReportUpdate)
+	router.GET(baseURL+"/robots", wrapper.RobotsList)
+	router.POST(baseURL+"/robots", wrapper.RobotCreate)
+	router.POST(baseURL+"/robots/chat/sse", wrapper.RobotChatSSE)
+	router.GET(baseURL+"/robots/mcp-servers", wrapper.RobotMCPServersList)
+	router.POST(baseURL+"/robots/mcp-servers", wrapper.RobotMCPServerCreate)
+	router.POST(baseURL+"/robots/mcp-servers/probe", wrapper.RobotMCPServerProbe)
+	router.DELETE(baseURL+"/robots/mcp-servers/:mcp_server_id", wrapper.RobotMCPServerDelete)
+	router.GET(baseURL+"/robots/mcp-servers/:mcp_server_id", wrapper.RobotMCPServerGet)
+	router.PATCH(baseURL+"/robots/mcp-servers/:mcp_server_id", wrapper.RobotMCPServerUpdate)
+	router.POST(baseURL+"/robots/mcp-servers/:mcp_server_id/refresh", wrapper.RobotMCPServerRefresh)
+	router.GET(baseURL+"/robots/models", wrapper.RobotModelsList)
+	router.GET(baseURL+"/robots/providers", wrapper.RobotProvidersList)
+	router.PATCH(baseURL+"/robots/providers/:provider", wrapper.RobotProviderUpdate)
+	router.POST(baseURL+"/robots/providers/:provider/models/refresh", wrapper.RobotProviderModelsRefresh)
+	router.GET(baseURL+"/robots/sessions", wrapper.RobotSessionsList)
+	router.GET(baseURL+"/robots/sessions/:session_id", wrapper.RobotSessionGet)
+	router.GET(baseURL+"/robots/tools", wrapper.RobotToolsList)
+	router.GET(baseURL+"/robots/workspace-instances", wrapper.RobotWorkspaceInstancesList)
+	router.DELETE(baseURL+"/robots/workspace-instances/:workspace_instance_id", wrapper.RobotWorkspaceInstanceDelete)
+	router.GET(baseURL+"/robots/workspace-instances/:workspace_instance_id", wrapper.RobotWorkspaceInstanceGet)
+	router.GET(baseURL+"/robots/workspace-providers", wrapper.RobotWorkspaceProvidersList)
+	router.GET(baseURL+"/robots/workspaces", wrapper.RobotWorkspacesList)
+	router.POST(baseURL+"/robots/workspaces", wrapper.RobotWorkspaceCreate)
+	router.DELETE(baseURL+"/robots/workspaces/:workspace_id", wrapper.RobotWorkspaceDelete)
+	router.GET(baseURL+"/robots/workspaces/:workspace_id", wrapper.RobotWorkspaceGet)
+	router.PATCH(baseURL+"/robots/workspaces/:workspace_id", wrapper.RobotWorkspaceUpdate)
+	router.DELETE(baseURL+"/robots/:robot_id", wrapper.RobotDelete)
+	router.GET(baseURL+"/robots/:robot_id", wrapper.RobotGet)
+	router.PATCH(baseURL+"/robots/:robot_id", wrapper.RobotUpdate)
 	router.GET(baseURL+"/roles", wrapper.RoleList)
 	router.POST(baseURL+"/roles", wrapper.RoleCreate)
 	router.PATCH(baseURL+"/roles/order", wrapper.RoleUpdateOrder)
@@ -41801,6 +49703,16 @@ type OAuthJWKSOKJSONResponse OAuthJWKS
 
 type OAuthRefreshTokenListOKJSONResponse OAuthRefreshTokenListResult
 
+type OAuthRemoteAuthorizeOKJSONResponse OAuthRemoteAuthorizeResult
+
+type OAuthRemoteCallbackOKJSONResponse OAuthRemoteCallbackResult
+
+type OAuthRemoteConnectionListOKJSONResponse OAuthRemoteConnectionListResult
+
+type OAuthRemoteConnectionOKJSONResponse OAuthRemoteConnection
+
+type OAuthRemoteDiscoverOKJSONResponse OAuthRemoteDiscoveryResult
+
 type OAuthTokenErrorJSONResponse OAuthError
 
 type OAuthTokenOKJSONResponse OAuthToken
@@ -41862,6 +49774,57 @@ type ReportCreateOKJSONResponse Report
 type ReportListOKJSONResponse ReportListResult
 
 type ReportUpdateOKJSONResponse Report
+
+type RobotChatStreamTexteventStreamResponse struct {
+	Body io.Reader
+
+	ContentLength int64
+}
+
+type RobotCreateOKJSONResponse Robot
+
+type RobotGetOKJSONResponse Robot
+
+type RobotMCPServerCreateOKJSONResponse RobotMCPServer
+
+type RobotMCPServerDeleteOKResponse struct {
+}
+
+type RobotMCPServerGetOKJSONResponse RobotMCPServer
+
+type RobotMCPServerProbeOKJSONResponse RobotMCPServerProbeResult
+
+type RobotMCPServerRefreshOKJSONResponse RobotMCPServer
+
+type RobotMCPServerUpdateOKJSONResponse RobotMCPServer
+
+type RobotMCPServersListOKJSONResponse RobotMCPServerListResult
+
+type RobotModelsListOKJSONResponse RobotModelListResult
+
+type RobotProviderGetOKJSONResponse RobotProviderStatus
+
+type RobotProvidersListOKJSONResponse RobotProviderListResult
+
+type RobotSessionGetOKJSONResponse RobotSession
+
+type RobotSessionsListOKJSONResponse RobotSessionsListResult
+
+type RobotToolsListOKJSONResponse RobotToolListResult
+
+type RobotWorkspaceCreateOKJSONResponse RobotWorkspace
+
+type RobotWorkspaceGetOKJSONResponse RobotWorkspace
+
+type RobotWorkspaceInstanceGetOKJSONResponse RobotWorkspaceInstance
+
+type RobotWorkspaceInstancesListOKJSONResponse RobotWorkspaceInstancesListResult
+
+type RobotWorkspaceProvidersListOKJSONResponse RobotWorkspaceProviderListResult
+
+type RobotWorkspacesListOKJSONResponse RobotWorkspacesListResult
+
+type RobotsListOKJSONResponse RobotsListResult
 
 type RoleCreateOKJSONResponse Role
 
@@ -43950,6 +51913,185 @@ type AdminOAuthRefreshTokenDeletedefaultJSONResponse struct {
 }
 
 func (response AdminOAuthRefreshTokenDeletedefaultJSONResponse) VisitAdminOAuthRefreshTokenDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRemoteConnectionListRequestObject struct {
+}
+
+type OAuthRemoteConnectionListResponseObject interface {
+	VisitOAuthRemoteConnectionListResponse(w http.ResponseWriter) error
+}
+
+type OAuthRemoteConnectionList200JSONResponse struct {
+	OAuthRemoteConnectionListOKJSONResponse
+}
+
+func (response OAuthRemoteConnectionList200JSONResponse) VisitOAuthRemoteConnectionListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRemoteConnectionList403Response = ForbiddenResponse
+
+func (response OAuthRemoteConnectionList403Response) VisitOAuthRemoteConnectionListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthRemoteConnectionListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRemoteConnectionListdefaultJSONResponse) VisitOAuthRemoteConnectionListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRemoteConnectionCreateRequestObject struct {
+	Body *OAuthRemoteConnectionCreateJSONRequestBody
+}
+
+type OAuthRemoteConnectionCreateResponseObject interface {
+	VisitOAuthRemoteConnectionCreateResponse(w http.ResponseWriter) error
+}
+
+type OAuthRemoteConnectionCreate200JSONResponse struct {
+	OAuthRemoteConnectionOKJSONResponse
+}
+
+func (response OAuthRemoteConnectionCreate200JSONResponse) VisitOAuthRemoteConnectionCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRemoteConnectionCreate400Response = BadRequestResponse
+
+func (response OAuthRemoteConnectionCreate400Response) VisitOAuthRemoteConnectionCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthRemoteConnectionCreate403Response = ForbiddenResponse
+
+func (response OAuthRemoteConnectionCreate403Response) VisitOAuthRemoteConnectionCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthRemoteConnectionCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRemoteConnectionCreatedefaultJSONResponse) VisitOAuthRemoteConnectionCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRemoteConnectionAuthorizeRequestObject struct {
+	OauthRemoteConnectionId OAuthRemoteConnectionIDParam `json:"oauth_remote_connection_id"`
+}
+
+type OAuthRemoteConnectionAuthorizeResponseObject interface {
+	VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error
+}
+
+type OAuthRemoteConnectionAuthorize200JSONResponse struct {
+	OAuthRemoteAuthorizeOKJSONResponse
+}
+
+func (response OAuthRemoteConnectionAuthorize200JSONResponse) VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRemoteConnectionAuthorize400Response = BadRequestResponse
+
+func (response OAuthRemoteConnectionAuthorize400Response) VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthRemoteConnectionAuthorize403Response = ForbiddenResponse
+
+func (response OAuthRemoteConnectionAuthorize403Response) VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthRemoteConnectionAuthorize404Response = NotFoundResponse
+
+func (response OAuthRemoteConnectionAuthorize404Response) VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type OAuthRemoteConnectionAuthorizedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRemoteConnectionAuthorizedefaultJSONResponse) VisitOAuthRemoteConnectionAuthorizeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type OAuthRemoteDiscoverRequestObject struct {
+	Body *OAuthRemoteDiscoverJSONRequestBody
+}
+
+type OAuthRemoteDiscoverResponseObject interface {
+	VisitOAuthRemoteDiscoverResponse(w http.ResponseWriter) error
+}
+
+type OAuthRemoteDiscover200JSONResponse struct {
+	OAuthRemoteDiscoverOKJSONResponse
+}
+
+func (response OAuthRemoteDiscover200JSONResponse) VisitOAuthRemoteDiscoverResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRemoteDiscover400Response = BadRequestResponse
+
+func (response OAuthRemoteDiscover400Response) VisitOAuthRemoteDiscoverResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthRemoteDiscover403Response = ForbiddenResponse
+
+func (response OAuthRemoteDiscover403Response) VisitOAuthRemoteDiscoverResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthRemoteDiscoverdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRemoteDiscoverdefaultJSONResponse) VisitOAuthRemoteDiscoverResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -48940,6 +57082,58 @@ func (response OAuthClientRegisterdefaultJSONResponse) VisitOAuthClientRegisterR
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type OAuthRemoteCallbackRequestObject struct {
+	Params OAuthRemoteCallbackParams
+}
+
+type OAuthRemoteCallbackResponseObject interface {
+	VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error
+}
+
+type OAuthRemoteCallback200JSONResponse struct {
+	OAuthRemoteCallbackOKJSONResponse
+}
+
+func (response OAuthRemoteCallback200JSONResponse) VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type OAuthRemoteCallback400Response = BadRequestResponse
+
+func (response OAuthRemoteCallback400Response) VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type OAuthRemoteCallback401Response = UnauthorisedResponse
+
+func (response OAuthRemoteCallback401Response) VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type OAuthRemoteCallback403Response = ForbiddenResponse
+
+func (response OAuthRemoteCallback403Response) VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type OAuthRemoteCallbackdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response OAuthRemoteCallbackdefaultJSONResponse) VisitOAuthRemoteCallbackResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type OAuthTokenRequestObject struct {
 	Body *OAuthTokenFormdataRequestBody
 }
@@ -50245,6 +58439,1392 @@ func (response ReportUpdatedefaultJSONResponse) VisitReportUpdateResponse(w http
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type RobotsListRequestObject struct {
+	Params RobotsListParams
+}
+
+type RobotsListResponseObject interface {
+	VisitRobotsListResponse(w http.ResponseWriter) error
+}
+
+type RobotsList200JSONResponse struct{ RobotsListOKJSONResponse }
+
+func (response RobotsList200JSONResponse) VisitRobotsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotsList401Response = UnauthorisedResponse
+
+func (response RobotsList401Response) VisitRobotsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotsList403Response = ForbiddenResponse
+
+func (response RobotsList403Response) VisitRobotsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotsListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotsListdefaultJSONResponse) VisitRobotsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotCreateRequestObject struct {
+	Body *RobotCreateJSONRequestBody
+}
+
+type RobotCreateResponseObject interface {
+	VisitRobotCreateResponse(w http.ResponseWriter) error
+}
+
+type RobotCreate200JSONResponse struct{ RobotCreateOKJSONResponse }
+
+func (response RobotCreate200JSONResponse) VisitRobotCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotCreate401Response = UnauthorisedResponse
+
+func (response RobotCreate401Response) VisitRobotCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotCreate403Response = ForbiddenResponse
+
+func (response RobotCreate403Response) VisitRobotCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotCreatedefaultJSONResponse) VisitRobotCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotChatSSERequestObject struct {
+	Body *RobotChatSSEJSONRequestBody
+}
+
+type RobotChatSSEResponseObject interface {
+	VisitRobotChatSSEResponse(w http.ResponseWriter) error
+}
+
+type RobotChatSSE200TexteventStreamResponse struct {
+	RobotChatStreamTexteventStreamResponse
+}
+
+func (response RobotChatSSE200TexteventStreamResponse) VisitRobotChatSSEResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "text/event-stream")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type RobotChatSSE401Response = UnauthorisedResponse
+
+func (response RobotChatSSE401Response) VisitRobotChatSSEResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotChatSSE403Response = ForbiddenResponse
+
+func (response RobotChatSSE403Response) VisitRobotChatSSEResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotChatSSE404Response = NotFoundResponse
+
+func (response RobotChatSSE404Response) VisitRobotChatSSEResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotChatSSEdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotChatSSEdefaultJSONResponse) VisitRobotChatSSEResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServersListRequestObject struct {
+}
+
+type RobotMCPServersListResponseObject interface {
+	VisitRobotMCPServersListResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServersList200JSONResponse struct {
+	RobotMCPServersListOKJSONResponse
+}
+
+func (response RobotMCPServersList200JSONResponse) VisitRobotMCPServersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServersList401Response = UnauthorisedResponse
+
+func (response RobotMCPServersList401Response) VisitRobotMCPServersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServersList403Response = ForbiddenResponse
+
+func (response RobotMCPServersList403Response) VisitRobotMCPServersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServersListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServersListdefaultJSONResponse) VisitRobotMCPServersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerCreateRequestObject struct {
+	Body *RobotMCPServerCreateJSONRequestBody
+}
+
+type RobotMCPServerCreateResponseObject interface {
+	VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerCreate200JSONResponse struct {
+	RobotMCPServerCreateOKJSONResponse
+}
+
+func (response RobotMCPServerCreate200JSONResponse) VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServerCreate400Response = BadRequestResponse
+
+func (response RobotMCPServerCreate400Response) VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotMCPServerCreate401Response = UnauthorisedResponse
+
+func (response RobotMCPServerCreate401Response) VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerCreate403Response = ForbiddenResponse
+
+func (response RobotMCPServerCreate403Response) VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerCreatedefaultJSONResponse) VisitRobotMCPServerCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerProbeRequestObject struct {
+	Body *RobotMCPServerProbeJSONRequestBody
+}
+
+type RobotMCPServerProbeResponseObject interface {
+	VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerProbe200JSONResponse struct {
+	RobotMCPServerProbeOKJSONResponse
+}
+
+func (response RobotMCPServerProbe200JSONResponse) VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServerProbe400Response = BadRequestResponse
+
+func (response RobotMCPServerProbe400Response) VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotMCPServerProbe401Response = UnauthorisedResponse
+
+func (response RobotMCPServerProbe401Response) VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerProbe403Response = ForbiddenResponse
+
+func (response RobotMCPServerProbe403Response) VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerProbedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerProbedefaultJSONResponse) VisitRobotMCPServerProbeResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerDeleteRequestObject struct {
+	McpServerId RobotMCPServerIDParam `json:"mcp_server_id"`
+}
+
+type RobotMCPServerDeleteResponseObject interface {
+	VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerDelete200Response = RobotMCPServerDeleteOKResponse
+
+func (response RobotMCPServerDelete200Response) VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type RobotMCPServerDelete401Response = UnauthorisedResponse
+
+func (response RobotMCPServerDelete401Response) VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerDelete403Response = ForbiddenResponse
+
+func (response RobotMCPServerDelete403Response) VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerDelete404Response = NotFoundResponse
+
+func (response RobotMCPServerDelete404Response) VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotMCPServerDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerDeletedefaultJSONResponse) VisitRobotMCPServerDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerGetRequestObject struct {
+	McpServerId RobotMCPServerIDParam `json:"mcp_server_id"`
+}
+
+type RobotMCPServerGetResponseObject interface {
+	VisitRobotMCPServerGetResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerGet200JSONResponse struct {
+	RobotMCPServerGetOKJSONResponse
+}
+
+func (response RobotMCPServerGet200JSONResponse) VisitRobotMCPServerGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServerGet401Response = UnauthorisedResponse
+
+func (response RobotMCPServerGet401Response) VisitRobotMCPServerGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerGet403Response = ForbiddenResponse
+
+func (response RobotMCPServerGet403Response) VisitRobotMCPServerGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerGet404Response = NotFoundResponse
+
+func (response RobotMCPServerGet404Response) VisitRobotMCPServerGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotMCPServerGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerGetdefaultJSONResponse) VisitRobotMCPServerGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerUpdateRequestObject struct {
+	McpServerId RobotMCPServerIDParam `json:"mcp_server_id"`
+	Body        *RobotMCPServerUpdateJSONRequestBody
+}
+
+type RobotMCPServerUpdateResponseObject interface {
+	VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerUpdate200JSONResponse struct {
+	RobotMCPServerUpdateOKJSONResponse
+}
+
+func (response RobotMCPServerUpdate200JSONResponse) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServerUpdate400Response = BadRequestResponse
+
+func (response RobotMCPServerUpdate400Response) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotMCPServerUpdate401Response = UnauthorisedResponse
+
+func (response RobotMCPServerUpdate401Response) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerUpdate403Response = ForbiddenResponse
+
+func (response RobotMCPServerUpdate403Response) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerUpdate404Response = NotFoundResponse
+
+func (response RobotMCPServerUpdate404Response) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotMCPServerUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerUpdatedefaultJSONResponse) VisitRobotMCPServerUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotMCPServerRefreshRequestObject struct {
+	McpServerId RobotMCPServerIDParam `json:"mcp_server_id"`
+}
+
+type RobotMCPServerRefreshResponseObject interface {
+	VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error
+}
+
+type RobotMCPServerRefresh200JSONResponse struct {
+	RobotMCPServerRefreshOKJSONResponse
+}
+
+func (response RobotMCPServerRefresh200JSONResponse) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotMCPServerRefresh400Response = BadRequestResponse
+
+func (response RobotMCPServerRefresh400Response) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotMCPServerRefresh401Response = UnauthorisedResponse
+
+func (response RobotMCPServerRefresh401Response) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotMCPServerRefresh403Response = ForbiddenResponse
+
+func (response RobotMCPServerRefresh403Response) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotMCPServerRefresh404Response = NotFoundResponse
+
+func (response RobotMCPServerRefresh404Response) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotMCPServerRefreshdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotMCPServerRefreshdefaultJSONResponse) VisitRobotMCPServerRefreshResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotModelsListRequestObject struct {
+}
+
+type RobotModelsListResponseObject interface {
+	VisitRobotModelsListResponse(w http.ResponseWriter) error
+}
+
+type RobotModelsList200JSONResponse struct{ RobotModelsListOKJSONResponse }
+
+func (response RobotModelsList200JSONResponse) VisitRobotModelsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotModelsList401Response = UnauthorisedResponse
+
+func (response RobotModelsList401Response) VisitRobotModelsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotModelsList403Response = ForbiddenResponse
+
+func (response RobotModelsList403Response) VisitRobotModelsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotModelsListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotModelsListdefaultJSONResponse) VisitRobotModelsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotProvidersListRequestObject struct {
+}
+
+type RobotProvidersListResponseObject interface {
+	VisitRobotProvidersListResponse(w http.ResponseWriter) error
+}
+
+type RobotProvidersList200JSONResponse struct {
+	RobotProvidersListOKJSONResponse
+}
+
+func (response RobotProvidersList200JSONResponse) VisitRobotProvidersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotProvidersList401Response = UnauthorisedResponse
+
+func (response RobotProvidersList401Response) VisitRobotProvidersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotProvidersList403Response = ForbiddenResponse
+
+func (response RobotProvidersList403Response) VisitRobotProvidersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotProvidersListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotProvidersListdefaultJSONResponse) VisitRobotProvidersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotProviderUpdateRequestObject struct {
+	Provider RobotModelProviderParam `json:"provider"`
+	Body     *RobotProviderUpdateJSONRequestBody
+}
+
+type RobotProviderUpdateResponseObject interface {
+	VisitRobotProviderUpdateResponse(w http.ResponseWriter) error
+}
+
+type RobotProviderUpdate200JSONResponse struct{ RobotProviderGetOKJSONResponse }
+
+func (response RobotProviderUpdate200JSONResponse) VisitRobotProviderUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotProviderUpdate400Response = BadRequestResponse
+
+func (response RobotProviderUpdate400Response) VisitRobotProviderUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotProviderUpdate401Response = UnauthorisedResponse
+
+func (response RobotProviderUpdate401Response) VisitRobotProviderUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotProviderUpdate403Response = ForbiddenResponse
+
+func (response RobotProviderUpdate403Response) VisitRobotProviderUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotProviderUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotProviderUpdatedefaultJSONResponse) VisitRobotProviderUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotProviderModelsRefreshRequestObject struct {
+	Provider RobotModelProviderParam `json:"provider"`
+}
+
+type RobotProviderModelsRefreshResponseObject interface {
+	VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error
+}
+
+type RobotProviderModelsRefresh200JSONResponse struct{ RobotProviderGetOKJSONResponse }
+
+func (response RobotProviderModelsRefresh200JSONResponse) VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotProviderModelsRefresh400Response = BadRequestResponse
+
+func (response RobotProviderModelsRefresh400Response) VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(400)
+	return nil
+}
+
+type RobotProviderModelsRefresh401Response = UnauthorisedResponse
+
+func (response RobotProviderModelsRefresh401Response) VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotProviderModelsRefresh403Response = ForbiddenResponse
+
+func (response RobotProviderModelsRefresh403Response) VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotProviderModelsRefreshdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotProviderModelsRefreshdefaultJSONResponse) VisitRobotProviderModelsRefreshResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotSessionsListRequestObject struct {
+	Params RobotSessionsListParams
+}
+
+type RobotSessionsListResponseObject interface {
+	VisitRobotSessionsListResponse(w http.ResponseWriter) error
+}
+
+type RobotSessionsList200JSONResponse struct {
+	RobotSessionsListOKJSONResponse
+}
+
+func (response RobotSessionsList200JSONResponse) VisitRobotSessionsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotSessionsList401Response = UnauthorisedResponse
+
+func (response RobotSessionsList401Response) VisitRobotSessionsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotSessionsListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotSessionsListdefaultJSONResponse) VisitRobotSessionsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotSessionGetRequestObject struct {
+	SessionId RobotSessionIDParam `json:"session_id"`
+	Params    RobotSessionGetParams
+}
+
+type RobotSessionGetResponseObject interface {
+	VisitRobotSessionGetResponse(w http.ResponseWriter) error
+}
+
+type RobotSessionGet200JSONResponse struct{ RobotSessionGetOKJSONResponse }
+
+func (response RobotSessionGet200JSONResponse) VisitRobotSessionGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotSessionGet401Response = UnauthorisedResponse
+
+func (response RobotSessionGet401Response) VisitRobotSessionGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotSessionGet404Response = NotFoundResponse
+
+func (response RobotSessionGet404Response) VisitRobotSessionGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotSessionGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotSessionGetdefaultJSONResponse) VisitRobotSessionGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotToolsListRequestObject struct {
+}
+
+type RobotToolsListResponseObject interface {
+	VisitRobotToolsListResponse(w http.ResponseWriter) error
+}
+
+type RobotToolsList200JSONResponse struct{ RobotToolsListOKJSONResponse }
+
+func (response RobotToolsList200JSONResponse) VisitRobotToolsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotToolsList401Response = UnauthorisedResponse
+
+func (response RobotToolsList401Response) VisitRobotToolsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotToolsList403Response = ForbiddenResponse
+
+func (response RobotToolsList403Response) VisitRobotToolsListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotToolsListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotToolsListdefaultJSONResponse) VisitRobotToolsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceInstancesListRequestObject struct {
+	Params RobotWorkspaceInstancesListParams
+}
+
+type RobotWorkspaceInstancesListResponseObject interface {
+	VisitRobotWorkspaceInstancesListResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceInstancesList200JSONResponse struct {
+	RobotWorkspaceInstancesListOKJSONResponse
+}
+
+func (response RobotWorkspaceInstancesList200JSONResponse) VisitRobotWorkspaceInstancesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceInstancesList401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceInstancesList401Response) VisitRobotWorkspaceInstancesListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceInstancesList403Response = ForbiddenResponse
+
+func (response RobotWorkspaceInstancesList403Response) VisitRobotWorkspaceInstancesListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceInstancesListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceInstancesListdefaultJSONResponse) VisitRobotWorkspaceInstancesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceInstanceDeleteRequestObject struct {
+	WorkspaceInstanceId RobotWorkspaceInstanceIDParam `json:"workspace_instance_id"`
+}
+
+type RobotWorkspaceInstanceDeleteResponseObject interface {
+	VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceInstanceDelete200Response struct {
+}
+
+func (response RobotWorkspaceInstanceDelete200Response) VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type RobotWorkspaceInstanceDelete401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceInstanceDelete401Response) VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceInstanceDelete403Response = ForbiddenResponse
+
+func (response RobotWorkspaceInstanceDelete403Response) VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceInstanceDelete404Response = NotFoundResponse
+
+func (response RobotWorkspaceInstanceDelete404Response) VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotWorkspaceInstanceDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceInstanceDeletedefaultJSONResponse) VisitRobotWorkspaceInstanceDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceInstanceGetRequestObject struct {
+	WorkspaceInstanceId RobotWorkspaceInstanceIDParam `json:"workspace_instance_id"`
+}
+
+type RobotWorkspaceInstanceGetResponseObject interface {
+	VisitRobotWorkspaceInstanceGetResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceInstanceGet200JSONResponse struct {
+	RobotWorkspaceInstanceGetOKJSONResponse
+}
+
+func (response RobotWorkspaceInstanceGet200JSONResponse) VisitRobotWorkspaceInstanceGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceInstanceGet401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceInstanceGet401Response) VisitRobotWorkspaceInstanceGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceInstanceGet404Response = NotFoundResponse
+
+func (response RobotWorkspaceInstanceGet404Response) VisitRobotWorkspaceInstanceGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotWorkspaceInstanceGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceInstanceGetdefaultJSONResponse) VisitRobotWorkspaceInstanceGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceProvidersListRequestObject struct {
+}
+
+type RobotWorkspaceProvidersListResponseObject interface {
+	VisitRobotWorkspaceProvidersListResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceProvidersList200JSONResponse struct {
+	RobotWorkspaceProvidersListOKJSONResponse
+}
+
+func (response RobotWorkspaceProvidersList200JSONResponse) VisitRobotWorkspaceProvidersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceProvidersList401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceProvidersList401Response) VisitRobotWorkspaceProvidersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceProvidersList403Response = ForbiddenResponse
+
+func (response RobotWorkspaceProvidersList403Response) VisitRobotWorkspaceProvidersListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceProvidersListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceProvidersListdefaultJSONResponse) VisitRobotWorkspaceProvidersListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspacesListRequestObject struct {
+	Params RobotWorkspacesListParams
+}
+
+type RobotWorkspacesListResponseObject interface {
+	VisitRobotWorkspacesListResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspacesList200JSONResponse struct {
+	RobotWorkspacesListOKJSONResponse
+}
+
+func (response RobotWorkspacesList200JSONResponse) VisitRobotWorkspacesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspacesList401Response = UnauthorisedResponse
+
+func (response RobotWorkspacesList401Response) VisitRobotWorkspacesListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspacesList403Response = ForbiddenResponse
+
+func (response RobotWorkspacesList403Response) VisitRobotWorkspacesListResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspacesListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspacesListdefaultJSONResponse) VisitRobotWorkspacesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceCreateRequestObject struct {
+	Body *RobotWorkspaceCreateJSONRequestBody
+}
+
+type RobotWorkspaceCreateResponseObject interface {
+	VisitRobotWorkspaceCreateResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceCreate200JSONResponse struct {
+	RobotWorkspaceCreateOKJSONResponse
+}
+
+func (response RobotWorkspaceCreate200JSONResponse) VisitRobotWorkspaceCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceCreate401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceCreate401Response) VisitRobotWorkspaceCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceCreate403Response = ForbiddenResponse
+
+func (response RobotWorkspaceCreate403Response) VisitRobotWorkspaceCreateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceCreatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceCreatedefaultJSONResponse) VisitRobotWorkspaceCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceDeleteRequestObject struct {
+	WorkspaceId RobotWorkspaceIDParam `json:"workspace_id"`
+}
+
+type RobotWorkspaceDeleteResponseObject interface {
+	VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceDelete200Response struct {
+}
+
+func (response RobotWorkspaceDelete200Response) VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type RobotWorkspaceDelete401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceDelete401Response) VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceDelete403Response = ForbiddenResponse
+
+func (response RobotWorkspaceDelete403Response) VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceDelete404Response = NotFoundResponse
+
+func (response RobotWorkspaceDelete404Response) VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotWorkspaceDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceDeletedefaultJSONResponse) VisitRobotWorkspaceDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceGetRequestObject struct {
+	WorkspaceId RobotWorkspaceIDParam `json:"workspace_id"`
+}
+
+type RobotWorkspaceGetResponseObject interface {
+	VisitRobotWorkspaceGetResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceGet200JSONResponse struct {
+	RobotWorkspaceGetOKJSONResponse
+}
+
+func (response RobotWorkspaceGet200JSONResponse) VisitRobotWorkspaceGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceGet401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceGet401Response) VisitRobotWorkspaceGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceGet404Response = NotFoundResponse
+
+func (response RobotWorkspaceGet404Response) VisitRobotWorkspaceGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotWorkspaceGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceGetdefaultJSONResponse) VisitRobotWorkspaceGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotWorkspaceUpdateRequestObject struct {
+	WorkspaceId RobotWorkspaceIDParam `json:"workspace_id"`
+	Body        *RobotWorkspaceUpdateJSONRequestBody
+}
+
+type RobotWorkspaceUpdateResponseObject interface {
+	VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error
+}
+
+type RobotWorkspaceUpdate200JSONResponse struct {
+	RobotWorkspaceGetOKJSONResponse
+}
+
+func (response RobotWorkspaceUpdate200JSONResponse) VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotWorkspaceUpdate401Response = UnauthorisedResponse
+
+func (response RobotWorkspaceUpdate401Response) VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotWorkspaceUpdate403Response = ForbiddenResponse
+
+func (response RobotWorkspaceUpdate403Response) VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotWorkspaceUpdate404Response = NotFoundResponse
+
+func (response RobotWorkspaceUpdate404Response) VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotWorkspaceUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotWorkspaceUpdatedefaultJSONResponse) VisitRobotWorkspaceUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotDeleteRequestObject struct {
+	RobotId RobotIDParam `json:"robot_id"`
+}
+
+type RobotDeleteResponseObject interface {
+	VisitRobotDeleteResponse(w http.ResponseWriter) error
+}
+
+type RobotDelete200Response struct {
+}
+
+func (response RobotDelete200Response) VisitRobotDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type RobotDelete401Response = UnauthorisedResponse
+
+func (response RobotDelete401Response) VisitRobotDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotDelete403Response = ForbiddenResponse
+
+func (response RobotDelete403Response) VisitRobotDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotDelete404Response = NotFoundResponse
+
+func (response RobotDelete404Response) VisitRobotDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotDeletedefaultJSONResponse) VisitRobotDeleteResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotGetRequestObject struct {
+	RobotId RobotIDParam `json:"robot_id"`
+}
+
+type RobotGetResponseObject interface {
+	VisitRobotGetResponse(w http.ResponseWriter) error
+}
+
+type RobotGet200JSONResponse struct{ RobotGetOKJSONResponse }
+
+func (response RobotGet200JSONResponse) VisitRobotGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotGet401Response = UnauthorisedResponse
+
+func (response RobotGet401Response) VisitRobotGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotGet404Response = NotFoundResponse
+
+func (response RobotGet404Response) VisitRobotGetResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotGetdefaultJSONResponse) VisitRobotGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RobotUpdateRequestObject struct {
+	RobotId RobotIDParam `json:"robot_id"`
+	Body    *RobotUpdateJSONRequestBody
+}
+
+type RobotUpdateResponseObject interface {
+	VisitRobotUpdateResponse(w http.ResponseWriter) error
+}
+
+type RobotUpdate200JSONResponse struct{ RobotGetOKJSONResponse }
+
+func (response RobotUpdate200JSONResponse) VisitRobotUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RobotUpdate401Response = UnauthorisedResponse
+
+func (response RobotUpdate401Response) VisitRobotUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RobotUpdate403Response = ForbiddenResponse
+
+func (response RobotUpdate403Response) VisitRobotUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(403)
+	return nil
+}
+
+type RobotUpdate404Response = NotFoundResponse
+
+func (response RobotUpdate404Response) VisitRobotUpdateResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RobotUpdatedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RobotUpdatedefaultJSONResponse) VisitRobotUpdateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type RoleListRequestObject struct {
 }
 
@@ -51024,6 +60604,18 @@ type StrictServerInterface interface {
 	// (DELETE /admin/oauth/refresh-tokens/{oauth_refresh_token_id})
 	AdminOAuthRefreshTokenDelete(ctx context.Context, request AdminOAuthRefreshTokenDeleteRequestObject) (AdminOAuthRefreshTokenDeleteResponseObject, error)
 
+	// (GET /admin/oauth/remote/connections)
+	OAuthRemoteConnectionList(ctx context.Context, request OAuthRemoteConnectionListRequestObject) (OAuthRemoteConnectionListResponseObject, error)
+
+	// (POST /admin/oauth/remote/connections)
+	OAuthRemoteConnectionCreate(ctx context.Context, request OAuthRemoteConnectionCreateRequestObject) (OAuthRemoteConnectionCreateResponseObject, error)
+
+	// (POST /admin/oauth/remote/connections/{oauth_remote_connection_id}/authorize)
+	OAuthRemoteConnectionAuthorize(ctx context.Context, request OAuthRemoteConnectionAuthorizeRequestObject) (OAuthRemoteConnectionAuthorizeResponseObject, error)
+
+	// (POST /admin/oauth/remote/discover)
+	OAuthRemoteDiscover(ctx context.Context, request OAuthRemoteDiscoverRequestObject) (OAuthRemoteDiscoverResponseObject, error)
+
 	// (POST /assets)
 	AssetUpload(ctx context.Context, request AssetUploadRequestObject) (AssetUploadResponseObject, error)
 
@@ -51363,6 +60955,9 @@ type StrictServerInterface interface {
 	// (POST /oauth/register)
 	OAuthClientRegister(ctx context.Context, request OAuthClientRegisterRequestObject) (OAuthClientRegisterResponseObject, error)
 
+	// (GET /oauth/remote/callback)
+	OAuthRemoteCallback(ctx context.Context, request OAuthRemoteCallbackRequestObject) (OAuthRemoteCallbackResponseObject, error)
+
 	// (POST /oauth/token)
 	OAuthToken(ctx context.Context, request OAuthTokenRequestObject) (OAuthTokenResponseObject, error)
 
@@ -51449,6 +61044,93 @@ type StrictServerInterface interface {
 
 	// (PATCH /reports/{report_id})
 	ReportUpdate(ctx context.Context, request ReportUpdateRequestObject) (ReportUpdateResponseObject, error)
+	// List robots
+	// (GET /robots)
+	RobotsList(ctx context.Context, request RobotsListRequestObject) (RobotsListResponseObject, error)
+	// Create a robot
+	// (POST /robots)
+	RobotCreate(ctx context.Context, request RobotCreateRequestObject) (RobotCreateResponseObject, error)
+
+	// (POST /robots/chat/sse)
+	RobotChatSSE(ctx context.Context, request RobotChatSSERequestObject) (RobotChatSSEResponseObject, error)
+	// List Robot MCP servers
+	// (GET /robots/mcp-servers)
+	RobotMCPServersList(ctx context.Context, request RobotMCPServersListRequestObject) (RobotMCPServersListResponseObject, error)
+	// Create Robot MCP server
+	// (POST /robots/mcp-servers)
+	RobotMCPServerCreate(ctx context.Context, request RobotMCPServerCreateRequestObject) (RobotMCPServerCreateResponseObject, error)
+	// Probe Robot MCP server
+	// (POST /robots/mcp-servers/probe)
+	RobotMCPServerProbe(ctx context.Context, request RobotMCPServerProbeRequestObject) (RobotMCPServerProbeResponseObject, error)
+	// Delete Robot MCP server
+	// (DELETE /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerDelete(ctx context.Context, request RobotMCPServerDeleteRequestObject) (RobotMCPServerDeleteResponseObject, error)
+	// Get Robot MCP server
+	// (GET /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerGet(ctx context.Context, request RobotMCPServerGetRequestObject) (RobotMCPServerGetResponseObject, error)
+	// Update Robot MCP server
+	// (PATCH /robots/mcp-servers/{mcp_server_id})
+	RobotMCPServerUpdate(ctx context.Context, request RobotMCPServerUpdateRequestObject) (RobotMCPServerUpdateResponseObject, error)
+	// Refresh Robot MCP server tools
+	// (POST /robots/mcp-servers/{mcp_server_id}/refresh)
+	RobotMCPServerRefresh(ctx context.Context, request RobotMCPServerRefreshRequestObject) (RobotMCPServerRefreshResponseObject, error)
+	// List robot models
+	// (GET /robots/models)
+	RobotModelsList(ctx context.Context, request RobotModelsListRequestObject) (RobotModelsListResponseObject, error)
+	// List robot providers
+	// (GET /robots/providers)
+	RobotProvidersList(ctx context.Context, request RobotProvidersListRequestObject) (RobotProvidersListResponseObject, error)
+	// Update a robot provider
+	// (PATCH /robots/providers/{provider})
+	RobotProviderUpdate(ctx context.Context, request RobotProviderUpdateRequestObject) (RobotProviderUpdateResponseObject, error)
+	// Refresh robot provider models
+	// (POST /robots/providers/{provider}/models/refresh)
+	RobotProviderModelsRefresh(ctx context.Context, request RobotProviderModelsRefreshRequestObject) (RobotProviderModelsRefreshResponseObject, error)
+	// List robot sessions
+	// (GET /robots/sessions)
+	RobotSessionsList(ctx context.Context, request RobotSessionsListRequestObject) (RobotSessionsListResponseObject, error)
+	// Get a robot session
+	// (GET /robots/sessions/{session_id})
+	RobotSessionGet(ctx context.Context, request RobotSessionGetRequestObject) (RobotSessionGetResponseObject, error)
+	// List robot tools
+	// (GET /robots/tools)
+	RobotToolsList(ctx context.Context, request RobotToolsListRequestObject) (RobotToolsListResponseObject, error)
+	// List robot workspace instances
+	// (GET /robots/workspace-instances)
+	RobotWorkspaceInstancesList(ctx context.Context, request RobotWorkspaceInstancesListRequestObject) (RobotWorkspaceInstancesListResponseObject, error)
+	// Delete a robot workspace instance
+	// (DELETE /robots/workspace-instances/{workspace_instance_id})
+	RobotWorkspaceInstanceDelete(ctx context.Context, request RobotWorkspaceInstanceDeleteRequestObject) (RobotWorkspaceInstanceDeleteResponseObject, error)
+	// Get a robot workspace instance
+	// (GET /robots/workspace-instances/{workspace_instance_id})
+	RobotWorkspaceInstanceGet(ctx context.Context, request RobotWorkspaceInstanceGetRequestObject) (RobotWorkspaceInstanceGetResponseObject, error)
+	// List robot workspace providers
+	// (GET /robots/workspace-providers)
+	RobotWorkspaceProvidersList(ctx context.Context, request RobotWorkspaceProvidersListRequestObject) (RobotWorkspaceProvidersListResponseObject, error)
+	// List robot workspaces
+	// (GET /robots/workspaces)
+	RobotWorkspacesList(ctx context.Context, request RobotWorkspacesListRequestObject) (RobotWorkspacesListResponseObject, error)
+	// Create a robot workspace
+	// (POST /robots/workspaces)
+	RobotWorkspaceCreate(ctx context.Context, request RobotWorkspaceCreateRequestObject) (RobotWorkspaceCreateResponseObject, error)
+	// Delete a robot workspace
+	// (DELETE /robots/workspaces/{workspace_id})
+	RobotWorkspaceDelete(ctx context.Context, request RobotWorkspaceDeleteRequestObject) (RobotWorkspaceDeleteResponseObject, error)
+	// Get a robot workspace
+	// (GET /robots/workspaces/{workspace_id})
+	RobotWorkspaceGet(ctx context.Context, request RobotWorkspaceGetRequestObject) (RobotWorkspaceGetResponseObject, error)
+	// Update a robot workspace
+	// (PATCH /robots/workspaces/{workspace_id})
+	RobotWorkspaceUpdate(ctx context.Context, request RobotWorkspaceUpdateRequestObject) (RobotWorkspaceUpdateResponseObject, error)
+	// Delete a robot
+	// (DELETE /robots/{robot_id})
+	RobotDelete(ctx context.Context, request RobotDeleteRequestObject) (RobotDeleteResponseObject, error)
+	// Get a robot
+	// (GET /robots/{robot_id})
+	RobotGet(ctx context.Context, request RobotGetRequestObject) (RobotGetResponseObject, error)
+	// Update a robot
+	// (PATCH /robots/{robot_id})
+	RobotUpdate(ctx context.Context, request RobotUpdateRequestObject) (RobotUpdateResponseObject, error)
 
 	// (GET /roles)
 	RoleList(ctx context.Context, request RoleListRequestObject) (RoleListResponseObject, error)
@@ -52667,6 +62349,112 @@ func (sh *strictHandler) AdminOAuthRefreshTokenDelete(ctx echo.Context, oauthRef
 		return err
 	} else if validResponse, ok := response.(AdminOAuthRefreshTokenDeleteResponseObject); ok {
 		return validResponse.VisitAdminOAuthRefreshTokenDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRemoteConnectionList operation middleware
+func (sh *strictHandler) OAuthRemoteConnectionList(ctx echo.Context) error {
+	var request OAuthRemoteConnectionListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRemoteConnectionList(ctx.Request().Context(), request.(OAuthRemoteConnectionListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRemoteConnectionList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRemoteConnectionListResponseObject); ok {
+		return validResponse.VisitOAuthRemoteConnectionListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRemoteConnectionCreate operation middleware
+func (sh *strictHandler) OAuthRemoteConnectionCreate(ctx echo.Context) error {
+	var request OAuthRemoteConnectionCreateRequestObject
+
+	var body OAuthRemoteConnectionCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRemoteConnectionCreate(ctx.Request().Context(), request.(OAuthRemoteConnectionCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRemoteConnectionCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRemoteConnectionCreateResponseObject); ok {
+		return validResponse.VisitOAuthRemoteConnectionCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRemoteConnectionAuthorize operation middleware
+func (sh *strictHandler) OAuthRemoteConnectionAuthorize(ctx echo.Context, oauthRemoteConnectionId OAuthRemoteConnectionIDParam) error {
+	var request OAuthRemoteConnectionAuthorizeRequestObject
+
+	request.OauthRemoteConnectionId = oauthRemoteConnectionId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRemoteConnectionAuthorize(ctx.Request().Context(), request.(OAuthRemoteConnectionAuthorizeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRemoteConnectionAuthorize")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRemoteConnectionAuthorizeResponseObject); ok {
+		return validResponse.VisitOAuthRemoteConnectionAuthorizeResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// OAuthRemoteDiscover operation middleware
+func (sh *strictHandler) OAuthRemoteDiscover(ctx echo.Context) error {
+	var request OAuthRemoteDiscoverRequestObject
+
+	var body OAuthRemoteDiscoverJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRemoteDiscover(ctx.Request().Context(), request.(OAuthRemoteDiscoverRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRemoteDiscover")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRemoteDiscoverResponseObject); ok {
+		return validResponse.VisitOAuthRemoteDiscoverResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -55766,6 +65554,31 @@ func (sh *strictHandler) OAuthClientRegister(ctx echo.Context) error {
 	return nil
 }
 
+// OAuthRemoteCallback operation middleware
+func (sh *strictHandler) OAuthRemoteCallback(ctx echo.Context, params OAuthRemoteCallbackParams) error {
+	var request OAuthRemoteCallbackRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.OAuthRemoteCallback(ctx.Request().Context(), request.(OAuthRemoteCallbackRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "OAuthRemoteCallback")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(OAuthRemoteCallbackResponseObject); ok {
+		return validResponse.VisitOAuthRemoteCallbackResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // OAuthToken operation middleware
 func (sh *strictHandler) OAuthToken(ctx echo.Context) error {
 	var request OAuthTokenRequestObject
@@ -56547,6 +66360,766 @@ func (sh *strictHandler) ReportUpdate(ctx echo.Context, reportId ReportIDParam) 
 	return nil
 }
 
+// RobotsList operation middleware
+func (sh *strictHandler) RobotsList(ctx echo.Context, params RobotsListParams) error {
+	var request RobotsListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotsList(ctx.Request().Context(), request.(RobotsListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotsList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotsListResponseObject); ok {
+		return validResponse.VisitRobotsListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotCreate operation middleware
+func (sh *strictHandler) RobotCreate(ctx echo.Context) error {
+	var request RobotCreateRequestObject
+
+	var body RobotCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotCreate(ctx.Request().Context(), request.(RobotCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotCreateResponseObject); ok {
+		return validResponse.VisitRobotCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotChatSSE operation middleware
+func (sh *strictHandler) RobotChatSSE(ctx echo.Context) error {
+	var request RobotChatSSERequestObject
+
+	var body RobotChatSSEJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotChatSSE(ctx.Request().Context(), request.(RobotChatSSERequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotChatSSE")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotChatSSEResponseObject); ok {
+		return validResponse.VisitRobotChatSSEResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServersList operation middleware
+func (sh *strictHandler) RobotMCPServersList(ctx echo.Context) error {
+	var request RobotMCPServersListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServersList(ctx.Request().Context(), request.(RobotMCPServersListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServersList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServersListResponseObject); ok {
+		return validResponse.VisitRobotMCPServersListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerCreate operation middleware
+func (sh *strictHandler) RobotMCPServerCreate(ctx echo.Context) error {
+	var request RobotMCPServerCreateRequestObject
+
+	var body RobotMCPServerCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerCreate(ctx.Request().Context(), request.(RobotMCPServerCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerCreateResponseObject); ok {
+		return validResponse.VisitRobotMCPServerCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerProbe operation middleware
+func (sh *strictHandler) RobotMCPServerProbe(ctx echo.Context) error {
+	var request RobotMCPServerProbeRequestObject
+
+	var body RobotMCPServerProbeJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerProbe(ctx.Request().Context(), request.(RobotMCPServerProbeRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerProbe")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerProbeResponseObject); ok {
+		return validResponse.VisitRobotMCPServerProbeResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerDelete operation middleware
+func (sh *strictHandler) RobotMCPServerDelete(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error {
+	var request RobotMCPServerDeleteRequestObject
+
+	request.McpServerId = mcpServerId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerDelete(ctx.Request().Context(), request.(RobotMCPServerDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerDeleteResponseObject); ok {
+		return validResponse.VisitRobotMCPServerDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerGet operation middleware
+func (sh *strictHandler) RobotMCPServerGet(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error {
+	var request RobotMCPServerGetRequestObject
+
+	request.McpServerId = mcpServerId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerGet(ctx.Request().Context(), request.(RobotMCPServerGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerGetResponseObject); ok {
+		return validResponse.VisitRobotMCPServerGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerUpdate operation middleware
+func (sh *strictHandler) RobotMCPServerUpdate(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error {
+	var request RobotMCPServerUpdateRequestObject
+
+	request.McpServerId = mcpServerId
+
+	var body RobotMCPServerUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerUpdate(ctx.Request().Context(), request.(RobotMCPServerUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerUpdateResponseObject); ok {
+		return validResponse.VisitRobotMCPServerUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotMCPServerRefresh operation middleware
+func (sh *strictHandler) RobotMCPServerRefresh(ctx echo.Context, mcpServerId RobotMCPServerIDParam) error {
+	var request RobotMCPServerRefreshRequestObject
+
+	request.McpServerId = mcpServerId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotMCPServerRefresh(ctx.Request().Context(), request.(RobotMCPServerRefreshRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotMCPServerRefresh")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotMCPServerRefreshResponseObject); ok {
+		return validResponse.VisitRobotMCPServerRefreshResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotModelsList operation middleware
+func (sh *strictHandler) RobotModelsList(ctx echo.Context) error {
+	var request RobotModelsListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotModelsList(ctx.Request().Context(), request.(RobotModelsListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotModelsList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotModelsListResponseObject); ok {
+		return validResponse.VisitRobotModelsListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotProvidersList operation middleware
+func (sh *strictHandler) RobotProvidersList(ctx echo.Context) error {
+	var request RobotProvidersListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotProvidersList(ctx.Request().Context(), request.(RobotProvidersListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotProvidersList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotProvidersListResponseObject); ok {
+		return validResponse.VisitRobotProvidersListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotProviderUpdate operation middleware
+func (sh *strictHandler) RobotProviderUpdate(ctx echo.Context, provider RobotModelProviderParam) error {
+	var request RobotProviderUpdateRequestObject
+
+	request.Provider = provider
+
+	var body RobotProviderUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotProviderUpdate(ctx.Request().Context(), request.(RobotProviderUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotProviderUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotProviderUpdateResponseObject); ok {
+		return validResponse.VisitRobotProviderUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotProviderModelsRefresh operation middleware
+func (sh *strictHandler) RobotProviderModelsRefresh(ctx echo.Context, provider RobotModelProviderParam) error {
+	var request RobotProviderModelsRefreshRequestObject
+
+	request.Provider = provider
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotProviderModelsRefresh(ctx.Request().Context(), request.(RobotProviderModelsRefreshRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotProviderModelsRefresh")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotProviderModelsRefreshResponseObject); ok {
+		return validResponse.VisitRobotProviderModelsRefreshResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotSessionsList operation middleware
+func (sh *strictHandler) RobotSessionsList(ctx echo.Context, params RobotSessionsListParams) error {
+	var request RobotSessionsListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotSessionsList(ctx.Request().Context(), request.(RobotSessionsListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotSessionsList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotSessionsListResponseObject); ok {
+		return validResponse.VisitRobotSessionsListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotSessionGet operation middleware
+func (sh *strictHandler) RobotSessionGet(ctx echo.Context, sessionId RobotSessionIDParam, params RobotSessionGetParams) error {
+	var request RobotSessionGetRequestObject
+
+	request.SessionId = sessionId
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotSessionGet(ctx.Request().Context(), request.(RobotSessionGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotSessionGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotSessionGetResponseObject); ok {
+		return validResponse.VisitRobotSessionGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotToolsList operation middleware
+func (sh *strictHandler) RobotToolsList(ctx echo.Context) error {
+	var request RobotToolsListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotToolsList(ctx.Request().Context(), request.(RobotToolsListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotToolsList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotToolsListResponseObject); ok {
+		return validResponse.VisitRobotToolsListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceInstancesList operation middleware
+func (sh *strictHandler) RobotWorkspaceInstancesList(ctx echo.Context, params RobotWorkspaceInstancesListParams) error {
+	var request RobotWorkspaceInstancesListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceInstancesList(ctx.Request().Context(), request.(RobotWorkspaceInstancesListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceInstancesList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceInstancesListResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceInstancesListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceInstanceDelete operation middleware
+func (sh *strictHandler) RobotWorkspaceInstanceDelete(ctx echo.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam) error {
+	var request RobotWorkspaceInstanceDeleteRequestObject
+
+	request.WorkspaceInstanceId = workspaceInstanceId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceInstanceDelete(ctx.Request().Context(), request.(RobotWorkspaceInstanceDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceInstanceDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceInstanceDeleteResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceInstanceDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceInstanceGet operation middleware
+func (sh *strictHandler) RobotWorkspaceInstanceGet(ctx echo.Context, workspaceInstanceId RobotWorkspaceInstanceIDParam) error {
+	var request RobotWorkspaceInstanceGetRequestObject
+
+	request.WorkspaceInstanceId = workspaceInstanceId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceInstanceGet(ctx.Request().Context(), request.(RobotWorkspaceInstanceGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceInstanceGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceInstanceGetResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceInstanceGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceProvidersList operation middleware
+func (sh *strictHandler) RobotWorkspaceProvidersList(ctx echo.Context) error {
+	var request RobotWorkspaceProvidersListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceProvidersList(ctx.Request().Context(), request.(RobotWorkspaceProvidersListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceProvidersList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceProvidersListResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceProvidersListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspacesList operation middleware
+func (sh *strictHandler) RobotWorkspacesList(ctx echo.Context, params RobotWorkspacesListParams) error {
+	var request RobotWorkspacesListRequestObject
+
+	request.Params = params
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspacesList(ctx.Request().Context(), request.(RobotWorkspacesListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspacesList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspacesListResponseObject); ok {
+		return validResponse.VisitRobotWorkspacesListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceCreate operation middleware
+func (sh *strictHandler) RobotWorkspaceCreate(ctx echo.Context) error {
+	var request RobotWorkspaceCreateRequestObject
+
+	var body RobotWorkspaceCreateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceCreate(ctx.Request().Context(), request.(RobotWorkspaceCreateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceCreate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceCreateResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceDelete operation middleware
+func (sh *strictHandler) RobotWorkspaceDelete(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error {
+	var request RobotWorkspaceDeleteRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceDelete(ctx.Request().Context(), request.(RobotWorkspaceDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceDeleteResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceGet operation middleware
+func (sh *strictHandler) RobotWorkspaceGet(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error {
+	var request RobotWorkspaceGetRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceGet(ctx.Request().Context(), request.(RobotWorkspaceGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceGetResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotWorkspaceUpdate operation middleware
+func (sh *strictHandler) RobotWorkspaceUpdate(ctx echo.Context, workspaceId RobotWorkspaceIDParam) error {
+	var request RobotWorkspaceUpdateRequestObject
+
+	request.WorkspaceId = workspaceId
+
+	var body RobotWorkspaceUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotWorkspaceUpdate(ctx.Request().Context(), request.(RobotWorkspaceUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotWorkspaceUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotWorkspaceUpdateResponseObject); ok {
+		return validResponse.VisitRobotWorkspaceUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotDelete operation middleware
+func (sh *strictHandler) RobotDelete(ctx echo.Context, robotId RobotIDParam) error {
+	var request RobotDeleteRequestObject
+
+	request.RobotId = robotId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotDelete(ctx.Request().Context(), request.(RobotDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotDeleteResponseObject); ok {
+		return validResponse.VisitRobotDeleteResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotGet operation middleware
+func (sh *strictHandler) RobotGet(ctx echo.Context, robotId RobotIDParam) error {
+	var request RobotGetRequestObject
+
+	request.RobotId = robotId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotGet(ctx.Request().Context(), request.(RobotGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotGetResponseObject); ok {
+		return validResponse.VisitRobotGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RobotUpdate operation middleware
+func (sh *strictHandler) RobotUpdate(ctx echo.Context, robotId RobotIDParam) error {
+	var request RobotUpdateRequestObject
+
+	request.RobotId = robotId
+
+	var body RobotUpdateJSONRequestBody
+	if err := ctx.Bind(&body); err != nil {
+		return err
+	}
+	request.Body = &body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RobotUpdate(ctx.Request().Context(), request.(RobotUpdateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RobotUpdate")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RobotUpdateResponseObject); ok {
+		return validResponse.VisitRobotUpdateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // RoleList operation middleware
 func (sh *strictHandler) RoleList(ctx echo.Context) error {
 	var request RoleListRequestObject
@@ -56975,820 +67548,968 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"fPju7u7u/wYAAP//Ou34nrOOBAA=",
+	"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",
+	"OWOI61kjI3bRPdmbCpP6HxDFv8USrQhhCCeC4HjvQqIVR5i5AsnzBaPK15F11UXhtQEkwIxTyoyBbotd",
+	"2Yy3kHLOjyyhOKAgiKpPJGJE/47FXg9lsgeZTDx2TFsS0EwPPtyTtoqv1ZUdZ3dUmSJkcDSAtynQ7nZn",
+	"+HhB26L1OqeUiiRL/DSnSmMiCDwA6S+s58Zu6qEGQDjZYh2BZooeqOQII0qXljBznYr8TC50N3DL6Ipr",
+	"ZrauYFNFYORD12f9ZSnpry2fTc2YlqAQxRVOAHawQT0blx+pAFuFMa9Op5sf+IqrV3o7bXyFjJpDwnzs",
+	"X10N6YZAgEEZoKNdkUN9RObjg6k6iGh+akES+XCJskJ7fv3i7PbF8urNze1sPrt+cXaxvHr77cvLmx9e",
+	"XCxvf9A/3Mzmrtn1i7Pz28s3r2fz2auz12ffm443xZ/nZ7cvvn9zffmi1Ony9c+Xt2e2W22El5ffXp9d",
+	"/1cBoPjh5u23ry5v3Q/L128uXoR/XZ7/cPb6exjx7dXLN2cXy7Obmxe3BcwXP794DUi+vLy5XV5dv/nu",
+	"8iU0N8iYvwt8z9+8fPnCTRO6FL/4XpVGbvKVZsVfS4O0xu/mxfLqxfXNm9dnL5dn5+cvbm6WP734rxv7",
+	"6c3Z29sflucvLy2+Fu7Ni9vby9ffl345Oz9/87bS5t3Z9etqm5u3N1cvXt9YbOyP12/MzN2fL67eXAOY",
+	"ny9fvCuDhb9fvbl4cQ0rt3z95rbcMfBFT+D6zbdvbivD2b/PLl5dvr68ub0+u31zHVRJCvYcdWiVuDpw",
+	"YF1tOXNVyc55TDpKJGe6KWJ5uiLCV73K8D7hOG7KV9qRMUdDi4nUWxU5LVef7All9y5/Wnm0avIcyXO1",
+	"jRK8k8HQPN1vafoNmIfirqK81WqNExtFUL2XnQ5I2ennWRs8KGJ0AxPa1ENtaIlMujWDTSuph0UytaZV",
+	"uKKMkfgamyLDwcL2WmPWKl0GTecmtVFhHVAlkcDs3tYY4WpLhG2rjQKtK8pT9JLviLB0Ny9LTRO0pRvd",
+	"Ic9O0ZnNbs7X6FcieDGGhmOq3HtkGFcWQkXTK50WV0m+oSOSeJn2hSLe3/ZSGzksIkWh9iZ5oeFZpOgD",
+	"uEtIeL1NfT1b+SGDPnO02xKgpVGoMcDQZpn7l1RYKFszH2phMxsYBtBO0bstYRaYoThkBJzbSupauzYp",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

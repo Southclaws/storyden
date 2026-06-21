@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: library_search_pages
+    respond:
+      text: "Search for library pages complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_library_search_1
+          name: library_search_pages
+          args:
+            query: "magnolia"

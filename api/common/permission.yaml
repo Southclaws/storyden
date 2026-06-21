@@ -35,6 +35,8 @@ oneOf:
   - $ref: "#/$defs/VIEW_ACCOUNTS"
   - $ref: "#/$defs/VIEW_MODERATION_NOTES"
   - $ref: "#/$defs/MANAGE_MODERATION_NOTES"
+  - $ref: "#/$defs/USE_ROBOTS"
+  - $ref: "#/$defs/MANAGE_ROBOTS"
   - $ref: "#/$defs/ADMINISTRATOR"
 
 $defs:
@@ -217,6 +219,18 @@ $defs:
     const: MANAGE_MODERATION_NOTES
     title: Manage moderation notes
     description: Create and delete internal staff-only moderation notes attached to member accounts.
+
+  USE_ROBOTS:
+    type: string
+    const: USE_ROBOTS
+    title: Use robots
+    description: Use robots to automate actions on the platform.
+
+  MANAGE_ROBOTS:
+    type: string
+    const: MANAGE_ROBOTS
+    title: Manage robots
+    description: Create, edit and delete robots.
 
   ADMINISTRATOR:
     type: string

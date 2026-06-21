@@ -1,0 +1,42 @@
+---
+title: robot_model_provider_list_models
+description: Host to Plugin RPC method.
+---
+
+`robot_model_provider_list_models` is a **Host to Plugin** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/host-to-plugin/robot_model_provider_list_models.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestRobotModelProviderListModels`
+- Response type: `RPCResponseRobotModelProviderListModels`
+
+## Request contract
+
+Requests the current list of models exposed by a plugin-backed Robot model provider.
+
+
+Required fields:
+- `method`
+- `params`
+
+
+
+## Response contract
+
+Returns models exposed by a plugin-backed Robot model provider.
+
+
+Required fields:
+- `method`
+- `models`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

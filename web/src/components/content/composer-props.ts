@@ -5,6 +5,7 @@ export type ContentComposerProps = {
   disabled?: boolean;
   resetKey?: string;
   initialValue?: string;
+  initialValueFormat?: "html" | "markdown";
 
   // NOTE: This is not for making the editor controllable but for optimistic
   // mutation/revalidation of disabled editors. Use with care!

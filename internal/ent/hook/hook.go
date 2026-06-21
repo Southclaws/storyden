@@ -333,6 +333,30 @@ func (f OAuthRefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthRefreshTokenMutation", m)
 }
 
+// The OAuthRemoteAuthorisationFlowFunc type is an adapter to allow the use of ordinary
+// function as OAuthRemoteAuthorisationFlow mutator.
+type OAuthRemoteAuthorisationFlowFunc func(context.Context, *ent.OAuthRemoteAuthorisationFlowMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OAuthRemoteAuthorisationFlowFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OAuthRemoteAuthorisationFlowMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthRemoteAuthorisationFlowMutation", m)
+}
+
+// The OAuthRemoteConnectionFunc type is an adapter to allow the use of ordinary
+// function as OAuthRemoteConnection mutator.
+type OAuthRemoteConnectionFunc func(context.Context, *ent.OAuthRemoteConnectionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f OAuthRemoteConnectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.OAuthRemoteConnectionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.OAuthRemoteConnectionMutation", m)
+}
+
 // The PluginFunc type is an adapter to allow the use of ordinary
 // function as Plugin mutator.
 type PluginFunc func(context.Context, *ent.PluginMutation) (ent.Value, error)
@@ -439,6 +463,102 @@ func (f ReportFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ReportMutation", m)
+}
+
+// The RobotFunc type is an adapter to allow the use of ordinary
+// function as Robot mutator.
+type RobotFunc func(context.Context, *ent.RobotMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotMutation", m)
+}
+
+// The RobotMCPServerFunc type is an adapter to allow the use of ordinary
+// function as RobotMCPServer mutator.
+type RobotMCPServerFunc func(context.Context, *ent.RobotMCPServerMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotMCPServerFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotMCPServerMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotMCPServerMutation", m)
+}
+
+// The RobotMCPToolFunc type is an adapter to allow the use of ordinary
+// function as RobotMCPTool mutator.
+type RobotMCPToolFunc func(context.Context, *ent.RobotMCPToolMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotMCPToolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotMCPToolMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotMCPToolMutation", m)
+}
+
+// The RobotProviderModelFunc type is an adapter to allow the use of ordinary
+// function as RobotProviderModel mutator.
+type RobotProviderModelFunc func(context.Context, *ent.RobotProviderModelMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotProviderModelFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotProviderModelMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotProviderModelMutation", m)
+}
+
+// The RobotSessionFunc type is an adapter to allow the use of ordinary
+// function as RobotSession mutator.
+type RobotSessionFunc func(context.Context, *ent.RobotSessionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotSessionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotSessionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotSessionMutation", m)
+}
+
+// The RobotSessionMessageFunc type is an adapter to allow the use of ordinary
+// function as RobotSessionMessage mutator.
+type RobotSessionMessageFunc func(context.Context, *ent.RobotSessionMessageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotSessionMessageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotSessionMessageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotSessionMessageMutation", m)
+}
+
+// The RobotWorkspaceFunc type is an adapter to allow the use of ordinary
+// function as RobotWorkspace mutator.
+type RobotWorkspaceFunc func(context.Context, *ent.RobotWorkspaceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotWorkspaceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotWorkspaceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotWorkspaceMutation", m)
+}
+
+// The RobotWorkspaceInstanceFunc type is an adapter to allow the use of ordinary
+// function as RobotWorkspaceInstance mutator.
+type RobotWorkspaceInstanceFunc func(context.Context, *ent.RobotWorkspaceInstanceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RobotWorkspaceInstanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RobotWorkspaceInstanceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RobotWorkspaceInstanceMutation", m)
 }
 
 // The RoleFunc type is an adapter to allow the use of ordinary

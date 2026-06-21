@@ -16,6 +16,8 @@ var IDPattern = regexp.MustCompile(`^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`)
 
 var AuthorPattern = regexp.MustCompile(`^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`)
 
+var CapabilityIDPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`)
+
 var (
 	ErrInvalidPluginName = fmt.Errorf("plugin name cannot be empty")
 	ErrPluginNameTooLong = fmt.Errorf("plugin name cannot be longer than 100 characters")
@@ -111,6 +113,29 @@ func (m *Manifest) Validate() error {
 		if _, ok := validEventSet[event]; !ok {
 			internal = append(internal, fmt.Sprintf("invalid events_consumed value: %q", event))
 			external = append(external, fmt.Sprintf(`Field "events_consumed" contains unknown event %q.`, event))
+		}
+	}
+
+	for _, capability := range m.Capabilities {
+		if capability.CapabilityConfigUnion == nil {
+			internal = append(internal, "empty capabilities entry")
+			external = append(external, `Field "capabilities" contains an empty entry.`)
+			continue
+		}
+
+		switch config := capability.CapabilityConfigUnion.(type) {
+		case *RobotLLMProviderCapabilityConfig:
+			if !CapabilityIDPattern.MatchString(config.ID) {
+				internal = append(internal, fmt.Sprintf("invalid capabilities id for %q: %q", config.Type, config.ID))
+				external = append(external, `Field "capabilities.id" is invalid. Use letters, numbers, dots, underscores, and hyphens only.`)
+			}
+			if config.Version == "" {
+				internal = append(internal, fmt.Sprintf("empty capabilities version for %q: %q", config.Type, config.ID))
+				external = append(external, `Field "capabilities.version" cannot be empty.`)
+			}
+		default:
+			internal = append(internal, fmt.Sprintf("unsupported capabilities entry: %T", capability.CapabilityConfigUnion))
+			external = append(external, `Field "capabilities" contains an unsupported capability type.`)
 		}
 	}
 

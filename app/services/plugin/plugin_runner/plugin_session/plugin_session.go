@@ -484,9 +484,21 @@ func (s *sdxSession) handleInboundRPC(ctx context.Context, req rpc.PluginToHostR
 	response, err := s.inboundRpcHandler.Handle(ctx, req)
 	if err != nil {
 		s.logger.Error("RPC handler error", slog.Any("error", err))
+		s.sendInboundRPCResponse(ctx, req, &rpc.PluginToHostResponse{
+			ID:      pluginToHostRequestID(req),
+			Jsonrpc: "2.0",
+			Error: opt.New(rpc.PluginToHostResponseError{
+				Code:    opt.New(-32000),
+				Message: opt.New(err.Error()),
+			}),
+		})
 		return
 	}
 
+	s.sendInboundRPCResponse(ctx, req, response)
+}
+
+func (s *sdxSession) sendInboundRPCResponse(ctx context.Context, req rpc.PluginToHostRequestUnion, response *rpc.PluginToHostResponse) {
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
 		s.logger.Error("failed to marshal RPC response", slog.Any("error", err))
@@ -509,6 +521,19 @@ func (s *sdxSession) handleInboundRPC(ctx context.Context, req rpc.PluginToHostR
 		case <-ctx.Done():
 			s.logger.Warn("context canceled while sending RPC response")
 		}
+	}
+}
+
+func pluginToHostRequestID(req rpc.PluginToHostRequestUnion) xid.ID {
+	switch v := req.(type) {
+	case *rpc.RPCRequestAccessGet:
+		return v.ID
+	case *rpc.RPCRequestGetConfig:
+		return v.ID
+	case *rpc.RPCRequestRobotRun:
+		return v.ID
+	default:
+		return xid.NilID()
 	}
 }
 

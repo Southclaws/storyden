@@ -51,6 +51,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_querier"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
+	oauth_remote "github.com/Southclaws/storyden/app/resources/oauth/remote"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
@@ -73,6 +74,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/resources/report/report_querier"
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
+	robot_mcp "github.com/Southclaws/storyden/app/resources/robot/mcp"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_model_cache"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_workspace"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_writer"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
@@ -116,6 +124,12 @@ func Build() fx.Option {
 			thread_querier.New,
 			thread_cache.New,
 			reaction_repo.New,
+			robot_model_cache.New,
+			robot_mcp.New,
+			robot_querier.New,
+			robot_writer.New,
+			robot_session.New,
+			robot_workspace.New,
 			like_querier.New,
 			like_writer.New,
 			post_querier.New,
@@ -136,6 +150,7 @@ func Build() fx.Option {
 			node_properties.New,
 			link_querier.New,
 			link_writer.New,
+			oauth_remote.New,
 			oauth_querier.New,
 			oauth_writer.New,
 			profile_search.New,
@@ -153,6 +168,7 @@ func Build() fx.Option {
 			report_writer.New,
 			plugin_reader.New,
 			plugin_writer.New,
+			llm_provider.New,
 		),
 		token.Build(),
 	)

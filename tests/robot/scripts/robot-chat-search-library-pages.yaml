@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: search_library_pages
+    respond:
+      text: "Search for robot pages complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_search_1
+          name: search_library_pages
+          args:
+            query: "robot"

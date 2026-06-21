@@ -19,6 +19,7 @@ import { InterfaceSettingsScreen } from "./InterfaceSettingsScreen";
 import { ModerationSettingsScreen } from "./ModerationSettingsScreen";
 import { OAuthSettingsScreen } from "./OAuthSettingsScreen";
 import { PluginSettingsScreen } from "./PluginSettingsScreen";
+import { RobotsSettingsScreen } from "./RobotsSettingsScreen/RobotsSettingsScreen";
 import { SystemSettingsScreen } from "./SystemSettingsScreen";
 
 const DEFAULT_TAB = "brand";
@@ -55,7 +56,6 @@ export function AdminScreen() {
     if (!canViewOAuth && tab === "oauth") {
       setTab(DEFAULT_TAB);
     }
-
   }, [canViewEmailLog, canViewOAuth, pluginsEnabled, tab, setTab]);
 
   function handleTabChange({ value }: TabsValueChangeDetails) {
@@ -83,6 +83,7 @@ export function AdminScreen() {
         <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
         {canViewOAuth && <Tabs.Trigger value="oauth">OAuth</Tabs.Trigger>}
         {pluginsEnabled && <Tabs.Trigger value="plugins">Plugins</Tabs.Trigger>}
+        <Tabs.Trigger value="robots">Robots</Tabs.Trigger>
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -131,6 +132,10 @@ export function AdminScreen() {
           <PluginSettingsScreen />
         </Tabs.Content>
       )}
+
+      <Tabs.Content value="robots">
+        <RobotsSettingsScreen />
+      </Tabs.Content>
     </Tabs.Root>
   );
 }

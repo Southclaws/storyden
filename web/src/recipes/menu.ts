@@ -56,7 +56,7 @@ export const menu = defineSlotRecipe({
       flexDirection: "column",
       outline: "none",
       width: "calc(100% + 2rem)",
-      zIndex: "dropdown",
+      zIndex: "popover",
       _hidden: {
         display: "none",
       },
@@ -72,7 +72,7 @@ export const menu = defineSlotRecipe({
       flexDirection: "column",
     },
     positioner: {
-      zIndex: "dropdown",
+      zIndex: "popover",
     },
     item: itemStyle,
     triggerItem: itemStyle,

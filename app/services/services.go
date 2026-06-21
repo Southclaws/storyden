@@ -12,6 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/asset"
 	"github.com/Southclaws/storyden/app/services/audit/audit_logger"
 	"github.com/Southclaws/storyden/app/services/authentication"
+	"github.com/Southclaws/storyden/app/services/authentication/oauthremote"
+	"github.com/Southclaws/storyden/app/services/authentication/oauthremotetoken"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/beacon_listener"
@@ -39,6 +41,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/bleve_search"
 	"github.com/Southclaws/storyden/app/services/search/redis_search"
 	"github.com/Southclaws/storyden/app/services/search/search_indexer"
+	"github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -54,6 +57,8 @@ func Build() fx.Option {
 		onboarding.Build(),
 		account_suspension.Build(),
 		authentication.Build(),
+		oauthremote.Build(),
+		oauthremotetoken.Build(),
 		category.Build(),
 		thread.Build(),
 		reply.Build(),
@@ -75,6 +80,7 @@ func Build() fx.Option {
 		mention_job.Build(),
 		beacon_listener.Build(),
 		generative.Build(),
+		robot.Build(),
 		semdexer.Build(),
 		event.Build(),
 		moderation.Build(),

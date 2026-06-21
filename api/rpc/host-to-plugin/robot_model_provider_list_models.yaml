@@ -1,0 +1,65 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestRobotModelProviderListModelsParams:
+    type: object
+    required:
+      - provider
+    properties:
+      provider:
+        type: string
+        description: Provider identifier declared by the plugin manifest.
+
+  RobotModelProviderModel:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+        description: Model name within the provider namespace.
+      display_name:
+        type: string
+        description: Human-readable model name.
+      context_window:
+        type: integer
+        description: Context window in tokens, when known.
+      max_output_tokens:
+        type: integer
+        description: Maximum output tokens, when known.
+      released_at:
+        type: string
+        format: date-time
+        description: Model release time, when known.
+      raw:
+        type: object
+        additionalProperties: true
+        description: Provider-specific model metadata.
+
+  RPCRequestRobotModelProviderListModels:
+    description: >
+      Requests the current list of models exposed by a plugin-backed Robot
+      model provider.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_model_provider_list_models"
+          params:
+            $ref: "#/$defs/RPCRequestRobotModelProviderListModelsParams"
+
+  RPCResponseRobotModelProviderListModels:
+    description: >
+      Returns models exposed by a plugin-backed Robot model provider.
+    type: object
+    required: ["method", "models"]
+    properties:
+      method:
+        type: string
+        const: "robot_model_provider_list_models"
+      models:
+        type: array
+        items:
+          $ref: "#/$defs/RobotModelProviderModel"

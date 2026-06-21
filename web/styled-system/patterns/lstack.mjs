@@ -2,13 +2,14 @@ import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const lstackConfig = {
-transform() {
+transform(props20) {
   return {
     display: "flex",
     gap: "3",
     flexDirection: "column",
     width: "full",
     alignItems: "start"
+    // ...props,
   };
 }}
 

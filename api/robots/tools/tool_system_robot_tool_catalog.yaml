@@ -1,0 +1,50 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolSystemRobotToolCatalog
+x-storyden-tool:
+  title: List All Tool Names
+  role: USE_ROBOTS
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: system_robot_tool_catalog
+description: >
+  Returns a list of tools that may be assigned to a Robot during Robot creation
+  or update. Use this when selecting capabilities assigned to a Robot. This
+  catalog describes Robot capabilities, not this conversation's capabilities.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolSystemRobotToolCatalogInput"
+  output:
+    $ref: "#/definitions/ToolSystemRobotToolCatalogOutput"
+definitions:
+  ToolSystemRobotToolCatalogInput:
+    type: object
+    properties: {}
+    additionalProperties: false
+  ToolSystemRobotToolCatalogOutput:
+    type: object
+    description: List of the tools available in the catalog that you can assign to Robots, with their names and descriptions
+    properties:
+      tools:
+        type: array
+        items:
+          $ref: "#/definitions/ToolInfo"
+  ToolInfo:
+    type: object
+    required:
+      - name
+      - description
+    properties:
+      name:
+        type: string
+        description: The tool name identifier
+      description:
+        type: string
+        description: Brief description of what the tool does
+    additionalProperties: false

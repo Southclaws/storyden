@@ -1,0 +1,22 @@
+steps:
+  - match:
+      contains: "list pages"
+    respond:
+      tool_calls:
+        - id: call_list_1
+          name: library_page_list
+          args: {}
+  - match:
+      contains: "trigger error"
+    respond:
+      error: "simulated LLM provider failure"
+  - match:
+      tool_result: library_page_list
+    respond:
+      text: "I found some pages in the library."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      text: "This is a mock response from the test provider."
+      finish: "stop"

@@ -1,6 +1,7 @@
 package datagraph
 
 import (
+	"fmt"
 	"net/url"
 	"path"
 	"strings"
@@ -32,6 +33,18 @@ type RefList []*Ref
 func (a RefList) Len() int           { return len(a) }
 func (a RefList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a RefList) Less(i, j int) bool { return a[i].Relevance > a[j].Relevance }
+
+func (r *Ref) URL() url.URL {
+	return url.URL{
+		Scheme: RefScheme,
+		Opaque: fmt.Sprintf("%s/%s", r.Kind.String(), r.ID.String()),
+	}
+}
+
+func (r *Ref) String() string {
+	u := r.URL()
+	return u.String()
+}
 
 func NewRef(i Item) *Ref {
 	return &Ref{

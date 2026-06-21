@@ -1,0 +1,16 @@
+steps:
+  - match:
+      contains: "target followup one"
+    respond:
+      text: "Target robot handled followup one."
+      finish: "stop"
+  - match:
+      contains: "target followup two"
+    respond:
+      text: "Target robot handled followup two."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      text: "Target robot received the conversation."
+      finish: "stop"

@@ -962,6 +962,17 @@ The directory where plugin files will be extracted and stored. Each plugin gets 
 
 This directory should be persistent and writable by the Storyden process.
 
+### `ROBOT_WORKSPACE_DATA_PATH`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`./data/robot-workspaces`</td></tr>
+</table>
+
+The directory where local Robot workspace instance files will be stored. Each workspace instance gets its own subdirectory keyed by the workspace instance ID.
+
+This directory should be persistent and writable by the Storyden process when local Robot workspaces are used.
+
 ### `PLUGIN_RUNTIME_PROVIDER`
 
 <table>

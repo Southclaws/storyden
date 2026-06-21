@@ -68,6 +68,10 @@ type Tx struct {
 	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
 	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
 	OAuthRefreshToken *OAuthRefreshTokenClient
+	// OAuthRemoteAuthorisationFlow is the client for interacting with the OAuthRemoteAuthorisationFlow builders.
+	OAuthRemoteAuthorisationFlow *OAuthRemoteAuthorisationFlowClient
+	// OAuthRemoteConnection is the client for interacting with the OAuthRemoteConnection builders.
+	OAuthRemoteConnection *OAuthRemoteConnectionClient
 	// Plugin is the client for interacting with the Plugin builders.
 	Plugin *PluginClient
 	// Post is the client for interacting with the Post builders.
@@ -86,6 +90,22 @@ type Tx struct {
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
 	Report *ReportClient
+	// Robot is the client for interacting with the Robot builders.
+	Robot *RobotClient
+	// RobotMCPServer is the client for interacting with the RobotMCPServer builders.
+	RobotMCPServer *RobotMCPServerClient
+	// RobotMCPTool is the client for interacting with the RobotMCPTool builders.
+	RobotMCPTool *RobotMCPToolClient
+	// RobotProviderModel is the client for interacting with the RobotProviderModel builders.
+	RobotProviderModel *RobotProviderModelClient
+	// RobotSession is the client for interacting with the RobotSession builders.
+	RobotSession *RobotSessionClient
+	// RobotSessionMessage is the client for interacting with the RobotSessionMessage builders.
+	RobotSessionMessage *RobotSessionMessageClient
+	// RobotWorkspace is the client for interacting with the RobotWorkspace builders.
+	RobotWorkspace *RobotWorkspaceClient
+	// RobotWorkspaceInstance is the client for interacting with the RobotWorkspaceInstance builders.
+	RobotWorkspaceInstance *RobotWorkspaceInstanceClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// Session is the client for interacting with the Session builders.
@@ -254,6 +274,8 @@ func (tx *Tx) init() {
 	tx.OAuthClient = NewOAuthClientClient(tx.config)
 	tx.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(tx.config)
 	tx.OAuthRefreshToken = NewOAuthRefreshTokenClient(tx.config)
+	tx.OAuthRemoteAuthorisationFlow = NewOAuthRemoteAuthorisationFlowClient(tx.config)
+	tx.OAuthRemoteConnection = NewOAuthRemoteConnectionClient(tx.config)
 	tx.Plugin = NewPluginClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.PostRead = NewPostReadClient(tx.config)
@@ -263,6 +285,14 @@ func (tx *Tx) init() {
 	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Report = NewReportClient(tx.config)
+	tx.Robot = NewRobotClient(tx.config)
+	tx.RobotMCPServer = NewRobotMCPServerClient(tx.config)
+	tx.RobotMCPTool = NewRobotMCPToolClient(tx.config)
+	tx.RobotProviderModel = NewRobotProviderModelClient(tx.config)
+	tx.RobotSession = NewRobotSessionClient(tx.config)
+	tx.RobotSessionMessage = NewRobotSessionMessageClient(tx.config)
+	tx.RobotWorkspace = NewRobotWorkspaceClient(tx.config)
+	tx.RobotWorkspaceInstance = NewRobotWorkspaceInstanceClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)

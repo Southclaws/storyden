@@ -472,6 +472,12 @@ type Config struct {
 	*/
 	PluginDataPath string `default:"./data/plugins" envconfig:"PLUGIN_DATA_PATH"`
 	/*
+	   The directory where local Robot workspace instance files will be stored. Each workspace instance gets its own subdirectory keyed by the workspace instance ID.
+
+	   This directory should be persistent and writable by the Storyden process when local Robot workspaces are used.
+	*/
+	RobotWorkspaceDataPath string `default:"./data/robot-workspaces" envconfig:"ROBOT_WORKSPACE_DATA_PATH"`
+	/*
 	   The plugin runtime provider. Different runtime providers offer different security guarantees. The simplest is `local` which just runs the plugin as a child process on the same machine as Storyden.
 
 	   - `none`: disables plugins entirely. Plugin APIs return a permission error and instance capabilities will not include `plugins`.

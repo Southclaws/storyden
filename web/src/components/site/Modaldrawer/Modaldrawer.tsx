@@ -13,11 +13,13 @@ type Props = {
   title?: string;
   dismissable?: boolean;
   className?: string;
+  size?: "default" | "wide";
 } & UseDisclosureProps;
 
 export function ModalDrawer({
   children,
   className,
+  size = "default",
   ...props
 }: PropsWithChildren<Props>) {
   const handleOpenChange = (open: boolean) => {
@@ -50,8 +52,8 @@ export function ModalDrawer({
               maxWidth={{
                 base: "full",
                 md: "breakpoint-sm",
-                lg: "breakpoint-md",
-                xl: "breakpoint-lg",
+                lg: size === "wide" ? "breakpoint-lg" : "breakpoint-md",
+                xl: size === "wide" ? "breakpoint-xl" : "breakpoint-lg",
               }}
               borderTopRadius={{ base: "xl", md: "md" }}
               borderBottomRadius={{ base: "none", md: "md" }}

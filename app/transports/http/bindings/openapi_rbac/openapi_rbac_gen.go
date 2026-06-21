@@ -32,6 +32,10 @@ type OperationPermissions interface {
 	AdminOAuthDeviceAuthorisationList() (bool, *rbac.Permission)
 	AdminOAuthRefreshTokenList() (bool, *rbac.Permission)
 	AdminOAuthRefreshTokenDelete() (bool, *rbac.Permission)
+	OAuthRemoteDiscover() (bool, *rbac.Permission)
+	OAuthRemoteConnectionList() (bool, *rbac.Permission)
+	OAuthRemoteConnectionCreate() (bool, *rbac.Permission)
+	OAuthRemoteConnectionAuthorize() (bool, *rbac.Permission)
 	PluginList() (bool, *rbac.Permission)
 	PluginAdd() (bool, *rbac.Permission)
 	PluginGet() (bool, *rbac.Permission)
@@ -72,6 +76,7 @@ type OperationPermissions interface {
 	OAuthAuthoriseConsentSubmit() (bool, *rbac.Permission)
 	OAuthToken() (bool, *rbac.Permission)
 	OAuthUserInfo() (bool, *rbac.Permission)
+	OAuthRemoteCallback() (bool, *rbac.Permission)
 	OAuthClientRegister() (bool, *rbac.Permission)
 	WebAuthnRequestCredential() (bool, *rbac.Permission)
 	WebAuthnMakeCredential() (bool, *rbac.Permission)
@@ -205,6 +210,35 @@ type OperationPermissions interface {
 	EventDelete() (bool, *rbac.Permission)
 	EventParticipantUpdate() (bool, *rbac.Permission)
 	EventParticipantRemove() (bool, *rbac.Permission)
+	RobotsList() (bool, *rbac.Permission)
+	RobotCreate() (bool, *rbac.Permission)
+	RobotToolsList() (bool, *rbac.Permission)
+	RobotChatSSE() (bool, *rbac.Permission)
+	RobotProvidersList() (bool, *rbac.Permission)
+	RobotProviderUpdate() (bool, *rbac.Permission)
+	RobotProviderModelsRefresh() (bool, *rbac.Permission)
+	RobotModelsList() (bool, *rbac.Permission)
+	RobotWorkspaceProvidersList() (bool, *rbac.Permission)
+	RobotWorkspacesList() (bool, *rbac.Permission)
+	RobotWorkspaceCreate() (bool, *rbac.Permission)
+	RobotWorkspaceGet() (bool, *rbac.Permission)
+	RobotWorkspaceUpdate() (bool, *rbac.Permission)
+	RobotWorkspaceDelete() (bool, *rbac.Permission)
+	RobotWorkspaceInstancesList() (bool, *rbac.Permission)
+	RobotWorkspaceInstanceGet() (bool, *rbac.Permission)
+	RobotWorkspaceInstanceDelete() (bool, *rbac.Permission)
+	RobotGet() (bool, *rbac.Permission)
+	RobotUpdate() (bool, *rbac.Permission)
+	RobotDelete() (bool, *rbac.Permission)
+	RobotSessionsList() (bool, *rbac.Permission)
+	RobotSessionGet() (bool, *rbac.Permission)
+	RobotMCPServersList() (bool, *rbac.Permission)
+	RobotMCPServerCreate() (bool, *rbac.Permission)
+	RobotMCPServerProbe() (bool, *rbac.Permission)
+	RobotMCPServerGet() (bool, *rbac.Permission)
+	RobotMCPServerUpdate() (bool, *rbac.Permission)
+	RobotMCPServerDelete() (bool, *rbac.Permission)
+	RobotMCPServerRefresh() (bool, *rbac.Permission)
 }
 
 func GetOperationPermission(optable OperationPermissions, op string) (bool, *rbac.Permission) {
@@ -267,6 +301,14 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminOAuthRefreshTokenList()
 	case "AdminOAuthRefreshTokenDelete":
 		return optable.AdminOAuthRefreshTokenDelete()
+	case "OAuthRemoteDiscover":
+		return optable.OAuthRemoteDiscover()
+	case "OAuthRemoteConnectionList":
+		return optable.OAuthRemoteConnectionList()
+	case "OAuthRemoteConnectionCreate":
+		return optable.OAuthRemoteConnectionCreate()
+	case "OAuthRemoteConnectionAuthorize":
+		return optable.OAuthRemoteConnectionAuthorize()
 	case "PluginList":
 		return optable.PluginList()
 	case "PluginAdd":
@@ -347,6 +389,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.OAuthToken()
 	case "OAuthUserInfo":
 		return optable.OAuthUserInfo()
+	case "OAuthRemoteCallback":
+		return optable.OAuthRemoteCallback()
 	case "OAuthClientRegister":
 		return optable.OAuthClientRegister()
 	case "WebAuthnRequestCredential":
@@ -613,6 +657,64 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.EventParticipantUpdate()
 	case "EventParticipantRemove":
 		return optable.EventParticipantRemove()
+	case "RobotsList":
+		return optable.RobotsList()
+	case "RobotCreate":
+		return optable.RobotCreate()
+	case "RobotToolsList":
+		return optable.RobotToolsList()
+	case "RobotChatSSE":
+		return optable.RobotChatSSE()
+	case "RobotProvidersList":
+		return optable.RobotProvidersList()
+	case "RobotProviderUpdate":
+		return optable.RobotProviderUpdate()
+	case "RobotProviderModelsRefresh":
+		return optable.RobotProviderModelsRefresh()
+	case "RobotModelsList":
+		return optable.RobotModelsList()
+	case "RobotWorkspaceProvidersList":
+		return optable.RobotWorkspaceProvidersList()
+	case "RobotWorkspacesList":
+		return optable.RobotWorkspacesList()
+	case "RobotWorkspaceCreate":
+		return optable.RobotWorkspaceCreate()
+	case "RobotWorkspaceGet":
+		return optable.RobotWorkspaceGet()
+	case "RobotWorkspaceUpdate":
+		return optable.RobotWorkspaceUpdate()
+	case "RobotWorkspaceDelete":
+		return optable.RobotWorkspaceDelete()
+	case "RobotWorkspaceInstancesList":
+		return optable.RobotWorkspaceInstancesList()
+	case "RobotWorkspaceInstanceGet":
+		return optable.RobotWorkspaceInstanceGet()
+	case "RobotWorkspaceInstanceDelete":
+		return optable.RobotWorkspaceInstanceDelete()
+	case "RobotGet":
+		return optable.RobotGet()
+	case "RobotUpdate":
+		return optable.RobotUpdate()
+	case "RobotDelete":
+		return optable.RobotDelete()
+	case "RobotSessionsList":
+		return optable.RobotSessionsList()
+	case "RobotSessionGet":
+		return optable.RobotSessionGet()
+	case "RobotMCPServersList":
+		return optable.RobotMCPServersList()
+	case "RobotMCPServerCreate":
+		return optable.RobotMCPServerCreate()
+	case "RobotMCPServerProbe":
+		return optable.RobotMCPServerProbe()
+	case "RobotMCPServerGet":
+		return optable.RobotMCPServerGet()
+	case "RobotMCPServerUpdate":
+		return optable.RobotMCPServerUpdate()
+	case "RobotMCPServerDelete":
+		return optable.RobotMCPServerDelete()
+	case "RobotMCPServerRefresh":
+		return optable.RobotMCPServerRefresh()
 	default:
 		panic("unknown operation, must re-run rbacgen")
 	}

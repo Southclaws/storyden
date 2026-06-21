@@ -16,12 +16,7 @@ const PLACEHOLDER_SEPARATOR = "\n\n";
 const ERROR_UNSUPPORTED_FILE_TYPE = "File type not supported";
 
 export function useContentComposerMarkdown(props: ContentComposerProps) {
-  const [value, setValue] = useState(() => {
-    if (props.initialValue) {
-      return htmlToMarkdown(props.initialValue);
-    }
-    return "";
-  });
+  const [value, setValue] = useState(() => getInitialMarkdownValue(props));
   const { upload } = useImageUpload();
   const [previewHTML, setPreviewHTML] = useState<string>("");
   const [showPreview, setShowPreview] = useState(false);
@@ -40,6 +35,19 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
       setPreviewHTML("");
     }
   }, [props.resetKey]);
+
+  useEffect(() => {
+    if (!props.disabled) {
+      return;
+    }
+
+    setValue(getInitialMarkdownValue(props));
+  }, [
+    props.disabled,
+    props.initialValue,
+    props.initialValueFormat,
+    props.value,
+  ]);
 
   useEffect(() => {
     if (props.disabled || showPreview) return;
@@ -270,4 +278,15 @@ export function useContentComposerMarkdown(props: ContentComposerProps) {
     handleDragEnter,
     handleDragLeave,
   };
+}
+
+function getInitialMarkdownValue(props: ContentComposerProps) {
+  const value = props.value ?? props.initialValue;
+  if (!value) {
+    return "";
+  }
+
+  return props.initialValueFormat === "markdown"
+    ? value
+    : htmlToMarkdown(value);
 }

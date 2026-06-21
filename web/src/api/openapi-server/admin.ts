@@ -28,6 +28,12 @@ import type {
   OAuthClientUpdateBody,
   OAuthDeviceAuthorisationListOKResponse,
   OAuthRefreshTokenListOKResponse,
+  OAuthRemoteAuthorizeOKResponse,
+  OAuthRemoteConnectionCreateBody,
+  OAuthRemoteConnectionListOKResponse,
+  OAuthRemoteConnectionOKResponse,
+  OAuthRemoteDiscoverBody,
+  OAuthRemoteDiscoverOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -611,6 +617,121 @@ export const adminOAuthRefreshTokenDelete = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Discover OAuth configuration for a remote protected resource URL.
+
+Storyden fetches protected resource metadata, follows the advertised
+authorization server, and chooses CIMD, DCR, or manual setup according
+to the discovered authorization server metadata.
+
+ */
+export type oAuthRemoteDiscoverResponse = {
+  data: OAuthRemoteDiscoverOKResponse;
+  status: number;
+};
+
+export const getOAuthRemoteDiscoverUrl = () => {
+  return `/admin/oauth/remote/discover`;
+};
+
+export const oAuthRemoteDiscover = async (
+  oAuthRemoteDiscoverBody: OAuthRemoteDiscoverBody,
+  options?: RequestInit,
+): Promise<oAuthRemoteDiscoverResponse> => {
+  return fetcher<Promise<oAuthRemoteDiscoverResponse>>(
+    getOAuthRemoteDiscoverUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRemoteDiscoverBody),
+    },
+  );
+};
+
+/**
+ * List remote OAuth connections configured for this Storyden instance.
+
+ */
+export type oAuthRemoteConnectionListResponse = {
+  data: OAuthRemoteConnectionListOKResponse;
+  status: number;
+};
+
+export const getOAuthRemoteConnectionListUrl = () => {
+  return `/admin/oauth/remote/connections`;
+};
+
+export const oAuthRemoteConnectionList = async (
+  options?: RequestInit,
+): Promise<oAuthRemoteConnectionListResponse> => {
+  return fetcher<Promise<oAuthRemoteConnectionListResponse>>(
+    getOAuthRemoteConnectionListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Create a remote OAuth connection using CIMD, DCR, or manual
+configuration. CIMD is preferred when discovery supports it.
+
+ */
+export type oAuthRemoteConnectionCreateResponse = {
+  data: OAuthRemoteConnectionOKResponse;
+  status: number;
+};
+
+export const getOAuthRemoteConnectionCreateUrl = () => {
+  return `/admin/oauth/remote/connections`;
+};
+
+export const oAuthRemoteConnectionCreate = async (
+  oAuthRemoteConnectionCreateBody: OAuthRemoteConnectionCreateBody,
+  options?: RequestInit,
+): Promise<oAuthRemoteConnectionCreateResponse> => {
+  return fetcher<Promise<oAuthRemoteConnectionCreateResponse>>(
+    getOAuthRemoteConnectionCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(oAuthRemoteConnectionCreateBody),
+    },
+  );
+};
+
+/**
+ * Start OAuth authorization code with PKCE for a remote OAuth
+connection and return the authorization URL to open in a browser.
+
+ */
+export type oAuthRemoteConnectionAuthorizeResponse = {
+  data: OAuthRemoteAuthorizeOKResponse;
+  status: number;
+};
+
+export const getOAuthRemoteConnectionAuthorizeUrl = (
+  oauthRemoteConnectionId: string,
+) => {
+  return `/admin/oauth/remote/connections/${oauthRemoteConnectionId}/authorize`;
+};
+
+export const oAuthRemoteConnectionAuthorize = async (
+  oauthRemoteConnectionId: string,
+  options?: RequestInit,
+): Promise<oAuthRemoteConnectionAuthorizeResponse> => {
+  return fetcher<Promise<oAuthRemoteConnectionAuthorizeResponse>>(
+    getOAuthRemoteConnectionAuthorizeUrl(oauthRemoteConnectionId),
+    {
+      ...options,
+      method: "POST",
     },
   );
 };

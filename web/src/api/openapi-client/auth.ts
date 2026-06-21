@@ -62,6 +62,8 @@ import type {
   OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
   OAuthRefreshTokenListOKResponse,
+  OAuthRemoteCallbackOKResponse,
+  OAuthRemoteCallbackParams,
   OAuthTokenBody,
   OAuthTokenErrorResponse,
   OAuthTokenOKResponse,
@@ -1493,6 +1495,66 @@ export const useOAuthUserInfo = <
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getOAuthUserInfoKey() : null));
   const swrFn = () => oAuthUserInfo();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Complete a remote OAuth authorization code callback. This validates the
+saved state, exchanges the code with PKCE, and stores returned tokens
+on the remote connection.
+
+ */
+export const oAuthRemoteCallback = (params: OAuthRemoteCallbackParams) => {
+  return fetcher<OAuthRemoteCallbackOKResponse>({
+    url: `/oauth/remote/callback`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getOAuthRemoteCallbackKey = (params: OAuthRemoteCallbackParams) =>
+  [`/oauth/remote/callback`, ...(params ? [params] : [])] as const;
+
+export type OAuthRemoteCallbackQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRemoteCallback>>
+>;
+export type OAuthRemoteCallbackQueryError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRemoteCallback = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(
+  params: OAuthRemoteCallbackParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthRemoteCallback>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthRemoteCallbackKey(params) : null));
+  const swrFn = () => oAuthRemoteCallback(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

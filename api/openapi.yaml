@@ -94,6 +94,8 @@ tags:
     description: Content graph (posts, nodes, links) APIs.
   - name: events
     description: Event scheduling, invites and management.
+  - name: robots
+    description: Robots (AI Agents)
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -561,6 +563,63 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
         "204": { $ref: "#/components/responses/NoContent" }
+
+  /admin/oauth/remote/discover:
+    post:
+      operationId: OAuthRemoteDiscover
+      description: |
+        Discover OAuth configuration for a remote protected resource URL.
+
+        Storyden fetches protected resource metadata, follows the advertised
+        authorization server, and chooses CIMD, DCR, or manual setup according
+        to the discovered authorization server metadata.
+      tags: [admin]
+      requestBody: { $ref: "#/components/requestBodies/OAuthRemoteDiscover" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthRemoteDiscoverOK" }
+
+  /admin/oauth/remote/connections:
+    get:
+      operationId: OAuthRemoteConnectionList
+      description: |
+        List remote OAuth connections configured for this Storyden instance.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthRemoteConnectionListOK" }
+    post:
+      operationId: OAuthRemoteConnectionCreate
+      description: |
+        Create a remote OAuth connection using CIMD, DCR, or manual
+        configuration. CIMD is preferred when discovery supports it.
+      tags: [admin]
+      requestBody:
+        { $ref: "#/components/requestBodies/OAuthRemoteConnectionCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthRemoteConnectionOK" }
+
+  /admin/oauth/remote/connections/{oauth_remote_connection_id}/authorize:
+    post:
+      operationId: OAuthRemoteConnectionAuthorize
+      description: |
+        Start OAuth authorization code with PKCE for a remote OAuth
+        connection and return the authorization URL to open in a browser.
+      tags: [admin]
+      parameters:
+        - $ref: "#/components/parameters/OAuthRemoteConnectionIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/OAuthRemoteAuthorizeOK" }
 
   #
   #          888                   d8b
@@ -1286,6 +1345,25 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/OAuthUserInfoOK" }
+
+  /oauth/remote/callback:
+    get:
+      operationId: OAuthRemoteCallback
+      description: |
+        Complete a remote OAuth authorization code callback. This validates the
+        saved state, exchanges the code with PKCE, and stores returned tokens
+        on the remote connection.
+      tags: [auth]
+      security: [browser: []]
+      parameters:
+        - $ref: "#/components/parameters/OAuthStateQuery"
+        - $ref: "#/components/parameters/OAuthCodeQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/OAuthRemoteCallbackOK" }
 
   /oauth/register:
     post:
@@ -3633,6 +3711,474 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
+  #
+  #                 888               888
+  #                 888               888
+  #                 888               888
+  # 888d888 .d88b.  88888b.   .d88b.  888888 .d8888b
+  # 888P"  d88""88b 888 "88b d88""88b 888    88K
+  # 888    888  888 888  888 888  888 888    "Y8888b.
+  # 888    Y88..88P 888 d88P Y88..88P Y88b.       X88
+  # 888     "Y88P"  88888P"   "Y88P"   "Y888  88888P'
+  #
+
+  /robots:
+    get:
+      operationId: RobotsList
+      summary: List robots
+      description: Get a paginated list of all available robots.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotsListOK" }
+    post:
+      operationId: RobotCreate
+      summary: Create a robot
+      description: |
+        Create a new Robot with the specified configuration. A Robot in Storyden
+        consists of a name and description (for humans) as well as a playbook,
+        and a set of available tools to interact with Storyden or plugins. The
+        playbook is a detailed set of instructions that guides behaviour of the
+        Robot to help it assist members in achieving a specific automation goal.
+        Tools are available from either Storyden or plugins that allow it to
+        perform actions or query data. Robots never need all tools and it's best
+        to build goal-specific Robots with minimal sets of tools.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotCreateOK" }
+
+  /robots/tools:
+    get:
+      operationId: RobotToolsList
+      summary: List robot tools
+      description: |
+        List all tools that may be assigned to Robots, including native Storyden
+        tools and discovered MCP tools.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotToolsListOK" }
+
+  /robots/chat/sse:
+    post:
+      operationId: RobotChatSSE
+      description: |
+        Send a message to a Robot and receive its response. This endpoint
+        manages sessions automatically, creating new sessions as needed or
+        continuing existing sessions based on the provided session ID.
+
+        Each message sent to the Robot is processed according to its playbook
+        and available tools, allowing it to perform actions or retrieve data
+        as part of the conversation. The response from the Robot includes its
+        reply message along with any actions taken during the interaction.
+
+        This endpoint is a Server Sent Events (SSE) stream, meaning that the
+        response is streamed back to the client in real-time as the Robot
+        generates its reply.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotChatStart" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotChatStream" }
+
+  /robots/providers:
+    get:
+      operationId: RobotProvidersList
+      summary: List robot providers
+      description: |
+        Retrieve supported Robot model providers, redacted settings, cache
+        status and cached models.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotProvidersListOK" }
+
+  /robots/providers/{provider}:
+    patch:
+      operationId: RobotProviderUpdate
+      summary: Update a robot provider
+      description: |
+        Update a Robot model provider configuration. API keys are write-only and
+        are redacted from responses.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotModelProviderParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotProviderUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotProviderGetOK" }
+
+  /robots/providers/{provider}/models/refresh:
+    post:
+      operationId: RobotProviderModelsRefresh
+      summary: Refresh robot provider models
+      description: |
+        Force refresh the cached model list for a Robot model provider.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotModelProviderParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotProviderGetOK" }
+
+  /robots/models:
+    get:
+      operationId: RobotModelsList
+      summary: List robot models
+      description: |
+        Retrieve a list of all enabled models from all providers. Model names
+        are in the format `provider/model` some provider models may include
+        further slashes, such as with OpenRouter: `openrouter/openai/gpt-4`.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotModelsListOK" }
+
+  /robots/workspace-providers:
+    get:
+      operationId: RobotWorkspaceProvidersList
+      summary: List robot workspace providers
+      description: Retrieve the registered Robot workspace providers.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceProvidersListOK" }
+
+  /robots/workspaces:
+    get:
+      operationId: RobotWorkspacesList
+      summary: List robot workspaces
+      description: Get a paginated list of reusable Robot workspace templates.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotWorkspacesListOK" }
+    post:
+      operationId: RobotWorkspaceCreate
+      summary: Create a robot workspace
+      description: Create a reusable Robot workspace template.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotWorkspaceCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceCreateOK" }
+
+  /robots/workspaces/{workspace_id}:
+    get:
+      operationId: RobotWorkspaceGet
+      summary: Get a robot workspace
+      description: Retrieve a reusable Robot workspace template.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotWorkspaceIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceGetOK" }
+    patch:
+      operationId: RobotWorkspaceUpdate
+      summary: Update a robot workspace
+      description: Update a reusable Robot workspace template.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotWorkspaceIDParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotWorkspaceUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceGetOK" }
+    delete:
+      operationId: RobotWorkspaceDelete
+      summary: Delete a robot workspace
+      description: Delete a reusable Robot workspace template.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotWorkspaceIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { description: OK }
+
+  /robots/workspace-instances:
+    get:
+      operationId: RobotWorkspaceInstancesList
+      summary: List robot workspace instances
+      description: Get a paginated list of live reusable Robot workspace instances.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceInstancesListOK" }
+
+  /robots/workspace-instances/{workspace_instance_id}:
+    get:
+      operationId: RobotWorkspaceInstanceGet
+      summary: Get a robot workspace instance
+      description: Retrieve a live reusable Robot workspace instance.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotWorkspaceInstanceIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotWorkspaceInstanceGetOK" }
+    delete:
+      operationId: RobotWorkspaceInstanceDelete
+      summary: Delete a robot workspace instance
+      description: Delete a live reusable Robot workspace instance.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotWorkspaceInstanceIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { description: OK }
+
+  /robots/{robot_id}:
+    get:
+      operationId: RobotGet
+      summary: Get a robot
+      description: |
+        Retrieve a specific Robot by its ID. Does not include any messages or
+        sessions associated with the Robot, just provides metadata about it.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotGetOK" }
+    patch:
+      operationId: RobotUpdate
+      summary: Update a robot
+      description: |
+        Update a Robot's name, description, playbook or available tools.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotIDParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotGetOK" }
+    delete:
+      operationId: RobotDelete
+      summary: Delete a robot
+      description: Delete a Robot.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { description: OK }
+
+  /robots/sessions:
+    get:
+      operationId: RobotSessionsList
+      summary: List robot sessions
+      description: |
+        Get a paginated list of Robot sessions. These are chat sessions with the
+        Robot system. One session may span multiple Robots as members can switch
+        which Robot they are talking to mid conversation, or the Robot itself
+        may choose to switch to another Robot to achieve a goal. A session is a
+        representation of an entire conversation thread with the Robot system.
+
+        You may include an account ID to filter sessions by account. Only those
+        with "USE_ROBOTS" permission can use Robots, however sessions, messages
+        and usage is not considered hidden to other accounts with the usage
+        permission. Robots are intended as administrative or moderation tools
+        to be shared among the team rather than private assistants.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/AccountIDQueryParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotSessionsListOK" }
+
+  /robots/sessions/{session_id}:
+    get:
+      operationId: RobotSessionGet
+      summary: Get a robot session
+      description: |
+        Retrieve a specific robot session with all of its messages. Sessions can
+        involve interactions with multiple Robots so the Robot is specified on
+        each message. Messages may not be representative of exactly what is sent
+        into a language model, as certain optimisations may be performed before
+        this such as compaction, summarisation or removal of irrelevant context.
+
+        Any member with "USE_ROBOTS" can see any other members' sessions and
+        messages with a Robot. Robots are not considered private assistants, but
+        rather shared tools for the team to use for managing their community.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotSessionIDParam"
+        - $ref: "#/components/parameters/RobotSessionMessageBeforeQuery"
+        - $ref: "#/components/parameters/RobotSessionMessageLimitQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotSessionGetOK" }
+
+  /robots/mcp-servers:
+    get:
+      operationId: RobotMCPServersList
+      summary: List Robot MCP servers
+      description: |
+        List external MCP servers configured for Robot tool discovery.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServersListOK" }
+    post:
+      operationId: RobotMCPServerCreate
+      summary: Create Robot MCP server
+      description: |
+        Configure an external streamable HTTP MCP server for Robot tool
+        discovery.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotMCPServerCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerCreateOK" }
+
+  /robots/mcp-servers/probe:
+    post:
+      operationId: RobotMCPServerProbe
+      summary: Probe Robot MCP server
+      description: |
+        Resolve an MCP endpoint from a URL, optionally using an MCP Server
+        Card, and attempt a streamable HTTP MCP handshake.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotMCPServerProbe" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerProbeOK" }
+
+  /robots/mcp-servers/{mcp_server_id}:
+    get:
+      operationId: RobotMCPServerGet
+      summary: Get Robot MCP server
+      description: |
+        Retrieve an external MCP server configuration and its cached tools.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotMCPServerIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerGetOK" }
+    patch:
+      operationId: RobotMCPServerUpdate
+      summary: Update Robot MCP server
+      description: |
+        Update an external MCP server configuration. Bearer tokens are
+        write-only and are redacted from responses.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotMCPServerIDParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotMCPServerUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerUpdateOK" }
+    delete:
+      operationId: RobotMCPServerDelete
+      summary: Delete Robot MCP server
+      description: |
+        Delete an external MCP server configuration and remove its tools from
+        the runtime Robot tool registry.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotMCPServerIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerDeleteOK" }
+
+  /robots/mcp-servers/{mcp_server_id}/refresh:
+    post:
+      operationId: RobotMCPServerRefresh
+      summary: Refresh Robot MCP server tools
+      description: |
+        Connect to the external MCP server, refresh its tool cache, and update
+        the runtime Robot tool registry.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotMCPServerIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotMCPServerRefreshOK" }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -3757,6 +4303,14 @@ components:
       description: OAuth refresh token ID.
       in: path
       name: oauth_refresh_token_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    OAuthRemoteConnectionIDParam:
+      description: Remote OAuth connection ID.
+      in: path
+      name: oauth_remote_connection_id
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
@@ -4007,6 +4561,14 @@ components:
       schema:
         type: string
 
+    OAuthCodeQuery:
+      description: OAuth authorization code returned to the redirect URI.
+      name: code
+      in: query
+      required: true
+      schema:
+        type: string
+
     OAuthNonceQuery:
       description: |
         OpenID Connect nonce. When provided, it is returned unmodified as the
@@ -4105,6 +4667,22 @@ components:
     PaginationQuery:
       description: Pagination query parameters.
       name: page
+      in: query
+      required: false
+      schema:
+        type: string
+
+    RobotSessionMessageBeforeQuery:
+      description: Load messages older than this message ID.
+      name: before
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotSessionMessageLimitQuery:
+      description: Maximum number of messages to return.
+      name: limit
       in: query
       required: false
       schema:
@@ -4320,6 +4898,54 @@ components:
       schema:
         $ref: "#/components/schemas/Mark"
 
+    RobotIDParam:
+      description: Robot ID
+      in: path
+      name: robot_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotModelProviderParam:
+      description: Robot model provider namespace
+      in: path
+      name: provider
+      required: true
+      schema:
+        $ref: "#/components/schemas/RobotModelProvider"
+
+    RobotMCPServerIDParam:
+      description: Robot MCP server ID
+      in: path
+      name: mcp_server_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotSessionIDParam:
+      description: Robot session ID
+      in: path
+      name: session_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotWorkspaceIDParam:
+      description: Robot workspace ID
+      in: path
+      name: workspace_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    RobotWorkspaceInstanceIDParam:
+      description: Robot workspace instance ID
+      in: path
+      name: workspace_instance_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
   # 888   Y88b 888       d88P" "Y88b 888     888 888       d88P  Y88b    888    d88P  Y88b
@@ -4493,6 +5119,19 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/OAuthClientRegisterProps" }
+
+    OAuthRemoteDiscover:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/OAuthRemoteDiscoverProps" }
+
+    OAuthRemoteConnectionCreate:
+      required: true
+      content:
+        application/json:
+          schema:
+            { $ref: "#/components/schemas/OAuthRemoteConnectionCreateProps" }
 
     WebAuthnMakeCredential:
       content:
@@ -4746,6 +5385,54 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/EventParticipantMutableProps" }
+
+    RobotCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotInitialProps" }
+
+    RobotChatStart:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotChatRequest" }
+
+    RobotWorkspaceCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspaceInitialProps" }
+
+    RobotWorkspaceUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspaceMutableProps" }
+
+    RobotProviderUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotProviderMutableSettings" }
+
+    RobotMCPServerCreate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServerInitialProps" }
+
+    RobotMCPServerProbe:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServerProbeProps" }
+
+    RobotMCPServerUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServerMutableProps" }
+
+    RobotUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMutableProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -5065,6 +5752,41 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/OAuthError"
+
+    OAuthRemoteDiscoverOK:
+      description: Remote OAuth discovery result.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRemoteDiscoveryResult"
+
+    OAuthRemoteConnectionOK:
+      description: Remote OAuth connection.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRemoteConnection"
+
+    OAuthRemoteConnectionListOK:
+      description: Remote OAuth connections.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRemoteConnectionListResult"
+
+    OAuthRemoteAuthorizeOK:
+      description: Remote OAuth authorization URL.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRemoteAuthorizeResult"
+
+    OAuthRemoteCallbackOK:
+      description: Remote OAuth callback result.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OAuthRemoteCallbackResult"
 
     OAuthDeviceAuthorisationListOK:
       description: OAuth device authorisations.
@@ -5687,6 +6409,147 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Event" }
 
+    RobotsListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotsListResult"
+
+    RobotCreateOK:
+      description: Robot created.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Robot" }
+
+    RobotGetOK:
+      description: Robot retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Robot" }
+
+    RobotToolsListOK:
+      description: Robot tools retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotToolListResult" }
+
+    RobotChatStream:
+      description: Server-sent events stream of robot chat responses.
+      content:
+        text/event-stream:
+          schema:
+            $ref: "#/components/schemas/StreamPart"
+
+    RobotProvidersListOK:
+      description: Robot providers retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotProviderListResult" }
+
+    RobotProviderGetOK:
+      description: Robot provider retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotProviderStatus" }
+
+    RobotModelsListOK:
+      description: Robot models retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotModelListResult" }
+
+    RobotWorkspaceProvidersListOK:
+      description: Robot workspace providers retrieved.
+      content:
+        application/json:
+          schema:
+            { $ref: "#/components/schemas/RobotWorkspaceProviderListResult" }
+
+    RobotWorkspacesListOK:
+      description: Robot workspaces retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspacesListResult" }
+
+    RobotWorkspaceCreateOK:
+      description: Robot workspace created.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspace" }
+
+    RobotWorkspaceGetOK:
+      description: Robot workspace retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspace" }
+
+    RobotWorkspaceInstancesListOK:
+      description: Robot workspace instances retrieved.
+      content:
+        application/json:
+          schema:
+            { $ref: "#/components/schemas/RobotWorkspaceInstancesListResult" }
+
+    RobotWorkspaceInstanceGetOK:
+      description: Robot workspace instance retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotWorkspaceInstance" }
+
+    RobotSessionsListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotSessionsListResult"
+
+    RobotSessionGetOK:
+      description: Robot session with messages.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RobotSession"
+
+    RobotMCPServersListOK:
+      description: Robot MCP servers retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServerListResult" }
+
+    RobotMCPServerCreateOK:
+      description: Robot MCP server created.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServer" }
+
+    RobotMCPServerProbeOK:
+      description: Robot MCP server probe completed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServerProbeResult" }
+
+    RobotMCPServerGetOK:
+      description: Robot MCP server retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServer" }
+
+    RobotMCPServerUpdateOK:
+      description: Robot MCP server updated.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServer" }
+
+    RobotMCPServerDeleteOK:
+      description: Robot MCP server deleted.
+
+    RobotMCPServerRefreshOK:
+      description: Robot MCP server refreshed.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotMCPServer" }
+
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
   # d88P  Y88b d88P  Y88b 888    888 888        8888b   d8888       d88888 d88P  Y88b
@@ -5866,6 +6729,7 @@ components:
         - email_client
         - sms_client
         - oauth
+        - robots
 
     InstanceCapabilityList:
       type: array
@@ -6195,6 +7059,14 @@ components:
           $ref: "#/components/schemas/RateLimitServiceSettings"
         moderation:
           $ref: "#/components/schemas/ModerationServiceSettings"
+        robots:
+          $ref: "#/components/schemas/RobotServiceSettings"
+
+    RobotServiceSettings:
+      type: object
+      properties:
+        default_model:
+          $ref: "#/components/schemas/RobotModelRef"
 
     ClientIPServiceSettings:
       type: object
@@ -7165,6 +8037,9 @@ components:
         - "VIEW_ACCOUNTS"
         - "VIEW_MODERATION_NOTES"
         - "MANAGE_MODERATION_NOTES"
+        # Robots
+        - "USE_ROBOTS"
+        - "MANAGE_ROBOTS"
         # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
 
@@ -7745,6 +8620,173 @@ components:
         client_uri: { type: string, format: uri }
         tos_uri: { type: string, format: uri }
         policy_uri: { type: string, format: uri }
+
+    OAuthRemoteMode:
+      type: string
+      enum: [cimd, dcr, manual]
+
+    OAuthRemoteStatus:
+      type: string
+      enum: [pending, connected, error]
+
+    OAuthProtectedResourceMetadata:
+      type: object
+      required: [authorization_servers]
+      properties:
+        resource: { type: string }
+        resource_name: { type: string }
+        authorization_servers:
+          type: array
+          items: { type: string, format: uri }
+        bearer_methods_supported:
+          type: array
+          items: { type: string }
+
+    OAuthAuthorizationServerMetadata:
+      type: object
+      properties:
+        issuer: { type: string }
+        authorization_endpoint: { type: string, format: uri }
+        token_endpoint: { type: string, format: uri }
+        registration_endpoint: { type: string, format: uri }
+        response_types_supported:
+          type: array
+          items: { type: string }
+        grant_types_supported:
+          type: array
+          items: { type: string }
+        token_endpoint_auth_methods_supported:
+          type: array
+          items: { type: string }
+        code_challenge_methods_supported:
+          type: array
+          items: { type: string }
+        client_id_metadata_document_supported:
+          type: boolean
+
+    OAuthRemoteDiscoverProps:
+      type: object
+      required: [resource_url]
+      properties:
+        resource_url:
+          type: string
+          format: uri
+
+    OAuthRemoteDiscoveryResult:
+      type: object
+      required:
+        - resource_url
+        - protected_resource_metadata
+        - authorization_server
+        - authorization_server_metadata
+        - mode
+        - client_id
+        - redirect_uri
+      properties:
+        resource_url: { type: string, format: uri }
+        protected_resource_metadata:
+          $ref: "#/components/schemas/OAuthProtectedResourceMetadata"
+        authorization_server:
+          type: string
+          format: uri
+        authorization_server_metadata:
+          $ref: "#/components/schemas/OAuthAuthorizationServerMetadata"
+        mode: { $ref: "#/components/schemas/OAuthRemoteMode" }
+        client_id:
+          type: string
+        redirect_uri:
+          type: string
+          format: uri
+
+    OAuthRemoteManualConfig:
+      type: object
+      properties:
+        client_id: { type: string }
+        client_secret: { type: string }
+        authorization_endpoint: { type: string, format: uri }
+        token_endpoint: { type: string, format: uri }
+        redirect_uri: { type: string, format: uri }
+        authorization_server: { type: string, format: uri }
+        scope: { type: string }
+
+    OAuthRemoteConnectionCreateProps:
+      type: object
+      required: [resource_url]
+      properties:
+        resource_url:
+          type: string
+          format: uri
+        mode: { $ref: "#/components/schemas/OAuthRemoteMode" }
+        scope: { type: string }
+        manual:
+          $ref: "#/components/schemas/OAuthRemoteManualConfig"
+
+    OAuthRemoteConnection:
+      type: object
+      required:
+        - id
+        - createdAt
+        - updatedAt
+        - resource_url
+        - mode
+        - status
+        - has_client_secret
+        - has_access_token
+        - has_refresh_token
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        createdAt: { $ref: "#/components/schemas/CreatedAt" }
+        updatedAt: { $ref: "#/components/schemas/UpdatedAt" }
+        resource_url: { type: string, format: uri }
+        resource: { type: string }
+        resource_name: { type: string }
+        authorization_server: { type: string, format: uri }
+        mode: { $ref: "#/components/schemas/OAuthRemoteMode" }
+        status: { $ref: "#/components/schemas/OAuthRemoteStatus" }
+        client_id: { type: string }
+        has_client_secret: { type: boolean }
+        authorization_endpoint: { type: string, format: uri }
+        token_endpoint: { type: string, format: uri }
+        registration_endpoint: { type: string, format: uri }
+        token_endpoint_auth_method: { type: string }
+        redirect_uri: { type: string, format: uri }
+        redirect_uris:
+          type: array
+          items: { type: string, format: uri }
+        scope: { type: string }
+        has_access_token: { type: boolean }
+        has_refresh_token: { type: boolean }
+        token_type: { type: string }
+        token_expiry: { type: string, format: date-time }
+        last_error: { type: string }
+
+    OAuthRemoteConnectionList:
+      type: array
+      items: { $ref: "#/components/schemas/OAuthRemoteConnection" }
+
+    OAuthRemoteConnectionListResult:
+      type: object
+      required: [connections]
+      properties:
+        connections:
+          $ref: "#/components/schemas/OAuthRemoteConnectionList"
+
+    OAuthRemoteAuthorizeResult:
+      type: object
+      required: [connection, authorization_url]
+      properties:
+        connection:
+          $ref: "#/components/schemas/OAuthRemoteConnection"
+        authorization_url:
+          type: string
+          format: uri
+
+    OAuthRemoteCallbackResult:
+      type: object
+      required: [connection]
+      properties:
+        connection:
+          $ref: "#/components/schemas/OAuthRemoteConnection"
 
     OAuthClientList:
       type: array
@@ -10526,6 +11568,1292 @@ components:
     EventCapacity:
       description: The maximum number of attendees that can attend the event.
       type: integer
+
+    #
+    # 8888888b.          888               888
+    # 888   Y88b         888               888
+    # 888    888         888               888
+    # 888   d88P .d88b.  88888b.   .d88b.  888888
+    # 8888888P" d88""88b 888 "88b d88""88b 888
+    # 888 T88b  888  888 888  888 888  888 888
+    # 888  T88b Y88..88P 888 d88P Y88..88P Y88b.
+    # 888   T88b "Y88P"  88888P"   "Y88P"   "Y888
+    #
+
+    Robot:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotProps"
+
+    RobotReference:
+      type: object
+      description: A minimal reference to a Robot for message attribution.
+      required: [id, name]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        name:
+          type: string
+          description: The name of the robot
+
+    RobotProps:
+      type: object
+      required: [name, description, playbook, model, author, tools]
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        model:
+          $ref: "#/components/schemas/RobotModelRef"
+        workspace_id:
+          allOf:
+            - $ref: "#/components/schemas/NullableIdentifier"
+          nullable: true
+          description: Optional default workspace template for this robot.
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        tools: { $ref: "#/components/schemas/RobotToolNameList" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotWorkspaceProvider:
+      description: Robot workspace provider type.
+      type: string
+
+    RobotWorkspaceProviderInfo:
+      type: object
+      required: [provider, name]
+      properties:
+        provider:
+          $ref: "#/components/schemas/RobotWorkspaceProvider"
+        name:
+          type: string
+          description: Display name for the workspace provider.
+
+    RobotWorkspace:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotWorkspaceProps"
+
+    RobotWorkspaceProps:
+      type: object
+      required: [name, description, provider, config, meta, created_by]
+      properties:
+        name:
+          type: string
+          description: The name of the workspace template.
+        description:
+          type: string
+          description: Human-readable description of the workspace template.
+        provider:
+          $ref: "#/components/schemas/RobotWorkspaceProvider"
+        config:
+          type: object
+          additionalProperties: true
+          description: Provider-specific template configuration.
+        meta: { $ref: "#/components/schemas/Metadata" }
+        created_by: { $ref: "#/components/schemas/ProfileReference" }
+
+    RobotWorkspaceInstance:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotWorkspaceInstanceProps"
+
+    RobotWorkspaceInstanceProps:
+      type: object
+      required: [workspace_id, provider, provider_state, meta, created_by]
+      properties:
+        workspace_id:
+          $ref: "#/components/schemas/Identifier"
+        provider:
+          $ref: "#/components/schemas/RobotWorkspaceProvider"
+        provider_state:
+          type: object
+          additionalProperties: true
+          description: Provider-specific live instance state.
+        meta: { $ref: "#/components/schemas/Metadata" }
+        created_by: { $ref: "#/components/schemas/ProfileReference" }
+
+    RobotWorkspaceMount:
+      type: object
+      required: [workspace_id, workspace_instance_id, provider]
+      properties:
+        workspace_id:
+          $ref: "#/components/schemas/Identifier"
+        workspace_instance_id:
+          $ref: "#/components/schemas/Identifier"
+        provider:
+          $ref: "#/components/schemas/RobotWorkspaceProvider"
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotSession:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotSessionRefProps"
+        - $ref: "#/components/schemas/RobotSessionProps"
+
+    RobotSessionProps:
+      type: object
+      required: [message_list]
+      properties:
+        message_list: { $ref: "#/components/schemas/PaginatedRobotMessageList" }
+        active_robot_id:
+          type: string
+          description: Most recently active Robot ID for this session, including built-in Robot IDs.
+        active_workspace:
+          $ref: "#/components/schemas/RobotWorkspaceMount"
+
+    RobotSessionRef:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RobotSessionRefProps"
+
+    RobotSessionRefProps:
+      type: object
+      required: [name, created_by]
+      properties:
+        name: { type: string }
+        created_by: { $ref: "#/components/schemas/ProfileReference" }
+
+    # -
+    # Vercel AI SDK UIMessage format
+    # These schemas match the structure from @ai-sdk/react for compatibility
+    # -
+
+    UIMessage:
+      type: object
+      required: [id, role, parts]
+      description: |
+        A message in the Vercel AI SDK format. This is compatible with the
+        UIMessage interface from @ai-sdk/react and can be used directly with
+        the useChat hook.
+      properties:
+        id:
+          type: string
+          description: Unique message identifier
+        role:
+          type: string
+          enum: [system, user, assistant]
+          description: The role of the message sender
+        parts:
+          type: array
+          items: { $ref: "#/components/schemas/UIMessagePart" }
+          description: The parts that make up the message content
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Optional metadata associated with the message
+
+    UIMessagePart:
+      oneOf:
+        - $ref: "#/components/schemas/TextUIPart"
+        - $ref: "#/components/schemas/ReasoningUIPart"
+        - $ref: "#/components/schemas/ToolUIPart"
+        - $ref: "#/components/schemas/FileUIPart"
+        - $ref: "#/components/schemas/DataPart"
+      discriminator:
+        propertyName: type
+        mapping:
+          text: "#/components/schemas/TextUIPart"
+          reasoning: "#/components/schemas/ReasoningUIPart"
+          "dynamic-tool": "#/components/schemas/ToolUIPart"
+          file: "#/components/schemas/FileUIPart"
+          "data-render_card": "#/components/schemas/DataPart"
+      description: |
+        A part of a UIMessage. Can be text, reasoning, tool invocation, file, or custom data.
+      required: [type]
+      properties:
+        type:
+          type: string
+          description: The type of the message part
+          enum: [text, reasoning, dynamic-tool, file, data-render_card]
+
+    TextUIPart:
+      type: object
+      required: [type, text]
+      description: A text part of a message
+      properties:
+        type:
+          type: string
+          enum: [text]
+        text:
+          type: string
+          description: The text content
+        state:
+          type: string
+          enum: [streaming, done]
+          description: The state of the text part
+
+    ReasoningUIPart:
+      type: object
+      required: [type, text]
+      description: A reasoning part of a message (extended thinking/reasoning)
+      properties:
+        type:
+          type: string
+          enum: [reasoning]
+        text:
+          type: string
+          description: The reasoning text
+        state:
+          type: string
+          enum: [streaming, done]
+          description: The state of the reasoning part
+
+    ToolUIPart:
+      oneOf:
+        - $ref: "#/components/schemas/ToolUIPartInputStreaming"
+        - $ref: "#/components/schemas/ToolUIPartInputAvailable"
+        - $ref: "#/components/schemas/ToolUIPartOutputAvailable"
+        - $ref: "#/components/schemas/ToolUIPartOutputError"
+      discriminator:
+        propertyName: state
+        mapping:
+          input-streaming: "#/components/schemas/ToolUIPartInputStreaming"
+          input-available: "#/components/schemas/ToolUIPartInputAvailable"
+          output-available: "#/components/schemas/ToolUIPartOutputAvailable"
+          output-error: "#/components/schemas/ToolUIPartOutputError"
+      description: A tool invocation part (dynamic-tool format matching Vercel AI SDK)
+
+    ToolUIPartBase:
+      type: object
+      required: [type, toolCallId, toolName]
+      properties:
+        type:
+          type: string
+          enum: [dynamic-tool]
+          description: Type identifier for dynamic tool calls
+        toolCallId:
+          type: string
+          description: Unique ID for this tool call
+        toolName:
+          type: string
+          description: Name of the tool being called
+        title:
+          type: string
+          description: Optional title for the tool call
+        providerExecuted:
+          type: boolean
+          description: Whether the tool was executed by the provider
+
+    ToolUIPartInputStreaming:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input]
+          properties:
+            state:
+              type: string
+              enum: [input-streaming]
+            input:
+              type: object
+              additionalProperties: true
+              description: Partial input (streaming)
+
+    ToolUIPartInputAvailable:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input]
+          properties:
+            state:
+              type: string
+              enum: [input-available]
+            input:
+              type: object
+              additionalProperties: true
+              description: Complete input arguments
+
+    ToolUIPartOutputAvailable:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, output]
+          properties:
+            state:
+              type: string
+              enum: [output-available]
+            input:
+              type: object
+              additionalProperties: true
+              description: Input arguments used
+            output:
+              type: object
+              additionalProperties: true
+              description: Output result from the tool
+            preliminary:
+              type: boolean
+              description: Whether this is a preliminary result
+
+    ToolUIPartOutputError:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, errorText]
+          properties:
+            state:
+              type: string
+              enum: [output-error]
+            input:
+              type: object
+              additionalProperties: true
+              description: Input that caused the error
+            errorText:
+              type: string
+              description: Error message
+
+    FileUIPart:
+      type: object
+      required: [type, mediaType, url]
+      description: A file part of a message
+      properties:
+        type:
+          type: string
+          enum: [file]
+        mediaType:
+          type: string
+          description: IANA media type of the file
+        filename:
+          type: string
+          description: Optional filename
+        url:
+          type: string
+          description: URL to the file (can be a data URL or hosted URL)
+
+    # -
+    # Robot session messages - extends UIMessage with our metadata
+    # -
+
+    RobotSessionMessage:
+      allOf:
+        - $ref: "#/components/schemas/UIMessage"
+        - type: object
+          required: [created_at]
+          properties:
+            created_at:
+              type: string
+              format: date-time
+              description: When the message was sent
+            robot:
+              $ref: "#/components/schemas/RobotReference"
+              description: Robot that generated this message
+            author:
+              $ref: "#/components/schemas/ProfileReference"
+              description: Human author of the message
+
+    RobotSessionMessageList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotSessionMessage" }
+
+    PaginatedRobotMessageList:
+      type: object
+      required: [page_size, results, messages]
+      properties:
+        page_size:
+          type: integer
+        results:
+          type: integer
+        next_before:
+          $ref: "#/components/schemas/Identifier"
+        messages: { $ref: "#/components/schemas/RobotSessionMessageList" }
+
+    RobotToolNameList:
+      description: A list of tool names that the robot can use.
+      type: array
+      items:
+        type: string
+
+    RobotToolSource:
+      type: string
+      enum: [native, mcp]
+
+    RobotToolInfo:
+      type: object
+      required: [id, callable_name, source, available, description]
+      properties:
+        id:
+          type: string
+          description: Stable tool ID stored on Robot configurations.
+        callable_name:
+          type: string
+          description: ADK/model-safe function name used at runtime.
+        name:
+          type: string
+          description: Human-readable tool title.
+        description:
+          type: string
+        source:
+          $ref: "#/components/schemas/RobotToolSource"
+        available:
+          type: boolean
+          description: Whether the tool can currently be attached to a Robot run.
+
+    RobotToolInfoList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotToolInfo" }
+
+    RobotToolListResult:
+      type: object
+      required: [tools]
+      properties:
+        tools: { $ref: "#/components/schemas/RobotToolInfoList" }
+
+    RobotMCPTool:
+      type: object
+      required:
+        - id
+        - remote_name
+        - callable_name
+        - description
+        - enabled
+        - available
+        - last_seen_at
+      properties:
+        id:
+          type: string
+        remote_name:
+          type: string
+        callable_name:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        enabled:
+          type: boolean
+        available:
+          type: boolean
+        last_seen_at:
+          type: string
+          format: date-time
+
+    RobotMCPToolList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotMCPTool" }
+
+    RobotMCPServer:
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - type: object
+          required:
+            [
+              name,
+              slug,
+              description,
+              endpoint_url,
+              enabled,
+              has_bearer_token,
+              has_oauth_token,
+              tools,
+            ]
+          properties:
+            name:
+              type: string
+            slug:
+              type: string
+              description: Immutable namespace used in MCP tool IDs.
+            description:
+              type: string
+            endpoint_url:
+              type: string
+              format: uri
+            oauth_remote_connection_id:
+              $ref: "#/components/schemas/Identifier"
+            enabled:
+              type: boolean
+            has_bearer_token:
+              type: boolean
+              description: |
+                Whether this server has a stored Bearer token. The token value
+                is never returned.
+            has_oauth_token:
+              type: boolean
+              description: |
+                Whether this server is linked to a remote OAuth connection with
+                a stored access token.
+            last_refreshed_at:
+              type: string
+              format: date-time
+            last_error:
+              type: string
+            tools:
+              $ref: "#/components/schemas/RobotMCPToolList"
+
+    RobotMCPServerList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotMCPServer" }
+
+    RobotMCPServerListResult:
+      type: object
+      required: [servers]
+      properties:
+        servers: { $ref: "#/components/schemas/RobotMCPServerList" }
+
+    RobotMCPServerInitialProps:
+      type: object
+      required: [name, endpoint_url]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+          description: Optional immutable namespace. If omitted, Storyden derives one from the name.
+        description:
+          type: string
+        endpoint_url:
+          type: string
+          format: uri
+        oauth_remote_connection_id:
+          $ref: "#/components/schemas/Identifier"
+          description: |
+            Optional remote OAuth connection that supplies the Bearer token for
+            this MCP server after authorization completes.
+        enabled:
+          type: boolean
+          default: true
+        bearer_token:
+          type: string
+          description: Write-only Bearer token for the MCP server.
+
+    RobotMCPServerProbeProps:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: |
+            User-provided MCP URL. This may be a root domain when the host
+            exposes an MCP Server Card.
+        bearer_token:
+          type: string
+          description: Optional Bearer token to use for the active probe.
+
+    RobotMCPServerCardRemote:
+      type: object
+      required: [type, url]
+      properties:
+        type:
+          type: string
+        url:
+          type: string
+          format: uri
+        supportedProtocolVersions:
+          type: array
+          items: { type: string }
+
+    RobotMCPServerCard:
+      type: object
+      required: [name, version, description]
+      properties:
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        title:
+          type: string
+        websiteUrl:
+          type: string
+          format: uri
+        remotes:
+          type: array
+          items: { $ref: "#/components/schemas/RobotMCPServerCardRemote" }
+
+    RobotMCPServerProbeResult:
+      type: object
+      required: [input_url, endpoint_url, active]
+      properties:
+        input_url:
+          type: string
+          format: uri
+        endpoint_url:
+          type: string
+          format: uri
+        server_card_url:
+          type: string
+          format: uri
+        server_card:
+          $ref: "#/components/schemas/RobotMCPServerCard"
+        remote_type:
+          type: string
+        active:
+          type: boolean
+        probe_error:
+          type: string
+
+    RobotMCPServerMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        endpoint_url:
+          type: string
+          format: uri
+        enabled:
+          type: boolean
+        bearer_token:
+          type: string
+          description: Write-only Bearer token. Omit to preserve the current token.
+        clear_bearer_token:
+          type: boolean
+          description: Remove the stored Bearer token.
+
+    RobotModelProvider:
+      description: The model provider namespace, such as openai, anthropic, or a plugin-declared provider.
+      type: string
+      example: openai
+
+    RobotModelName:
+      description: The provider-local model name.
+      type: string
+      example: gpt-4.1-mini
+
+    RobotModelRef:
+      description: Fully-qualified Robot model reference in provider/model format.
+      type: string
+      pattern: "^[^/]+/.+$"
+      example: openai/gpt-4.1-mini
+
+    RobotProviderSettings:
+      type: object
+      required: [enabled, has_api_key, requires_api_key]
+      properties:
+        enabled:
+          type: boolean
+        has_api_key:
+          type: boolean
+          description: Whether this provider has an API key configured. The key value is never returned.
+        requires_api_key:
+          type: boolean
+          description: Whether this provider expects API key configuration through the Robots provider settings API.
+
+    RobotProviderMutableSettings:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        api_key:
+          type: string
+          description: Write-only provider API key. Omit to preserve the current key.
+        clear_api_key:
+          type: boolean
+          description: Remove the stored provider API key.
+
+    RobotModelInfo:
+      type: object
+      required: [ref, provider, model]
+      properties:
+        ref:
+          $ref: "#/components/schemas/RobotModelRef"
+        provider:
+          $ref: "#/components/schemas/RobotModelProvider"
+        model:
+          $ref: "#/components/schemas/RobotModelName"
+
+    RobotModelInfoList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotModelInfo" }
+
+    RobotModelCacheStatus:
+      type: object
+      required: [stale]
+      properties:
+        last_refreshed_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        stale:
+          type: boolean
+
+    RobotProviderStatus:
+      type: object
+      required: [provider, supported, settings, cache, models]
+      properties:
+        provider:
+          $ref: "#/components/schemas/RobotModelProvider"
+        supported:
+          type: boolean
+        settings:
+          $ref: "#/components/schemas/RobotProviderSettings"
+        cache:
+          $ref: "#/components/schemas/RobotModelCacheStatus"
+        models:
+          $ref: "#/components/schemas/RobotModelInfoList"
+
+    RobotProviderStatusList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotProviderStatus" }
+
+    RobotProviderListResult:
+      type: object
+      required: [providers]
+      properties:
+        providers: { $ref: "#/components/schemas/RobotProviderStatusList" }
+
+    RobotModelListResult:
+      type: object
+      required: [models]
+      properties:
+        models:
+          $ref: "#/components/schemas/RobotModelInfoList"
+
+    # -
+    # Robot mutation types
+    # -
+
+    RobotInitialProps:
+      type: object
+      required: [name, description, playbook]
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        model:
+          $ref: "#/components/schemas/RobotModelRef"
+        workspace_id:
+          $ref: "#/components/schemas/Identifier"
+        tools:
+          $ref: "#/components/schemas/RobotToolNameList"
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the robot
+        description:
+          type: string
+          description: Human-readable description of the robot's purpose
+        playbook:
+          type: string
+          description: The directive/system prompt that defines the robot's behavior
+        model:
+          $ref: "#/components/schemas/RobotModelRef"
+        workspace_id:
+          allOf:
+            - $ref: "#/components/schemas/NullableIdentifier"
+          nullable: true
+        tools:
+          $ref: "#/components/schemas/RobotToolNameList"
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotWorkspaceInitialProps:
+      type: object
+      required: [name, description]
+      properties:
+        name:
+          type: string
+          description: The name of the workspace template.
+        description:
+          type: string
+          description: Human-readable description of the workspace template.
+        provider:
+          $ref: "#/components/schemas/RobotWorkspaceProvider"
+        config:
+          type: object
+          additionalProperties: true
+          description: Provider-specific template configuration.
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotWorkspaceMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the workspace template.
+        description:
+          type: string
+          description: Human-readable description of the workspace template.
+        config:
+          type: object
+          additionalProperties: true
+          description: Provider-specific template configuration.
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotWorkspaceMountRequest:
+      type: object
+      description: Workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
+      properties:
+        workspace_id:
+          $ref: "#/components/schemas/Identifier"
+        workspace_instance_id:
+          $ref: "#/components/schemas/Identifier"
+
+    RobotChatRequest:
+      type: object
+      required: [id, messages]
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this chat request
+        threadId:
+          type: string
+          description: Optional thread ID if this chat is part of a thread context
+        sessionId:
+          type: string
+          description: Session ID to continue an existing conversation
+        robotId:
+          type: string
+          description: Specific robot ID to use for this message
+        messages:
+          type: array
+          description: Array of chat messages in the conversation
+          items:
+            $ref: "#/components/schemas/UIMessage"
+        data:
+          type: object
+          description: Additional data for the chat request
+          additionalProperties: true
+        context:
+          $ref: "#/components/schemas/RobotChatContext"
+          description: Context about the page/item the user is viewing
+        workspace:
+          $ref: "#/components/schemas/RobotWorkspaceMountRequest"
+
+    RobotChatContext:
+      type: object
+      properties:
+        datagraph_item:
+          $ref: "#/components/schemas/DatagraphItemRef"
+          description: Optional reference to a datagraph item if the user is viewing one
+        page_type:
+          type: string
+          description: Human-readable page type if not viewing a specific datagraph item
+
+    DatagraphItemRef:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/Identifier"
+          description: The unique identifier of the datagraph item
+        kind:
+          type: string
+          enum: [thread, node, profile, link, collection]
+          description: The type of datagraph item
+        slug:
+          type: string
+          description: Human-readable URL slug for the item
+        name:
+          type: string
+          description: Display name of the item
+
+    # -
+    # Robot listing types
+    # -
+
+    RobotList:
+      type: array
+      items: { $ref: "#/components/schemas/Robot" }
+
+    RobotWorkspaceList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotWorkspace" }
+
+    RobotWorkspaceInstanceList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotWorkspaceInstance" }
+
+    RobotWorkspaceProviderList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotWorkspaceProviderInfo" }
+
+    RobotsListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [robots]
+          properties:
+            robots: { $ref: "#/components/schemas/RobotList" }
+
+    RobotWorkspacesListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [workspaces]
+          properties:
+            workspaces: { $ref: "#/components/schemas/RobotWorkspaceList" }
+
+    RobotWorkspaceInstancesListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [workspace_instances]
+          properties:
+            workspace_instances:
+              { $ref: "#/components/schemas/RobotWorkspaceInstanceList" }
+
+    RobotWorkspaceProviderListResult:
+      type: object
+      required: [providers]
+      properties:
+        providers: { $ref: "#/components/schemas/RobotWorkspaceProviderList" }
+
+    RobotSessionList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotSessionRef" }
+
+    RobotSessionsListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [sessions]
+          properties:
+            sessions: { $ref: "#/components/schemas/RobotSessionList" }
+
+    # -
+    # Vercel Streaming Protocol
+    # -
+
+    NonEmptyString:
+      type: string
+      minLength: 1
+
+    Id:
+      type: string
+      minLength: 1
+
+    MediaType:
+      type: string
+      minLength: 1
+      description: IANA media type (MIME type) such as image/png, application/pdf, text/plain.
+      pattern: "^[\\w!#$&^_.+-]+\\/[\\w!#$&^_.+-]+$"
+
+    ArbitraryData: {}
+    #   description: Arbitrary structured data for the custom data part.
+    #   oneOf:
+    #     - type: object
+    #       additionalProperties: true
+    #     - type: array
+    #       items:
+    #         $ref: "#/components/schemas/ArbitraryData"
+    #     - type: string
+    #     - type: number
+    #     - type: integer
+    #     - type: boolean
+
+    StreamPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          "$ref": "#/components/schemas/NonEmptyString"
+      oneOf:
+        - "$ref": "#/components/schemas/StartPart"
+        - "$ref": "#/components/schemas/TextStartPart"
+        - "$ref": "#/components/schemas/TextDeltaPart"
+        - "$ref": "#/components/schemas/TextEndPart"
+        - "$ref": "#/components/schemas/ReasoningStartPart"
+        - "$ref": "#/components/schemas/ReasoningDeltaPart"
+        - "$ref": "#/components/schemas/ReasoningEndPart"
+        - "$ref": "#/components/schemas/SourceUrlPart"
+        - "$ref": "#/components/schemas/SourceDocumentPart"
+        - "$ref": "#/components/schemas/FilePart"
+        - "$ref": "#/components/schemas/DataPart"
+        - "$ref": "#/components/schemas/ErrorPart"
+        - "$ref": "#/components/schemas/ToolInputStartPart"
+        - "$ref": "#/components/schemas/ToolInputDeltaPart"
+        - "$ref": "#/components/schemas/ToolInputAvailablePart"
+        - "$ref": "#/components/schemas/ToolOutputAvailablePart"
+        - "$ref": "#/components/schemas/StartStepPart"
+        - "$ref": "#/components/schemas/FinishStepPart"
+        - "$ref": "#/components/schemas/FinishMessagePart"
+        - "$ref": "#/components/schemas/AbortPart"
+      discriminator:
+        propertyName: type
+        mapping:
+          start: "#/components/schemas/StartPart"
+          text-start: "#/components/schemas/TextStartPart"
+          text-delta: "#/components/schemas/TextDeltaPart"
+          text-end: "#/components/schemas/TextEndPart"
+          reasoning-start: "#/components/schemas/ReasoningStartPart"
+          reasoning-delta: "#/components/schemas/ReasoningDeltaPart"
+          reasoning-end: "#/components/schemas/ReasoningEndPart"
+          source-url: "#/components/schemas/SourceUrlPart"
+          source-document: "#/components/schemas/SourceDocumentPart"
+          file: "#/components/schemas/FilePart"
+          error: "#/components/schemas/ErrorPart"
+          tool-input-start: "#/components/schemas/ToolInputStartPart"
+          tool-input-delta: "#/components/schemas/ToolInputDeltaPart"
+          tool-input-available: "#/components/schemas/ToolInputAvailablePart"
+          tool-output-available: "#/components/schemas/ToolOutputAvailablePart"
+          start-step: "#/components/schemas/StartStepPart"
+          finish-step: "#/components/schemas/FinishStepPart"
+          finish: "#/components/schemas/FinishMessagePart"
+          abort: "#/components/schemas/AbortPart"
+
+    StartPart:
+      type: object
+      required:
+        - type
+        - messageId
+      properties:
+        type:
+          const: start
+        messageId:
+          "$ref": "#/components/schemas/Id"
+
+    TextStartPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: text-start
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    TextDeltaPart:
+      type: object
+      required:
+        - type
+        - id
+        - delta
+      properties:
+        type:
+          const: text-delta
+        id:
+          "$ref": "#/components/schemas/Id"
+        delta:
+          type: string
+
+    TextEndPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: text-end
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    ReasoningStartPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: reasoning-start
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    ReasoningDeltaPart:
+      type: object
+      required:
+        - type
+        - id
+        - delta
+      properties:
+        type:
+          const: reasoning-delta
+        id:
+          "$ref": "#/components/schemas/Id"
+        delta:
+          type: string
+
+    ReasoningEndPart:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          const: reasoning-end
+        id:
+          "$ref": "#/components/schemas/Id"
+
+    SourceUrlPart:
+      type: object
+      required:
+        - type
+        - sourceId
+        - url
+      properties:
+        type:
+          const: source-url
+        sourceId:
+          "$ref": "#/components/schemas/NonEmptyString"
+        url:
+          "$ref": "#/components/schemas/URL"
+
+    SourceDocumentPart:
+      type: object
+      required:
+        - type
+        - sourceId
+        - mediaType
+        - title
+      properties:
+        type:
+          const: source-document
+        sourceId:
+          "$ref": "#/components/schemas/NonEmptyString"
+        mediaType:
+          type: string
+          minLength: 1
+          description:
+            Protocol doc example uses "file" here. Kept as a non-empty string
+            to avoid over-constraining.
+        title:
+          "$ref": "#/components/schemas/NonEmptyString"
+        url:
+          "$ref": "#/components/schemas/URL"
+          description:
+            Not shown in the provided example, but some implementations may
+            include a URL for the document.
+
+    FilePart:
+      type: object
+      required:
+        - type
+        - url
+        - mediaType
+      properties:
+        type:
+          const: file
+        url:
+          "$ref": "#/components/schemas/URL"
+        mediaType:
+          "$ref": "#/components/schemas/MediaType"
+
+    DataPart:
+      type: object
+      required:
+        - type
+        - data
+      properties:
+        type:
+          type: string
+          pattern: "^data-[A-Za-z0-9][A-Za-z0-9._-]*$"
+          description: Custom data part types, e.g. "data-weather".
+        id:
+          type: string
+          description: Optional identifier for this data part.
+        data:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    ErrorPart:
+      type: object
+      required:
+        - type
+        - errorText
+      properties:
+        type:
+          const: error
+        errorText:
+          type: string
+
+    ToolInputStartPart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - toolName
+      properties:
+        type:
+          const: tool-input-start
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        toolName:
+          "$ref": "#/components/schemas/NonEmptyString"
+
+    ToolInputDeltaPart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - inputTextDelta
+      properties:
+        type:
+          const: tool-input-delta
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        inputTextDelta:
+          type: string
+
+    ToolInputAvailablePart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - toolName
+        - input
+      properties:
+        type:
+          const: tool-input-available
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        toolName:
+          "$ref": "#/components/schemas/NonEmptyString"
+        input:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    ToolOutputAvailablePart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - output
+      properties:
+        type:
+          const: tool-output-available
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        output:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    StartStepPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: start-step
+
+    FinishStepPart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: finish-step
+
+    FinishMessagePart:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          const: finish
+
+    AbortPart:
+      type: object
+      required:
+        - type
+        - reason
+      properties:
+        type:
+          const: abort
+        reason:
+          type: string
 
   securitySchemes:
     browser:

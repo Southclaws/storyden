@@ -1,0 +1,82 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageUpdate
+x-storyden-tool:
+  title: Update Library Page
+  annotations:
+    readOnlyHint: false
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+title: update_library_page
+description: Update an existing page in the library. Only provide the fields you
+  want to change.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageUpdateInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageUpdateOutput"
+definitions:
+  ToolLibraryPageUpdateInput:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        type: string
+        minLength: 1
+        description: The unique identifier of the page to update
+      name:
+        type: string
+        minLength: 1
+        description: The new name/title of the page
+      slug:
+        type: string
+        minLength: 1
+        description: The new URL slug for the page
+      content:
+        type: string
+        description: The new content of the page in HTML format
+      visibility:
+        type: string
+        enum:
+          - published
+          - draft
+        description: New visibility of the page
+      url:
+        type: string
+        format: uri
+        description: New external URL reference
+      parent:
+        type: string
+        description: New parent page slug. Provide to move the page to a different parent.
+      tags:
+        type: array
+        items:
+          type: string
+        description: New tags to categorise this page
+    additionalProperties: false
+  ToolLibraryPageUpdateOutput:
+    type: object
+    required:
+      - id
+      - slug
+      - name
+      - browser_url
+    properties:
+      browser_url:
+        type: string
+        description: Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
+      id:
+        type: string
+        description: Unique identifier for the updated page
+      slug:
+        type: string
+        description: The slug of the updated page
+      name:
+        type: string
+        description: The name of the updated page
+    additionalProperties: false

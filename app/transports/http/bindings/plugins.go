@@ -314,7 +314,7 @@ func serialisePluginStatus(in *plugin.Record) openapi.PluginStatus {
 	switch in.ReportedState {
 	case plugin.ReportedStateActive:
 		as.FromPluginStatusActive(openapi.PluginStatusActive{
-			ActiveState: openapi.PluginStatusActiveActiveStateActive,
+			ActiveState: openapi.Active,
 			ActivatedAt: in.StartedAt,
 		})
 

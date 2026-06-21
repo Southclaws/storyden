@@ -118,6 +118,22 @@ func (m *Mapping) AdminOAuthRefreshTokenDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
 
+func (m *Mapping) OAuthRemoteDiscover() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) OAuthRemoteConnectionList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) OAuthRemoteConnectionCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) OAuthRemoteConnectionAuthorize() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
 func (m *Mapping) AdminAccountBanRemove() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSuspensions
 }
@@ -284,6 +300,10 @@ func (m *Mapping) OAuthUserInfo() (bool, *rbac.Permission) {
 
 func (m *Mapping) OAuthClientRegister() (bool, *rbac.Permission) {
 	return false, nil // Public RFC 7591 dynamic client registration.
+}
+
+func (m *Mapping) OAuthRemoteCallback() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
 }
 
 func (m *Mapping) WebAuthnRequestCredential() (bool, *rbac.Permission) {
@@ -818,4 +838,120 @@ func (m *Mapping) EventParticipantUpdate() (bool, *rbac.Permission) {
 func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	// Requires PermissionManageEvents unless deleting self
 	return true, nil
+}
+
+func (m *Mapping) RobotsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotChatSSE() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotProvidersList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotProviderUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotProviderModelsRefresh() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotModelsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotWorkspaceProvidersList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotWorkspacesList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotWorkspaceCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotWorkspaceGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotWorkspaceUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotWorkspaceDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotWorkspaceInstancesList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotWorkspaceInstanceGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotWorkspaceInstanceDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotToolsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServersList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerProbe() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotMCPServerRefresh() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRobots
+}
+
+func (m *Mapping) RobotSessionsList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
+}
+
+func (m *Mapping) RobotSessionGet() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUseRobots
 }

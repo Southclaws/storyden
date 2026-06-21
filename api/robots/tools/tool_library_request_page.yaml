@@ -1,0 +1,51 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryRequestPage
+x-storyden-tool:
+  title: Request Library Page
+  role: READ_PUBLISHED_LIBRARY
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: library_request_page
+description: Request a Library page selection from the user. When this tool
+  returns, the user has selected the returned Library page and the task should
+  continue using that page.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryRequestPageInput"
+  output:
+    $ref: "#/definitions/ToolLibraryRequestPageOutput"
+definitions:
+  ToolLibraryRequestPageInput:
+    type: object
+    additionalProperties: false
+  ToolLibraryRequestPageOutput:
+    type: object
+    required:
+      - id
+      - slug
+      - name
+    properties:
+      id:
+        type: string
+        description: Unique identifier for the selected Library page.
+      slug:
+        type: string
+        description: URL-friendly identifier for the selected Library page.
+      name:
+        type: string
+        description: Display name for the selected Library page.
+      description:
+        type: string
+        description: Brief description of the selected Library page.
+      browser_url:
+        type: string
+        format: uri
+        description: Absolute frontend URL that opens the selected Library page in a browser. Prefer this in Markdown links when presenting the page to users.
+    additionalProperties: false
