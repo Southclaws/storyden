@@ -6,3 +6,6 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  # Renovate security update: dompurify@3.4.11
+  - dompurify@3.4.11
