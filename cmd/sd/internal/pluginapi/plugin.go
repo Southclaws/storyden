@@ -16,6 +16,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bmatcuk/doublestar"
 	"github.com/goccy/go-yaml"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
@@ -119,6 +120,10 @@ func BuildPackage(ctx context.Context, dir string, manifestPath string, excludeP
 		return nil, err
 	}
 
+	if len(mf.Manifest.Files) == 0 {
+		return nil, fmt.Errorf("manifest has no \"files\" patterns; add a \"files\" field to declare which files to include in the package")
+	}
+
 	manifestJSON, err := json.MarshalIndent(mf.Manifest, "", "  ")
 	if err != nil {
 		return nil, err
@@ -197,6 +202,23 @@ func BuildPackage(ctx context.Context, dir string, manifestPath string, excludeP
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].rel < files[j].rel
 	})
+
+	if len(mf.Manifest.Files) > 0 {
+		filtered := files[:0]
+		for _, file := range files {
+			for _, pattern := range mf.Manifest.Files {
+				matched, err := doublestar.Match(pattern, file.rel)
+				if err != nil {
+					return nil, fmt.Errorf("invalid files pattern %q: %w", pattern, err)
+				}
+				if matched {
+					filtered = append(filtered, file)
+					break
+				}
+			}
+		}
+		files = filtered
+	}
 
 	var buf bytes.Buffer
 	zw := zip.NewWriter(&buf)

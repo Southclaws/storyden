@@ -1174,6 +1174,9 @@ type Manifest struct {
 	// The list of events the plugin subscribes to and will receive from the host via RPC. Events allow your plugins to react to things that humans or robots do on Storyden.
 	//
 	EventsConsumed []Event `json:"events_consumed,omitempty"`
+	// Glob patterns controlling which files are included in the plugin package when running `sd plugin dev package`. Patterns use double-star glob syntax and are matched against file paths relative to the plugin project root (e.g. `dist/**`, `*.py`, `assets/**/*.json`). This field must be present; omitting it causes `sd plugin dev package` to exit with an error so that no unintentional files are bundled.
+	//
+	Files []string `json:"files,omitempty"`
 	// The unique identifier of the plugin. Must match the pattern `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.
 	// (NOTE: May change in future.)
 	//

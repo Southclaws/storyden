@@ -533,9 +533,10 @@ func sortManifestTopFields(fields []ManifestField) {
 		"version":              4,
 		"command":              5,
 		"args":                 6,
-		"events_consumed":      7,
-		"access":               8,
-		"configuration_schema": 9,
+		"files":                7,
+		"events_consumed":      8,
+		"access":               9,
+		"configuration_schema": 10,
 	}
 
 	sort.Slice(fields, func(i, j int) bool {
