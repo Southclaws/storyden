@@ -109,7 +109,7 @@
   },
   "packageManager": "pnpm@11.4.0",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "browserslist": [
     "defaults and supports es6-module",

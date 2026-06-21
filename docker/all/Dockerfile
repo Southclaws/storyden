@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target="/root/.cache/go-build" \
     CGO_ENABLED=0 GOOS=linux go build -o /server/storyden-api ./cmd/backend
 
-FROM docker.io/node:22.21.1-alpine AS base
+FROM docker.io/node:24.17.0-alpine3.24 AS base
 
 #
 # DEPENDENCIES LAYER
