@@ -2,6 +2,7 @@ package password
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -13,12 +14,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/services/authentication/provider"
 )
 
 func (p *Provider) RegisterWithHandle(ctx context.Context, handle string, password string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	handle = mark.Slugify(handle)
+	handle = strings.ToLower(handle)
 
 	if err := provider.CheckMode(ctx, p.logger, p.settings, authentication.ModeHandle); err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (p *Provider) RegisterWithHandle(ctx context.Context, handle string, passwo
 }
 
 func (b *Provider) LoginWithHandle(ctx context.Context, handle string, password string) (*account.Account, error) {
-	handle = mark.Slugify(handle)
+	handle = strings.ToLower(handle)
 
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,

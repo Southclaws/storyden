@@ -71,6 +71,16 @@ func TestHandleNormalisation(t *testing.T) {
 				tests.Status(t, err, second, http.StatusConflict)
 			})
 
+			t.Run("invalid_handle_characters_rejected_not_silently_mangled", func(t *testing.T) {
+				for _, bad := range []string{"-leading", "trailing-", "has space", "!!!"} {
+					resp, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{
+						Identifier: bad,
+						Token:      "password1",
+					})
+					tests.Status(t, err, resp, http.StatusBadRequest)
+				}
+			})
+
 			t.Run("uppercase_handle_normalised_on_profile_update", func(t *testing.T) {
 				suffix := xid.New().String()
 				resp := tests.AssertRequest(
