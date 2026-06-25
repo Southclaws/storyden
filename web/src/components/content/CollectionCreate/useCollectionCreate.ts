@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
 
-import { getCollectionListKey } from "src/api/openapi-client/collections";
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { getCollectionListKey } from "@/api/openapi-client/collections";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import { Account } from "@/api/openapi-schema";

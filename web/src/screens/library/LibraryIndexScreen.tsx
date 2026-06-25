@@ -1,6 +1,6 @@
 "use client";
 
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { LibraryEmptyState } from "@/components/library/LibraryEmptyState";

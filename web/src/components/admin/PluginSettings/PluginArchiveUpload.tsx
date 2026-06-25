@@ -1,7 +1,7 @@
 import {
   FileUploadFileChangeDetails,
 } from "@ark-ui/react";
-import { FileError } from "node_modules/@ark-ui/react/dist/components/file-upload/file-upload";
+import { FileUploadFileError as FileError } from "@ark-ui/react/file-upload";
 
 import { Button } from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";

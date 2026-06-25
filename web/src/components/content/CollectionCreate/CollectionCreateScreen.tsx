@@ -1,4 +1,4 @@
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";

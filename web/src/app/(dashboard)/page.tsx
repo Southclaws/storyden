@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { UnreadyBanner } from "src/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 

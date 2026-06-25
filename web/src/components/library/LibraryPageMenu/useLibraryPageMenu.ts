@@ -7,8 +7,8 @@ import {
   Node,
   Permission,
   Visibility,
-} from "src/api/openapi-schema";
-import { useSession } from "src/auth";
+} from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 
 import { handle } from "@/api/client";
 import { useConfirmation } from "@/components/site/useConfirmation";

@@ -1,7 +1,7 @@
 import { keyBy } from "lodash/fp";
 import { z } from "zod";
 
-import { SearchScreen } from "src/screens/search/SearchScreen";
+import { SearchScreen } from "@/screens/search/SearchScreen";
 
 import { categoryList } from "@/api/openapi-server/categories";
 import { datagraphSearch } from "@/api/openapi-server/datagraph";

@@ -1,8 +1,8 @@
 "use client";
 
-import { Reply, Thread } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
-import { useShare } from "src/utils/client";
+import { Reply, Thread } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { useShare } from "@/utils/client";
 
 import { handle } from "@/api/client";
 import { useReportContext } from "@/lib/report/useReportContext";

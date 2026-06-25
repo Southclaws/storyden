@@ -1,6 +1,6 @@
 import { createListCollection } from "@ark-ui/react";
 
-import { useCategoryList } from "src/api/openapi-client/categories";
+import { useCategoryList } from "@/api/openapi-client/categories";
 
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";

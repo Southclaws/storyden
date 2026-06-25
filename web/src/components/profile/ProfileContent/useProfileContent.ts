@@ -1,5 +1,5 @@
-import { useCollectionList } from "src/api/openapi-client/collections";
-import { Account, PublicProfile } from "src/api/openapi-schema";
+import { useCollectionList } from "@/api/openapi-client/collections";
+import { Account, PublicProfile } from "@/api/openapi-schema";
 
 import { useThreadList } from "@/api/openapi-client/threads";
 

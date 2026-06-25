@@ -1,11 +1,11 @@
-import { useNodeList } from "src/api/openapi-client/nodes";
-import { useThreadList } from "src/api/openapi-client/threads";
+import { useNodeList } from "@/api/openapi-client/nodes";
+import { useThreadList } from "@/api/openapi-client/threads";
 import {
   Account,
   NodeListOKResponse,
   ThreadListOKResponse,
   Visibility,
-} from "src/api/openapi-schema";
+} from "@/api/openapi-schema";
 
 export type Props = {
   session: Account;

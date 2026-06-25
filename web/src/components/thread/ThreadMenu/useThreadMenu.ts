@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
-import { Permission, ThreadReference } from "src/api/openapi-schema";
+import { Permission, ThreadReference } from "@/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";

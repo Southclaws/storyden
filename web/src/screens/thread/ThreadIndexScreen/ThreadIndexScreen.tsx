@@ -1,7 +1,7 @@
 "use client";
 
-import { Unready } from "src/components/site/Unready";
-import { ThreadIndexView } from "src/components/thread/ThreadIndexView/ThreadIndexView";
+import { Unready } from "@/components/site/Unready";
+import { ThreadIndexView } from "@/components/thread/ThreadIndexView/ThreadIndexView";
 
 import { Props, useThreadIndexScreen } from "./useThreadIndexScreen";
 

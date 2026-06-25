@@ -1,5 +1,5 @@
-import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
-import { Unready } from "src/components/site/Unready";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
+import { Unready } from "@/components/site/Unready";
 
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";

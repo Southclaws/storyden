@@ -1,10 +1,10 @@
 "use client";
 
-import { useSession } from "src/auth";
+import { useSession } from "@/auth";
 import {
   LoginAnchor,
   RegisterAnchor,
-} from "src/components/site/Navigation/Anchors/Login";
+} from "@/components/site/Navigation/Anchors/Login";
 
 import { Account } from "@/api/openapi-schema";
 import { NotificationsMenu } from "@/components/notifications/NotificationsMenu";

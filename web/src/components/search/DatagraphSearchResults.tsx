@@ -1,5 +1,5 @@
-import { DatagraphSearchResult } from "src/api/openapi-schema";
-import { EmptyState } from "src/components/site/EmptyState";
+import { DatagraphSearchResult } from "@/api/openapi-schema";
+import { EmptyState } from "@/components/site/EmptyState";
 
 import { styled } from "@/styled-system/jsx";
 

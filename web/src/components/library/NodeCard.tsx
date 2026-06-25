@@ -1,5 +1,5 @@
-import { Node } from "src/api/openapi-schema";
-import { Timestamp } from "src/components/site/Timestamp";
+import { Node } from "@/api/openapi-schema";
+import { Timestamp } from "@/components/site/Timestamp";
 
 import { Card } from "@/components/ui/rich-card";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";

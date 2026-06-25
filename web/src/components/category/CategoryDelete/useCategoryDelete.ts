@@ -3,7 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import { categoryGet } from "@/api/openapi-client/categories";

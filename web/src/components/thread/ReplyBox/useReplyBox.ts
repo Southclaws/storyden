@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Account, DatagraphItemKind, Thread } from "src/api/openapi-schema";
+import { Account, DatagraphItemKind, Thread } from "@/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";

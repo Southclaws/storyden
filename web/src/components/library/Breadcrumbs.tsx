@@ -2,8 +2,8 @@ import { last } from "lodash";
 import { uniq } from "lodash/fp";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
-import { Visibility } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
+import { Visibility } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";

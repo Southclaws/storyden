@@ -1,5 +1,5 @@
-import { ProfileReference } from "src/api/openapi-schema";
-import { Timestamp } from "src/components/site/Timestamp";
+import { ProfileReference } from "@/api/openapi-schema";
+import { Timestamp } from "@/components/site/Timestamp";
 
 import { HStack } from "@/styled-system/jsx";
 

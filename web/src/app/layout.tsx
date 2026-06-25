@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { PropsWithChildren } from "react";
 
-import { getColourAsHex } from "src/utils/colour";
+import { getColourAsHex } from "@/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";

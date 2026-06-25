@@ -1,6 +1,6 @@
 import { createListCollection } from "@ark-ui/react";
 
-import { ColourField } from "src/components/form/ColourInput/ColourInput";
+import { ColourField } from "@/components/form/ColourInput/ColourInput";
 
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { FormErrorText } from "@/components/ui/FormErrorText";

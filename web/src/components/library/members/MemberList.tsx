@@ -1,4 +1,4 @@
-import { PublicProfileList } from "src/api/openapi-schema";
+import { PublicProfileList } from "@/api/openapi-schema";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { EmptyState } from "@/components/site/EmptyState";

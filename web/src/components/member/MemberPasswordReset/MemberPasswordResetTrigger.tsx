@@ -1,7 +1,7 @@
 import React, { PropsWithChildren } from "react";
 
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { useDisclosure } from "src/utils/useDisclosure";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { ProfileReference } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";

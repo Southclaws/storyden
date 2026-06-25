@@ -1,7 +1,7 @@
 "use client";
 
-import { CollectionWithItems } from "src/api/openapi-schema";
-import { Unready } from "src/components/site/Unready";
+import { CollectionWithItems } from "@/api/openapi-schema";
+import { Unready } from "@/components/site/Unready";
 
 import { useCollectionGet } from "@/api/openapi-client/collections";
 import { Account } from "@/api/openapi-schema";

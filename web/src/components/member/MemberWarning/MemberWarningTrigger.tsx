@@ -2,8 +2,8 @@ import React, { ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { useDisclosure } from "src/utils/useDisclosure";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import {

@@ -1,7 +1,7 @@
 import { Manifest } from "next/dist/lib/metadata/types/manifest-types";
 import { NextResponse } from "next/server";
 
-import { getColourAsHex } from "src/utils/colour";
+import { getColourAsHex } from "@/utils/colour";
 
 import { API_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";

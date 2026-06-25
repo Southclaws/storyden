@@ -1,5 +1,5 @@
-import { useThreadList } from "src/api/openapi-client/threads";
-import { ThreadListResult } from "src/api/openapi-schema";
+import { useThreadList } from "@/api/openapi-client/threads";
+import { ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
   query?: string;

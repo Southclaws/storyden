@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { KeyedMutator } from "swr";
 import { z } from "zod";
 
-import { linkCreate } from "src/api/openapi-client/links";
-import { LinkListResult, LinkReference } from "src/api/openapi-schema";
+import { linkCreate } from "@/api/openapi-client/links";
+import { LinkListResult, LinkReference } from "@/api/openapi-schema";
 
 export type Props = {
   links: LinkListResult;

@@ -1,8 +1,8 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { OnboardingStatus } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
+import { OnboardingStatus } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 
 import { useSettings } from "@/lib/settings/settings-client";
 

@@ -1,4 +1,4 @@
-import { WithDisclosure } from "src/utils/useDisclosure";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 import { Button } from "@/components/ui/button";
 import { HStack, VStack, styled } from "@/styled-system/jsx";

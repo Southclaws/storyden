@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 
-import { useSession } from "src/auth";
+import { useSession } from "@/auth";
 
 import { useSettings } from "@/lib/settings/settings-client";
 

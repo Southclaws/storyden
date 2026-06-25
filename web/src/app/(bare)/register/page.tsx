@@ -1,4 +1,4 @@
-import { RegisterScreen } from "src/screens/auth/RegisterScreen/RegisterScreen";
+import { RegisterScreen } from "@/screens/auth/RegisterScreen/RegisterScreen";
 
 import { RegistrationMode } from "@/api/openapi-schema";
 import { OAuthProviderList } from "@/components/auth/OAuthProviderList";

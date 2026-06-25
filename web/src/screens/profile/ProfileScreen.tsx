@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";

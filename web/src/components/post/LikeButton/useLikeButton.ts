@@ -1,4 +1,4 @@
-import { PostReference } from "src/api/openapi-schema";
+import { PostReference } from "@/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";

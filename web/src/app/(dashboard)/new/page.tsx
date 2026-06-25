@@ -3,7 +3,7 @@
 import { use } from "react";
 import { z } from "zod";
 
-import { ComposeScreen } from "src/screens/compose/ComposeScreen";
+import { ComposeScreen } from "@/screens/compose/ComposeScreen";
 
 const QuerySchema = z.object({
   id: z.string().optional(),

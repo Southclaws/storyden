@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Asset, Category } from "src/api/openapi-schema";
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { Asset, Category } from "@/api/openapi-schema";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import { useCategoryMutations } from "@/lib/category/mutation";

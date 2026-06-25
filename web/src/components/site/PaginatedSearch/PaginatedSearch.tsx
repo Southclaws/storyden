@@ -6,7 +6,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";

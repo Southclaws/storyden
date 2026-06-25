@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Controller, ControllerProps } from "react-hook-form";
 
-import { Anchor } from "src/components/site/Anchor";
+import { Anchor } from "@/components/site/Anchor";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";

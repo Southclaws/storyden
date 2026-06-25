@@ -1,5 +1,5 @@
-import { useThreadList } from "src/api/openapi-client/threads";
-import { ThreadListParams, ThreadListResult } from "src/api/openapi-schema";
+import { useThreadList } from "@/api/openapi-client/threads";
+import { ThreadListParams, ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
   params?: ThreadListParams;

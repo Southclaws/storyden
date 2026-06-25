@@ -1,6 +1,6 @@
 import { PropsWithChildren, ReactNode } from "react";
 
-import { Navigation } from "src/components/site/Navigation/Navigation";
+import { Navigation } from "@/components/site/Navigation/Navigation";
 
 import { MotdBanner } from "@/components/site/MotdBanner/MotdBanner";
 import { getSettings } from "@/lib/settings/settings-server";
