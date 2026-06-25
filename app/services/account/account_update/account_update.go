@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -50,6 +51,7 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 	opts := []account_writer.Mutation{}
 
 	if v, ok := params.Handle.Get(); ok {
+		v = mark.Slugify(v)
 		if err := account.ValidateHandle(ctx, v); err != nil {
 			return nil, err
 		}
