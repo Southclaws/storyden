@@ -34,7 +34,6 @@ import {
   ToolInputMap,
   ToolLibraryRequestPageOutput,
   ToolName,
-  ToolRobotDeleteInput,
   ToolRobotSwitchOutput,
 } from "@/api/robots";
 import { StorydenUIMessage, toStorydenUIMessages } from "@/api/robots-types";
@@ -147,10 +146,9 @@ type RobotChatContextValue = {
   handleDismissError: () => void;
   isSessionConfirmed: boolean;
   resolveToolConfirmation: (input: {
-    toolName: ToolName;
-    toolCallId: string;
+    approvalId: string;
+    toolName?: string;
     approved: boolean;
-    input?: unknown;
   }) => Promise<void>;
   resolveLibraryPageRequest: (input: {
     toolCallId: string;
@@ -598,30 +596,29 @@ export function RobotChatContext({
 
   const resolveToolConfirmation = useCallback(
     async (input: {
-      toolName: ToolName;
-      toolCallId: string;
+      approvalId: string;
+      toolName?: string;
       approved: boolean;
-      input?: unknown;
     }) => {
-      const robotDeleteInput =
-        input.toolName === "robot_delete"
-          ? (input.input as ToolRobotDeleteInput | undefined)
-          : undefined;
-
-      chat.addToolOutput({
-        tool: input.toolName,
-        toolCallId: input.toolCallId,
-        state: "output-available",
-        output: {
-          _storyden_confirmation: {
-            approved: input.approved,
-            id: robotDeleteInput?.id,
-          },
-        },
+      await chat.addToolApprovalResponse({
+        id: input.approvalId,
+        approved: input.approved,
       });
 
-      if (input.approved && input.toolName === "robot_delete") {
+      if (
+        !input.approved ||
+        !input.toolName ||
+        !isKnownToolName(input.toolName)
+      ) {
+        return;
+      }
+
+      if (MUTATIVE_ROBOT_TOOLS.includes(input.toolName)) {
         await mutate(getRobotsListKey());
+      }
+
+      if (MUTATIVE_THREAD_TOOLS.includes(input.toolName)) {
+        await mutate(threadListKeyFilterFn);
       }
     },
     [chat, mutate],
@@ -738,7 +735,9 @@ export function assistantToolOutputsAreComplete(message: StorydenUIMessage) {
     toolParts.every(
       (part) =>
         "state" in part &&
-        (part.state === "output-available" || part.state === "output-error"),
+        (part.state === "output-available" ||
+          part.state === "output-error" ||
+          part.state === "approval-responded"),
     )
   );
 }
@@ -748,7 +747,9 @@ export function assistantCompletedToolOutputIDs(message: StorydenUIMessage) {
     .filter(
       (part) =>
         "state" in part &&
-        (part.state === "output-available" || part.state === "output-error"),
+        (part.state === "output-available" ||
+          part.state === "output-error" ||
+          part.state === "approval-responded"),
     )
     .map((part) => ("toolCallId" in part ? part.toolCallId : undefined))
     .filter((id): id is string => !!id);

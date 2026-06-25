@@ -242,12 +242,13 @@ func (m *Manager) ListToolCatalogue(ctx context.Context) ([]tools.CatalogueTool,
 			continue
 		}
 		catalogue = append(catalogue, tools.CatalogueTool{
-			ID:           tool.ID,
-			CallableName: tool.CallableName,
-			Name:         tool.Title,
-			Description:  tool.Description,
-			Source:       "mcp",
-			Available:    false,
+			ID:                   tool.ID,
+			CallableName:         tool.CallableName,
+			Name:                 tool.Title,
+			Description:          tool.Description,
+			Source:               "mcp",
+			Available:            false,
+			RequiresConfirmation: false,
 		})
 	}
 
@@ -388,6 +389,7 @@ func (m *Manager) makeTool(server mcp.Server, cachedTool mcp.Tool) *tools.Tool {
 
 	return &tools.Tool{
 		Definition:   def,
+		Source:       "mcp",
 		CallableName: cachedTool.CallableName,
 		Handler: func(ctx context.Context, raw json.RawMessage) (json.RawMessage, error) {
 			var args map[string]any

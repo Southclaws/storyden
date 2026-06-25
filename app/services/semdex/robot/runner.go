@@ -328,7 +328,11 @@ func (s *Agent) runResolvedAgent(
 		return nil, nil
 	}
 
-	toolCtx := ctx
+	toolCtx := tools.ContextWithRunContext(ctx, tools.RunContext{
+		RobotID:   spec.DatabaseRobotID,
+		AccountID: userID,
+		SessionID: sessionID,
+	})
 	if runOptions.Mode == ModeUnattended {
 		toolCtx = tools.ContextWithConfirmationDisabled(toolCtx)
 	}

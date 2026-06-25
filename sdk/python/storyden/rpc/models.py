@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Annotated, Any, Dict, List, Literal, Union
 from datetime import datetime
 from enum import Enum
-from pydantic import AnyUrl, BaseModel, ConfigDict, Field
+from pydantic import AnyUrl, BaseModel, ConfigDict, Field, RootModel
 
 
 
@@ -12,7 +12,7 @@ class CapabilityConfigBase(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     description: str | None = None
-    """Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs."""
+    """Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names."""
     id: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
     """Human-readable capability name."""
     name: str | None = None
@@ -22,11 +22,46 @@ class CapabilityConfigBase(BaseModel):
     version: str
 
 
+class RobotToolAnnotations(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    destructive_hint: bool | None = None
+    idempotent_hint: bool | None = None
+    open_world_hint: bool | None = None
+    read_only_hint: bool | None = None
+
+
+class RobotToolJSONSchema(RootModel[Any]):
+    pass
+
+
+class RobotToolProviderToolConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    annotations: RobotToolAnnotations | None = None
+    description: str
+    """Stable provider-local tool identifier."""
+    id: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$")
+    input_schema: RobotToolJSONSchema
+    """Human-readable tool name."""
+    name: str
+    output_schema: RobotToolJSONSchema | None = None
+    requires_confirmation: bool | None = None
+    """Optional display title for MCP clients and Robot builders."""
+    title: str | None = None
+
+
 class RobotLLMProviderCapabilityConfig(CapabilityConfigBase):
     type: Literal["robot.llm_provider"]
 
+
+class RobotToolProviderCapabilityConfig(CapabilityConfigBase):
+    type: Literal["robot.tool_provider"]
+    """Robot tools statically provided by this plugin."""
+    tools: List[RobotToolProviderToolConfig]
+
 CapabilityConfig = Annotated[
-    Union[RobotLLMProviderCapabilityConfig],
+    Union[RobotLLMProviderCapabilityConfig, RobotToolProviderCapabilityConfig],
     Field(discriminator="type"),
 ]
 
@@ -621,6 +656,24 @@ class RPCRequestRobotModelProviderListModelsParams(BaseModel):
     provider: str
 
 
+class RPCRequestRobotToolCallParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Account identifier for the user who invoked the Robot run."""
+    account_id: str
+    arguments: Dict[str, Any]
+    """Host-generated tool call identifier."""
+    call_id: str
+    """Tool provider identifier declared by the plugin manifest."""
+    provider_id: str
+    """Active Robot identifier when the call came from a custom Robot."""
+    robot_id: str | None = None
+    """Robot session identifier."""
+    session_id: str
+    """Provider-local tool identifier declared by the plugin manifest."""
+    tool_id: str
+
+
 """
 Request sent by the host to the plugin to provide configuration settings. The params object can contain any key-value pairs defined by the plugin in its manifest `configuration_schema` field and the plugin should validate and apply these settings to its internal state.
 If configuration changes require a plugin to restart, the plugin should cleanly shut down with a zero exit code so that the host can restart it if it is a supervised plugin. If it is an external plugin, the plugin itself is responsible for this behavior based on the plugin's lifecycle design.
@@ -658,8 +711,15 @@ class RPCRequestRobotModelProviderGenerate(JsonRpcRequest):
     method: Literal["robot_model_provider_generate"]
     params: RPCRequestRobotModelProviderGenerateParams
 
+
+"""Executes a manifest-declared Robot tool provided by a plugin."""
+
+class RPCRequestRobotToolCall(JsonRpcRequest):
+    method: Literal["robot_tool_call"]
+    params: RPCRequestRobotToolCallParams
+
 HostToPluginRequest = Annotated[
-    Union[RPCRequestConfigure, RPCRequestEvent, RPCRequestPing, RPCRequestRobotModelProviderListModels, RPCRequestRobotModelProviderGenerate],
+    Union[RPCRequestConfigure, RPCRequestEvent, RPCRequestPing, RPCRequestRobotModelProviderListModels, RPCRequestRobotModelProviderGenerate, RPCRequestRobotToolCall],
     Field(discriminator="method"),
 ]
 
@@ -743,8 +803,17 @@ class RPCResponseRobotModelProviderGenerate(BaseModel):
     finish_reason: str | None = None
     tool_calls: List[RobotModelProviderToolCall] | None = None
 
+
+"""Returns a structured result from a plugin-provided Robot tool."""
+
+class RPCResponseRobotToolCall(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    method: Literal["robot_tool_call"]
+    error: str | None = None
+    output: Dict[str, Any] | None = None
+
 HostToPluginResponseUnion = Annotated[
-    Union[RPCResponseConfigure, RPCResponseEvent, RPCResponsePing, RPCResponseRobotModelProviderListModels, RPCResponseRobotModelProviderGenerate],
+    Union[RPCResponseConfigure, RPCResponseEvent, RPCResponsePing, RPCResponseRobotModelProviderListModels, RPCResponseRobotModelProviderGenerate, RPCResponseRobotToolCall],
     Field(discriminator="method"),
 ]
 

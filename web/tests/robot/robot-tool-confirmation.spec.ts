@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 import { unlink, writeFile } from "node:fs/promises";
 
 import { withAdminAccessKey } from "../access_key_admin_assignment";
@@ -9,9 +9,17 @@ import {
   sendMessage,
   setupRobotProviderWithScript,
   switchToRobot,
+  waitForPersistedChatRoute,
 } from "./helpers";
 
 const ROBOT_SCRIPT_DIR = "../tests/robot/scripts";
+
+function robotDeleteSummary(page: Page, status: string) {
+  return page
+    .locator("summary")
+    .filter({ hasText: "Robot Delete" })
+    .filter({ hasText: status });
+}
 
 test.describe("Robot Chat — tool confirmation", () => {
   test.beforeAll(async () => {
@@ -72,11 +80,10 @@ test.describe("Robot Chat — tool confirmation", () => {
       await sendMessage(page, "delete the victim");
 
       await expect(
-        page
-          .locator("summary")
-          .filter({ hasText: "Robot Delete" })
-          .filter({ hasText: "Needs approval" }),
-      ).toBeVisible({ timeout: 15000 });
+        robotDeleteSummary(page, "Needs approval").last(),
+      ).toBeVisible({
+        timeout: 15000,
+      });
       await expect(page.getByRole("button", { name: "Approve" })).toBeVisible();
       await expect(page.getByRole("button", { name: "Deny" })).toBeVisible();
 
@@ -89,14 +96,24 @@ test.describe("Robot Chat — tool confirmation", () => {
       await page.getByRole("button", { name: "Approve" }).click();
 
       await expect(
-        page
-          .locator("summary")
-          .filter({ hasText: "Robot Delete" })
-          .filter({ hasText: "Tool complete" }),
-      ).toBeVisible({ timeout: 15000 });
+        robotDeleteSummary(page, "Tool complete").last(),
+      ).toBeVisible({
+        timeout: 15000,
+      });
       await expect(page.getByText("Delete flow finished.")).toBeVisible({
         timeout: 15000,
       });
+
+      await waitForPersistedChatRoute(page);
+      await page.reload();
+      await expect(page.getByText("Delete flow finished.")).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(robotDeleteSummary(page, "Needs approval")).toHaveCount(0);
+      await expect(page.getByRole("button", { name: "Approve" })).toHaveCount(
+        0,
+      );
+      await expect(page.getByRole("button", { name: "Deny" })).toHaveCount(0);
 
       await withAdminAccessKey(async ({ robotGet }) => {
         let deleted = false;
@@ -332,9 +349,12 @@ test.describe("Robot Chat — tool confirmation", () => {
         .getByRole("button", { name: "Approve all confirmations" })
         .click();
 
-      await expect(confirmationBatch).toContainText("2 actions resolved", {
-        timeout: 15000,
-      });
+      await expect(
+        page
+          .getByRole("group", { name: "Confirmation batch" })
+          .filter({ hasText: "2 actions resolved" })
+          .last(),
+      ).toBeVisible({ timeout: 15000 });
       await expect(page.getByText("Both delete flows finished.")).toBeVisible({
         timeout: 15000,
       });

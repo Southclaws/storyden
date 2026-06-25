@@ -121,6 +121,13 @@ type chatPart struct {
 	ToolName   string          `json:"toolName,omitempty"`
 	Input      json.RawMessage `json:"input,omitempty"`
 	Output     json.RawMessage `json:"output,omitempty"`
+	Approval   *chatApproval   `json:"approval,omitempty"`
+}
+
+type chatApproval struct {
+	ID       string `json:"id,omitempty"`
+	Approved bool   `json:"approved,omitempty"`
+	Reason   string `json:"reason,omitempty"`
 }
 
 func newChatHandler(
@@ -379,11 +386,11 @@ func newChatHandler(
 
 					if part.FunctionCall != nil {
 						if part.FunctionCall.Name == toolconfirmation.FunctionCallName {
-							sendToolConfirmationCall(ctx, event, part, emitter, sessionRepo, robotSessionID, opt.New(robotRef), logger)
+							sendToolConfirmationCall(ctx, event, part, emitter, sessionRepo, robotSessionID, opt.New(robotRef), toolRegistry, logger)
 						} else if toolRequiresConfirmation(ctx, toolRegistry, part.FunctionCall.Name) {
 							continue
 						} else {
-							sendToolCall(event, part, emitter, logger)
+							sendToolCall(ctx, event, part, emitter, toolRegistry, logger)
 						}
 					}
 
@@ -525,6 +532,46 @@ func getLastMessage(ctx context.Context, messages []chatMessage, pendingToolIDs 
 		content.Role = "user"
 
 		for _, part := range lastMessage.Parts {
+			if strings.HasPrefix(part.Type, "tool-") && part.State == "approval-responded" {
+				if part.ToolCallId == "" {
+					return nil, fmt.Errorf("tool approval missing toolCallId: type=%s", part.Type)
+				}
+				if part.Approval == nil {
+					return nil, fmt.Errorf("tool approval missing approval payload: type=%s, toolCallId=%s", part.Type, part.ToolCallId)
+				}
+
+				approvalID := part.Approval.ID
+				if approvalID == "" {
+					approvalID = part.ToolCallId
+				}
+
+				if len(pendingSet) > 0 && !pendingSet[approvalID] && !pendingSet[part.ToolCallId] {
+					logger.Info("skipping tool approval not in pending list",
+						slog.String("tool_call_id", part.ToolCallId),
+						slog.String("approval_id", approvalID),
+						slog.String("tool_name", part.ToolName))
+					continue
+				}
+
+				content.Parts = append(content.Parts, &genai.Part{
+					FunctionResponse: &genai.FunctionResponse{
+						ID:   approvalID,
+						Name: toolconfirmation.FunctionCallName,
+						Response: map[string]any{
+							"confirmed": part.Approval.Approved,
+						},
+					},
+				})
+
+				logger.Info("tool approval received from frontend",
+					slog.String("tool_call_id", part.ToolCallId),
+					slog.String("approval_id", approvalID),
+					slog.String("tool_name", part.ToolName),
+					slog.Bool("approved", part.Approval.Approved))
+
+				continue
+			}
+
 			if strings.HasPrefix(part.Type, "tool-") && part.State == "output-available" {
 				if part.ToolCallId == "" {
 					return nil, fmt.Errorf("tool result missing toolCallId: type=%s", part.Type)
@@ -748,7 +795,7 @@ func streamErrorText(err error) string {
 	return fmt.Sprintf("%s (%s)", issue, raw)
 }
 
-func sendToolCall(event *adksession.Event, part *genai.Part, emitter *streamEmitter, logger *slog.Logger) {
+func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part, emitter *streamEmitter, toolRegistry *tools.Registry, logger *slog.Logger) {
 	fc := part.FunctionCall
 	if fc == nil {
 		return
@@ -764,7 +811,8 @@ func sendToolCall(event *adksession.Event, part *genai.Part, emitter *streamEmit
 		slog.Any("long_running_ids", event.LongRunningToolIDs),
 	)
 
-	for _, streamPart := range robotprojection.FunctionCallStreamParts(fc) {
+	metadata := robotprojection.ToolMetadataFromRegistry(ctx, toolRegistry)(toolName)
+	for _, streamPart := range robotprojection.FunctionCallStreamPartsWithMetadata(fc, metadata) {
 		_ = emitter.Send(streamPart)
 	}
 }
@@ -777,6 +825,7 @@ func sendToolConfirmationCall(
 	sessionRepo *robot_session.Repository,
 	robotSessionID robot.SessionID,
 	robotID opt.Optional[string],
+	toolRegistry *tools.Registry,
 	logger *slog.Logger,
 ) {
 	fc := part.FunctionCall
@@ -813,7 +862,8 @@ func sendToolConfirmationCall(
 			Args: original.Args,
 		},
 	}
-	sendToolCall(event, confirmationPart, emitter, logger)
+	sendToolCall(ctx, event, confirmationPart, emitter, toolRegistry, logger)
+	_ = emitter.Send(robotprojection.ToolApprovalRequestStreamPart(fc.ID, fc.ID))
 }
 
 func sendToolResult(event *adksession.Event, part *genai.Part, emitter *streamEmitter, logger *slog.Logger) {

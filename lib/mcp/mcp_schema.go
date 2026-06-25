@@ -1069,6 +1069,9 @@ type ToolInfo struct {
 
 	// The tool name identifier
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
+
+	// Whether Robot runs must pause for human approval before executing this tool.
+	RequiresConfirmation bool `json:"requires_confirmation" yaml:"requires_confirmation" mapstructure:"requires_confirmation"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1082,6 +1085,9 @@ func (j *ToolInfo) UnmarshalJSON(value []byte) error {
 	}
 	if _, ok := raw["name"]; raw != nil && !ok {
 		return fmt.Errorf("field name in ToolInfo: required")
+	}
+	if _, ok := raw["requires_confirmation"]; raw != nil && !ok {
+		return fmt.Errorf("field requires_confirmation in ToolInfo: required")
 	}
 	type Plain ToolInfo
 	var plain Plain

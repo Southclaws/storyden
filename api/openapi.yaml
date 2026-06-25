@@ -11807,6 +11807,8 @@ components:
       oneOf:
         - $ref: "#/components/schemas/ToolUIPartInputStreaming"
         - $ref: "#/components/schemas/ToolUIPartInputAvailable"
+        - $ref: "#/components/schemas/ToolUIPartApprovalRequested"
+        - $ref: "#/components/schemas/ToolUIPartApprovalResponded"
         - $ref: "#/components/schemas/ToolUIPartOutputAvailable"
         - $ref: "#/components/schemas/ToolUIPartOutputError"
       discriminator:
@@ -11814,6 +11816,8 @@ components:
         mapping:
           input-streaming: "#/components/schemas/ToolUIPartInputStreaming"
           input-available: "#/components/schemas/ToolUIPartInputAvailable"
+          approval-requested: "#/components/schemas/ToolUIPartApprovalRequested"
+          approval-responded: "#/components/schemas/ToolUIPartApprovalResponded"
           output-available: "#/components/schemas/ToolUIPartOutputAvailable"
           output-error: "#/components/schemas/ToolUIPartOutputError"
       description: A tool invocation part (dynamic-tool format matching Vercel AI SDK)
@@ -11838,6 +11842,8 @@ components:
         providerExecuted:
           type: boolean
           description: Whether the tool was executed by the provider
+        callProviderMetadata:
+          $ref: "#/components/schemas/ArbitraryData"
 
     ToolUIPartInputStreaming:
       allOf:
@@ -11866,6 +11872,49 @@ components:
               type: object
               additionalProperties: true
               description: Complete input arguments
+
+    ToolApprovalState:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        approved:
+          type: boolean
+        reason:
+          type: string
+
+    ToolUIPartApprovalRequested:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, approval]
+          properties:
+            state:
+              type: string
+              enum: [approval-requested]
+            input:
+              type: object
+              additionalProperties: true
+              description: Complete input arguments awaiting approval
+            approval:
+              $ref: "#/components/schemas/ToolApprovalState"
+
+    ToolUIPartApprovalResponded:
+      allOf:
+        - $ref: "#/components/schemas/ToolUIPartBase"
+        - type: object
+          required: [state, input, approval]
+          properties:
+            state:
+              type: string
+              enum: [approval-responded]
+            input:
+              type: object
+              additionalProperties: true
+              description: Complete input arguments that received an approval decision
+            approval:
+              $ref: "#/components/schemas/ToolApprovalState"
 
     ToolUIPartOutputAvailable:
       allOf:
@@ -11968,11 +12017,11 @@ components:
 
     RobotToolSource:
       type: string
-      enum: [native, mcp]
+      enum: [native, mcp, plugin]
 
     RobotToolInfo:
       type: object
-      required: [id, callable_name, source, available, description]
+      required: [id, callable_name, source, available, description, requires_confirmation]
       properties:
         id:
           type: string
@@ -11990,6 +12039,9 @@ components:
         available:
           type: boolean
           description: Whether the tool can currently be attached to a Robot run.
+        requires_confirmation:
+          type: boolean
+          description: Whether Robot runs must pause for human approval before executing this tool.
 
     RobotToolInfoList:
       type: array
@@ -12569,6 +12621,7 @@ components:
         - "$ref": "#/components/schemas/ToolInputStartPart"
         - "$ref": "#/components/schemas/ToolInputDeltaPart"
         - "$ref": "#/components/schemas/ToolInputAvailablePart"
+        - "$ref": "#/components/schemas/ToolApprovalRequestPart"
         - "$ref": "#/components/schemas/ToolOutputAvailablePart"
         - "$ref": "#/components/schemas/StartStepPart"
         - "$ref": "#/components/schemas/FinishStepPart"
@@ -12591,6 +12644,7 @@ components:
           tool-input-start: "#/components/schemas/ToolInputStartPart"
           tool-input-delta: "#/components/schemas/ToolInputDeltaPart"
           tool-input-available: "#/components/schemas/ToolInputAvailablePart"
+          tool-approval-request: "#/components/schemas/ToolApprovalRequestPart"
           tool-output-available: "#/components/schemas/ToolOutputAvailablePart"
           start-step: "#/components/schemas/StartStepPart"
           finish-step: "#/components/schemas/FinishStepPart"
@@ -12774,6 +12828,8 @@ components:
           "$ref": "#/components/schemas/Id"
         toolName:
           "$ref": "#/components/schemas/NonEmptyString"
+        providerMetadata:
+          $ref: "#/components/schemas/ArbitraryData"
 
     ToolInputDeltaPart:
       type: object
@@ -12805,6 +12861,24 @@ components:
           "$ref": "#/components/schemas/NonEmptyString"
         input:
           $ref: "#/components/schemas/ArbitraryData"
+        providerMetadata:
+          $ref: "#/components/schemas/ArbitraryData"
+
+    ToolApprovalRequestPart:
+      type: object
+      required:
+        - type
+        - toolCallId
+        - approvalId
+      properties:
+        type:
+          const: tool-approval-request
+        toolCallId:
+          "$ref": "#/components/schemas/Id"
+        approvalId:
+          "$ref": "#/components/schemas/Id"
+        isAutomatic:
+          type: boolean
 
     ToolOutputAvailablePart:
       type: object

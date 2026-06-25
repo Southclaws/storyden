@@ -15,4 +15,5 @@ export type RobotToolSource =
 export const RobotToolSource = {
   native: "native",
   mcp: "mcp",
+  plugin: "plugin",
 } as const;

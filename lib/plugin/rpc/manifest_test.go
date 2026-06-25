@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -59,6 +60,80 @@ func TestManifestValidate(t *testing.T) {
 		require.ErrorContains(t, err, "invalid plugin author")
 		require.ErrorContains(t, err, "invalid plugin name")
 		require.ErrorContains(t, err, "invalid events_consumed value")
+	})
+
+	t.Run("valid robot tool provider", func(t *testing.T) {
+		m := Manifest{
+			ID:          "my-plugin",
+			Name:        "My Plugin",
+			Description: "desc",
+			Version:     "0.0.1",
+			Author:      "you",
+			Command:     "./plugin",
+			Capabilities: []CapabilityConfig{
+				{CapabilityConfigUnion: &RobotToolProviderCapabilityConfig{
+					Type:    "robot.tool_provider",
+					ID:      "tools",
+					Version: "v1",
+					Tools: []RobotToolProviderToolConfig{
+						{
+							ID:          "lookup",
+							Name:        "Lookup",
+							Description: "Looks up a thing.",
+							InputSchema: map[string]any{
+								"type":       "object",
+								"properties": map[string]any{},
+							},
+							OutputSchema: opt.New[RobotToolJSONSchema](map[string]any{
+								"type":       "object",
+								"properties": map[string]any{},
+							}),
+						},
+					},
+				}},
+			},
+		}
+
+		require.NoError(t, m.Validate())
+	})
+
+	t.Run("invalid robot tool provider", func(t *testing.T) {
+		m := Manifest{
+			ID:          "my-plugin",
+			Name:        "My Plugin",
+			Description: "desc",
+			Version:     "0.0.1",
+			Author:      "you",
+			Command:     "./plugin",
+			Capabilities: []CapabilityConfig{
+				{CapabilityConfigUnion: &RobotToolProviderCapabilityConfig{
+					Type:    "robot.tool_provider",
+					ID:      "bad-provider",
+					Version: "v1",
+					Tools: []RobotToolProviderToolConfig{
+						{
+							ID:          "bad-tool",
+							Name:        "Bad",
+							Description: "Bad.",
+							InputSchema: map[string]any{"type": "string"},
+						},
+						{
+							ID:          "bad-tool",
+							Name:        "Bad again",
+							Description: "Bad again.",
+							InputSchema: map[string]any{"type": "object"},
+						},
+					},
+				}},
+			},
+		}
+
+		err := m.Validate()
+		require.Error(t, err)
+		require.ErrorContains(t, err, "invalid capabilities id")
+		require.ErrorContains(t, err, "invalid robot tool id")
+		require.ErrorContains(t, err, "duplicate robot tool id")
+		require.ErrorContains(t, err, "invalid robot tool input_schema")
 	})
 }
 

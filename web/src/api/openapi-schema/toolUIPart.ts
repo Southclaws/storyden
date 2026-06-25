@@ -7,6 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.12-post
  */
+import type { ToolUIPartApprovalRequested } from "./toolUIPartApprovalRequested";
+import type { ToolUIPartApprovalResponded } from "./toolUIPartApprovalResponded";
 import type { ToolUIPartInputAvailable } from "./toolUIPartInputAvailable";
 import type { ToolUIPartInputStreaming } from "./toolUIPartInputStreaming";
 import type { ToolUIPartOutputAvailable } from "./toolUIPartOutputAvailable";
@@ -21,6 +23,12 @@ export type ToolUIPart =
       type: ToolUIPartType;
     })
   | (ToolUIPartInputAvailable & {
+      type: ToolUIPartType;
+    })
+  | (ToolUIPartApprovalRequested & {
+      type: ToolUIPartType;
+    })
+  | (ToolUIPartApprovalResponded & {
       type: ToolUIPartType;
     })
   | (ToolUIPartOutputAvailable & {

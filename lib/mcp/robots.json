@@ -705,11 +705,16 @@
         "name": {
           "description": "The tool name identifier",
           "type": "string"
+        },
+        "requires_confirmation": {
+          "description": "Whether Robot runs must pause for human approval before executing this tool.",
+          "type": "boolean"
         }
       },
       "required": [
         "name",
-        "description"
+        "description",
+        "requires_confirmation"
       ],
       "type": "object"
     },

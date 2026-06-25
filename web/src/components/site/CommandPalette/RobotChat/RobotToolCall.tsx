@@ -8,7 +8,11 @@ import {
   ToolLibraryRequestPageOutput,
   ToolRobotDeleteInput,
 } from "@/api/robots";
-import { getToolName, isToolType } from "@/api/robots-types";
+import {
+  type StorydenUIMessage,
+  getToolName,
+  isToolType,
+} from "@/api/robots-types";
 import { Button } from "@/components/ui/button";
 import { ToolIcon } from "@/components/ui/icons/Tool";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
@@ -20,9 +24,18 @@ type Props = {
   part: UIMessagePart<UIDataTypes, StorydenTools>;
 };
 
-export type ConfirmationPart = UIMessagePart<UIDataTypes, StorydenTools> & {
-  type: "tool-robot_delete";
+export type ConfirmationPart = {
+  type: `tool-${string}`;
   toolCallId: string;
+  toolName?: string;
+  state?: string;
+  input?: unknown;
+  output?: unknown;
+  approval?: {
+    id: string;
+    approved?: boolean;
+    reason?: string;
+  };
 };
 
 export function RobotToolCall({ part }: Props) {
@@ -196,65 +209,77 @@ function RobotToolCallContent({ part }: Props) {
 }
 
 function RobotToolCallStatus({ part }: Props) {
+  const { messages } = useRobotChat();
+
   if (!isToolUIPart(part)) {
     return null;
   }
 
+  const confirmationResolution = getToolConfirmationResolution(part, messages);
+
   const label = match(part.state)
+    .with("approval-requested", () =>
+      confirmationResolution === "denied"
+        ? "Denied"
+        : confirmationResolution === "approved"
+          ? "Tool complete"
+          : "Needs approval",
+    )
+    .with("approval-responded", () => "Tool complete")
     .with("input-available", () =>
-      part.type === "tool-robot_delete" ||
-      String(part.type) === "tool-adk_request_confirmation"
-        ? "Needs approval"
-        : part.type === "tool-library_request_page"
-          ? "Needs selection"
-          : "Running tool",
+      part.type === "tool-library_request_page"
+        ? "Needs selection"
+        : "Running tool",
     )
     .with("input-streaming", () => "Running tool")
     .with("output-available", () => "Tool complete")
     .with("output-error", () => "Error")
+    .with("output-denied", () => "Denied")
     .otherwise(() => "Tool complete");
 
   return <styled.span>{label}</styled.span>;
 }
 
 function RobotToolConfirmation({ part }: Props) {
-  const { resolveToolConfirmation } = useRobotChat();
+  const { messages, resolveToolConfirmation } = useRobotChat();
 
   if (!isToolUIPart(part)) {
     return null;
   }
 
-  if (part.type !== "tool-robot_delete" || part.state !== "input-available") {
+  if (
+    part.state !== "approval-requested" ||
+    !part.approval?.id ||
+    getToolConfirmationResolution(part, messages)
+  ) {
     return null;
   }
 
   return (
     <HStack gap="2" justifyContent="flex-start">
       <Button
-        aria-label="Approve robot delete"
+        aria-label="Approve"
         size="xs"
         variant="solid"
         onClick={() =>
           resolveToolConfirmation({
-            toolName: "robot_delete",
-            toolCallId: part.toolCallId,
+            approvalId: part.approval.id,
+            toolName: getToolPartName(part),
             approved: true,
-            input: part.input,
           })
         }
       >
         Approve
       </Button>
       <Button
-        aria-label="Deny robot delete"
+        aria-label="Deny"
         size="xs"
         variant="outline"
         onClick={() =>
           resolveToolConfirmation({
-            toolName: "robot_delete",
-            toolCallId: part.toolCallId,
+            approvalId: part.approval.id,
+            toolName: getToolPartName(part),
             approved: false,
-            input: part.input,
           })
         }
       >
@@ -269,17 +294,23 @@ export function RobotToolConfirmationBatch({
 }: {
   parts: ConfirmationPart[];
 }) {
-  const { resolveToolConfirmation, robots } = useRobotChat();
-  const pendingParts = parts.filter((part) => part.state === "input-available");
+  const { messages, resolveToolConfirmation, robots } = useRobotChat();
+  const pendingParts = parts.filter(
+    (part) =>
+      part.state === "approval-requested" &&
+      !getToolConfirmationResolution(part, messages),
+  );
   const hasPending = pendingParts.length > 0;
+  const isPartiallyResolved = hasPending && pendingParts.length !== parts.length;
 
   const resolvePart = (part: ConfirmationPart, approved: boolean) =>
-    resolveToolConfirmation({
-      toolName: "robot_delete",
-      toolCallId: part.toolCallId,
-      approved,
-      input: part.input,
-    });
+    part.approval?.id
+      ? resolveToolConfirmation({
+          approvalId: part.approval.id,
+          toolName: getToolPartName(part),
+          approved,
+        })
+      : Promise.resolve();
 
   const resolveAll = async (approved: boolean) => {
     for (const part of pendingParts) {
@@ -290,7 +321,7 @@ export function RobotToolConfirmationBatch({
   return (
     <LStack
       role="group"
-      aria-label="Confirmation batch"
+      aria-label={isPartiallyResolved ? "Partial approvals" : "Confirmation batch"}
       className="group"
       gap="2"
       pl="3"
@@ -319,6 +350,7 @@ export function RobotToolConfirmationBatch({
           <ConfirmationBatchRow
             key={part.toolCallId}
             part={part}
+            resolution={getToolConfirmationResolution(part, messages)}
             label={formatConfirmationAction(part, index, robots)}
             onApprove={() => resolvePart(part, true)}
             onDeny={() => resolvePart(part, false)}
@@ -352,17 +384,23 @@ export function RobotToolConfirmationBatch({
 
 function ConfirmationBatchRow({
   part,
+  resolution,
   label,
   onApprove,
   onDeny,
 }: {
   part: ConfirmationPart;
+  resolution?: ConfirmationResolution;
   label: string;
   onApprove: () => void;
   onDeny: () => void;
 }) {
-  const pending = part.state === "input-available";
-  const denied = isConfirmationDenied(part.output);
+  const pending = part.state === "approval-requested" && !resolution;
+  const denied =
+    resolution === "denied" ||
+    part.state === "output-denied" ||
+    part.approval?.approved === false ||
+    isConfirmationDenied(part.output);
 
   return (
     <HStack
@@ -427,8 +465,85 @@ function formatConfirmationAction(
 
 export function isConfirmationToolPart(
   part: UIMessagePart<UIDataTypes, StorydenTools>,
-): part is ConfirmationPart {
-  return isToolUIPart(part) && part.type === "tool-robot_delete";
+): boolean {
+  return (
+    isToolUIPart(part) &&
+    (part.state === "approval-requested" ||
+      part.state === "approval-responded" ||
+      part.state === "output-denied")
+  );
+}
+
+function getToolPartName(part: { type: string; toolName?: string }) {
+  if (part.toolName) {
+    return part.toolName;
+  }
+  if (part.type.startsWith("tool-")) {
+    return part.type.slice("tool-".length);
+  }
+  return undefined;
+}
+
+type ConfirmationResolution = "approved" | "denied";
+
+function getToolConfirmationResolution(
+  part: { toolCallId?: string; approval?: { id?: string } },
+  messages: readonly StorydenUIMessage[],
+): ConfirmationResolution | undefined {
+  const approvalID = part.approval?.id ?? part.toolCallId;
+  if (!approvalID) {
+    return undefined;
+  }
+
+  for (const message of messages) {
+    for (const messagePart of message.parts ?? []) {
+      if (!isToolUIPart(messagePart) || messagePart.toolCallId !== approvalID) {
+        continue;
+      }
+
+      if (messagePart.state === "approval-responded") {
+        if (messagePart.approval?.approved === false) {
+          return "denied";
+        }
+        if (messagePart.approval?.approved === true) {
+          return "approved";
+        }
+      }
+
+      if (
+        isAdkRequestConfirmationPart(messagePart) &&
+        messagePart.state === "output-available" &&
+        "output" in messagePart
+      ) {
+        const confirmed = getConfirmationOutputDecision(messagePart.output);
+        if (confirmed === false) {
+          return "denied";
+        }
+        if (confirmed === true) {
+          return "approved";
+        }
+      }
+
+      if (messagePart.state === "output-denied") {
+        return "denied";
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function isAdkRequestConfirmationPart(part: { type: string }) {
+  return part.type === "tool-adk_request_confirmation";
+}
+
+function getConfirmationOutputDecision(output: unknown): boolean | undefined {
+  if (!output || typeof output !== "object" || !("confirmed" in output)) {
+    return undefined;
+  }
+
+  const confirmed = output.confirmed;
+  return typeof confirmed === "boolean" ? confirmed : undefined;
 }
 
 function RobotLibraryPageRequest({ part }: Props) {

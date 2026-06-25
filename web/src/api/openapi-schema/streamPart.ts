@@ -24,6 +24,7 @@ import type { StartStepPart } from "./startStepPart";
 import type { TextDeltaPart } from "./textDeltaPart";
 import type { TextEndPart } from "./textEndPart";
 import type { TextStartPart } from "./textStartPart";
+import type { ToolApprovalRequestPart } from "./toolApprovalRequestPart";
 import type { ToolInputAvailablePart } from "./toolInputAvailablePart";
 import type { ToolInputDeltaPart } from "./toolInputDeltaPart";
 import type { ToolInputStartPart } from "./toolInputStartPart";
@@ -73,6 +74,9 @@ export type StreamPart =
       type: NonEmptyString;
     })
   | (ToolInputAvailablePart & {
+      type: NonEmptyString;
+    })
+  | (ToolApprovalRequestPart & {
       type: NonEmptyString;
     })
   | (ToolOutputAvailablePart & {

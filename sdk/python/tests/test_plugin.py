@@ -7,6 +7,7 @@ import pytest
 import websockets
 
 from storyden import Plugin
+from storyden.rpc import models
 
 
 def _server_port(server: websockets.asyncio.server.Server) -> int:
@@ -222,6 +223,226 @@ async def test_configure_handler_rejection_returns_not_ok() -> None:
     @plugin.on_configure
     async def _on_configure(_config: dict[str, object]) -> bool:
         return False
+
+    run_task = asyncio.create_task(plugin.run())
+
+    try:
+        await plugin.wait_until_connected(timeout=2.0)
+        await asyncio.wait_for(ack_received.wait(), timeout=2.0)
+    finally:
+        await plugin.shutdown()
+        await run_task
+        stop_event.set()
+        server.close()
+        await server.wait_closed()
+
+
+@pytest.mark.asyncio
+async def test_robot_tool_call_dispatch_and_response() -> None:
+    stop_event = asyncio.Event()
+    call_received = asyncio.Event()
+    ack_received = asyncio.Event()
+
+    async def handler(websocket) -> None:
+        await websocket.send(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": "9m4e2mr0ui3e8a215n4j",
+                    "method": "robot_tool_call",
+                    "params": {
+                        "provider_id": "discord",
+                        "tool_id": "list_channels",
+                        "call_id": "call_123",
+                        "session_id": "session_123",
+                        "account_id": "account_123",
+                        "arguments": {
+                            "include_active_threads": True,
+                        },
+                    },
+                }
+            )
+        )
+
+        response = json.loads(await websocket.recv())
+        assert response["id"] == "9m4e2mr0ui3e8a215n4j"
+        assert response["result"]["method"] == "robot_tool_call"
+        assert response["result"]["output"] == {"ok": True}
+
+        ack_received.set()
+        await stop_event.wait()
+
+    server = await websockets.serve(handler, "127.0.0.1", 0)
+    port = _server_port(server)
+
+    plugin = Plugin(f"ws://127.0.0.1:{port}/rpc?token=sdprt_external_test_token")
+
+    @plugin.on_robot_tool_call()
+    async def _on_robot_tool_call(params: models.RPCRequestRobotToolCallParams) -> dict[str, object]:
+        assert params.provider_id == "discord"
+        assert params.tool_id == "list_channels"
+        assert params.call_id == "call_123"
+        assert params.arguments["include_active_threads"] is True
+        call_received.set()
+        return {"ok": True}
+
+    run_task = asyncio.create_task(plugin.run())
+
+    try:
+        await plugin.wait_until_connected(timeout=2.0)
+        await asyncio.wait_for(call_received.wait(), timeout=2.0)
+        await asyncio.wait_for(ack_received.wait(), timeout=2.0)
+    finally:
+        await plugin.shutdown()
+        await run_task
+        stop_event.set()
+        server.close()
+        await server.wait_closed()
+
+
+@pytest.mark.asyncio
+async def test_robot_tool_call_can_return_tool_error() -> None:
+    stop_event = asyncio.Event()
+    ack_received = asyncio.Event()
+
+    async def handler(websocket) -> None:
+        await websocket.send(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": "9m4e2mr0ui3e8a215n4k",
+                    "method": "robot_tool_call",
+                    "params": {
+                        "provider_id": "discord",
+                        "tool_id": "send_message",
+                        "call_id": "call_456",
+                        "session_id": "session_123",
+                        "account_id": "account_123",
+                        "arguments": {},
+                    },
+                }
+            )
+        )
+
+        response = json.loads(await websocket.recv())
+        assert response["id"] == "9m4e2mr0ui3e8a215n4k"
+        assert response["result"]["method"] == "robot_tool_call"
+        assert response["result"]["error"] == "channel_id is required"
+
+        ack_received.set()
+        await stop_event.wait()
+
+    server = await websockets.serve(handler, "127.0.0.1", 0)
+    port = _server_port(server)
+
+    plugin = Plugin(f"ws://127.0.0.1:{port}/rpc?token=sdprt_external_test_token")
+
+    @plugin.on_robot_tool_call
+    def _on_robot_tool_call(_params: models.RPCRequestRobotToolCallParams) -> models.RPCResponseRobotToolCall:
+        return models.RPCResponseRobotToolCall(method="robot_tool_call", error="channel_id is required")
+
+    run_task = asyncio.create_task(plugin.run())
+
+    try:
+        await plugin.wait_until_connected(timeout=2.0)
+        await asyncio.wait_for(ack_received.wait(), timeout=2.0)
+    finally:
+        await plugin.shutdown()
+        await run_task
+        stop_event.set()
+        server.close()
+        await server.wait_closed()
+
+
+@pytest.mark.asyncio
+async def test_robot_tool_call_without_handler_returns_json_rpc_error() -> None:
+    stop_event = asyncio.Event()
+    ack_received = asyncio.Event()
+
+    async def handler(websocket) -> None:
+        await websocket.send(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": "9m4e2mr0ui3e8a215n4l",
+                    "method": "robot_tool_call",
+                    "params": {
+                        "provider_id": "discord",
+                        "tool_id": "list_channels",
+                        "call_id": "call_789",
+                        "session_id": "session_123",
+                        "account_id": "account_123",
+                        "arguments": {},
+                    },
+                }
+            )
+        )
+
+        response = json.loads(await websocket.recv())
+        assert response["id"] == "9m4e2mr0ui3e8a215n4l"
+        assert response["error"]["code"] == -32601
+        assert response["error"]["message"] == "robot tool call handler is not registered"
+
+        ack_received.set()
+        await stop_event.wait()
+
+    server = await websockets.serve(handler, "127.0.0.1", 0)
+    port = _server_port(server)
+
+    plugin = Plugin(f"ws://127.0.0.1:{port}/rpc?token=sdprt_external_test_token")
+    run_task = asyncio.create_task(plugin.run())
+
+    try:
+        await plugin.wait_until_connected(timeout=2.0)
+        await asyncio.wait_for(ack_received.wait(), timeout=2.0)
+    finally:
+        await plugin.shutdown()
+        await run_task
+        stop_event.set()
+        server.close()
+        await server.wait_closed()
+
+
+@pytest.mark.asyncio
+async def test_robot_tool_call_handler_error_returns_json_rpc_error() -> None:
+    stop_event = asyncio.Event()
+    ack_received = asyncio.Event()
+
+    async def handler(websocket) -> None:
+        await websocket.send(
+            json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": "9m4e2mr0ui3e8a215n4m",
+                    "method": "robot_tool_call",
+                    "params": {
+                        "provider_id": "discord",
+                        "tool_id": "send_message",
+                        "call_id": "call_abc",
+                        "session_id": "session_123",
+                        "account_id": "account_123",
+                        "arguments": {},
+                    },
+                }
+            )
+        )
+
+        response = json.loads(await websocket.recv())
+        assert response["id"] == "9m4e2mr0ui3e8a215n4m"
+        assert response["error"]["code"] == -32000
+        assert response["error"]["message"] == "discord rejected the request"
+
+        ack_received.set()
+        await stop_event.wait()
+
+    server = await websockets.serve(handler, "127.0.0.1", 0)
+    port = _server_port(server)
+
+    plugin = Plugin(f"ws://127.0.0.1:{port}/rpc?token=sdprt_external_test_token")
+
+    @plugin.on_robot_tool_call
+    def _on_robot_tool_call(_params: models.RPCRequestRobotToolCallParams) -> dict[str, object]:
+        raise RuntimeError("discord rejected the request")
 
     run_task = asyncio.create_task(plugin.run())
 

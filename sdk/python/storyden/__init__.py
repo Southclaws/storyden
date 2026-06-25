@@ -5,7 +5,7 @@ from .errors import (
     RPCError,
     StorydenError,
 )
-from .plugin import AccessCredentials, ConfigureHandler, Plugin, PluginMode
+from .plugin import AccessCredentials, ConfigureHandler, Plugin, PluginMode, RobotToolCallHandler
 from .rpc.models import Event
 
 __all__ = [
@@ -18,6 +18,7 @@ __all__ = [
     "PluginConnectionClosedError",
     "PluginMode",
     "RPCError",
+    "RobotToolCallHandler",
     "StorydenError",
     "__version__",
 ]

@@ -322,6 +322,95 @@ func TestConfigureHandlerErrorRespondsNotOK(t *testing.T) {
 	}
 }
 
+func TestRobotToolCallHandlerRespondsWithOutput(t *testing.T) {
+	received := make(chan rpc.RPCRequestRobotToolCallParams, 1)
+	ackReceived := make(chan map[string]interface{}, 1)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		conn, err := websocket.Accept(w, r, nil)
+		if err != nil {
+			return
+		}
+		defer conn.CloseNow()
+
+		reqID := xid.New()
+		req := rpc.RPCRequestRobotToolCall{
+			ID:      reqID,
+			Jsonrpc: "2.0",
+			Method:  "robot_tool_call",
+			Params: rpc.RPCRequestRobotToolCallParams{
+				ProviderID: "discord",
+				ToolID:     "list_channels",
+				CallID:     "call_123",
+				SessionID:  "session_123",
+				AccountID:  "account_123",
+				Arguments: map[string]interface{}{
+					"include_active_threads": true,
+				},
+			},
+		}
+
+		reqBytes, err := json.Marshal(req)
+		require.NoError(t, err)
+		require.NoError(t, conn.Write(r.Context(), websocket.MessageText, reqBytes))
+
+		_, responseBytes, err := conn.Read(r.Context())
+		require.NoError(t, err)
+
+		var response rpc.HostToPluginResponse
+		require.NoError(t, json.Unmarshal(responseBytes, &response))
+		toolResponse, ok := response.Result.HostToPluginResponseUnionUnion.(*rpc.RPCResponseRobotToolCall)
+		require.True(t, ok)
+		ackReceived <- toolResponse.Output
+
+		_ = conn.Close(websocket.StatusNormalClosure, "done")
+	}))
+	defer srv.Close()
+
+	t.Setenv("STORYDEN_RPC_URL", wsURLWithToken(srv.URL, "sdprt_test_robot_tool_call_123456"))
+
+	pl, err := New(context.Background())
+	require.NoError(t, err)
+
+	pl.OnRobotToolCall(func(_ context.Context, req rpc.RPCRequestRobotToolCallParams) (rpc.RPCResponseRobotToolCall, error) {
+		received <- req
+		return rpc.RPCResponseRobotToolCall{
+			Method: "robot_tool_call",
+			Output: map[string]interface{}{
+				"ok": true,
+			},
+		}, nil
+	})
+
+	runDone := make(chan error, 1)
+	go func() {
+		runDone <- pl.Run(context.Background())
+	}()
+
+	select {
+	case req := <-received:
+		assert.Equal(t, "discord", req.ProviderID)
+		assert.Equal(t, "list_channels", req.ToolID)
+		assert.Equal(t, true, req.Arguments["include_active_threads"])
+	case <-time.After(2 * time.Second):
+		t.Fatal("robot tool call callback was not called")
+	}
+
+	select {
+	case output := <-ackReceived:
+		assert.Equal(t, true, output["ok"])
+	case <-time.After(2 * time.Second):
+		t.Fatal("robot tool call response ack was not received by test server")
+	}
+
+	select {
+	case err := <-runDone:
+		require.NoError(t, err)
+	case <-time.After(2 * time.Second):
+		t.Fatal("run did not return")
+	}
+}
+
 func TestRPCResponseBase_DistinguishesFromRequest(t *testing.T) {
 	messageID := xid.New()
 	responseMessage := fmt.Sprintf(`{

@@ -42,7 +42,7 @@ export function getToolName(
     return "Unknown";
   }
 
-  const rawName = part.type.replace(/^tool-/, "");
+  const rawName = getRawToolName(part);
 
   if (rawName === "adk_request_confirmation") {
     return "Confirmation";
@@ -52,4 +52,12 @@ export function getToolName(
     .split("_")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+export function getRawToolName(part: { type: string }): string {
+  if (!part.type.startsWith("tool-")) {
+    return "";
+  }
+
+  return String(part.type).replace(/^tool-/, "");
 }

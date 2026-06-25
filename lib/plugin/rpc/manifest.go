@@ -17,6 +17,7 @@ var IDPattern = regexp.MustCompile(`^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`)
 var AuthorPattern = regexp.MustCompile(`^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`)
 
 var CapabilityIDPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]*$`)
+var RobotToolIDPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_]*$`)
 
 var (
 	ErrInvalidPluginName = fmt.Errorf("plugin name cannot be empty")
@@ -133,6 +134,37 @@ func (m *Manifest) Validate() error {
 				internal = append(internal, fmt.Sprintf("empty capabilities version for %q: %q", config.Type, config.ID))
 				external = append(external, `Field "capabilities.version" cannot be empty.`)
 			}
+		case *RobotToolProviderCapabilityConfig:
+			if !RobotToolIDPattern.MatchString(config.ID) {
+				internal = append(internal, fmt.Sprintf("invalid capabilities id for %q: %q", config.Type, config.ID))
+				external = append(external, `Field "capabilities.id" for robot.tool_provider is invalid. Use letters, numbers, and underscores only.`)
+			}
+			if config.Version == "" {
+				internal = append(internal, fmt.Sprintf("empty capabilities version for %q: %q", config.Type, config.ID))
+				external = append(external, `Field "capabilities.version" cannot be empty.`)
+			}
+			seenTools := map[string]struct{}{}
+			for _, tool := range config.Tools {
+				if !RobotToolIDPattern.MatchString(tool.ID) {
+					internal = append(internal, fmt.Sprintf("invalid robot tool id for provider %q: %q", config.ID, tool.ID))
+					external = append(external, `Field "capabilities.tools.id" is invalid. Use letters, numbers, and underscores only.`)
+				}
+				if _, ok := seenTools[tool.ID]; ok {
+					internal = append(internal, fmt.Sprintf("duplicate robot tool id for provider %q: %q", config.ID, tool.ID))
+					external = append(external, `Field "capabilities.tools.id" contains a duplicate value.`)
+				}
+				seenTools[tool.ID] = struct{}{}
+				if err := validateRobotToolSchema(tool.InputSchema); err != nil {
+					internal = append(internal, fmt.Sprintf("invalid robot tool input_schema for provider %q tool %q: %v", config.ID, tool.ID, err))
+					external = append(external, `Field "capabilities.tools.input_schema" must be a JSON Schema object with type "object".`)
+				}
+				if raw, ok := tool.OutputSchema.Get(); ok {
+					if err := validateRobotToolSchema(raw); err != nil {
+						internal = append(internal, fmt.Sprintf("invalid robot tool output_schema for provider %q tool %q: %v", config.ID, tool.ID, err))
+						external = append(external, `Field "capabilities.tools.output_schema" must be a JSON Schema object with type "object".`)
+					}
+				}
+			}
 		default:
 			internal = append(internal, fmt.Sprintf("unsupported capabilities entry: %T", capability.CapabilityConfigUnion))
 			external = append(external, `Field "capabilities" contains an unsupported capability type.`)
@@ -148,5 +180,22 @@ func (m *Manifest) Validate() error {
 		)
 	}
 
+	return nil
+}
+
+func validateRobotToolSchema(raw RobotToolJSONSchema) error {
+	b, err := json.Marshal(raw)
+	if err != nil {
+		return err
+	}
+	var schema struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(b, &schema); err != nil {
+		return err
+	}
+	if schema.Type != "object" {
+		return fmt.Errorf("schema type must be object")
+	}
 	return nil
 }

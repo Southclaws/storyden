@@ -14,6 +14,7 @@ import type { ToolInputAvailablePartType } from "./toolInputAvailablePartType";
 
 export interface ToolInputAvailablePart {
   input: ArbitraryData;
+  providerMetadata?: ArbitraryData;
   toolCallId: Id;
   toolName: NonEmptyString;
   type: ToolInputAvailablePartType;

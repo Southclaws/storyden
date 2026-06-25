@@ -39,6 +39,9 @@ type Handler func(ctx context.Context, args json.RawMessage) (json.RawMessage, e
 // executor as well as the definition and a flag for if it's a client-side tool.
 type Tool struct {
 	Definition *mcp.ToolDefinition
+	// Source identifies where the tool came from for catalogues and UI labels.
+	// Empty means a built-in Storyden tool.
+	Source string
 	// CallableName is the name exposed to ADK/model providers. Native tools use
 	// Definition.Name; dynamic MCP tools may need a stricter generated name.
 	CallableName string
@@ -74,6 +77,10 @@ func ContextWithConfirmationDisabled(ctx context.Context) context.Context {
 func confirmationDisabled(ctx context.Context) bool {
 	v, _ := ctx.Value(confirmationDisabledContextKey{}).(bool)
 	return v
+}
+
+func ConfirmationDisabled(ctx context.Context) bool {
+	return confirmationDisabled(ctx)
 }
 
 func (t Tools) ToADKTools(ctx context.Context) ([]adktool.Tool, error) {

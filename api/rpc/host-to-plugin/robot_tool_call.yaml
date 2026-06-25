@@ -1,0 +1,62 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestRobotToolCallParams:
+    type: object
+    required:
+      - provider_id
+      - tool_id
+      - call_id
+      - session_id
+      - account_id
+      - arguments
+    properties:
+      provider_id:
+        type: string
+        description: Tool provider identifier declared by the plugin manifest.
+      tool_id:
+        type: string
+        description: Provider-local tool identifier declared by the plugin manifest.
+      call_id:
+        type: string
+        description: Host-generated tool call identifier.
+      robot_id:
+        type: string
+        description: Active Robot identifier when the call came from a custom Robot.
+      session_id:
+        type: string
+        description: Robot session identifier.
+      account_id:
+        type: string
+        description: Account identifier for the user who invoked the Robot run.
+      arguments:
+        type: object
+        additionalProperties: true
+
+  RPCRequestRobotToolCall:
+    description: >
+      Executes a manifest-declared Robot tool provided by a plugin.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_tool_call"
+          params:
+            $ref: "#/$defs/RPCRequestRobotToolCallParams"
+
+  RPCResponseRobotToolCall:
+    description: >
+      Returns a structured result from a plugin-provided Robot tool.
+    type: object
+    required: ["method"]
+    properties:
+      method:
+        type: string
+        const: "robot_tool_call"
+      output:
+        type: object
+        additionalProperties: true
+      error:
+        type: string
