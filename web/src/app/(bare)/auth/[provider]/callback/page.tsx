@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { oAuthProviderCallback } from "src/api/openapi-client/auth";
-import { Unready } from "src/components/site/Unready";
+import { oAuthProviderCallback } from "@/api/openapi-client/auth";
+import { Unready } from "@/components/site/Unready";
 
 import { handle } from "@/api/client";
 import { OAuthCallback } from "@/api/openapi-schema";

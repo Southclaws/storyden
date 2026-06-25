@@ -5,10 +5,10 @@ import {
   Permission,
   ThreadReference,
   Visibility,
-} from "src/api/openapi-schema";
-import { useSession } from "src/auth";
-import { Byline } from "src/components/content/Byline";
-import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
+} from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { Byline } from "@/components/content/Byline";
+import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
 
 import { Card } from "@/components/ui/rich-card";
 import { Box, HStack, styled } from "@/styled-system/jsx";

@@ -1,4 +1,4 @@
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { Heading } from "@/components/ui/heading";
 import { CardBox, LStack } from "@/styled-system/jsx";

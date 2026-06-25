@@ -1,4 +1,4 @@
-import { ThreadReference } from "src/api/openapi-schema";
+import { ThreadReference } from "@/api/openapi-schema";
 
 import { styled } from "@/styled-system/jsx";
 

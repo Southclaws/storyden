@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
-import { authPasswordSignin } from "src/api/openapi-client/auth";
-import { APIError } from "src/api/openapi-schema";
-import { passkeyLogin } from "src/components/auth/webauthn/utils";
-import { deriveError } from "src/utils/error";
+import { useAccountGet } from "@/api/openapi-client/accounts";
+import { authPasswordSignin } from "@/api/openapi-client/auth";
+import { APIError } from "@/api/openapi-schema";
+import { passkeyLogin } from "@/components/auth/webauthn/utils";
+import { deriveError } from "@/utils/error";
 
 import { ExistingPasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
 import { isWebauthnAvailable } from "@/lib/auth/webauthn";

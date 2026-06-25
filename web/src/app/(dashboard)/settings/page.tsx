@@ -1,4 +1,4 @@
-import { SettingsScreen } from "src/screens/settings/SettingsScreen";
+import { SettingsScreen } from "@/screens/settings/SettingsScreen";
 
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getSettings } from "@/lib/settings/settings-server";

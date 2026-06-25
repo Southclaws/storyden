@@ -3,7 +3,7 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "src/components/site/Action/More";
+import { MoreAction } from "@/components/site/Action/More";
 
 import { DeleteWithConfirmationMenuItem } from "@/components/site/DeleteConfirmationMenuItem";
 import { LinkIcon } from "@/components/ui/icons/Link";

@@ -1,5 +1,5 @@
-import { Category } from "src/api/openapi-schema";
-import { useDisclosure } from "src/utils/useDisclosure";
+import { Category } from "@/api/openapi-schema";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { Item } from "@/components/ui/menu";
 

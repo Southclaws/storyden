@@ -1,6 +1,6 @@
 import { Portal } from "@ark-ui/react";
 
-import { useDisclosure } from "src/utils/useDisclosure";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";

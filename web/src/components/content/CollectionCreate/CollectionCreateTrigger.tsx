@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { useDisclosure } from "src/utils/useDisclosure";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { Button } from "@/components/ui/button";
 import { CreateFolderIcon } from "@/components/ui/icons/CreateFolder";

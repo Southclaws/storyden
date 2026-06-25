@@ -1,5 +1,5 @@
-import { UnreadyBanner } from "src/components/site/Unready";
-import { CollectionScreen } from "src/screens/collection/CollectionScreen";
+import { UnreadyBanner } from "@/components/site/Unready";
+import { CollectionScreen } from "@/screens/collection/CollectionScreen";
 
 import { collectionGet } from "@/api/openapi-server/collections";
 import { getServerSession } from "@/auth/server-session";

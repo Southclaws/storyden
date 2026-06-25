@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { Default } from "src/layouts/Default";
+import { Default } from "@/layouts/Default";
 
 export default async function Layout({
   children,

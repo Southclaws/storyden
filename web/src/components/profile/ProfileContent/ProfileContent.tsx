@@ -1,4 +1,4 @@
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";

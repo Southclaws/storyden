@@ -1,4 +1,4 @@
-import { LinkListResult } from "src/api/openapi-schema";
+import { LinkListResult } from "@/api/openapi-schema";
 
 import { EmptyState } from "@/components/site/EmptyState";
 

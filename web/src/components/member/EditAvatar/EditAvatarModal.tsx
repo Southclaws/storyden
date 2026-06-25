@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 
 import { Slot } from "@/components/ui/Slot";
 import { Button, ButtonProps } from "@/components/ui/button";

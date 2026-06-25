@@ -1,7 +1,7 @@
 "use client";
 
-import { DatagraphSearchResults } from "src/components/search/DatagraphSearchResults";
-import { UnreadyBanner } from "src/components/site/Unready";
+import { DatagraphSearchResults } from "@/components/search/DatagraphSearchResults";
+import { UnreadyBanner } from "@/components/site/Unready";
 
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import { EmptyState } from "@/components/site/EmptyState";

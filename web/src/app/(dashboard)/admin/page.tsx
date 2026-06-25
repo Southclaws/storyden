@@ -1,4 +1,4 @@
-import { AdminScreen } from "src/screens/admin/AdminScreen";
+import { AdminScreen } from "@/screens/admin/AdminScreen";
 
 import { Permission } from "@/api/openapi-schema";
 import { getServerSession } from "@/auth/server-session";

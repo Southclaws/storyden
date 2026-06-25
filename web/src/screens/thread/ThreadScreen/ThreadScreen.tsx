@@ -3,7 +3,7 @@
 import { Controller, ControllerProps } from "react-hook-form";
 import { match } from "ts-pattern";
 
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { Thread, Visibility } from "@/api/openapi-schema";
 import { CategoryBadge } from "@/components/category/CategoryBadge";

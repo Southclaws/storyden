@@ -1,4 +1,4 @@
-import { timestamp } from "src/utils/date";
+import { timestamp } from "@/utils/date";
 
 import { styled } from "@/styled-system/jsx";
 import { JsxStyleProps } from "@/styled-system/types";

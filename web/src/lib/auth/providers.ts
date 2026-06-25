@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import "server-only";
 
-import { AuthProvider } from "src/api/openapi-schema";
+import { AuthProvider } from "@/api/openapi-schema";
 
 import {
   authProviderList,

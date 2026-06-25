@@ -1,4 +1,4 @@
-import { AccountAuthMethod, AuthProvider } from "src/api/openapi-schema";
+import { AccountAuthMethod, AuthProvider } from "@/api/openapi-schema";
 
 import { Timestamp } from "@/components/site/Timestamp";
 import { Heading } from "@/components/ui/heading";

@@ -9,7 +9,7 @@ import {
   webAuthnMakeAssertion,
   webAuthnMakeCredential,
   webAuthnRequestCredential,
-} from "src/api/openapi-client/auth";
+} from "@/api/openapi-client/auth";
 
 import {
   WebAuthnMakeAssertionBody,

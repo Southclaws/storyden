@@ -1,4 +1,4 @@
-import { useDisclosure } from "src/utils/useDisclosure";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { Node } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";

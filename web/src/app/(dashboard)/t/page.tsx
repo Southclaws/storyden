@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ThreadIndexScreen } from "src/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
+import { ThreadIndexScreen } from "@/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
 
 import { threadList } from "@/api/openapi-server/threads";
 

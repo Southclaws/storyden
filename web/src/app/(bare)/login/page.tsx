@@ -1,4 +1,4 @@
-import { LoginScreen } from "src/screens/auth/LoginScreen/LoginScreen";
+import { LoginScreen } from "@/screens/auth/LoginScreen/LoginScreen";
 
 import { OAuthProviderList } from "@/components/auth/OAuthProviderList";
 import { UnreadyBanner } from "@/components/site/Unready";

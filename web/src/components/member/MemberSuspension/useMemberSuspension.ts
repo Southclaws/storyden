@@ -1,8 +1,8 @@
 import { Arguments, useSWRConfig } from "swr";
 
-import { getProfileListKey } from "src/api/openapi-client/profiles";
-import { ProfileReference } from "src/api/openapi-schema";
-import { WithDisclosure } from "src/utils/useDisclosure";
+import { getProfileListKey } from "@/api/openapi-client/profiles";
+import { ProfileReference } from "@/api/openapi-schema";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import {

@@ -1,4 +1,4 @@
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { ColourPickerField } from "@/components/ui/ColourPickerField";

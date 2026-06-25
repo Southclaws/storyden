@@ -2,7 +2,7 @@
 
 import { PropsWithChildren } from "react";
 
-import { OnboardingStatus } from "src/api/openapi-schema";
+import { OnboardingStatus } from "@/api/openapi-schema";
 
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";

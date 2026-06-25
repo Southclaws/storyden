@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { Heading } from "@/components/ui/heading";
 import { cx } from "@/styled-system/css";

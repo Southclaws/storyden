@@ -6,7 +6,7 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { ExpandedChangeDetails } from "node_modules/@ark-ui/react/dist/components/tree-view/tree-view";
+import { TreeViewExpandedChangeDetails as ExpandedChangeDetails } from "@ark-ui/react/tree-view";
 import {
   CSSProperties,
   Fragment,

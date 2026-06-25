@@ -1,6 +1,6 @@
 "use client";
 
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { NodeCardRows } from "@/components/library/NodeCardList";
 import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";

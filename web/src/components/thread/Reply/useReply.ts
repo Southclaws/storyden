@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Account, Permission, Reply, Thread } from "src/api/openapi-schema";
+import { Account, Permission, Reply, Thread } from "@/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";

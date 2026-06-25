@@ -1,7 +1,7 @@
 import { parseAsArrayOf, parseAsString, useQueryStates } from "nuqs";
 
-import { useProfileList } from "src/api/openapi-client/profiles";
-import { PublicProfileListResult } from "src/api/openapi-schema";
+import { useProfileList } from "@/api/openapi-client/profiles";
+import { PublicProfileListResult } from "@/api/openapi-schema";
 
 export type Props = {
   initialResult: PublicProfileListResult;

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { UnreadyBanner } from "src/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 
 import { Button } from "@/components/ui/button";
 import { LinkButton } from "@/components/ui/link-button";

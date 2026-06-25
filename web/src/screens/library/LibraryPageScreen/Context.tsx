@@ -15,7 +15,7 @@ import {
   Identifier,
   NodeListResult,
   NodeWithChildren,
-} from "src/api/openapi-schema";
+} from "@/api/openapi-schema";
 
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";

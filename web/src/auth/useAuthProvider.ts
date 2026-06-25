@@ -1,7 +1,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
+import { useAccountGet } from "@/api/openapi-client/accounts";
 
 import { usePublicRegistration } from "@/lib/settings/registration";
 

@@ -1,10 +1,10 @@
 import {
   useAccountAuthProviderList,
   useAccountGet,
-} from "src/api/openapi-client/accounts";
-import { AccountAuthMethod } from "src/api/openapi-schema";
-import { passkeyRegister } from "src/components/auth/webauthn/utils";
-import { deriveError } from "src/utils/error";
+} from "@/api/openapi-client/accounts";
+import { AccountAuthMethod } from "@/api/openapi-schema";
+import { passkeyRegister } from "@/components/auth/webauthn/utils";
+import { deriveError } from "@/utils/error";
 
 export type Props = {
   active: AccountAuthMethod[];

@@ -1,5 +1,5 @@
-import { UnreadyBanner } from "src/components/site/Unready";
-import { ProfileScreen } from "src/screens/profile/ProfileScreen";
+import { UnreadyBanner } from "@/components/site/Unready";
+import { ProfileScreen } from "@/screens/profile/ProfileScreen";
 
 import { profileGet } from "@/api/openapi-server/profiles";
 import { getServerSession } from "@/auth/server-session";

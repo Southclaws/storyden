@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { UnreadyBanner } from "src/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 
 import { categoryGet } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";

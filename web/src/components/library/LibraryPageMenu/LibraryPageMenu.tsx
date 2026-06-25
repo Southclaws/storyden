@@ -1,7 +1,7 @@
 import { MenuOpenChangeDetails, Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "src/components/site/Action/More";
+import { MoreAction } from "@/components/site/Action/More";
 
 import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";

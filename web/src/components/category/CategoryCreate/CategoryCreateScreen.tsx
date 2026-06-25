@@ -1,6 +1,6 @@
 import { createListCollection } from "@ark-ui/react";
 
-import { useCategoryList } from "src/api/openapi-client/categories";
+import { useCategoryList } from "@/api/openapi-client/categories";
 
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { ColourPickerField } from "@/components/ui/ColourPickerField";

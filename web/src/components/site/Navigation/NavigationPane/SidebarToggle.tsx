@@ -1,6 +1,6 @@
 "use client";
 
-import { Sidebar } from "src/components/graphics/Sidebar/Sidebar";
+import { Sidebar } from "@/components/graphics/Sidebar/Sidebar";
 
 import { Button } from "@/components/ui/button";
 

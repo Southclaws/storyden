@@ -1,7 +1,7 @@
 import { formatDate, formatDistance, formatDistanceStrict } from "date-fns";
 import { Fragment } from "react";
 
-import { Account, Thread } from "src/api/openapi-schema";
+import { Account, Thread } from "@/api/openapi-schema";
 
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { VStack, styled } from "@/styled-system/jsx";

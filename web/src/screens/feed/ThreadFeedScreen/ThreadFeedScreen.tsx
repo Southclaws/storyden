@@ -1,6 +1,6 @@
 "use client";
 
-import { Unready } from "src/components/site/Unready";
+import { Unready } from "@/components/site/Unready";
 
 import { type Account } from "@/api/openapi-schema";
 import { useSession } from "@/auth";

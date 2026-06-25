@@ -5,7 +5,7 @@ import {
   AccountAuthMethodList,
   AuthProvider,
   AuthProviderList,
-} from "src/api/openapi-schema";
+} from "@/api/openapi-schema";
 
 import { filterWithLink } from "./oauth";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { MemberIndexScreen } from "src/screens/library/members/MemberIndexScreen/MemberIndexScreen";
+import { MemberIndexScreen } from "@/screens/library/members/MemberIndexScreen/MemberIndexScreen";
 
 import { profileList } from "@/api/openapi-server/profiles";
 import { UnreadyBanner } from "@/components/site/Unready";

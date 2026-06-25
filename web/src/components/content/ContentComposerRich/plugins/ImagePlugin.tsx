@@ -8,7 +8,7 @@ import {
 import { Plugin, PluginKey } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
-import { Asset } from "src/api/openapi-schema";
+import { Asset } from "@/api/openapi-schema";
 
 import { Button } from "@/components/ui/button";
 import { ProgressCircle } from "@/components/ui/progress";

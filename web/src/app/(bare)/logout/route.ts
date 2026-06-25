@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { WEB_ADDRESS } from "src/config";
+import { WEB_ADDRESS } from "@/config";
 
 const cookieName = "storyden-session";
 

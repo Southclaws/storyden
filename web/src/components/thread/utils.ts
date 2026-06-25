@@ -1,4 +1,4 @@
-import { WEB_ADDRESS } from "src/config";
+import { WEB_ADDRESS } from "@/config";
 
 export function getPermalinkForPost(
   slug: string,

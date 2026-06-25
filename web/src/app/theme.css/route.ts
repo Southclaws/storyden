@@ -1,7 +1,7 @@
 import { flatten, zip } from "lodash";
 import { NextResponse } from "next/server";
 
-import { getColourVariants } from "src/utils/colour";
+import { getColourVariants } from "@/utils/colour";
 
 import { getSettings } from "@/lib/settings/settings-server";
 

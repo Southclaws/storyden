@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { PropsWithChildren } from "react";
 
-import { Fullpage } from "src/layouts/Fullpage";
+import { Fullpage } from "@/layouts/Fullpage";
 
 import { BackAction } from "@/components/site/Action/Back";
 import { HomeAnchor } from "@/components/site/Navigation/Anchors/Home";

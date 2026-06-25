@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { Account, Collection } from "src/api/openapi-schema";
+import { Account, Collection } from "@/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";

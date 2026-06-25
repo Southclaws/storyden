@@ -1,4 +1,4 @@
-import { WithDisclosure } from "src/utils/useDisclosure";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 import { useAccountView } from "@/api/openapi-client/accounts";
 import { InstanceCapability, ProfileReference } from "@/api/openapi-schema";

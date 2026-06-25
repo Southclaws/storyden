@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
 
-import { useSession } from "src/auth";
+import { useSession } from "@/auth";
 
 import { Permission, ProfileReference } from "@/api/openapi-schema";
 import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";

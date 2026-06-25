@@ -4,7 +4,7 @@ import {
   CategoryReference,
   Thread,
   ThreadReference,
-} from "src/api/openapi-schema";
+} from "@/api/openapi-schema";
 
 import { BreadcrumbIcon } from "@/components/ui/icons/Breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";

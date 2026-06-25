@@ -1,4 +1,4 @@
-import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 
 import { CreateOAuthClientScreen } from "./CreateOAuthClientScreen";
 import { Props, WithDisclosure } from "./useCreateOAuthClientScreen";

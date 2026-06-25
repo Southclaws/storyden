@@ -6,9 +6,9 @@ import { z } from "zod";
 import {
   categoryCreate,
   getCategoryListKey,
-} from "src/api/openapi-client/categories";
-import { Asset } from "src/api/openapi-schema";
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+} from "@/api/openapi-client/categories";
+import { Asset } from "@/api/openapi-schema";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 

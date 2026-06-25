@@ -1,5 +1,5 @@
-import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
-import { Unready } from "src/components/site/Unready";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
+import { Unready } from "@/components/site/Unready";
 
 import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Button } from "@/components/ui/button";

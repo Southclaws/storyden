@@ -1,7 +1,7 @@
 import { Portal } from "@ark-ui/react";
 import { KeyboardEvent, useState } from "react";
 
-import { BookmarkAction } from "src/components/site/Action/Bookmark";
+import { BookmarkAction } from "@/components/site/Action/Bookmark";
 
 import { Unready } from "@/components/site/Unready";
 import { Checkbox } from "@/components/ui/checkbox";

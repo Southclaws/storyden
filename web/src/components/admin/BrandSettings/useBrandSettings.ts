@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { iconUpload } from "src/api/openapi-client/misc";
-import { getColourVariants } from "src/utils/colour";
+import { iconUpload } from "@/api/openapi-client/misc";
+import { getColourVariants } from "@/utils/colour";
 
 import { handle } from "@/api/client";
 import { useSettingsMutation } from "@/lib/settings/mutation";

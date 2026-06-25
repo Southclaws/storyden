@@ -1,4 +1,4 @@
-import { UnreadyBanner } from "src/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 
 import { VStack } from "@/styled-system/jsx";
 
