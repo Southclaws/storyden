@@ -2,6 +2,8 @@
     "pages": [
         "configure",
         "event",
-        "ping"
+        "ping",
+        "robot_model_provider_generate",
+        "robot_model_provider_list_models"
     ]
 }

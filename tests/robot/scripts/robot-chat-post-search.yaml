@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: post_search
+    respond:
+      text: "Post search complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_post_search_1
+          name: post_search
+          args:
+            query: "magnolia"

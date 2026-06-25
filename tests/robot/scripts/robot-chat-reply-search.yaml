@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: reply_search
+    respond:
+      text: "Reply search complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_reply_search_1
+          name: reply_search
+          args:
+            query: "magnolia"

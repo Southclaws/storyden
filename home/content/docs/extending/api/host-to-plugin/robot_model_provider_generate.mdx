@@ -1,0 +1,41 @@
+---
+title: robot_model_provider_generate
+description: Host to Plugin RPC method.
+---
+
+`robot_model_provider_generate` is a **Host to Plugin** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/host-to-plugin/robot_model_provider_generate.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestRobotModelProviderGenerate`
+- Response type: `RPCResponseRobotModelProviderGenerate`
+
+## Request contract
+
+Runs one non-streaming model generation through a plugin-backed Robot model provider.
+
+
+Required fields:
+- `method`
+- `params`
+
+
+
+## Response contract
+
+Returns one non-streaming model generation from a plugin-backed Robot model provider.
+
+
+Required fields:
+- `method`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

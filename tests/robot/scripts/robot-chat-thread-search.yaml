@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: thread_search
+    respond:
+      text: "Thread search complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_thread_search_1
+          name: thread_search
+          args:
+            query: "magnolia"

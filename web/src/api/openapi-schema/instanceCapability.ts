@@ -19,4 +19,5 @@ export const InstanceCapability = {
   email_client: "email_client",
   sms_client: "sms_client",
   oauth: "oauth",
+  robots: "robots",
 } as const;

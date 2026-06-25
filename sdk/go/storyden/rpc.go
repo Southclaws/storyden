@@ -34,6 +34,10 @@ func (p *Plugin) handleMessage(message []byte) error {
 		return p.handleEvent(*r)
 	case *rpc.RPCRequestPing:
 		return p.handlePing(*r)
+	case *rpc.RPCRequestRobotModelProviderListModels:
+		return p.handleRobotModelProviderListModels(*r)
+	case *rpc.RPCRequestRobotModelProviderGenerate:
+		return p.handleRobotModelProviderGenerate(*r)
 	default:
 		return fmt.Errorf("unknown request type: %T", r)
 	}
@@ -148,6 +152,74 @@ func (p *Plugin) handlePing(req rpc.RPCRequestPing) error {
 			Status:        opt.New("healthy"),
 		},
 	})
+}
+
+func (p *Plugin) handleRobotModelProviderListModels(req rpc.RPCRequestRobotModelProviderListModels) error {
+	p.robotModelProviderListModelsHandlerMu.RLock()
+	handler := p.robotModelProviderListModelsHandler
+	p.robotModelProviderListModelsHandlerMu.RUnlock()
+
+	if handler == nil {
+		return p.sendErrorResponse(req.ID, -32601, "robot model provider list models handler is not registered")
+	}
+
+	go func() {
+		resp, err := handler(p.ctx, req.Params)
+		if err != nil {
+			if sendErr := p.sendErrorResponse(req.ID, -32000, err.Error()); sendErr != nil {
+				p.logger.Error("failed to send robot model provider list models error response",
+					slog.String("error", sendErr.Error()))
+			}
+			return
+		}
+
+		if resp.Method == "" {
+			resp.Method = "robot_model_provider_list_models"
+		}
+
+		if err := p.sendResponse(req.ID, rpc.HostToPluginResponseUnion{
+			HostToPluginResponseUnionUnion: &resp,
+		}); err != nil {
+			p.logger.Error("failed to send robot model provider list models response",
+				slog.String("error", err.Error()))
+		}
+	}()
+
+	return nil
+}
+
+func (p *Plugin) handleRobotModelProviderGenerate(req rpc.RPCRequestRobotModelProviderGenerate) error {
+	p.robotModelProviderGenerateHandlerMu.RLock()
+	handler := p.robotModelProviderGenerateHandler
+	p.robotModelProviderGenerateHandlerMu.RUnlock()
+
+	if handler == nil {
+		return p.sendErrorResponse(req.ID, -32601, "robot model provider generate handler is not registered")
+	}
+
+	go func() {
+		resp, err := handler(p.ctx, req.Params)
+		if err != nil {
+			if sendErr := p.sendErrorResponse(req.ID, -32000, err.Error()); sendErr != nil {
+				p.logger.Error("failed to send robot model provider generate error response",
+					slog.String("error", sendErr.Error()))
+			}
+			return
+		}
+
+		if resp.Method == "" {
+			resp.Method = "robot_model_provider_generate"
+		}
+
+		if err := p.sendResponse(req.ID, rpc.HostToPluginResponseUnion{
+			HostToPluginResponseUnionUnion: &resp,
+		}); err != nil {
+			p.logger.Error("failed to send robot model provider generate response",
+				slog.String("error", err.Error()))
+		}
+	}()
+
+	return nil
 }
 
 func (p *Plugin) sendResponse(id xid.ID, result rpc.HostToPluginResponseUnion) error {

@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: member_search
+    respond:
+      text: "Member search complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_member_search_1
+          name: member_search
+          args:
+            query: "odin"

@@ -1,9 +1,34 @@
 from __future__ import annotations
 
 from typing import Annotated, Any, Dict, List, Literal, Union
+from datetime import datetime
 from enum import Enum
 from pydantic import AnyUrl, BaseModel, ConfigDict, Field
 
+
+
+
+class CapabilityConfigBase(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    description: str | None = None
+    """Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs."""
+    id: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
+    """Human-readable capability name."""
+    name: str | None = None
+    """Capability type discriminator."""
+    type: str
+    """Version of the host capability protocol implemented by this plugin."""
+    version: str
+
+
+class RobotLLMProviderCapabilityConfig(CapabilityConfigBase):
+    type: Literal["robot.llm_provider"]
+
+CapabilityConfig = Annotated[
+    Union[RobotLLMProviderCapabilityConfig],
+    Field(discriminator="type"),
+]
 
 
 
@@ -560,6 +585,42 @@ class RPCRequestPingParams(BaseModel):
     pass
 
 
+class RobotModelProviderMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    content: str | None = None
+    name: str | None = None
+    role: str
+    tool_call_id: str | None = None
+
+
+class RobotModelProviderTool(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    description: str | None = None
+    name: str
+    parameters: Dict[str, Any] | None = None
+
+
+class RPCRequestRobotModelProviderGenerateParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    messages: List[RobotModelProviderMessage]
+    """Model name within the provider namespace."""
+    model: str
+    """Provider identifier declared by the plugin manifest."""
+    provider: str
+    system: str | None = None
+    tools: List[RobotModelProviderTool] | None = None
+
+
+class RPCRequestRobotModelProviderListModelsParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Provider identifier declared by the plugin manifest."""
+    provider: str
+
+
 """
 Request sent by the host to the plugin to provide configuration settings. The params object can contain any key-value pairs defined by the plugin in its manifest `configuration_schema` field and the plugin should validate and apply these settings to its internal state.
 If configuration changes require a plugin to restart, the plugin should cleanly shut down with a zero exit code so that the host can restart it if it is a supervised plugin. If it is an external plugin, the plugin itself is responsible for this behavior based on the plugin's lifecycle design.
@@ -583,8 +644,22 @@ class RPCRequestPing(JsonRpcRequest):
     method: Literal["ping"]
     params: RPCRequestPingParams | None = None
 
+
+"""Requests the current list of models exposed by a plugin-backed Robot model provider."""
+
+class RPCRequestRobotModelProviderListModels(JsonRpcRequest):
+    method: Literal["robot_model_provider_list_models"]
+    params: RPCRequestRobotModelProviderListModelsParams
+
+
+"""Runs one non-streaming model generation through a plugin-backed Robot model provider."""
+
+class RPCRequestRobotModelProviderGenerate(JsonRpcRequest):
+    method: Literal["robot_model_provider_generate"]
+    params: RPCRequestRobotModelProviderGenerateParams
+
 HostToPluginRequest = Annotated[
-    Union[RPCRequestConfigure, RPCRequestEvent, RPCRequestPing],
+    Union[RPCRequestConfigure, RPCRequestEvent, RPCRequestPing, RPCRequestRobotModelProviderListModels, RPCRequestRobotModelProviderGenerate],
     Field(discriminator="method"),
 ]
 
@@ -595,6 +670,31 @@ class HostToPluginResponseError(BaseModel):
 
     code: int | None = None
     message: str | None = None
+
+
+class RobotModelProviderModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Context window in tokens, when known."""
+    context_window: int | None = None
+    """Human-readable model name."""
+    display_name: str | None = None
+    """Maximum output tokens, when known."""
+    max_output_tokens: int | None = None
+    """Model name within the provider namespace."""
+    name: str
+    """Provider-specific model metadata."""
+    raw: Dict[str, Any] | None = None
+    """Model release time, when known."""
+    released_at: datetime | None = None
+
+
+class RobotModelProviderToolCall(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    arguments: Dict[str, Any] | None = None
+    id: str | None = None
+    name: str
 
 
 """Confirms that the configuration was received and applied correctly."""
@@ -624,8 +724,27 @@ class RPCResponsePing(BaseModel):
     """How long the plugin has been running"""
     uptime_seconds: float | None = None
 
+
+"""Returns models exposed by a plugin-backed Robot model provider."""
+
+class RPCResponseRobotModelProviderListModels(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    method: Literal["robot_model_provider_list_models"]
+    models: List[RobotModelProviderModel]
+
+
+"""Returns one non-streaming model generation from a plugin-backed Robot model provider."""
+
+class RPCResponseRobotModelProviderGenerate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    method: Literal["robot_model_provider_generate"]
+    content: str | None = None
+    error: str | None = None
+    finish_reason: str | None = None
+    tool_calls: List[RobotModelProviderToolCall] | None = None
+
 HostToPluginResponseUnion = Annotated[
-    Union[RPCResponseConfigure, RPCResponseEvent, RPCResponsePing],
+    Union[RPCResponseConfigure, RPCResponseEvent, RPCResponsePing, RPCResponseRobotModelProviderListModels, RPCResponseRobotModelProviderGenerate],
     Field(discriminator="method"),
 ]
 
@@ -751,6 +870,8 @@ class Manifest(BaseModel):
     (NOTE: May change in future.)
     """
     author: str
+    """Platform capabilities this plugin provides. Capabilities extend Storyden with host-defined integration points such as Robot model providers, authentication providers, or Robot tools."""
+    capabilities: List[CapabilityConfig] | None = None
     """
     The executable or script used to launch your plugin. If your plugin is a binary (Go, Rust, C, etc) then this should be a path to that binary, it's best to put it in the root of your plugin archive like `./myplugin.exe` or `./myplugin`. If your plugin is a script (Python, Node, etc) then this should be the interpreter's `$PATH` executable (e.g. `python` or `node`)  and you should include the script in the `args` field.
     This field is used only for Supervised plugins. External plugins can provide a placeholder value and it will be ignored by the runtime.
@@ -781,6 +902,26 @@ class RPCRequestGetConfigParams(BaseModel):
     keys: List[str] | None = None
 
 
+class RPCRequestRobotRunParamsWorkspace(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Workspace template to instantiate and mount for this run."""
+    workspace_id: str | None = None
+    """Existing workspace instance to mount for this run."""
+    workspace_instance_id: str | None = None
+
+
+class RPCRequestRobotRunParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Input message for the robot."""
+    message: str = Field(min_length=1)
+    """The Robot to invoke."""
+    robot_id: str
+    """Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both."""
+    workspace: RPCRequestRobotRunParamsWorkspace | None = None
+
+
 """Request API access credentials provisioned for this plugin."""
 
 class RPCRequestAccessGet(JsonRpcRequest):
@@ -793,8 +934,15 @@ class RPCRequestGetConfig(JsonRpcRequest):
     method: Literal["get_config"]
     params: RPCRequestGetConfigParams | None = None
 
+
+"""Run a one-shot robot invocation and return the assistant's final text response."""
+
+class RPCRequestRobotRun(JsonRpcRequest):
+    method: Literal["robot_run"]
+    params: RPCRequestRobotRunParams
+
 PluginToHostRequest = Annotated[
-    Union[RPCRequestAccessGet, RPCRequestGetConfig],
+    Union[RPCRequestAccessGet, RPCRequestGetConfig, RPCRequestRobotRun],
     Field(discriminator="method"),
 ]
 
@@ -823,6 +971,41 @@ class RPCResponseAccessGetResult(BaseModel):
     apibase_url: AnyUrl
 
 
+"""Reason an unattended Robot invocation needs human attention."""
+
+class RobotRunAttentionReason(str, Enum):
+    MISSING_INPUT = "missing_input"
+    NEEDS_APPROVAL = "needs_approval"
+    POLICY_BLOCKED = "policy_blocked"
+    TOOL_UNAVAILABLE = "tool_unavailable"
+    ERROR = "error"
+
+
+class RobotRunAttention(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    """Actionable explanation for the user."""
+    message: str = Field(min_length=1)
+    reason: RobotRunAttentionReason
+
+
+"""Overall status of an unattended Robot invocation."""
+
+class RobotRunStatus(str, Enum):
+    COMPLETED = "completed"
+    BLOCKED = "blocked"
+    FAILED = "failed"
+
+
+class RobotRunOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    attention: RobotRunAttention | None = None
+    status: RobotRunStatus
+    """Concise user-facing summary of what happened."""
+    summary: str
+
+
 """Returns API base URL and bearer access key for authenticated API calls."""
 
 class RPCResponseAccessGet(JsonRpcResponse):
@@ -838,8 +1021,20 @@ class RPCResponseGetConfig(BaseModel):
     """Configuration key-value pairs"""
     config: Dict[str, Any]
 
+
+"""Final result of a one-shot robot invocation."""
+
+class RPCResponseRobotRun(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    method: Literal["robot_run"]
+    """Error message if invocation failed."""
+    error: str | None = None
+    output: RobotRunOutput | None = None
+    """Robot session ID containing the persisted invocation log."""
+    session_id: str | None = None
+
 PluginToHostResponseUnion = Annotated[
-    Union[RPCResponseAccessGet, RPCResponseGetConfig],
+    Union[RPCResponseAccessGet, RPCResponseGetConfig, RPCResponseRobotRun],
     Field(discriminator="method"),
 ]
 

@@ -1,0 +1,96 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RobotRunStatus:
+    type: string
+    enum: ["completed", "blocked", "failed"]
+    description: Overall status of an unattended Robot invocation.
+
+  RobotRunAttentionReason:
+    type: string
+    enum:
+      [
+        "missing_input",
+        "needs_approval",
+        "policy_blocked",
+        "tool_unavailable",
+        "error",
+      ]
+    description: Reason an unattended Robot invocation needs human attention.
+
+  RobotRunAttention:
+    type: object
+    required: ["reason", "message"]
+    properties:
+      reason:
+        $ref: "#/$defs/RobotRunAttentionReason"
+      message:
+        type: string
+        minLength: 1
+        description: Actionable explanation for the user.
+
+  RobotRunOutput:
+    type: object
+    required: ["status", "summary"]
+    properties:
+      status:
+        $ref: "#/$defs/RobotRunStatus"
+      summary:
+        type: string
+        description: Concise user-facing summary of what happened.
+      attention:
+        $ref: "#/$defs/RobotRunAttention"
+
+  RPCRequestRobotRun:
+    description: >
+      Run a one-shot robot invocation and return the assistant's final text response.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_run"
+          params:
+            type: object
+            required: ["message", "robot_id"]
+            properties:
+              message:
+                type: string
+                minLength: 1
+                description: Input message for the robot.
+              robot_id:
+                type: string
+                format: xid
+                description: The Robot to invoke.
+              workspace:
+                type: object
+                description: Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
+                properties:
+                  workspace_id:
+                    type: string
+                    format: xid
+                    description: Workspace template to instantiate and mount for this run.
+                  workspace_instance_id:
+                    type: string
+                    format: xid
+                    description: Existing workspace instance to mount for this run.
+
+  RPCResponseRobotRun:
+    description: >
+      Final result of a one-shot robot invocation.
+    type: object
+    required: ["method"]
+    properties:
+      method:
+        type: string
+        const: "robot_run"
+      output:
+        $ref: "#/$defs/RobotRunOutput"
+      session_id:
+        type: string
+        format: xid
+        description: Robot session ID containing the persisted invocation log.
+      error:
+        type: string
+        description: Error message if invocation failed.

@@ -31,6 +31,8 @@ export const combobox = defineSlotRecipe({
       boxShadow: "lg",
       display: "flex",
       flexDirection: "column",
+      maxHeight: "[min(24rem,calc(100vh-2rem))]",
+      maxWidth: "[calc(100vw-2rem)]",
       zIndex: "dropdown",
       height: "fit-content",
       _hidden: {
@@ -70,6 +72,10 @@ export const combobox = defineSlotRecipe({
           background: "transparent",
         },
       },
+    },
+    list: {
+      maxHeight: "64",
+      overflowY: "auto",
     },
     itemGroupLabel: {
       fontWeight: "semibold",

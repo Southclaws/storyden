@@ -39,6 +39,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteauthorisationflow"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -49,6 +51,14 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
+	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
@@ -67,47 +77,57 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAccount                   = "Account"
-	TypeAccountFollow             = "AccountFollow"
-	TypeAccountRoles              = "AccountRoles"
-	TypeAsset                     = "Asset"
-	TypeAuditLog                  = "AuditLog"
-	TypeAuthentication            = "Authentication"
-	TypeCategory                  = "Category"
-	TypeCollection                = "Collection"
-	TypeCollectionNode            = "CollectionNode"
-	TypeCollectionPost            = "CollectionPost"
-	TypeEmail                     = "Email"
-	TypeEmailQueue                = "EmailQueue"
-	TypeEvent                     = "Event"
-	TypeEventParticipant          = "EventParticipant"
-	TypeInvitation                = "Invitation"
-	TypeLikePost                  = "LikePost"
-	TypeLink                      = "Link"
-	TypeMentionProfile            = "MentionProfile"
-	TypeModerationNote            = "ModerationNote"
-	TypeNode                      = "Node"
-	TypeNodeVersion               = "NodeVersion"
-	TypeNotification              = "Notification"
-	TypeOAuthAuthorisationCode    = "OAuthAuthorisationCode"
-	TypeOAuthAuthorisationRequest = "OAuthAuthorisationRequest"
-	TypeOAuthClient               = "OAuthClient"
-	TypeOAuthDeviceAuthorisation  = "OAuthDeviceAuthorisation"
-	TypeOAuthRefreshToken         = "OAuthRefreshToken"
-	TypePlugin                    = "Plugin"
-	TypePost                      = "Post"
-	TypePostRead                  = "PostRead"
-	TypeProperty                  = "Property"
-	TypePropertySchema            = "PropertySchema"
-	TypePropertySchemaField       = "PropertySchemaField"
-	TypeQuestion                  = "Question"
-	TypeReact                     = "React"
-	TypeReport                    = "Report"
-	TypeRole                      = "Role"
-	TypeSession                   = "Session"
-	TypeSetting                   = "Setting"
-	TypeTag                       = "Tag"
-	TypeWarning                   = "Warning"
+	TypeAccount                      = "Account"
+	TypeAccountFollow                = "AccountFollow"
+	TypeAccountRoles                 = "AccountRoles"
+	TypeAsset                        = "Asset"
+	TypeAuditLog                     = "AuditLog"
+	TypeAuthentication               = "Authentication"
+	TypeCategory                     = "Category"
+	TypeCollection                   = "Collection"
+	TypeCollectionNode               = "CollectionNode"
+	TypeCollectionPost               = "CollectionPost"
+	TypeEmail                        = "Email"
+	TypeEmailQueue                   = "EmailQueue"
+	TypeEvent                        = "Event"
+	TypeEventParticipant             = "EventParticipant"
+	TypeInvitation                   = "Invitation"
+	TypeLikePost                     = "LikePost"
+	TypeLink                         = "Link"
+	TypeMentionProfile               = "MentionProfile"
+	TypeModerationNote               = "ModerationNote"
+	TypeNode                         = "Node"
+	TypeNodeVersion                  = "NodeVersion"
+	TypeNotification                 = "Notification"
+	TypeOAuthAuthorisationCode       = "OAuthAuthorisationCode"
+	TypeOAuthAuthorisationRequest    = "OAuthAuthorisationRequest"
+	TypeOAuthClient                  = "OAuthClient"
+	TypeOAuthDeviceAuthorisation     = "OAuthDeviceAuthorisation"
+	TypeOAuthRefreshToken            = "OAuthRefreshToken"
+	TypeOAuthRemoteAuthorisationFlow = "OAuthRemoteAuthorisationFlow"
+	TypeOAuthRemoteConnection        = "OAuthRemoteConnection"
+	TypePlugin                       = "Plugin"
+	TypePost                         = "Post"
+	TypePostRead                     = "PostRead"
+	TypeProperty                     = "Property"
+	TypePropertySchema               = "PropertySchema"
+	TypePropertySchemaField          = "PropertySchemaField"
+	TypeQuestion                     = "Question"
+	TypeReact                        = "React"
+	TypeReport                       = "Report"
+	TypeRobot                        = "Robot"
+	TypeRobotMCPServer               = "RobotMCPServer"
+	TypeRobotMCPTool                 = "RobotMCPTool"
+	TypeRobotProviderModel           = "RobotProviderModel"
+	TypeRobotSession                 = "RobotSession"
+	TypeRobotSessionMessage          = "RobotSessionMessage"
+	TypeRobotWorkspace               = "RobotWorkspace"
+	TypeRobotWorkspaceInstance       = "RobotWorkspaceInstance"
+	TypeRole                         = "Role"
+	TypeSession                      = "Session"
+	TypeSetting                      = "Setting"
+	TypeTag                          = "Tag"
+	TypeWarning                      = "Warning"
 )
 
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
@@ -190,6 +210,9 @@ type AccountMutation struct {
 	oauth_refresh_tokens                        map[xid.ID]struct{}
 	removedoauth_refresh_tokens                 map[xid.ID]struct{}
 	clearedoauth_refresh_tokens                 bool
+	oauth_remote_connections                    map[xid.ID]struct{}
+	removedoauth_remote_connections             map[xid.ID]struct{}
+	clearedoauth_remote_connections             bool
 	claimed_oauth_device_authorisations         map[xid.ID]struct{}
 	removedclaimed_oauth_device_authorisations  map[xid.ID]struct{}
 	clearedclaimed_oauth_device_authorisations  bool
@@ -238,6 +261,24 @@ type AccountMutation struct {
 	authored_warnings                           map[xid.ID]struct{}
 	removedauthored_warnings                    map[xid.ID]struct{}
 	clearedauthored_warnings                    bool
+	robots                                      map[xid.ID]struct{}
+	removedrobots                               map[xid.ID]struct{}
+	clearedrobots                               bool
+	robot_workspaces                            map[xid.ID]struct{}
+	removedrobot_workspaces                     map[xid.ID]struct{}
+	clearedrobot_workspaces                     bool
+	robot_workspace_instances                   map[xid.ID]struct{}
+	removedrobot_workspace_instances            map[xid.ID]struct{}
+	clearedrobot_workspace_instances            bool
+	robot_mcp_servers                           map[xid.ID]struct{}
+	removedrobot_mcp_servers                    map[xid.ID]struct{}
+	clearedrobot_mcp_servers                    bool
+	robot_sessions                              map[xid.ID]struct{}
+	removedrobot_sessions                       map[xid.ID]struct{}
+	clearedrobot_sessions                       bool
+	robot_messages                              map[xid.ID]struct{}
+	removedrobot_messages                       map[xid.ID]struct{}
+	clearedrobot_messages                       bool
 	account_roles                               map[xid.ID]struct{}
 	removedaccount_roles                        map[xid.ID]struct{}
 	clearedaccount_roles                        bool
@@ -2014,6 +2055,60 @@ func (m *AccountMutation) ResetOauthRefreshTokens() {
 	m.removedoauth_refresh_tokens = nil
 }
 
+// AddOauthRemoteConnectionIDs adds the "oauth_remote_connections" edge to the OAuthRemoteConnection entity by ids.
+func (m *AccountMutation) AddOauthRemoteConnectionIDs(ids ...xid.ID) {
+	if m.oauth_remote_connections == nil {
+		m.oauth_remote_connections = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.oauth_remote_connections[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOauthRemoteConnections clears the "oauth_remote_connections" edge to the OAuthRemoteConnection entity.
+func (m *AccountMutation) ClearOauthRemoteConnections() {
+	m.clearedoauth_remote_connections = true
+}
+
+// OauthRemoteConnectionsCleared reports if the "oauth_remote_connections" edge to the OAuthRemoteConnection entity was cleared.
+func (m *AccountMutation) OauthRemoteConnectionsCleared() bool {
+	return m.clearedoauth_remote_connections
+}
+
+// RemoveOauthRemoteConnectionIDs removes the "oauth_remote_connections" edge to the OAuthRemoteConnection entity by IDs.
+func (m *AccountMutation) RemoveOauthRemoteConnectionIDs(ids ...xid.ID) {
+	if m.removedoauth_remote_connections == nil {
+		m.removedoauth_remote_connections = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.oauth_remote_connections, ids[i])
+		m.removedoauth_remote_connections[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOauthRemoteConnections returns the removed IDs of the "oauth_remote_connections" edge to the OAuthRemoteConnection entity.
+func (m *AccountMutation) RemovedOauthRemoteConnectionsIDs() (ids []xid.ID) {
+	for id := range m.removedoauth_remote_connections {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OauthRemoteConnectionsIDs returns the "oauth_remote_connections" edge IDs in the mutation.
+func (m *AccountMutation) OauthRemoteConnectionsIDs() (ids []xid.ID) {
+	for id := range m.oauth_remote_connections {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOauthRemoteConnections resets all changes to the "oauth_remote_connections" edge.
+func (m *AccountMutation) ResetOauthRemoteConnections() {
+	m.oauth_remote_connections = nil
+	m.clearedoauth_remote_connections = false
+	m.removedoauth_remote_connections = nil
+}
+
 // AddClaimedOauthDeviceAuthorisationIDs adds the "claimed_oauth_device_authorisations" edge to the OAuthDeviceAuthorisation entity by ids.
 func (m *AccountMutation) AddClaimedOauthDeviceAuthorisationIDs(ids ...xid.ID) {
 	if m.claimed_oauth_device_authorisations == nil {
@@ -2878,6 +2973,330 @@ func (m *AccountMutation) ResetAuthoredWarnings() {
 	m.removedauthored_warnings = nil
 }
 
+// AddRobotIDs adds the "robots" edge to the Robot entity by ids.
+func (m *AccountMutation) AddRobotIDs(ids ...xid.ID) {
+	if m.robots == nil {
+		m.robots = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robots[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobots clears the "robots" edge to the Robot entity.
+func (m *AccountMutation) ClearRobots() {
+	m.clearedrobots = true
+}
+
+// RobotsCleared reports if the "robots" edge to the Robot entity was cleared.
+func (m *AccountMutation) RobotsCleared() bool {
+	return m.clearedrobots
+}
+
+// RemoveRobotIDs removes the "robots" edge to the Robot entity by IDs.
+func (m *AccountMutation) RemoveRobotIDs(ids ...xid.ID) {
+	if m.removedrobots == nil {
+		m.removedrobots = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robots, ids[i])
+		m.removedrobots[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobots returns the removed IDs of the "robots" edge to the Robot entity.
+func (m *AccountMutation) RemovedRobotsIDs() (ids []xid.ID) {
+	for id := range m.removedrobots {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotsIDs returns the "robots" edge IDs in the mutation.
+func (m *AccountMutation) RobotsIDs() (ids []xid.ID) {
+	for id := range m.robots {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobots resets all changes to the "robots" edge.
+func (m *AccountMutation) ResetRobots() {
+	m.robots = nil
+	m.clearedrobots = false
+	m.removedrobots = nil
+}
+
+// AddRobotWorkspaceIDs adds the "robot_workspaces" edge to the RobotWorkspace entity by ids.
+func (m *AccountMutation) AddRobotWorkspaceIDs(ids ...xid.ID) {
+	if m.robot_workspaces == nil {
+		m.robot_workspaces = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_workspaces[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotWorkspaces clears the "robot_workspaces" edge to the RobotWorkspace entity.
+func (m *AccountMutation) ClearRobotWorkspaces() {
+	m.clearedrobot_workspaces = true
+}
+
+// RobotWorkspacesCleared reports if the "robot_workspaces" edge to the RobotWorkspace entity was cleared.
+func (m *AccountMutation) RobotWorkspacesCleared() bool {
+	return m.clearedrobot_workspaces
+}
+
+// RemoveRobotWorkspaceIDs removes the "robot_workspaces" edge to the RobotWorkspace entity by IDs.
+func (m *AccountMutation) RemoveRobotWorkspaceIDs(ids ...xid.ID) {
+	if m.removedrobot_workspaces == nil {
+		m.removedrobot_workspaces = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_workspaces, ids[i])
+		m.removedrobot_workspaces[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotWorkspaces returns the removed IDs of the "robot_workspaces" edge to the RobotWorkspace entity.
+func (m *AccountMutation) RemovedRobotWorkspacesIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_workspaces {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotWorkspacesIDs returns the "robot_workspaces" edge IDs in the mutation.
+func (m *AccountMutation) RobotWorkspacesIDs() (ids []xid.ID) {
+	for id := range m.robot_workspaces {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotWorkspaces resets all changes to the "robot_workspaces" edge.
+func (m *AccountMutation) ResetRobotWorkspaces() {
+	m.robot_workspaces = nil
+	m.clearedrobot_workspaces = false
+	m.removedrobot_workspaces = nil
+}
+
+// AddRobotWorkspaceInstanceIDs adds the "robot_workspace_instances" edge to the RobotWorkspaceInstance entity by ids.
+func (m *AccountMutation) AddRobotWorkspaceInstanceIDs(ids ...xid.ID) {
+	if m.robot_workspace_instances == nil {
+		m.robot_workspace_instances = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_workspace_instances[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotWorkspaceInstances clears the "robot_workspace_instances" edge to the RobotWorkspaceInstance entity.
+func (m *AccountMutation) ClearRobotWorkspaceInstances() {
+	m.clearedrobot_workspace_instances = true
+}
+
+// RobotWorkspaceInstancesCleared reports if the "robot_workspace_instances" edge to the RobotWorkspaceInstance entity was cleared.
+func (m *AccountMutation) RobotWorkspaceInstancesCleared() bool {
+	return m.clearedrobot_workspace_instances
+}
+
+// RemoveRobotWorkspaceInstanceIDs removes the "robot_workspace_instances" edge to the RobotWorkspaceInstance entity by IDs.
+func (m *AccountMutation) RemoveRobotWorkspaceInstanceIDs(ids ...xid.ID) {
+	if m.removedrobot_workspace_instances == nil {
+		m.removedrobot_workspace_instances = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_workspace_instances, ids[i])
+		m.removedrobot_workspace_instances[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotWorkspaceInstances returns the removed IDs of the "robot_workspace_instances" edge to the RobotWorkspaceInstance entity.
+func (m *AccountMutation) RemovedRobotWorkspaceInstancesIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_workspace_instances {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotWorkspaceInstancesIDs returns the "robot_workspace_instances" edge IDs in the mutation.
+func (m *AccountMutation) RobotWorkspaceInstancesIDs() (ids []xid.ID) {
+	for id := range m.robot_workspace_instances {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotWorkspaceInstances resets all changes to the "robot_workspace_instances" edge.
+func (m *AccountMutation) ResetRobotWorkspaceInstances() {
+	m.robot_workspace_instances = nil
+	m.clearedrobot_workspace_instances = false
+	m.removedrobot_workspace_instances = nil
+}
+
+// AddRobotMcpServerIDs adds the "robot_mcp_servers" edge to the RobotMCPServer entity by ids.
+func (m *AccountMutation) AddRobotMcpServerIDs(ids ...xid.ID) {
+	if m.robot_mcp_servers == nil {
+		m.robot_mcp_servers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_mcp_servers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotMcpServers clears the "robot_mcp_servers" edge to the RobotMCPServer entity.
+func (m *AccountMutation) ClearRobotMcpServers() {
+	m.clearedrobot_mcp_servers = true
+}
+
+// RobotMcpServersCleared reports if the "robot_mcp_servers" edge to the RobotMCPServer entity was cleared.
+func (m *AccountMutation) RobotMcpServersCleared() bool {
+	return m.clearedrobot_mcp_servers
+}
+
+// RemoveRobotMcpServerIDs removes the "robot_mcp_servers" edge to the RobotMCPServer entity by IDs.
+func (m *AccountMutation) RemoveRobotMcpServerIDs(ids ...xid.ID) {
+	if m.removedrobot_mcp_servers == nil {
+		m.removedrobot_mcp_servers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_mcp_servers, ids[i])
+		m.removedrobot_mcp_servers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotMcpServers returns the removed IDs of the "robot_mcp_servers" edge to the RobotMCPServer entity.
+func (m *AccountMutation) RemovedRobotMcpServersIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_mcp_servers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotMcpServersIDs returns the "robot_mcp_servers" edge IDs in the mutation.
+func (m *AccountMutation) RobotMcpServersIDs() (ids []xid.ID) {
+	for id := range m.robot_mcp_servers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotMcpServers resets all changes to the "robot_mcp_servers" edge.
+func (m *AccountMutation) ResetRobotMcpServers() {
+	m.robot_mcp_servers = nil
+	m.clearedrobot_mcp_servers = false
+	m.removedrobot_mcp_servers = nil
+}
+
+// AddRobotSessionIDs adds the "robot_sessions" edge to the RobotSession entity by ids.
+func (m *AccountMutation) AddRobotSessionIDs(ids ...xid.ID) {
+	if m.robot_sessions == nil {
+		m.robot_sessions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_sessions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotSessions clears the "robot_sessions" edge to the RobotSession entity.
+func (m *AccountMutation) ClearRobotSessions() {
+	m.clearedrobot_sessions = true
+}
+
+// RobotSessionsCleared reports if the "robot_sessions" edge to the RobotSession entity was cleared.
+func (m *AccountMutation) RobotSessionsCleared() bool {
+	return m.clearedrobot_sessions
+}
+
+// RemoveRobotSessionIDs removes the "robot_sessions" edge to the RobotSession entity by IDs.
+func (m *AccountMutation) RemoveRobotSessionIDs(ids ...xid.ID) {
+	if m.removedrobot_sessions == nil {
+		m.removedrobot_sessions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_sessions, ids[i])
+		m.removedrobot_sessions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotSessions returns the removed IDs of the "robot_sessions" edge to the RobotSession entity.
+func (m *AccountMutation) RemovedRobotSessionsIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_sessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotSessionsIDs returns the "robot_sessions" edge IDs in the mutation.
+func (m *AccountMutation) RobotSessionsIDs() (ids []xid.ID) {
+	for id := range m.robot_sessions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotSessions resets all changes to the "robot_sessions" edge.
+func (m *AccountMutation) ResetRobotSessions() {
+	m.robot_sessions = nil
+	m.clearedrobot_sessions = false
+	m.removedrobot_sessions = nil
+}
+
+// AddRobotMessageIDs adds the "robot_messages" edge to the RobotSessionMessage entity by ids.
+func (m *AccountMutation) AddRobotMessageIDs(ids ...xid.ID) {
+	if m.robot_messages == nil {
+		m.robot_messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_messages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotMessages clears the "robot_messages" edge to the RobotSessionMessage entity.
+func (m *AccountMutation) ClearRobotMessages() {
+	m.clearedrobot_messages = true
+}
+
+// RobotMessagesCleared reports if the "robot_messages" edge to the RobotSessionMessage entity was cleared.
+func (m *AccountMutation) RobotMessagesCleared() bool {
+	return m.clearedrobot_messages
+}
+
+// RemoveRobotMessageIDs removes the "robot_messages" edge to the RobotSessionMessage entity by IDs.
+func (m *AccountMutation) RemoveRobotMessageIDs(ids ...xid.ID) {
+	if m.removedrobot_messages == nil {
+		m.removedrobot_messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_messages, ids[i])
+		m.removedrobot_messages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotMessages returns the removed IDs of the "robot_messages" edge to the RobotSessionMessage entity.
+func (m *AccountMutation) RemovedRobotMessagesIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotMessagesIDs returns the "robot_messages" edge IDs in the mutation.
+func (m *AccountMutation) RobotMessagesIDs() (ids []xid.ID) {
+	for id := range m.robot_messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotMessages resets all changes to the "robot_messages" edge.
+func (m *AccountMutation) ResetRobotMessages() {
+	m.robot_messages = nil
+	m.clearedrobot_messages = false
+	m.removedrobot_messages = nil
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
 func (m *AccountMutation) AddAccountRoleIDs(ids ...xid.ID) {
 	if m.account_roles == nil {
@@ -3331,7 +3750,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 37)
+	edges := make([]string, 0, 44)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3392,6 +3811,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	if m.oauth_refresh_tokens != nil {
 		edges = append(edges, account.EdgeOauthRefreshTokens)
 	}
+	if m.oauth_remote_connections != nil {
+		edges = append(edges, account.EdgeOauthRemoteConnections)
+	}
 	if m.claimed_oauth_device_authorisations != nil {
 		edges = append(edges, account.EdgeClaimedOauthDeviceAuthorisations)
 	}
@@ -3439,6 +3861,24 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.authored_warnings != nil {
 		edges = append(edges, account.EdgeAuthoredWarnings)
+	}
+	if m.robots != nil {
+		edges = append(edges, account.EdgeRobots)
+	}
+	if m.robot_workspaces != nil {
+		edges = append(edges, account.EdgeRobotWorkspaces)
+	}
+	if m.robot_workspace_instances != nil {
+		edges = append(edges, account.EdgeRobotWorkspaceInstances)
+	}
+	if m.robot_mcp_servers != nil {
+		edges = append(edges, account.EdgeRobotMcpServers)
+	}
+	if m.robot_sessions != nil {
+		edges = append(edges, account.EdgeRobotSessions)
+	}
+	if m.robot_messages != nil {
+		edges = append(edges, account.EdgeRobotMessages)
 	}
 	if m.account_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -3568,6 +4008,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeOauthRemoteConnections:
+		ids := make([]ent.Value, 0, len(m.oauth_remote_connections))
+		for id := range m.oauth_remote_connections {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeClaimedOauthDeviceAuthorisations:
 		ids := make([]ent.Value, 0, len(m.claimed_oauth_device_authorisations))
 		for id := range m.claimed_oauth_device_authorisations {
@@ -3664,6 +4110,42 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeRobots:
+		ids := make([]ent.Value, 0, len(m.robots))
+		for id := range m.robots {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotWorkspaces:
+		ids := make([]ent.Value, 0, len(m.robot_workspaces))
+		for id := range m.robot_workspaces {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotWorkspaceInstances:
+		ids := make([]ent.Value, 0, len(m.robot_workspace_instances))
+		for id := range m.robot_workspace_instances {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotMcpServers:
+		ids := make([]ent.Value, 0, len(m.robot_mcp_servers))
+		for id := range m.robot_mcp_servers {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotSessions:
+		ids := make([]ent.Value, 0, len(m.robot_sessions))
+		for id := range m.robot_sessions {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotMessages:
+		ids := make([]ent.Value, 0, len(m.robot_messages))
+		for id := range m.robot_messages {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.account_roles))
 		for id := range m.account_roles {
@@ -3676,7 +4158,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 37)
+	edges := make([]string, 0, 44)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3734,6 +4216,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	if m.removedoauth_refresh_tokens != nil {
 		edges = append(edges, account.EdgeOauthRefreshTokens)
 	}
+	if m.removedoauth_remote_connections != nil {
+		edges = append(edges, account.EdgeOauthRemoteConnections)
+	}
 	if m.removedclaimed_oauth_device_authorisations != nil {
 		edges = append(edges, account.EdgeClaimedOauthDeviceAuthorisations)
 	}
@@ -3781,6 +4266,24 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedauthored_warnings != nil {
 		edges = append(edges, account.EdgeAuthoredWarnings)
+	}
+	if m.removedrobots != nil {
+		edges = append(edges, account.EdgeRobots)
+	}
+	if m.removedrobot_workspaces != nil {
+		edges = append(edges, account.EdgeRobotWorkspaces)
+	}
+	if m.removedrobot_workspace_instances != nil {
+		edges = append(edges, account.EdgeRobotWorkspaceInstances)
+	}
+	if m.removedrobot_mcp_servers != nil {
+		edges = append(edges, account.EdgeRobotMcpServers)
+	}
+	if m.removedrobot_sessions != nil {
+		edges = append(edges, account.EdgeRobotSessions)
+	}
+	if m.removedrobot_messages != nil {
+		edges = append(edges, account.EdgeRobotMessages)
 	}
 	if m.removedaccount_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -3906,6 +4409,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeOauthRemoteConnections:
+		ids := make([]ent.Value, 0, len(m.removedoauth_remote_connections))
+		for id := range m.removedoauth_remote_connections {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeClaimedOauthDeviceAuthorisations:
 		ids := make([]ent.Value, 0, len(m.removedclaimed_oauth_device_authorisations))
 		for id := range m.removedclaimed_oauth_device_authorisations {
@@ -4002,6 +4511,42 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeRobots:
+		ids := make([]ent.Value, 0, len(m.removedrobots))
+		for id := range m.removedrobots {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotWorkspaces:
+		ids := make([]ent.Value, 0, len(m.removedrobot_workspaces))
+		for id := range m.removedrobot_workspaces {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotWorkspaceInstances:
+		ids := make([]ent.Value, 0, len(m.removedrobot_workspace_instances))
+		for id := range m.removedrobot_workspace_instances {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotMcpServers:
+		ids := make([]ent.Value, 0, len(m.removedrobot_mcp_servers))
+		for id := range m.removedrobot_mcp_servers {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotSessions:
+		ids := make([]ent.Value, 0, len(m.removedrobot_sessions))
+		for id := range m.removedrobot_sessions {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeRobotMessages:
+		ids := make([]ent.Value, 0, len(m.removedrobot_messages))
+		for id := range m.removedrobot_messages {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
 		for id := range m.removedaccount_roles {
@@ -4014,7 +4559,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 37)
+	edges := make([]string, 0, 44)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4075,6 +4620,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedoauth_refresh_tokens {
 		edges = append(edges, account.EdgeOauthRefreshTokens)
 	}
+	if m.clearedoauth_remote_connections {
+		edges = append(edges, account.EdgeOauthRemoteConnections)
+	}
 	if m.clearedclaimed_oauth_device_authorisations {
 		edges = append(edges, account.EdgeClaimedOauthDeviceAuthorisations)
 	}
@@ -4122,6 +4670,24 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedauthored_warnings {
 		edges = append(edges, account.EdgeAuthoredWarnings)
+	}
+	if m.clearedrobots {
+		edges = append(edges, account.EdgeRobots)
+	}
+	if m.clearedrobot_workspaces {
+		edges = append(edges, account.EdgeRobotWorkspaces)
+	}
+	if m.clearedrobot_workspace_instances {
+		edges = append(edges, account.EdgeRobotWorkspaceInstances)
+	}
+	if m.clearedrobot_mcp_servers {
+		edges = append(edges, account.EdgeRobotMcpServers)
+	}
+	if m.clearedrobot_sessions {
+		edges = append(edges, account.EdgeRobotSessions)
+	}
+	if m.clearedrobot_messages {
+		edges = append(edges, account.EdgeRobotMessages)
 	}
 	if m.clearedaccount_roles {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -4173,6 +4739,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedoauth_authorisation_requests
 	case account.EdgeOauthRefreshTokens:
 		return m.clearedoauth_refresh_tokens
+	case account.EdgeOauthRemoteConnections:
+		return m.clearedoauth_remote_connections
 	case account.EdgeClaimedOauthDeviceAuthorisations:
 		return m.clearedclaimed_oauth_device_authorisations
 	case account.EdgeApprovedOauthDeviceAuthorisations:
@@ -4205,6 +4773,18 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedwarnings
 	case account.EdgeAuthoredWarnings:
 		return m.clearedauthored_warnings
+	case account.EdgeRobots:
+		return m.clearedrobots
+	case account.EdgeRobotWorkspaces:
+		return m.clearedrobot_workspaces
+	case account.EdgeRobotWorkspaceInstances:
+		return m.clearedrobot_workspace_instances
+	case account.EdgeRobotMcpServers:
+		return m.clearedrobot_mcp_servers
+	case account.EdgeRobotSessions:
+		return m.clearedrobot_sessions
+	case account.EdgeRobotMessages:
+		return m.clearedrobot_messages
 	case account.EdgeAccountRoles:
 		return m.clearedaccount_roles
 	}
@@ -4286,6 +4866,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 	case account.EdgeOauthRefreshTokens:
 		m.ResetOauthRefreshTokens()
 		return nil
+	case account.EdgeOauthRemoteConnections:
+		m.ResetOauthRemoteConnections()
+		return nil
 	case account.EdgeClaimedOauthDeviceAuthorisations:
 		m.ResetClaimedOauthDeviceAuthorisations()
 		return nil
@@ -4333,6 +4916,24 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeAuthoredWarnings:
 		m.ResetAuthoredWarnings()
+		return nil
+	case account.EdgeRobots:
+		m.ResetRobots()
+		return nil
+	case account.EdgeRobotWorkspaces:
+		m.ResetRobotWorkspaces()
+		return nil
+	case account.EdgeRobotWorkspaceInstances:
+		m.ResetRobotWorkspaceInstances()
+		return nil
+	case account.EdgeRobotMcpServers:
+		m.ResetRobotMcpServers()
+		return nil
+	case account.EdgeRobotSessions:
+		m.ResetRobotSessions()
+		return nil
+	case account.EdgeRobotMessages:
+		m.ResetRobotMessages()
 		return nil
 	case account.EdgeAccountRoles:
 		m.ResetAccountRoles()
@@ -30024,6 +30625,3055 @@ func (m *OAuthRefreshTokenMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown OAuthRefreshToken edge %s", name)
 }
 
+// OAuthRemoteAuthorisationFlowMutation represents an operation that mutates the OAuthRemoteAuthorisationFlow nodes in the graph.
+type OAuthRemoteAuthorisationFlowMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *xid.ID
+	created_at        *time.Time
+	state_hash        *string
+	pkce_verifier     *string
+	redirect_uri      *string
+	expires_at        *time.Time
+	consumed_at       *time.Time
+	clearedFields     map[string]struct{}
+	connection        *xid.ID
+	clearedconnection bool
+	done              bool
+	oldValue          func(context.Context) (*OAuthRemoteAuthorisationFlow, error)
+	predicates        []predicate.OAuthRemoteAuthorisationFlow
+}
+
+var _ ent.Mutation = (*OAuthRemoteAuthorisationFlowMutation)(nil)
+
+// oauthremoteauthorisationflowOption allows management of the mutation configuration using functional options.
+type oauthremoteauthorisationflowOption func(*OAuthRemoteAuthorisationFlowMutation)
+
+// newOAuthRemoteAuthorisationFlowMutation creates new mutation for the OAuthRemoteAuthorisationFlow entity.
+func newOAuthRemoteAuthorisationFlowMutation(c config, op Op, opts ...oauthremoteauthorisationflowOption) *OAuthRemoteAuthorisationFlowMutation {
+	m := &OAuthRemoteAuthorisationFlowMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOAuthRemoteAuthorisationFlow,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOAuthRemoteAuthorisationFlowID sets the ID field of the mutation.
+func withOAuthRemoteAuthorisationFlowID(id xid.ID) oauthremoteauthorisationflowOption {
+	return func(m *OAuthRemoteAuthorisationFlowMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *OAuthRemoteAuthorisationFlow
+		)
+		m.oldValue = func(ctx context.Context) (*OAuthRemoteAuthorisationFlow, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().OAuthRemoteAuthorisationFlow.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOAuthRemoteAuthorisationFlow sets the old OAuthRemoteAuthorisationFlow of the mutation.
+func withOAuthRemoteAuthorisationFlow(node *OAuthRemoteAuthorisationFlow) oauthremoteauthorisationflowOption {
+	return func(m *OAuthRemoteAuthorisationFlowMutation) {
+		m.oldValue = func(context.Context) (*OAuthRemoteAuthorisationFlow, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OAuthRemoteAuthorisationFlowMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OAuthRemoteAuthorisationFlowMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of OAuthRemoteAuthorisationFlow entities.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OAuthRemoteAuthorisationFlowMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().OAuthRemoteAuthorisationFlow.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetConnectionID sets the "connection_id" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetConnectionID(x xid.ID) {
+	m.connection = &x
+}
+
+// ConnectionID returns the value of the "connection_id" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ConnectionID() (r xid.ID, exists bool) {
+	v := m.connection
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConnectionID returns the old "connection_id" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldConnectionID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConnectionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConnectionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConnectionID: %w", err)
+	}
+	return oldValue.ConnectionID, nil
+}
+
+// ResetConnectionID resets all changes to the "connection_id" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetConnectionID() {
+	m.connection = nil
+}
+
+// SetStateHash sets the "state_hash" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetStateHash(s string) {
+	m.state_hash = &s
+}
+
+// StateHash returns the value of the "state_hash" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) StateHash() (r string, exists bool) {
+	v := m.state_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStateHash returns the old "state_hash" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldStateHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStateHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStateHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStateHash: %w", err)
+	}
+	return oldValue.StateHash, nil
+}
+
+// ResetStateHash resets all changes to the "state_hash" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetStateHash() {
+	m.state_hash = nil
+}
+
+// SetPkceVerifier sets the "pkce_verifier" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetPkceVerifier(s string) {
+	m.pkce_verifier = &s
+}
+
+// PkceVerifier returns the value of the "pkce_verifier" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) PkceVerifier() (r string, exists bool) {
+	v := m.pkce_verifier
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPkceVerifier returns the old "pkce_verifier" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldPkceVerifier(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPkceVerifier is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPkceVerifier requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPkceVerifier: %w", err)
+	}
+	return oldValue.PkceVerifier, nil
+}
+
+// ResetPkceVerifier resets all changes to the "pkce_verifier" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetPkceVerifier() {
+	m.pkce_verifier = nil
+}
+
+// SetRedirectURI sets the "redirect_uri" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetRedirectURI(s string) {
+	m.redirect_uri = &s
+}
+
+// RedirectURI returns the value of the "redirect_uri" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) RedirectURI() (r string, exists bool) {
+	v := m.redirect_uri
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedirectURI returns the old "redirect_uri" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldRedirectURI(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedirectURI is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedirectURI requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedirectURI: %w", err)
+	}
+	return oldValue.RedirectURI, nil
+}
+
+// ResetRedirectURI resets all changes to the "redirect_uri" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetRedirectURI() {
+	m.redirect_uri = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldExpiresAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetExpiresAt() {
+	m.expires_at = nil
+}
+
+// SetConsumedAt sets the "consumed_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetConsumedAt(t time.Time) {
+	m.consumed_at = &t
+}
+
+// ConsumedAt returns the value of the "consumed_at" field in the mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ConsumedAt() (r time.Time, exists bool) {
+	v := m.consumed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConsumedAt returns the old "consumed_at" field's value of the OAuthRemoteAuthorisationFlow entity.
+// If the OAuthRemoteAuthorisationFlow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldConsumedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConsumedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConsumedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConsumedAt: %w", err)
+	}
+	return oldValue.ConsumedAt, nil
+}
+
+// ClearConsumedAt clears the value of the "consumed_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearConsumedAt() {
+	m.consumed_at = nil
+	m.clearedFields[oauthremoteauthorisationflow.FieldConsumedAt] = struct{}{}
+}
+
+// ConsumedAtCleared returns if the "consumed_at" field was cleared in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ConsumedAtCleared() bool {
+	_, ok := m.clearedFields[oauthremoteauthorisationflow.FieldConsumedAt]
+	return ok
+}
+
+// ResetConsumedAt resets all changes to the "consumed_at" field.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetConsumedAt() {
+	m.consumed_at = nil
+	delete(m.clearedFields, oauthremoteauthorisationflow.FieldConsumedAt)
+}
+
+// ClearConnection clears the "connection" edge to the OAuthRemoteConnection entity.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearConnection() {
+	m.clearedconnection = true
+	m.clearedFields[oauthremoteauthorisationflow.FieldConnectionID] = struct{}{}
+}
+
+// ConnectionCleared reports if the "connection" edge to the OAuthRemoteConnection entity was cleared.
+func (m *OAuthRemoteAuthorisationFlowMutation) ConnectionCleared() bool {
+	return m.clearedconnection
+}
+
+// ConnectionIDs returns the "connection" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ConnectionID instead. It exists only for internal usage by the builders.
+func (m *OAuthRemoteAuthorisationFlowMutation) ConnectionIDs() (ids []xid.ID) {
+	if id := m.connection; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetConnection resets all changes to the "connection" edge.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetConnection() {
+	m.connection = nil
+	m.clearedconnection = false
+}
+
+// Where appends a list predicates to the OAuthRemoteAuthorisationFlowMutation builder.
+func (m *OAuthRemoteAuthorisationFlowMutation) Where(ps ...predicate.OAuthRemoteAuthorisationFlow) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OAuthRemoteAuthorisationFlowMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OAuthRemoteAuthorisationFlowMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.OAuthRemoteAuthorisationFlow, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OAuthRemoteAuthorisationFlowMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (OAuthRemoteAuthorisationFlow).
+func (m *OAuthRemoteAuthorisationFlowMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OAuthRemoteAuthorisationFlowMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldCreatedAt)
+	}
+	if m.connection != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldConnectionID)
+	}
+	if m.state_hash != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldStateHash)
+	}
+	if m.pkce_verifier != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldPkceVerifier)
+	}
+	if m.redirect_uri != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldRedirectURI)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldExpiresAt)
+	}
+	if m.consumed_at != nil {
+		fields = append(fields, oauthremoteauthorisationflow.FieldConsumedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case oauthremoteauthorisationflow.FieldCreatedAt:
+		return m.CreatedAt()
+	case oauthremoteauthorisationflow.FieldConnectionID:
+		return m.ConnectionID()
+	case oauthremoteauthorisationflow.FieldStateHash:
+		return m.StateHash()
+	case oauthremoteauthorisationflow.FieldPkceVerifier:
+		return m.PkceVerifier()
+	case oauthremoteauthorisationflow.FieldRedirectURI:
+		return m.RedirectURI()
+	case oauthremoteauthorisationflow.FieldExpiresAt:
+		return m.ExpiresAt()
+	case oauthremoteauthorisationflow.FieldConsumedAt:
+		return m.ConsumedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OAuthRemoteAuthorisationFlowMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case oauthremoteauthorisationflow.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case oauthremoteauthorisationflow.FieldConnectionID:
+		return m.OldConnectionID(ctx)
+	case oauthremoteauthorisationflow.FieldStateHash:
+		return m.OldStateHash(ctx)
+	case oauthremoteauthorisationflow.FieldPkceVerifier:
+		return m.OldPkceVerifier(ctx)
+	case oauthremoteauthorisationflow.FieldRedirectURI:
+		return m.OldRedirectURI(ctx)
+	case oauthremoteauthorisationflow.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
+	case oauthremoteauthorisationflow.FieldConsumedAt:
+		return m.OldConsumedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown OAuthRemoteAuthorisationFlow field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OAuthRemoteAuthorisationFlowMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case oauthremoteauthorisationflow.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldConnectionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConnectionID(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldStateHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStateHash(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldPkceVerifier:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPkceVerifier(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldRedirectURI:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedirectURI(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
+		return nil
+	case oauthremoteauthorisationflow.FieldConsumedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConsumedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OAuthRemoteAuthorisationFlowMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(oauthremoteauthorisationflow.FieldConsumedAt) {
+		fields = append(fields, oauthremoteauthorisationflow.FieldConsumedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearField(name string) error {
+	switch name {
+	case oauthremoteauthorisationflow.FieldConsumedAt:
+		m.ClearConsumedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetField(name string) error {
+	switch name {
+	case oauthremoteauthorisationflow.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case oauthremoteauthorisationflow.FieldConnectionID:
+		m.ResetConnectionID()
+		return nil
+	case oauthremoteauthorisationflow.FieldStateHash:
+		m.ResetStateHash()
+		return nil
+	case oauthremoteauthorisationflow.FieldPkceVerifier:
+		m.ResetPkceVerifier()
+		return nil
+	case oauthremoteauthorisationflow.FieldRedirectURI:
+		m.ResetRedirectURI()
+		return nil
+	case oauthremoteauthorisationflow.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
+	case oauthremoteauthorisationflow.FieldConsumedAt:
+		m.ResetConsumedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.connection != nil {
+		edges = append(edges, oauthremoteauthorisationflow.EdgeConnection)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case oauthremoteauthorisationflow.EdgeConnection:
+		if id := m.connection; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedconnection {
+		edges = append(edges, oauthremoteauthorisationflow.EdgeConnection)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OAuthRemoteAuthorisationFlowMutation) EdgeCleared(name string) bool {
+	switch name {
+	case oauthremoteauthorisationflow.EdgeConnection:
+		return m.clearedconnection
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) ClearEdge(name string) error {
+	switch name {
+	case oauthremoteauthorisationflow.EdgeConnection:
+		m.ClearConnection()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OAuthRemoteAuthorisationFlowMutation) ResetEdge(name string) error {
+	switch name {
+	case oauthremoteauthorisationflow.EdgeConnection:
+		m.ResetConnection()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteAuthorisationFlow edge %s", name)
+}
+
+// OAuthRemoteConnectionMutation represents an operation that mutates the OAuthRemoteConnection nodes in the graph.
+type OAuthRemoteConnectionMutation struct {
+	config
+	op                            Op
+	typ                           string
+	id                            *xid.ID
+	created_at                    *time.Time
+	updated_at                    *time.Time
+	resource_url                  *string
+	resource                      *string
+	resource_name                 *string
+	protected_resource_metadata   *map[string]interface{}
+	authorization_server          *string
+	authorization_server_metadata *map[string]interface{}
+	mode                          *oauthremoteconnection.Mode
+	status                        *oauthremoteconnection.Status
+	client_id                     *string
+	client_secret                 *string
+	authorization_endpoint        *string
+	token_endpoint                *string
+	registration_endpoint         *string
+	token_endpoint_auth_method    *string
+	redirect_uris                 *[]string
+	appendredirect_uris           []string
+	redirect_uri                  *string
+	scope                         *string
+	access_token                  *string
+	refresh_token                 *string
+	token_type                    *string
+	token_expiry                  *time.Time
+	token_refresh_started_at      *time.Time
+	last_error                    *string
+	clearedFields                 map[string]struct{}
+	account                       *xid.ID
+	clearedaccount                bool
+	authorisation_flows           map[xid.ID]struct{}
+	removedauthorisation_flows    map[xid.ID]struct{}
+	clearedauthorisation_flows    bool
+	robot_mcp_servers             map[xid.ID]struct{}
+	removedrobot_mcp_servers      map[xid.ID]struct{}
+	clearedrobot_mcp_servers      bool
+	done                          bool
+	oldValue                      func(context.Context) (*OAuthRemoteConnection, error)
+	predicates                    []predicate.OAuthRemoteConnection
+}
+
+var _ ent.Mutation = (*OAuthRemoteConnectionMutation)(nil)
+
+// oauthremoteconnectionOption allows management of the mutation configuration using functional options.
+type oauthremoteconnectionOption func(*OAuthRemoteConnectionMutation)
+
+// newOAuthRemoteConnectionMutation creates new mutation for the OAuthRemoteConnection entity.
+func newOAuthRemoteConnectionMutation(c config, op Op, opts ...oauthremoteconnectionOption) *OAuthRemoteConnectionMutation {
+	m := &OAuthRemoteConnectionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOAuthRemoteConnection,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOAuthRemoteConnectionID sets the ID field of the mutation.
+func withOAuthRemoteConnectionID(id xid.ID) oauthremoteconnectionOption {
+	return func(m *OAuthRemoteConnectionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *OAuthRemoteConnection
+		)
+		m.oldValue = func(ctx context.Context) (*OAuthRemoteConnection, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().OAuthRemoteConnection.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOAuthRemoteConnection sets the old OAuthRemoteConnection of the mutation.
+func withOAuthRemoteConnection(node *OAuthRemoteConnection) oauthremoteconnectionOption {
+	return func(m *OAuthRemoteConnectionMutation) {
+		m.oldValue = func(context.Context) (*OAuthRemoteConnection, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OAuthRemoteConnectionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OAuthRemoteConnectionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of OAuthRemoteConnection entities.
+func (m *OAuthRemoteConnectionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OAuthRemoteConnectionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OAuthRemoteConnectionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().OAuthRemoteConnection.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OAuthRemoteConnectionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OAuthRemoteConnectionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *OAuthRemoteConnectionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *OAuthRemoteConnectionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetResourceURL sets the "resource_url" field.
+func (m *OAuthRemoteConnectionMutation) SetResourceURL(s string) {
+	m.resource_url = &s
+}
+
+// ResourceURL returns the value of the "resource_url" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) ResourceURL() (r string, exists bool) {
+	v := m.resource_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResourceURL returns the old "resource_url" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldResourceURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResourceURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResourceURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResourceURL: %w", err)
+	}
+	return oldValue.ResourceURL, nil
+}
+
+// ResetResourceURL resets all changes to the "resource_url" field.
+func (m *OAuthRemoteConnectionMutation) ResetResourceURL() {
+	m.resource_url = nil
+}
+
+// SetResource sets the "resource" field.
+func (m *OAuthRemoteConnectionMutation) SetResource(s string) {
+	m.resource = &s
+}
+
+// Resource returns the value of the "resource" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) Resource() (r string, exists bool) {
+	v := m.resource
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResource returns the old "resource" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldResource(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResource is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResource requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResource: %w", err)
+	}
+	return oldValue.Resource, nil
+}
+
+// ClearResource clears the value of the "resource" field.
+func (m *OAuthRemoteConnectionMutation) ClearResource() {
+	m.resource = nil
+	m.clearedFields[oauthremoteconnection.FieldResource] = struct{}{}
+}
+
+// ResourceCleared returns if the "resource" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ResourceCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldResource]
+	return ok
+}
+
+// ResetResource resets all changes to the "resource" field.
+func (m *OAuthRemoteConnectionMutation) ResetResource() {
+	m.resource = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldResource)
+}
+
+// SetResourceName sets the "resource_name" field.
+func (m *OAuthRemoteConnectionMutation) SetResourceName(s string) {
+	m.resource_name = &s
+}
+
+// ResourceName returns the value of the "resource_name" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) ResourceName() (r string, exists bool) {
+	v := m.resource_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResourceName returns the old "resource_name" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldResourceName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResourceName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResourceName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResourceName: %w", err)
+	}
+	return oldValue.ResourceName, nil
+}
+
+// ClearResourceName clears the value of the "resource_name" field.
+func (m *OAuthRemoteConnectionMutation) ClearResourceName() {
+	m.resource_name = nil
+	m.clearedFields[oauthremoteconnection.FieldResourceName] = struct{}{}
+}
+
+// ResourceNameCleared returns if the "resource_name" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ResourceNameCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldResourceName]
+	return ok
+}
+
+// ResetResourceName resets all changes to the "resource_name" field.
+func (m *OAuthRemoteConnectionMutation) ResetResourceName() {
+	m.resource_name = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldResourceName)
+}
+
+// SetProtectedResourceMetadata sets the "protected_resource_metadata" field.
+func (m *OAuthRemoteConnectionMutation) SetProtectedResourceMetadata(value map[string]interface{}) {
+	m.protected_resource_metadata = &value
+}
+
+// ProtectedResourceMetadata returns the value of the "protected_resource_metadata" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) ProtectedResourceMetadata() (r map[string]interface{}, exists bool) {
+	v := m.protected_resource_metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProtectedResourceMetadata returns the old "protected_resource_metadata" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldProtectedResourceMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProtectedResourceMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProtectedResourceMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProtectedResourceMetadata: %w", err)
+	}
+	return oldValue.ProtectedResourceMetadata, nil
+}
+
+// ClearProtectedResourceMetadata clears the value of the "protected_resource_metadata" field.
+func (m *OAuthRemoteConnectionMutation) ClearProtectedResourceMetadata() {
+	m.protected_resource_metadata = nil
+	m.clearedFields[oauthremoteconnection.FieldProtectedResourceMetadata] = struct{}{}
+}
+
+// ProtectedResourceMetadataCleared returns if the "protected_resource_metadata" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ProtectedResourceMetadataCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldProtectedResourceMetadata]
+	return ok
+}
+
+// ResetProtectedResourceMetadata resets all changes to the "protected_resource_metadata" field.
+func (m *OAuthRemoteConnectionMutation) ResetProtectedResourceMetadata() {
+	m.protected_resource_metadata = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldProtectedResourceMetadata)
+}
+
+// SetAuthorizationServer sets the "authorization_server" field.
+func (m *OAuthRemoteConnectionMutation) SetAuthorizationServer(s string) {
+	m.authorization_server = &s
+}
+
+// AuthorizationServer returns the value of the "authorization_server" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationServer() (r string, exists bool) {
+	v := m.authorization_server
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorizationServer returns the old "authorization_server" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldAuthorizationServer(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorizationServer is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorizationServer requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorizationServer: %w", err)
+	}
+	return oldValue.AuthorizationServer, nil
+}
+
+// ClearAuthorizationServer clears the value of the "authorization_server" field.
+func (m *OAuthRemoteConnectionMutation) ClearAuthorizationServer() {
+	m.authorization_server = nil
+	m.clearedFields[oauthremoteconnection.FieldAuthorizationServer] = struct{}{}
+}
+
+// AuthorizationServerCleared returns if the "authorization_server" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationServerCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldAuthorizationServer]
+	return ok
+}
+
+// ResetAuthorizationServer resets all changes to the "authorization_server" field.
+func (m *OAuthRemoteConnectionMutation) ResetAuthorizationServer() {
+	m.authorization_server = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldAuthorizationServer)
+}
+
+// SetAuthorizationServerMetadata sets the "authorization_server_metadata" field.
+func (m *OAuthRemoteConnectionMutation) SetAuthorizationServerMetadata(value map[string]interface{}) {
+	m.authorization_server_metadata = &value
+}
+
+// AuthorizationServerMetadata returns the value of the "authorization_server_metadata" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationServerMetadata() (r map[string]interface{}, exists bool) {
+	v := m.authorization_server_metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorizationServerMetadata returns the old "authorization_server_metadata" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldAuthorizationServerMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorizationServerMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorizationServerMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorizationServerMetadata: %w", err)
+	}
+	return oldValue.AuthorizationServerMetadata, nil
+}
+
+// ClearAuthorizationServerMetadata clears the value of the "authorization_server_metadata" field.
+func (m *OAuthRemoteConnectionMutation) ClearAuthorizationServerMetadata() {
+	m.authorization_server_metadata = nil
+	m.clearedFields[oauthremoteconnection.FieldAuthorizationServerMetadata] = struct{}{}
+}
+
+// AuthorizationServerMetadataCleared returns if the "authorization_server_metadata" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationServerMetadataCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldAuthorizationServerMetadata]
+	return ok
+}
+
+// ResetAuthorizationServerMetadata resets all changes to the "authorization_server_metadata" field.
+func (m *OAuthRemoteConnectionMutation) ResetAuthorizationServerMetadata() {
+	m.authorization_server_metadata = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldAuthorizationServerMetadata)
+}
+
+// SetMode sets the "mode" field.
+func (m *OAuthRemoteConnectionMutation) SetMode(o oauthremoteconnection.Mode) {
+	m.mode = &o
+}
+
+// Mode returns the value of the "mode" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) Mode() (r oauthremoteconnection.Mode, exists bool) {
+	v := m.mode
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMode returns the old "mode" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldMode(ctx context.Context) (v oauthremoteconnection.Mode, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMode: %w", err)
+	}
+	return oldValue.Mode, nil
+}
+
+// ResetMode resets all changes to the "mode" field.
+func (m *OAuthRemoteConnectionMutation) ResetMode() {
+	m.mode = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *OAuthRemoteConnectionMutation) SetStatus(o oauthremoteconnection.Status) {
+	m.status = &o
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) Status() (r oauthremoteconnection.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldStatus(ctx context.Context) (v oauthremoteconnection.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *OAuthRemoteConnectionMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetClientID sets the "client_id" field.
+func (m *OAuthRemoteConnectionMutation) SetClientID(s string) {
+	m.client_id = &s
+}
+
+// ClientID returns the value of the "client_id" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) ClientID() (r string, exists bool) {
+	v := m.client_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClientID returns the old "client_id" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldClientID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClientID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClientID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClientID: %w", err)
+	}
+	return oldValue.ClientID, nil
+}
+
+// ClearClientID clears the value of the "client_id" field.
+func (m *OAuthRemoteConnectionMutation) ClearClientID() {
+	m.client_id = nil
+	m.clearedFields[oauthremoteconnection.FieldClientID] = struct{}{}
+}
+
+// ClientIDCleared returns if the "client_id" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ClientIDCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldClientID]
+	return ok
+}
+
+// ResetClientID resets all changes to the "client_id" field.
+func (m *OAuthRemoteConnectionMutation) ResetClientID() {
+	m.client_id = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldClientID)
+}
+
+// SetClientSecret sets the "client_secret" field.
+func (m *OAuthRemoteConnectionMutation) SetClientSecret(s string) {
+	m.client_secret = &s
+}
+
+// ClientSecret returns the value of the "client_secret" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) ClientSecret() (r string, exists bool) {
+	v := m.client_secret
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldClientSecret returns the old "client_secret" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldClientSecret(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldClientSecret is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldClientSecret requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldClientSecret: %w", err)
+	}
+	return oldValue.ClientSecret, nil
+}
+
+// ClearClientSecret clears the value of the "client_secret" field.
+func (m *OAuthRemoteConnectionMutation) ClearClientSecret() {
+	m.client_secret = nil
+	m.clearedFields[oauthremoteconnection.FieldClientSecret] = struct{}{}
+}
+
+// ClientSecretCleared returns if the "client_secret" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ClientSecretCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldClientSecret]
+	return ok
+}
+
+// ResetClientSecret resets all changes to the "client_secret" field.
+func (m *OAuthRemoteConnectionMutation) ResetClientSecret() {
+	m.client_secret = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldClientSecret)
+}
+
+// SetAuthorizationEndpoint sets the "authorization_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) SetAuthorizationEndpoint(s string) {
+	m.authorization_endpoint = &s
+}
+
+// AuthorizationEndpoint returns the value of the "authorization_endpoint" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationEndpoint() (r string, exists bool) {
+	v := m.authorization_endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorizationEndpoint returns the old "authorization_endpoint" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldAuthorizationEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorizationEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorizationEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorizationEndpoint: %w", err)
+	}
+	return oldValue.AuthorizationEndpoint, nil
+}
+
+// ClearAuthorizationEndpoint clears the value of the "authorization_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ClearAuthorizationEndpoint() {
+	m.authorization_endpoint = nil
+	m.clearedFields[oauthremoteconnection.FieldAuthorizationEndpoint] = struct{}{}
+}
+
+// AuthorizationEndpointCleared returns if the "authorization_endpoint" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorizationEndpointCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldAuthorizationEndpoint]
+	return ok
+}
+
+// ResetAuthorizationEndpoint resets all changes to the "authorization_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ResetAuthorizationEndpoint() {
+	m.authorization_endpoint = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldAuthorizationEndpoint)
+}
+
+// SetTokenEndpoint sets the "token_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) SetTokenEndpoint(s string) {
+	m.token_endpoint = &s
+}
+
+// TokenEndpoint returns the value of the "token_endpoint" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) TokenEndpoint() (r string, exists bool) {
+	v := m.token_endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenEndpoint returns the old "token_endpoint" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldTokenEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenEndpoint: %w", err)
+	}
+	return oldValue.TokenEndpoint, nil
+}
+
+// ClearTokenEndpoint clears the value of the "token_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ClearTokenEndpoint() {
+	m.token_endpoint = nil
+	m.clearedFields[oauthremoteconnection.FieldTokenEndpoint] = struct{}{}
+}
+
+// TokenEndpointCleared returns if the "token_endpoint" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) TokenEndpointCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldTokenEndpoint]
+	return ok
+}
+
+// ResetTokenEndpoint resets all changes to the "token_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ResetTokenEndpoint() {
+	m.token_endpoint = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldTokenEndpoint)
+}
+
+// SetRegistrationEndpoint sets the "registration_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) SetRegistrationEndpoint(s string) {
+	m.registration_endpoint = &s
+}
+
+// RegistrationEndpoint returns the value of the "registration_endpoint" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) RegistrationEndpoint() (r string, exists bool) {
+	v := m.registration_endpoint
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRegistrationEndpoint returns the old "registration_endpoint" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldRegistrationEndpoint(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRegistrationEndpoint is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRegistrationEndpoint requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRegistrationEndpoint: %w", err)
+	}
+	return oldValue.RegistrationEndpoint, nil
+}
+
+// ClearRegistrationEndpoint clears the value of the "registration_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ClearRegistrationEndpoint() {
+	m.registration_endpoint = nil
+	m.clearedFields[oauthremoteconnection.FieldRegistrationEndpoint] = struct{}{}
+}
+
+// RegistrationEndpointCleared returns if the "registration_endpoint" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) RegistrationEndpointCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldRegistrationEndpoint]
+	return ok
+}
+
+// ResetRegistrationEndpoint resets all changes to the "registration_endpoint" field.
+func (m *OAuthRemoteConnectionMutation) ResetRegistrationEndpoint() {
+	m.registration_endpoint = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldRegistrationEndpoint)
+}
+
+// SetTokenEndpointAuthMethod sets the "token_endpoint_auth_method" field.
+func (m *OAuthRemoteConnectionMutation) SetTokenEndpointAuthMethod(s string) {
+	m.token_endpoint_auth_method = &s
+}
+
+// TokenEndpointAuthMethod returns the value of the "token_endpoint_auth_method" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) TokenEndpointAuthMethod() (r string, exists bool) {
+	v := m.token_endpoint_auth_method
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenEndpointAuthMethod returns the old "token_endpoint_auth_method" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldTokenEndpointAuthMethod(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenEndpointAuthMethod is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenEndpointAuthMethod requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenEndpointAuthMethod: %w", err)
+	}
+	return oldValue.TokenEndpointAuthMethod, nil
+}
+
+// ClearTokenEndpointAuthMethod clears the value of the "token_endpoint_auth_method" field.
+func (m *OAuthRemoteConnectionMutation) ClearTokenEndpointAuthMethod() {
+	m.token_endpoint_auth_method = nil
+	m.clearedFields[oauthremoteconnection.FieldTokenEndpointAuthMethod] = struct{}{}
+}
+
+// TokenEndpointAuthMethodCleared returns if the "token_endpoint_auth_method" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) TokenEndpointAuthMethodCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldTokenEndpointAuthMethod]
+	return ok
+}
+
+// ResetTokenEndpointAuthMethod resets all changes to the "token_endpoint_auth_method" field.
+func (m *OAuthRemoteConnectionMutation) ResetTokenEndpointAuthMethod() {
+	m.token_endpoint_auth_method = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldTokenEndpointAuthMethod)
+}
+
+// SetRedirectUris sets the "redirect_uris" field.
+func (m *OAuthRemoteConnectionMutation) SetRedirectUris(s []string) {
+	m.redirect_uris = &s
+	m.appendredirect_uris = nil
+}
+
+// RedirectUris returns the value of the "redirect_uris" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) RedirectUris() (r []string, exists bool) {
+	v := m.redirect_uris
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedirectUris returns the old "redirect_uris" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldRedirectUris(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedirectUris is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedirectUris requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedirectUris: %w", err)
+	}
+	return oldValue.RedirectUris, nil
+}
+
+// AppendRedirectUris adds s to the "redirect_uris" field.
+func (m *OAuthRemoteConnectionMutation) AppendRedirectUris(s []string) {
+	m.appendredirect_uris = append(m.appendredirect_uris, s...)
+}
+
+// AppendedRedirectUris returns the list of values that were appended to the "redirect_uris" field in this mutation.
+func (m *OAuthRemoteConnectionMutation) AppendedRedirectUris() ([]string, bool) {
+	if len(m.appendredirect_uris) == 0 {
+		return nil, false
+	}
+	return m.appendredirect_uris, true
+}
+
+// ClearRedirectUris clears the value of the "redirect_uris" field.
+func (m *OAuthRemoteConnectionMutation) ClearRedirectUris() {
+	m.redirect_uris = nil
+	m.appendredirect_uris = nil
+	m.clearedFields[oauthremoteconnection.FieldRedirectUris] = struct{}{}
+}
+
+// RedirectUrisCleared returns if the "redirect_uris" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) RedirectUrisCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldRedirectUris]
+	return ok
+}
+
+// ResetRedirectUris resets all changes to the "redirect_uris" field.
+func (m *OAuthRemoteConnectionMutation) ResetRedirectUris() {
+	m.redirect_uris = nil
+	m.appendredirect_uris = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldRedirectUris)
+}
+
+// SetRedirectURI sets the "redirect_uri" field.
+func (m *OAuthRemoteConnectionMutation) SetRedirectURI(s string) {
+	m.redirect_uri = &s
+}
+
+// RedirectURI returns the value of the "redirect_uri" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) RedirectURI() (r string, exists bool) {
+	v := m.redirect_uri
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRedirectURI returns the old "redirect_uri" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldRedirectURI(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRedirectURI is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRedirectURI requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRedirectURI: %w", err)
+	}
+	return oldValue.RedirectURI, nil
+}
+
+// ClearRedirectURI clears the value of the "redirect_uri" field.
+func (m *OAuthRemoteConnectionMutation) ClearRedirectURI() {
+	m.redirect_uri = nil
+	m.clearedFields[oauthremoteconnection.FieldRedirectURI] = struct{}{}
+}
+
+// RedirectURICleared returns if the "redirect_uri" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) RedirectURICleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldRedirectURI]
+	return ok
+}
+
+// ResetRedirectURI resets all changes to the "redirect_uri" field.
+func (m *OAuthRemoteConnectionMutation) ResetRedirectURI() {
+	m.redirect_uri = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldRedirectURI)
+}
+
+// SetScope sets the "scope" field.
+func (m *OAuthRemoteConnectionMutation) SetScope(s string) {
+	m.scope = &s
+}
+
+// Scope returns the value of the "scope" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) Scope() (r string, exists bool) {
+	v := m.scope
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScope returns the old "scope" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldScope(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScope is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScope requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScope: %w", err)
+	}
+	return oldValue.Scope, nil
+}
+
+// ClearScope clears the value of the "scope" field.
+func (m *OAuthRemoteConnectionMutation) ClearScope() {
+	m.scope = nil
+	m.clearedFields[oauthremoteconnection.FieldScope] = struct{}{}
+}
+
+// ScopeCleared returns if the "scope" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ScopeCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldScope]
+	return ok
+}
+
+// ResetScope resets all changes to the "scope" field.
+func (m *OAuthRemoteConnectionMutation) ResetScope() {
+	m.scope = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldScope)
+}
+
+// SetAccessToken sets the "access_token" field.
+func (m *OAuthRemoteConnectionMutation) SetAccessToken(s string) {
+	m.access_token = &s
+}
+
+// AccessToken returns the value of the "access_token" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) AccessToken() (r string, exists bool) {
+	v := m.access_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccessToken returns the old "access_token" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldAccessToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccessToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccessToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccessToken: %w", err)
+	}
+	return oldValue.AccessToken, nil
+}
+
+// ClearAccessToken clears the value of the "access_token" field.
+func (m *OAuthRemoteConnectionMutation) ClearAccessToken() {
+	m.access_token = nil
+	m.clearedFields[oauthremoteconnection.FieldAccessToken] = struct{}{}
+}
+
+// AccessTokenCleared returns if the "access_token" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) AccessTokenCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldAccessToken]
+	return ok
+}
+
+// ResetAccessToken resets all changes to the "access_token" field.
+func (m *OAuthRemoteConnectionMutation) ResetAccessToken() {
+	m.access_token = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldAccessToken)
+}
+
+// SetRefreshToken sets the "refresh_token" field.
+func (m *OAuthRemoteConnectionMutation) SetRefreshToken(s string) {
+	m.refresh_token = &s
+}
+
+// RefreshToken returns the value of the "refresh_token" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) RefreshToken() (r string, exists bool) {
+	v := m.refresh_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRefreshToken returns the old "refresh_token" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldRefreshToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRefreshToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRefreshToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRefreshToken: %w", err)
+	}
+	return oldValue.RefreshToken, nil
+}
+
+// ClearRefreshToken clears the value of the "refresh_token" field.
+func (m *OAuthRemoteConnectionMutation) ClearRefreshToken() {
+	m.refresh_token = nil
+	m.clearedFields[oauthremoteconnection.FieldRefreshToken] = struct{}{}
+}
+
+// RefreshTokenCleared returns if the "refresh_token" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) RefreshTokenCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldRefreshToken]
+	return ok
+}
+
+// ResetRefreshToken resets all changes to the "refresh_token" field.
+func (m *OAuthRemoteConnectionMutation) ResetRefreshToken() {
+	m.refresh_token = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldRefreshToken)
+}
+
+// SetTokenType sets the "token_type" field.
+func (m *OAuthRemoteConnectionMutation) SetTokenType(s string) {
+	m.token_type = &s
+}
+
+// TokenType returns the value of the "token_type" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) TokenType() (r string, exists bool) {
+	v := m.token_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenType returns the old "token_type" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldTokenType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenType: %w", err)
+	}
+	return oldValue.TokenType, nil
+}
+
+// ClearTokenType clears the value of the "token_type" field.
+func (m *OAuthRemoteConnectionMutation) ClearTokenType() {
+	m.token_type = nil
+	m.clearedFields[oauthremoteconnection.FieldTokenType] = struct{}{}
+}
+
+// TokenTypeCleared returns if the "token_type" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) TokenTypeCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldTokenType]
+	return ok
+}
+
+// ResetTokenType resets all changes to the "token_type" field.
+func (m *OAuthRemoteConnectionMutation) ResetTokenType() {
+	m.token_type = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldTokenType)
+}
+
+// SetTokenExpiry sets the "token_expiry" field.
+func (m *OAuthRemoteConnectionMutation) SetTokenExpiry(t time.Time) {
+	m.token_expiry = &t
+}
+
+// TokenExpiry returns the value of the "token_expiry" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) TokenExpiry() (r time.Time, exists bool) {
+	v := m.token_expiry
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenExpiry returns the old "token_expiry" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldTokenExpiry(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenExpiry is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenExpiry requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenExpiry: %w", err)
+	}
+	return oldValue.TokenExpiry, nil
+}
+
+// ClearTokenExpiry clears the value of the "token_expiry" field.
+func (m *OAuthRemoteConnectionMutation) ClearTokenExpiry() {
+	m.token_expiry = nil
+	m.clearedFields[oauthremoteconnection.FieldTokenExpiry] = struct{}{}
+}
+
+// TokenExpiryCleared returns if the "token_expiry" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) TokenExpiryCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldTokenExpiry]
+	return ok
+}
+
+// ResetTokenExpiry resets all changes to the "token_expiry" field.
+func (m *OAuthRemoteConnectionMutation) ResetTokenExpiry() {
+	m.token_expiry = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldTokenExpiry)
+}
+
+// SetTokenRefreshStartedAt sets the "token_refresh_started_at" field.
+func (m *OAuthRemoteConnectionMutation) SetTokenRefreshStartedAt(t time.Time) {
+	m.token_refresh_started_at = &t
+}
+
+// TokenRefreshStartedAt returns the value of the "token_refresh_started_at" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) TokenRefreshStartedAt() (r time.Time, exists bool) {
+	v := m.token_refresh_started_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenRefreshStartedAt returns the old "token_refresh_started_at" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldTokenRefreshStartedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenRefreshStartedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenRefreshStartedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenRefreshStartedAt: %w", err)
+	}
+	return oldValue.TokenRefreshStartedAt, nil
+}
+
+// ClearTokenRefreshStartedAt clears the value of the "token_refresh_started_at" field.
+func (m *OAuthRemoteConnectionMutation) ClearTokenRefreshStartedAt() {
+	m.token_refresh_started_at = nil
+	m.clearedFields[oauthremoteconnection.FieldTokenRefreshStartedAt] = struct{}{}
+}
+
+// TokenRefreshStartedAtCleared returns if the "token_refresh_started_at" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) TokenRefreshStartedAtCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldTokenRefreshStartedAt]
+	return ok
+}
+
+// ResetTokenRefreshStartedAt resets all changes to the "token_refresh_started_at" field.
+func (m *OAuthRemoteConnectionMutation) ResetTokenRefreshStartedAt() {
+	m.token_refresh_started_at = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldTokenRefreshStartedAt)
+}
+
+// SetLastError sets the "last_error" field.
+func (m *OAuthRemoteConnectionMutation) SetLastError(s string) {
+	m.last_error = &s
+}
+
+// LastError returns the value of the "last_error" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) LastError() (r string, exists bool) {
+	v := m.last_error
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastError returns the old "last_error" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldLastError(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastError is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastError requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastError: %w", err)
+	}
+	return oldValue.LastError, nil
+}
+
+// ClearLastError clears the value of the "last_error" field.
+func (m *OAuthRemoteConnectionMutation) ClearLastError() {
+	m.last_error = nil
+	m.clearedFields[oauthremoteconnection.FieldLastError] = struct{}{}
+}
+
+// LastErrorCleared returns if the "last_error" field was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) LastErrorCleared() bool {
+	_, ok := m.clearedFields[oauthremoteconnection.FieldLastError]
+	return ok
+}
+
+// ResetLastError resets all changes to the "last_error" field.
+func (m *OAuthRemoteConnectionMutation) ResetLastError() {
+	m.last_error = nil
+	delete(m.clearedFields, oauthremoteconnection.FieldLastError)
+}
+
+// SetAddedBy sets the "added_by" field.
+func (m *OAuthRemoteConnectionMutation) SetAddedBy(x xid.ID) {
+	m.account = &x
+}
+
+// AddedBy returns the value of the "added_by" field in the mutation.
+func (m *OAuthRemoteConnectionMutation) AddedBy() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddedBy returns the old "added_by" field's value of the OAuthRemoteConnection entity.
+// If the OAuthRemoteConnection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OAuthRemoteConnectionMutation) OldAddedBy(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddedBy: %w", err)
+	}
+	return oldValue.AddedBy, nil
+}
+
+// ResetAddedBy resets all changes to the "added_by" field.
+func (m *OAuthRemoteConnectionMutation) ResetAddedBy() {
+	m.account = nil
+}
+
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *OAuthRemoteConnectionMutation) SetAccountID(id xid.ID) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *OAuthRemoteConnectionMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[oauthremoteconnection.FieldAddedBy] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *OAuthRemoteConnectionMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *OAuthRemoteConnectionMutation) AccountID() (id xid.ID, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *OAuthRemoteConnectionMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *OAuthRemoteConnectionMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// AddAuthorisationFlowIDs adds the "authorisation_flows" edge to the OAuthRemoteAuthorisationFlow entity by ids.
+func (m *OAuthRemoteConnectionMutation) AddAuthorisationFlowIDs(ids ...xid.ID) {
+	if m.authorisation_flows == nil {
+		m.authorisation_flows = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.authorisation_flows[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAuthorisationFlows clears the "authorisation_flows" edge to the OAuthRemoteAuthorisationFlow entity.
+func (m *OAuthRemoteConnectionMutation) ClearAuthorisationFlows() {
+	m.clearedauthorisation_flows = true
+}
+
+// AuthorisationFlowsCleared reports if the "authorisation_flows" edge to the OAuthRemoteAuthorisationFlow entity was cleared.
+func (m *OAuthRemoteConnectionMutation) AuthorisationFlowsCleared() bool {
+	return m.clearedauthorisation_flows
+}
+
+// RemoveAuthorisationFlowIDs removes the "authorisation_flows" edge to the OAuthRemoteAuthorisationFlow entity by IDs.
+func (m *OAuthRemoteConnectionMutation) RemoveAuthorisationFlowIDs(ids ...xid.ID) {
+	if m.removedauthorisation_flows == nil {
+		m.removedauthorisation_flows = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.authorisation_flows, ids[i])
+		m.removedauthorisation_flows[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAuthorisationFlows returns the removed IDs of the "authorisation_flows" edge to the OAuthRemoteAuthorisationFlow entity.
+func (m *OAuthRemoteConnectionMutation) RemovedAuthorisationFlowsIDs() (ids []xid.ID) {
+	for id := range m.removedauthorisation_flows {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AuthorisationFlowsIDs returns the "authorisation_flows" edge IDs in the mutation.
+func (m *OAuthRemoteConnectionMutation) AuthorisationFlowsIDs() (ids []xid.ID) {
+	for id := range m.authorisation_flows {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAuthorisationFlows resets all changes to the "authorisation_flows" edge.
+func (m *OAuthRemoteConnectionMutation) ResetAuthorisationFlows() {
+	m.authorisation_flows = nil
+	m.clearedauthorisation_flows = false
+	m.removedauthorisation_flows = nil
+}
+
+// AddRobotMcpServerIDs adds the "robot_mcp_servers" edge to the RobotMCPServer entity by ids.
+func (m *OAuthRemoteConnectionMutation) AddRobotMcpServerIDs(ids ...xid.ID) {
+	if m.robot_mcp_servers == nil {
+		m.robot_mcp_servers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_mcp_servers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotMcpServers clears the "robot_mcp_servers" edge to the RobotMCPServer entity.
+func (m *OAuthRemoteConnectionMutation) ClearRobotMcpServers() {
+	m.clearedrobot_mcp_servers = true
+}
+
+// RobotMcpServersCleared reports if the "robot_mcp_servers" edge to the RobotMCPServer entity was cleared.
+func (m *OAuthRemoteConnectionMutation) RobotMcpServersCleared() bool {
+	return m.clearedrobot_mcp_servers
+}
+
+// RemoveRobotMcpServerIDs removes the "robot_mcp_servers" edge to the RobotMCPServer entity by IDs.
+func (m *OAuthRemoteConnectionMutation) RemoveRobotMcpServerIDs(ids ...xid.ID) {
+	if m.removedrobot_mcp_servers == nil {
+		m.removedrobot_mcp_servers = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_mcp_servers, ids[i])
+		m.removedrobot_mcp_servers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotMcpServers returns the removed IDs of the "robot_mcp_servers" edge to the RobotMCPServer entity.
+func (m *OAuthRemoteConnectionMutation) RemovedRobotMcpServersIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_mcp_servers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotMcpServersIDs returns the "robot_mcp_servers" edge IDs in the mutation.
+func (m *OAuthRemoteConnectionMutation) RobotMcpServersIDs() (ids []xid.ID) {
+	for id := range m.robot_mcp_servers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotMcpServers resets all changes to the "robot_mcp_servers" edge.
+func (m *OAuthRemoteConnectionMutation) ResetRobotMcpServers() {
+	m.robot_mcp_servers = nil
+	m.clearedrobot_mcp_servers = false
+	m.removedrobot_mcp_servers = nil
+}
+
+// Where appends a list predicates to the OAuthRemoteConnectionMutation builder.
+func (m *OAuthRemoteConnectionMutation) Where(ps ...predicate.OAuthRemoteConnection) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OAuthRemoteConnectionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OAuthRemoteConnectionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.OAuthRemoteConnection, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OAuthRemoteConnectionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OAuthRemoteConnectionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (OAuthRemoteConnection).
+func (m *OAuthRemoteConnectionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OAuthRemoteConnectionMutation) Fields() []string {
+	fields := make([]string, 0, 26)
+	if m.created_at != nil {
+		fields = append(fields, oauthremoteconnection.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, oauthremoteconnection.FieldUpdatedAt)
+	}
+	if m.resource_url != nil {
+		fields = append(fields, oauthremoteconnection.FieldResourceURL)
+	}
+	if m.resource != nil {
+		fields = append(fields, oauthremoteconnection.FieldResource)
+	}
+	if m.resource_name != nil {
+		fields = append(fields, oauthremoteconnection.FieldResourceName)
+	}
+	if m.protected_resource_metadata != nil {
+		fields = append(fields, oauthremoteconnection.FieldProtectedResourceMetadata)
+	}
+	if m.authorization_server != nil {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationServer)
+	}
+	if m.authorization_server_metadata != nil {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationServerMetadata)
+	}
+	if m.mode != nil {
+		fields = append(fields, oauthremoteconnection.FieldMode)
+	}
+	if m.status != nil {
+		fields = append(fields, oauthremoteconnection.FieldStatus)
+	}
+	if m.client_id != nil {
+		fields = append(fields, oauthremoteconnection.FieldClientID)
+	}
+	if m.client_secret != nil {
+		fields = append(fields, oauthremoteconnection.FieldClientSecret)
+	}
+	if m.authorization_endpoint != nil {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationEndpoint)
+	}
+	if m.token_endpoint != nil {
+		fields = append(fields, oauthremoteconnection.FieldTokenEndpoint)
+	}
+	if m.registration_endpoint != nil {
+		fields = append(fields, oauthremoteconnection.FieldRegistrationEndpoint)
+	}
+	if m.token_endpoint_auth_method != nil {
+		fields = append(fields, oauthremoteconnection.FieldTokenEndpointAuthMethod)
+	}
+	if m.redirect_uris != nil {
+		fields = append(fields, oauthremoteconnection.FieldRedirectUris)
+	}
+	if m.redirect_uri != nil {
+		fields = append(fields, oauthremoteconnection.FieldRedirectURI)
+	}
+	if m.scope != nil {
+		fields = append(fields, oauthremoteconnection.FieldScope)
+	}
+	if m.access_token != nil {
+		fields = append(fields, oauthremoteconnection.FieldAccessToken)
+	}
+	if m.refresh_token != nil {
+		fields = append(fields, oauthremoteconnection.FieldRefreshToken)
+	}
+	if m.token_type != nil {
+		fields = append(fields, oauthremoteconnection.FieldTokenType)
+	}
+	if m.token_expiry != nil {
+		fields = append(fields, oauthremoteconnection.FieldTokenExpiry)
+	}
+	if m.token_refresh_started_at != nil {
+		fields = append(fields, oauthremoteconnection.FieldTokenRefreshStartedAt)
+	}
+	if m.last_error != nil {
+		fields = append(fields, oauthremoteconnection.FieldLastError)
+	}
+	if m.account != nil {
+		fields = append(fields, oauthremoteconnection.FieldAddedBy)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OAuthRemoteConnectionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case oauthremoteconnection.FieldCreatedAt:
+		return m.CreatedAt()
+	case oauthremoteconnection.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case oauthremoteconnection.FieldResourceURL:
+		return m.ResourceURL()
+	case oauthremoteconnection.FieldResource:
+		return m.Resource()
+	case oauthremoteconnection.FieldResourceName:
+		return m.ResourceName()
+	case oauthremoteconnection.FieldProtectedResourceMetadata:
+		return m.ProtectedResourceMetadata()
+	case oauthremoteconnection.FieldAuthorizationServer:
+		return m.AuthorizationServer()
+	case oauthremoteconnection.FieldAuthorizationServerMetadata:
+		return m.AuthorizationServerMetadata()
+	case oauthremoteconnection.FieldMode:
+		return m.Mode()
+	case oauthremoteconnection.FieldStatus:
+		return m.Status()
+	case oauthremoteconnection.FieldClientID:
+		return m.ClientID()
+	case oauthremoteconnection.FieldClientSecret:
+		return m.ClientSecret()
+	case oauthremoteconnection.FieldAuthorizationEndpoint:
+		return m.AuthorizationEndpoint()
+	case oauthremoteconnection.FieldTokenEndpoint:
+		return m.TokenEndpoint()
+	case oauthremoteconnection.FieldRegistrationEndpoint:
+		return m.RegistrationEndpoint()
+	case oauthremoteconnection.FieldTokenEndpointAuthMethod:
+		return m.TokenEndpointAuthMethod()
+	case oauthremoteconnection.FieldRedirectUris:
+		return m.RedirectUris()
+	case oauthremoteconnection.FieldRedirectURI:
+		return m.RedirectURI()
+	case oauthremoteconnection.FieldScope:
+		return m.Scope()
+	case oauthremoteconnection.FieldAccessToken:
+		return m.AccessToken()
+	case oauthremoteconnection.FieldRefreshToken:
+		return m.RefreshToken()
+	case oauthremoteconnection.FieldTokenType:
+		return m.TokenType()
+	case oauthremoteconnection.FieldTokenExpiry:
+		return m.TokenExpiry()
+	case oauthremoteconnection.FieldTokenRefreshStartedAt:
+		return m.TokenRefreshStartedAt()
+	case oauthremoteconnection.FieldLastError:
+		return m.LastError()
+	case oauthremoteconnection.FieldAddedBy:
+		return m.AddedBy()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OAuthRemoteConnectionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case oauthremoteconnection.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case oauthremoteconnection.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case oauthremoteconnection.FieldResourceURL:
+		return m.OldResourceURL(ctx)
+	case oauthremoteconnection.FieldResource:
+		return m.OldResource(ctx)
+	case oauthremoteconnection.FieldResourceName:
+		return m.OldResourceName(ctx)
+	case oauthremoteconnection.FieldProtectedResourceMetadata:
+		return m.OldProtectedResourceMetadata(ctx)
+	case oauthremoteconnection.FieldAuthorizationServer:
+		return m.OldAuthorizationServer(ctx)
+	case oauthremoteconnection.FieldAuthorizationServerMetadata:
+		return m.OldAuthorizationServerMetadata(ctx)
+	case oauthremoteconnection.FieldMode:
+		return m.OldMode(ctx)
+	case oauthremoteconnection.FieldStatus:
+		return m.OldStatus(ctx)
+	case oauthremoteconnection.FieldClientID:
+		return m.OldClientID(ctx)
+	case oauthremoteconnection.FieldClientSecret:
+		return m.OldClientSecret(ctx)
+	case oauthremoteconnection.FieldAuthorizationEndpoint:
+		return m.OldAuthorizationEndpoint(ctx)
+	case oauthremoteconnection.FieldTokenEndpoint:
+		return m.OldTokenEndpoint(ctx)
+	case oauthremoteconnection.FieldRegistrationEndpoint:
+		return m.OldRegistrationEndpoint(ctx)
+	case oauthremoteconnection.FieldTokenEndpointAuthMethod:
+		return m.OldTokenEndpointAuthMethod(ctx)
+	case oauthremoteconnection.FieldRedirectUris:
+		return m.OldRedirectUris(ctx)
+	case oauthremoteconnection.FieldRedirectURI:
+		return m.OldRedirectURI(ctx)
+	case oauthremoteconnection.FieldScope:
+		return m.OldScope(ctx)
+	case oauthremoteconnection.FieldAccessToken:
+		return m.OldAccessToken(ctx)
+	case oauthremoteconnection.FieldRefreshToken:
+		return m.OldRefreshToken(ctx)
+	case oauthremoteconnection.FieldTokenType:
+		return m.OldTokenType(ctx)
+	case oauthremoteconnection.FieldTokenExpiry:
+		return m.OldTokenExpiry(ctx)
+	case oauthremoteconnection.FieldTokenRefreshStartedAt:
+		return m.OldTokenRefreshStartedAt(ctx)
+	case oauthremoteconnection.FieldLastError:
+		return m.OldLastError(ctx)
+	case oauthremoteconnection.FieldAddedBy:
+		return m.OldAddedBy(ctx)
+	}
+	return nil, fmt.Errorf("unknown OAuthRemoteConnection field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OAuthRemoteConnectionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case oauthremoteconnection.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case oauthremoteconnection.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case oauthremoteconnection.FieldResourceURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResourceURL(v)
+		return nil
+	case oauthremoteconnection.FieldResource:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResource(v)
+		return nil
+	case oauthremoteconnection.FieldResourceName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResourceName(v)
+		return nil
+	case oauthremoteconnection.FieldProtectedResourceMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProtectedResourceMetadata(v)
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServer:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorizationServer(v)
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServerMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorizationServerMetadata(v)
+		return nil
+	case oauthremoteconnection.FieldMode:
+		v, ok := value.(oauthremoteconnection.Mode)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMode(v)
+		return nil
+	case oauthremoteconnection.FieldStatus:
+		v, ok := value.(oauthremoteconnection.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case oauthremoteconnection.FieldClientID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClientID(v)
+		return nil
+	case oauthremoteconnection.FieldClientSecret:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetClientSecret(v)
+		return nil
+	case oauthremoteconnection.FieldAuthorizationEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorizationEndpoint(v)
+		return nil
+	case oauthremoteconnection.FieldTokenEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenEndpoint(v)
+		return nil
+	case oauthremoteconnection.FieldRegistrationEndpoint:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRegistrationEndpoint(v)
+		return nil
+	case oauthremoteconnection.FieldTokenEndpointAuthMethod:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenEndpointAuthMethod(v)
+		return nil
+	case oauthremoteconnection.FieldRedirectUris:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedirectUris(v)
+		return nil
+	case oauthremoteconnection.FieldRedirectURI:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRedirectURI(v)
+		return nil
+	case oauthremoteconnection.FieldScope:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScope(v)
+		return nil
+	case oauthremoteconnection.FieldAccessToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccessToken(v)
+		return nil
+	case oauthremoteconnection.FieldRefreshToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRefreshToken(v)
+		return nil
+	case oauthremoteconnection.FieldTokenType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenType(v)
+		return nil
+	case oauthremoteconnection.FieldTokenExpiry:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenExpiry(v)
+		return nil
+	case oauthremoteconnection.FieldTokenRefreshStartedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenRefreshStartedAt(v)
+		return nil
+	case oauthremoteconnection.FieldLastError:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastError(v)
+		return nil
+	case oauthremoteconnection.FieldAddedBy:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddedBy(v)
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OAuthRemoteConnectionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OAuthRemoteConnectionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OAuthRemoteConnectionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OAuthRemoteConnectionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(oauthremoteconnection.FieldResource) {
+		fields = append(fields, oauthremoteconnection.FieldResource)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldResourceName) {
+		fields = append(fields, oauthremoteconnection.FieldResourceName)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldProtectedResourceMetadata) {
+		fields = append(fields, oauthremoteconnection.FieldProtectedResourceMetadata)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldAuthorizationServer) {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationServer)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldAuthorizationServerMetadata) {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationServerMetadata)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldClientID) {
+		fields = append(fields, oauthremoteconnection.FieldClientID)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldClientSecret) {
+		fields = append(fields, oauthremoteconnection.FieldClientSecret)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldAuthorizationEndpoint) {
+		fields = append(fields, oauthremoteconnection.FieldAuthorizationEndpoint)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldTokenEndpoint) {
+		fields = append(fields, oauthremoteconnection.FieldTokenEndpoint)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldRegistrationEndpoint) {
+		fields = append(fields, oauthremoteconnection.FieldRegistrationEndpoint)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldTokenEndpointAuthMethod) {
+		fields = append(fields, oauthremoteconnection.FieldTokenEndpointAuthMethod)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldRedirectUris) {
+		fields = append(fields, oauthremoteconnection.FieldRedirectUris)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldRedirectURI) {
+		fields = append(fields, oauthremoteconnection.FieldRedirectURI)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldScope) {
+		fields = append(fields, oauthremoteconnection.FieldScope)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldAccessToken) {
+		fields = append(fields, oauthremoteconnection.FieldAccessToken)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldRefreshToken) {
+		fields = append(fields, oauthremoteconnection.FieldRefreshToken)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldTokenType) {
+		fields = append(fields, oauthremoteconnection.FieldTokenType)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldTokenExpiry) {
+		fields = append(fields, oauthremoteconnection.FieldTokenExpiry)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldTokenRefreshStartedAt) {
+		fields = append(fields, oauthremoteconnection.FieldTokenRefreshStartedAt)
+	}
+	if m.FieldCleared(oauthremoteconnection.FieldLastError) {
+		fields = append(fields, oauthremoteconnection.FieldLastError)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OAuthRemoteConnectionMutation) ClearField(name string) error {
+	switch name {
+	case oauthremoteconnection.FieldResource:
+		m.ClearResource()
+		return nil
+	case oauthremoteconnection.FieldResourceName:
+		m.ClearResourceName()
+		return nil
+	case oauthremoteconnection.FieldProtectedResourceMetadata:
+		m.ClearProtectedResourceMetadata()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServer:
+		m.ClearAuthorizationServer()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServerMetadata:
+		m.ClearAuthorizationServerMetadata()
+		return nil
+	case oauthremoteconnection.FieldClientID:
+		m.ClearClientID()
+		return nil
+	case oauthremoteconnection.FieldClientSecret:
+		m.ClearClientSecret()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationEndpoint:
+		m.ClearAuthorizationEndpoint()
+		return nil
+	case oauthremoteconnection.FieldTokenEndpoint:
+		m.ClearTokenEndpoint()
+		return nil
+	case oauthremoteconnection.FieldRegistrationEndpoint:
+		m.ClearRegistrationEndpoint()
+		return nil
+	case oauthremoteconnection.FieldTokenEndpointAuthMethod:
+		m.ClearTokenEndpointAuthMethod()
+		return nil
+	case oauthremoteconnection.FieldRedirectUris:
+		m.ClearRedirectUris()
+		return nil
+	case oauthremoteconnection.FieldRedirectURI:
+		m.ClearRedirectURI()
+		return nil
+	case oauthremoteconnection.FieldScope:
+		m.ClearScope()
+		return nil
+	case oauthremoteconnection.FieldAccessToken:
+		m.ClearAccessToken()
+		return nil
+	case oauthremoteconnection.FieldRefreshToken:
+		m.ClearRefreshToken()
+		return nil
+	case oauthremoteconnection.FieldTokenType:
+		m.ClearTokenType()
+		return nil
+	case oauthremoteconnection.FieldTokenExpiry:
+		m.ClearTokenExpiry()
+		return nil
+	case oauthremoteconnection.FieldTokenRefreshStartedAt:
+		m.ClearTokenRefreshStartedAt()
+		return nil
+	case oauthremoteconnection.FieldLastError:
+		m.ClearLastError()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OAuthRemoteConnectionMutation) ResetField(name string) error {
+	switch name {
+	case oauthremoteconnection.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case oauthremoteconnection.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case oauthremoteconnection.FieldResourceURL:
+		m.ResetResourceURL()
+		return nil
+	case oauthremoteconnection.FieldResource:
+		m.ResetResource()
+		return nil
+	case oauthremoteconnection.FieldResourceName:
+		m.ResetResourceName()
+		return nil
+	case oauthremoteconnection.FieldProtectedResourceMetadata:
+		m.ResetProtectedResourceMetadata()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServer:
+		m.ResetAuthorizationServer()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationServerMetadata:
+		m.ResetAuthorizationServerMetadata()
+		return nil
+	case oauthremoteconnection.FieldMode:
+		m.ResetMode()
+		return nil
+	case oauthremoteconnection.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case oauthremoteconnection.FieldClientID:
+		m.ResetClientID()
+		return nil
+	case oauthremoteconnection.FieldClientSecret:
+		m.ResetClientSecret()
+		return nil
+	case oauthremoteconnection.FieldAuthorizationEndpoint:
+		m.ResetAuthorizationEndpoint()
+		return nil
+	case oauthremoteconnection.FieldTokenEndpoint:
+		m.ResetTokenEndpoint()
+		return nil
+	case oauthremoteconnection.FieldRegistrationEndpoint:
+		m.ResetRegistrationEndpoint()
+		return nil
+	case oauthremoteconnection.FieldTokenEndpointAuthMethod:
+		m.ResetTokenEndpointAuthMethod()
+		return nil
+	case oauthremoteconnection.FieldRedirectUris:
+		m.ResetRedirectUris()
+		return nil
+	case oauthremoteconnection.FieldRedirectURI:
+		m.ResetRedirectURI()
+		return nil
+	case oauthremoteconnection.FieldScope:
+		m.ResetScope()
+		return nil
+	case oauthremoteconnection.FieldAccessToken:
+		m.ResetAccessToken()
+		return nil
+	case oauthremoteconnection.FieldRefreshToken:
+		m.ResetRefreshToken()
+		return nil
+	case oauthremoteconnection.FieldTokenType:
+		m.ResetTokenType()
+		return nil
+	case oauthremoteconnection.FieldTokenExpiry:
+		m.ResetTokenExpiry()
+		return nil
+	case oauthremoteconnection.FieldTokenRefreshStartedAt:
+		m.ResetTokenRefreshStartedAt()
+		return nil
+	case oauthremoteconnection.FieldLastError:
+		m.ResetLastError()
+		return nil
+	case oauthremoteconnection.FieldAddedBy:
+		m.ResetAddedBy()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OAuthRemoteConnectionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.account != nil {
+		edges = append(edges, oauthremoteconnection.EdgeAccount)
+	}
+	if m.authorisation_flows != nil {
+		edges = append(edges, oauthremoteconnection.EdgeAuthorisationFlows)
+	}
+	if m.robot_mcp_servers != nil {
+		edges = append(edges, oauthremoteconnection.EdgeRobotMcpServers)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OAuthRemoteConnectionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case oauthremoteconnection.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	case oauthremoteconnection.EdgeAuthorisationFlows:
+		ids := make([]ent.Value, 0, len(m.authorisation_flows))
+		for id := range m.authorisation_flows {
+			ids = append(ids, id)
+		}
+		return ids
+	case oauthremoteconnection.EdgeRobotMcpServers:
+		ids := make([]ent.Value, 0, len(m.robot_mcp_servers))
+		for id := range m.robot_mcp_servers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OAuthRemoteConnectionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedauthorisation_flows != nil {
+		edges = append(edges, oauthremoteconnection.EdgeAuthorisationFlows)
+	}
+	if m.removedrobot_mcp_servers != nil {
+		edges = append(edges, oauthremoteconnection.EdgeRobotMcpServers)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OAuthRemoteConnectionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case oauthremoteconnection.EdgeAuthorisationFlows:
+		ids := make([]ent.Value, 0, len(m.removedauthorisation_flows))
+		for id := range m.removedauthorisation_flows {
+			ids = append(ids, id)
+		}
+		return ids
+	case oauthremoteconnection.EdgeRobotMcpServers:
+		ids := make([]ent.Value, 0, len(m.removedrobot_mcp_servers))
+		for id := range m.removedrobot_mcp_servers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedaccount {
+		edges = append(edges, oauthremoteconnection.EdgeAccount)
+	}
+	if m.clearedauthorisation_flows {
+		edges = append(edges, oauthremoteconnection.EdgeAuthorisationFlows)
+	}
+	if m.clearedrobot_mcp_servers {
+		edges = append(edges, oauthremoteconnection.EdgeRobotMcpServers)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OAuthRemoteConnectionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case oauthremoteconnection.EdgeAccount:
+		return m.clearedaccount
+	case oauthremoteconnection.EdgeAuthorisationFlows:
+		return m.clearedauthorisation_flows
+	case oauthremoteconnection.EdgeRobotMcpServers:
+		return m.clearedrobot_mcp_servers
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OAuthRemoteConnectionMutation) ClearEdge(name string) error {
+	switch name {
+	case oauthremoteconnection.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OAuthRemoteConnectionMutation) ResetEdge(name string) error {
+	switch name {
+	case oauthremoteconnection.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	case oauthremoteconnection.EdgeAuthorisationFlows:
+		m.ResetAuthorisationFlows()
+		return nil
+	case oauthremoteconnection.EdgeRobotMcpServers:
+		m.ResetRobotMcpServers()
+		return nil
+	}
+	return fmt.Errorf("unknown OAuthRemoteConnection edge %s", name)
+}
+
 // PluginMutation represents an operation that mutates the Plugin nodes in the graph.
 type PluginMutation struct {
 	config
@@ -38363,6 +42013,7495 @@ func (m *ReportMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Report edge %s", name)
+}
+
+// RobotMutation represents an operation that mutates the Robot nodes in the graph.
+type RobotMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	updated_at       *time.Time
+	name             *string
+	description      *string
+	playbook         *string
+	model            *string
+	tools            *[]string
+	appendtools      []string
+	metadata         *map[string]interface{}
+	clearedFields    map[string]struct{}
+	author           *xid.ID
+	clearedauthor    bool
+	workspace        *xid.ID
+	clearedworkspace bool
+	messages         map[xid.ID]struct{}
+	removedmessages  map[xid.ID]struct{}
+	clearedmessages  bool
+	done             bool
+	oldValue         func(context.Context) (*Robot, error)
+	predicates       []predicate.Robot
+}
+
+var _ ent.Mutation = (*RobotMutation)(nil)
+
+// robotOption allows management of the mutation configuration using functional options.
+type robotOption func(*RobotMutation)
+
+// newRobotMutation creates new mutation for the Robot entity.
+func newRobotMutation(c config, op Op, opts ...robotOption) *RobotMutation {
+	m := &RobotMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobot,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotID sets the ID field of the mutation.
+func withRobotID(id xid.ID) robotOption {
+	return func(m *RobotMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Robot
+		)
+		m.oldValue = func(ctx context.Context) (*Robot, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Robot.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobot sets the old Robot of the mutation.
+func withRobot(node *Robot) robotOption {
+	return func(m *RobotMutation) {
+		m.oldValue = func(context.Context) (*Robot, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Robot entities.
+func (m *RobotMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Robot.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *RobotMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *RobotMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *RobotMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[robot.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *RobotMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[robot.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *RobotMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, robot.FieldDescription)
+}
+
+// SetPlaybook sets the "playbook" field.
+func (m *RobotMutation) SetPlaybook(s string) {
+	m.playbook = &s
+}
+
+// Playbook returns the value of the "playbook" field in the mutation.
+func (m *RobotMutation) Playbook() (r string, exists bool) {
+	v := m.playbook
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPlaybook returns the old "playbook" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldPlaybook(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPlaybook is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPlaybook requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPlaybook: %w", err)
+	}
+	return oldValue.Playbook, nil
+}
+
+// ResetPlaybook resets all changes to the "playbook" field.
+func (m *RobotMutation) ResetPlaybook() {
+	m.playbook = nil
+}
+
+// SetModel sets the "model" field.
+func (m *RobotMutation) SetModel(s string) {
+	m.model = &s
+}
+
+// Model returns the value of the "model" field in the mutation.
+func (m *RobotMutation) Model() (r string, exists bool) {
+	v := m.model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldModel returns the old "model" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldModel(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModel: %w", err)
+	}
+	return oldValue.Model, nil
+}
+
+// ResetModel resets all changes to the "model" field.
+func (m *RobotMutation) ResetModel() {
+	m.model = nil
+}
+
+// SetTools sets the "tools" field.
+func (m *RobotMutation) SetTools(s []string) {
+	m.tools = &s
+	m.appendtools = nil
+}
+
+// Tools returns the value of the "tools" field in the mutation.
+func (m *RobotMutation) Tools() (r []string, exists bool) {
+	v := m.tools
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTools returns the old "tools" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldTools(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTools is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTools requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTools: %w", err)
+	}
+	return oldValue.Tools, nil
+}
+
+// AppendTools adds s to the "tools" field.
+func (m *RobotMutation) AppendTools(s []string) {
+	m.appendtools = append(m.appendtools, s...)
+}
+
+// AppendedTools returns the list of values that were appended to the "tools" field in this mutation.
+func (m *RobotMutation) AppendedTools() ([]string, bool) {
+	if len(m.appendtools) == 0 {
+		return nil, false
+	}
+	return m.appendtools, true
+}
+
+// ClearTools clears the value of the "tools" field.
+func (m *RobotMutation) ClearTools() {
+	m.tools = nil
+	m.appendtools = nil
+	m.clearedFields[robot.FieldTools] = struct{}{}
+}
+
+// ToolsCleared returns if the "tools" field was cleared in this mutation.
+func (m *RobotMutation) ToolsCleared() bool {
+	_, ok := m.clearedFields[robot.FieldTools]
+	return ok
+}
+
+// ResetTools resets all changes to the "tools" field.
+func (m *RobotMutation) ResetTools() {
+	m.tools = nil
+	m.appendtools = nil
+	delete(m.clearedFields, robot.FieldTools)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *RobotMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *RobotMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *RobotMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[robot.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *RobotMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[robot.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *RobotMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, robot.FieldMetadata)
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *RobotMutation) SetWorkspaceID(x xid.ID) {
+	m.workspace = &x
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *RobotMutation) WorkspaceID() (r xid.ID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldWorkspaceID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ClearWorkspaceID clears the value of the "workspace_id" field.
+func (m *RobotMutation) ClearWorkspaceID() {
+	m.workspace = nil
+	m.clearedFields[robot.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceIDCleared returns if the "workspace_id" field was cleared in this mutation.
+func (m *RobotMutation) WorkspaceIDCleared() bool {
+	_, ok := m.clearedFields[robot.FieldWorkspaceID]
+	return ok
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *RobotMutation) ResetWorkspaceID() {
+	m.workspace = nil
+	delete(m.clearedFields, robot.FieldWorkspaceID)
+}
+
+// SetAuthorID sets the "author_id" field.
+func (m *RobotMutation) SetAuthorID(x xid.ID) {
+	m.author = &x
+}
+
+// AuthorID returns the value of the "author_id" field in the mutation.
+func (m *RobotMutation) AuthorID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorID returns the old "author_id" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldAuthorID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorID: %w", err)
+	}
+	return oldValue.AuthorID, nil
+}
+
+// ResetAuthorID resets all changes to the "author_id" field.
+func (m *RobotMutation) ResetAuthorID() {
+	m.author = nil
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *RobotMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[robot.FieldAuthorID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *RobotMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *RobotMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *RobotMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// ClearWorkspace clears the "workspace" edge to the RobotWorkspace entity.
+func (m *RobotMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[robot.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the RobotWorkspace entity was cleared.
+func (m *RobotMutation) WorkspaceCleared() bool {
+	return m.WorkspaceIDCleared() || m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *RobotMutation) WorkspaceIDs() (ids []xid.ID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *RobotMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// AddMessageIDs adds the "messages" edge to the RobotSessionMessage entity by ids.
+func (m *RobotMutation) AddMessageIDs(ids ...xid.ID) {
+	if m.messages == nil {
+		m.messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.messages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMessages clears the "messages" edge to the RobotSessionMessage entity.
+func (m *RobotMutation) ClearMessages() {
+	m.clearedmessages = true
+}
+
+// MessagesCleared reports if the "messages" edge to the RobotSessionMessage entity was cleared.
+func (m *RobotMutation) MessagesCleared() bool {
+	return m.clearedmessages
+}
+
+// RemoveMessageIDs removes the "messages" edge to the RobotSessionMessage entity by IDs.
+func (m *RobotMutation) RemoveMessageIDs(ids ...xid.ID) {
+	if m.removedmessages == nil {
+		m.removedmessages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.messages, ids[i])
+		m.removedmessages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMessages returns the removed IDs of the "messages" edge to the RobotSessionMessage entity.
+func (m *RobotMutation) RemovedMessagesIDs() (ids []xid.ID) {
+	for id := range m.removedmessages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MessagesIDs returns the "messages" edge IDs in the mutation.
+func (m *RobotMutation) MessagesIDs() (ids []xid.ID) {
+	for id := range m.messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMessages resets all changes to the "messages" edge.
+func (m *RobotMutation) ResetMessages() {
+	m.messages = nil
+	m.clearedmessages = false
+	m.removedmessages = nil
+}
+
+// Where appends a list predicates to the RobotMutation builder.
+func (m *RobotMutation) Where(ps ...predicate.Robot) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Robot, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Robot).
+func (m *RobotMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, robot.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robot.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, robot.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, robot.FieldDescription)
+	}
+	if m.playbook != nil {
+		fields = append(fields, robot.FieldPlaybook)
+	}
+	if m.model != nil {
+		fields = append(fields, robot.FieldModel)
+	}
+	if m.tools != nil {
+		fields = append(fields, robot.FieldTools)
+	}
+	if m.metadata != nil {
+		fields = append(fields, robot.FieldMetadata)
+	}
+	if m.workspace != nil {
+		fields = append(fields, robot.FieldWorkspaceID)
+	}
+	if m.author != nil {
+		fields = append(fields, robot.FieldAuthorID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robot.FieldCreatedAt:
+		return m.CreatedAt()
+	case robot.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robot.FieldName:
+		return m.Name()
+	case robot.FieldDescription:
+		return m.Description()
+	case robot.FieldPlaybook:
+		return m.Playbook()
+	case robot.FieldModel:
+		return m.Model()
+	case robot.FieldTools:
+		return m.Tools()
+	case robot.FieldMetadata:
+		return m.Metadata()
+	case robot.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case robot.FieldAuthorID:
+		return m.AuthorID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robot.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robot.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robot.FieldName:
+		return m.OldName(ctx)
+	case robot.FieldDescription:
+		return m.OldDescription(ctx)
+	case robot.FieldPlaybook:
+		return m.OldPlaybook(ctx)
+	case robot.FieldModel:
+		return m.OldModel(ctx)
+	case robot.FieldTools:
+		return m.OldTools(ctx)
+	case robot.FieldMetadata:
+		return m.OldMetadata(ctx)
+	case robot.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case robot.FieldAuthorID:
+		return m.OldAuthorID(ctx)
+	}
+	return nil, fmt.Errorf("unknown Robot field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robot.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robot.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robot.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robot.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case robot.FieldPlaybook:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPlaybook(v)
+		return nil
+	case robot.FieldModel:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetModel(v)
+		return nil
+	case robot.FieldTools:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTools(v)
+		return nil
+	case robot.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	case robot.FieldWorkspaceID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case robot.FieldAuthorID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Robot field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Robot numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robot.FieldDescription) {
+		fields = append(fields, robot.FieldDescription)
+	}
+	if m.FieldCleared(robot.FieldTools) {
+		fields = append(fields, robot.FieldTools)
+	}
+	if m.FieldCleared(robot.FieldMetadata) {
+		fields = append(fields, robot.FieldMetadata)
+	}
+	if m.FieldCleared(robot.FieldWorkspaceID) {
+		fields = append(fields, robot.FieldWorkspaceID)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotMutation) ClearField(name string) error {
+	switch name {
+	case robot.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case robot.FieldTools:
+		m.ClearTools()
+		return nil
+	case robot.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	case robot.FieldWorkspaceID:
+		m.ClearWorkspaceID()
+		return nil
+	}
+	return fmt.Errorf("unknown Robot nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotMutation) ResetField(name string) error {
+	switch name {
+	case robot.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robot.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robot.FieldName:
+		m.ResetName()
+		return nil
+	case robot.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case robot.FieldPlaybook:
+		m.ResetPlaybook()
+		return nil
+	case robot.FieldModel:
+		m.ResetModel()
+		return nil
+	case robot.FieldTools:
+		m.ResetTools()
+		return nil
+	case robot.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	case robot.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case robot.FieldAuthorID:
+		m.ResetAuthorID()
+		return nil
+	}
+	return fmt.Errorf("unknown Robot field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.author != nil {
+		edges = append(edges, robot.EdgeAuthor)
+	}
+	if m.workspace != nil {
+		edges = append(edges, robot.EdgeWorkspace)
+	}
+	if m.messages != nil {
+		edges = append(edges, robot.EdgeMessages)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robot.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	case robot.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case robot.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.messages))
+		for id := range m.messages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedmessages != nil {
+		edges = append(edges, robot.EdgeMessages)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robot.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.removedmessages))
+		for id := range m.removedmessages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedauthor {
+		edges = append(edges, robot.EdgeAuthor)
+	}
+	if m.clearedworkspace {
+		edges = append(edges, robot.EdgeWorkspace)
+	}
+	if m.clearedmessages {
+		edges = append(edges, robot.EdgeMessages)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robot.EdgeAuthor:
+		return m.clearedauthor
+	case robot.EdgeWorkspace:
+		return m.clearedworkspace
+	case robot.EdgeMessages:
+		return m.clearedmessages
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotMutation) ClearEdge(name string) error {
+	switch name {
+	case robot.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	case robot.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	}
+	return fmt.Errorf("unknown Robot unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotMutation) ResetEdge(name string) error {
+	switch name {
+	case robot.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	case robot.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case robot.EdgeMessages:
+		m.ResetMessages()
+		return nil
+	}
+	return fmt.Errorf("unknown Robot edge %s", name)
+}
+
+// RobotMCPServerMutation represents an operation that mutates the RobotMCPServer nodes in the graph.
+type RobotMCPServerMutation struct {
+	config
+	op                             Op
+	typ                            string
+	id                             *xid.ID
+	created_at                     *time.Time
+	updated_at                     *time.Time
+	name                           *string
+	slug                           *string
+	description                    *string
+	endpoint_url                   *string
+	enabled                        *bool
+	bearer_token                   *string
+	last_refreshed_at              *time.Time
+	last_error                     *string
+	clearedFields                  map[string]struct{}
+	account                        *xid.ID
+	clearedaccount                 bool
+	oauth_remote_connection        *xid.ID
+	clearedoauth_remote_connection bool
+	tools                          map[xid.ID]struct{}
+	removedtools                   map[xid.ID]struct{}
+	clearedtools                   bool
+	done                           bool
+	oldValue                       func(context.Context) (*RobotMCPServer, error)
+	predicates                     []predicate.RobotMCPServer
+}
+
+var _ ent.Mutation = (*RobotMCPServerMutation)(nil)
+
+// robotmcpserverOption allows management of the mutation configuration using functional options.
+type robotmcpserverOption func(*RobotMCPServerMutation)
+
+// newRobotMCPServerMutation creates new mutation for the RobotMCPServer entity.
+func newRobotMCPServerMutation(c config, op Op, opts ...robotmcpserverOption) *RobotMCPServerMutation {
+	m := &RobotMCPServerMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotMCPServer,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotMCPServerID sets the ID field of the mutation.
+func withRobotMCPServerID(id xid.ID) robotmcpserverOption {
+	return func(m *RobotMCPServerMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotMCPServer
+		)
+		m.oldValue = func(ctx context.Context) (*RobotMCPServer, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotMCPServer.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotMCPServer sets the old RobotMCPServer of the mutation.
+func withRobotMCPServer(node *RobotMCPServer) robotmcpserverOption {
+	return func(m *RobotMCPServerMutation) {
+		m.oldValue = func(context.Context) (*RobotMCPServer, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotMCPServerMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotMCPServerMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotMCPServer entities.
+func (m *RobotMCPServerMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotMCPServerMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotMCPServerMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotMCPServer.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotMCPServerMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotMCPServerMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotMCPServerMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotMCPServerMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotMCPServerMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotMCPServerMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotMCPServerMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotMCPServerMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotMCPServerMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSlug sets the "slug" field.
+func (m *RobotMCPServerMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *RobotMCPServerMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *RobotMCPServerMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *RobotMCPServerMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *RobotMCPServerMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *RobotMCPServerMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[robotmcpserver.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *RobotMCPServerMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[robotmcpserver.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *RobotMCPServerMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, robotmcpserver.FieldDescription)
+}
+
+// SetEndpointURL sets the "endpoint_url" field.
+func (m *RobotMCPServerMutation) SetEndpointURL(s string) {
+	m.endpoint_url = &s
+}
+
+// EndpointURL returns the value of the "endpoint_url" field in the mutation.
+func (m *RobotMCPServerMutation) EndpointURL() (r string, exists bool) {
+	v := m.endpoint_url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEndpointURL returns the old "endpoint_url" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldEndpointURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEndpointURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEndpointURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEndpointURL: %w", err)
+	}
+	return oldValue.EndpointURL, nil
+}
+
+// ResetEndpointURL resets all changes to the "endpoint_url" field.
+func (m *RobotMCPServerMutation) ResetEndpointURL() {
+	m.endpoint_url = nil
+}
+
+// SetOauthRemoteConnectionID sets the "oauth_remote_connection_id" field.
+func (m *RobotMCPServerMutation) SetOauthRemoteConnectionID(x xid.ID) {
+	m.oauth_remote_connection = &x
+}
+
+// OauthRemoteConnectionID returns the value of the "oauth_remote_connection_id" field in the mutation.
+func (m *RobotMCPServerMutation) OauthRemoteConnectionID() (r xid.ID, exists bool) {
+	v := m.oauth_remote_connection
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOauthRemoteConnectionID returns the old "oauth_remote_connection_id" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldOauthRemoteConnectionID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOauthRemoteConnectionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOauthRemoteConnectionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOauthRemoteConnectionID: %w", err)
+	}
+	return oldValue.OauthRemoteConnectionID, nil
+}
+
+// ClearOauthRemoteConnectionID clears the value of the "oauth_remote_connection_id" field.
+func (m *RobotMCPServerMutation) ClearOauthRemoteConnectionID() {
+	m.oauth_remote_connection = nil
+	m.clearedFields[robotmcpserver.FieldOauthRemoteConnectionID] = struct{}{}
+}
+
+// OauthRemoteConnectionIDCleared returns if the "oauth_remote_connection_id" field was cleared in this mutation.
+func (m *RobotMCPServerMutation) OauthRemoteConnectionIDCleared() bool {
+	_, ok := m.clearedFields[robotmcpserver.FieldOauthRemoteConnectionID]
+	return ok
+}
+
+// ResetOauthRemoteConnectionID resets all changes to the "oauth_remote_connection_id" field.
+func (m *RobotMCPServerMutation) ResetOauthRemoteConnectionID() {
+	m.oauth_remote_connection = nil
+	delete(m.clearedFields, robotmcpserver.FieldOauthRemoteConnectionID)
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *RobotMCPServerMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *RobotMCPServerMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *RobotMCPServerMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetBearerToken sets the "bearer_token" field.
+func (m *RobotMCPServerMutation) SetBearerToken(s string) {
+	m.bearer_token = &s
+}
+
+// BearerToken returns the value of the "bearer_token" field in the mutation.
+func (m *RobotMCPServerMutation) BearerToken() (r string, exists bool) {
+	v := m.bearer_token
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBearerToken returns the old "bearer_token" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldBearerToken(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBearerToken is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBearerToken requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBearerToken: %w", err)
+	}
+	return oldValue.BearerToken, nil
+}
+
+// ClearBearerToken clears the value of the "bearer_token" field.
+func (m *RobotMCPServerMutation) ClearBearerToken() {
+	m.bearer_token = nil
+	m.clearedFields[robotmcpserver.FieldBearerToken] = struct{}{}
+}
+
+// BearerTokenCleared returns if the "bearer_token" field was cleared in this mutation.
+func (m *RobotMCPServerMutation) BearerTokenCleared() bool {
+	_, ok := m.clearedFields[robotmcpserver.FieldBearerToken]
+	return ok
+}
+
+// ResetBearerToken resets all changes to the "bearer_token" field.
+func (m *RobotMCPServerMutation) ResetBearerToken() {
+	m.bearer_token = nil
+	delete(m.clearedFields, robotmcpserver.FieldBearerToken)
+}
+
+// SetLastRefreshedAt sets the "last_refreshed_at" field.
+func (m *RobotMCPServerMutation) SetLastRefreshedAt(t time.Time) {
+	m.last_refreshed_at = &t
+}
+
+// LastRefreshedAt returns the value of the "last_refreshed_at" field in the mutation.
+func (m *RobotMCPServerMutation) LastRefreshedAt() (r time.Time, exists bool) {
+	v := m.last_refreshed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastRefreshedAt returns the old "last_refreshed_at" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldLastRefreshedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastRefreshedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastRefreshedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastRefreshedAt: %w", err)
+	}
+	return oldValue.LastRefreshedAt, nil
+}
+
+// ClearLastRefreshedAt clears the value of the "last_refreshed_at" field.
+func (m *RobotMCPServerMutation) ClearLastRefreshedAt() {
+	m.last_refreshed_at = nil
+	m.clearedFields[robotmcpserver.FieldLastRefreshedAt] = struct{}{}
+}
+
+// LastRefreshedAtCleared returns if the "last_refreshed_at" field was cleared in this mutation.
+func (m *RobotMCPServerMutation) LastRefreshedAtCleared() bool {
+	_, ok := m.clearedFields[robotmcpserver.FieldLastRefreshedAt]
+	return ok
+}
+
+// ResetLastRefreshedAt resets all changes to the "last_refreshed_at" field.
+func (m *RobotMCPServerMutation) ResetLastRefreshedAt() {
+	m.last_refreshed_at = nil
+	delete(m.clearedFields, robotmcpserver.FieldLastRefreshedAt)
+}
+
+// SetLastError sets the "last_error" field.
+func (m *RobotMCPServerMutation) SetLastError(s string) {
+	m.last_error = &s
+}
+
+// LastError returns the value of the "last_error" field in the mutation.
+func (m *RobotMCPServerMutation) LastError() (r string, exists bool) {
+	v := m.last_error
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastError returns the old "last_error" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldLastError(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastError is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastError requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastError: %w", err)
+	}
+	return oldValue.LastError, nil
+}
+
+// ClearLastError clears the value of the "last_error" field.
+func (m *RobotMCPServerMutation) ClearLastError() {
+	m.last_error = nil
+	m.clearedFields[robotmcpserver.FieldLastError] = struct{}{}
+}
+
+// LastErrorCleared returns if the "last_error" field was cleared in this mutation.
+func (m *RobotMCPServerMutation) LastErrorCleared() bool {
+	_, ok := m.clearedFields[robotmcpserver.FieldLastError]
+	return ok
+}
+
+// ResetLastError resets all changes to the "last_error" field.
+func (m *RobotMCPServerMutation) ResetLastError() {
+	m.last_error = nil
+	delete(m.clearedFields, robotmcpserver.FieldLastError)
+}
+
+// SetAddedBy sets the "added_by" field.
+func (m *RobotMCPServerMutation) SetAddedBy(x xid.ID) {
+	m.account = &x
+}
+
+// AddedBy returns the value of the "added_by" field in the mutation.
+func (m *RobotMCPServerMutation) AddedBy() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAddedBy returns the old "added_by" field's value of the RobotMCPServer entity.
+// If the RobotMCPServer object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPServerMutation) OldAddedBy(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAddedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAddedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAddedBy: %w", err)
+	}
+	return oldValue.AddedBy, nil
+}
+
+// ResetAddedBy resets all changes to the "added_by" field.
+func (m *RobotMCPServerMutation) ResetAddedBy() {
+	m.account = nil
+}
+
+// SetAccountID sets the "account" edge to the Account entity by id.
+func (m *RobotMCPServerMutation) SetAccountID(id xid.ID) {
+	m.account = &id
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *RobotMCPServerMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[robotmcpserver.FieldAddedBy] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *RobotMCPServerMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountID returns the "account" edge ID in the mutation.
+func (m *RobotMCPServerMutation) AccountID() (id xid.ID, exists bool) {
+	if m.account != nil {
+		return *m.account, true
+	}
+	return
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *RobotMCPServerMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *RobotMCPServerMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// ClearOauthRemoteConnection clears the "oauth_remote_connection" edge to the OAuthRemoteConnection entity.
+func (m *RobotMCPServerMutation) ClearOauthRemoteConnection() {
+	m.clearedoauth_remote_connection = true
+	m.clearedFields[robotmcpserver.FieldOauthRemoteConnectionID] = struct{}{}
+}
+
+// OauthRemoteConnectionCleared reports if the "oauth_remote_connection" edge to the OAuthRemoteConnection entity was cleared.
+func (m *RobotMCPServerMutation) OauthRemoteConnectionCleared() bool {
+	return m.OauthRemoteConnectionIDCleared() || m.clearedoauth_remote_connection
+}
+
+// OauthRemoteConnectionIDs returns the "oauth_remote_connection" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OauthRemoteConnectionID instead. It exists only for internal usage by the builders.
+func (m *RobotMCPServerMutation) OauthRemoteConnectionIDs() (ids []xid.ID) {
+	if id := m.oauth_remote_connection; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOauthRemoteConnection resets all changes to the "oauth_remote_connection" edge.
+func (m *RobotMCPServerMutation) ResetOauthRemoteConnection() {
+	m.oauth_remote_connection = nil
+	m.clearedoauth_remote_connection = false
+}
+
+// AddToolIDs adds the "tools" edge to the RobotMCPTool entity by ids.
+func (m *RobotMCPServerMutation) AddToolIDs(ids ...xid.ID) {
+	if m.tools == nil {
+		m.tools = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.tools[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTools clears the "tools" edge to the RobotMCPTool entity.
+func (m *RobotMCPServerMutation) ClearTools() {
+	m.clearedtools = true
+}
+
+// ToolsCleared reports if the "tools" edge to the RobotMCPTool entity was cleared.
+func (m *RobotMCPServerMutation) ToolsCleared() bool {
+	return m.clearedtools
+}
+
+// RemoveToolIDs removes the "tools" edge to the RobotMCPTool entity by IDs.
+func (m *RobotMCPServerMutation) RemoveToolIDs(ids ...xid.ID) {
+	if m.removedtools == nil {
+		m.removedtools = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.tools, ids[i])
+		m.removedtools[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTools returns the removed IDs of the "tools" edge to the RobotMCPTool entity.
+func (m *RobotMCPServerMutation) RemovedToolsIDs() (ids []xid.ID) {
+	for id := range m.removedtools {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ToolsIDs returns the "tools" edge IDs in the mutation.
+func (m *RobotMCPServerMutation) ToolsIDs() (ids []xid.ID) {
+	for id := range m.tools {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTools resets all changes to the "tools" edge.
+func (m *RobotMCPServerMutation) ResetTools() {
+	m.tools = nil
+	m.clearedtools = false
+	m.removedtools = nil
+}
+
+// Where appends a list predicates to the RobotMCPServerMutation builder.
+func (m *RobotMCPServerMutation) Where(ps ...predicate.RobotMCPServer) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotMCPServerMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotMCPServerMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotMCPServer, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotMCPServerMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotMCPServerMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotMCPServer).
+func (m *RobotMCPServerMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotMCPServerMutation) Fields() []string {
+	fields := make([]string, 0, 12)
+	if m.created_at != nil {
+		fields = append(fields, robotmcpserver.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotmcpserver.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, robotmcpserver.FieldName)
+	}
+	if m.slug != nil {
+		fields = append(fields, robotmcpserver.FieldSlug)
+	}
+	if m.description != nil {
+		fields = append(fields, robotmcpserver.FieldDescription)
+	}
+	if m.endpoint_url != nil {
+		fields = append(fields, robotmcpserver.FieldEndpointURL)
+	}
+	if m.oauth_remote_connection != nil {
+		fields = append(fields, robotmcpserver.FieldOauthRemoteConnectionID)
+	}
+	if m.enabled != nil {
+		fields = append(fields, robotmcpserver.FieldEnabled)
+	}
+	if m.bearer_token != nil {
+		fields = append(fields, robotmcpserver.FieldBearerToken)
+	}
+	if m.last_refreshed_at != nil {
+		fields = append(fields, robotmcpserver.FieldLastRefreshedAt)
+	}
+	if m.last_error != nil {
+		fields = append(fields, robotmcpserver.FieldLastError)
+	}
+	if m.account != nil {
+		fields = append(fields, robotmcpserver.FieldAddedBy)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotMCPServerMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotmcpserver.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotmcpserver.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotmcpserver.FieldName:
+		return m.Name()
+	case robotmcpserver.FieldSlug:
+		return m.Slug()
+	case robotmcpserver.FieldDescription:
+		return m.Description()
+	case robotmcpserver.FieldEndpointURL:
+		return m.EndpointURL()
+	case robotmcpserver.FieldOauthRemoteConnectionID:
+		return m.OauthRemoteConnectionID()
+	case robotmcpserver.FieldEnabled:
+		return m.Enabled()
+	case robotmcpserver.FieldBearerToken:
+		return m.BearerToken()
+	case robotmcpserver.FieldLastRefreshedAt:
+		return m.LastRefreshedAt()
+	case robotmcpserver.FieldLastError:
+		return m.LastError()
+	case robotmcpserver.FieldAddedBy:
+		return m.AddedBy()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotMCPServerMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotmcpserver.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotmcpserver.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotmcpserver.FieldName:
+		return m.OldName(ctx)
+	case robotmcpserver.FieldSlug:
+		return m.OldSlug(ctx)
+	case robotmcpserver.FieldDescription:
+		return m.OldDescription(ctx)
+	case robotmcpserver.FieldEndpointURL:
+		return m.OldEndpointURL(ctx)
+	case robotmcpserver.FieldOauthRemoteConnectionID:
+		return m.OldOauthRemoteConnectionID(ctx)
+	case robotmcpserver.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case robotmcpserver.FieldBearerToken:
+		return m.OldBearerToken(ctx)
+	case robotmcpserver.FieldLastRefreshedAt:
+		return m.OldLastRefreshedAt(ctx)
+	case robotmcpserver.FieldLastError:
+		return m.OldLastError(ctx)
+	case robotmcpserver.FieldAddedBy:
+		return m.OldAddedBy(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotMCPServer field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMCPServerMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotmcpserver.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotmcpserver.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotmcpserver.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robotmcpserver.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case robotmcpserver.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case robotmcpserver.FieldEndpointURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEndpointURL(v)
+		return nil
+	case robotmcpserver.FieldOauthRemoteConnectionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOauthRemoteConnectionID(v)
+		return nil
+	case robotmcpserver.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case robotmcpserver.FieldBearerToken:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBearerToken(v)
+		return nil
+	case robotmcpserver.FieldLastRefreshedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastRefreshedAt(v)
+		return nil
+	case robotmcpserver.FieldLastError:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastError(v)
+		return nil
+	case robotmcpserver.FieldAddedBy:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAddedBy(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPServer field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotMCPServerMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotMCPServerMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMCPServerMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotMCPServer numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotMCPServerMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotmcpserver.FieldDescription) {
+		fields = append(fields, robotmcpserver.FieldDescription)
+	}
+	if m.FieldCleared(robotmcpserver.FieldOauthRemoteConnectionID) {
+		fields = append(fields, robotmcpserver.FieldOauthRemoteConnectionID)
+	}
+	if m.FieldCleared(robotmcpserver.FieldBearerToken) {
+		fields = append(fields, robotmcpserver.FieldBearerToken)
+	}
+	if m.FieldCleared(robotmcpserver.FieldLastRefreshedAt) {
+		fields = append(fields, robotmcpserver.FieldLastRefreshedAt)
+	}
+	if m.FieldCleared(robotmcpserver.FieldLastError) {
+		fields = append(fields, robotmcpserver.FieldLastError)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotMCPServerMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotMCPServerMutation) ClearField(name string) error {
+	switch name {
+	case robotmcpserver.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case robotmcpserver.FieldOauthRemoteConnectionID:
+		m.ClearOauthRemoteConnectionID()
+		return nil
+	case robotmcpserver.FieldBearerToken:
+		m.ClearBearerToken()
+		return nil
+	case robotmcpserver.FieldLastRefreshedAt:
+		m.ClearLastRefreshedAt()
+		return nil
+	case robotmcpserver.FieldLastError:
+		m.ClearLastError()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPServer nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotMCPServerMutation) ResetField(name string) error {
+	switch name {
+	case robotmcpserver.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotmcpserver.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotmcpserver.FieldName:
+		m.ResetName()
+		return nil
+	case robotmcpserver.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case robotmcpserver.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case robotmcpserver.FieldEndpointURL:
+		m.ResetEndpointURL()
+		return nil
+	case robotmcpserver.FieldOauthRemoteConnectionID:
+		m.ResetOauthRemoteConnectionID()
+		return nil
+	case robotmcpserver.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case robotmcpserver.FieldBearerToken:
+		m.ResetBearerToken()
+		return nil
+	case robotmcpserver.FieldLastRefreshedAt:
+		m.ResetLastRefreshedAt()
+		return nil
+	case robotmcpserver.FieldLastError:
+		m.ResetLastError()
+		return nil
+	case robotmcpserver.FieldAddedBy:
+		m.ResetAddedBy()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPServer field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotMCPServerMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.account != nil {
+		edges = append(edges, robotmcpserver.EdgeAccount)
+	}
+	if m.oauth_remote_connection != nil {
+		edges = append(edges, robotmcpserver.EdgeOauthRemoteConnection)
+	}
+	if m.tools != nil {
+		edges = append(edges, robotmcpserver.EdgeTools)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotMCPServerMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotmcpserver.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotmcpserver.EdgeOauthRemoteConnection:
+		if id := m.oauth_remote_connection; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotmcpserver.EdgeTools:
+		ids := make([]ent.Value, 0, len(m.tools))
+		for id := range m.tools {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotMCPServerMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedtools != nil {
+		edges = append(edges, robotmcpserver.EdgeTools)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotMCPServerMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robotmcpserver.EdgeTools:
+		ids := make([]ent.Value, 0, len(m.removedtools))
+		for id := range m.removedtools {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotMCPServerMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedaccount {
+		edges = append(edges, robotmcpserver.EdgeAccount)
+	}
+	if m.clearedoauth_remote_connection {
+		edges = append(edges, robotmcpserver.EdgeOauthRemoteConnection)
+	}
+	if m.clearedtools {
+		edges = append(edges, robotmcpserver.EdgeTools)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotMCPServerMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotmcpserver.EdgeAccount:
+		return m.clearedaccount
+	case robotmcpserver.EdgeOauthRemoteConnection:
+		return m.clearedoauth_remote_connection
+	case robotmcpserver.EdgeTools:
+		return m.clearedtools
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotMCPServerMutation) ClearEdge(name string) error {
+	switch name {
+	case robotmcpserver.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	case robotmcpserver.EdgeOauthRemoteConnection:
+		m.ClearOauthRemoteConnection()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPServer unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotMCPServerMutation) ResetEdge(name string) error {
+	switch name {
+	case robotmcpserver.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	case robotmcpserver.EdgeOauthRemoteConnection:
+		m.ResetOauthRemoteConnection()
+		return nil
+	case robotmcpserver.EdgeTools:
+		m.ResetTools()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPServer edge %s", name)
+}
+
+// RobotMCPToolMutation represents an operation that mutates the RobotMCPTool nodes in the graph.
+type RobotMCPToolMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	updated_at    *time.Time
+	tool_id       *string
+	remote_name   *string
+	callable_name *string
+	title         *string
+	description   *string
+	input_schema  *map[string]interface{}
+	output_schema *map[string]interface{}
+	annotations   *map[string]interface{}
+	enabled       *bool
+	last_seen_at  *time.Time
+	clearedFields map[string]struct{}
+	server        *xid.ID
+	clearedserver bool
+	done          bool
+	oldValue      func(context.Context) (*RobotMCPTool, error)
+	predicates    []predicate.RobotMCPTool
+}
+
+var _ ent.Mutation = (*RobotMCPToolMutation)(nil)
+
+// robotmcptoolOption allows management of the mutation configuration using functional options.
+type robotmcptoolOption func(*RobotMCPToolMutation)
+
+// newRobotMCPToolMutation creates new mutation for the RobotMCPTool entity.
+func newRobotMCPToolMutation(c config, op Op, opts ...robotmcptoolOption) *RobotMCPToolMutation {
+	m := &RobotMCPToolMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotMCPTool,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotMCPToolID sets the ID field of the mutation.
+func withRobotMCPToolID(id xid.ID) robotmcptoolOption {
+	return func(m *RobotMCPToolMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotMCPTool
+		)
+		m.oldValue = func(ctx context.Context) (*RobotMCPTool, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotMCPTool.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotMCPTool sets the old RobotMCPTool of the mutation.
+func withRobotMCPTool(node *RobotMCPTool) robotmcptoolOption {
+	return func(m *RobotMCPToolMutation) {
+		m.oldValue = func(context.Context) (*RobotMCPTool, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotMCPToolMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotMCPToolMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotMCPTool entities.
+func (m *RobotMCPToolMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotMCPToolMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotMCPToolMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotMCPTool.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotMCPToolMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotMCPToolMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotMCPToolMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotMCPToolMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotMCPToolMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotMCPToolMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetServerID sets the "server_id" field.
+func (m *RobotMCPToolMutation) SetServerID(x xid.ID) {
+	m.server = &x
+}
+
+// ServerID returns the value of the "server_id" field in the mutation.
+func (m *RobotMCPToolMutation) ServerID() (r xid.ID, exists bool) {
+	v := m.server
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldServerID returns the old "server_id" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldServerID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldServerID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldServerID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldServerID: %w", err)
+	}
+	return oldValue.ServerID, nil
+}
+
+// ResetServerID resets all changes to the "server_id" field.
+func (m *RobotMCPToolMutation) ResetServerID() {
+	m.server = nil
+}
+
+// SetToolID sets the "tool_id" field.
+func (m *RobotMCPToolMutation) SetToolID(s string) {
+	m.tool_id = &s
+}
+
+// ToolID returns the value of the "tool_id" field in the mutation.
+func (m *RobotMCPToolMutation) ToolID() (r string, exists bool) {
+	v := m.tool_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldToolID returns the old "tool_id" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldToolID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldToolID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldToolID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldToolID: %w", err)
+	}
+	return oldValue.ToolID, nil
+}
+
+// ResetToolID resets all changes to the "tool_id" field.
+func (m *RobotMCPToolMutation) ResetToolID() {
+	m.tool_id = nil
+}
+
+// SetRemoteName sets the "remote_name" field.
+func (m *RobotMCPToolMutation) SetRemoteName(s string) {
+	m.remote_name = &s
+}
+
+// RemoteName returns the value of the "remote_name" field in the mutation.
+func (m *RobotMCPToolMutation) RemoteName() (r string, exists bool) {
+	v := m.remote_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemoteName returns the old "remote_name" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldRemoteName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemoteName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemoteName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemoteName: %w", err)
+	}
+	return oldValue.RemoteName, nil
+}
+
+// ResetRemoteName resets all changes to the "remote_name" field.
+func (m *RobotMCPToolMutation) ResetRemoteName() {
+	m.remote_name = nil
+}
+
+// SetCallableName sets the "callable_name" field.
+func (m *RobotMCPToolMutation) SetCallableName(s string) {
+	m.callable_name = &s
+}
+
+// CallableName returns the value of the "callable_name" field in the mutation.
+func (m *RobotMCPToolMutation) CallableName() (r string, exists bool) {
+	v := m.callable_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCallableName returns the old "callable_name" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldCallableName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCallableName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCallableName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCallableName: %w", err)
+	}
+	return oldValue.CallableName, nil
+}
+
+// ResetCallableName resets all changes to the "callable_name" field.
+func (m *RobotMCPToolMutation) ResetCallableName() {
+	m.callable_name = nil
+}
+
+// SetTitle sets the "title" field.
+func (m *RobotMCPToolMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *RobotMCPToolMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ClearTitle clears the value of the "title" field.
+func (m *RobotMCPToolMutation) ClearTitle() {
+	m.title = nil
+	m.clearedFields[robotmcptool.FieldTitle] = struct{}{}
+}
+
+// TitleCleared returns if the "title" field was cleared in this mutation.
+func (m *RobotMCPToolMutation) TitleCleared() bool {
+	_, ok := m.clearedFields[robotmcptool.FieldTitle]
+	return ok
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *RobotMCPToolMutation) ResetTitle() {
+	m.title = nil
+	delete(m.clearedFields, robotmcptool.FieldTitle)
+}
+
+// SetDescription sets the "description" field.
+func (m *RobotMCPToolMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *RobotMCPToolMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *RobotMCPToolMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[robotmcptool.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *RobotMCPToolMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[robotmcptool.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *RobotMCPToolMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, robotmcptool.FieldDescription)
+}
+
+// SetInputSchema sets the "input_schema" field.
+func (m *RobotMCPToolMutation) SetInputSchema(value map[string]interface{}) {
+	m.input_schema = &value
+}
+
+// InputSchema returns the value of the "input_schema" field in the mutation.
+func (m *RobotMCPToolMutation) InputSchema() (r map[string]interface{}, exists bool) {
+	v := m.input_schema
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInputSchema returns the old "input_schema" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldInputSchema(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInputSchema is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInputSchema requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInputSchema: %w", err)
+	}
+	return oldValue.InputSchema, nil
+}
+
+// ClearInputSchema clears the value of the "input_schema" field.
+func (m *RobotMCPToolMutation) ClearInputSchema() {
+	m.input_schema = nil
+	m.clearedFields[robotmcptool.FieldInputSchema] = struct{}{}
+}
+
+// InputSchemaCleared returns if the "input_schema" field was cleared in this mutation.
+func (m *RobotMCPToolMutation) InputSchemaCleared() bool {
+	_, ok := m.clearedFields[robotmcptool.FieldInputSchema]
+	return ok
+}
+
+// ResetInputSchema resets all changes to the "input_schema" field.
+func (m *RobotMCPToolMutation) ResetInputSchema() {
+	m.input_schema = nil
+	delete(m.clearedFields, robotmcptool.FieldInputSchema)
+}
+
+// SetOutputSchema sets the "output_schema" field.
+func (m *RobotMCPToolMutation) SetOutputSchema(value map[string]interface{}) {
+	m.output_schema = &value
+}
+
+// OutputSchema returns the value of the "output_schema" field in the mutation.
+func (m *RobotMCPToolMutation) OutputSchema() (r map[string]interface{}, exists bool) {
+	v := m.output_schema
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOutputSchema returns the old "output_schema" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldOutputSchema(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOutputSchema is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOutputSchema requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOutputSchema: %w", err)
+	}
+	return oldValue.OutputSchema, nil
+}
+
+// ClearOutputSchema clears the value of the "output_schema" field.
+func (m *RobotMCPToolMutation) ClearOutputSchema() {
+	m.output_schema = nil
+	m.clearedFields[robotmcptool.FieldOutputSchema] = struct{}{}
+}
+
+// OutputSchemaCleared returns if the "output_schema" field was cleared in this mutation.
+func (m *RobotMCPToolMutation) OutputSchemaCleared() bool {
+	_, ok := m.clearedFields[robotmcptool.FieldOutputSchema]
+	return ok
+}
+
+// ResetOutputSchema resets all changes to the "output_schema" field.
+func (m *RobotMCPToolMutation) ResetOutputSchema() {
+	m.output_schema = nil
+	delete(m.clearedFields, robotmcptool.FieldOutputSchema)
+}
+
+// SetAnnotations sets the "annotations" field.
+func (m *RobotMCPToolMutation) SetAnnotations(value map[string]interface{}) {
+	m.annotations = &value
+}
+
+// Annotations returns the value of the "annotations" field in the mutation.
+func (m *RobotMCPToolMutation) Annotations() (r map[string]interface{}, exists bool) {
+	v := m.annotations
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAnnotations returns the old "annotations" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldAnnotations(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAnnotations is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAnnotations requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAnnotations: %w", err)
+	}
+	return oldValue.Annotations, nil
+}
+
+// ClearAnnotations clears the value of the "annotations" field.
+func (m *RobotMCPToolMutation) ClearAnnotations() {
+	m.annotations = nil
+	m.clearedFields[robotmcptool.FieldAnnotations] = struct{}{}
+}
+
+// AnnotationsCleared returns if the "annotations" field was cleared in this mutation.
+func (m *RobotMCPToolMutation) AnnotationsCleared() bool {
+	_, ok := m.clearedFields[robotmcptool.FieldAnnotations]
+	return ok
+}
+
+// ResetAnnotations resets all changes to the "annotations" field.
+func (m *RobotMCPToolMutation) ResetAnnotations() {
+	m.annotations = nil
+	delete(m.clearedFields, robotmcptool.FieldAnnotations)
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *RobotMCPToolMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *RobotMCPToolMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *RobotMCPToolMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// SetLastSeenAt sets the "last_seen_at" field.
+func (m *RobotMCPToolMutation) SetLastSeenAt(t time.Time) {
+	m.last_seen_at = &t
+}
+
+// LastSeenAt returns the value of the "last_seen_at" field in the mutation.
+func (m *RobotMCPToolMutation) LastSeenAt() (r time.Time, exists bool) {
+	v := m.last_seen_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastSeenAt returns the old "last_seen_at" field's value of the RobotMCPTool entity.
+// If the RobotMCPTool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMCPToolMutation) OldLastSeenAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastSeenAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastSeenAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastSeenAt: %w", err)
+	}
+	return oldValue.LastSeenAt, nil
+}
+
+// ResetLastSeenAt resets all changes to the "last_seen_at" field.
+func (m *RobotMCPToolMutation) ResetLastSeenAt() {
+	m.last_seen_at = nil
+}
+
+// ClearServer clears the "server" edge to the RobotMCPServer entity.
+func (m *RobotMCPToolMutation) ClearServer() {
+	m.clearedserver = true
+	m.clearedFields[robotmcptool.FieldServerID] = struct{}{}
+}
+
+// ServerCleared reports if the "server" edge to the RobotMCPServer entity was cleared.
+func (m *RobotMCPToolMutation) ServerCleared() bool {
+	return m.clearedserver
+}
+
+// ServerIDs returns the "server" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ServerID instead. It exists only for internal usage by the builders.
+func (m *RobotMCPToolMutation) ServerIDs() (ids []xid.ID) {
+	if id := m.server; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetServer resets all changes to the "server" edge.
+func (m *RobotMCPToolMutation) ResetServer() {
+	m.server = nil
+	m.clearedserver = false
+}
+
+// Where appends a list predicates to the RobotMCPToolMutation builder.
+func (m *RobotMCPToolMutation) Where(ps ...predicate.RobotMCPTool) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotMCPToolMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotMCPToolMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotMCPTool, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotMCPToolMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotMCPToolMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotMCPTool).
+func (m *RobotMCPToolMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotMCPToolMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.created_at != nil {
+		fields = append(fields, robotmcptool.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotmcptool.FieldUpdatedAt)
+	}
+	if m.server != nil {
+		fields = append(fields, robotmcptool.FieldServerID)
+	}
+	if m.tool_id != nil {
+		fields = append(fields, robotmcptool.FieldToolID)
+	}
+	if m.remote_name != nil {
+		fields = append(fields, robotmcptool.FieldRemoteName)
+	}
+	if m.callable_name != nil {
+		fields = append(fields, robotmcptool.FieldCallableName)
+	}
+	if m.title != nil {
+		fields = append(fields, robotmcptool.FieldTitle)
+	}
+	if m.description != nil {
+		fields = append(fields, robotmcptool.FieldDescription)
+	}
+	if m.input_schema != nil {
+		fields = append(fields, robotmcptool.FieldInputSchema)
+	}
+	if m.output_schema != nil {
+		fields = append(fields, robotmcptool.FieldOutputSchema)
+	}
+	if m.annotations != nil {
+		fields = append(fields, robotmcptool.FieldAnnotations)
+	}
+	if m.enabled != nil {
+		fields = append(fields, robotmcptool.FieldEnabled)
+	}
+	if m.last_seen_at != nil {
+		fields = append(fields, robotmcptool.FieldLastSeenAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotMCPToolMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotmcptool.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotmcptool.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotmcptool.FieldServerID:
+		return m.ServerID()
+	case robotmcptool.FieldToolID:
+		return m.ToolID()
+	case robotmcptool.FieldRemoteName:
+		return m.RemoteName()
+	case robotmcptool.FieldCallableName:
+		return m.CallableName()
+	case robotmcptool.FieldTitle:
+		return m.Title()
+	case robotmcptool.FieldDescription:
+		return m.Description()
+	case robotmcptool.FieldInputSchema:
+		return m.InputSchema()
+	case robotmcptool.FieldOutputSchema:
+		return m.OutputSchema()
+	case robotmcptool.FieldAnnotations:
+		return m.Annotations()
+	case robotmcptool.FieldEnabled:
+		return m.Enabled()
+	case robotmcptool.FieldLastSeenAt:
+		return m.LastSeenAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotMCPToolMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotmcptool.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotmcptool.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotmcptool.FieldServerID:
+		return m.OldServerID(ctx)
+	case robotmcptool.FieldToolID:
+		return m.OldToolID(ctx)
+	case robotmcptool.FieldRemoteName:
+		return m.OldRemoteName(ctx)
+	case robotmcptool.FieldCallableName:
+		return m.OldCallableName(ctx)
+	case robotmcptool.FieldTitle:
+		return m.OldTitle(ctx)
+	case robotmcptool.FieldDescription:
+		return m.OldDescription(ctx)
+	case robotmcptool.FieldInputSchema:
+		return m.OldInputSchema(ctx)
+	case robotmcptool.FieldOutputSchema:
+		return m.OldOutputSchema(ctx)
+	case robotmcptool.FieldAnnotations:
+		return m.OldAnnotations(ctx)
+	case robotmcptool.FieldEnabled:
+		return m.OldEnabled(ctx)
+	case robotmcptool.FieldLastSeenAt:
+		return m.OldLastSeenAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotMCPTool field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMCPToolMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotmcptool.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotmcptool.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotmcptool.FieldServerID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetServerID(v)
+		return nil
+	case robotmcptool.FieldToolID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetToolID(v)
+		return nil
+	case robotmcptool.FieldRemoteName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemoteName(v)
+		return nil
+	case robotmcptool.FieldCallableName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCallableName(v)
+		return nil
+	case robotmcptool.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case robotmcptool.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case robotmcptool.FieldInputSchema:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInputSchema(v)
+		return nil
+	case robotmcptool.FieldOutputSchema:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOutputSchema(v)
+		return nil
+	case robotmcptool.FieldAnnotations:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAnnotations(v)
+		return nil
+	case robotmcptool.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	case robotmcptool.FieldLastSeenAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastSeenAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPTool field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotMCPToolMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotMCPToolMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotMCPToolMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotMCPTool numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotMCPToolMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotmcptool.FieldTitle) {
+		fields = append(fields, robotmcptool.FieldTitle)
+	}
+	if m.FieldCleared(robotmcptool.FieldDescription) {
+		fields = append(fields, robotmcptool.FieldDescription)
+	}
+	if m.FieldCleared(robotmcptool.FieldInputSchema) {
+		fields = append(fields, robotmcptool.FieldInputSchema)
+	}
+	if m.FieldCleared(robotmcptool.FieldOutputSchema) {
+		fields = append(fields, robotmcptool.FieldOutputSchema)
+	}
+	if m.FieldCleared(robotmcptool.FieldAnnotations) {
+		fields = append(fields, robotmcptool.FieldAnnotations)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotMCPToolMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotMCPToolMutation) ClearField(name string) error {
+	switch name {
+	case robotmcptool.FieldTitle:
+		m.ClearTitle()
+		return nil
+	case robotmcptool.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case robotmcptool.FieldInputSchema:
+		m.ClearInputSchema()
+		return nil
+	case robotmcptool.FieldOutputSchema:
+		m.ClearOutputSchema()
+		return nil
+	case robotmcptool.FieldAnnotations:
+		m.ClearAnnotations()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPTool nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotMCPToolMutation) ResetField(name string) error {
+	switch name {
+	case robotmcptool.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotmcptool.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotmcptool.FieldServerID:
+		m.ResetServerID()
+		return nil
+	case robotmcptool.FieldToolID:
+		m.ResetToolID()
+		return nil
+	case robotmcptool.FieldRemoteName:
+		m.ResetRemoteName()
+		return nil
+	case robotmcptool.FieldCallableName:
+		m.ResetCallableName()
+		return nil
+	case robotmcptool.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case robotmcptool.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case robotmcptool.FieldInputSchema:
+		m.ResetInputSchema()
+		return nil
+	case robotmcptool.FieldOutputSchema:
+		m.ResetOutputSchema()
+		return nil
+	case robotmcptool.FieldAnnotations:
+		m.ResetAnnotations()
+		return nil
+	case robotmcptool.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	case robotmcptool.FieldLastSeenAt:
+		m.ResetLastSeenAt()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPTool field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotMCPToolMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.server != nil {
+		edges = append(edges, robotmcptool.EdgeServer)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotMCPToolMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotmcptool.EdgeServer:
+		if id := m.server; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotMCPToolMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotMCPToolMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotMCPToolMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedserver {
+		edges = append(edges, robotmcptool.EdgeServer)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotMCPToolMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotmcptool.EdgeServer:
+		return m.clearedserver
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotMCPToolMutation) ClearEdge(name string) error {
+	switch name {
+	case robotmcptool.EdgeServer:
+		m.ClearServer()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPTool unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotMCPToolMutation) ResetEdge(name string) error {
+	switch name {
+	case robotmcptool.EdgeServer:
+		m.ResetServer()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotMCPTool edge %s", name)
+}
+
+// RobotProviderModelMutation represents an operation that mutates the RobotProviderModel nodes in the graph.
+type RobotProviderModelMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	updated_at    *time.Time
+	provider      *string
+	name          *string
+	raw           *map[string]interface{}
+	last_seen_at  *time.Time
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*RobotProviderModel, error)
+	predicates    []predicate.RobotProviderModel
+}
+
+var _ ent.Mutation = (*RobotProviderModelMutation)(nil)
+
+// robotprovidermodelOption allows management of the mutation configuration using functional options.
+type robotprovidermodelOption func(*RobotProviderModelMutation)
+
+// newRobotProviderModelMutation creates new mutation for the RobotProviderModel entity.
+func newRobotProviderModelMutation(c config, op Op, opts ...robotprovidermodelOption) *RobotProviderModelMutation {
+	m := &RobotProviderModelMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotProviderModel,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotProviderModelID sets the ID field of the mutation.
+func withRobotProviderModelID(id xid.ID) robotprovidermodelOption {
+	return func(m *RobotProviderModelMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotProviderModel
+		)
+		m.oldValue = func(ctx context.Context) (*RobotProviderModel, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotProviderModel.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotProviderModel sets the old RobotProviderModel of the mutation.
+func withRobotProviderModel(node *RobotProviderModel) robotprovidermodelOption {
+	return func(m *RobotProviderModelMutation) {
+		m.oldValue = func(context.Context) (*RobotProviderModel, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotProviderModelMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotProviderModelMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotProviderModel entities.
+func (m *RobotProviderModelMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotProviderModelMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotProviderModelMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotProviderModel.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotProviderModelMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotProviderModelMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotProviderModelMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotProviderModelMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotProviderModelMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotProviderModelMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetProvider sets the "provider" field.
+func (m *RobotProviderModelMutation) SetProvider(s string) {
+	m.provider = &s
+}
+
+// Provider returns the value of the "provider" field in the mutation.
+func (m *RobotProviderModelMutation) Provider() (r string, exists bool) {
+	v := m.provider
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProvider returns the old "provider" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldProvider(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProvider is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProvider requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProvider: %w", err)
+	}
+	return oldValue.Provider, nil
+}
+
+// ResetProvider resets all changes to the "provider" field.
+func (m *RobotProviderModelMutation) ResetProvider() {
+	m.provider = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotProviderModelMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotProviderModelMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotProviderModelMutation) ResetName() {
+	m.name = nil
+}
+
+// SetRaw sets the "raw" field.
+func (m *RobotProviderModelMutation) SetRaw(value map[string]interface{}) {
+	m.raw = &value
+}
+
+// Raw returns the value of the "raw" field in the mutation.
+func (m *RobotProviderModelMutation) Raw() (r map[string]interface{}, exists bool) {
+	v := m.raw
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRaw returns the old "raw" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldRaw(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRaw is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRaw requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRaw: %w", err)
+	}
+	return oldValue.Raw, nil
+}
+
+// ClearRaw clears the value of the "raw" field.
+func (m *RobotProviderModelMutation) ClearRaw() {
+	m.raw = nil
+	m.clearedFields[robotprovidermodel.FieldRaw] = struct{}{}
+}
+
+// RawCleared returns if the "raw" field was cleared in this mutation.
+func (m *RobotProviderModelMutation) RawCleared() bool {
+	_, ok := m.clearedFields[robotprovidermodel.FieldRaw]
+	return ok
+}
+
+// ResetRaw resets all changes to the "raw" field.
+func (m *RobotProviderModelMutation) ResetRaw() {
+	m.raw = nil
+	delete(m.clearedFields, robotprovidermodel.FieldRaw)
+}
+
+// SetLastSeenAt sets the "last_seen_at" field.
+func (m *RobotProviderModelMutation) SetLastSeenAt(t time.Time) {
+	m.last_seen_at = &t
+}
+
+// LastSeenAt returns the value of the "last_seen_at" field in the mutation.
+func (m *RobotProviderModelMutation) LastSeenAt() (r time.Time, exists bool) {
+	v := m.last_seen_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastSeenAt returns the old "last_seen_at" field's value of the RobotProviderModel entity.
+// If the RobotProviderModel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotProviderModelMutation) OldLastSeenAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastSeenAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastSeenAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastSeenAt: %w", err)
+	}
+	return oldValue.LastSeenAt, nil
+}
+
+// ResetLastSeenAt resets all changes to the "last_seen_at" field.
+func (m *RobotProviderModelMutation) ResetLastSeenAt() {
+	m.last_seen_at = nil
+}
+
+// Where appends a list predicates to the RobotProviderModelMutation builder.
+func (m *RobotProviderModelMutation) Where(ps ...predicate.RobotProviderModel) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotProviderModelMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotProviderModelMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotProviderModel, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotProviderModelMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotProviderModelMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotProviderModel).
+func (m *RobotProviderModelMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotProviderModelMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, robotprovidermodel.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotprovidermodel.FieldUpdatedAt)
+	}
+	if m.provider != nil {
+		fields = append(fields, robotprovidermodel.FieldProvider)
+	}
+	if m.name != nil {
+		fields = append(fields, robotprovidermodel.FieldName)
+	}
+	if m.raw != nil {
+		fields = append(fields, robotprovidermodel.FieldRaw)
+	}
+	if m.last_seen_at != nil {
+		fields = append(fields, robotprovidermodel.FieldLastSeenAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotProviderModelMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotprovidermodel.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotprovidermodel.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotprovidermodel.FieldProvider:
+		return m.Provider()
+	case robotprovidermodel.FieldName:
+		return m.Name()
+	case robotprovidermodel.FieldRaw:
+		return m.Raw()
+	case robotprovidermodel.FieldLastSeenAt:
+		return m.LastSeenAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotProviderModelMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotprovidermodel.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotprovidermodel.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotprovidermodel.FieldProvider:
+		return m.OldProvider(ctx)
+	case robotprovidermodel.FieldName:
+		return m.OldName(ctx)
+	case robotprovidermodel.FieldRaw:
+		return m.OldRaw(ctx)
+	case robotprovidermodel.FieldLastSeenAt:
+		return m.OldLastSeenAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotProviderModel field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotProviderModelMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotprovidermodel.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotprovidermodel.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotprovidermodel.FieldProvider:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProvider(v)
+		return nil
+	case robotprovidermodel.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robotprovidermodel.FieldRaw:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRaw(v)
+		return nil
+	case robotprovidermodel.FieldLastSeenAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastSeenAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotProviderModel field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotProviderModelMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotProviderModelMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotProviderModelMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotProviderModel numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotProviderModelMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotprovidermodel.FieldRaw) {
+		fields = append(fields, robotprovidermodel.FieldRaw)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotProviderModelMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotProviderModelMutation) ClearField(name string) error {
+	switch name {
+	case robotprovidermodel.FieldRaw:
+		m.ClearRaw()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotProviderModel nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotProviderModelMutation) ResetField(name string) error {
+	switch name {
+	case robotprovidermodel.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotprovidermodel.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotprovidermodel.FieldProvider:
+		m.ResetProvider()
+		return nil
+	case robotprovidermodel.FieldName:
+		m.ResetName()
+		return nil
+	case robotprovidermodel.FieldRaw:
+		m.ResetRaw()
+		return nil
+	case robotprovidermodel.FieldLastSeenAt:
+		m.ResetLastSeenAt()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotProviderModel field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotProviderModelMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotProviderModelMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotProviderModelMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotProviderModelMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotProviderModelMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotProviderModelMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotProviderModelMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown RobotProviderModel unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotProviderModelMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown RobotProviderModel edge %s", name)
+}
+
+// RobotSessionMutation represents an operation that mutates the RobotSession nodes in the graph.
+type RobotSessionMutation struct {
+	config
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	updated_at      *time.Time
+	name            *string
+	state           *map[string]interface{}
+	clearedFields   map[string]struct{}
+	user            *xid.ID
+	cleareduser     bool
+	messages        map[xid.ID]struct{}
+	removedmessages map[xid.ID]struct{}
+	clearedmessages bool
+	done            bool
+	oldValue        func(context.Context) (*RobotSession, error)
+	predicates      []predicate.RobotSession
+}
+
+var _ ent.Mutation = (*RobotSessionMutation)(nil)
+
+// robotsessionOption allows management of the mutation configuration using functional options.
+type robotsessionOption func(*RobotSessionMutation)
+
+// newRobotSessionMutation creates new mutation for the RobotSession entity.
+func newRobotSessionMutation(c config, op Op, opts ...robotsessionOption) *RobotSessionMutation {
+	m := &RobotSessionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotSession,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotSessionID sets the ID field of the mutation.
+func withRobotSessionID(id xid.ID) robotsessionOption {
+	return func(m *RobotSessionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotSession
+		)
+		m.oldValue = func(ctx context.Context) (*RobotSession, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotSession.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotSession sets the old RobotSession of the mutation.
+func withRobotSession(node *RobotSession) robotsessionOption {
+	return func(m *RobotSessionMutation) {
+		m.oldValue = func(context.Context) (*RobotSession, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotSessionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotSessionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotSession entities.
+func (m *RobotSessionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotSessionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotSessionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotSession.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotSessionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotSessionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotSessionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotSessionMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotSessionMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotSessionMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotSessionMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotSessionMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotSessionMutation) ResetName() {
+	m.name = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *RobotSessionMutation) SetAccountID(x xid.ID) {
+	m.user = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *RobotSessionMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.user
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *RobotSessionMutation) ResetAccountID() {
+	m.user = nil
+}
+
+// SetState sets the "state" field.
+func (m *RobotSessionMutation) SetState(value map[string]interface{}) {
+	m.state = &value
+}
+
+// State returns the value of the "state" field in the mutation.
+func (m *RobotSessionMutation) State() (r map[string]interface{}, exists bool) {
+	v := m.state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldState returns the old "state" field's value of the RobotSession entity.
+// If the RobotSession object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMutation) OldState(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldState: %w", err)
+	}
+	return oldValue.State, nil
+}
+
+// ClearState clears the value of the "state" field.
+func (m *RobotSessionMutation) ClearState() {
+	m.state = nil
+	m.clearedFields[robotsession.FieldState] = struct{}{}
+}
+
+// StateCleared returns if the "state" field was cleared in this mutation.
+func (m *RobotSessionMutation) StateCleared() bool {
+	_, ok := m.clearedFields[robotsession.FieldState]
+	return ok
+}
+
+// ResetState resets all changes to the "state" field.
+func (m *RobotSessionMutation) ResetState() {
+	m.state = nil
+	delete(m.clearedFields, robotsession.FieldState)
+}
+
+// SetUserID sets the "user" edge to the Account entity by id.
+func (m *RobotSessionMutation) SetUserID(id xid.ID) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the Account entity.
+func (m *RobotSessionMutation) ClearUser() {
+	m.cleareduser = true
+	m.clearedFields[robotsession.FieldAccountID] = struct{}{}
+}
+
+// UserCleared reports if the "user" edge to the Account entity was cleared.
+func (m *RobotSessionMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *RobotSessionMutation) UserID() (id xid.ID, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *RobotSessionMutation) UserIDs() (ids []xid.ID) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *RobotSessionMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// AddMessageIDs adds the "messages" edge to the RobotSessionMessage entity by ids.
+func (m *RobotSessionMutation) AddMessageIDs(ids ...xid.ID) {
+	if m.messages == nil {
+		m.messages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.messages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMessages clears the "messages" edge to the RobotSessionMessage entity.
+func (m *RobotSessionMutation) ClearMessages() {
+	m.clearedmessages = true
+}
+
+// MessagesCleared reports if the "messages" edge to the RobotSessionMessage entity was cleared.
+func (m *RobotSessionMutation) MessagesCleared() bool {
+	return m.clearedmessages
+}
+
+// RemoveMessageIDs removes the "messages" edge to the RobotSessionMessage entity by IDs.
+func (m *RobotSessionMutation) RemoveMessageIDs(ids ...xid.ID) {
+	if m.removedmessages == nil {
+		m.removedmessages = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.messages, ids[i])
+		m.removedmessages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMessages returns the removed IDs of the "messages" edge to the RobotSessionMessage entity.
+func (m *RobotSessionMutation) RemovedMessagesIDs() (ids []xid.ID) {
+	for id := range m.removedmessages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MessagesIDs returns the "messages" edge IDs in the mutation.
+func (m *RobotSessionMutation) MessagesIDs() (ids []xid.ID) {
+	for id := range m.messages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMessages resets all changes to the "messages" edge.
+func (m *RobotSessionMutation) ResetMessages() {
+	m.messages = nil
+	m.clearedmessages = false
+	m.removedmessages = nil
+}
+
+// Where appends a list predicates to the RobotSessionMutation builder.
+func (m *RobotSessionMutation) Where(ps ...predicate.RobotSession) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotSessionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotSessionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotSession, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotSessionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotSessionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotSession).
+func (m *RobotSessionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotSessionMutation) Fields() []string {
+	fields := make([]string, 0, 5)
+	if m.created_at != nil {
+		fields = append(fields, robotsession.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotsession.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, robotsession.FieldName)
+	}
+	if m.user != nil {
+		fields = append(fields, robotsession.FieldAccountID)
+	}
+	if m.state != nil {
+		fields = append(fields, robotsession.FieldState)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotSessionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotsession.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotsession.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotsession.FieldName:
+		return m.Name()
+	case robotsession.FieldAccountID:
+		return m.AccountID()
+	case robotsession.FieldState:
+		return m.State()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotSessionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotsession.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotsession.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotsession.FieldName:
+		return m.OldName(ctx)
+	case robotsession.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case robotsession.FieldState:
+		return m.OldState(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotSession field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotSessionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotsession.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotsession.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotsession.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robotsession.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case robotsession.FieldState:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetState(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSession field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotSessionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotSessionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotSessionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotSession numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotSessionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotsession.FieldState) {
+		fields = append(fields, robotsession.FieldState)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotSessionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotSessionMutation) ClearField(name string) error {
+	switch name {
+	case robotsession.FieldState:
+		m.ClearState()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSession nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotSessionMutation) ResetField(name string) error {
+	switch name {
+	case robotsession.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotsession.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotsession.FieldName:
+		m.ResetName()
+		return nil
+	case robotsession.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case robotsession.FieldState:
+		m.ResetState()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSession field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotSessionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.user != nil {
+		edges = append(edges, robotsession.EdgeUser)
+	}
+	if m.messages != nil {
+		edges = append(edges, robotsession.EdgeMessages)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotSessionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotsession.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotsession.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.messages))
+		for id := range m.messages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotSessionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedmessages != nil {
+		edges = append(edges, robotsession.EdgeMessages)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotSessionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robotsession.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.removedmessages))
+		for id := range m.removedmessages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotSessionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareduser {
+		edges = append(edges, robotsession.EdgeUser)
+	}
+	if m.clearedmessages {
+		edges = append(edges, robotsession.EdgeMessages)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotSessionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotsession.EdgeUser:
+		return m.cleareduser
+	case robotsession.EdgeMessages:
+		return m.clearedmessages
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotSessionMutation) ClearEdge(name string) error {
+	switch name {
+	case robotsession.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSession unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotSessionMutation) ResetEdge(name string) error {
+	switch name {
+	case robotsession.EdgeUser:
+		m.ResetUser()
+		return nil
+	case robotsession.EdgeMessages:
+		m.ResetMessages()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSession edge %s", name)
+}
+
+// RobotSessionMessageMutation represents an operation that mutates the RobotSessionMessage nodes in the graph.
+type RobotSessionMessageMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	invocation_id  *string
+	builtin_robot  *string
+	event_data     *map[string]interface{}
+	clearedFields  map[string]struct{}
+	session        *xid.ID
+	clearedsession bool
+	robot          *xid.ID
+	clearedrobot   bool
+	author         *xid.ID
+	clearedauthor  bool
+	done           bool
+	oldValue       func(context.Context) (*RobotSessionMessage, error)
+	predicates     []predicate.RobotSessionMessage
+}
+
+var _ ent.Mutation = (*RobotSessionMessageMutation)(nil)
+
+// robotsessionmessageOption allows management of the mutation configuration using functional options.
+type robotsessionmessageOption func(*RobotSessionMessageMutation)
+
+// newRobotSessionMessageMutation creates new mutation for the RobotSessionMessage entity.
+func newRobotSessionMessageMutation(c config, op Op, opts ...robotsessionmessageOption) *RobotSessionMessageMutation {
+	m := &RobotSessionMessageMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotSessionMessage,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotSessionMessageID sets the ID field of the mutation.
+func withRobotSessionMessageID(id xid.ID) robotsessionmessageOption {
+	return func(m *RobotSessionMessageMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotSessionMessage
+		)
+		m.oldValue = func(ctx context.Context) (*RobotSessionMessage, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotSessionMessage.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotSessionMessage sets the old RobotSessionMessage of the mutation.
+func withRobotSessionMessage(node *RobotSessionMessage) robotsessionmessageOption {
+	return func(m *RobotSessionMessageMutation) {
+		m.oldValue = func(context.Context) (*RobotSessionMessage, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotSessionMessageMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotSessionMessageMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotSessionMessage entities.
+func (m *RobotSessionMessageMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotSessionMessageMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotSessionMessageMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotSessionMessage.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotSessionMessageMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotSessionMessageMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotSessionMessageMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetSessionID sets the "session_id" field.
+func (m *RobotSessionMessageMutation) SetSessionID(x xid.ID) {
+	m.session = &x
+}
+
+// SessionID returns the value of the "session_id" field in the mutation.
+func (m *RobotSessionMessageMutation) SessionID() (r xid.ID, exists bool) {
+	v := m.session
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSessionID returns the old "session_id" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldSessionID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSessionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSessionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSessionID: %w", err)
+	}
+	return oldValue.SessionID, nil
+}
+
+// ResetSessionID resets all changes to the "session_id" field.
+func (m *RobotSessionMessageMutation) ResetSessionID() {
+	m.session = nil
+}
+
+// SetInvocationID sets the "invocation_id" field.
+func (m *RobotSessionMessageMutation) SetInvocationID(s string) {
+	m.invocation_id = &s
+}
+
+// InvocationID returns the value of the "invocation_id" field in the mutation.
+func (m *RobotSessionMessageMutation) InvocationID() (r string, exists bool) {
+	v := m.invocation_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInvocationID returns the old "invocation_id" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldInvocationID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInvocationID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInvocationID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInvocationID: %w", err)
+	}
+	return oldValue.InvocationID, nil
+}
+
+// ResetInvocationID resets all changes to the "invocation_id" field.
+func (m *RobotSessionMessageMutation) ResetInvocationID() {
+	m.invocation_id = nil
+}
+
+// SetRobotID sets the "robot_id" field.
+func (m *RobotSessionMessageMutation) SetRobotID(x xid.ID) {
+	m.robot = &x
+}
+
+// RobotID returns the value of the "robot_id" field in the mutation.
+func (m *RobotSessionMessageMutation) RobotID() (r xid.ID, exists bool) {
+	v := m.robot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRobotID returns the old "robot_id" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldRobotID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRobotID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRobotID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRobotID: %w", err)
+	}
+	return oldValue.RobotID, nil
+}
+
+// ClearRobotID clears the value of the "robot_id" field.
+func (m *RobotSessionMessageMutation) ClearRobotID() {
+	m.robot = nil
+	m.clearedFields[robotsessionmessage.FieldRobotID] = struct{}{}
+}
+
+// RobotIDCleared returns if the "robot_id" field was cleared in this mutation.
+func (m *RobotSessionMessageMutation) RobotIDCleared() bool {
+	_, ok := m.clearedFields[robotsessionmessage.FieldRobotID]
+	return ok
+}
+
+// ResetRobotID resets all changes to the "robot_id" field.
+func (m *RobotSessionMessageMutation) ResetRobotID() {
+	m.robot = nil
+	delete(m.clearedFields, robotsessionmessage.FieldRobotID)
+}
+
+// SetBuiltinRobot sets the "builtin_robot" field.
+func (m *RobotSessionMessageMutation) SetBuiltinRobot(s string) {
+	m.builtin_robot = &s
+}
+
+// BuiltinRobot returns the value of the "builtin_robot" field in the mutation.
+func (m *RobotSessionMessageMutation) BuiltinRobot() (r string, exists bool) {
+	v := m.builtin_robot
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBuiltinRobot returns the old "builtin_robot" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldBuiltinRobot(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBuiltinRobot is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBuiltinRobot requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBuiltinRobot: %w", err)
+	}
+	return oldValue.BuiltinRobot, nil
+}
+
+// ClearBuiltinRobot clears the value of the "builtin_robot" field.
+func (m *RobotSessionMessageMutation) ClearBuiltinRobot() {
+	m.builtin_robot = nil
+	m.clearedFields[robotsessionmessage.FieldBuiltinRobot] = struct{}{}
+}
+
+// BuiltinRobotCleared returns if the "builtin_robot" field was cleared in this mutation.
+func (m *RobotSessionMessageMutation) BuiltinRobotCleared() bool {
+	_, ok := m.clearedFields[robotsessionmessage.FieldBuiltinRobot]
+	return ok
+}
+
+// ResetBuiltinRobot resets all changes to the "builtin_robot" field.
+func (m *RobotSessionMessageMutation) ResetBuiltinRobot() {
+	m.builtin_robot = nil
+	delete(m.clearedFields, robotsessionmessage.FieldBuiltinRobot)
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *RobotSessionMessageMutation) SetAccountID(x xid.ID) {
+	m.author = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *RobotSessionMessageMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldAccountID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ClearAccountID clears the value of the "account_id" field.
+func (m *RobotSessionMessageMutation) ClearAccountID() {
+	m.author = nil
+	m.clearedFields[robotsessionmessage.FieldAccountID] = struct{}{}
+}
+
+// AccountIDCleared returns if the "account_id" field was cleared in this mutation.
+func (m *RobotSessionMessageMutation) AccountIDCleared() bool {
+	_, ok := m.clearedFields[robotsessionmessage.FieldAccountID]
+	return ok
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *RobotSessionMessageMutation) ResetAccountID() {
+	m.author = nil
+	delete(m.clearedFields, robotsessionmessage.FieldAccountID)
+}
+
+// SetEventData sets the "event_data" field.
+func (m *RobotSessionMessageMutation) SetEventData(value map[string]interface{}) {
+	m.event_data = &value
+}
+
+// EventData returns the value of the "event_data" field in the mutation.
+func (m *RobotSessionMessageMutation) EventData() (r map[string]interface{}, exists bool) {
+	v := m.event_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventData returns the old "event_data" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldEventData(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventData: %w", err)
+	}
+	return oldValue.EventData, nil
+}
+
+// ResetEventData resets all changes to the "event_data" field.
+func (m *RobotSessionMessageMutation) ResetEventData() {
+	m.event_data = nil
+}
+
+// ClearSession clears the "session" edge to the RobotSession entity.
+func (m *RobotSessionMessageMutation) ClearSession() {
+	m.clearedsession = true
+	m.clearedFields[robotsessionmessage.FieldSessionID] = struct{}{}
+}
+
+// SessionCleared reports if the "session" edge to the RobotSession entity was cleared.
+func (m *RobotSessionMessageMutation) SessionCleared() bool {
+	return m.clearedsession
+}
+
+// SessionIDs returns the "session" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// SessionID instead. It exists only for internal usage by the builders.
+func (m *RobotSessionMessageMutation) SessionIDs() (ids []xid.ID) {
+	if id := m.session; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetSession resets all changes to the "session" edge.
+func (m *RobotSessionMessageMutation) ResetSession() {
+	m.session = nil
+	m.clearedsession = false
+}
+
+// ClearRobot clears the "robot" edge to the Robot entity.
+func (m *RobotSessionMessageMutation) ClearRobot() {
+	m.clearedrobot = true
+	m.clearedFields[robotsessionmessage.FieldRobotID] = struct{}{}
+}
+
+// RobotCleared reports if the "robot" edge to the Robot entity was cleared.
+func (m *RobotSessionMessageMutation) RobotCleared() bool {
+	return m.RobotIDCleared() || m.clearedrobot
+}
+
+// RobotIDs returns the "robot" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RobotID instead. It exists only for internal usage by the builders.
+func (m *RobotSessionMessageMutation) RobotIDs() (ids []xid.ID) {
+	if id := m.robot; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRobot resets all changes to the "robot" edge.
+func (m *RobotSessionMessageMutation) ResetRobot() {
+	m.robot = nil
+	m.clearedrobot = false
+}
+
+// SetAuthorID sets the "author" edge to the Account entity by id.
+func (m *RobotSessionMessageMutation) SetAuthorID(id xid.ID) {
+	m.author = &id
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *RobotSessionMessageMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[robotsessionmessage.FieldAccountID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *RobotSessionMessageMutation) AuthorCleared() bool {
+	return m.AccountIDCleared() || m.clearedauthor
+}
+
+// AuthorID returns the "author" edge ID in the mutation.
+func (m *RobotSessionMessageMutation) AuthorID() (id xid.ID, exists bool) {
+	if m.author != nil {
+		return *m.author, true
+	}
+	return
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *RobotSessionMessageMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *RobotSessionMessageMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// Where appends a list predicates to the RobotSessionMessageMutation builder.
+func (m *RobotSessionMessageMutation) Where(ps ...predicate.RobotSessionMessage) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotSessionMessageMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotSessionMessageMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotSessionMessage, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotSessionMessageMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotSessionMessageMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotSessionMessage).
+func (m *RobotSessionMessageMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotSessionMessageMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, robotsessionmessage.FieldCreatedAt)
+	}
+	if m.session != nil {
+		fields = append(fields, robotsessionmessage.FieldSessionID)
+	}
+	if m.invocation_id != nil {
+		fields = append(fields, robotsessionmessage.FieldInvocationID)
+	}
+	if m.robot != nil {
+		fields = append(fields, robotsessionmessage.FieldRobotID)
+	}
+	if m.builtin_robot != nil {
+		fields = append(fields, robotsessionmessage.FieldBuiltinRobot)
+	}
+	if m.author != nil {
+		fields = append(fields, robotsessionmessage.FieldAccountID)
+	}
+	if m.event_data != nil {
+		fields = append(fields, robotsessionmessage.FieldEventData)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotSessionMessageMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotsessionmessage.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotsessionmessage.FieldSessionID:
+		return m.SessionID()
+	case robotsessionmessage.FieldInvocationID:
+		return m.InvocationID()
+	case robotsessionmessage.FieldRobotID:
+		return m.RobotID()
+	case robotsessionmessage.FieldBuiltinRobot:
+		return m.BuiltinRobot()
+	case robotsessionmessage.FieldAccountID:
+		return m.AccountID()
+	case robotsessionmessage.FieldEventData:
+		return m.EventData()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotSessionMessageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotsessionmessage.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotsessionmessage.FieldSessionID:
+		return m.OldSessionID(ctx)
+	case robotsessionmessage.FieldInvocationID:
+		return m.OldInvocationID(ctx)
+	case robotsessionmessage.FieldRobotID:
+		return m.OldRobotID(ctx)
+	case robotsessionmessage.FieldBuiltinRobot:
+		return m.OldBuiltinRobot(ctx)
+	case robotsessionmessage.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case robotsessionmessage.FieldEventData:
+		return m.OldEventData(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotSessionMessage field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotSessionMessageMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotsessionmessage.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotsessionmessage.FieldSessionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSessionID(v)
+		return nil
+	case robotsessionmessage.FieldInvocationID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInvocationID(v)
+		return nil
+	case robotsessionmessage.FieldRobotID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRobotID(v)
+		return nil
+	case robotsessionmessage.FieldBuiltinRobot:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBuiltinRobot(v)
+		return nil
+	case robotsessionmessage.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case robotsessionmessage.FieldEventData:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventData(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSessionMessage field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotSessionMessageMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotSessionMessageMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotSessionMessageMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotSessionMessage numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotSessionMessageMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotsessionmessage.FieldRobotID) {
+		fields = append(fields, robotsessionmessage.FieldRobotID)
+	}
+	if m.FieldCleared(robotsessionmessage.FieldBuiltinRobot) {
+		fields = append(fields, robotsessionmessage.FieldBuiltinRobot)
+	}
+	if m.FieldCleared(robotsessionmessage.FieldAccountID) {
+		fields = append(fields, robotsessionmessage.FieldAccountID)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotSessionMessageMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotSessionMessageMutation) ClearField(name string) error {
+	switch name {
+	case robotsessionmessage.FieldRobotID:
+		m.ClearRobotID()
+		return nil
+	case robotsessionmessage.FieldBuiltinRobot:
+		m.ClearBuiltinRobot()
+		return nil
+	case robotsessionmessage.FieldAccountID:
+		m.ClearAccountID()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSessionMessage nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotSessionMessageMutation) ResetField(name string) error {
+	switch name {
+	case robotsessionmessage.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotsessionmessage.FieldSessionID:
+		m.ResetSessionID()
+		return nil
+	case robotsessionmessage.FieldInvocationID:
+		m.ResetInvocationID()
+		return nil
+	case robotsessionmessage.FieldRobotID:
+		m.ResetRobotID()
+		return nil
+	case robotsessionmessage.FieldBuiltinRobot:
+		m.ResetBuiltinRobot()
+		return nil
+	case robotsessionmessage.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case robotsessionmessage.FieldEventData:
+		m.ResetEventData()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSessionMessage field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotSessionMessageMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.session != nil {
+		edges = append(edges, robotsessionmessage.EdgeSession)
+	}
+	if m.robot != nil {
+		edges = append(edges, robotsessionmessage.EdgeRobot)
+	}
+	if m.author != nil {
+		edges = append(edges, robotsessionmessage.EdgeAuthor)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotSessionMessageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotsessionmessage.EdgeSession:
+		if id := m.session; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotsessionmessage.EdgeRobot:
+		if id := m.robot; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotsessionmessage.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotSessionMessageMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotSessionMessageMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotSessionMessageMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedsession {
+		edges = append(edges, robotsessionmessage.EdgeSession)
+	}
+	if m.clearedrobot {
+		edges = append(edges, robotsessionmessage.EdgeRobot)
+	}
+	if m.clearedauthor {
+		edges = append(edges, robotsessionmessage.EdgeAuthor)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotSessionMessageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotsessionmessage.EdgeSession:
+		return m.clearedsession
+	case robotsessionmessage.EdgeRobot:
+		return m.clearedrobot
+	case robotsessionmessage.EdgeAuthor:
+		return m.clearedauthor
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotSessionMessageMutation) ClearEdge(name string) error {
+	switch name {
+	case robotsessionmessage.EdgeSession:
+		m.ClearSession()
+		return nil
+	case robotsessionmessage.EdgeRobot:
+		m.ClearRobot()
+		return nil
+	case robotsessionmessage.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSessionMessage unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotSessionMessageMutation) ResetEdge(name string) error {
+	switch name {
+	case robotsessionmessage.EdgeSession:
+		m.ResetSession()
+		return nil
+	case robotsessionmessage.EdgeRobot:
+		m.ResetRobot()
+		return nil
+	case robotsessionmessage.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotSessionMessage edge %s", name)
+}
+
+// RobotWorkspaceMutation represents an operation that mutates the RobotWorkspace nodes in the graph.
+type RobotWorkspaceMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	updated_at       *time.Time
+	name             *string
+	description      *string
+	provider         *robotworkspace.Provider
+	_config          *map[string]interface{}
+	metadata         *map[string]interface{}
+	clearedFields    map[string]struct{}
+	creator          *xid.ID
+	clearedcreator   bool
+	robots           map[xid.ID]struct{}
+	removedrobots    map[xid.ID]struct{}
+	clearedrobots    bool
+	instances        map[xid.ID]struct{}
+	removedinstances map[xid.ID]struct{}
+	clearedinstances bool
+	done             bool
+	oldValue         func(context.Context) (*RobotWorkspace, error)
+	predicates       []predicate.RobotWorkspace
+}
+
+var _ ent.Mutation = (*RobotWorkspaceMutation)(nil)
+
+// robotworkspaceOption allows management of the mutation configuration using functional options.
+type robotworkspaceOption func(*RobotWorkspaceMutation)
+
+// newRobotWorkspaceMutation creates new mutation for the RobotWorkspace entity.
+func newRobotWorkspaceMutation(c config, op Op, opts ...robotworkspaceOption) *RobotWorkspaceMutation {
+	m := &RobotWorkspaceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotWorkspace,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotWorkspaceID sets the ID field of the mutation.
+func withRobotWorkspaceID(id xid.ID) robotworkspaceOption {
+	return func(m *RobotWorkspaceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotWorkspace
+		)
+		m.oldValue = func(ctx context.Context) (*RobotWorkspace, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotWorkspace.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotWorkspace sets the old RobotWorkspace of the mutation.
+func withRobotWorkspace(node *RobotWorkspace) robotworkspaceOption {
+	return func(m *RobotWorkspaceMutation) {
+		m.oldValue = func(context.Context) (*RobotWorkspace, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotWorkspaceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotWorkspaceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotWorkspace entities.
+func (m *RobotWorkspaceMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotWorkspaceMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotWorkspaceMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotWorkspace.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotWorkspaceMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotWorkspaceMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotWorkspaceMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotWorkspaceMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotWorkspaceMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotWorkspaceMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotWorkspaceMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotWorkspaceMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotWorkspaceMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *RobotWorkspaceMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *RobotWorkspaceMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *RobotWorkspaceMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[robotworkspace.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *RobotWorkspaceMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[robotworkspace.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *RobotWorkspaceMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, robotworkspace.FieldDescription)
+}
+
+// SetProvider sets the "provider" field.
+func (m *RobotWorkspaceMutation) SetProvider(r robotworkspace.Provider) {
+	m.provider = &r
+}
+
+// Provider returns the value of the "provider" field in the mutation.
+func (m *RobotWorkspaceMutation) Provider() (r robotworkspace.Provider, exists bool) {
+	v := m.provider
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProvider returns the old "provider" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldProvider(ctx context.Context) (v robotworkspace.Provider, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProvider is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProvider requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProvider: %w", err)
+	}
+	return oldValue.Provider, nil
+}
+
+// ResetProvider resets all changes to the "provider" field.
+func (m *RobotWorkspaceMutation) ResetProvider() {
+	m.provider = nil
+}
+
+// SetConfig sets the "config" field.
+func (m *RobotWorkspaceMutation) SetConfig(value map[string]interface{}) {
+	m._config = &value
+}
+
+// Config returns the value of the "config" field in the mutation.
+func (m *RobotWorkspaceMutation) Config() (r map[string]interface{}, exists bool) {
+	v := m._config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConfig returns the old "config" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldConfig(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConfig: %w", err)
+	}
+	return oldValue.Config, nil
+}
+
+// ClearConfig clears the value of the "config" field.
+func (m *RobotWorkspaceMutation) ClearConfig() {
+	m._config = nil
+	m.clearedFields[robotworkspace.FieldConfig] = struct{}{}
+}
+
+// ConfigCleared returns if the "config" field was cleared in this mutation.
+func (m *RobotWorkspaceMutation) ConfigCleared() bool {
+	_, ok := m.clearedFields[robotworkspace.FieldConfig]
+	return ok
+}
+
+// ResetConfig resets all changes to the "config" field.
+func (m *RobotWorkspaceMutation) ResetConfig() {
+	m._config = nil
+	delete(m.clearedFields, robotworkspace.FieldConfig)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *RobotWorkspaceMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *RobotWorkspaceMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *RobotWorkspaceMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[robotworkspace.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *RobotWorkspaceMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[robotworkspace.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *RobotWorkspaceMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, robotworkspace.FieldMetadata)
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *RobotWorkspaceMutation) SetCreatedBy(x xid.ID) {
+	m.creator = &x
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *RobotWorkspaceMutation) CreatedBy() (r xid.ID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldCreatedBy(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *RobotWorkspaceMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetCreatorID sets the "creator" edge to the Account entity by id.
+func (m *RobotWorkspaceMutation) SetCreatorID(id xid.ID) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Account entity.
+func (m *RobotWorkspaceMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[robotworkspace.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Account entity was cleared.
+func (m *RobotWorkspaceMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *RobotWorkspaceMutation) CreatorID() (id xid.ID, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *RobotWorkspaceMutation) CreatorIDs() (ids []xid.ID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *RobotWorkspaceMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// AddRobotIDs adds the "robots" edge to the Robot entity by ids.
+func (m *RobotWorkspaceMutation) AddRobotIDs(ids ...xid.ID) {
+	if m.robots == nil {
+		m.robots = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robots[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobots clears the "robots" edge to the Robot entity.
+func (m *RobotWorkspaceMutation) ClearRobots() {
+	m.clearedrobots = true
+}
+
+// RobotsCleared reports if the "robots" edge to the Robot entity was cleared.
+func (m *RobotWorkspaceMutation) RobotsCleared() bool {
+	return m.clearedrobots
+}
+
+// RemoveRobotIDs removes the "robots" edge to the Robot entity by IDs.
+func (m *RobotWorkspaceMutation) RemoveRobotIDs(ids ...xid.ID) {
+	if m.removedrobots == nil {
+		m.removedrobots = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robots, ids[i])
+		m.removedrobots[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobots returns the removed IDs of the "robots" edge to the Robot entity.
+func (m *RobotWorkspaceMutation) RemovedRobotsIDs() (ids []xid.ID) {
+	for id := range m.removedrobots {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotsIDs returns the "robots" edge IDs in the mutation.
+func (m *RobotWorkspaceMutation) RobotsIDs() (ids []xid.ID) {
+	for id := range m.robots {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobots resets all changes to the "robots" edge.
+func (m *RobotWorkspaceMutation) ResetRobots() {
+	m.robots = nil
+	m.clearedrobots = false
+	m.removedrobots = nil
+}
+
+// AddInstanceIDs adds the "instances" edge to the RobotWorkspaceInstance entity by ids.
+func (m *RobotWorkspaceMutation) AddInstanceIDs(ids ...xid.ID) {
+	if m.instances == nil {
+		m.instances = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.instances[ids[i]] = struct{}{}
+	}
+}
+
+// ClearInstances clears the "instances" edge to the RobotWorkspaceInstance entity.
+func (m *RobotWorkspaceMutation) ClearInstances() {
+	m.clearedinstances = true
+}
+
+// InstancesCleared reports if the "instances" edge to the RobotWorkspaceInstance entity was cleared.
+func (m *RobotWorkspaceMutation) InstancesCleared() bool {
+	return m.clearedinstances
+}
+
+// RemoveInstanceIDs removes the "instances" edge to the RobotWorkspaceInstance entity by IDs.
+func (m *RobotWorkspaceMutation) RemoveInstanceIDs(ids ...xid.ID) {
+	if m.removedinstances == nil {
+		m.removedinstances = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.instances, ids[i])
+		m.removedinstances[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedInstances returns the removed IDs of the "instances" edge to the RobotWorkspaceInstance entity.
+func (m *RobotWorkspaceMutation) RemovedInstancesIDs() (ids []xid.ID) {
+	for id := range m.removedinstances {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// InstancesIDs returns the "instances" edge IDs in the mutation.
+func (m *RobotWorkspaceMutation) InstancesIDs() (ids []xid.ID) {
+	for id := range m.instances {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetInstances resets all changes to the "instances" edge.
+func (m *RobotWorkspaceMutation) ResetInstances() {
+	m.instances = nil
+	m.clearedinstances = false
+	m.removedinstances = nil
+}
+
+// Where appends a list predicates to the RobotWorkspaceMutation builder.
+func (m *RobotWorkspaceMutation) Where(ps ...predicate.RobotWorkspace) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotWorkspaceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotWorkspaceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotWorkspace, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotWorkspaceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotWorkspaceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotWorkspace).
+func (m *RobotWorkspaceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotWorkspaceMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, robotworkspace.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotworkspace.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, robotworkspace.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, robotworkspace.FieldDescription)
+	}
+	if m.provider != nil {
+		fields = append(fields, robotworkspace.FieldProvider)
+	}
+	if m._config != nil {
+		fields = append(fields, robotworkspace.FieldConfig)
+	}
+	if m.metadata != nil {
+		fields = append(fields, robotworkspace.FieldMetadata)
+	}
+	if m.creator != nil {
+		fields = append(fields, robotworkspace.FieldCreatedBy)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotWorkspaceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotworkspace.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotworkspace.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotworkspace.FieldName:
+		return m.Name()
+	case robotworkspace.FieldDescription:
+		return m.Description()
+	case robotworkspace.FieldProvider:
+		return m.Provider()
+	case robotworkspace.FieldConfig:
+		return m.Config()
+	case robotworkspace.FieldMetadata:
+		return m.Metadata()
+	case robotworkspace.FieldCreatedBy:
+		return m.CreatedBy()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotWorkspaceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotworkspace.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotworkspace.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotworkspace.FieldName:
+		return m.OldName(ctx)
+	case robotworkspace.FieldDescription:
+		return m.OldDescription(ctx)
+	case robotworkspace.FieldProvider:
+		return m.OldProvider(ctx)
+	case robotworkspace.FieldConfig:
+		return m.OldConfig(ctx)
+	case robotworkspace.FieldMetadata:
+		return m.OldMetadata(ctx)
+	case robotworkspace.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotWorkspace field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotWorkspaceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotworkspace.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotworkspace.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotworkspace.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robotworkspace.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case robotworkspace.FieldProvider:
+		v, ok := value.(robotworkspace.Provider)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProvider(v)
+		return nil
+	case robotworkspace.FieldConfig:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConfig(v)
+		return nil
+	case robotworkspace.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	case robotworkspace.FieldCreatedBy:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspace field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotWorkspaceMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotWorkspaceMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotWorkspaceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotWorkspace numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotWorkspaceMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotworkspace.FieldDescription) {
+		fields = append(fields, robotworkspace.FieldDescription)
+	}
+	if m.FieldCleared(robotworkspace.FieldConfig) {
+		fields = append(fields, robotworkspace.FieldConfig)
+	}
+	if m.FieldCleared(robotworkspace.FieldMetadata) {
+		fields = append(fields, robotworkspace.FieldMetadata)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotWorkspaceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotWorkspaceMutation) ClearField(name string) error {
+	switch name {
+	case robotworkspace.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case robotworkspace.FieldConfig:
+		m.ClearConfig()
+		return nil
+	case robotworkspace.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspace nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotWorkspaceMutation) ResetField(name string) error {
+	switch name {
+	case robotworkspace.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotworkspace.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotworkspace.FieldName:
+		m.ResetName()
+		return nil
+	case robotworkspace.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case robotworkspace.FieldProvider:
+		m.ResetProvider()
+		return nil
+	case robotworkspace.FieldConfig:
+		m.ResetConfig()
+		return nil
+	case robotworkspace.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	case robotworkspace.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspace field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotWorkspaceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.creator != nil {
+		edges = append(edges, robotworkspace.EdgeCreator)
+	}
+	if m.robots != nil {
+		edges = append(edges, robotworkspace.EdgeRobots)
+	}
+	if m.instances != nil {
+		edges = append(edges, robotworkspace.EdgeInstances)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotWorkspaceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotworkspace.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotworkspace.EdgeRobots:
+		ids := make([]ent.Value, 0, len(m.robots))
+		for id := range m.robots {
+			ids = append(ids, id)
+		}
+		return ids
+	case robotworkspace.EdgeInstances:
+		ids := make([]ent.Value, 0, len(m.instances))
+		for id := range m.instances {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotWorkspaceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedrobots != nil {
+		edges = append(edges, robotworkspace.EdgeRobots)
+	}
+	if m.removedinstances != nil {
+		edges = append(edges, robotworkspace.EdgeInstances)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotWorkspaceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case robotworkspace.EdgeRobots:
+		ids := make([]ent.Value, 0, len(m.removedrobots))
+		for id := range m.removedrobots {
+			ids = append(ids, id)
+		}
+		return ids
+	case robotworkspace.EdgeInstances:
+		ids := make([]ent.Value, 0, len(m.removedinstances))
+		for id := range m.removedinstances {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotWorkspaceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcreator {
+		edges = append(edges, robotworkspace.EdgeCreator)
+	}
+	if m.clearedrobots {
+		edges = append(edges, robotworkspace.EdgeRobots)
+	}
+	if m.clearedinstances {
+		edges = append(edges, robotworkspace.EdgeInstances)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotWorkspaceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotworkspace.EdgeCreator:
+		return m.clearedcreator
+	case robotworkspace.EdgeRobots:
+		return m.clearedrobots
+	case robotworkspace.EdgeInstances:
+		return m.clearedinstances
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotWorkspaceMutation) ClearEdge(name string) error {
+	switch name {
+	case robotworkspace.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspace unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotWorkspaceMutation) ResetEdge(name string) error {
+	switch name {
+	case robotworkspace.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case robotworkspace.EdgeRobots:
+		m.ResetRobots()
+		return nil
+	case robotworkspace.EdgeInstances:
+		m.ResetInstances()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspace edge %s", name)
+}
+
+// RobotWorkspaceInstanceMutation represents an operation that mutates the RobotWorkspaceInstance nodes in the graph.
+type RobotWorkspaceInstanceMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	updated_at       *time.Time
+	provider         *robotworkspaceinstance.Provider
+	provider_state   *map[string]interface{}
+	metadata         *map[string]interface{}
+	clearedFields    map[string]struct{}
+	workspace        *xid.ID
+	clearedworkspace bool
+	creator          *xid.ID
+	clearedcreator   bool
+	done             bool
+	oldValue         func(context.Context) (*RobotWorkspaceInstance, error)
+	predicates       []predicate.RobotWorkspaceInstance
+}
+
+var _ ent.Mutation = (*RobotWorkspaceInstanceMutation)(nil)
+
+// robotworkspaceinstanceOption allows management of the mutation configuration using functional options.
+type robotworkspaceinstanceOption func(*RobotWorkspaceInstanceMutation)
+
+// newRobotWorkspaceInstanceMutation creates new mutation for the RobotWorkspaceInstance entity.
+func newRobotWorkspaceInstanceMutation(c config, op Op, opts ...robotworkspaceinstanceOption) *RobotWorkspaceInstanceMutation {
+	m := &RobotWorkspaceInstanceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotWorkspaceInstance,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotWorkspaceInstanceID sets the ID field of the mutation.
+func withRobotWorkspaceInstanceID(id xid.ID) robotworkspaceinstanceOption {
+	return func(m *RobotWorkspaceInstanceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotWorkspaceInstance
+		)
+		m.oldValue = func(ctx context.Context) (*RobotWorkspaceInstance, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotWorkspaceInstance.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotWorkspaceInstance sets the old RobotWorkspaceInstance of the mutation.
+func withRobotWorkspaceInstance(node *RobotWorkspaceInstance) robotworkspaceinstanceOption {
+	return func(m *RobotWorkspaceInstanceMutation) {
+		m.oldValue = func(context.Context) (*RobotWorkspaceInstance, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotWorkspaceInstanceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotWorkspaceInstanceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotWorkspaceInstance entities.
+func (m *RobotWorkspaceInstanceMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotWorkspaceInstanceMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotWorkspaceInstanceMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotWorkspaceInstance.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotWorkspaceInstanceMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotWorkspaceInstanceMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotWorkspaceInstanceMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotWorkspaceInstanceMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetWorkspaceID sets the "workspace_id" field.
+func (m *RobotWorkspaceInstanceMutation) SetWorkspaceID(x xid.ID) {
+	m.workspace = &x
+}
+
+// WorkspaceID returns the value of the "workspace_id" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) WorkspaceID() (r xid.ID, exists bool) {
+	v := m.workspace
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWorkspaceID returns the old "workspace_id" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldWorkspaceID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWorkspaceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWorkspaceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWorkspaceID: %w", err)
+	}
+	return oldValue.WorkspaceID, nil
+}
+
+// ResetWorkspaceID resets all changes to the "workspace_id" field.
+func (m *RobotWorkspaceInstanceMutation) ResetWorkspaceID() {
+	m.workspace = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *RobotWorkspaceInstanceMutation) SetCreatedBy(x xid.ID) {
+	m.creator = &x
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) CreatedBy() (r xid.ID, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldCreatedBy(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *RobotWorkspaceInstanceMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetProvider sets the "provider" field.
+func (m *RobotWorkspaceInstanceMutation) SetProvider(r robotworkspaceinstance.Provider) {
+	m.provider = &r
+}
+
+// Provider returns the value of the "provider" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) Provider() (r robotworkspaceinstance.Provider, exists bool) {
+	v := m.provider
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProvider returns the old "provider" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldProvider(ctx context.Context) (v robotworkspaceinstance.Provider, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProvider is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProvider requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProvider: %w", err)
+	}
+	return oldValue.Provider, nil
+}
+
+// ResetProvider resets all changes to the "provider" field.
+func (m *RobotWorkspaceInstanceMutation) ResetProvider() {
+	m.provider = nil
+}
+
+// SetProviderState sets the "provider_state" field.
+func (m *RobotWorkspaceInstanceMutation) SetProviderState(value map[string]interface{}) {
+	m.provider_state = &value
+}
+
+// ProviderState returns the value of the "provider_state" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) ProviderState() (r map[string]interface{}, exists bool) {
+	v := m.provider_state
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProviderState returns the old "provider_state" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldProviderState(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProviderState is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProviderState requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProviderState: %w", err)
+	}
+	return oldValue.ProviderState, nil
+}
+
+// ClearProviderState clears the value of the "provider_state" field.
+func (m *RobotWorkspaceInstanceMutation) ClearProviderState() {
+	m.provider_state = nil
+	m.clearedFields[robotworkspaceinstance.FieldProviderState] = struct{}{}
+}
+
+// ProviderStateCleared returns if the "provider_state" field was cleared in this mutation.
+func (m *RobotWorkspaceInstanceMutation) ProviderStateCleared() bool {
+	_, ok := m.clearedFields[robotworkspaceinstance.FieldProviderState]
+	return ok
+}
+
+// ResetProviderState resets all changes to the "provider_state" field.
+func (m *RobotWorkspaceInstanceMutation) ResetProviderState() {
+	m.provider_state = nil
+	delete(m.clearedFields, robotworkspaceinstance.FieldProviderState)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *RobotWorkspaceInstanceMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *RobotWorkspaceInstanceMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the RobotWorkspaceInstance entity.
+// If the RobotWorkspaceInstance object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceInstanceMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *RobotWorkspaceInstanceMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[robotworkspaceinstance.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *RobotWorkspaceInstanceMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[robotworkspaceinstance.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *RobotWorkspaceInstanceMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, robotworkspaceinstance.FieldMetadata)
+}
+
+// ClearWorkspace clears the "workspace" edge to the RobotWorkspace entity.
+func (m *RobotWorkspaceInstanceMutation) ClearWorkspace() {
+	m.clearedworkspace = true
+	m.clearedFields[robotworkspaceinstance.FieldWorkspaceID] = struct{}{}
+}
+
+// WorkspaceCleared reports if the "workspace" edge to the RobotWorkspace entity was cleared.
+func (m *RobotWorkspaceInstanceMutation) WorkspaceCleared() bool {
+	return m.clearedworkspace
+}
+
+// WorkspaceIDs returns the "workspace" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkspaceID instead. It exists only for internal usage by the builders.
+func (m *RobotWorkspaceInstanceMutation) WorkspaceIDs() (ids []xid.ID) {
+	if id := m.workspace; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkspace resets all changes to the "workspace" edge.
+func (m *RobotWorkspaceInstanceMutation) ResetWorkspace() {
+	m.workspace = nil
+	m.clearedworkspace = false
+}
+
+// SetCreatorID sets the "creator" edge to the Account entity by id.
+func (m *RobotWorkspaceInstanceMutation) SetCreatorID(id xid.ID) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Account entity.
+func (m *RobotWorkspaceInstanceMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[robotworkspaceinstance.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Account entity was cleared.
+func (m *RobotWorkspaceInstanceMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *RobotWorkspaceInstanceMutation) CreatorID() (id xid.ID, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *RobotWorkspaceInstanceMutation) CreatorIDs() (ids []xid.ID) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *RobotWorkspaceInstanceMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// Where appends a list predicates to the RobotWorkspaceInstanceMutation builder.
+func (m *RobotWorkspaceInstanceMutation) Where(ps ...predicate.RobotWorkspaceInstance) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotWorkspaceInstanceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotWorkspaceInstanceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotWorkspaceInstance, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotWorkspaceInstanceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotWorkspaceInstanceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotWorkspaceInstance).
+func (m *RobotWorkspaceInstanceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotWorkspaceInstanceMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, robotworkspaceinstance.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robotworkspaceinstance.FieldUpdatedAt)
+	}
+	if m.workspace != nil {
+		fields = append(fields, robotworkspaceinstance.FieldWorkspaceID)
+	}
+	if m.creator != nil {
+		fields = append(fields, robotworkspaceinstance.FieldCreatedBy)
+	}
+	if m.provider != nil {
+		fields = append(fields, robotworkspaceinstance.FieldProvider)
+	}
+	if m.provider_state != nil {
+		fields = append(fields, robotworkspaceinstance.FieldProviderState)
+	}
+	if m.metadata != nil {
+		fields = append(fields, robotworkspaceinstance.FieldMetadata)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotWorkspaceInstanceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robotworkspaceinstance.FieldCreatedAt:
+		return m.CreatedAt()
+	case robotworkspaceinstance.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robotworkspaceinstance.FieldWorkspaceID:
+		return m.WorkspaceID()
+	case robotworkspaceinstance.FieldCreatedBy:
+		return m.CreatedBy()
+	case robotworkspaceinstance.FieldProvider:
+		return m.Provider()
+	case robotworkspaceinstance.FieldProviderState:
+		return m.ProviderState()
+	case robotworkspaceinstance.FieldMetadata:
+		return m.Metadata()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotWorkspaceInstanceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robotworkspaceinstance.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robotworkspaceinstance.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robotworkspaceinstance.FieldWorkspaceID:
+		return m.OldWorkspaceID(ctx)
+	case robotworkspaceinstance.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case robotworkspaceinstance.FieldProvider:
+		return m.OldProvider(ctx)
+	case robotworkspaceinstance.FieldProviderState:
+		return m.OldProviderState(ctx)
+	case robotworkspaceinstance.FieldMetadata:
+		return m.OldMetadata(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotWorkspaceInstance field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotWorkspaceInstanceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robotworkspaceinstance.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robotworkspaceinstance.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robotworkspaceinstance.FieldWorkspaceID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWorkspaceID(v)
+		return nil
+	case robotworkspaceinstance.FieldCreatedBy:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case robotworkspaceinstance.FieldProvider:
+		v, ok := value.(robotworkspaceinstance.Provider)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProvider(v)
+		return nil
+	case robotworkspaceinstance.FieldProviderState:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProviderState(v)
+		return nil
+	case robotworkspaceinstance.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotWorkspaceInstanceMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotWorkspaceInstanceMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotWorkspaceInstanceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotWorkspaceInstanceMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robotworkspaceinstance.FieldProviderState) {
+		fields = append(fields, robotworkspaceinstance.FieldProviderState)
+	}
+	if m.FieldCleared(robotworkspaceinstance.FieldMetadata) {
+		fields = append(fields, robotworkspaceinstance.FieldMetadata)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotWorkspaceInstanceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotWorkspaceInstanceMutation) ClearField(name string) error {
+	switch name {
+	case robotworkspaceinstance.FieldProviderState:
+		m.ClearProviderState()
+		return nil
+	case robotworkspaceinstance.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotWorkspaceInstanceMutation) ResetField(name string) error {
+	switch name {
+	case robotworkspaceinstance.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robotworkspaceinstance.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robotworkspaceinstance.FieldWorkspaceID:
+		m.ResetWorkspaceID()
+		return nil
+	case robotworkspaceinstance.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case robotworkspaceinstance.FieldProvider:
+		m.ResetProvider()
+		return nil
+	case robotworkspaceinstance.FieldProviderState:
+		m.ResetProviderState()
+		return nil
+	case robotworkspaceinstance.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotWorkspaceInstanceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.workspace != nil {
+		edges = append(edges, robotworkspaceinstance.EdgeWorkspace)
+	}
+	if m.creator != nil {
+		edges = append(edges, robotworkspaceinstance.EdgeCreator)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotWorkspaceInstanceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robotworkspaceinstance.EdgeWorkspace:
+		if id := m.workspace; id != nil {
+			return []ent.Value{*id}
+		}
+	case robotworkspaceinstance.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotWorkspaceInstanceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotWorkspaceInstanceMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotWorkspaceInstanceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedworkspace {
+		edges = append(edges, robotworkspaceinstance.EdgeWorkspace)
+	}
+	if m.clearedcreator {
+		edges = append(edges, robotworkspaceinstance.EdgeCreator)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotWorkspaceInstanceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robotworkspaceinstance.EdgeWorkspace:
+		return m.clearedworkspace
+	case robotworkspaceinstance.EdgeCreator:
+		return m.clearedcreator
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotWorkspaceInstanceMutation) ClearEdge(name string) error {
+	switch name {
+	case robotworkspaceinstance.EdgeWorkspace:
+		m.ClearWorkspace()
+		return nil
+	case robotworkspaceinstance.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotWorkspaceInstanceMutation) ResetEdge(name string) error {
+	switch name {
+	case robotworkspaceinstance.EdgeWorkspace:
+		m.ResetWorkspace()
+		return nil
+	case robotworkspaceinstance.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotWorkspaceInstance edge %s", name)
 }
 
 // RoleMutation represents an operation that mutates the Role nodes in the graph.

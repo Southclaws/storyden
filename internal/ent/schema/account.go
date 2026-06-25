@@ -113,6 +113,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("oauth_refresh_tokens", OAuthRefreshToken.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("oauth_remote_connections", OAuthRemoteConnection.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("claimed_oauth_device_authorisations", OAuthDeviceAuthorisation.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
@@ -159,6 +162,24 @@ func (Account) Edges() []ent.Edge {
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("authored_warnings", Warning.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
+
+		edge.To("robots", Robot.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_workspaces", RobotWorkspace.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_workspace_instances", RobotWorkspaceInstance.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_mcp_servers", RobotMCPServer.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_sessions", RobotSession.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("robot_messages", RobotSessionMessage.Type).
 			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

@@ -11,6 +11,7 @@ const (
 	capabilityEmailClient capabilityEnum = `email_client`
 	capabilitySMSClient   capabilityEnum = `sms_client`
 	capabilityOAuth       capabilityEnum = `oauth`
+	capabilityRobots      capabilityEnum = `robots`
 )
 
 type Capabilities []Capability

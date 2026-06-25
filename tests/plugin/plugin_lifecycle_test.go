@@ -109,7 +109,7 @@ func TestPluginLifecycle(t *testing.T) {
 
 			status2, err := activeResp.JSON200.Status.AsPluginStatusActive()
 			r.NoError(err)
-			a.Equal(openapi.PluginStatusActiveActiveStateActive, status2.ActiveState)
+			a.Equal(openapi.Active, status2.ActiveState)
 			t.Logf("plugin activated: %s", status2.ActiveState)
 
 			sess2, err := runner.GetSession(root, installationID)

@@ -14,8 +14,11 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
+	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/duplex"
+	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_llmprovider"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_logger"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_session"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/rpc_handler"
@@ -24,12 +27,15 @@ import (
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime/sprites"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Host struct {
 	logger            *slog.Logger
 	sessions          *xsync.Map[plugin.InstallationID, plugin_runner.Session]
 	pluginReader      *plugin_reader.Reader
+	modelProviders    *llm_provider.Factory
+	pluginProviders   *xsync.Map[plugin.InstallationID, []model_ref.Provider]
 	rpcHandlerFactory *rpc_handler.Factory
 	bus               *pubsub.Bus
 	serverURL         url.URL
@@ -41,6 +47,7 @@ func New(
 	ctx context.Context,
 	logger *slog.Logger,
 	pluginReader *plugin_reader.Reader,
+	modelProviders *llm_provider.Factory,
 	pluginLogger *plugin_logger.Writer,
 	rpcHandlerFactory *rpc_handler.Factory,
 	bus *pubsub.Bus,
@@ -98,6 +105,8 @@ func New(
 		logger:            logger,
 		sessions:          xsync.NewMap[plugin.InstallationID, plugin_runner.Session](),
 		pluginReader:      pluginReader,
+		modelProviders:    modelProviders,
+		pluginProviders:   xsync.NewMap[plugin.InstallationID, []model_ref.Provider](),
 		rpcHandlerFactory: rpcHandlerFactory,
 		bus:               bus,
 		serverURL:         serverURL,
@@ -181,6 +190,7 @@ func (h *Host) Load(ctx context.Context, rec plugin.Record) error {
 		)
 
 		h.sessions.Store(rec.InstallationID, sess)
+		h.registerModelProviders(rec.InstallationID, validated, sess)
 	} else {
 		// External plugin - no process management, websocket-only session.
 		validated := &plugin.Validated{Metadata: rec.Manifest}
@@ -201,6 +211,7 @@ func (h *Host) Load(ctx context.Context, rec plugin.Record) error {
 		)
 
 		h.sessions.Store(rec.InstallationID, sess)
+		h.registerModelProviders(rec.InstallationID, validated, sess)
 	}
 
 	return nil
@@ -221,9 +232,49 @@ func (h *Host) Unload(ctx context.Context, id plugin.InstallationID) error {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to deactivate plugin session"))
 	}
 
+	h.unregisterModelProviders(id)
 	h.sessions.Delete(id)
 
 	return nil
+}
+
+func (h *Host) registerModelProviders(id plugin.InstallationID, manifest *plugin.Validated, sess plugin_runner.Session) {
+	providers := []model_ref.Provider{}
+
+	for _, capability := range manifest.Metadata.Capabilities {
+		declaration, ok := capability.CapabilityConfigUnion.(*rpc.RobotLLMProviderCapabilityConfig)
+		if !ok {
+			continue
+		}
+
+		provider := model_ref.NewProvider(declaration.ID)
+		h.modelProviders.Put(plugin_llmprovider.New(provider, sess))
+		providers = append(providers, provider)
+
+		name := declaration.Name.Or(declaration.ID)
+		h.logger.Info("registered plugin robot model provider",
+			slog.String("plugin_id", id.String()),
+			slog.String("provider", provider.String()),
+			slog.String("name", name))
+	}
+	if len(providers) > 0 {
+		h.pluginProviders.Store(id, providers)
+	}
+}
+
+func (h *Host) unregisterModelProviders(id plugin.InstallationID) {
+	providers, ok := h.pluginProviders.LoadAndDelete(id)
+	if !ok {
+		h.logger.Warn("plugin robot model providers not found during unregister",
+			slog.String("plugin_id", id.String()))
+		return
+	}
+	for _, provider := range providers {
+		h.modelProviders.Delete(provider)
+		h.logger.Info("unregistered plugin robot model provider",
+			slog.String("plugin_id", id.String()),
+			slog.String("provider", provider.String()))
+	}
 }
 
 func (h *Host) GetSession(ctx context.Context, id plugin.InstallationID) (plugin_runner.Session, error) {

@@ -1,0 +1,13 @@
+steps:
+  - match:
+      tool_result: library_page_list
+    respond:
+      text: "library page list succeeded"
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_lpl_1
+          name: library_page_list
+          args: {}

@@ -43,6 +43,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteauthorisationflow"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -52,6 +54,14 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
+	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -120,6 +130,10 @@ type Client struct {
 	OAuthDeviceAuthorisation *OAuthDeviceAuthorisationClient
 	// OAuthRefreshToken is the client for interacting with the OAuthRefreshToken builders.
 	OAuthRefreshToken *OAuthRefreshTokenClient
+	// OAuthRemoteAuthorisationFlow is the client for interacting with the OAuthRemoteAuthorisationFlow builders.
+	OAuthRemoteAuthorisationFlow *OAuthRemoteAuthorisationFlowClient
+	// OAuthRemoteConnection is the client for interacting with the OAuthRemoteConnection builders.
+	OAuthRemoteConnection *OAuthRemoteConnectionClient
 	// Plugin is the client for interacting with the Plugin builders.
 	Plugin *PluginClient
 	// Post is the client for interacting with the Post builders.
@@ -138,6 +152,22 @@ type Client struct {
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
 	Report *ReportClient
+	// Robot is the client for interacting with the Robot builders.
+	Robot *RobotClient
+	// RobotMCPServer is the client for interacting with the RobotMCPServer builders.
+	RobotMCPServer *RobotMCPServerClient
+	// RobotMCPTool is the client for interacting with the RobotMCPTool builders.
+	RobotMCPTool *RobotMCPToolClient
+	// RobotProviderModel is the client for interacting with the RobotProviderModel builders.
+	RobotProviderModel *RobotProviderModelClient
+	// RobotSession is the client for interacting with the RobotSession builders.
+	RobotSession *RobotSessionClient
+	// RobotSessionMessage is the client for interacting with the RobotSessionMessage builders.
+	RobotSessionMessage *RobotSessionMessageClient
+	// RobotWorkspace is the client for interacting with the RobotWorkspace builders.
+	RobotWorkspace *RobotWorkspaceClient
+	// RobotWorkspaceInstance is the client for interacting with the RobotWorkspaceInstance builders.
+	RobotWorkspaceInstance *RobotWorkspaceInstanceClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// Session is the client for interacting with the Session builders.
@@ -186,6 +216,8 @@ func (c *Client) init() {
 	c.OAuthClient = NewOAuthClientClient(c.config)
 	c.OAuthDeviceAuthorisation = NewOAuthDeviceAuthorisationClient(c.config)
 	c.OAuthRefreshToken = NewOAuthRefreshTokenClient(c.config)
+	c.OAuthRemoteAuthorisationFlow = NewOAuthRemoteAuthorisationFlowClient(c.config)
+	c.OAuthRemoteConnection = NewOAuthRemoteConnectionClient(c.config)
 	c.Plugin = NewPluginClient(c.config)
 	c.Post = NewPostClient(c.config)
 	c.PostRead = NewPostReadClient(c.config)
@@ -195,6 +227,14 @@ func (c *Client) init() {
 	c.Question = NewQuestionClient(c.config)
 	c.React = NewReactClient(c.config)
 	c.Report = NewReportClient(c.config)
+	c.Robot = NewRobotClient(c.config)
+	c.RobotMCPServer = NewRobotMCPServerClient(c.config)
+	c.RobotMCPTool = NewRobotMCPToolClient(c.config)
+	c.RobotProviderModel = NewRobotProviderModelClient(c.config)
+	c.RobotSession = NewRobotSessionClient(c.config)
+	c.RobotSessionMessage = NewRobotSessionMessageClient(c.config)
+	c.RobotWorkspace = NewRobotWorkspaceClient(c.config)
+	c.RobotWorkspaceInstance = NewRobotWorkspaceInstanceClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.Session = NewSessionClient(c.config)
 	c.Setting = NewSettingClient(c.config)
@@ -290,49 +330,59 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                       ctx,
-		config:                    cfg,
-		Account:                   NewAccountClient(cfg),
-		AccountFollow:             NewAccountFollowClient(cfg),
-		AccountRoles:              NewAccountRolesClient(cfg),
-		Asset:                     NewAssetClient(cfg),
-		AuditLog:                  NewAuditLogClient(cfg),
-		Authentication:            NewAuthenticationClient(cfg),
-		Category:                  NewCategoryClient(cfg),
-		Collection:                NewCollectionClient(cfg),
-		CollectionNode:            NewCollectionNodeClient(cfg),
-		CollectionPost:            NewCollectionPostClient(cfg),
-		Email:                     NewEmailClient(cfg),
-		EmailQueue:                NewEmailQueueClient(cfg),
-		Event:                     NewEventClient(cfg),
-		EventParticipant:          NewEventParticipantClient(cfg),
-		Invitation:                NewInvitationClient(cfg),
-		LikePost:                  NewLikePostClient(cfg),
-		Link:                      NewLinkClient(cfg),
-		MentionProfile:            NewMentionProfileClient(cfg),
-		ModerationNote:            NewModerationNoteClient(cfg),
-		Node:                      NewNodeClient(cfg),
-		NodeVersion:               NewNodeVersionClient(cfg),
-		Notification:              NewNotificationClient(cfg),
-		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
-		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
-		OAuthClient:               NewOAuthClientClient(cfg),
-		OAuthDeviceAuthorisation:  NewOAuthDeviceAuthorisationClient(cfg),
-		OAuthRefreshToken:         NewOAuthRefreshTokenClient(cfg),
-		Plugin:                    NewPluginClient(cfg),
-		Post:                      NewPostClient(cfg),
-		PostRead:                  NewPostReadClient(cfg),
-		Property:                  NewPropertyClient(cfg),
-		PropertySchema:            NewPropertySchemaClient(cfg),
-		PropertySchemaField:       NewPropertySchemaFieldClient(cfg),
-		Question:                  NewQuestionClient(cfg),
-		React:                     NewReactClient(cfg),
-		Report:                    NewReportClient(cfg),
-		Role:                      NewRoleClient(cfg),
-		Session:                   NewSessionClient(cfg),
-		Setting:                   NewSettingClient(cfg),
-		Tag:                       NewTagClient(cfg),
-		Warning:                   NewWarningClient(cfg),
+		ctx:                          ctx,
+		config:                       cfg,
+		Account:                      NewAccountClient(cfg),
+		AccountFollow:                NewAccountFollowClient(cfg),
+		AccountRoles:                 NewAccountRolesClient(cfg),
+		Asset:                        NewAssetClient(cfg),
+		AuditLog:                     NewAuditLogClient(cfg),
+		Authentication:               NewAuthenticationClient(cfg),
+		Category:                     NewCategoryClient(cfg),
+		Collection:                   NewCollectionClient(cfg),
+		CollectionNode:               NewCollectionNodeClient(cfg),
+		CollectionPost:               NewCollectionPostClient(cfg),
+		Email:                        NewEmailClient(cfg),
+		EmailQueue:                   NewEmailQueueClient(cfg),
+		Event:                        NewEventClient(cfg),
+		EventParticipant:             NewEventParticipantClient(cfg),
+		Invitation:                   NewInvitationClient(cfg),
+		LikePost:                     NewLikePostClient(cfg),
+		Link:                         NewLinkClient(cfg),
+		MentionProfile:               NewMentionProfileClient(cfg),
+		ModerationNote:               NewModerationNoteClient(cfg),
+		Node:                         NewNodeClient(cfg),
+		NodeVersion:                  NewNodeVersionClient(cfg),
+		Notification:                 NewNotificationClient(cfg),
+		OAuthAuthorisationCode:       NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest:    NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:                  NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:     NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthRefreshToken:            NewOAuthRefreshTokenClient(cfg),
+		OAuthRemoteAuthorisationFlow: NewOAuthRemoteAuthorisationFlowClient(cfg),
+		OAuthRemoteConnection:        NewOAuthRemoteConnectionClient(cfg),
+		Plugin:                       NewPluginClient(cfg),
+		Post:                         NewPostClient(cfg),
+		PostRead:                     NewPostReadClient(cfg),
+		Property:                     NewPropertyClient(cfg),
+		PropertySchema:               NewPropertySchemaClient(cfg),
+		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
+		Question:                     NewQuestionClient(cfg),
+		React:                        NewReactClient(cfg),
+		Report:                       NewReportClient(cfg),
+		Robot:                        NewRobotClient(cfg),
+		RobotMCPServer:               NewRobotMCPServerClient(cfg),
+		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
+		RobotProviderModel:           NewRobotProviderModelClient(cfg),
+		RobotSession:                 NewRobotSessionClient(cfg),
+		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
+		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
+		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
+		Role:                         NewRoleClient(cfg),
+		Session:                      NewSessionClient(cfg),
+		Setting:                      NewSettingClient(cfg),
+		Tag:                          NewTagClient(cfg),
+		Warning:                      NewWarningClient(cfg),
 	}, nil
 }
 
@@ -350,49 +400,59 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:                       ctx,
-		config:                    cfg,
-		Account:                   NewAccountClient(cfg),
-		AccountFollow:             NewAccountFollowClient(cfg),
-		AccountRoles:              NewAccountRolesClient(cfg),
-		Asset:                     NewAssetClient(cfg),
-		AuditLog:                  NewAuditLogClient(cfg),
-		Authentication:            NewAuthenticationClient(cfg),
-		Category:                  NewCategoryClient(cfg),
-		Collection:                NewCollectionClient(cfg),
-		CollectionNode:            NewCollectionNodeClient(cfg),
-		CollectionPost:            NewCollectionPostClient(cfg),
-		Email:                     NewEmailClient(cfg),
-		EmailQueue:                NewEmailQueueClient(cfg),
-		Event:                     NewEventClient(cfg),
-		EventParticipant:          NewEventParticipantClient(cfg),
-		Invitation:                NewInvitationClient(cfg),
-		LikePost:                  NewLikePostClient(cfg),
-		Link:                      NewLinkClient(cfg),
-		MentionProfile:            NewMentionProfileClient(cfg),
-		ModerationNote:            NewModerationNoteClient(cfg),
-		Node:                      NewNodeClient(cfg),
-		NodeVersion:               NewNodeVersionClient(cfg),
-		Notification:              NewNotificationClient(cfg),
-		OAuthAuthorisationCode:    NewOAuthAuthorisationCodeClient(cfg),
-		OAuthAuthorisationRequest: NewOAuthAuthorisationRequestClient(cfg),
-		OAuthClient:               NewOAuthClientClient(cfg),
-		OAuthDeviceAuthorisation:  NewOAuthDeviceAuthorisationClient(cfg),
-		OAuthRefreshToken:         NewOAuthRefreshTokenClient(cfg),
-		Plugin:                    NewPluginClient(cfg),
-		Post:                      NewPostClient(cfg),
-		PostRead:                  NewPostReadClient(cfg),
-		Property:                  NewPropertyClient(cfg),
-		PropertySchema:            NewPropertySchemaClient(cfg),
-		PropertySchemaField:       NewPropertySchemaFieldClient(cfg),
-		Question:                  NewQuestionClient(cfg),
-		React:                     NewReactClient(cfg),
-		Report:                    NewReportClient(cfg),
-		Role:                      NewRoleClient(cfg),
-		Session:                   NewSessionClient(cfg),
-		Setting:                   NewSettingClient(cfg),
-		Tag:                       NewTagClient(cfg),
-		Warning:                   NewWarningClient(cfg),
+		ctx:                          ctx,
+		config:                       cfg,
+		Account:                      NewAccountClient(cfg),
+		AccountFollow:                NewAccountFollowClient(cfg),
+		AccountRoles:                 NewAccountRolesClient(cfg),
+		Asset:                        NewAssetClient(cfg),
+		AuditLog:                     NewAuditLogClient(cfg),
+		Authentication:               NewAuthenticationClient(cfg),
+		Category:                     NewCategoryClient(cfg),
+		Collection:                   NewCollectionClient(cfg),
+		CollectionNode:               NewCollectionNodeClient(cfg),
+		CollectionPost:               NewCollectionPostClient(cfg),
+		Email:                        NewEmailClient(cfg),
+		EmailQueue:                   NewEmailQueueClient(cfg),
+		Event:                        NewEventClient(cfg),
+		EventParticipant:             NewEventParticipantClient(cfg),
+		Invitation:                   NewInvitationClient(cfg),
+		LikePost:                     NewLikePostClient(cfg),
+		Link:                         NewLinkClient(cfg),
+		MentionProfile:               NewMentionProfileClient(cfg),
+		ModerationNote:               NewModerationNoteClient(cfg),
+		Node:                         NewNodeClient(cfg),
+		NodeVersion:                  NewNodeVersionClient(cfg),
+		Notification:                 NewNotificationClient(cfg),
+		OAuthAuthorisationCode:       NewOAuthAuthorisationCodeClient(cfg),
+		OAuthAuthorisationRequest:    NewOAuthAuthorisationRequestClient(cfg),
+		OAuthClient:                  NewOAuthClientClient(cfg),
+		OAuthDeviceAuthorisation:     NewOAuthDeviceAuthorisationClient(cfg),
+		OAuthRefreshToken:            NewOAuthRefreshTokenClient(cfg),
+		OAuthRemoteAuthorisationFlow: NewOAuthRemoteAuthorisationFlowClient(cfg),
+		OAuthRemoteConnection:        NewOAuthRemoteConnectionClient(cfg),
+		Plugin:                       NewPluginClient(cfg),
+		Post:                         NewPostClient(cfg),
+		PostRead:                     NewPostReadClient(cfg),
+		Property:                     NewPropertyClient(cfg),
+		PropertySchema:               NewPropertySchemaClient(cfg),
+		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
+		Question:                     NewQuestionClient(cfg),
+		React:                        NewReactClient(cfg),
+		Report:                       NewReportClient(cfg),
+		Robot:                        NewRobotClient(cfg),
+		RobotMCPServer:               NewRobotMCPServerClient(cfg),
+		RobotMCPTool:                 NewRobotMCPToolClient(cfg),
+		RobotProviderModel:           NewRobotProviderModelClient(cfg),
+		RobotSession:                 NewRobotSessionClient(cfg),
+		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
+		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
+		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
+		Role:                         NewRoleClient(cfg),
+		Session:                      NewSessionClient(cfg),
+		Setting:                      NewSettingClient(cfg),
+		Tag:                          NewTagClient(cfg),
+		Warning:                      NewWarningClient(cfg),
 	}, nil
 }
 
@@ -427,9 +487,12 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
 		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin,
-		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
+		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
+		c.React, c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool,
+		c.RobotProviderModel, c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
 	}
@@ -444,9 +507,12 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Email, c.EmailQueue, c.Event, c.EventParticipant, c.Invitation, c.LikePost,
 		c.Link, c.MentionProfile, c.ModerationNote, c.Node, c.NodeVersion,
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
-		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken, c.Plugin,
-		c.Post, c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Report, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
+		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
+		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
+		c.React, c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool,
+		c.RobotProviderModel, c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -509,6 +575,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.OAuthDeviceAuthorisation.mutate(ctx, m)
 	case *OAuthRefreshTokenMutation:
 		return c.OAuthRefreshToken.mutate(ctx, m)
+	case *OAuthRemoteAuthorisationFlowMutation:
+		return c.OAuthRemoteAuthorisationFlow.mutate(ctx, m)
+	case *OAuthRemoteConnectionMutation:
+		return c.OAuthRemoteConnection.mutate(ctx, m)
 	case *PluginMutation:
 		return c.Plugin.mutate(ctx, m)
 	case *PostMutation:
@@ -527,6 +597,22 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.React.mutate(ctx, m)
 	case *ReportMutation:
 		return c.Report.mutate(ctx, m)
+	case *RobotMutation:
+		return c.Robot.mutate(ctx, m)
+	case *RobotMCPServerMutation:
+		return c.RobotMCPServer.mutate(ctx, m)
+	case *RobotMCPToolMutation:
+		return c.RobotMCPTool.mutate(ctx, m)
+	case *RobotProviderModelMutation:
+		return c.RobotProviderModel.mutate(ctx, m)
+	case *RobotSessionMutation:
+		return c.RobotSession.mutate(ctx, m)
+	case *RobotSessionMessageMutation:
+		return c.RobotSessionMessage.mutate(ctx, m)
+	case *RobotWorkspaceMutation:
+		return c.RobotWorkspace.mutate(ctx, m)
+	case *RobotWorkspaceInstanceMutation:
+		return c.RobotWorkspaceInstance.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
 	case *SessionMutation:
@@ -970,6 +1056,22 @@ func (c *AccountClient) QueryOauthRefreshTokens(_m *Account) *OAuthRefreshTokenQ
 	return query
 }
 
+// QueryOauthRemoteConnections queries the oauth_remote_connections edge of a Account.
+func (c *AccountClient) QueryOauthRemoteConnections(_m *Account) *OAuthRemoteConnectionQuery {
+	query := (&OAuthRemoteConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(oauthremoteconnection.Table, oauthremoteconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.OauthRemoteConnectionsTable, account.OauthRemoteConnectionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryClaimedOauthDeviceAuthorisations queries the claimed_oauth_device_authorisations edge of a Account.
 func (c *AccountClient) QueryClaimedOauthDeviceAuthorisations(_m *Account) *OAuthDeviceAuthorisationQuery {
 	query := (&OAuthDeviceAuthorisationClient{config: c.config}).Query()
@@ -1219,6 +1321,102 @@ func (c *AccountClient) QueryAuthoredWarnings(_m *Account) *WarningQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(warning.Table, warning.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthoredWarningsTable, account.AuthoredWarningsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobots queries the robots edge of a Account.
+func (c *AccountClient) QueryRobots(_m *Account) *RobotQuery {
+	query := (&RobotClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robot.Table, robot.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotsTable, account.RobotsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotWorkspaces queries the robot_workspaces edge of a Account.
+func (c *AccountClient) QueryRobotWorkspaces(_m *Account) *RobotWorkspaceQuery {
+	query := (&RobotWorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robotworkspace.Table, robotworkspace.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotWorkspacesTable, account.RobotWorkspacesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotWorkspaceInstances queries the robot_workspace_instances edge of a Account.
+func (c *AccountClient) QueryRobotWorkspaceInstances(_m *Account) *RobotWorkspaceInstanceQuery {
+	query := (&RobotWorkspaceInstanceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robotworkspaceinstance.Table, robotworkspaceinstance.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotWorkspaceInstancesTable, account.RobotWorkspaceInstancesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotMcpServers queries the robot_mcp_servers edge of a Account.
+func (c *AccountClient) QueryRobotMcpServers(_m *Account) *RobotMCPServerQuery {
+	query := (&RobotMCPServerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robotmcpserver.Table, robotmcpserver.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotMcpServersTable, account.RobotMcpServersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotSessions queries the robot_sessions edge of a Account.
+func (c *AccountClient) QueryRobotSessions(_m *Account) *RobotSessionQuery {
+	query := (&RobotSessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robotsession.Table, robotsession.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotSessionsTable, account.RobotSessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotMessages queries the robot_messages edge of a Account.
+func (c *AccountClient) QueryRobotMessages(_m *Account) *RobotSessionMessageQuery {
+	query := (&RobotSessionMessageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotMessagesTable, account.RobotMessagesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -5955,6 +6153,336 @@ func (c *OAuthRefreshTokenClient) mutate(ctx context.Context, m *OAuthRefreshTok
 	}
 }
 
+// OAuthRemoteAuthorisationFlowClient is a client for the OAuthRemoteAuthorisationFlow schema.
+type OAuthRemoteAuthorisationFlowClient struct {
+	config
+}
+
+// NewOAuthRemoteAuthorisationFlowClient returns a client for the OAuthRemoteAuthorisationFlow from the given config.
+func NewOAuthRemoteAuthorisationFlowClient(c config) *OAuthRemoteAuthorisationFlowClient {
+	return &OAuthRemoteAuthorisationFlowClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthremoteauthorisationflow.Hooks(f(g(h())))`.
+func (c *OAuthRemoteAuthorisationFlowClient) Use(hooks ...Hook) {
+	c.hooks.OAuthRemoteAuthorisationFlow = append(c.hooks.OAuthRemoteAuthorisationFlow, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthremoteauthorisationflow.Intercept(f(g(h())))`.
+func (c *OAuthRemoteAuthorisationFlowClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthRemoteAuthorisationFlow = append(c.inters.OAuthRemoteAuthorisationFlow, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthRemoteAuthorisationFlow entity.
+func (c *OAuthRemoteAuthorisationFlowClient) Create() *OAuthRemoteAuthorisationFlowCreate {
+	mutation := newOAuthRemoteAuthorisationFlowMutation(c.config, OpCreate)
+	return &OAuthRemoteAuthorisationFlowCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthRemoteAuthorisationFlow entities.
+func (c *OAuthRemoteAuthorisationFlowClient) CreateBulk(builders ...*OAuthRemoteAuthorisationFlowCreate) *OAuthRemoteAuthorisationFlowCreateBulk {
+	return &OAuthRemoteAuthorisationFlowCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthRemoteAuthorisationFlowClient) MapCreateBulk(slice any, setFunc func(*OAuthRemoteAuthorisationFlowCreate, int)) *OAuthRemoteAuthorisationFlowCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthRemoteAuthorisationFlowCreateBulk{err: fmt.Errorf("calling to OAuthRemoteAuthorisationFlowClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthRemoteAuthorisationFlowCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthRemoteAuthorisationFlowCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthRemoteAuthorisationFlow.
+func (c *OAuthRemoteAuthorisationFlowClient) Update() *OAuthRemoteAuthorisationFlowUpdate {
+	mutation := newOAuthRemoteAuthorisationFlowMutation(c.config, OpUpdate)
+	return &OAuthRemoteAuthorisationFlowUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthRemoteAuthorisationFlowClient) UpdateOne(_m *OAuthRemoteAuthorisationFlow) *OAuthRemoteAuthorisationFlowUpdateOne {
+	mutation := newOAuthRemoteAuthorisationFlowMutation(c.config, OpUpdateOne, withOAuthRemoteAuthorisationFlow(_m))
+	return &OAuthRemoteAuthorisationFlowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthRemoteAuthorisationFlowClient) UpdateOneID(id xid.ID) *OAuthRemoteAuthorisationFlowUpdateOne {
+	mutation := newOAuthRemoteAuthorisationFlowMutation(c.config, OpUpdateOne, withOAuthRemoteAuthorisationFlowID(id))
+	return &OAuthRemoteAuthorisationFlowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthRemoteAuthorisationFlow.
+func (c *OAuthRemoteAuthorisationFlowClient) Delete() *OAuthRemoteAuthorisationFlowDelete {
+	mutation := newOAuthRemoteAuthorisationFlowMutation(c.config, OpDelete)
+	return &OAuthRemoteAuthorisationFlowDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthRemoteAuthorisationFlowClient) DeleteOne(_m *OAuthRemoteAuthorisationFlow) *OAuthRemoteAuthorisationFlowDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthRemoteAuthorisationFlowClient) DeleteOneID(id xid.ID) *OAuthRemoteAuthorisationFlowDeleteOne {
+	builder := c.Delete().Where(oauthremoteauthorisationflow.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthRemoteAuthorisationFlowDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthRemoteAuthorisationFlow.
+func (c *OAuthRemoteAuthorisationFlowClient) Query() *OAuthRemoteAuthorisationFlowQuery {
+	return &OAuthRemoteAuthorisationFlowQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthRemoteAuthorisationFlow},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthRemoteAuthorisationFlow entity by its id.
+func (c *OAuthRemoteAuthorisationFlowClient) Get(ctx context.Context, id xid.ID) (*OAuthRemoteAuthorisationFlow, error) {
+	return c.Query().Where(oauthremoteauthorisationflow.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthRemoteAuthorisationFlowClient) GetX(ctx context.Context, id xid.ID) *OAuthRemoteAuthorisationFlow {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryConnection queries the connection edge of a OAuthRemoteAuthorisationFlow.
+func (c *OAuthRemoteAuthorisationFlowClient) QueryConnection(_m *OAuthRemoteAuthorisationFlow) *OAuthRemoteConnectionQuery {
+	query := (&OAuthRemoteConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthremoteauthorisationflow.Table, oauthremoteauthorisationflow.FieldID, id),
+			sqlgraph.To(oauthremoteconnection.Table, oauthremoteconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthremoteauthorisationflow.ConnectionTable, oauthremoteauthorisationflow.ConnectionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthRemoteAuthorisationFlowClient) Hooks() []Hook {
+	return c.hooks.OAuthRemoteAuthorisationFlow
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthRemoteAuthorisationFlowClient) Interceptors() []Interceptor {
+	return c.inters.OAuthRemoteAuthorisationFlow
+}
+
+func (c *OAuthRemoteAuthorisationFlowClient) mutate(ctx context.Context, m *OAuthRemoteAuthorisationFlowMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthRemoteAuthorisationFlowCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthRemoteAuthorisationFlowUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthRemoteAuthorisationFlowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthRemoteAuthorisationFlowDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthRemoteAuthorisationFlow mutation op: %q", m.Op())
+	}
+}
+
+// OAuthRemoteConnectionClient is a client for the OAuthRemoteConnection schema.
+type OAuthRemoteConnectionClient struct {
+	config
+}
+
+// NewOAuthRemoteConnectionClient returns a client for the OAuthRemoteConnection from the given config.
+func NewOAuthRemoteConnectionClient(c config) *OAuthRemoteConnectionClient {
+	return &OAuthRemoteConnectionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `oauthremoteconnection.Hooks(f(g(h())))`.
+func (c *OAuthRemoteConnectionClient) Use(hooks ...Hook) {
+	c.hooks.OAuthRemoteConnection = append(c.hooks.OAuthRemoteConnection, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `oauthremoteconnection.Intercept(f(g(h())))`.
+func (c *OAuthRemoteConnectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.OAuthRemoteConnection = append(c.inters.OAuthRemoteConnection, interceptors...)
+}
+
+// Create returns a builder for creating a OAuthRemoteConnection entity.
+func (c *OAuthRemoteConnectionClient) Create() *OAuthRemoteConnectionCreate {
+	mutation := newOAuthRemoteConnectionMutation(c.config, OpCreate)
+	return &OAuthRemoteConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of OAuthRemoteConnection entities.
+func (c *OAuthRemoteConnectionClient) CreateBulk(builders ...*OAuthRemoteConnectionCreate) *OAuthRemoteConnectionCreateBulk {
+	return &OAuthRemoteConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *OAuthRemoteConnectionClient) MapCreateBulk(slice any, setFunc func(*OAuthRemoteConnectionCreate, int)) *OAuthRemoteConnectionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &OAuthRemoteConnectionCreateBulk{err: fmt.Errorf("calling to OAuthRemoteConnectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*OAuthRemoteConnectionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &OAuthRemoteConnectionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) Update() *OAuthRemoteConnectionUpdate {
+	mutation := newOAuthRemoteConnectionMutation(c.config, OpUpdate)
+	return &OAuthRemoteConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *OAuthRemoteConnectionClient) UpdateOne(_m *OAuthRemoteConnection) *OAuthRemoteConnectionUpdateOne {
+	mutation := newOAuthRemoteConnectionMutation(c.config, OpUpdateOne, withOAuthRemoteConnection(_m))
+	return &OAuthRemoteConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *OAuthRemoteConnectionClient) UpdateOneID(id xid.ID) *OAuthRemoteConnectionUpdateOne {
+	mutation := newOAuthRemoteConnectionMutation(c.config, OpUpdateOne, withOAuthRemoteConnectionID(id))
+	return &OAuthRemoteConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) Delete() *OAuthRemoteConnectionDelete {
+	mutation := newOAuthRemoteConnectionMutation(c.config, OpDelete)
+	return &OAuthRemoteConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *OAuthRemoteConnectionClient) DeleteOne(_m *OAuthRemoteConnection) *OAuthRemoteConnectionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *OAuthRemoteConnectionClient) DeleteOneID(id xid.ID) *OAuthRemoteConnectionDeleteOne {
+	builder := c.Delete().Where(oauthremoteconnection.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &OAuthRemoteConnectionDeleteOne{builder}
+}
+
+// Query returns a query builder for OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) Query() *OAuthRemoteConnectionQuery {
+	return &OAuthRemoteConnectionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeOAuthRemoteConnection},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a OAuthRemoteConnection entity by its id.
+func (c *OAuthRemoteConnectionClient) Get(ctx context.Context, id xid.ID) (*OAuthRemoteConnection, error) {
+	return c.Query().Where(oauthremoteconnection.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *OAuthRemoteConnectionClient) GetX(ctx context.Context, id xid.ID) *OAuthRemoteConnection {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) QueryAccount(_m *OAuthRemoteConnection) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthremoteconnection.Table, oauthremoteconnection.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, oauthremoteconnection.AccountTable, oauthremoteconnection.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthorisationFlows queries the authorisation_flows edge of a OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) QueryAuthorisationFlows(_m *OAuthRemoteConnection) *OAuthRemoteAuthorisationFlowQuery {
+	query := (&OAuthRemoteAuthorisationFlowClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthremoteconnection.Table, oauthremoteconnection.FieldID, id),
+			sqlgraph.To(oauthremoteauthorisationflow.Table, oauthremoteauthorisationflow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthremoteconnection.AuthorisationFlowsTable, oauthremoteconnection.AuthorisationFlowsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotMcpServers queries the robot_mcp_servers edge of a OAuthRemoteConnection.
+func (c *OAuthRemoteConnectionClient) QueryRobotMcpServers(_m *OAuthRemoteConnection) *RobotMCPServerQuery {
+	query := (&RobotMCPServerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(oauthremoteconnection.Table, oauthremoteconnection.FieldID, id),
+			sqlgraph.To(robotmcpserver.Table, robotmcpserver.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, oauthremoteconnection.RobotMcpServersTable, oauthremoteconnection.RobotMcpServersColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *OAuthRemoteConnectionClient) Hooks() []Hook {
+	return c.hooks.OAuthRemoteConnection
+}
+
+// Interceptors returns the client interceptors.
+func (c *OAuthRemoteConnectionClient) Interceptors() []Interceptor {
+	return c.inters.OAuthRemoteConnection
+}
+
+func (c *OAuthRemoteConnectionClient) mutate(ctx context.Context, m *OAuthRemoteConnectionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&OAuthRemoteConnectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&OAuthRemoteConnectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&OAuthRemoteConnectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&OAuthRemoteConnectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown OAuthRemoteConnection mutation op: %q", m.Op())
+	}
+}
+
 // PluginClient is a client for the Plugin schema.
 type PluginClient struct {
 	config
@@ -7664,6 +8192,1342 @@ func (c *ReportClient) mutate(ctx context.Context, m *ReportMutation) (Value, er
 	}
 }
 
+// RobotClient is a client for the Robot schema.
+type RobotClient struct {
+	config
+}
+
+// NewRobotClient returns a client for the Robot from the given config.
+func NewRobotClient(c config) *RobotClient {
+	return &RobotClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robot.Hooks(f(g(h())))`.
+func (c *RobotClient) Use(hooks ...Hook) {
+	c.hooks.Robot = append(c.hooks.Robot, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robot.Intercept(f(g(h())))`.
+func (c *RobotClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Robot = append(c.inters.Robot, interceptors...)
+}
+
+// Create returns a builder for creating a Robot entity.
+func (c *RobotClient) Create() *RobotCreate {
+	mutation := newRobotMutation(c.config, OpCreate)
+	return &RobotCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Robot entities.
+func (c *RobotClient) CreateBulk(builders ...*RobotCreate) *RobotCreateBulk {
+	return &RobotCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotClient) MapCreateBulk(slice any, setFunc func(*RobotCreate, int)) *RobotCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotCreateBulk{err: fmt.Errorf("calling to RobotClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Robot.
+func (c *RobotClient) Update() *RobotUpdate {
+	mutation := newRobotMutation(c.config, OpUpdate)
+	return &RobotUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotClient) UpdateOne(_m *Robot) *RobotUpdateOne {
+	mutation := newRobotMutation(c.config, OpUpdateOne, withRobot(_m))
+	return &RobotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotClient) UpdateOneID(id xid.ID) *RobotUpdateOne {
+	mutation := newRobotMutation(c.config, OpUpdateOne, withRobotID(id))
+	return &RobotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Robot.
+func (c *RobotClient) Delete() *RobotDelete {
+	mutation := newRobotMutation(c.config, OpDelete)
+	return &RobotDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotClient) DeleteOne(_m *Robot) *RobotDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotClient) DeleteOneID(id xid.ID) *RobotDeleteOne {
+	builder := c.Delete().Where(robot.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotDeleteOne{builder}
+}
+
+// Query returns a query builder for Robot.
+func (c *RobotClient) Query() *RobotQuery {
+	return &RobotQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobot},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Robot entity by its id.
+func (c *RobotClient) Get(ctx context.Context, id xid.ID) (*Robot, error) {
+	return c.Query().Where(robot.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotClient) GetX(ctx context.Context, id xid.ID) *Robot {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAuthor queries the author edge of a Robot.
+func (c *RobotClient) QueryAuthor(_m *Robot) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robot.Table, robot.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robot.AuthorTable, robot.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWorkspace queries the workspace edge of a Robot.
+func (c *RobotClient) QueryWorkspace(_m *Robot) *RobotWorkspaceQuery {
+	query := (&RobotWorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robot.Table, robot.FieldID, id),
+			sqlgraph.To(robotworkspace.Table, robotworkspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robot.WorkspaceTable, robot.WorkspaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMessages queries the messages edge of a Robot.
+func (c *RobotClient) QueryMessages(_m *Robot) *RobotSessionMessageQuery {
+	query := (&RobotSessionMessageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robot.Table, robot.FieldID, id),
+			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robot.MessagesTable, robot.MessagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotClient) Hooks() []Hook {
+	return c.hooks.Robot
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotClient) Interceptors() []Interceptor {
+	return c.inters.Robot
+}
+
+func (c *RobotClient) mutate(ctx context.Context, m *RobotMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Robot mutation op: %q", m.Op())
+	}
+}
+
+// RobotMCPServerClient is a client for the RobotMCPServer schema.
+type RobotMCPServerClient struct {
+	config
+}
+
+// NewRobotMCPServerClient returns a client for the RobotMCPServer from the given config.
+func NewRobotMCPServerClient(c config) *RobotMCPServerClient {
+	return &RobotMCPServerClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotmcpserver.Hooks(f(g(h())))`.
+func (c *RobotMCPServerClient) Use(hooks ...Hook) {
+	c.hooks.RobotMCPServer = append(c.hooks.RobotMCPServer, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotmcpserver.Intercept(f(g(h())))`.
+func (c *RobotMCPServerClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotMCPServer = append(c.inters.RobotMCPServer, interceptors...)
+}
+
+// Create returns a builder for creating a RobotMCPServer entity.
+func (c *RobotMCPServerClient) Create() *RobotMCPServerCreate {
+	mutation := newRobotMCPServerMutation(c.config, OpCreate)
+	return &RobotMCPServerCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotMCPServer entities.
+func (c *RobotMCPServerClient) CreateBulk(builders ...*RobotMCPServerCreate) *RobotMCPServerCreateBulk {
+	return &RobotMCPServerCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotMCPServerClient) MapCreateBulk(slice any, setFunc func(*RobotMCPServerCreate, int)) *RobotMCPServerCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotMCPServerCreateBulk{err: fmt.Errorf("calling to RobotMCPServerClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotMCPServerCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotMCPServerCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotMCPServer.
+func (c *RobotMCPServerClient) Update() *RobotMCPServerUpdate {
+	mutation := newRobotMCPServerMutation(c.config, OpUpdate)
+	return &RobotMCPServerUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotMCPServerClient) UpdateOne(_m *RobotMCPServer) *RobotMCPServerUpdateOne {
+	mutation := newRobotMCPServerMutation(c.config, OpUpdateOne, withRobotMCPServer(_m))
+	return &RobotMCPServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotMCPServerClient) UpdateOneID(id xid.ID) *RobotMCPServerUpdateOne {
+	mutation := newRobotMCPServerMutation(c.config, OpUpdateOne, withRobotMCPServerID(id))
+	return &RobotMCPServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotMCPServer.
+func (c *RobotMCPServerClient) Delete() *RobotMCPServerDelete {
+	mutation := newRobotMCPServerMutation(c.config, OpDelete)
+	return &RobotMCPServerDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotMCPServerClient) DeleteOne(_m *RobotMCPServer) *RobotMCPServerDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotMCPServerClient) DeleteOneID(id xid.ID) *RobotMCPServerDeleteOne {
+	builder := c.Delete().Where(robotmcpserver.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotMCPServerDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotMCPServer.
+func (c *RobotMCPServerClient) Query() *RobotMCPServerQuery {
+	return &RobotMCPServerQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotMCPServer},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotMCPServer entity by its id.
+func (c *RobotMCPServerClient) Get(ctx context.Context, id xid.ID) (*RobotMCPServer, error) {
+	return c.Query().Where(robotmcpserver.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotMCPServerClient) GetX(ctx context.Context, id xid.ID) *RobotMCPServer {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a RobotMCPServer.
+func (c *RobotMCPServerClient) QueryAccount(_m *RobotMCPServer) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmcpserver.Table, robotmcpserver.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotmcpserver.AccountTable, robotmcpserver.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOauthRemoteConnection queries the oauth_remote_connection edge of a RobotMCPServer.
+func (c *RobotMCPServerClient) QueryOauthRemoteConnection(_m *RobotMCPServer) *OAuthRemoteConnectionQuery {
+	query := (&OAuthRemoteConnectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmcpserver.Table, robotmcpserver.FieldID, id),
+			sqlgraph.To(oauthremoteconnection.Table, oauthremoteconnection.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotmcpserver.OauthRemoteConnectionTable, robotmcpserver.OauthRemoteConnectionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTools queries the tools edge of a RobotMCPServer.
+func (c *RobotMCPServerClient) QueryTools(_m *RobotMCPServer) *RobotMCPToolQuery {
+	query := (&RobotMCPToolClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmcpserver.Table, robotmcpserver.FieldID, id),
+			sqlgraph.To(robotmcptool.Table, robotmcptool.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotmcpserver.ToolsTable, robotmcpserver.ToolsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotMCPServerClient) Hooks() []Hook {
+	return c.hooks.RobotMCPServer
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotMCPServerClient) Interceptors() []Interceptor {
+	return c.inters.RobotMCPServer
+}
+
+func (c *RobotMCPServerClient) mutate(ctx context.Context, m *RobotMCPServerMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotMCPServerCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotMCPServerUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotMCPServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotMCPServerDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotMCPServer mutation op: %q", m.Op())
+	}
+}
+
+// RobotMCPToolClient is a client for the RobotMCPTool schema.
+type RobotMCPToolClient struct {
+	config
+}
+
+// NewRobotMCPToolClient returns a client for the RobotMCPTool from the given config.
+func NewRobotMCPToolClient(c config) *RobotMCPToolClient {
+	return &RobotMCPToolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotmcptool.Hooks(f(g(h())))`.
+func (c *RobotMCPToolClient) Use(hooks ...Hook) {
+	c.hooks.RobotMCPTool = append(c.hooks.RobotMCPTool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotmcptool.Intercept(f(g(h())))`.
+func (c *RobotMCPToolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotMCPTool = append(c.inters.RobotMCPTool, interceptors...)
+}
+
+// Create returns a builder for creating a RobotMCPTool entity.
+func (c *RobotMCPToolClient) Create() *RobotMCPToolCreate {
+	mutation := newRobotMCPToolMutation(c.config, OpCreate)
+	return &RobotMCPToolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotMCPTool entities.
+func (c *RobotMCPToolClient) CreateBulk(builders ...*RobotMCPToolCreate) *RobotMCPToolCreateBulk {
+	return &RobotMCPToolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotMCPToolClient) MapCreateBulk(slice any, setFunc func(*RobotMCPToolCreate, int)) *RobotMCPToolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotMCPToolCreateBulk{err: fmt.Errorf("calling to RobotMCPToolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotMCPToolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotMCPToolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotMCPTool.
+func (c *RobotMCPToolClient) Update() *RobotMCPToolUpdate {
+	mutation := newRobotMCPToolMutation(c.config, OpUpdate)
+	return &RobotMCPToolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotMCPToolClient) UpdateOne(_m *RobotMCPTool) *RobotMCPToolUpdateOne {
+	mutation := newRobotMCPToolMutation(c.config, OpUpdateOne, withRobotMCPTool(_m))
+	return &RobotMCPToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotMCPToolClient) UpdateOneID(id xid.ID) *RobotMCPToolUpdateOne {
+	mutation := newRobotMCPToolMutation(c.config, OpUpdateOne, withRobotMCPToolID(id))
+	return &RobotMCPToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotMCPTool.
+func (c *RobotMCPToolClient) Delete() *RobotMCPToolDelete {
+	mutation := newRobotMCPToolMutation(c.config, OpDelete)
+	return &RobotMCPToolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotMCPToolClient) DeleteOne(_m *RobotMCPTool) *RobotMCPToolDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotMCPToolClient) DeleteOneID(id xid.ID) *RobotMCPToolDeleteOne {
+	builder := c.Delete().Where(robotmcptool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotMCPToolDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotMCPTool.
+func (c *RobotMCPToolClient) Query() *RobotMCPToolQuery {
+	return &RobotMCPToolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotMCPTool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotMCPTool entity by its id.
+func (c *RobotMCPToolClient) Get(ctx context.Context, id xid.ID) (*RobotMCPTool, error) {
+	return c.Query().Where(robotmcptool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotMCPToolClient) GetX(ctx context.Context, id xid.ID) *RobotMCPTool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryServer queries the server edge of a RobotMCPTool.
+func (c *RobotMCPToolClient) QueryServer(_m *RobotMCPTool) *RobotMCPServerQuery {
+	query := (&RobotMCPServerClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotmcptool.Table, robotmcptool.FieldID, id),
+			sqlgraph.To(robotmcpserver.Table, robotmcpserver.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotmcptool.ServerTable, robotmcptool.ServerColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotMCPToolClient) Hooks() []Hook {
+	return c.hooks.RobotMCPTool
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotMCPToolClient) Interceptors() []Interceptor {
+	return c.inters.RobotMCPTool
+}
+
+func (c *RobotMCPToolClient) mutate(ctx context.Context, m *RobotMCPToolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotMCPToolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotMCPToolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotMCPToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotMCPToolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotMCPTool mutation op: %q", m.Op())
+	}
+}
+
+// RobotProviderModelClient is a client for the RobotProviderModel schema.
+type RobotProviderModelClient struct {
+	config
+}
+
+// NewRobotProviderModelClient returns a client for the RobotProviderModel from the given config.
+func NewRobotProviderModelClient(c config) *RobotProviderModelClient {
+	return &RobotProviderModelClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotprovidermodel.Hooks(f(g(h())))`.
+func (c *RobotProviderModelClient) Use(hooks ...Hook) {
+	c.hooks.RobotProviderModel = append(c.hooks.RobotProviderModel, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotprovidermodel.Intercept(f(g(h())))`.
+func (c *RobotProviderModelClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotProviderModel = append(c.inters.RobotProviderModel, interceptors...)
+}
+
+// Create returns a builder for creating a RobotProviderModel entity.
+func (c *RobotProviderModelClient) Create() *RobotProviderModelCreate {
+	mutation := newRobotProviderModelMutation(c.config, OpCreate)
+	return &RobotProviderModelCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotProviderModel entities.
+func (c *RobotProviderModelClient) CreateBulk(builders ...*RobotProviderModelCreate) *RobotProviderModelCreateBulk {
+	return &RobotProviderModelCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotProviderModelClient) MapCreateBulk(slice any, setFunc func(*RobotProviderModelCreate, int)) *RobotProviderModelCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotProviderModelCreateBulk{err: fmt.Errorf("calling to RobotProviderModelClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotProviderModelCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotProviderModelCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotProviderModel.
+func (c *RobotProviderModelClient) Update() *RobotProviderModelUpdate {
+	mutation := newRobotProviderModelMutation(c.config, OpUpdate)
+	return &RobotProviderModelUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotProviderModelClient) UpdateOne(_m *RobotProviderModel) *RobotProviderModelUpdateOne {
+	mutation := newRobotProviderModelMutation(c.config, OpUpdateOne, withRobotProviderModel(_m))
+	return &RobotProviderModelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotProviderModelClient) UpdateOneID(id xid.ID) *RobotProviderModelUpdateOne {
+	mutation := newRobotProviderModelMutation(c.config, OpUpdateOne, withRobotProviderModelID(id))
+	return &RobotProviderModelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotProviderModel.
+func (c *RobotProviderModelClient) Delete() *RobotProviderModelDelete {
+	mutation := newRobotProviderModelMutation(c.config, OpDelete)
+	return &RobotProviderModelDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotProviderModelClient) DeleteOne(_m *RobotProviderModel) *RobotProviderModelDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotProviderModelClient) DeleteOneID(id xid.ID) *RobotProviderModelDeleteOne {
+	builder := c.Delete().Where(robotprovidermodel.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotProviderModelDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotProviderModel.
+func (c *RobotProviderModelClient) Query() *RobotProviderModelQuery {
+	return &RobotProviderModelQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotProviderModel},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotProviderModel entity by its id.
+func (c *RobotProviderModelClient) Get(ctx context.Context, id xid.ID) (*RobotProviderModel, error) {
+	return c.Query().Where(robotprovidermodel.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotProviderModelClient) GetX(ctx context.Context, id xid.ID) *RobotProviderModel {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *RobotProviderModelClient) Hooks() []Hook {
+	return c.hooks.RobotProviderModel
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotProviderModelClient) Interceptors() []Interceptor {
+	return c.inters.RobotProviderModel
+}
+
+func (c *RobotProviderModelClient) mutate(ctx context.Context, m *RobotProviderModelMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotProviderModelCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotProviderModelUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotProviderModelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotProviderModelDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotProviderModel mutation op: %q", m.Op())
+	}
+}
+
+// RobotSessionClient is a client for the RobotSession schema.
+type RobotSessionClient struct {
+	config
+}
+
+// NewRobotSessionClient returns a client for the RobotSession from the given config.
+func NewRobotSessionClient(c config) *RobotSessionClient {
+	return &RobotSessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotsession.Hooks(f(g(h())))`.
+func (c *RobotSessionClient) Use(hooks ...Hook) {
+	c.hooks.RobotSession = append(c.hooks.RobotSession, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotsession.Intercept(f(g(h())))`.
+func (c *RobotSessionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotSession = append(c.inters.RobotSession, interceptors...)
+}
+
+// Create returns a builder for creating a RobotSession entity.
+func (c *RobotSessionClient) Create() *RobotSessionCreate {
+	mutation := newRobotSessionMutation(c.config, OpCreate)
+	return &RobotSessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotSession entities.
+func (c *RobotSessionClient) CreateBulk(builders ...*RobotSessionCreate) *RobotSessionCreateBulk {
+	return &RobotSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotSessionClient) MapCreateBulk(slice any, setFunc func(*RobotSessionCreate, int)) *RobotSessionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotSessionCreateBulk{err: fmt.Errorf("calling to RobotSessionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotSessionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotSessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotSession.
+func (c *RobotSessionClient) Update() *RobotSessionUpdate {
+	mutation := newRobotSessionMutation(c.config, OpUpdate)
+	return &RobotSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotSessionClient) UpdateOne(_m *RobotSession) *RobotSessionUpdateOne {
+	mutation := newRobotSessionMutation(c.config, OpUpdateOne, withRobotSession(_m))
+	return &RobotSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotSessionClient) UpdateOneID(id xid.ID) *RobotSessionUpdateOne {
+	mutation := newRobotSessionMutation(c.config, OpUpdateOne, withRobotSessionID(id))
+	return &RobotSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotSession.
+func (c *RobotSessionClient) Delete() *RobotSessionDelete {
+	mutation := newRobotSessionMutation(c.config, OpDelete)
+	return &RobotSessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotSessionClient) DeleteOne(_m *RobotSession) *RobotSessionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotSessionClient) DeleteOneID(id xid.ID) *RobotSessionDeleteOne {
+	builder := c.Delete().Where(robotsession.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotSessionDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotSession.
+func (c *RobotSessionClient) Query() *RobotSessionQuery {
+	return &RobotSessionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotSession},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotSession entity by its id.
+func (c *RobotSessionClient) Get(ctx context.Context, id xid.ID) (*RobotSession, error) {
+	return c.Query().Where(robotsession.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotSessionClient) GetX(ctx context.Context, id xid.ID) *RobotSession {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a RobotSession.
+func (c *RobotSessionClient) QueryUser(_m *RobotSession) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsession.Table, robotsession.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotsession.UserTable, robotsession.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMessages queries the messages edge of a RobotSession.
+func (c *RobotSessionClient) QueryMessages(_m *RobotSession) *RobotSessionMessageQuery {
+	query := (&RobotSessionMessageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsession.Table, robotsession.FieldID, id),
+			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotsession.MessagesTable, robotsession.MessagesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotSessionClient) Hooks() []Hook {
+	return c.hooks.RobotSession
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotSessionClient) Interceptors() []Interceptor {
+	return c.inters.RobotSession
+}
+
+func (c *RobotSessionClient) mutate(ctx context.Context, m *RobotSessionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotSessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotSessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotSessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotSessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotSession mutation op: %q", m.Op())
+	}
+}
+
+// RobotSessionMessageClient is a client for the RobotSessionMessage schema.
+type RobotSessionMessageClient struct {
+	config
+}
+
+// NewRobotSessionMessageClient returns a client for the RobotSessionMessage from the given config.
+func NewRobotSessionMessageClient(c config) *RobotSessionMessageClient {
+	return &RobotSessionMessageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotsessionmessage.Hooks(f(g(h())))`.
+func (c *RobotSessionMessageClient) Use(hooks ...Hook) {
+	c.hooks.RobotSessionMessage = append(c.hooks.RobotSessionMessage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotsessionmessage.Intercept(f(g(h())))`.
+func (c *RobotSessionMessageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotSessionMessage = append(c.inters.RobotSessionMessage, interceptors...)
+}
+
+// Create returns a builder for creating a RobotSessionMessage entity.
+func (c *RobotSessionMessageClient) Create() *RobotSessionMessageCreate {
+	mutation := newRobotSessionMessageMutation(c.config, OpCreate)
+	return &RobotSessionMessageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotSessionMessage entities.
+func (c *RobotSessionMessageClient) CreateBulk(builders ...*RobotSessionMessageCreate) *RobotSessionMessageCreateBulk {
+	return &RobotSessionMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotSessionMessageClient) MapCreateBulk(slice any, setFunc func(*RobotSessionMessageCreate, int)) *RobotSessionMessageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotSessionMessageCreateBulk{err: fmt.Errorf("calling to RobotSessionMessageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotSessionMessageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotSessionMessageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotSessionMessage.
+func (c *RobotSessionMessageClient) Update() *RobotSessionMessageUpdate {
+	mutation := newRobotSessionMessageMutation(c.config, OpUpdate)
+	return &RobotSessionMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotSessionMessageClient) UpdateOne(_m *RobotSessionMessage) *RobotSessionMessageUpdateOne {
+	mutation := newRobotSessionMessageMutation(c.config, OpUpdateOne, withRobotSessionMessage(_m))
+	return &RobotSessionMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotSessionMessageClient) UpdateOneID(id xid.ID) *RobotSessionMessageUpdateOne {
+	mutation := newRobotSessionMessageMutation(c.config, OpUpdateOne, withRobotSessionMessageID(id))
+	return &RobotSessionMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotSessionMessage.
+func (c *RobotSessionMessageClient) Delete() *RobotSessionMessageDelete {
+	mutation := newRobotSessionMessageMutation(c.config, OpDelete)
+	return &RobotSessionMessageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotSessionMessageClient) DeleteOne(_m *RobotSessionMessage) *RobotSessionMessageDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotSessionMessageClient) DeleteOneID(id xid.ID) *RobotSessionMessageDeleteOne {
+	builder := c.Delete().Where(robotsessionmessage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotSessionMessageDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotSessionMessage.
+func (c *RobotSessionMessageClient) Query() *RobotSessionMessageQuery {
+	return &RobotSessionMessageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotSessionMessage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotSessionMessage entity by its id.
+func (c *RobotSessionMessageClient) Get(ctx context.Context, id xid.ID) (*RobotSessionMessage, error) {
+	return c.Query().Where(robotsessionmessage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotSessionMessageClient) GetX(ctx context.Context, id xid.ID) *RobotSessionMessage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySession queries the session edge of a RobotSessionMessage.
+func (c *RobotSessionMessageClient) QuerySession(_m *RobotSessionMessage) *RobotSessionQuery {
+	query := (&RobotSessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, id),
+			sqlgraph.To(robotsession.Table, robotsession.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotsessionmessage.SessionTable, robotsessionmessage.SessionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobot queries the robot edge of a RobotSessionMessage.
+func (c *RobotSessionMessageClient) QueryRobot(_m *RobotSessionMessage) *RobotQuery {
+	query := (&RobotClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, id),
+			sqlgraph.To(robot.Table, robot.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotsessionmessage.RobotTable, robotsessionmessage.RobotColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAuthor queries the author edge of a RobotSessionMessage.
+func (c *RobotSessionMessageClient) QueryAuthor(_m *RobotSessionMessage) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsessionmessage.Table, robotsessionmessage.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotsessionmessage.AuthorTable, robotsessionmessage.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotSessionMessageClient) Hooks() []Hook {
+	return c.hooks.RobotSessionMessage
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotSessionMessageClient) Interceptors() []Interceptor {
+	return c.inters.RobotSessionMessage
+}
+
+func (c *RobotSessionMessageClient) mutate(ctx context.Context, m *RobotSessionMessageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotSessionMessageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotSessionMessageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotSessionMessageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotSessionMessageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotSessionMessage mutation op: %q", m.Op())
+	}
+}
+
+// RobotWorkspaceClient is a client for the RobotWorkspace schema.
+type RobotWorkspaceClient struct {
+	config
+}
+
+// NewRobotWorkspaceClient returns a client for the RobotWorkspace from the given config.
+func NewRobotWorkspaceClient(c config) *RobotWorkspaceClient {
+	return &RobotWorkspaceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotworkspace.Hooks(f(g(h())))`.
+func (c *RobotWorkspaceClient) Use(hooks ...Hook) {
+	c.hooks.RobotWorkspace = append(c.hooks.RobotWorkspace, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotworkspace.Intercept(f(g(h())))`.
+func (c *RobotWorkspaceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotWorkspace = append(c.inters.RobotWorkspace, interceptors...)
+}
+
+// Create returns a builder for creating a RobotWorkspace entity.
+func (c *RobotWorkspaceClient) Create() *RobotWorkspaceCreate {
+	mutation := newRobotWorkspaceMutation(c.config, OpCreate)
+	return &RobotWorkspaceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotWorkspace entities.
+func (c *RobotWorkspaceClient) CreateBulk(builders ...*RobotWorkspaceCreate) *RobotWorkspaceCreateBulk {
+	return &RobotWorkspaceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotWorkspaceClient) MapCreateBulk(slice any, setFunc func(*RobotWorkspaceCreate, int)) *RobotWorkspaceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotWorkspaceCreateBulk{err: fmt.Errorf("calling to RobotWorkspaceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotWorkspaceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotWorkspaceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotWorkspace.
+func (c *RobotWorkspaceClient) Update() *RobotWorkspaceUpdate {
+	mutation := newRobotWorkspaceMutation(c.config, OpUpdate)
+	return &RobotWorkspaceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotWorkspaceClient) UpdateOne(_m *RobotWorkspace) *RobotWorkspaceUpdateOne {
+	mutation := newRobotWorkspaceMutation(c.config, OpUpdateOne, withRobotWorkspace(_m))
+	return &RobotWorkspaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotWorkspaceClient) UpdateOneID(id xid.ID) *RobotWorkspaceUpdateOne {
+	mutation := newRobotWorkspaceMutation(c.config, OpUpdateOne, withRobotWorkspaceID(id))
+	return &RobotWorkspaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotWorkspace.
+func (c *RobotWorkspaceClient) Delete() *RobotWorkspaceDelete {
+	mutation := newRobotWorkspaceMutation(c.config, OpDelete)
+	return &RobotWorkspaceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotWorkspaceClient) DeleteOne(_m *RobotWorkspace) *RobotWorkspaceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotWorkspaceClient) DeleteOneID(id xid.ID) *RobotWorkspaceDeleteOne {
+	builder := c.Delete().Where(robotworkspace.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotWorkspaceDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotWorkspace.
+func (c *RobotWorkspaceClient) Query() *RobotWorkspaceQuery {
+	return &RobotWorkspaceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotWorkspace},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotWorkspace entity by its id.
+func (c *RobotWorkspaceClient) Get(ctx context.Context, id xid.ID) (*RobotWorkspace, error) {
+	return c.Query().Where(robotworkspace.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotWorkspaceClient) GetX(ctx context.Context, id xid.ID) *RobotWorkspace {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a RobotWorkspace.
+func (c *RobotWorkspaceClient) QueryCreator(_m *RobotWorkspace) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotworkspace.Table, robotworkspace.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotworkspace.CreatorTable, robotworkspace.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobots queries the robots edge of a RobotWorkspace.
+func (c *RobotWorkspaceClient) QueryRobots(_m *RobotWorkspace) *RobotQuery {
+	query := (&RobotClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotworkspace.Table, robotworkspace.FieldID, id),
+			sqlgraph.To(robot.Table, robot.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotworkspace.RobotsTable, robotworkspace.RobotsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInstances queries the instances edge of a RobotWorkspace.
+func (c *RobotWorkspaceClient) QueryInstances(_m *RobotWorkspace) *RobotWorkspaceInstanceQuery {
+	query := (&RobotWorkspaceInstanceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotworkspace.Table, robotworkspace.FieldID, id),
+			sqlgraph.To(robotworkspaceinstance.Table, robotworkspaceinstance.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotworkspace.InstancesTable, robotworkspace.InstancesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotWorkspaceClient) Hooks() []Hook {
+	return c.hooks.RobotWorkspace
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotWorkspaceClient) Interceptors() []Interceptor {
+	return c.inters.RobotWorkspace
+}
+
+func (c *RobotWorkspaceClient) mutate(ctx context.Context, m *RobotWorkspaceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotWorkspaceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotWorkspaceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotWorkspaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotWorkspaceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotWorkspace mutation op: %q", m.Op())
+	}
+}
+
+// RobotWorkspaceInstanceClient is a client for the RobotWorkspaceInstance schema.
+type RobotWorkspaceInstanceClient struct {
+	config
+}
+
+// NewRobotWorkspaceInstanceClient returns a client for the RobotWorkspaceInstance from the given config.
+func NewRobotWorkspaceInstanceClient(c config) *RobotWorkspaceInstanceClient {
+	return &RobotWorkspaceInstanceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robotworkspaceinstance.Hooks(f(g(h())))`.
+func (c *RobotWorkspaceInstanceClient) Use(hooks ...Hook) {
+	c.hooks.RobotWorkspaceInstance = append(c.hooks.RobotWorkspaceInstance, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robotworkspaceinstance.Intercept(f(g(h())))`.
+func (c *RobotWorkspaceInstanceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotWorkspaceInstance = append(c.inters.RobotWorkspaceInstance, interceptors...)
+}
+
+// Create returns a builder for creating a RobotWorkspaceInstance entity.
+func (c *RobotWorkspaceInstanceClient) Create() *RobotWorkspaceInstanceCreate {
+	mutation := newRobotWorkspaceInstanceMutation(c.config, OpCreate)
+	return &RobotWorkspaceInstanceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotWorkspaceInstance entities.
+func (c *RobotWorkspaceInstanceClient) CreateBulk(builders ...*RobotWorkspaceInstanceCreate) *RobotWorkspaceInstanceCreateBulk {
+	return &RobotWorkspaceInstanceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotWorkspaceInstanceClient) MapCreateBulk(slice any, setFunc func(*RobotWorkspaceInstanceCreate, int)) *RobotWorkspaceInstanceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotWorkspaceInstanceCreateBulk{err: fmt.Errorf("calling to RobotWorkspaceInstanceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotWorkspaceInstanceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotWorkspaceInstanceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotWorkspaceInstance.
+func (c *RobotWorkspaceInstanceClient) Update() *RobotWorkspaceInstanceUpdate {
+	mutation := newRobotWorkspaceInstanceMutation(c.config, OpUpdate)
+	return &RobotWorkspaceInstanceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotWorkspaceInstanceClient) UpdateOne(_m *RobotWorkspaceInstance) *RobotWorkspaceInstanceUpdateOne {
+	mutation := newRobotWorkspaceInstanceMutation(c.config, OpUpdateOne, withRobotWorkspaceInstance(_m))
+	return &RobotWorkspaceInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotWorkspaceInstanceClient) UpdateOneID(id xid.ID) *RobotWorkspaceInstanceUpdateOne {
+	mutation := newRobotWorkspaceInstanceMutation(c.config, OpUpdateOne, withRobotWorkspaceInstanceID(id))
+	return &RobotWorkspaceInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotWorkspaceInstance.
+func (c *RobotWorkspaceInstanceClient) Delete() *RobotWorkspaceInstanceDelete {
+	mutation := newRobotWorkspaceInstanceMutation(c.config, OpDelete)
+	return &RobotWorkspaceInstanceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotWorkspaceInstanceClient) DeleteOne(_m *RobotWorkspaceInstance) *RobotWorkspaceInstanceDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotWorkspaceInstanceClient) DeleteOneID(id xid.ID) *RobotWorkspaceInstanceDeleteOne {
+	builder := c.Delete().Where(robotworkspaceinstance.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotWorkspaceInstanceDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotWorkspaceInstance.
+func (c *RobotWorkspaceInstanceClient) Query() *RobotWorkspaceInstanceQuery {
+	return &RobotWorkspaceInstanceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotWorkspaceInstance},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotWorkspaceInstance entity by its id.
+func (c *RobotWorkspaceInstanceClient) Get(ctx context.Context, id xid.ID) (*RobotWorkspaceInstance, error) {
+	return c.Query().Where(robotworkspaceinstance.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotWorkspaceInstanceClient) GetX(ctx context.Context, id xid.ID) *RobotWorkspaceInstance {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWorkspace queries the workspace edge of a RobotWorkspaceInstance.
+func (c *RobotWorkspaceInstanceClient) QueryWorkspace(_m *RobotWorkspaceInstance) *RobotWorkspaceQuery {
+	query := (&RobotWorkspaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotworkspaceinstance.Table, robotworkspaceinstance.FieldID, id),
+			sqlgraph.To(robotworkspace.Table, robotworkspace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotworkspaceinstance.WorkspaceTable, robotworkspaceinstance.WorkspaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCreator queries the creator edge of a RobotWorkspaceInstance.
+func (c *RobotWorkspaceInstanceClient) QueryCreator(_m *RobotWorkspaceInstance) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotworkspaceinstance.Table, robotworkspaceinstance.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robotworkspaceinstance.CreatorTable, robotworkspaceinstance.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotWorkspaceInstanceClient) Hooks() []Hook {
+	return c.hooks.RobotWorkspaceInstance
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotWorkspaceInstanceClient) Interceptors() []Interceptor {
+	return c.inters.RobotWorkspaceInstance
+}
+
+func (c *RobotWorkspaceInstanceClient) mutate(ctx context.Context, m *RobotWorkspaceInstanceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotWorkspaceInstanceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotWorkspaceInstanceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotWorkspaceInstanceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotWorkspaceInstanceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotWorkspaceInstance mutation op: %q", m.Op())
+	}
+}
+
 // RoleClient is a client for the Role schema.
 type RoleClient struct {
 	config
@@ -8465,9 +10329,11 @@ type (
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthRefreshToken, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
-		Warning []ent.Hook
+		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
+		Post, PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
+		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
+		Setting, Tag, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
@@ -8475,9 +10341,11 @@ type (
 		EventParticipant, Invitation, LikePost, Link, MentionProfile, ModerationNote,
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
-		OAuthRefreshToken, Plugin, Post, PostRead, Property, PropertySchema,
-		PropertySchemaField, Question, React, Report, Role, Session, Setting, Tag,
-		Warning []ent.Interceptor
+		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
+		Post, PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
+		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
+		Setting, Tag, Warning []ent.Interceptor
 	}
 )
 

@@ -1,0 +1,25 @@
+id: openrouter-provider
+name: OpenRouter Provider
+author: Southclaws
+description: Provides OpenRouter models to Storyden Robots.
+version: 0.1.0
+command: go
+args:
+  - run
+  - .
+capabilities:
+  - type: robot.llm_provider
+    id: openrouter
+    version: v1
+    name: OpenRouter
+    description: OpenRouter hosted model gateway.
+configuration_schema:
+  fields:
+    - id: api_key
+      label: OpenRouter API Key
+      description: API key used by the plugin to list and run OpenRouter models.
+      type: string
+    - id: model_ids
+      label: Model IDs
+      description: Comma or newline separated OpenRouter model IDs to expose to Robots. Leave empty to use the curated default set.
+      type: string

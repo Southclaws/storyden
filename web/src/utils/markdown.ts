@@ -9,6 +9,8 @@ import { visit } from "unist-util-visit";
 
 import { deriveError } from "./error";
 
+const SDR_URL_PATTERN = /^sdr:[a-z]+\/[a-z0-9]+$/i;
+
 const SANITIZE_CONFIG = {
   ALLOWED_TAGS: [
     "p",
@@ -41,6 +43,8 @@ const SANITIZE_CONFIG = {
     "hr",
   ],
   ALLOWED_ATTR: ["href", "src", "alt", "title", "class", "target", "rel"],
+  ALLOWED_URI_REGEXP:
+    /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|sdr):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
   ALLOW_DATA_ATTR: false,
 };
 
@@ -68,6 +72,29 @@ export const remarkLooseLists: Plugin<[], Root> = () => (tree) => {
     node.spread = true;
   });
 };
+
+export function markdownURLTransform(value: string): string {
+  if (SDR_URL_PATTERN.test(value)) {
+    return value;
+  }
+
+  const colon = value.indexOf(":");
+  const questionMark = value.indexOf("?");
+  const numberSign = value.indexOf("#");
+  const slash = value.indexOf("/");
+
+  if (
+    colon === -1 ||
+    (slash !== -1 && colon > slash) ||
+    (questionMark !== -1 && colon > questionMark) ||
+    (numberSign !== -1 && colon > numberSign) ||
+    /^(https?|ircs?|mailto|xmpp)$/i.test(value.slice(0, colon))
+  ) {
+    return value;
+  }
+
+  return "";
+}
 
 export async function markdownToHTML(markdown: string): Promise<string> {
   try {

@@ -174,6 +174,18 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "Create and delete internal staff-only moderation notes attached to member accounts.",
   },
+  [Permission.USE_ROBOTS]: {
+    value: Permission.USE_ROBOTS,
+    name: "Use robots",
+    description:
+      "Use Robots to build automations for managing content, moderation and more.",
+  },
+  [Permission.MANAGE_ROBOTS]: {
+    value: Permission.MANAGE_ROBOTS,
+    name: "Manage robots",
+    description:
+      "Create, edit, and delete Robots and manage Robot configurations.",
+  },
   [Permission.ADMINISTRATOR]: {
     value: Permission.ADMINISTRATOR,
     name: "Administrator",

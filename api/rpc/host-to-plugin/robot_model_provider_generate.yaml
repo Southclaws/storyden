@@ -1,0 +1,102 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RobotModelProviderMessage:
+    type: object
+    required:
+      - role
+    properties:
+      role:
+        type: string
+        enum: ["system", "user", "assistant", "tool"]
+      content:
+        type: string
+      name:
+        type: string
+      tool_call_id:
+        type: string
+
+  RobotModelProviderTool:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      parameters:
+        type: object
+        additionalProperties: true
+
+  RobotModelProviderToolCall:
+    type: object
+    required:
+      - name
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      arguments:
+        type: object
+        additionalProperties: true
+
+  RPCRequestRobotModelProviderGenerateParams:
+    type: object
+    required:
+      - provider
+      - model
+      - messages
+    properties:
+      provider:
+        type: string
+        description: Provider identifier declared by the plugin manifest.
+      model:
+        type: string
+        description: Model name within the provider namespace.
+      system:
+        type: string
+      messages:
+        type: array
+        items:
+          $ref: "#/$defs/RobotModelProviderMessage"
+      tools:
+        type: array
+        items:
+          $ref: "#/$defs/RobotModelProviderTool"
+
+  RPCRequestRobotModelProviderGenerate:
+    description: >
+      Runs one non-streaming model generation through a plugin-backed Robot
+      model provider.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_model_provider_generate"
+          params:
+            $ref: "#/$defs/RPCRequestRobotModelProviderGenerateParams"
+
+  RPCResponseRobotModelProviderGenerate:
+    description: >
+      Returns one non-streaming model generation from a plugin-backed Robot
+      model provider.
+    type: object
+    required: ["method"]
+    properties:
+      method:
+        type: string
+        const: "robot_model_provider_generate"
+      content:
+        type: string
+      tool_calls:
+        type: array
+        items:
+          $ref: "#/$defs/RobotModelProviderToolCall"
+      finish_reason:
+        type: string
+      error:
+        type: string

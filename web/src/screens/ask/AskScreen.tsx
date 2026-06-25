@@ -35,6 +35,7 @@ import { css } from "@/styled-system/css";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack, lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
+import { markdownURLTransform } from "@/utils/markdown";
 
 type DatagraphRef = {
   id: string;
@@ -201,7 +202,11 @@ export function Ask() {
         </Button>
       </styled.form>
       <LStack>
-        <ReactMarkdown className="typography" components={components}>
+        <ReactMarkdown
+          className="typography"
+          components={components}
+          urlTransform={markdownURLTransform}
+        >
           {replaceSdrUrls(content)}
         </ReactMarkdown>
 

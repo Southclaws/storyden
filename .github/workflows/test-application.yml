@@ -27,19 +27,15 @@ jobs:
           cache: true
           cache-dependency-path: "**/go.sum"
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
       - run: corepack enable
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             ~/.cache/ms-playwright
@@ -47,7 +43,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             web/.next/cache
@@ -62,11 +58,11 @@ jobs:
         working-directory: web
 
       - name: Install Task
-        uses: go-task/setup-task@v1
+        uses: go-task/setup-task@v2
 
       - run: task test:e2e:ci
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: ${{ !cancelled() }}
         with:
           name: playwright-report

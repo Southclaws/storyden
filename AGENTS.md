@@ -68,6 +68,7 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
   - `go test ./...` for full suite.
   - Prefer targeted package runs while iterating, then finish with broader test coverage.
 - End-to-end:
+  - Initialise the Node toolchain first when running frontend or E2E commands: `eval "$(fnm env)"`.
   - `task test:e2e`, `task test:e2e:fresh`, `task test:e2e:ci` (see `Taskfile.yml`).
   - E2E harness entrypoint: `cmd/e2etest/main.go`.
 - Test fixtures/data:
@@ -75,10 +76,11 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 
 ## Runtime Guardrails
 
-- Never start backend or frontend runtime processes from the agent.
+- Never start long-lived backend or frontend development processes directly from the agent.
 - Do not run Go app entrypoints (for example `go run ./cmd/backend`).
 - Do not run Next.js app servers (for example `pnpm dev`, `pnpm start`, `next dev`, `next start`).
-- Assume the user already has required services running; use tests, linters, codegen, and static checks instead.
+- The E2E harness is an explicit exception: `task test:e2e`, `task test:e2e:fresh`, and `task test:e2e:ci` are allowed. These tasks build and run their own isolated backend/frontend pair for Playwright validation, separate from the normal development services.
+- Outside the E2E harness, assume the user already has required services running; use tests, linters, codegen, and static checks instead.
 
 ## Codegen Routing
 
@@ -88,7 +90,7 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 
 - Common source-of-truth -> command mapping:
   - `internal/ent/schema/**` -> `task generate:db` or `go generate ./internal/ent`
-  - `api/openapi.yaml`, `api/common/**`, `api/plugin.yaml`, `api/rpc/**` -> `task generate:openapi` or `go generate ./api`
+  - `api/openapi.yaml`, `api/common/**`, `api/plugin.yaml`, `api/rpc/**` -> `task generate:openapi` or `task generate:mcp`
   - OpenAPI frontend client only -> `task generate:openapi:frontend` (runs `pnpm openapi` in `web`)
   - OpenAPI docs site only -> `task generate:openapi:docs` (runs `pnpm openapi` in `home`)
   - Full regen when unsure -> `task generate`

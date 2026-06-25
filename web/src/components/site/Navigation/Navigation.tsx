@@ -6,6 +6,7 @@ import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 import { Box } from "@/styled-system/jsx";
 
+import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
@@ -26,7 +27,9 @@ export async function Navigation({
   children,
 }: PropsWithChildren<Props>) {
   const globalSettings = await getSettings();
-  const canRegister = allowsPublicRegistration(globalSettings.registration_mode);
+  const canRegister = allowsPublicRegistration(
+    globalSettings.registration_mode,
+  );
   const sessionAccount = await getServerSession();
   const session = sessionAccount
     ? parseMemberSettings(sessionAccount, globalSettings.metadata)
@@ -94,6 +97,8 @@ export async function Navigation({
           <MobileCommandBar canRegister={canRegister} />
         </Box>
       </Box>
+
+      <CommandPalette />
     </Box>
   );
 }

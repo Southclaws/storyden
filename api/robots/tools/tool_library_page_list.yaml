@@ -1,0 +1,76 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolLibraryPageTree
+x-storyden-tool:
+  title: List Library Pages
+  role: READ_PUBLISHED_LIBRARY
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: library_page_list
+description: Get the full tree structure of pages in the library. Returns a
+  hierarchical view of all wiki pages showing their parent-child relationships.
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolLibraryPageTreeInput"
+  output:
+    $ref: "#/definitions/ToolLibraryPageTreeOutput"
+definitions:
+  ToolLibraryPageTreeInput:
+    type: object
+    properties:
+      depth:
+        type: integer
+        minimum: -1
+        description: Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for
+          root + children, etc.)
+    additionalProperties: false
+  ToolLibraryPageTreeOutput:
+    type: object
+    required:
+      - pages
+    properties:
+      pages:
+        type: array
+        description: List of pages in tree structure
+        items:
+          $ref: "#/definitions/LibraryPageTreeNode"
+    additionalProperties: false
+  LibraryPageTreeNode:
+    type: object
+    required:
+      - id
+      - slug
+      - name
+      - description
+      - browser_url
+    properties:
+      browser_url:
+        type: string
+        description: Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
+      id:
+        type: string
+        description: Unique identifier for the page
+      slug:
+        type: string
+        description: URL-friendly identifier for the page
+      name:
+        type: string
+        description: Display name of the page
+      description:
+        type: string
+        description: Brief description of the page
+      parent:
+        type: string
+        description: Slug of the parent page (omitted for root pages)
+      tags:
+        type: array
+        description: Tags associated with this page
+        items:
+          type: string
+    additionalProperties: false

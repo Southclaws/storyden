@@ -1,0 +1,6 @@
+steps:
+  - match:
+      any: true
+    respond:
+      text: "hello from mock"
+      finish: "stop"

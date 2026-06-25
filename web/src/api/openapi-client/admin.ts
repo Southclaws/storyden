@@ -38,6 +38,12 @@ import type {
   OAuthClientUpdateBody,
   OAuthDeviceAuthorisationListOKResponse,
   OAuthRefreshTokenListOKResponse,
+  OAuthRemoteAuthorizeOKResponse,
+  OAuthRemoteConnectionCreateBody,
+  OAuthRemoteConnectionListOKResponse,
+  OAuthRemoteConnectionOKResponse,
+  OAuthRemoteDiscoverBody,
+  OAuthRemoteDiscoverOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -1126,6 +1132,248 @@ export const useAdminOAuthRefreshTokenDelete = <
     getAdminOAuthRefreshTokenDeleteMutationKey(oauthRefreshTokenId);
   const swrFn =
     getAdminOAuthRefreshTokenDeleteMutationFetcher(oauthRefreshTokenId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Discover OAuth configuration for a remote protected resource URL.
+
+Storyden fetches protected resource metadata, follows the advertised
+authorization server, and chooses CIMD, DCR, or manual setup according
+to the discovered authorization server metadata.
+
+ */
+export const oAuthRemoteDiscover = (
+  oAuthRemoteDiscoverBody: OAuthRemoteDiscoverBody,
+) => {
+  return fetcher<OAuthRemoteDiscoverOKResponse>({
+    url: `/admin/oauth/remote/discover`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthRemoteDiscoverBody,
+  });
+};
+
+export const getOAuthRemoteDiscoverMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthRemoteDiscoverBody },
+  ): Promise<OAuthRemoteDiscoverOKResponse> => {
+    return oAuthRemoteDiscover(arg);
+  };
+};
+export const getOAuthRemoteDiscoverMutationKey = () =>
+  [`/admin/oauth/remote/discover`] as const;
+
+export type OAuthRemoteDiscoverMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRemoteDiscover>>
+>;
+export type OAuthRemoteDiscoverMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRemoteDiscover = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthRemoteDiscover>>,
+    TError,
+    Key,
+    OAuthRemoteDiscoverBody,
+    Awaited<ReturnType<typeof oAuthRemoteDiscover>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getOAuthRemoteDiscoverMutationKey();
+  const swrFn = getOAuthRemoteDiscoverMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List remote OAuth connections configured for this Storyden instance.
+
+ */
+export const oAuthRemoteConnectionList = () => {
+  return fetcher<OAuthRemoteConnectionListOKResponse>({
+    url: `/admin/oauth/remote/connections`,
+    method: "GET",
+  });
+};
+
+export const getOAuthRemoteConnectionListKey = () =>
+  [`/admin/oauth/remote/connections`] as const;
+
+export type OAuthRemoteConnectionListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRemoteConnectionList>>
+>;
+export type OAuthRemoteConnectionListQueryError =
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRemoteConnectionList = <
+  TError = ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof oAuthRemoteConnectionList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getOAuthRemoteConnectionListKey() : null));
+  const swrFn = () => oAuthRemoteConnectionList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create a remote OAuth connection using CIMD, DCR, or manual
+configuration. CIMD is preferred when discovery supports it.
+
+ */
+export const oAuthRemoteConnectionCreate = (
+  oAuthRemoteConnectionCreateBody: OAuthRemoteConnectionCreateBody,
+) => {
+  return fetcher<OAuthRemoteConnectionOKResponse>({
+    url: `/admin/oauth/remote/connections`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: oAuthRemoteConnectionCreateBody,
+  });
+};
+
+export const getOAuthRemoteConnectionCreateMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: OAuthRemoteConnectionCreateBody },
+  ): Promise<OAuthRemoteConnectionOKResponse> => {
+    return oAuthRemoteConnectionCreate(arg);
+  };
+};
+export const getOAuthRemoteConnectionCreateMutationKey = () =>
+  [`/admin/oauth/remote/connections`] as const;
+
+export type OAuthRemoteConnectionCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRemoteConnectionCreate>>
+>;
+export type OAuthRemoteConnectionCreateMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRemoteConnectionCreate = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof oAuthRemoteConnectionCreate>>,
+    TError,
+    Key,
+    OAuthRemoteConnectionCreateBody,
+    Awaited<ReturnType<typeof oAuthRemoteConnectionCreate>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getOAuthRemoteConnectionCreateMutationKey();
+  const swrFn = getOAuthRemoteConnectionCreateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Start OAuth authorization code with PKCE for a remote OAuth
+connection and return the authorization URL to open in a browser.
+
+ */
+export const oAuthRemoteConnectionAuthorize = (
+  oauthRemoteConnectionId: string,
+) => {
+  return fetcher<OAuthRemoteAuthorizeOKResponse>({
+    url: `/admin/oauth/remote/connections/${oauthRemoteConnectionId}/authorize`,
+    method: "POST",
+  });
+};
+
+export const getOAuthRemoteConnectionAuthorizeMutationFetcher = (
+  oauthRemoteConnectionId: string,
+) => {
+  return (
+    _: Key,
+    __: { arg: Arguments },
+  ): Promise<OAuthRemoteAuthorizeOKResponse> => {
+    return oAuthRemoteConnectionAuthorize(oauthRemoteConnectionId);
+  };
+};
+export const getOAuthRemoteConnectionAuthorizeMutationKey = (
+  oauthRemoteConnectionId: string,
+) =>
+  [
+    `/admin/oauth/remote/connections/${oauthRemoteConnectionId}/authorize`,
+  ] as const;
+
+export type OAuthRemoteConnectionAuthorizeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof oAuthRemoteConnectionAuthorize>>
+>;
+export type OAuthRemoteConnectionAuthorizeMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useOAuthRemoteConnectionAuthorize = <
+  TError =
+    | BadRequestResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  oauthRemoteConnectionId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof oAuthRemoteConnectionAuthorize>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof oAuthRemoteConnectionAuthorize>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getOAuthRemoteConnectionAuthorizeMutationKey(oauthRemoteConnectionId);
+  const swrFn = getOAuthRemoteConnectionAuthorizeMutationFetcher(
+    oauthRemoteConnectionId,
+  );
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

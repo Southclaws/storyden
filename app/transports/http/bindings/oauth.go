@@ -17,8 +17,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
+	oauth_remote "github.com/Southclaws/storyden/app/resources/oauth/remote"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
+	"github.com/Southclaws/storyden/app/services/authentication/oauthremote"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -26,14 +28,16 @@ import (
 
 type OAuth struct {
 	oauth      *oauthservice.Service
+	remote     *oauthremote.Service
 	apiAddress url.URL
 	webAddress url.URL
 }
 
-func NewOAuth(cfg config.Config, oauth *oauthservice.Service, router *echo.Echo) OAuth {
+func NewOAuth(cfg config.Config, oauth *oauthservice.Service, remote *oauthremote.Service, router *echo.Echo) OAuth {
 	router.Use(oauthTokenClientAuth)
 	return OAuth{
 		oauth:      oauth,
+		remote:     remote,
 		apiAddress: cfg.PublicAPIAddress,
 		webAddress: cfg.PublicWebAddress,
 	}
@@ -197,6 +201,10 @@ func (o OAuth) OAuthProtectedResourceMetadataWithScopes(resource string) OAuthPr
 	return m
 }
 
+func (o OAuth) OAuthRemoteClientMetadata(ctx context.Context) (oauthremote.ClientMetadataDocument, error) {
+	return o.remote.ClientMetadataDocument(ctx)
+}
+
 // Issuer returns the authorization server issuer URL for use in protected
 // resource metadata authorization_servers arrays.
 func (o OAuth) Issuer() string {
@@ -213,6 +221,189 @@ func (o OAuth) OAuthJWKS(ctx context.Context, _ openapi.OAuthJWKSRequestObject) 
 			Keys: mapOAuthJWKs(o.oauth.JWKS()),
 		}),
 	}, nil
+}
+
+func (o OAuth) OAuthRemoteDiscover(ctx context.Context, request openapi.OAuthRemoteDiscoverRequestObject) (openapi.OAuthRemoteDiscoverResponseObject, error) {
+	if request.Body == nil {
+		return nil, fault.Wrap(fault.New("missing request body"), fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+	result, err := o.remote.Discover(ctx, request.Body.ResourceUrl)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return openapi.OAuthRemoteDiscover200JSONResponse{
+		OAuthRemoteDiscoverOKJSONResponse: openapi.OAuthRemoteDiscoverOKJSONResponse(serialiseOAuthRemoteDiscovery(result)),
+	}, nil
+}
+
+func (o OAuth) OAuthRemoteConnectionList(ctx context.Context, request openapi.OAuthRemoteConnectionListRequestObject) (openapi.OAuthRemoteConnectionListResponseObject, error) {
+	connections, err := o.remote.ListConnections(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return openapi.OAuthRemoteConnectionList200JSONResponse{
+		OAuthRemoteConnectionListOKJSONResponse: openapi.OAuthRemoteConnectionListOKJSONResponse{
+			Connections: dt.Map(connections, serialiseOAuthRemoteConnection),
+		},
+	}, nil
+}
+
+func (o OAuth) OAuthRemoteConnectionCreate(ctx context.Context, request openapi.OAuthRemoteConnectionCreateRequestObject) (openapi.OAuthRemoteConnectionCreateResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if request.Body == nil {
+		return nil, fault.Wrap(fault.New("missing request body"), fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	mode := oauthremote.Mode("")
+	if request.Body.Mode != nil {
+		mode = oauthremote.Mode(*request.Body.Mode)
+	}
+	manual := oauthremote.ManualConfig{}
+	if request.Body.Manual != nil {
+		manual = oauthremote.ManualConfig{
+			ClientID:              zero(request.Body.Manual.ClientId),
+			ClientSecret:          zero(request.Body.Manual.ClientSecret),
+			AuthorizationEndpoint: zero(request.Body.Manual.AuthorizationEndpoint),
+			TokenEndpoint:         zero(request.Body.Manual.TokenEndpoint),
+			RedirectURI:           zero(request.Body.Manual.RedirectUri),
+			AuthorizationServer:   zero(request.Body.Manual.AuthorizationServer),
+			Scope:                 zero(request.Body.Manual.Scope),
+		}
+	}
+
+	connection, err := o.remote.CreateConnection(ctx, oauthremote.CreateConnectionInput{
+		ResourceURL: request.Body.ResourceUrl,
+		Mode:        mode,
+		Manual:      manual,
+		Scope:       zero(request.Body.Scope),
+		AddedBy:     accountID,
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.OAuthRemoteConnectionCreate200JSONResponse{
+		OAuthRemoteConnectionOKJSONResponse: openapi.OAuthRemoteConnectionOKJSONResponse(serialiseOAuthRemoteConnection(connection)),
+	}, nil
+}
+
+func (o OAuth) OAuthRemoteConnectionAuthorize(ctx context.Context, request openapi.OAuthRemoteConnectionAuthorizeRequestObject) (openapi.OAuthRemoteConnectionAuthorizeResponseObject, error) {
+	id, err := oauth_remote.NewConnectionID(string(request.OauthRemoteConnectionId))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+	result, err := o.remote.StartAuthorization(ctx, id)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return openapi.OAuthRemoteConnectionAuthorize200JSONResponse{
+		OAuthRemoteAuthorizeOKJSONResponse: openapi.OAuthRemoteAuthorizeOKJSONResponse{
+			Connection:       serialiseOAuthRemoteConnection(result.Connection),
+			AuthorizationUrl: result.AuthURL,
+		},
+	}, nil
+}
+
+func (o OAuth) OAuthRemoteCallback(ctx context.Context, request openapi.OAuthRemoteCallbackRequestObject) (openapi.OAuthRemoteCallbackResponseObject, error) {
+	if _, err := session.GetAccountID(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	state := ""
+	if request.Params.State != nil {
+		state = *request.Params.State
+	}
+	result, err := o.remote.HandleCallback(ctx, state, request.Params.Code)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+	return openapi.OAuthRemoteCallback200JSONResponse{
+		OAuthRemoteCallbackOKJSONResponse: openapi.OAuthRemoteCallbackOKJSONResponse{
+			Connection: serialiseOAuthRemoteConnection(result.Connection),
+		},
+	}, nil
+}
+
+func serialiseOAuthRemoteDiscovery(in oauthremote.DiscoveryResult) openapi.OAuthRemoteDiscoveryResult {
+	clientIDMetadataDocumentSupported := in.AuthorizationServerMetadata.ClientIDMetadataDocumentSupported
+
+	return openapi.OAuthRemoteDiscoveryResult{
+		ResourceUrl:         in.ResourceURL,
+		AuthorizationServer: in.AuthorizationServer,
+		Mode:                openapi.OAuthRemoteMode(in.Mode),
+		ClientId:            in.ClientID,
+		RedirectUri:         in.RedirectURI,
+		ProtectedResourceMetadata: openapi.OAuthProtectedResourceMetadata{
+			Resource:               optionalString(in.ProtectedResourceMetadata.Resource),
+			ResourceName:           optionalString(in.ProtectedResourceMetadata.ResourceName),
+			AuthorizationServers:   in.ProtectedResourceMetadata.AuthorizationServers,
+			BearerMethodsSupported: optionalStringSlice(in.ProtectedResourceMetadata.BearerMethodsSupported),
+		},
+		AuthorizationServerMetadata: openapi.OAuthAuthorizationServerMetadata{
+			Issuer:                            optionalString(in.AuthorizationServerMetadata.Issuer),
+			AuthorizationEndpoint:             optionalString(in.AuthorizationServerMetadata.AuthorizationEndpoint),
+			TokenEndpoint:                     optionalString(in.AuthorizationServerMetadata.TokenEndpoint),
+			RegistrationEndpoint:              optionalString(in.AuthorizationServerMetadata.RegistrationEndpoint),
+			ResponseTypesSupported:            optionalStringSlice(in.AuthorizationServerMetadata.ResponseTypesSupported),
+			GrantTypesSupported:               optionalStringSlice(in.AuthorizationServerMetadata.GrantTypesSupported),
+			TokenEndpointAuthMethodsSupported: optionalStringSlice(in.AuthorizationServerMetadata.TokenEndpointAuthMethodsSupported),
+			CodeChallengeMethodsSupported:     optionalStringSlice(in.AuthorizationServerMetadata.CodeChallengeMethodsSupported),
+			ClientIdMetadataDocumentSupported: &clientIDMetadataDocumentSupported,
+		},
+	}
+}
+
+func serialiseOAuthRemoteConnection(in oauth_remote.Connection) openapi.OAuthRemoteConnection {
+	return openapi.OAuthRemoteConnection{
+		Id:                      openapi.Identifier(in.ID.String()),
+		CreatedAt:               openapi.CreatedAt(in.CreatedAt),
+		UpdatedAt:               openapi.UpdatedAt(in.UpdatedAt),
+		ResourceUrl:             in.ResourceURL,
+		Resource:                optionalString(in.Resource),
+		ResourceName:            optionalString(in.ResourceName),
+		AuthorizationServer:     optionalString(in.AuthorizationServer),
+		Mode:                    openapi.OAuthRemoteMode(in.Mode),
+		Status:                  openapi.OAuthRemoteStatus(in.Status),
+		ClientId:                optionalString(in.ClientID),
+		HasClientSecret:         in.HasClientSecret,
+		AuthorizationEndpoint:   optionalString(in.AuthorizationEndpoint),
+		TokenEndpoint:           optionalString(in.TokenEndpoint),
+		RegistrationEndpoint:    optionalString(in.RegistrationEndpoint),
+		TokenEndpointAuthMethod: optionalString(in.TokenEndpointAuthMethod),
+		RedirectUris:            optionalStringSlice(in.RedirectURIs),
+		RedirectUri:             optionalString(in.RedirectURI),
+		Scope:                   optionalString(in.Scope),
+		HasAccessToken:          in.HasAccessToken,
+		HasRefreshToken:         in.HasRefreshToken,
+		TokenType:               optionalString(in.TokenType),
+		TokenExpiry:             in.TokenExpiry,
+		LastError:               in.LastError,
+	}
+}
+
+func zero(in *string) string {
+	if in == nil {
+		return ""
+	}
+	return *in
+}
+
+func optionalString(in string) *string {
+	if in == "" {
+		return nil
+	}
+	return &in
+}
+
+func optionalStringSlice(in []string) *[]string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := append([]string(nil), in...)
+	return &out
 }
 
 func oauthDisabledError(ctx context.Context) error {

@@ -35,6 +35,11 @@ type Plugin struct {
 	configureHandlerMu sync.RWMutex
 	configureHandler   ConfigureHandler
 
+	robotModelProviderListModelsHandlerMu sync.RWMutex
+	robotModelProviderListModelsHandler   RobotModelProviderListModelsHandler
+	robotModelProviderGenerateHandlerMu   sync.RWMutex
+	robotModelProviderGenerateHandler     RobotModelProviderGenerateHandler
+
 	ctx    context.Context
 	cancel context.CancelFunc
 
@@ -62,11 +67,14 @@ type outboundWrite struct {
 
 type EventHandler func(context.Context, rpc.EventPayload) error
 type ConfigureHandler func(context.Context, map[string]any) error
+type RobotModelProviderListModelsHandler func(context.Context, rpc.RPCRequestRobotModelProviderListModelsParams) (rpc.RPCResponseRobotModelProviderListModels, error)
+type RobotModelProviderGenerateHandler func(context.Context, rpc.RPCRequestRobotModelProviderGenerateParams) (rpc.RPCResponseRobotModelProviderGenerate, error)
 
 const (
 	initialReconnectWait = 250 * time.Millisecond
 	maxReconnectWait     = 10 * time.Second
 	defaultRPCTimeout    = 30 * time.Second
+	maxRPCMessageBytes   = 4 << 20
 )
 
 func New(ctx context.Context) (*Plugin, error) {
@@ -108,6 +116,20 @@ func (p *Plugin) OnConfigure(handler ConfigureHandler) {
 	p.logger.Debug("register configure handler")
 }
 
+func (p *Plugin) OnRobotModelProviderListModels(handler RobotModelProviderListModelsHandler) {
+	p.robotModelProviderListModelsHandlerMu.Lock()
+	p.robotModelProviderListModelsHandler = handler
+	p.robotModelProviderListModelsHandlerMu.Unlock()
+	p.logger.Debug("register robot model provider list models handler")
+}
+
+func (p *Plugin) OnRobotModelProviderGenerate(handler RobotModelProviderGenerateHandler) {
+	p.robotModelProviderGenerateHandlerMu.Lock()
+	p.robotModelProviderGenerateHandler = handler
+	p.robotModelProviderGenerateHandlerMu.Unlock()
+	p.logger.Debug("register robot model provider generate handler")
+}
+
 // Run connects the plugin to the host and starts the WebSocket RPC read/write loops.
 func (p *Plugin) Run(ctx context.Context) error {
 	p.runStarted.Store(true)
@@ -140,6 +162,7 @@ func (p *Plugin) Run(ctx context.Context) error {
 		}
 
 		retryWait = initialReconnectWait
+		conn.SetReadLimit(maxRPCMessageBytes)
 
 		connCtx, connCancel := context.WithCancel(p.ctx)
 		outbound := make(chan outboundWrite)

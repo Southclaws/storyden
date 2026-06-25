@@ -18,6 +18,7 @@ var (
 	CapabilityEmailClient = Capability{capabilityEmailClient}
 	CapabilitySMSClient   = Capability{capabilitySMSClient}
 	CapabilityOAuth       = Capability{capabilityOAuth}
+	CapabilityRobots      = Capability{capabilityRobots}
 )
 
 func (r Capability) Format(f fmt.State, verb rune) {
@@ -69,6 +70,8 @@ func NewCapability(__iNpUt__ string) (Capability, error) {
 		return CapabilitySMSClient, nil
 	case string(capabilityOAuth):
 		return CapabilityOAuth, nil
+	case string(capabilityRobots):
+		return CapabilityRobots, nil
 	default:
 		return Capability{}, fmt.Errorf("invalid value for type 'Capability': '%s'", __iNpUt__)
 	}

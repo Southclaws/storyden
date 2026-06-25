@@ -1,0 +1,17 @@
+id: robot-invoke
+name: Robot Invoke
+author: Southclaws
+description: Invoke the Content Searcher robot once through the robot_run RPC and print the structured result.
+version: 1.0.0
+command: go
+args:
+  - run
+  - .
+access:
+  handle: robot-invoke
+  name: Robot Invoke
+  permissions:
+    - USE_ROBOTS
+    - READ_PUBLISHED_LIBRARY
+    - READ_PUBLISHED_THREADS
+    - READ_PROFILE

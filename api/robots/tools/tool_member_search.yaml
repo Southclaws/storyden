@@ -1,0 +1,77 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "ToolMemberSearch"
+x-storyden-tool:
+  title: Member Search
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: member_search
+description: "Search community members by name or handle."
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolMemberSearchInput"
+  output:
+    $ref: "#/definitions/ToolMemberSearchOutput"
+definitions:
+  ToolMemberSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: "Plain text keyword search string matching name or handle. Boolean operators like OR, AND, and NOT, quoted phrases, and other special query syntax are not supported. Use simple words separated by spaces."
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum number of results to return (default 10, max 100)
+    additionalProperties: false
+
+  ToolMemberSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of matching members
+        items:
+          $ref: "#/definitions/MemberSearchItem"
+    additionalProperties: false
+
+  MemberSearchItem:
+    type: object
+    required:
+      - id
+      - handle
+      - name
+      - browser_url
+    properties:
+      browser_url:
+        type: string
+        description: Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
+      id:
+        type: string
+        description: Unique identifier
+      handle:
+        type: string
+        description: The member's unique handle (username)
+      name:
+        type: string
+        description: The member's display name
+      bio:
+        type: string
+        description: Brief member bio or description
+    additionalProperties: false

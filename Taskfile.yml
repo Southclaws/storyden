@@ -105,7 +105,7 @@ tasks:
   # -
 
   generate:
-    deps: [generate:db, generate:openapi]
+    deps: [generate:db, generate:openapi, generate:mcp]
 
   generate:db:
     cmds: [go generate ./internal/ent]
@@ -125,6 +125,21 @@ tasks:
     dir: home
     cmds: [pnpm openapi]
 
+  generate:mcp:
+    deps:
+      - generate:mcp:backend
+      - generate:mcp:frontend
+
+  generate:mcp:backend:
+    cmds:
+      - go generate ./api
+    dir: .
+
+  generate:mcp:frontend:
+    cmds:
+      - pnpm mcp-schema
+    dir: web
+
   # -
   # Database
   # -
@@ -139,27 +154,33 @@ tasks:
 
   test:e2e:ui:
     cmds:
-      - go run ./cmd/e2etest --ui
+      - go run ./cmd/e2etest --ui {{.CLI_ARGS}}
 
   test:e2e:
     cmds:
-      - go run ./cmd/e2etest
+      - go run ./cmd/e2etest {{.CLI_ARGS}}
 
   test:e2e:rebuild:
+    deps: [test:e2e:rebuild:backend, test:e2e:rebuild:frontend]
+
+  test:e2e:rebuild:backend:
     cmds:
       - mkdir -p ./tests/e2e-data || true
       - go build -o ./tests/e2e-data/backend.exe ./cmd/backend
+
+  test:e2e:rebuild:frontend:
+    cmds:
       - cd web ; pnpm build ; cd ..
 
   test:e2e:fresh:
     deps: [test:e2e:rebuild]
     cmds:
-      - go run ./cmd/e2etest --ui
+      - go run ./cmd/e2etest --ui {{.CLI_ARGS}}
 
   test:e2e:ci:
     deps: [test:e2e:rebuild]
     cmds:
-      - go run ./cmd/e2etest
+      - go run ./cmd/e2etest {{.CLI_ARGS}}
 
   # -
   # Container images

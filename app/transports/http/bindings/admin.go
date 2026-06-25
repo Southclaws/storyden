@@ -32,6 +32,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -236,11 +237,25 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 			})
 		}
 
-		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() {
+		var robots opt.Optional[settings.RobotServiceSettings]
+		if request.Body.Services.Robots != nil {
+			robotSettings := settings.RobotServiceSettings{}
+
+			if request.Body.Services.Robots.DefaultModel != nil {
+				if _, err := model_ref.ParseID(string(*request.Body.Services.Robots.DefaultModel)); err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+				}
+				robotSettings.DefaultModel = opt.New(string(*request.Body.Services.Robots.DefaultModel))
+			}
+			robots = opt.New(robotSettings)
+		}
+
+		if clientIP.Ok() || rateLimit.Ok() || moderation.Ok() || robots.Ok() {
 			services = opt.New(settings.ServiceSettings{
 				ClientIP:   clientIP,
 				RateLimit:  rateLimit,
 				Moderation: moderation,
+				Robots:     robots,
 			})
 		}
 	}
@@ -826,6 +841,13 @@ func serialiseServiceSettings(in settings.ServiceSettings) openapi.AdminSettings
 		ClientIp:     opt.Map(in.ClientIP, serialiseClientIPSettings).Ptr(),
 		RateLimiting: opt.Map(in.RateLimit, serialiseRateLimitSettings).Ptr(),
 		Moderation:   opt.Map(in.Moderation, serialiseModerationSettings).Ptr(),
+		Robots:       opt.Map(in.Robots, serialiseRobotServiceSettings).Ptr(),
+	}
+}
+
+func serialiseRobotServiceSettings(in settings.RobotServiceSettings) openapi.RobotServiceSettings {
+	return openapi.RobotServiceSettings{
+		DefaultModel: (*openapi.RobotModelRef)(in.DefaultModel.Ptr()),
 	}
 }
 

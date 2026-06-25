@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: content_search
+    respond:
+      text: "Content search complete."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_content_search_1
+          name: content_search
+          args:
+            query: "magnolia"

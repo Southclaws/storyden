@@ -1,0 +1,41 @@
+---
+title: robot_run
+description: Plugin to Host RPC method.
+---
+
+`robot_run` is a **Plugin to Host** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/plugin-to-host/robot_run.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestRobotRun`
+- Response type: `RPCResponseRobotRun`
+
+## Request contract
+
+Run a one-shot robot invocation and return the assistant's final text response.
+
+
+Required fields:
+- `method`
+- `params`
+
+
+
+## Response contract
+
+Final result of a one-shot robot invocation.
+
+
+Required fields:
+- `method`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

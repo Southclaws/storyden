@@ -90,6 +90,7 @@ type Bindings struct {
 	Datagraph
 	Events
 	OAuth
+	Robots
 }
 
 // bindingsProviders provides to the application the necessary implementations
@@ -126,6 +127,7 @@ func bindingsProviders() fx.Option {
 		NewDatagraph,
 		NewEvents,
 		NewOAuth,
+		NewRobots,
 	)
 }
 
@@ -266,6 +268,17 @@ func mount(
 		}
 
 		return c.JSON(http.StatusOK, oauthBinding.OAuthProtectedResourceMetadata(resource))
+	})
+
+	router.GET("/.well-known/oauth-client-metadata", func(c echo.Context) error {
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
+
+		doc, err := oauthBinding.OAuthRemoteClientMetadata(c.Request().Context())
+		if err != nil {
+			return err
+		}
+
+		return c.JSON(http.StatusOK, doc)
 	})
 
 	// RFC 6750 §3 / RFC 9728 §5.1: bearer-protected OAuth resources must answer

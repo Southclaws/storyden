@@ -1,0 +1,13 @@
+steps:
+  - match:
+      tool_result: throw_an_error
+    respond:
+      text: "The tool returned an error."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_err_1
+          name: throw_an_error
+          args: {}

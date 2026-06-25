@@ -39,6 +39,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/oauthclient"
 	"github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	"github.com/Southclaws/storyden/internal/ent/oauthrefreshtoken"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteauthorisationflow"
+	"github.com/Southclaws/storyden/internal/ent/oauthremoteconnection"
 	"github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
@@ -48,6 +50,14 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
+	"github.com/Southclaws/storyden/internal/ent/robot"
+	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
+	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
+	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
+	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
+	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -113,47 +123,57 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			account.Table:                   account.ValidColumn,
-			accountfollow.Table:             accountfollow.ValidColumn,
-			accountroles.Table:              accountroles.ValidColumn,
-			asset.Table:                     asset.ValidColumn,
-			auditlog.Table:                  auditlog.ValidColumn,
-			authentication.Table:            authentication.ValidColumn,
-			category.Table:                  category.ValidColumn,
-			collection.Table:                collection.ValidColumn,
-			collectionnode.Table:            collectionnode.ValidColumn,
-			collectionpost.Table:            collectionpost.ValidColumn,
-			email.Table:                     email.ValidColumn,
-			emailqueue.Table:                emailqueue.ValidColumn,
-			event.Table:                     event.ValidColumn,
-			eventparticipant.Table:          eventparticipant.ValidColumn,
-			invitation.Table:                invitation.ValidColumn,
-			likepost.Table:                  likepost.ValidColumn,
-			link.Table:                      link.ValidColumn,
-			mentionprofile.Table:            mentionprofile.ValidColumn,
-			moderationnote.Table:            moderationnote.ValidColumn,
-			node.Table:                      node.ValidColumn,
-			nodeversion.Table:               nodeversion.ValidColumn,
-			notification.Table:              notification.ValidColumn,
-			oauthauthorisationcode.Table:    oauthauthorisationcode.ValidColumn,
-			oauthauthorisationrequest.Table: oauthauthorisationrequest.ValidColumn,
-			oauthclient.Table:               oauthclient.ValidColumn,
-			oauthdeviceauthorisation.Table:  oauthdeviceauthorisation.ValidColumn,
-			oauthrefreshtoken.Table:         oauthrefreshtoken.ValidColumn,
-			plugin.Table:                    plugin.ValidColumn,
-			post.Table:                      post.ValidColumn,
-			postread.Table:                  postread.ValidColumn,
-			property.Table:                  property.ValidColumn,
-			propertyschema.Table:            propertyschema.ValidColumn,
-			propertyschemafield.Table:       propertyschemafield.ValidColumn,
-			question.Table:                  question.ValidColumn,
-			react.Table:                     react.ValidColumn,
-			report.Table:                    report.ValidColumn,
-			role.Table:                      role.ValidColumn,
-			session.Table:                   session.ValidColumn,
-			setting.Table:                   setting.ValidColumn,
-			tag.Table:                       tag.ValidColumn,
-			warning.Table:                   warning.ValidColumn,
+			account.Table:                      account.ValidColumn,
+			accountfollow.Table:                accountfollow.ValidColumn,
+			accountroles.Table:                 accountroles.ValidColumn,
+			asset.Table:                        asset.ValidColumn,
+			auditlog.Table:                     auditlog.ValidColumn,
+			authentication.Table:               authentication.ValidColumn,
+			category.Table:                     category.ValidColumn,
+			collection.Table:                   collection.ValidColumn,
+			collectionnode.Table:               collectionnode.ValidColumn,
+			collectionpost.Table:               collectionpost.ValidColumn,
+			email.Table:                        email.ValidColumn,
+			emailqueue.Table:                   emailqueue.ValidColumn,
+			event.Table:                        event.ValidColumn,
+			eventparticipant.Table:             eventparticipant.ValidColumn,
+			invitation.Table:                   invitation.ValidColumn,
+			likepost.Table:                     likepost.ValidColumn,
+			link.Table:                         link.ValidColumn,
+			mentionprofile.Table:               mentionprofile.ValidColumn,
+			moderationnote.Table:               moderationnote.ValidColumn,
+			node.Table:                         node.ValidColumn,
+			nodeversion.Table:                  nodeversion.ValidColumn,
+			notification.Table:                 notification.ValidColumn,
+			oauthauthorisationcode.Table:       oauthauthorisationcode.ValidColumn,
+			oauthauthorisationrequest.Table:    oauthauthorisationrequest.ValidColumn,
+			oauthclient.Table:                  oauthclient.ValidColumn,
+			oauthdeviceauthorisation.Table:     oauthdeviceauthorisation.ValidColumn,
+			oauthrefreshtoken.Table:            oauthrefreshtoken.ValidColumn,
+			oauthremoteauthorisationflow.Table: oauthremoteauthorisationflow.ValidColumn,
+			oauthremoteconnection.Table:        oauthremoteconnection.ValidColumn,
+			plugin.Table:                       plugin.ValidColumn,
+			post.Table:                         post.ValidColumn,
+			postread.Table:                     postread.ValidColumn,
+			property.Table:                     property.ValidColumn,
+			propertyschema.Table:               propertyschema.ValidColumn,
+			propertyschemafield.Table:          propertyschemafield.ValidColumn,
+			question.Table:                     question.ValidColumn,
+			react.Table:                        react.ValidColumn,
+			report.Table:                       report.ValidColumn,
+			robot.Table:                        robot.ValidColumn,
+			robotmcpserver.Table:               robotmcpserver.ValidColumn,
+			robotmcptool.Table:                 robotmcptool.ValidColumn,
+			robotprovidermodel.Table:           robotprovidermodel.ValidColumn,
+			robotsession.Table:                 robotsession.ValidColumn,
+			robotsessionmessage.Table:          robotsessionmessage.ValidColumn,
+			robotworkspace.Table:               robotworkspace.ValidColumn,
+			robotworkspaceinstance.Table:       robotworkspaceinstance.ValidColumn,
+			role.Table:                         role.ValidColumn,
+			session.Table:                      session.ValidColumn,
+			setting.Table:                      setting.ValidColumn,
+			tag.Table:                          tag.ValidColumn,
+			warning.Table:                      warning.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

@@ -1,0 +1,93 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$id: "ToolThreadSearch"
+x-storyden-tool:
+  title: Thread Search
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: false
+    openWorldHint: false
+title: thread_search
+description: "Search published forum threads by relevance."
+type: object
+required:
+  - input
+  - output
+properties:
+  input:
+    $ref: "#/definitions/ToolThreadSearchInput"
+  output:
+    $ref: "#/definitions/ToolThreadSearchOutput"
+definitions:
+  ToolThreadSearchInput:
+    type: object
+    required:
+      - query
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: "Plain text keyword search string. Boolean operators like OR, AND, and NOT, quoted phrases, and other special query syntax are not supported. Use simple words separated by spaces, for example: robot agent automation."
+      authors:
+        type: array
+        description: "Filter by author handles (usernames). Do not use '@' prefix."
+        items:
+          type: string
+          pattern: "^[a-zA-Z0-9_-]+$"
+      categories:
+        type: array
+        description: "Filter by category names. Category names are case-insensitive."
+        items:
+          type: string
+      tags:
+        type: array
+        description: "Filter by tag names. Tags are case-sensitive."
+        items:
+          type: string
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 100
+        description: Maximum number of results to return (default 10, max 100)
+    additionalProperties: false
+
+  ToolThreadSearchOutput:
+    type: object
+    required:
+      - results
+      - items
+    properties:
+      results:
+        type: integer
+        description: Total number of results found
+      items:
+        type: array
+        description: List of matching threads
+        items:
+          $ref: "#/definitions/ThreadSearchItem"
+    additionalProperties: false
+
+  ThreadSearchItem:
+    type: object
+    required:
+      - id
+      - slug
+      - name
+      - browser_url
+    properties:
+      browser_url:
+        type: string
+        description: Browser URL for this resource. Always present this as a Markdown link when showing results to the user.
+      id:
+        type: string
+        description: Unique identifier
+      slug:
+        type: string
+        description: URL friendly identifier
+      name:
+        type: string
+        description: Thread title
+      description:
+        type: string
+        description: Brief excerpt from the thread
+    additionalProperties: false

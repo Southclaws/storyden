@@ -36,6 +36,7 @@ const (
 	cmdProcessExited
 
 	gracefulStopTimeout = 3 * time.Second
+	forcedStopTimeout   = gracefulStopTimeout + 2*time.Second
 	deploymentMarker    = ".sdxlock"
 )
 
@@ -133,7 +134,11 @@ func (r *localRuntime) Start(ctx context.Context) error {
 }
 
 func (r *localRuntime) Stop(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, forcedStopTimeout)
+	defer cancel()
+
 	respch := make(chan error, 1)
+	r.logger.Debug("runtime stop requested")
 
 	select {
 	case r.commandCh <- command{typ: cmdStop, respch: respch}:
@@ -143,8 +148,10 @@ func (r *localRuntime) Stop(ctx context.Context) error {
 
 	select {
 	case err := <-respch:
+		r.logger.Debug("runtime stop completed", slog.Any("error", err))
 		return err
 	case <-ctx.Done():
+		r.logger.Warn("runtime stop timed out", slog.Any("error", ctx.Err()))
 		return ctx.Err()
 	}
 }
@@ -311,13 +318,13 @@ func (r *localRuntime) stopProcess(cmd *exec.Cmd) {
 		return
 	}
 
-	if err := cmd.Process.Signal(os.Interrupt); err != nil {
+	if err := interruptProcess(cmd); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
 
 		r.logger.Warn("failed to send interrupt signal, falling back to kill", slog.Any("error", err))
-		if killErr := cmd.Process.Kill(); killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
+		if killErr := killProcess(cmd); killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
 			r.logger.Error("failed to kill process after interrupt failure", slog.Any("error", killErr))
 		}
 		return
@@ -325,13 +332,12 @@ func (r *localRuntime) stopProcess(cmd *exec.Cmd) {
 
 	r.logger.Info("sent interrupt signal to plugin process")
 
-	proc := cmd.Process
 	go func() {
 		timer := time.NewTimer(gracefulStopTimeout)
 		defer timer.Stop()
 		<-timer.C
 
-		if err := proc.Kill(); err != nil {
+		if err := killProcess(cmd); err != nil {
 			if !errors.Is(err, os.ErrProcessDone) {
 				r.logger.Warn("failed to kill process after graceful shutdown timeout", slog.Any("error", err))
 			}
@@ -358,6 +364,9 @@ func (r *localRuntime) runProcess(ctx context.Context) {
 	r.commandCh <- command{typ: cmdProcessStarted, cmd: cmd}
 
 	waitErr := cmd.Wait()
+	r.logger.Debug("plugin process wait returned",
+		slog.Any("wait_error", waitErr),
+		slog.Any("context_error", ctx.Err()))
 
 	if ctx.Err() != nil {
 		r.logger.Info("plugin stopped")
@@ -398,6 +407,7 @@ func (r *localRuntime) startProcess(ctx context.Context) (*exec.Cmd, *plugin_log
 	}
 
 	cmd := exec.CommandContext(ctx, r.manifest.Metadata.Command, r.manifest.Metadata.Args...)
+	configureProcessCommand(cmd)
 	cmd.Dir = workdir
 	env := os.Environ()
 	env = append(env, "STORYDEN_RPC_URL="+rpcURL.String())

@@ -1,0 +1,6 @@
+steps:
+  - match:
+      any: true
+    respond:
+      text: "ack"
+      finish: "stop"
