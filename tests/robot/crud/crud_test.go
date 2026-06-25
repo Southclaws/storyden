@@ -82,12 +82,29 @@ func TestRobotCRUD(t *testing.T) {
 							Description: "Bot with tools",
 							Playbook:    "Use your tools.",
 							Model:       robotModel(testModel),
-							Tools:       robotTools("library_search", "thread_search"),
+							Tools:       robotTools("library_search_pages", "thread_search"),
 						},
 						adminSession,
 					))(t, http.StatusOK)
 
-					a.ElementsMatch([]string{"library_search", "thread_search"}, create.JSON200.Tools)
+					a.ElementsMatch([]string{"library_search_pages", "thread_search"}, create.JSON200.Tools)
+				})
+
+				t.Run("create_with_unknown_tool_returns_400", func(t *testing.T) {
+					r := require.New(t)
+
+					create, err := cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "unknown-tool-bot-" + uuid.NewString(),
+							Description: "Bot with unknown tool",
+							Playbook:    "Use your tools.",
+							Model:       robotModel(testModel),
+							Tools:       robotTools("unknown_tool"),
+						},
+						adminSession,
+					)
+					r.NoError(err)
+					r.Equal(http.StatusBadRequest, create.StatusCode())
 				})
 
 				t.Run("list_includes_created", func(t *testing.T) {
@@ -205,11 +222,11 @@ func TestRobotCRUD(t *testing.T) {
 							Description: "Tool update test",
 							Playbook:    "Playbook.",
 							Model:       robotModel(testModel),
-							Tools:       robotTools("library_search"),
+							Tools:       robotTools("library_search_pages"),
 						},
 						adminSession,
 					))(t, http.StatusOK)
-					a.ElementsMatch([]string{"library_search"}, created.JSON200.Tools)
+					a.ElementsMatch([]string{"library_search_pages"}, created.JSON200.Tools)
 
 					updated := tests.AssertRequest(cl.RobotUpdateWithResponse(root,
 						created.JSON200.Id,
@@ -220,6 +237,30 @@ func TestRobotCRUD(t *testing.T) {
 					))(t, http.StatusOK)
 
 					a.ElementsMatch([]string{"thread_search", "member_search"}, updated.JSON200.Tools)
+				})
+
+				t.Run("update_with_unknown_tool_returns_400", func(t *testing.T) {
+					r := require.New(t)
+
+					created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "unknown-tool-update-bot-" + uuid.NewString(),
+							Description: "Tool update test",
+							Playbook:    "Playbook.",
+							Model:       robotModel(testModel),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					updated, err := cl.RobotUpdateWithResponse(root,
+						created.JSON200.Id,
+						openapi.RobotUpdateJSONRequestBody{
+							Tools: robotTools("unknown_tool"),
+						},
+						adminSession,
+					)
+					r.NoError(err)
+					r.Equal(http.StatusBadRequest, updated.StatusCode())
 				})
 
 				t.Run("update_nonexistent_returns_404", func(t *testing.T) {

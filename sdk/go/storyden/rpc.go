@@ -38,6 +38,8 @@ func (p *Plugin) handleMessage(message []byte) error {
 		return p.handleRobotModelProviderListModels(*r)
 	case *rpc.RPCRequestRobotModelProviderGenerate:
 		return p.handleRobotModelProviderGenerate(*r)
+	case *rpc.RPCRequestRobotToolCall:
+		return p.handleRobotToolCall(*r)
 	default:
 		return fmt.Errorf("unknown request type: %T", r)
 	}
@@ -215,6 +217,40 @@ func (p *Plugin) handleRobotModelProviderGenerate(req rpc.RPCRequestRobotModelPr
 			HostToPluginResponseUnionUnion: &resp,
 		}); err != nil {
 			p.logger.Error("failed to send robot model provider generate response",
+				slog.String("error", err.Error()))
+		}
+	}()
+
+	return nil
+}
+
+func (p *Plugin) handleRobotToolCall(req rpc.RPCRequestRobotToolCall) error {
+	p.robotToolCallHandlerMu.RLock()
+	handler := p.robotToolCallHandler
+	p.robotToolCallHandlerMu.RUnlock()
+
+	if handler == nil {
+		return p.sendErrorResponse(req.ID, -32601, "robot tool call handler is not registered")
+	}
+
+	go func() {
+		resp, err := handler(p.ctx, req.Params)
+		if err != nil {
+			if sendErr := p.sendErrorResponse(req.ID, -32000, err.Error()); sendErr != nil {
+				p.logger.Error("failed to send robot tool call error response",
+					slog.String("error", sendErr.Error()))
+			}
+			return
+		}
+
+		if resp.Method == "" {
+			resp.Method = "robot_tool_call"
+		}
+
+		if err := p.sendResponse(req.ID, rpc.HostToPluginResponseUnion{
+			HostToPluginResponseUnionUnion: &resp,
+		}); err != nil {
+			p.logger.Error("failed to send robot tool call response",
 				slog.String("error", err.Error()))
 		}
 	}()

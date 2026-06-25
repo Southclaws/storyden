@@ -19,5 +19,7 @@ export interface RobotToolInfo {
   id: string;
   /** Human-readable tool title. */
   name?: string;
+  /** Whether Robot runs must pause for human approval before executing this tool. */
+  requires_confirmation: boolean;
   source: RobotToolSource;
 }

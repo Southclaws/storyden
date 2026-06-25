@@ -415,7 +415,8 @@
                 "type": "object",
                 "required": [
                   "name",
-                  "description"
+                  "description",
+                  "requires_confirmation"
                 ],
                 "properties": {
                   "name": {
@@ -425,6 +426,10 @@
                   "description": {
                     "type": "string",
                     "description": "Brief description of what the tool does"
+                  },
+                  "requires_confirmation": {
+                    "type": "boolean",
+                    "description": "Whether Robot runs must pause for human approval before executing this tool."
                   }
                 },
                 "additionalProperties": false
@@ -449,7 +454,8 @@
                 "type": "object",
                 "required": [
                   "name",
-                  "description"
+                  "description",
+                  "requires_confirmation"
                 ],
                 "properties": {
                   "name": {
@@ -459,6 +465,10 @@
                   "description": {
                     "type": "string",
                     "description": "Brief description of what the tool does"
+                  },
+                  "requires_confirmation": {
+                    "type": "boolean",
+                    "description": "Whether Robot runs must pause for human approval before executing this tool."
                   }
                 },
                 "additionalProperties": false
@@ -470,7 +480,8 @@
           "type": "object",
           "required": [
             "name",
-            "description"
+            "description",
+            "requires_confirmation"
           ],
           "properties": {
             "name": {
@@ -480,6 +491,10 @@
             "description": {
               "type": "string",
               "description": "Brief description of what the tool does"
+            },
+            "requires_confirmation": {
+              "type": "boolean",
+              "description": "Whether Robot runs must pause for human approval before executing this tool."
             }
           },
           "additionalProperties": false

@@ -40,6 +40,7 @@ definitions:
     required:
       - name
       - description
+      - requires_confirmation
     properties:
       name:
         type: string
@@ -47,4 +48,7 @@ definitions:
       description:
         type: string
         description: Brief description of what the tool does
+      requires_confirmation:
+        type: boolean
+        description: Whether Robot runs must pause for human approval before executing this tool.
     additionalProperties: false

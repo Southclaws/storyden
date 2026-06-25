@@ -1,0 +1,95 @@
+id: discord-robot-tools
+name: Discord Robot Tools
+author: Southclaws
+description: Exposes Discord channel listing and message sending as Robot tools.
+version: 0.1.0
+command: "./discord-robot-tools"
+capabilities:
+  - type: robot.tool_provider
+    id: discord
+    version: v1
+    tools:
+      - id: list_channels
+        name: List Discord Channels
+        title: List Discord Channels
+        description: List channels from the Discord guild resolved from the configured channel ID.
+        input_schema:
+          type: object
+          properties:
+            include_active_threads:
+              type: boolean
+              description: Include active Discord threads returned by the guild active threads endpoint.
+          additionalProperties: false
+        output_schema:
+          type: object
+          properties:
+            guild_id:
+              type: string
+            guild_name:
+              type: string
+            channels:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  parent_id:
+                    type: string
+                  position:
+                    type: integer
+          required: [guild_id, guild_name, channels]
+          additionalProperties: false
+        annotations:
+          readOnlyHint: true
+          destructiveHint: false
+          idempotentHint: true
+          openWorldHint: true
+      - id: send_message
+        name: Send Discord Message
+        title: Send Discord Message
+        description: Send a message to a Discord channel.
+        input_schema:
+          type: object
+          properties:
+            channel_id:
+              type: string
+              description: Discord channel ID to send the message to.
+            message:
+              type: string
+              description: Message content to send. Mentions are disabled by the plugin.
+          required: [channel_id, message]
+          additionalProperties: false
+        output_schema:
+          type: object
+          properties:
+            channel_id:
+              type: string
+            message_id:
+              type: string
+            content:
+              type: string
+            discord_url:
+              type: string
+          required: [channel_id, message_id, content]
+          additionalProperties: false
+        annotations:
+          readOnlyHint: false
+          destructiveHint: true
+          idempotentHint: false
+          openWorldHint: true
+        requires_confirmation: true
+configuration_schema:
+  fields:
+    - id: discord_token
+      label: "Discord Bot Token"
+      description: "The token for the Discord bot to connect with."
+      type: string
+    - id: channel_id
+      label: "Discord Channel ID"
+      description: "Any channel in the Discord guild the Robot should work with. Used to resolve the guild ID."
+      type: string

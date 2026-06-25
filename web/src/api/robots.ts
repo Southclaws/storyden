@@ -158,6 +158,10 @@ export interface ToolInfo {
    * Brief description of what the tool does
    */
   description: string;
+  /**
+   * Whether Robot runs must pause for human approval before executing this tool.
+   */
+  requires_confirmation: boolean;
 }
 /**
  * Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions.

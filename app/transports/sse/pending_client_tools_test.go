@@ -56,6 +56,76 @@ func TestReconcilePendingClientToolsUsesOwnerRobotForResolvedPendingTool(t *test
 	assert.False(t, blocked)
 }
 
+func TestReconcilePendingClientToolsUsesApprovalResponseForResolvedPendingTool(t *testing.T) {
+	decision := reconcilePendingClientTools([]chatMessage{
+		{
+			Role: "assistant",
+			Parts: []chatPart{
+				{
+					Type:       "tool-robot_delete",
+					State:      "approval-responded",
+					ToolCallId: "call_confirm",
+					ToolName:   "robot_delete",
+					Approval: &chatApproval{
+						ID:       "call_confirm",
+						Approved: true,
+					},
+				},
+			},
+		},
+	}, pendingClientTools{
+		IDs:    []string{"call_confirm"},
+		Robots: map[string]string{"call_confirm": "robot_builder"},
+	})
+
+	_, ok := decision.Provided["call_confirm"]
+	assert.True(t, ok)
+	owner, ok := decision.OwnerRobotID.Get()
+	require.True(t, ok)
+	assert.Equal(t, "robot_builder", owner)
+	_, blocked := decision.BlockingInteraction.Get()
+	assert.False(t, blocked)
+}
+
+func TestReconcilePendingClientToolsUsesMultipleApprovalResponsesForResolvedPendingTools(t *testing.T) {
+	decision := reconcilePendingClientTools([]chatMessage{
+		{
+			Role: "assistant",
+			Parts: []chatPart{
+				{
+					Type:       "tool-robot_delete",
+					State:      "approval-responded",
+					ToolCallId: "call_confirm_1",
+					ToolName:   "robot_delete",
+					Approval: &chatApproval{
+						ID:       "call_confirm_1",
+						Approved: true,
+					},
+				},
+				{
+					Type:       "tool-robot_delete",
+					State:      "approval-responded",
+					ToolCallId: "call_confirm_2",
+					ToolName:   "robot_delete",
+					Approval: &chatApproval{
+						ID:       "call_confirm_2",
+						Approved: true,
+					},
+				},
+			},
+		},
+	}, pendingClientTools{
+		IDs: []string{"call_confirm_1", "call_confirm_2"},
+	})
+
+	_, ok := decision.Provided["call_confirm_1"]
+	assert.True(t, ok)
+	_, ok = decision.Provided["call_confirm_2"]
+	assert.True(t, ok)
+	_, blocked := decision.BlockingInteraction.Get()
+	assert.False(t, blocked)
+}
+
 func TestReconcilePendingClientToolsRecoversStaleRobotSwitch(t *testing.T) {
 	decision := reconcilePendingClientTools([]chatMessage{
 		{

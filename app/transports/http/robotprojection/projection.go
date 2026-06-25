@@ -1,6 +1,7 @@
 package robotprojection
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -12,8 +13,48 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/presentation"
+	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
+
+type ToolMetadataResolver func(toolName string) map[string]any
+
+func ToolMetadataFromRegistry(ctx context.Context, registry *robot_tools.Registry) ToolMetadataResolver {
+	return func(toolName string) map[string]any {
+		if registry == nil || toolName == "" {
+			return nil
+		}
+
+		tool, err := registry.GetTool(ctx, toolName)
+		if err != nil || tool == nil || tool.Definition == nil {
+			return nil
+		}
+
+		source := tool.Source
+		if source == "" {
+			source = "native"
+		}
+		if source == "native" && tool.CallableName != "" && tool.CallableName != tool.Definition.Name {
+			source = "mcp"
+		}
+
+		return map[string]any{
+			"storyden": map[string]any{
+				"id":                    tool.Definition.Name,
+				"callable_name":         tool.ADKName(),
+				"source":                source,
+				"requires_confirmation": tool.Definition.RequiresConfirmation,
+			},
+		}
+	}
+}
+
+func resolveToolMetadata(resolver ToolMetadataResolver, toolName string) openapi.ArbitraryData {
+	if resolver == nil {
+		return nil
+	}
+	return resolver(toolName)
+}
 
 func HiddenConfirmationToolCallIDs(messages []*robot.Message) map[string]bool {
 	ids := make(map[string]bool)
@@ -40,7 +81,7 @@ func HiddenConfirmationToolCallIDs(messages []*robot.Message) map[string]bool {
 // ADKEventToUIMessageParts projects persisted ADK event content into AI SDK
 // UIMessage parts. It mirrors the live SSE projection so hydration cannot
 // expose internal confirmation wrapper events that the live stream hides.
-func ADKEventToUIMessageParts(event adksession.Event, hiddenToolCallIDs map[string]bool) ([]openapi.UIMessagePart, error) {
+func ADKEventToUIMessageParts(event adksession.Event, hiddenToolCallIDs map[string]bool, toolMetadata ToolMetadataResolver) ([]openapi.UIMessagePart, error) {
 	if event.LLMResponse.Content == nil {
 		return []openapi.UIMessagePart{}, nil
 	}
@@ -75,7 +116,13 @@ func ADKEventToUIMessageParts(event adksession.Event, hiddenToolCallIDs map[stri
 				continue
 			}
 
-			uiPart, err := FunctionCallToUIPart(UnwrapConfirmationFunctionCall(adkPart.FunctionCall))
+			var uiPart openapi.UIMessagePart
+			var err error
+			if adkPart.FunctionCall.Name == toolconfirmation.FunctionCallName {
+				uiPart, err = ConfirmationFunctionCallToUIPart(adkPart.FunctionCall, toolMetadata)
+			} else {
+				uiPart, err = FunctionCallToUIPart(adkPart.FunctionCall, toolMetadata)
+			}
 			if err != nil {
 				return nil, err
 			}
@@ -174,12 +221,15 @@ func DataUIPart(partType string, data any) (openapi.UIMessagePart, error) {
 	return uiPart, nil
 }
 
-func FunctionCallToUIPart(fc *genai.FunctionCall) (openapi.UIMessagePart, error) {
+func FunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolMetadataResolver) (openapi.UIMessagePart, error) {
 	inputAvailable := openapi.ToolUIPartInputAvailable{
 		ToolCallId: fc.ID,
 		ToolName:   fc.Name,
 		State:      openapi.InputAvailable,
 		Input:      fc.Args,
+	}
+	if metadata := resolveToolMetadata(toolMetadata, fc.Name); metadata != nil {
+		inputAvailable.CallProviderMetadata = &metadata
 	}
 
 	var toolPart openapi.ToolUIPart
@@ -193,6 +243,40 @@ func FunctionCallToUIPart(fc *genai.FunctionCall) (openapi.UIMessagePart, error)
 	}
 
 	uiPart.Type = openapi.UIMessagePartType("tool-" + fc.Name)
+
+	return uiPart, nil
+}
+
+func ConfirmationFunctionCallToUIPart(fc *genai.FunctionCall, toolMetadata ToolMetadataResolver) (openapi.UIMessagePart, error) {
+	original, err := toolconfirmation.OriginalCallFrom(fc)
+	if err != nil {
+		return openapi.UIMessagePart{}, err
+	}
+
+	approvalRequested := openapi.ToolUIPartApprovalRequested{
+		ToolCallId: fc.ID,
+		ToolName:   original.Name,
+		State:      openapi.ApprovalRequested,
+		Input:      original.Args,
+		Approval: openapi.ToolApprovalState{
+			Id: fc.ID,
+		},
+	}
+	if metadata := resolveToolMetadata(toolMetadata, original.Name); metadata != nil {
+		approvalRequested.CallProviderMetadata = &metadata
+	}
+
+	var toolPart openapi.ToolUIPart
+	if err := toolPart.FromToolUIPartApprovalRequested(approvalRequested); err != nil {
+		return openapi.UIMessagePart{}, fmt.Errorf("create tool approval part: %w", err)
+	}
+
+	var uiPart openapi.UIMessagePart
+	if err := uiPart.FromToolUIPart(toolPart); err != nil {
+		return openapi.UIMessagePart{}, fmt.Errorf("create UI message part from approval part: %w", err)
+	}
+
+	uiPart.Type = openapi.UIMessagePartType("tool-" + original.Name)
 
 	return uiPart, nil
 }
@@ -288,15 +372,24 @@ func DataStreamPart(partType string, data any) openapi.StreamPart {
 }
 
 func FunctionCallStreamParts(fc *genai.FunctionCall) []openapi.StreamPart {
+	return FunctionCallStreamPartsWithMetadata(fc, nil)
+}
+
+func FunctionCallStreamPartsWithMetadata(fc *genai.FunctionCall, metadata map[string]any) []openapi.StreamPart {
 	if fc == nil {
 		return nil
 	}
 
-	toolInputStartPart := openapi.StreamPart{}
-	_ = toolInputStartPart.FromToolInputStartPart(openapi.ToolInputStartPart{
+	inputStart := openapi.ToolInputStartPart{
 		ToolCallId: fc.ID,
 		ToolName:   fc.Name,
-	})
+	}
+	if metadata != nil {
+		providerMetadata := openapi.ArbitraryData(metadata)
+		inputStart.ProviderMetadata = &providerMetadata
+	}
+	toolInputStartPart := openapi.StreamPart{}
+	_ = toolInputStartPart.FromToolInputStartPart(inputStart)
 
 	parts := []openapi.StreamPart{toolInputStartPart}
 
@@ -310,15 +403,29 @@ func FunctionCallStreamParts(fc *genai.FunctionCall) []openapi.StreamPart {
 		parts = append(parts, toolInputDeltaPart)
 	}
 
-	toolInputAvailablePart := openapi.StreamPart{}
-	_ = toolInputAvailablePart.FromToolInputAvailablePart(openapi.ToolInputAvailablePart{
+	inputAvailable := openapi.ToolInputAvailablePart{
 		ToolCallId: fc.ID,
 		ToolName:   fc.Name,
 		Input:      fc.Args,
-	})
+	}
+	if metadata != nil {
+		providerMetadata := openapi.ArbitraryData(metadata)
+		inputAvailable.ProviderMetadata = &providerMetadata
+	}
+	toolInputAvailablePart := openapi.StreamPart{}
+	_ = toolInputAvailablePart.FromToolInputAvailablePart(inputAvailable)
 	parts = append(parts, toolInputAvailablePart)
 
 	return parts
+}
+
+func ToolApprovalRequestStreamPart(toolCallID string, approvalID string) openapi.StreamPart {
+	approvalPart := openapi.StreamPart{}
+	_ = approvalPart.FromToolApprovalRequestPart(openapi.ToolApprovalRequestPart{
+		ToolCallId: toolCallID,
+		ApprovalId: approvalID,
+	})
+	return approvalPart
 }
 
 func FunctionResponseStreamPart(fr *genai.FunctionResponse) (openapi.StreamPart, bool) {

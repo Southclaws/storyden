@@ -73,7 +73,9 @@ function renderMessageParts(
   parts: readonly StorydenUIMessage["parts"][number][],
   isUser: boolean,
 ) {
-  const confirmationParts = parts.filter(isConfirmationToolPart);
+  const confirmationParts = parts.filter(
+    isConfirmationToolPart,
+  ) as ConfirmationPart[];
   const shouldBatchConfirmations = !isUser && confirmationParts.length > 1;
   let renderedConfirmationBatch = false;
 

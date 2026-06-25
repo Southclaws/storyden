@@ -39,6 +39,8 @@ type Plugin struct {
 	robotModelProviderListModelsHandler   RobotModelProviderListModelsHandler
 	robotModelProviderGenerateHandlerMu   sync.RWMutex
 	robotModelProviderGenerateHandler     RobotModelProviderGenerateHandler
+	robotToolCallHandlerMu                sync.RWMutex
+	robotToolCallHandler                  RobotToolCallHandler
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -69,6 +71,7 @@ type EventHandler func(context.Context, rpc.EventPayload) error
 type ConfigureHandler func(context.Context, map[string]any) error
 type RobotModelProviderListModelsHandler func(context.Context, rpc.RPCRequestRobotModelProviderListModelsParams) (rpc.RPCResponseRobotModelProviderListModels, error)
 type RobotModelProviderGenerateHandler func(context.Context, rpc.RPCRequestRobotModelProviderGenerateParams) (rpc.RPCResponseRobotModelProviderGenerate, error)
+type RobotToolCallHandler func(context.Context, rpc.RPCRequestRobotToolCallParams) (rpc.RPCResponseRobotToolCall, error)
 
 const (
 	initialReconnectWait = 250 * time.Millisecond
@@ -128,6 +131,13 @@ func (p *Plugin) OnRobotModelProviderGenerate(handler RobotModelProviderGenerate
 	p.robotModelProviderGenerateHandler = handler
 	p.robotModelProviderGenerateHandlerMu.Unlock()
 	p.logger.Debug("register robot model provider generate handler")
+}
+
+func (p *Plugin) OnRobotToolCall(handler RobotToolCallHandler) {
+	p.robotToolCallHandlerMu.Lock()
+	p.robotToolCallHandler = handler
+	p.robotToolCallHandlerMu.Unlock()
+	p.logger.Debug("register robot tool call handler")
 }
 
 // Run connects the plugin to the host and starts the WebSocket RPC read/write loops.

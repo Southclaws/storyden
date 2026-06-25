@@ -136,6 +136,7 @@ $defs:
   CapabilityConfig:
     oneOf:
       - $ref: "#/$defs/RobotLLMProviderCapabilityConfig"
+      - $ref: "#/$defs/RobotToolProviderCapabilityConfig"
 
   CapabilityConfigBase:
     type: object
@@ -152,7 +153,9 @@ $defs:
         example: openrouter
         description: >
           Stable capability identifier. For Robot LLM providers, this is the
-          provider identifier used in `provider/model` refs.
+          provider identifier used in `provider/model` refs. For Robot tool
+          providers, this is the provider namespace used to build fully
+          qualified Robot tool names.
         pattern: "^[a-zA-Z0-9][a-zA-Z0-9._-]*$"
       version:
         type: string
@@ -176,6 +179,68 @@ $defs:
           type:
             type: string
             const: robot.llm_provider
+
+  RobotToolProviderCapabilityConfig:
+    allOf:
+      - $ref: "#/$defs/CapabilityConfigBase"
+      - type: object
+        required:
+          - type
+          - tools
+        properties:
+          type:
+            type: string
+            const: robot.tool_provider
+          tools:
+            type: array
+            description: Robot tools statically provided by this plugin.
+            items:
+              $ref: "#/$defs/RobotToolProviderToolConfig"
+
+  RobotToolProviderToolConfig:
+    type: object
+    required:
+      - id
+      - name
+      - description
+      - input_schema
+    properties:
+      id:
+        type: string
+        description: Stable provider-local tool identifier.
+        pattern: "^[a-zA-Z0-9][a-zA-Z0-9_]*$"
+      name:
+        type: string
+        description: Human-readable tool name.
+      title:
+        type: string
+        description: Optional display title for MCP clients and Robot builders.
+      description:
+        type: string
+      input_schema:
+        $ref: "#/$defs/RobotToolJSONSchema"
+      output_schema:
+        $ref: "#/$defs/RobotToolJSONSchema"
+      requires_confirmation:
+        type: boolean
+      annotations:
+        $ref: "#/$defs/RobotToolAnnotations"
+
+  RobotToolAnnotations:
+    type: object
+    properties:
+      readOnlyHint:
+        type: boolean
+      destructiveHint:
+        type: boolean
+      idempotentHint:
+        type: boolean
+      openWorldHint:
+        type: boolean
+
+  RobotToolJSONSchema:
+    type: object
+    additionalProperties: true
 
   ManifestAccess:
     type: object
@@ -256,6 +321,7 @@ $defs:
       - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCRequestPing"
       - $ref: "rpc/host-to-plugin/robot_model_provider_list_models.yaml#/$defs/RPCRequestRobotModelProviderListModels"
       - $ref: "rpc/host-to-plugin/robot_model_provider_generate.yaml#/$defs/RPCRequestRobotModelProviderGenerate"
+      - $ref: "rpc/host-to-plugin/robot_tool_call.yaml#/$defs/RPCRequestRobotToolCall"
 
   HostToPluginResponse:
     type: object
@@ -273,6 +339,7 @@ $defs:
       - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCResponsePing"
       - $ref: "rpc/host-to-plugin/robot_model_provider_list_models.yaml#/$defs/RPCResponseRobotModelProviderListModels"
       - $ref: "rpc/host-to-plugin/robot_model_provider_generate.yaml#/$defs/RPCResponseRobotModelProviderGenerate"
+      - $ref: "rpc/host-to-plugin/robot_tool_call.yaml#/$defs/RPCResponseRobotToolCall"
 
   # -
   # Plugin-to-Host RPC methods

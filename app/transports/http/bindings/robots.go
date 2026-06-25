@@ -59,9 +59,9 @@ func NewRobots(
 	workspaceProviders *workspaceprovider.Registry,
 	sessionRepo *robot_session.Repository,
 	modelFactory *llm_provider.Factory,
+	toolRegistry *robot_tools.Registry,
 	settingsManager *settings_manager.Manager,
 	mcpManager *mcpclient.Manager,
-	toolRegistry *robot_tools.Registry,
 ) Robots {
 	return Robots{
 		robotQuerier:       robotQuerier,
@@ -637,8 +637,9 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 
 	// Convert messages to Vercel AI SDK UIMessage format
 	hiddenToolCallIDs := robotprojection.HiddenConfirmationToolCallIDs(cursor.Items)
+	toolMetadata := robotprojection.ToolMetadataFromRegistry(ctx, r.tools)
 	messageDTOs, err := dt.MapErr(cursor.Items, func(m *robot.Message) (openapi.RobotSessionMessage, error) {
-		return serialiseRobotSessionMessage(m, hiddenToolCallIDs)
+		return serialiseRobotSessionMessage(m, hiddenToolCallIDs, toolMetadata)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -973,12 +974,13 @@ func serialiseRobotModelInfos(models []model_ref.Info) openapi.RobotModelInfoLis
 
 func serialiseRobotToolInfo(tool robot_tools.CatalogueTool) openapi.RobotToolInfo {
 	return openapi.RobotToolInfo{
-		Id:           tool.ID,
-		CallableName: tool.CallableName,
-		Name:         &tool.Name,
-		Description:  tool.Description,
-		Source:       openapi.RobotToolSource(tool.Source),
-		Available:    tool.Available,
+		Id:                   tool.ID,
+		CallableName:         tool.CallableName,
+		Name:                 &tool.Name,
+		Description:          tool.Description,
+		Source:               openapi.RobotToolSource(tool.Source),
+		Available:            tool.Available,
+		RequiresConfirmation: tool.RequiresConfirmation,
 	}
 }
 
@@ -1189,8 +1191,8 @@ func ensureMap(in map[string]any) map[string]any {
 
 // serialiseRobotSessionMessage converts a robot.Message (containing ADK Event)
 // into the Vercel AI SDK UIMessage format for the frontend.
-func serialiseRobotSessionMessage(m *robot.Message, hiddenToolCallIDs map[string]bool) (openapi.RobotSessionMessage, error) {
-	parts, err := robotprojection.ADKEventToUIMessageParts(m.Event, hiddenToolCallIDs)
+func serialiseRobotSessionMessage(m *robot.Message, hiddenToolCallIDs map[string]bool, toolMetadata robotprojection.ToolMetadataResolver) (openapi.RobotSessionMessage, error) {
+	parts, err := robotprojection.ADKEventToUIMessageParts(m.Event, hiddenToolCallIDs, toolMetadata)
 	if err != nil {
 		return openapi.RobotSessionMessage{}, err
 	}

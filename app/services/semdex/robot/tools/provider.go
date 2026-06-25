@@ -12,7 +12,10 @@ import (
 	"go.uber.org/fx"
 )
 
-var ErrToolNotFound = fault.New("tool not found")
+var (
+	ErrToolNotFound          = fault.New("tool not found")
+	ErrToolAlreadyRegistered = fault.New("tool already registered")
+)
 
 var DefaultTools = []string{
 	"content_search",
@@ -33,12 +36,13 @@ type Registry struct {
 }
 
 type CatalogueTool struct {
-	ID           string
-	CallableName string
-	Name         string
-	Description  string
-	Source       string
-	Available    bool
+	ID                   string
+	CallableName         string
+	Name                 string
+	Description          string
+	Source               string
+	Available            bool
+	RequiresConfirmation bool
 }
 
 func Build() fx.Option {
@@ -66,16 +70,19 @@ func NewRegistry(
 	}
 }
 
-func (p *Registry) Register(tool *Tool) {
-	p.tools.Store(tool.Definition.Name, tool)
-}
-
-func (p *Registry) RegisterAlias(alias string, target string) {
-	p.aliases.Store(alias, target)
+func (p *Registry) Register(tool *Tool) error {
+	if _, ok := p.tools.LoadOrStore(tool.Definition.Name, tool); ok {
+		return fault.Wrap(ErrToolAlreadyRegistered, fctx.With(context.Background()))
+	}
+	return nil
 }
 
 func (p *Registry) Unregister(name string) {
 	p.tools.Delete(name)
+}
+
+func (p *Registry) RegisterAlias(alias string, target string) {
+	p.aliases.Store(alias, target)
 }
 
 func (p *Registry) UnregisterPrefix(prefix string) {
@@ -152,17 +159,21 @@ func (p *Registry) GetToolsWithMissing(ctx context.Context, toolNames ...string)
 func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 	var tools []CatalogueTool
 	p.tools.Range(func(key string, tool *Tool) bool {
-		source := "native"
-		if tool.CallableName != "" && tool.CallableName != tool.Definition.Name {
+		source := tool.Source
+		if source == "" {
+			source = "native"
+		}
+		if source == "native" && tool.CallableName != "" && tool.CallableName != tool.Definition.Name {
 			source = "mcp"
 		}
 		tools = append(tools, CatalogueTool{
-			ID:           tool.Definition.Name,
-			CallableName: tool.ADKName(),
-			Name:         tool.Definition.Title,
-			Description:  tool.Definition.Description,
-			Source:       source,
-			Available:    true,
+			ID:                   tool.Definition.Name,
+			CallableName:         tool.ADKName(),
+			Name:                 tool.Definition.Title,
+			Description:          tool.Definition.Description,
+			Source:               source,
+			Available:            true,
+			RequiresConfirmation: tool.Definition.RequiresConfirmation,
 		})
 		return true
 	})
@@ -171,13 +182,18 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 		if !ok {
 			return true
 		}
+		source := tool.Source
+		if source == "" {
+			source = "native"
+		}
 		tools = append(tools, CatalogueTool{
-			ID:           alias,
-			CallableName: tool.ADKName(),
-			Name:         tool.Definition.Title,
-			Description:  tool.Definition.Description,
-			Source:       "native",
-			Available:    true,
+			ID:                   alias,
+			CallableName:         tool.ADKName(),
+			Name:                 tool.Definition.Title,
+			Description:          tool.Definition.Description,
+			Source:               source,
+			Available:            true,
+			RequiresConfirmation: tool.Definition.RequiresConfirmation,
 		})
 		return true
 	})

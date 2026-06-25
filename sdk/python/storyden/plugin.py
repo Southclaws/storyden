@@ -31,6 +31,11 @@ from .rpc.events import EventName
 
 EventHandler: TypeAlias = Callable[[models.EventPayload], Awaitable[None] | None]
 ConfigureHandler: TypeAlias = Callable[[dict[str, Any]], Awaitable[bool | None] | bool | None]
+RobotToolCallResult: TypeAlias = models.RPCResponseRobotToolCall | Mapping[str, Any] | None
+RobotToolCallHandler: TypeAlias = Callable[
+    [models.RPCRequestRobotToolCallParams],
+    Awaitable[RobotToolCallResult] | RobotToolCallResult,
+]
 
 _EXTERNAL_TOKEN_PREFIX = "sdprt_"
 _INITIAL_RECONNECT_WAIT_SECONDS = 0.25
@@ -79,6 +84,7 @@ class Plugin:
 
         self._handlers: dict[EventName, EventHandler] = {}
         self._configure_handler: ConfigureHandler | None = None
+        self._robot_tool_call_handler: RobotToolCallHandler | None = None
         self._pending: dict[str, asyncio.Future[dict[str, Any]]] = {}
         self._state: _ConnectionState | None = None
 
@@ -153,6 +159,28 @@ class Plugin:
 
         self._configure_handler = handler
         self._logger.debug("registered configure handler")
+        return handler
+
+    @overload
+    def on_robot_tool_call(self) -> Callable[[RobotToolCallHandler], RobotToolCallHandler]: ...
+
+    @overload
+    def on_robot_tool_call(self, handler: RobotToolCallHandler) -> RobotToolCallHandler: ...
+
+    def on_robot_tool_call(
+        self, handler: RobotToolCallHandler | None = None
+    ) -> RobotToolCallHandler | Callable[[RobotToolCallHandler], RobotToolCallHandler]:
+        if handler is None:
+
+            def decorator(fn: RobotToolCallHandler) -> RobotToolCallHandler:
+                self._robot_tool_call_handler = fn
+                self._logger.debug("registered robot tool call handler")
+                return fn
+
+            return decorator
+
+        self._robot_tool_call_handler = handler
+        self._logger.debug("registered robot tool call handler")
         return handler
 
     async def wait_until_connected(self, timeout: float | None = None) -> None:
@@ -250,7 +278,10 @@ class Plugin:
                     continue
 
                 if _is_graceful_disconnect(disconnect_error):
-                    self._logger.warning("connection closed", extra={"disconnect": _disconnect_summary(disconnect_error)})
+                    self._logger.warning(
+                        "connection closed",
+                        extra={"disconnect": _disconnect_summary(disconnect_error)},
+                    )
                     return
 
                 if disconnect_error is not None:
@@ -481,6 +512,10 @@ class Plugin:
             await self._handle_ping_request(request)
             return
 
+        if isinstance(request, models.RPCRequestRobotToolCall):
+            await self._handle_robot_tool_call_request(request)
+            return
+
         self._logger.warning("unknown host request type", extra={"type": type(request).__name__})
 
     async def _handle_event_request(self, request: models.RPCRequestEvent) -> None:
@@ -520,6 +555,22 @@ class Plugin:
             ok = False
 
         await self._send_result(request.id, {"method": "configure", "ok": ok})
+
+    async def _handle_robot_tool_call_request(self, request: models.RPCRequestRobotToolCall) -> None:
+        handler = self._robot_tool_call_handler
+        if handler is None:
+            await self._send_error(request.id, code=-32601, message="robot tool call handler is not registered")
+            return
+
+        try:
+            result = handler(request.params)
+            if inspect.isawaitable(result):
+                result = await result
+        except Exception as exc:  # noqa: BLE001
+            await self._send_error(request.id, code=-32000, message=str(exc))
+            return
+
+        await self._send_result(request.id, _robot_tool_call_result_payload(result))
 
     async def _handle_ping_request(self, request: models.RPCRequestPing) -> None:
         start_time = self._start_time or time.monotonic()
@@ -572,6 +623,16 @@ def _mode_from_rpc_url(rpc_url: str) -> PluginMode:
     if token.startswith(_EXTERNAL_TOKEN_PREFIX):
         return PluginMode.EXTERNAL
     return PluginMode.SUPERVISED
+
+
+def _robot_tool_call_result_payload(result: RobotToolCallResult) -> Mapping[str, Any]:
+    if isinstance(result, models.RPCResponseRobotToolCall):
+        return result.model_dump(mode="json", exclude_none=True)
+
+    if result is None:
+        return {"method": "robot_tool_call", "output": {}}
+
+    return {"method": "robot_tool_call", "output": dict(result)}
 
 
 def _extract_status_code(exc: Exception) -> int | None:

@@ -20,11 +20,13 @@ import (
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/duplex"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_llmprovider"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_logger"
+	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_robottools"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_session"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/rpc_handler"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime/local"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime/sprites"
+	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -35,7 +37,9 @@ type Host struct {
 	sessions          *xsync.Map[plugin.InstallationID, plugin_runner.Session]
 	pluginReader      *plugin_reader.Reader
 	modelProviders    *llm_provider.Factory
+	toolRegistry      *robot_tools.Registry
 	pluginProviders   *xsync.Map[plugin.InstallationID, []model_ref.Provider]
+	pluginTools       *xsync.Map[plugin.InstallationID, []string]
 	rpcHandlerFactory *rpc_handler.Factory
 	bus               *pubsub.Bus
 	serverURL         url.URL
@@ -48,6 +52,7 @@ func New(
 	logger *slog.Logger,
 	pluginReader *plugin_reader.Reader,
 	modelProviders *llm_provider.Factory,
+	toolRegistry *robot_tools.Registry,
 	pluginLogger *plugin_logger.Writer,
 	rpcHandlerFactory *rpc_handler.Factory,
 	bus *pubsub.Bus,
@@ -106,7 +111,9 @@ func New(
 		sessions:          xsync.NewMap[plugin.InstallationID, plugin_runner.Session](),
 		pluginReader:      pluginReader,
 		modelProviders:    modelProviders,
+		toolRegistry:      toolRegistry,
 		pluginProviders:   xsync.NewMap[plugin.InstallationID, []model_ref.Provider](),
+		pluginTools:       xsync.NewMap[plugin.InstallationID, []string](),
 		rpcHandlerFactory: rpcHandlerFactory,
 		bus:               bus,
 		serverURL:         serverURL,
@@ -191,6 +198,11 @@ func (h *Host) Load(ctx context.Context, rec plugin.Record) error {
 
 		h.sessions.Store(rec.InstallationID, sess)
 		h.registerModelProviders(rec.InstallationID, validated, sess)
+		if err := h.registerRobotTools(rec.InstallationID, validated, sess); err != nil {
+			h.unregisterModelProviders(rec.InstallationID)
+			h.sessions.Delete(rec.InstallationID)
+			return err
+		}
 	} else {
 		// External plugin - no process management, websocket-only session.
 		validated := &plugin.Validated{Metadata: rec.Manifest}
@@ -212,6 +224,11 @@ func (h *Host) Load(ctx context.Context, rec plugin.Record) error {
 
 		h.sessions.Store(rec.InstallationID, sess)
 		h.registerModelProviders(rec.InstallationID, validated, sess)
+		if err := h.registerRobotTools(rec.InstallationID, validated, sess); err != nil {
+			h.unregisterModelProviders(rec.InstallationID)
+			h.sessions.Delete(rec.InstallationID)
+			return err
+		}
 	}
 
 	return nil
@@ -233,6 +250,7 @@ func (h *Host) Unload(ctx context.Context, id plugin.InstallationID) error {
 	}
 
 	h.unregisterModelProviders(id)
+	h.unregisterRobotTools(id)
 	h.sessions.Delete(id)
 
 	return nil
@@ -259,6 +277,59 @@ func (h *Host) registerModelProviders(id plugin.InstallationID, manifest *plugin
 	}
 	if len(providers) > 0 {
 		h.pluginProviders.Store(id, providers)
+	}
+}
+
+func (h *Host) registerRobotTools(id plugin.InstallationID, manifest *plugin.Validated, sess plugin_runner.Session) error {
+	var registered []string
+
+	for _, capability := range manifest.Metadata.Capabilities {
+		declaration, ok := capability.CapabilityConfigUnion.(*rpc.RobotToolProviderCapabilityConfig)
+		if !ok {
+			continue
+		}
+
+		pluginTools, err := plugin_robottools.NewToolsForProvider(id, *declaration, sess)
+		if err != nil {
+			for _, name := range registered {
+				h.toolRegistry.Unregister(name)
+			}
+			return err
+		}
+
+		for _, pluginTool := range pluginTools {
+			if err := h.toolRegistry.Register(pluginTool); err != nil {
+				for _, name := range registered {
+					h.toolRegistry.Unregister(name)
+				}
+				return err
+			}
+			registered = append(registered, pluginTool.Definition.Name)
+
+			h.logger.Info("registered plugin robot tool",
+				slog.String("plugin_id", id.String()),
+				slog.String("provider", declaration.ID),
+				slog.String("tool", pluginTool.Definition.Name))
+		}
+	}
+
+	if len(registered) > 0 {
+		h.pluginTools.Store(id, registered)
+	}
+
+	return nil
+}
+
+func (h *Host) unregisterRobotTools(id plugin.InstallationID) {
+	toolNames, ok := h.pluginTools.LoadAndDelete(id)
+	if !ok {
+		return
+	}
+	for _, name := range toolNames {
+		h.toolRegistry.Unregister(name)
+		h.logger.Info("unregistered plugin robot tool",
+			slog.String("plugin_id", id.String()),
+			slog.String("tool", name))
 	}
 }
 

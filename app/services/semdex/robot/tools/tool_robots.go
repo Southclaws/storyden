@@ -162,8 +162,9 @@ func (rt *robotTools) ExecuteGetAllToolNames(ctx context.Context, args map[strin
 	}
 	for _, t := range allTools {
 		result.Tools = append(result.Tools, mcp.ToolInfo{
-			Name:        t.Definition.Name,
-			Description: t.Definition.Description,
+			Name:                 t.Definition.Name,
+			Description:          t.Definition.Description,
+			RequiresConfirmation: t.Definition.RequiresConfirmation,
 		})
 	}
 

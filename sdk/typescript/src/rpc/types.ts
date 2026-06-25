@@ -1,6 +1,6 @@
 export interface CapabilityConfigBase {
   description?: string;
-  // Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs.
+  // Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
   id: string;
   // Human-readable capability name.
   name?: string;
@@ -10,11 +10,34 @@ export interface CapabilityConfigBase {
   version: string;
 }
 
+export interface RobotToolAnnotations {
+  destructiveHint?: boolean;
+  idempotentHint?: boolean;
+  openWorldHint?: boolean;
+  readOnlyHint?: boolean;
+}
+
+export type RobotToolJSONSchema = unknown;
+
+export interface RobotToolProviderToolConfig {
+  annotations?: RobotToolAnnotations;
+  description: string;
+  // Stable provider-local tool identifier.
+  id: string;
+  input_schema: RobotToolJSONSchema;
+  // Human-readable tool name.
+  name: string;
+  output_schema?: RobotToolJSONSchema;
+  requires_confirmation?: boolean;
+  // Optional display title for MCP clients and Robot builders.
+  title?: string;
+}
+
 
 export interface RobotLLMProviderCapabilityConfig {
   type: "robot.llm_provider";
   description?: string;
-  // Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs.
+  // Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
   id: string;
   // Human-readable capability name.
   name?: string;
@@ -22,11 +45,29 @@ export interface RobotLLMProviderCapabilityConfig {
   version: string;
 }
 
+export interface RobotToolProviderCapabilityConfig {
+  type: "robot.tool_provider";
+  description?: string;
+  // Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
+  id: string;
+  // Human-readable capability name.
+  name?: string;
+  // Robot tools statically provided by this plugin.
+  tools: RobotToolProviderToolConfig[];
+  // Version of the host capability protocol implemented by this plugin.
+  version: string;
+}
+
 export type CapabilityConfig =
-  | RobotLLMProviderCapabilityConfig;
+  | RobotLLMProviderCapabilityConfig
+  | RobotToolProviderCapabilityConfig;
 
 export function isRobotLLMProviderCapabilityConfig(value: CapabilityConfig): value is RobotLLMProviderCapabilityConfig {
   return value.type === "robot.llm_provider";
+}
+
+export function isRobotToolProviderCapabilityConfig(value: CapabilityConfig): value is RobotToolProviderCapabilityConfig {
+  return value.type === "robot.tool_provider";
 }
 
 export interface DatagraphRef {
@@ -725,6 +766,22 @@ export interface RPCRequestRobotModelProviderListModelsParams {
   provider: string;
 }
 
+export interface RPCRequestRobotToolCallParams {
+  // Account identifier for the user who invoked the Robot run.
+  account_id: string;
+  arguments: Record<string, unknown>;
+  // Host-generated tool call identifier.
+  call_id: string;
+  // Tool provider identifier declared by the plugin manifest.
+  provider_id: string;
+  // Active Robot identifier when the call came from a custom Robot.
+  robot_id?: string;
+  // Robot session identifier.
+  session_id: string;
+  // Provider-local tool identifier declared by the plugin manifest.
+  tool_id: string;
+}
+
 
 // Request sent by the host to the plugin to provide configuration settings. The params object can contain any key-value pairs defined by the plugin in its manifest `configuration_schema` field and the plugin should validate and apply these settings to its internal state.
 // If configuration changes require a plugin to restart, the plugin should cleanly shut down with a zero exit code so that the host can restart it if it is a supervised plugin. If it is an external plugin, the plugin itself is responsible for this behavior based on the plugin's lifecycle design.
@@ -767,12 +824,21 @@ export interface RPCRequestRobotModelProviderGenerate {
   params: RPCRequestRobotModelProviderGenerateParams;
 }
 
+// Executes a manifest-declared Robot tool provided by a plugin.
+export interface RPCRequestRobotToolCall {
+  method: "robot_tool_call";
+  id: string;
+  jsonrpc: string;
+  params: RPCRequestRobotToolCallParams;
+}
+
 export type HostToPluginRequest =
   | RPCRequestConfigure
   | RPCRequestEvent
   | RPCRequestPing
   | RPCRequestRobotModelProviderListModels
-  | RPCRequestRobotModelProviderGenerate;
+  | RPCRequestRobotModelProviderGenerate
+  | RPCRequestRobotToolCall;
 
 export function isRPCRequestConfigure(value: HostToPluginRequest): value is RPCRequestConfigure {
   return value.method === "configure";
@@ -792,6 +858,10 @@ export function isRPCRequestRobotModelProviderListModels(value: HostToPluginRequ
 
 export function isRPCRequestRobotModelProviderGenerate(value: HostToPluginRequest): value is RPCRequestRobotModelProviderGenerate {
   return value.method === "robot_model_provider_generate";
+}
+
+export function isRPCRequestRobotToolCall(value: HostToPluginRequest): value is RPCRequestRobotToolCall {
+  return value.method === "robot_tool_call";
 }
 
 export interface HostToPluginResponseError {
@@ -858,12 +928,20 @@ export interface RPCResponseRobotModelProviderGenerate {
   tool_calls?: RobotModelProviderToolCall[];
 }
 
+// Returns a structured result from a plugin-provided Robot tool.
+export interface RPCResponseRobotToolCall {
+  method: "robot_tool_call";
+  error?: string;
+  output?: Record<string, unknown>;
+}
+
 export type HostToPluginResponseUnion =
   | RPCResponseConfigure
   | RPCResponseEvent
   | RPCResponsePing
   | RPCResponseRobotModelProviderListModels
-  | RPCResponseRobotModelProviderGenerate;
+  | RPCResponseRobotModelProviderGenerate
+  | RPCResponseRobotToolCall;
 
 export function isRPCResponseConfigure(value: HostToPluginResponseUnion): value is RPCResponseConfigure {
   return value.method === "configure";
@@ -883,6 +961,10 @@ export function isRPCResponseRobotModelProviderListModels(value: HostToPluginRes
 
 export function isRPCResponseRobotModelProviderGenerate(value: HostToPluginResponseUnion): value is RPCResponseRobotModelProviderGenerate {
   return value.method === "robot_model_provider_generate";
+}
+
+export function isRPCResponseRobotToolCall(value: HostToPluginResponseUnion): value is RPCResponseRobotToolCall {
+  return value.method === "robot_tool_call";
 }
 
 export interface JsonRpcResponseError {

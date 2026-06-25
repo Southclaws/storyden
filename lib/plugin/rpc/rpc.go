@@ -17,7 +17,7 @@ import (
 
 type CapabilityConfigBase struct {
 	Description opt.Optional[string] `json:"description,omitempty"`
-	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs.
+	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
 	//
 	ID string `json:"id"`
 	// Human-readable capability name.
@@ -26,6 +26,29 @@ type CapabilityConfigBase struct {
 	Type string `json:"type"`
 	// Version of the host capability protocol implemented by this plugin.
 	Version string `json:"version"`
+}
+
+type RobotToolAnnotations struct {
+	DestructiveHint opt.Optional[bool] `json:"destructiveHint,omitempty"`
+	IdempotentHint  opt.Optional[bool] `json:"idempotentHint,omitempty"`
+	OpenWorldHint   opt.Optional[bool] `json:"openWorldHint,omitempty"`
+	ReadOnlyHint    opt.Optional[bool] `json:"readOnlyHint,omitempty"`
+}
+
+type RobotToolJSONSchema = interface{}
+
+type RobotToolProviderToolConfig struct {
+	Annotations opt.Optional[RobotToolAnnotations] `json:"annotations,omitempty"`
+	Description string                             `json:"description"`
+	// Stable provider-local tool identifier.
+	ID          string              `json:"id"`
+	InputSchema RobotToolJSONSchema `json:"input_schema"`
+	// Human-readable tool name.
+	Name                 string                            `json:"name"`
+	OutputSchema         opt.Optional[RobotToolJSONSchema] `json:"output_schema,omitempty"`
+	RequiresConfirmation opt.Optional[bool]                `json:"requires_confirmation,omitempty"`
+	// Optional display title for MCP clients and Robot builders.
+	Title opt.Optional[string] `json:"title,omitempty"`
 }
 
 type CapabilityConfigUnion interface {
@@ -65,6 +88,8 @@ func (w *CapabilityConfig) UnmarshalJSON(data []byte) error {
 	switch peek.Type {
 	case "robot.llm_provider":
 		v = &RobotLLMProviderCapabilityConfig{}
+	case "robot.tool_provider":
+		v = &RobotToolProviderCapabilityConfig{}
 	default:
 		return fmt.Errorf("CapabilityConfig: unknown type %q", peek.Type)
 	}
@@ -79,7 +104,7 @@ func (w *CapabilityConfig) UnmarshalJSON(data []byte) error {
 
 type RobotLLMProviderCapabilityConfig struct {
 	Description opt.Optional[string] `json:"description,omitempty"`
-	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs.
+	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
 	//
 	ID string `json:"id"`
 	// Human-readable capability name.
@@ -92,6 +117,24 @@ type RobotLLMProviderCapabilityConfig struct {
 func (RobotLLMProviderCapabilityConfig) isCapabilityConfig() {}
 
 func (RobotLLMProviderCapabilityConfig) CapabilityConfigType() string { return "robot.llm_provider" }
+
+type RobotToolProviderCapabilityConfig struct {
+	Description opt.Optional[string] `json:"description,omitempty"`
+	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
+	//
+	ID string `json:"id"`
+	// Human-readable capability name.
+	Name opt.Optional[string] `json:"name,omitempty"`
+	// Robot tools statically provided by this plugin.
+	Tools []RobotToolProviderToolConfig `json:"tools"`
+	Type  string                        `json:"type"`
+	// Version of the host capability protocol implemented by this plugin.
+	Version string `json:"version"`
+}
+
+func (RobotToolProviderCapabilityConfig) isCapabilityConfig() {}
+
+func (RobotToolProviderCapabilityConfig) CapabilityConfigType() string { return "robot.tool_provider" }
 
 type DatagraphRef struct {
 	// Resource ID
@@ -923,6 +966,22 @@ type RPCRequestRobotModelProviderListModelsParams struct {
 	Provider string `json:"provider"`
 }
 
+type RPCRequestRobotToolCallParams struct {
+	// Account identifier for the user who invoked the Robot run.
+	AccountID string                 `json:"account_id"`
+	Arguments map[string]interface{} `json:"arguments"`
+	// Host-generated tool call identifier.
+	CallID string `json:"call_id"`
+	// Tool provider identifier declared by the plugin manifest.
+	ProviderID string `json:"provider_id"`
+	// Active Robot identifier when the call came from a custom Robot.
+	RobotID opt.Optional[string] `json:"robot_id,omitempty"`
+	// Robot session identifier.
+	SessionID string `json:"session_id"`
+	// Provider-local tool identifier declared by the plugin manifest.
+	ToolID string `json:"tool_id"`
+}
+
 type HostToPluginRequestUnion interface {
 	HostToPluginRequestType() string
 	isHostToPluginRequest()
@@ -968,6 +1027,8 @@ func (w *HostToPluginRequest) UnmarshalJSON(data []byte) error {
 		v = &RPCRequestRobotModelProviderListModels{}
 	case "robot_model_provider_generate":
 		v = &RPCRequestRobotModelProviderGenerate{}
+	case "robot_tool_call":
+		v = &RPCRequestRobotToolCall{}
 	default:
 		return fmt.Errorf("HostToPluginRequest: unknown type %q", peek.Type)
 	}
@@ -1045,6 +1106,18 @@ func (RPCRequestRobotModelProviderGenerate) HostToPluginRequestType() string {
 	return "robot_model_provider_generate"
 }
 
+// Executes a manifest-declared Robot tool provided by a plugin.
+type RPCRequestRobotToolCall struct {
+	ID      xid.ID                        `json:"id"`
+	Jsonrpc string                        `json:"jsonrpc"`
+	Method  string                        `json:"method"`
+	Params  RPCRequestRobotToolCallParams `json:"params"`
+}
+
+func (RPCRequestRobotToolCall) isHostToPluginRequest() {}
+
+func (RPCRequestRobotToolCall) HostToPluginRequestType() string { return "robot_tool_call" }
+
 type HostToPluginResponseError struct {
 	Code    opt.Optional[int]    `json:"code,omitempty"`
 	Message opt.Optional[string] `json:"message,omitempty"`
@@ -1116,6 +1189,8 @@ func (w *HostToPluginResponseUnion) UnmarshalJSON(data []byte) error {
 		v = &RPCResponseRobotModelProviderListModels{}
 	case "robot_model_provider_generate":
 		v = &RPCResponseRobotModelProviderGenerate{}
+	case "robot_tool_call":
+		v = &RPCResponseRobotToolCall{}
 	default:
 		return fmt.Errorf("HostToPluginResponseUnion: unknown type %q", peek.Type)
 	}
@@ -1188,6 +1263,17 @@ func (RPCResponseRobotModelProviderGenerate) isHostToPluginResponseUnion() {}
 func (RPCResponseRobotModelProviderGenerate) HostToPluginResponseUnionType() string {
 	return "robot_model_provider_generate"
 }
+
+// Returns a structured result from a plugin-provided Robot tool.
+type RPCResponseRobotToolCall struct {
+	Error  opt.Optional[string]   `json:"error,omitempty"`
+	Method string                 `json:"method"`
+	Output map[string]interface{} `json:"output,omitempty"`
+}
+
+func (RPCResponseRobotToolCall) isHostToPluginResponseUnion() {}
+
+func (RPCResponseRobotToolCall) HostToPluginResponseUnionType() string { return "robot_tool_call" }
 
 type JsonRpcResponseError struct {
 	Code    opt.Optional[int]    `json:"code,omitempty"`

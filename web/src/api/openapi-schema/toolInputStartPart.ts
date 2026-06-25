@@ -7,11 +7,13 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.12-post
  */
+import type { ArbitraryData } from "./arbitraryData";
 import type { Id } from "./id";
 import type { NonEmptyString } from "./nonEmptyString";
 import type { ToolInputStartPartType } from "./toolInputStartPartType";
 
 export interface ToolInputStartPart {
+  providerMetadata?: ArbitraryData;
   toolCallId: Id;
   toolName: NonEmptyString;
   type: ToolInputStartPartType;

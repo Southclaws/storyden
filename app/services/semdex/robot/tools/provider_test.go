@@ -50,6 +50,18 @@ func TestRegistryCatalogueUsesCallableNameForDynamicTools(t *testing.T) {
 	assert.True(t, catalogue[0].Available)
 }
 
+func TestRegistryCatalogueReportsRequiresConfirmation(t *testing.T) {
+	registry := NewRegistry(slog.New(slog.NewTextHandler(io.Discard, nil)))
+	tool := testTool("discord_send", "discord_send")
+	tool.Definition.RequiresConfirmation = true
+	registry.Register(tool)
+
+	catalogue := registry.ListCatalogue(context.Background())
+
+	require.Len(t, catalogue, 1)
+	assert.True(t, catalogue[0].RequiresConfirmation)
+}
+
 func testTool(id, callableName string) *Tool {
 	return &Tool{
 		Definition: &mcp.ToolDefinition{
