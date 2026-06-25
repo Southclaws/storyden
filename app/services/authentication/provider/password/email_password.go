@@ -13,6 +13,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 )
 
@@ -33,6 +34,8 @@ func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, pa
 	}
 
 	if h, ok := handle.Get(); ok {
+		h = mark.Slugify(h)
+		handle = opt.New(h)
 		_, exists, err := p.accountQuery.LookupByHandle(ctx, h)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
