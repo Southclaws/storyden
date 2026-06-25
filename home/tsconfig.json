@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "target": "ESNext",
     "lib": [
@@ -21,8 +20,12 @@
     "jsx": "react-jsx",
     "incremental": true,
     "paths": {
-      "@/.source/*": [".source/*"],
-      "@/*": ["src/*"]
+      "@/.source/*": [
+        "./.source/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
     },
     "plugins": [
       {
