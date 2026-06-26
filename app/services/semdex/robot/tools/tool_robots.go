@@ -185,7 +185,7 @@ func (rt *robotTools) injectToolNamesEnum(ctx context.Context, schema *jsonschem
 	prop.Items.Enum = dt.Map(ids, func(name string) any { return name })
 }
 
-func (rt *robotTools) validateToolNames(ctx context.Context, names []string) []string {
+func (rt *robotTools) validateToolNames(names []string) []string {
 	var invalid []string
 	for _, name := range names {
 		if !rt.registry.HasTool(name) {
@@ -228,7 +228,7 @@ func (rt *robotTools) ExecuteCreateRobot(ctx context.Context, args mcp.ToolRobot
 	var validationErrors []string
 
 	if len(args.Tools) > 0 {
-		if invalidTools := rt.validateToolNames(ctx, args.Tools); len(invalidTools) > 0 {
+		if invalidTools := rt.validateToolNames(args.Tools); len(invalidTools) > 0 {
 			validationErrors = append(validationErrors, "invalid tool names: "+strings.Join(invalidTools, ", "))
 		}
 	}
@@ -393,7 +393,7 @@ func (rt *robotTools) ExecuteUpdateRobot(ctx context.Context, args mcp.ToolRobot
 	var validationErrors []string
 
 	if len(args.Tools) > 0 {
-		if invalidTools := rt.validateToolNames(ctx, args.Tools); len(invalidTools) > 0 {
+		if invalidTools := rt.validateToolNames(args.Tools); len(invalidTools) > 0 {
 			validationErrors = append(validationErrors, "invalid tool names: "+strings.Join(invalidTools, ", "))
 		}
 	}

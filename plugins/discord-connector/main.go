@@ -621,24 +621,6 @@ func formatLinkSearchResultLine(link openapi.LinkReference) string {
 	return b.String()
 }
 
-func respondImmediate(s *discordgo.Session, i *discordgo.Interaction, message string, ephemeral bool) error {
-	flags := discordgo.MessageFlags(0)
-	if ephemeral {
-		flags = discordgo.MessageFlagsEphemeral
-	}
-
-	return s.InteractionRespond(i, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: sanitizeDiscordMessage(message),
-			Flags:   flags,
-			AllowedMentions: &discordgo.MessageAllowedMentions{
-				Parse: []discordgo.AllowedMentionType{},
-			},
-		},
-	})
-}
-
 func (c *connector) close() {
 	c.logger.Info("shutting down connector")
 	c.mu.Lock()

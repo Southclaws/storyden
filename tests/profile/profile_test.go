@@ -554,12 +554,3 @@ func findProfilesByNamePrefix(profiles []openapi.PublicProfile, prefix string) [
 		return strings.HasPrefix(strings.ToLower(p.Name), strings.ToLower(prefix))
 	})
 }
-
-func getProfileIndex(profiles []openapi.PublicProfile, handle string) int {
-	for i, p := range profiles {
-		if p.Handle == handle {
-			return i
-		}
-	}
-	return -1
-}

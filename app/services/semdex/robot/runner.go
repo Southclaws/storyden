@@ -371,7 +371,7 @@ func (s *Agent) runResolvedAgent(
 	llmAgent, err := llmagent.New(llmagent.Config{
 		Name:                      spec.AgentName,
 		Description:               spec.Description,
-		GlobalInstructionProvider: s.globalInstructionProvider(ctx, chatContext, identityContext, runOptions),
+		GlobalInstructionProvider: s.globalInstructionProvider(chatContext, identityContext, runOptions),
 		Instruction:               spec.Instruction,
 		InstructionProvider:       spec.InstructionProvider,
 		Model:                     llm,

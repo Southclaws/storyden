@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -53,11 +52,7 @@ func New(
 	}
 }
 
-type Options struct {
-	ContentFill opt.Optional[asset.ContentFillCommand]
-}
-
-func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref.LinkRef, error) {
+func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
 	if u.String() == "" {
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

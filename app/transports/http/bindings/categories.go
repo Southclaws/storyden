@@ -232,7 +232,3 @@ func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
 		Meta:        (*openapi.Metadata)(&c.Metadata),
 	}
 }
-
-func serialiseCategoryReferencePtr(c *category.Category) openapi.CategoryReference {
-	return serialiseCategoryReference(*c)
-}

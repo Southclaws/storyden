@@ -574,7 +574,7 @@ func (s *sdxSession) Subscribe(ctx context.Context, bus *pubsub.Bus, eventName, 
 			slog.String("topic", topicName),
 		)
 
-		rpcEvent, err := mapEventToRPC(ctx, topicName, event)
+		rpcEvent, err := mapEventToRPC(topicName, event)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
@@ -623,7 +623,7 @@ func isExpectedDisconnect(err error) bool {
 		duplex.IsExpectedDisconnect(err)
 }
 
-func mapEventToRPC(ctx context.Context, name string, event json.RawMessage) (rpc.EventPayloadUnion, error) {
+func mapEventToRPC(name string, event json.RawMessage) (rpc.EventPayloadUnion, error) {
 	var v map[string]any
 	if err := json.Unmarshal(event, &v); err != nil {
 		return nil, err

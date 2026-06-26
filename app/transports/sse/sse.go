@@ -230,7 +230,7 @@ func newChatHandler(
 			return
 		}
 
-		initMessage, err := getLastMessage(ctx, req.Messages, pendingToolIDs, toolRegistry, logger)
+		initMessage, err := getLastMessage(req.Messages, pendingToolIDs, logger)
 		if err != nil {
 			logger.Error("sse chat convert message", slog.String("error", err.Error()))
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
@@ -401,7 +401,7 @@ func newChatHandler(
 						if isClientSidePending(part.FunctionResponse.Response) || toolRequiresConfirmation(ctx, toolRegistry, part.FunctionResponse.Name) {
 							continue
 						}
-						sendToolResult(event, part, emitter, logger)
+						sendToolResult(part, emitter, logger)
 					}
 				}
 
@@ -500,7 +500,7 @@ func newChatHandler(
 	})
 }
 
-func getLastMessage(ctx context.Context, messages []chatMessage, pendingToolIDs []string, toolRegistry *tools.Registry, logger *slog.Logger) (*genai.Content, error) {
+func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slog.Logger) (*genai.Content, error) {
 	if len(messages) == 0 {
 		return nil, fmt.Errorf("no messages provided")
 	}
@@ -866,7 +866,7 @@ func sendToolConfirmationCall(
 	_ = emitter.Send(robotprojection.ToolApprovalRequestStreamPart(fc.ID, fc.ID))
 }
 
-func sendToolResult(event *adksession.Event, part *genai.Part, emitter *streamEmitter, logger *slog.Logger) {
+func sendToolResult(part *genai.Part, emitter *streamEmitter, logger *slog.Logger) {
 	fr := part.FunctionResponse
 	if fr == nil {
 		return

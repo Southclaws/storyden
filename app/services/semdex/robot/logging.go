@@ -158,36 +158,3 @@ func logAfterTool(logger *slog.Logger) llmagent.AfterToolCallback {
 		return nil, err
 	}
 }
-
-func logBeforeAgent(logger *slog.Logger) agentpkg.BeforeAgentCallback {
-	return func(ctx agentpkg.CallbackContext) (*genai.Content, error) {
-		logger.Info("agent iteration start",
-			slog.String("agent", ctx.AgentName()),
-			slog.String("invocation", ctx.InvocationID()),
-			slog.String("session", ctx.SessionID()),
-		)
-		return nil, nil
-	}
-}
-
-func logAfterAgent(logger *slog.Logger) agentpkg.AfterAgentCallback {
-	return func(ctx agentpkg.CallbackContext) (*genai.Content, error) {
-		if ctx.Err() != nil {
-			logger.Error("agent iteration error",
-				slog.String("agent", ctx.AgentName()),
-				slog.String("invocation", ctx.InvocationID()),
-				slog.String("session", ctx.SessionID()),
-				slog.String("error", ctx.Err().Error()),
-			)
-			return nil, ctx.Err()
-		}
-
-		logger.Info("agent iteration complete",
-			slog.String("agent", ctx.AgentName()),
-			slog.String("invocation", ctx.InvocationID()),
-			slog.String("session", ctx.SessionID()),
-		)
-
-		return nil, nil
-	}
-}

@@ -156,11 +156,3 @@ func find(tags []openapi.TagReference) func(string) bool {
 		return ok
 	}
 }
-
-func ids(nodes []openapi.NodeWithChildren) []string {
-	ids := make([]string, len(nodes))
-	for i, n := range nodes {
-		ids[i] = n.Id
-	}
-	return ids
-}

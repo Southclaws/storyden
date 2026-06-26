@@ -116,10 +116,6 @@ func mapVector(v *pinecone.Vector) (*Object, error) {
 	}, nil
 }
 
-func mapVectors(objects []*pinecone.Vector) (Objects, error) {
-	return dt.MapErr(objects, mapVector)
-}
-
 func mapScoredVector(v *pinecone.ScoredVector) (*Object, error) {
 	obj, err := mapVector(v.Vector)
 	if err != nil {

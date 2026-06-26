@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -32,8 +31,6 @@ const (
 	Llama_3_1_8bInstruct           = "llama-3.1-8b-instruct"
 	Llama_3_1_70bInstruct          = "llama-3.1-70b-instruct"
 )
-
-var citationMarkerRegex = regexp.MustCompile(`\[\d+\]`)
 
 type Perplexity struct {
 	endpoint    string

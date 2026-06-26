@@ -1,7 +1,6 @@
 package robot
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -14,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/lib/mcp"
 )
 
-func (s *Agent) globalInstructionProvider(ctx context.Context, chatContext *mcp.RobotChatContext, identity robotIdentityContext, options RunOptions) func(ctx agent.ReadonlyContext) (string, error) {
+func (s *Agent) globalInstructionProvider(chatContext *mcp.RobotChatContext, identity robotIdentityContext, options RunOptions) func(ctx agent.ReadonlyContext) (string, error) {
 	return func(ctx agent.ReadonlyContext) (string, error) {
 		acc, err := session.GetAccount(ctx)
 		if err != nil {

@@ -276,7 +276,7 @@ func (lt *libraryTools) ExecuteLibraryPageCreate(ctx context.Context, args mcp.T
 		if err != nil {
 			return nil, err
 		}
-		urlParsed = deletable.Skip[url.URL](opt.New(*u))
+		urlParsed = deletable.Skip(opt.New(*u))
 	}
 
 	var slug opt.Optional[mark.Slug]

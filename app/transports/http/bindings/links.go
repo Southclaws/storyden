@@ -45,7 +45,7 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	link, err := i.fetcher.Fetch(ctx, *u, fetcher.Options{})
+	link, err := i.fetcher.Fetch(ctx, *u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx),
 			fmsg.WithDesc("failed to fetch link",

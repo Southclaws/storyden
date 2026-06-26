@@ -79,7 +79,7 @@ var schemaLock = sync.Mutex{}
 func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
-	client, driver, err := connect(wctx, cfg, db)
+	client, driver, err := connect(cfg, db)
 	if err != nil {
 		cancel()
 		return nil, fault.Wrap(err, fctx.With(wctx), fmsg.With("failed to connect ent client"))
@@ -169,7 +169,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	return client, nil
 }
 
-func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Client, string, error) {
+func connect(cfg config.Config, driver *sql.DB) (*ent.Client, string, error) {
 	d, _, err := getDriver(cfg.DatabaseURL)
 	if err != nil {
 		return nil, "", fault.Wrap(err)

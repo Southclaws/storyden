@@ -16,10 +16,9 @@ import (
 )
 
 var (
-	errInvalidAccessKey               = fault.New("invalid access key")
-	errMalformedStoredAccessKeyRecord = fault.New("malformed stored access key record")
-	errRejectedAccessKey              = fault.New("access key rejected")
-	errRevoked                        = fault.New("access key revoked")
+	errInvalidAccessKey  = fault.New("invalid access key")
+	errRejectedAccessKey = fault.New("access key rejected")
+	errRevoked           = fault.New("access key revoked")
 )
 
 const (

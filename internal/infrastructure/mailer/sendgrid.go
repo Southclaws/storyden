@@ -22,8 +22,6 @@ type SendGrid struct {
 	fromAddress string
 }
 
-const attachmentContentDisposition = "attachment"
-
 func newSendgridMailer(logger *slog.Logger, cfg config.Config) (*SendGrid, error) {
 	sg := &SendGrid{
 		logger:      logger.With(slog.String("mailer", "sendgrid")),

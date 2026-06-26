@@ -1,8 +1,6 @@
 package pluginbuilder
 
 import (
-	"strings"
-
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 )
@@ -24,16 +22,11 @@ func (a *Agent) addSDKReferenceTools(add toolAdder) error {
 	}))
 }
 
-func SDKReference(in SDKReferenceInput) SDKReferenceResult {
-	topic := strings.ToLower(strings.TrimSpace(in.Topic))
-	if topic == "" {
-		topic = "overview"
-	}
-
-	return SDKReferenceResult{Content: sdkReferenceContent(topic)}
+func SDKReference(SDKReferenceInput) SDKReferenceResult {
+	return SDKReferenceResult{Content: sdkReferenceContent()}
 }
 
-func sdkReferenceContent(topic string) string {
+func sdkReferenceContent() string {
 	return `Storyden Go plugin SDK reference
 
 Core setup:

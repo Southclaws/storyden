@@ -14,7 +14,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -280,10 +279,6 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility
 	}
 
 	return v, nil
-}
-
-func deserialiseMark(s string) mark.Queryable {
-	return mark.NewQueryKey(s)
 }
 
 func deserialiseOptionalFloat(in *float32) opt.Optional[float64] {

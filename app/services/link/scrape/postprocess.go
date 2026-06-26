@@ -27,7 +27,7 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 	}
 
 	t := metatable(doc)
-	rc, err := getArticleContent(bytes.NewReader(buf), addr)
+	rc, err := getArticleContent(bytes.NewReader(buf))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -63,7 +63,7 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 	return wc, nil
 }
 
-func getArticleContent(r io.Reader, pageURL url.URL) (datagraph.Content, error) {
+func getArticleContent(r io.Reader) (datagraph.Content, error) {
 	rc, err := datagraph.NewRichTextFromReader(r)
 	if err != nil {
 		return datagraph.Content{}, nil

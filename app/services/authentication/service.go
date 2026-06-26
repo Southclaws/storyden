@@ -115,6 +115,4 @@ func (oa *Manager) Provider(id authentication.Service) (Provider, error) {
 	return p, nil
 }
 
-func service(p Provider) authentication.Service { return p.Service() }
-
 func name(p Provider) string { return p.Service().String() }

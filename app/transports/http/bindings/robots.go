@@ -108,7 +108,7 @@ func (r *Robots) RobotCreate(ctx context.Context, request openapi.RobotCreateReq
 		opts = append(opts, robot_writer.WithMeta(*meta))
 	}
 	if tools := request.Body.Tools; tools != nil {
-		if err := r.validateRobotToolsForCreate(ctx, *tools); err != nil {
+		if err := r.validateRobotToolsForCreate(*tools); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
 		opts = append(opts, robot_writer.WithTools(dt.Map(*tools, func(t string) robot_ref.ToolName { return robot_ref.ToolName(t) })))
@@ -882,7 +882,7 @@ func (r *Robots) validateRobotModelForSave(ctx context.Context, model model_ref.
 	return r.modelFactory.EnsureModelAvailable(ctx, model)
 }
 
-func (r *Robots) validateRobotToolsForCreate(ctx context.Context, toolNames []string) error {
+func (r *Robots) validateRobotToolsForCreate(toolNames []string) error {
 	var invalid []string
 	for _, name := range toolNames {
 		if !r.tools.HasTool(name) {
