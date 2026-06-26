@@ -806,10 +806,6 @@ func (m *Mapping) DatagraphMatches() (bool, *rbac.Permission) {
 	return true, nil
 }
 
-func (m *Mapping) DatagraphAsk() (bool, *rbac.Permission) {
-	return false, nil
-}
-
 func (m *Mapping) EventList() (bool, *rbac.Permission) {
 	return false, nil
 }

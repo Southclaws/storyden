@@ -38,7 +38,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
-	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -413,21 +412,6 @@ func (_u *AccountUpdate) AddPosts(v ...*Post) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddPostIDs(ids...)
-}
-
-// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (_u *AccountUpdate) AddQuestionIDs(ids ...xid.ID) *AccountUpdate {
-	_u.mutation.AddQuestionIDs(ids...)
-	return _u
-}
-
-// AddQuestions adds the "questions" edges to the Question entity.
-func (_u *AccountUpdate) AddQuestions(v ...*Question) *AccountUpdate {
-	ids := make([]xid.ID, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return _u.AddQuestionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
@@ -1123,27 +1107,6 @@ func (_u *AccountUpdate) RemovePosts(v ...*Post) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePostIDs(ids...)
-}
-
-// ClearQuestions clears all "questions" edges to the Question entity.
-func (_u *AccountUpdate) ClearQuestions() *AccountUpdate {
-	_u.mutation.ClearQuestions()
-	return _u
-}
-
-// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (_u *AccountUpdate) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdate {
-	_u.mutation.RemoveQuestionIDs(ids...)
-	return _u
-}
-
-// RemoveQuestions removes "questions" edges to Question entities.
-func (_u *AccountUpdate) RemoveQuestions(v ...*Question) *AccountUpdate {
-	ids := make([]xid.ID, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return _u.RemoveQuestionIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
@@ -2404,51 +2367,6 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if _u.mutation.QuestionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := _u.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !_u.mutation.QuestionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := _u.mutation.QuestionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -4330,21 +4248,6 @@ func (_u *AccountUpdateOne) AddPosts(v ...*Post) *AccountUpdateOne {
 	return _u.AddPostIDs(ids...)
 }
 
-// AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (_u *AccountUpdateOne) AddQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
-	_u.mutation.AddQuestionIDs(ids...)
-	return _u
-}
-
-// AddQuestions adds the "questions" edges to the Question entity.
-func (_u *AccountUpdateOne) AddQuestions(v ...*Question) *AccountUpdateOne {
-	ids := make([]xid.ID, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return _u.AddQuestionIDs(ids...)
-}
-
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
 func (_u *AccountUpdateOne) AddReactIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddReactIDs(ids...)
@@ -5038,27 +4941,6 @@ func (_u *AccountUpdateOne) RemovePosts(v ...*Post) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePostIDs(ids...)
-}
-
-// ClearQuestions clears all "questions" edges to the Question entity.
-func (_u *AccountUpdateOne) ClearQuestions() *AccountUpdateOne {
-	_u.mutation.ClearQuestions()
-	return _u
-}
-
-// RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (_u *AccountUpdateOne) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
-	_u.mutation.RemoveQuestionIDs(ids...)
-	return _u
-}
-
-// RemoveQuestions removes "questions" edges to Question entities.
-func (_u *AccountUpdateOne) RemoveQuestions(v ...*Question) *AccountUpdateOne {
-	ids := make([]xid.ID, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return _u.RemoveQuestionIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
@@ -6349,51 +6231,6 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if _u.mutation.QuestionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := _u.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !_u.mutation.QuestionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := _u.mutation.QuestionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.QuestionsTable,
-			Columns: []string{account.QuestionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -211,7 +211,6 @@ var (
 	OperationIDLinkGet                                = OperationID{`LinkGet`}
 	OperationIDDatagraphSearch                        = OperationID{`DatagraphSearch`}
 	OperationIDDatagraphMatches                       = OperationID{`DatagraphMatches`}
-	OperationIDDatagraphAsk                           = OperationID{`DatagraphAsk`}
 	OperationIDEventList                              = OperationID{`EventList`}
 	OperationIDEventCreate                            = OperationID{`EventCreate`}
 	OperationIDEventGet                               = OperationID{`EventGet`}
@@ -685,8 +684,6 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDDatagraphSearch, nil
 	case string(`DatagraphMatches`):
 		return OperationIDDatagraphMatches, nil
-	case string(`DatagraphAsk`):
-		return OperationIDDatagraphAsk, nil
 	case string(`EventList`):
 		return OperationIDEventList, nil
 	case string(`EventCreate`):

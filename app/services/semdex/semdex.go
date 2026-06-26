@@ -7,7 +7,6 @@ import (
 
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
@@ -39,29 +38,6 @@ type Searcher interface {
 	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error)
 	SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error)
 	SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*Chunk, error)
-}
-
-type AskResponseIterator = func(yield func(AskResponseChunk, error) bool)
-
-type AskResponseChunk interface {
-	Type() int
-}
-
-type AskResponseChunkText struct {
-	Chunk string `json:"chunk"`
-}
-
-func (c *AskResponseChunkText) Type() int { return 0 }
-
-type AskResponseChunkMeta struct {
-	Refs datagraph.RefList `json:"refs"`
-	URLs []url.URL         `json:"urls"`
-}
-
-func (c *AskResponseChunkMeta) Type() int { return 1 }
-
-type Asker interface {
-	Ask(ctx context.Context, q string, parent opt.Optional[xid.ID]) (AskResponseIterator, error)
 }
 
 type Recommender interface {

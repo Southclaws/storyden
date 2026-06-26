@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/services/semdex"
-	"github.com/Southclaws/storyden/app/services/semdex/asker"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/chromem_semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/pinecone_semdexer"
 	"github.com/Southclaws/storyden/internal/config"
@@ -42,9 +41,6 @@ func newSemdexer(
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(
-			asker.New,
-		),
 		fx.Provide(
 			fx.Annotate(
 				newSemdexer,

@@ -111,9 +111,6 @@ type PropertySchema func(*sql.Selector)
 // PropertySchemaField is the predicate function for propertyschemafield builders.
 type PropertySchemaField func(*sql.Selector)
 
-// Question is the predicate function for question builders.
-type Question func(*sql.Selector)
-
 // React is the predicate function for react builders.
 type React func(*sql.Selector)
 

@@ -536,17 +536,6 @@ type Config struct {
 	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
 	// When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
 	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
-	/*
-	   The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
-
-	   This can be set to either:
-
-	   - `openai` for OpenAI
-	   - `perplexity` for Perplexity AI - note that Perplexity does not currently support all the features necessary to be a `LANGUAGE_MODEL_PROVIDER` so it is only available as an `ASKER_PROVIDER`.
-	*/
-	AskerProvider string `default:"" envconfig:"ASKER_PROVIDER"`
-	// If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
-	PerplexityAPIKey string `envconfig:"PERPLEXITY_API_KEY"`
 
 	// -
 	// Semdex

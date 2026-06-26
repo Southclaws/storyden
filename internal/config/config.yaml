@@ -806,7 +806,7 @@
 
 - section: Artificial intelligence/language models
   description: |-
-    Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
+    Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and chat-based conversational searching.
   fields:
     - env: "MCP_ENABLED"
       name: MCPEnabled
@@ -832,24 +832,6 @@
       type: string
       description: |-
         When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
-
-    - env: "ASKER_PROVIDER"
-      name: AskerProvider
-      type: string
-      default: ""
-      description: |-
-        The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
-
-        This can be set to either:
-
-        - `openai` for OpenAI
-        - `perplexity` for Perplexity AI - note that Perplexity does not currently support all the features necessary to be a `LANGUAGE_MODEL_PROVIDER` so it is only available as an `ASKER_PROVIDER`.
-
-    - env: "PERPLEXITY_API_KEY"
-      name: PerplexityAPIKey
-      type: string
-      description: |-
-        If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
 
 - section: Semdex
   description: |-

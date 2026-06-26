@@ -202,7 +202,6 @@ type OperationPermissions interface {
 	LinkGet() (bool, *rbac.Permission)
 	DatagraphSearch() (bool, *rbac.Permission)
 	DatagraphMatches() (bool, *rbac.Permission)
-	DatagraphAsk() (bool, *rbac.Permission)
 	EventList() (bool, *rbac.Permission)
 	EventCreate() (bool, *rbac.Permission)
 	EventGet() (bool, *rbac.Permission)
@@ -641,8 +640,6 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.DatagraphSearch()
 	case "DatagraphMatches":
 		return optable.DatagraphMatches()
-	case "DatagraphAsk":
-		return optable.DatagraphAsk()
 	case "EventList":
 		return optable.EventList()
 	case "EventCreate":

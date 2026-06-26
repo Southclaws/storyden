@@ -64,8 +64,6 @@ const (
 	EdgeInvitedBy = "invited_by"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
-	// EdgeQuestions holds the string denoting the questions edge name in mutations.
-	EdgeQuestions = "questions"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
 	// EdgeLikes holds the string denoting the likes edge name in mutations.
@@ -204,13 +202,6 @@ const (
 	PostsInverseTable = "posts"
 	// PostsColumn is the table column denoting the posts relation/edge.
 	PostsColumn = "account_posts"
-	// QuestionsTable is the table that holds the questions relation/edge.
-	QuestionsTable = "questions"
-	// QuestionsInverseTable is the table name for the Question entity.
-	// It exists in this package in order to avoid circular dependency with the "question" package.
-	QuestionsInverseTable = "questions"
-	// QuestionsColumn is the table column denoting the questions relation/edge.
-	QuestionsColumn = "account_id"
 	// ReactsTable is the table that holds the reacts relation/edge.
 	ReactsTable = "reacts"
 	// ReactsInverseTable is the table name for the React entity.
@@ -751,20 +742,6 @@ func ByPosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByQuestionsCount orders the results by questions count.
-func ByQuestionsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newQuestionsStep(), opts...)
-	}
-}
-
-// ByQuestions orders the results by questions terms.
-func ByQuestions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newQuestionsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByReactsCount orders the results by reacts count.
 func ByReactsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1294,13 +1271,6 @@ func newPostsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PostsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PostsTable, PostsColumn),
-	)
-}
-func newQuestionsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(QuestionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, QuestionsTable, QuestionsColumn),
 	)
 }
 func newReactsStep() *sqlgraph.Step {

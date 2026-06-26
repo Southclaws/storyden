@@ -8,8 +8,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.26.12-post
  */
 import type {
-  DatagraphAskOKResponse,
-  DatagraphAskParams,
   DatagraphMatchesOKResponse,
   DatagraphMatchesParams,
   DatagraphSearchOKResponse,
@@ -115,36 +113,4 @@ export const datagraphMatches = async (
       method: "GET",
     },
   );
-};
-
-/**
- * Ask questions about the community's content.
- */
-export type datagraphAskResponse = {
-  data: DatagraphAskOKResponse;
-  status: number;
-};
-
-export const getDatagraphAskUrl = (params: DatagraphAskParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/datagraph/ask?${normalizedParams.toString()}`
-    : `/datagraph/ask`;
-};
-
-export const datagraphAsk = async (
-  params: DatagraphAskParams,
-  options?: RequestInit,
-): Promise<datagraphAskResponse> => {
-  return fetcher<Promise<datagraphAskResponse>>(getDatagraphAskUrl(params), {
-    ...options,
-    method: "GET",
-  });
 };

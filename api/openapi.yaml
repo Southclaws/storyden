@@ -3573,20 +3573,6 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphMatchesOK" }
 
-  /datagraph/ask:
-    get:
-      operationId: DatagraphAsk
-      description: Ask questions about the community's content.
-      tags: [datagraph]
-      parameters:
-        - $ref: "#/components/parameters/RequiredSearchQuery"
-        - $ref: "#/components/parameters/ParentQuestionID"
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/DatagraphAskOK" }
-
   #
   #                                     888
   #                                     888
@@ -4615,15 +4601,6 @@ components:
       schema:
         type: string
         minLength: 0
-
-    ParentQuestionID:
-      description: If a follow-up question, the parent question ID.
-      name: parent_question_id
-      in: query
-      required: false
-      allowEmptyValue: true
-      schema:
-        type: string
 
     DatagraphKindQuery:
       description: Datagraph item kind query.
@@ -6377,13 +6354,6 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/DatagraphMatchResult" }
-
-    DatagraphAskOK:
-      description: Search results.
-      content:
-        text/event-stream:
-          schema:
-            type: string
 
     EventListOK:
       description: Event list.

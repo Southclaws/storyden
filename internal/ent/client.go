@@ -51,7 +51,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
-	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/robot"
@@ -146,8 +145,6 @@ type Client struct {
 	PropertySchema *PropertySchemaClient
 	// PropertySchemaField is the client for interacting with the PropertySchemaField builders.
 	PropertySchemaField *PropertySchemaFieldClient
-	// Question is the client for interacting with the Question builders.
-	Question *QuestionClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
 	// Report is the client for interacting with the Report builders.
@@ -224,7 +221,6 @@ func (c *Client) init() {
 	c.Property = NewPropertyClient(c.config)
 	c.PropertySchema = NewPropertySchemaClient(c.config)
 	c.PropertySchemaField = NewPropertySchemaFieldClient(c.config)
-	c.Question = NewQuestionClient(c.config)
 	c.React = NewReactClient(c.config)
 	c.Report = NewReportClient(c.config)
 	c.Robot = NewRobotClient(c.config)
@@ -367,7 +363,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Property:                     NewPropertyClient(cfg),
 		PropertySchema:               NewPropertySchemaClient(cfg),
 		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
-		Question:                     NewQuestionClient(cfg),
 		React:                        NewReactClient(cfg),
 		Report:                       NewReportClient(cfg),
 		Robot:                        NewRobotClient(cfg),
@@ -437,7 +432,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Property:                     NewPropertyClient(cfg),
 		PropertySchema:               NewPropertySchemaClient(cfg),
 		PropertySchemaField:          NewPropertySchemaFieldClient(cfg),
-		Question:                     NewQuestionClient(cfg),
 		React:                        NewReactClient(cfg),
 		Report:                       NewReportClient(cfg),
 		Robot:                        NewRobotClient(cfg),
@@ -489,9 +483,9 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
 		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool,
-		c.RobotProviderModel, c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
+		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
+		c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
 		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
@@ -509,9 +503,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Notification, c.OAuthAuthorisationCode, c.OAuthAuthorisationRequest,
 		c.OAuthClient, c.OAuthDeviceAuthorisation, c.OAuthRefreshToken,
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
-		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.Question,
-		c.React, c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool,
-		c.RobotProviderModel, c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
+		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
+		c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
 		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
@@ -591,8 +585,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.PropertySchema.mutate(ctx, m)
 	case *PropertySchemaFieldMutation:
 		return c.PropertySchemaField.mutate(ctx, m)
-	case *QuestionMutation:
-		return c.Question.mutate(ctx, m)
 	case *ReactMutation:
 		return c.React.mutate(ctx, m)
 	case *ReportMutation:
@@ -889,22 +881,6 @@ func (c *AccountClient) QueryPosts(_m *Account) *PostQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PostsTable, account.PostsColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryQuestions queries the questions edge of a Account.
-func (c *AccountClient) QueryQuestions(_m *Account) *QuestionQuery {
-	query := (&QuestionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(account.Table, account.FieldID, id),
-			sqlgraph.To(question.Table, question.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, account.QuestionsTable, account.QuestionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -7681,187 +7657,6 @@ func (c *PropertySchemaFieldClient) mutate(ctx context.Context, m *PropertySchem
 	}
 }
 
-// QuestionClient is a client for the Question schema.
-type QuestionClient struct {
-	config
-}
-
-// NewQuestionClient returns a client for the Question from the given config.
-func NewQuestionClient(c config) *QuestionClient {
-	return &QuestionClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `question.Hooks(f(g(h())))`.
-func (c *QuestionClient) Use(hooks ...Hook) {
-	c.hooks.Question = append(c.hooks.Question, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `question.Intercept(f(g(h())))`.
-func (c *QuestionClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Question = append(c.inters.Question, interceptors...)
-}
-
-// Create returns a builder for creating a Question entity.
-func (c *QuestionClient) Create() *QuestionCreate {
-	mutation := newQuestionMutation(c.config, OpCreate)
-	return &QuestionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Question entities.
-func (c *QuestionClient) CreateBulk(builders ...*QuestionCreate) *QuestionCreateBulk {
-	return &QuestionCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *QuestionClient) MapCreateBulk(slice any, setFunc func(*QuestionCreate, int)) *QuestionCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &QuestionCreateBulk{err: fmt.Errorf("calling to QuestionClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*QuestionCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &QuestionCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Question.
-func (c *QuestionClient) Update() *QuestionUpdate {
-	mutation := newQuestionMutation(c.config, OpUpdate)
-	return &QuestionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *QuestionClient) UpdateOne(_m *Question) *QuestionUpdateOne {
-	mutation := newQuestionMutation(c.config, OpUpdateOne, withQuestion(_m))
-	return &QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *QuestionClient) UpdateOneID(id xid.ID) *QuestionUpdateOne {
-	mutation := newQuestionMutation(c.config, OpUpdateOne, withQuestionID(id))
-	return &QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Question.
-func (c *QuestionClient) Delete() *QuestionDelete {
-	mutation := newQuestionMutation(c.config, OpDelete)
-	return &QuestionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *QuestionClient) DeleteOne(_m *Question) *QuestionDeleteOne {
-	return c.DeleteOneID(_m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *QuestionClient) DeleteOneID(id xid.ID) *QuestionDeleteOne {
-	builder := c.Delete().Where(question.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &QuestionDeleteOne{builder}
-}
-
-// Query returns a query builder for Question.
-func (c *QuestionClient) Query() *QuestionQuery {
-	return &QuestionQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeQuestion},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Question entity by its id.
-func (c *QuestionClient) Get(ctx context.Context, id xid.ID) (*Question, error) {
-	return c.Query().Where(question.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *QuestionClient) GetX(ctx context.Context, id xid.ID) *Question {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryAuthor queries the author edge of a Question.
-func (c *QuestionClient) QueryAuthor(_m *Question) *AccountQuery {
-	query := (&AccountClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(question.Table, question.FieldID, id),
-			sqlgraph.To(account.Table, account.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, question.AuthorTable, question.AuthorColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryParent queries the parent edge of a Question.
-func (c *QuestionClient) QueryParent(_m *Question) *QuestionQuery {
-	query := (&QuestionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(question.Table, question.FieldID, id),
-			sqlgraph.To(question.Table, question.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, question.ParentTable, question.ParentColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryParentQuestion queries the parent_question edge of a Question.
-func (c *QuestionClient) QueryParentQuestion(_m *Question) *QuestionQuery {
-	query := (&QuestionClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := _m.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(question.Table, question.FieldID, id),
-			sqlgraph.To(question.Table, question.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, question.ParentQuestionTable, question.ParentQuestionColumn),
-		)
-		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *QuestionClient) Hooks() []Hook {
-	return c.hooks.Question
-}
-
-// Interceptors returns the client interceptors.
-func (c *QuestionClient) Interceptors() []Interceptor {
-	return c.inters.Question
-}
-
-func (c *QuestionClient) mutate(ctx context.Context, m *QuestionMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&QuestionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&QuestionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&QuestionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Question mutation op: %q", m.Op())
-	}
-}
-
 // ReactClient is a client for the React schema.
 type ReactClient struct {
 	config
@@ -10330,8 +10125,8 @@ type (
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
-		Post, PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
+		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
+		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
 		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
 		Setting, Tag, Warning []ent.Hook
 	}
@@ -10342,8 +10137,8 @@ type (
 		Node, NodeVersion, Notification, OAuthAuthorisationCode,
 		OAuthAuthorisationRequest, OAuthClient, OAuthDeviceAuthorisation,
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
-		Post, PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
-		Report, Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
+		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
+		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
 		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
 		Setting, Tag, Warning []ent.Interceptor
 	}

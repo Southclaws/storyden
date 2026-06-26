@@ -34,10 +34,6 @@ func (*Disabled) SearchChunks(ctx context.Context, q string, p pagination.Parame
 	return nil, nil
 }
 
-func (*Disabled) Ask(ctx context.Context, q string) (chan string, chan error) {
-	return nil, nil
-}
-
 func (*Disabled) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
 	return nil, nil
 }

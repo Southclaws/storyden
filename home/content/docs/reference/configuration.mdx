@@ -1043,7 +1043,7 @@ This is typically shorter than the exponential backoff used for startup crashes,
 
 ## Artificial intelligence/language models
 
-Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
+Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and chat-based conversational searching.
 
 ### `MCP_ENABLED`
 
@@ -1077,29 +1077,6 @@ The provider for language model features.
 </table>
 
 When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
-
-### `ASKER_PROVIDER`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
-</table>
-
-The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
-
-This can be set to either:
-
-- `openai` for OpenAI
-- `perplexity` for Perplexity AI - note that Perplexity does not currently support all the features necessary to be a `LANGUAGE_MODEL_PROVIDER` so it is only available as an `ASKER_PROVIDER`.
-
-### `PERPLEXITY_API_KEY`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
-</table>
-
-If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
 
 ## Semdex
 
