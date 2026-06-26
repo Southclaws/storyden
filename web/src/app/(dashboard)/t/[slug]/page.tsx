@@ -1,13 +1,10 @@
+import { Suspense } from "react";
 import { z } from "zod";
 
 import { threadGet } from "@/api/openapi-server/threads";
 import { getServerSession } from "@/auth/server-session";
 import { getSettings } from "@/lib/settings/settings-server";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 export type Props = {
   params: Promise<{
@@ -26,10 +23,16 @@ const QuerySchema = z.object({
 type Query = z.infer<typeof QuerySchema>;
 
 export default async function Page(props: Props) {
-  const { slug } = await props.params;
-  const searchParams = await props.searchParams;
+  return (
+    <Suspense>
+      <ThreadContent params={props.params} searchParams={props.searchParams} />
+    </Suspense>
+  );
+}
 
-  const { page } = QuerySchema.parse(searchParams);
+async function ThreadContent({ params, searchParams }: Props) {
+  const { slug } = await params;
+  const { page } = QuerySchema.parse(await searchParams);
 
   const { data } = await threadGet(slug, {
     page: page?.toString(),

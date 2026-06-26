@@ -1,11 +1,9 @@
-"use server";
-
-import { cache } from "react";
+import { cacheLife } from "next/cache";
 
 import { categoryList } from "@/api/openapi-server/categories";
 
-export const categoryListCached = cache(async () => {
-  return await categoryList({
-    cache: "default",
-  });
-});
+export async function categoryListCached() {
+  "use cache";
+  cacheLife("minutes");
+  return await categoryList({ cache: "no-store" });
+}

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
 import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
@@ -12,16 +13,20 @@ import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export type Props = {
   params: Promise<Params>;
 };
 
 export default async function Page(props: Props) {
-  const { slug } = ParamsSchema.parse(await props.params);
+  return (
+    <Suspense>
+      <LibraryPageContent params={props.params} />
+    </Suspense>
+  );
+}
+
+async function LibraryPageContent({ params }: Props) {
+  const { slug } = ParamsSchema.parse(await params);
 
   const targetSlug = getTargetSlug(slug);
 

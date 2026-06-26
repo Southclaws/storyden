@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, Suspense } from "react";
 
 import { getServerSession } from "@/auth/server-session";
 import { parseMemberSettings } from "@/lib/settings/member-settings";
@@ -17,6 +17,7 @@ import { DesktopCommandBar } from "./DesktopCommandBar";
 import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
 import { getServerSidebarState } from "./NavigationPane/server";
+import { type Settings } from "@/lib/settings/settings";
 
 type Props = {
   contextpane: React.ReactNode;
@@ -30,33 +31,19 @@ export async function Navigation({
   const canRegister = allowsPublicRegistration(
     globalSettings.registration_mode,
   );
-  const sessionAccount = await getServerSession();
-  const session = sessionAccount
-    ? parseMemberSettings(sessionAccount, globalSettings.metadata)
-    : undefined;
-
-  const sidebarDefaultState =
-    session?.meta.sidebar.defaultState ??
-    globalSettings.metadata.sidebar.defaultState;
-  const showLeftBar = await getServerSidebarState(sidebarDefaultState);
 
   return (
     <Box
       id="navigation__container"
       className={styles["navigation__container"]}
       w="full"
-      data-leftbar-shown={showLeftBar}
     >
       <Box id="navigation__scroll" className={styles["navgrid"]}>
         <Box className={styles["main"]}>
-          {/*  */}
-          <Onboarding />
-          <VerificationBanner
-            session={sessionAccount}
-            settings={globalSettings}
-          />
+          <Suspense>
+            <NavigationBanners settings={globalSettings} />
+          </Suspense>
           {children}
-          {/*  */}
         </Box>
       </Box>
 
@@ -70,25 +57,17 @@ export async function Navigation({
         className={styles["navgrid"]}
         pointerEvents="none"
       >
-        <DesktopCommandBar />
+        <Suspense>
+          <DesktopCommandBar />
+        </Suspense>
 
-        <Box
-          id="navigation__leftbar"
-          className={styles["leftbar"]}
-          aria-hidden={!showLeftBar}
-          inert={!showLeftBar}
-        >
-          <NavigationPane
-            initialSession={sessionAccount}
-            initialSettings={globalSettings}
-          />
-        </Box>
+        <Suspense>
+          <NavigationLeftBar settings={globalSettings} />
+        </Suspense>
 
         <Box
           id="navigation__rightbar"
           className={styles["rightbar"]}
-          aria-hidden={!showLeftBar}
-          inert={!showLeftBar}
         >
           <ContextPane>{contextpane}</ContextPane>
         </Box>
@@ -99,6 +78,41 @@ export async function Navigation({
       </Box>
 
       <CommandPalette />
+    </Box>
+  );
+}
+
+async function NavigationBanners({ settings }: { settings: Settings }) {
+  const session = await getServerSession();
+  return (
+    <>
+      <Onboarding />
+      <VerificationBanner session={session} settings={settings} />
+    </>
+  );
+}
+
+async function NavigationLeftBar({ settings }: { settings: Settings }) {
+  const session = await getServerSession();
+  const memberSettings = session
+    ? parseMemberSettings(session, settings.metadata)
+    : undefined;
+  const sidebarDefaultState =
+    memberSettings?.meta.sidebar.defaultState ??
+    settings.metadata.sidebar.defaultState;
+  const showLeftBar = await getServerSidebarState(sidebarDefaultState);
+
+  return (
+    <Box
+      id="navigation__leftbar"
+      className={styles["leftbar"]}
+      aria-hidden={!showLeftBar}
+      inert={!showLeftBar}
+    >
+      <NavigationPane
+        initialSession={session}
+        initialSettings={settings}
+      />
     </Box>
   );
 }

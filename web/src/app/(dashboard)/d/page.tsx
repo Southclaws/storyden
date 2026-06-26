@@ -1,13 +1,10 @@
+import { Suspense } from "react";
 import z from "zod";
 
 import { threadList } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { CategoryIndexScreen } from "@/screens/category/CategoryIndexScreen";
-
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
 
 type Props = {
   searchParams: Promise<Query>;
@@ -21,7 +18,19 @@ const QuerySchema = z.object({
 });
 type Query = z.infer<typeof QuerySchema>;
 
-export default async function Page({ searchParams }: Props) {
+export default async function Page(props: Props) {
+  return (
+    <Suspense>
+      <CategoryIndexContent searchParams={props.searchParams} />
+    </Suspense>
+  );
+}
+
+async function CategoryIndexContent({
+  searchParams,
+}: {
+  searchParams: Promise<Query>;
+}) {
   try {
     const { page } = QuerySchema.parse(await searchParams);
 

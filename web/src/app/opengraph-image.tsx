@@ -9,7 +9,6 @@ export const size = {
   height: 630,
 };
 
-export const runtime = "edge";
 export const contentType = "image/png";
 
 export default async function Image() {

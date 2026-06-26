@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { getServerSession } from "@/auth/server-session";
 import { hasCapability } from "@/lib/settings/capabilities";
 import { allowsPublicRegistration } from "@/lib/settings/registration";
@@ -17,9 +19,6 @@ import { Title } from "./Title";
 
 export async function DesktopCommandBar() {
   const { title, capabilities, registration_mode } = await getSettings();
-  const initialSidebarState = await getServerSidebarState();
-
-  const session = await getServerSession();
 
   const isSemdexEnabled = hasCapability("semdex", capabilities);
   const canRegister = allowsPublicRegistration(registration_mode);
@@ -33,7 +32,9 @@ export async function DesktopCommandBar() {
       px="1"
     >
       <HStack className={styles["topbar-left"]}>
-        <SidebarToggle initialValue={initialSidebarState} />
+        <Suspense>
+          <SidebarToggleWithState />
+        </Suspense>
         <SearchAnchor />
         {isSemdexEnabled && <AskAnchor />}
       </HStack>
@@ -43,8 +44,24 @@ export async function DesktopCommandBar() {
       </HStack>
 
       <HStack className={styles["topbar-right"]}>
-        <MemberActions session={session} canRegister={canRegister} />
+        <Suspense>
+          <MemberActionsWithSession canRegister={canRegister} />
+        </Suspense>
       </HStack>
     </HStack>
   );
+}
+
+async function SidebarToggleWithState() {
+  const initialSidebarState = await getServerSidebarState();
+  return <SidebarToggle initialValue={initialSidebarState} />;
+}
+
+async function MemberActionsWithSession({
+  canRegister,
+}: {
+  canRegister: boolean;
+}) {
+  const session = await getServerSession();
+  return <MemberActions session={session} canRegister={canRegister} />;
 }
