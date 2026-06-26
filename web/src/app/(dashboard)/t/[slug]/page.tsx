@@ -5,6 +5,10 @@ import { getServerSession } from "@/auth/server-session";
 import { getSettings } from "@/lib/settings/settings-server";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export type Props = {
   params: Promise<{
     slug: string;

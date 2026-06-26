@@ -9,3 +9,16 @@ allowBuilds:
 minimumReleaseAgeExclude:
   # Renovate security update: dompurify@3.4.11
   - dompurify@3.4.11
+  # Next.js canary packages for Cache Components / instant navigation feature
+  - next@16.3.0-canary.68
+  - eslint-config-next@16.3.0-canary.68
+  - "@next/env@16.3.0-canary.68"
+  - "@next/eslint-plugin-next@16.3.0-canary.68"
+  - "@next/swc-darwin-arm64@16.3.0-canary.68"
+  - "@next/swc-darwin-x64@16.3.0-canary.68"
+  - "@next/swc-linux-arm64-gnu@16.3.0-canary.68"
+  - "@next/swc-linux-arm64-musl@16.3.0-canary.68"
+  - "@next/swc-linux-x64-gnu@16.3.0-canary.68"
+  - "@next/swc-linux-x64-musl@16.3.0-canary.68"
+  - "@next/swc-win32-arm64-msvc@16.3.0-canary.68"
+  - "@next/swc-win32-x64-msvc@16.3.0-canary.68"

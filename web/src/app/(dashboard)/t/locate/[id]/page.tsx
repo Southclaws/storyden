@@ -4,6 +4,10 @@ import { PostLocationKind } from "@/api/openapi-schema";
 import { postLocationGet } from "@/api/openapi-server/posts";
 import { WEB_ADDRESS } from "@/config";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export type Props = {
   params: Promise<{
     id: string;

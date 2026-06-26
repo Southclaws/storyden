@@ -5,6 +5,10 @@ import { MemberIndexScreen } from "@/screens/library/members/MemberIndexScreen/M
 import { profileList } from "@/api/openapi-server/profiles";
 import { UnreadyBanner } from "@/components/site/Unready";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const QuerySchema = z.object({
   q: z.string().optional(),
   page: z

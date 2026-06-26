@@ -5,6 +5,10 @@ import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 import { HStack, VStack } from "@/styled-system/jsx";
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 export default async function Layout({ children }: PropsWithChildren) {
   const { registration_mode } = await getSettings();
   const canRegister = allowsPublicRegistration(registration_mode);

@@ -1,3 +1,5 @@
+"use client";
+
 import * as Alert from "@/components/ui/alert";
 import { MotdMetadata, ParsedMotd } from "@/lib/settings/settings";
 

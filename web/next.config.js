@@ -5,6 +5,7 @@ const nextConfig = {
   output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
   reactCompiler: true,
+  cacheComponents: true,
   images: {
     loader: "custom",
     loaderFile: "./src/lib/asset/loader.js",
