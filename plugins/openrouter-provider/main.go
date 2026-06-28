@@ -23,9 +23,11 @@ import (
 )
 
 const (
-	providerName   = "openrouter"
-	apiKeyConfig   = "api_key"
-	modelIDsConfig = "model_ids"
+	providerName          = "openrouter"
+	apiKeyConfig          = "api_key"
+	modelIDsConfig        = "model_ids"
+	embeddingModelConfig  = "embedding_model"
+	defaultEmbeddingModel = "openai/text-embedding-3-small"
 )
 
 var defaultModelIDs = []string{
@@ -62,6 +64,8 @@ func main() {
 	p := &provider{plugin: plugin, logger: logger}
 	plugin.OnRobotModelProviderListModels(p.listModels)
 	plugin.OnRobotModelProviderGenerate(p.generate)
+	plugin.OnRobotModelProviderStructuredPrompt(p.structuredPrompt)
+	plugin.OnRobotModelProviderEmbedText(p.embedText)
 
 	logger.Info("starting OpenRouter provider plugin")
 	if err := plugin.Run(ctx); err != nil {
@@ -155,6 +159,89 @@ func (p *provider) generate(ctx context.Context, req rpc.RPCRequestRobotModelPro
 	return response, nil
 }
 
+func (p *provider) structuredPrompt(ctx context.Context, req rpc.RPCRequestRobotModelProviderStructuredPromptParams) (rpc.RPCResponseRobotModelProviderStructuredPrompt, error) {
+	if req.Provider != providerName {
+		return rpc.RPCResponseRobotModelProviderStructuredPrompt{}, fmt.Errorf("unsupported provider %q", req.Provider)
+	}
+
+	client, err := p.client(ctx)
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderStructuredPrompt{}, err
+	}
+
+	stream := false
+	strict := true
+	responseFormat := components.CreateResponseFormatJSONSchema(components.ChatFormatJSONSchemaConfig{
+		JSONSchema: components.ChatJSONSchemaConfig{
+			Name:        "structured_output",
+			Description: &req.Description,
+			Schema:      req.Schema,
+			Strict:      optionalnullable.From(&strict),
+		},
+	})
+
+	res, err := client.Chat.Send(ctx, components.ChatRequest{
+		Model:          &req.Model,
+		Messages:       []components.ChatMessages{userMessage(req.Input)},
+		Stream:         &stream,
+		ResponseFormat: &responseFormat,
+	}, nil)
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderStructuredPrompt{}, fmt.Errorf("OpenRouter structured prompt failed: %s", openRouterErrorMessage(err))
+	}
+	content, err := chatResponseText(res)
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderStructuredPrompt{}, err
+	}
+
+	return rpc.RPCResponseRobotModelProviderStructuredPrompt{
+		Method:  "robot_model_provider_structured_prompt",
+		Content: opt.New(content),
+	}, nil
+}
+
+func (p *provider) embedText(ctx context.Context, req rpc.RPCRequestRobotModelProviderEmbedTextParams) (rpc.RPCResponseRobotModelProviderEmbedText, error) {
+	if req.Provider != providerName {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, fmt.Errorf("unsupported provider %q", req.Provider)
+	}
+
+	config, err := p.pluginConfig(ctx)
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, err
+	}
+
+	client, err := p.clientFromConfig(config)
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, err
+	}
+
+	encodingFormat := operations.EncodingFormatFloat
+	res, err := client.Embeddings.Generate(ctx, operations.CreateEmbeddingsRequest{
+		Model:          embeddingModel(config),
+		Input:          operations.CreateInputUnionStr(req.Text),
+		EncodingFormat: &encodingFormat,
+	})
+	if err != nil {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, fmt.Errorf("OpenRouter embedding failed: %s", openRouterErrorMessage(err))
+	}
+	if res == nil || res.CreateEmbeddingsResponseBody == nil {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, fmt.Errorf("OpenRouter returned no embedding response")
+	}
+	if len(res.CreateEmbeddingsResponseBody.Data) == 0 {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, fmt.Errorf("OpenRouter returned no embeddings")
+	}
+
+	embedding := res.CreateEmbeddingsResponseBody.Data[0].Embedding.ArrayOfNumber
+	if len(embedding) == 0 {
+		return rpc.RPCResponseRobotModelProviderEmbedText{}, fmt.Errorf("OpenRouter returned an empty embedding")
+	}
+
+	return rpc.RPCResponseRobotModelProviderEmbedText{
+		Method:    "robot_model_provider_embed_text",
+		Embedding: embedding,
+	}, nil
+}
+
 func (p *provider) client(ctx context.Context) (*openrouter.OpenRouter, error) {
 	config, err := p.pluginConfig(ctx)
 	if err != nil {
@@ -165,7 +252,7 @@ func (p *provider) client(ctx context.Context) (*openrouter.OpenRouter, error) {
 }
 
 func (p *provider) pluginConfig(ctx context.Context) (map[string]any, error) {
-	config, err := p.plugin.GetConfig(ctx, apiKeyConfig, modelIDsConfig)
+	config, err := p.plugin.GetConfig(ctx, apiKeyConfig, modelIDsConfig, embeddingModelConfig)
 	if err != nil {
 		return nil, fmt.Errorf("get plugin config: %w", err)
 	}
@@ -190,6 +277,15 @@ func modelIDs(config map[string]any) []string {
 		return defaultModelIDs
 	}
 	return ids
+}
+
+func embeddingModel(config map[string]any) string {
+	raw, _ := config[embeddingModelConfig].(string)
+	model := strings.TrimSpace(raw)
+	if model == "" {
+		return defaultEmbeddingModel
+	}
+	return model
 }
 
 func parseModelIDs(raw string) []string {
@@ -298,6 +394,34 @@ func compactOpenRouterMessage(prefix, message string) string {
 	return fmt.Sprintf("%s: %s", prefix, message)
 }
 
+func chatResponseText(res *operations.SendChatCompletionRequestResponse) (string, error) {
+	if res == nil || res.ChatResult == nil {
+		return "", fmt.Errorf("OpenRouter returned no chat result")
+	}
+	if len(res.ChatResult.Choices) == 0 {
+		return "", fmt.Errorf("OpenRouter returned no choices")
+	}
+
+	choice := res.ChatResult.Choices[0]
+	content, ok := choice.Message.Content.GetOrZero()
+	if !ok {
+		return "", fmt.Errorf("OpenRouter returned no message content")
+	}
+
+	text := strings.TrimSpace(contentText(content))
+	if text == "" {
+		return "", fmt.Errorf("OpenRouter returned empty message content")
+	}
+
+	return text, nil
+}
+
+func userMessage(content string) components.ChatMessages {
+	return components.CreateChatMessagesUser(components.ChatUserMessage{
+		Content: components.CreateChatUserMessageContentStr(content),
+	})
+}
+
 func mapModel(model components.Model) rpc.RobotModelProviderModel {
 	out := rpc.RobotModelProviderModel{
 		Name:        model.ID,
@@ -347,9 +471,7 @@ func convertMessages(req rpc.RPCRequestRobotModelProviderGenerateParams) []compo
 				ToolCallID: toolCallID,
 			}))
 		default:
-			messages = append(messages, components.CreateChatMessagesUser(components.ChatUserMessage{
-				Content: components.CreateChatUserMessageContentStr(content),
-			}))
+			messages = append(messages, userMessage(content))
 		}
 	}
 

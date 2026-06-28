@@ -179,6 +179,16 @@ $defs:
           type:
             type: string
             const: robot.llm_provider
+          structured_output:
+            type: boolean
+            description: >
+              Whether this provider implements the structured prompt RPC for
+              JSON Schema constrained single-shot outputs.
+          embeddings:
+            type: boolean
+            description: >
+              Whether this provider implements the embedding RPC for semantic
+              indexing and retrieval.
 
   RobotToolProviderCapabilityConfig:
     allOf:
@@ -321,6 +331,8 @@ $defs:
       - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCRequestPing"
       - $ref: "rpc/host-to-plugin/robot_model_provider_list_models.yaml#/$defs/RPCRequestRobotModelProviderListModels"
       - $ref: "rpc/host-to-plugin/robot_model_provider_generate.yaml#/$defs/RPCRequestRobotModelProviderGenerate"
+      - $ref: "rpc/host-to-plugin/robot_model_provider_structured_prompt.yaml#/$defs/RPCRequestRobotModelProviderStructuredPrompt"
+      - $ref: "rpc/host-to-plugin/robot_model_provider_embed_text.yaml#/$defs/RPCRequestRobotModelProviderEmbedText"
       - $ref: "rpc/host-to-plugin/robot_tool_call.yaml#/$defs/RPCRequestRobotToolCall"
 
   HostToPluginResponse:
@@ -339,6 +351,8 @@ $defs:
       - $ref: "rpc/host-to-plugin/ping.yaml#/$defs/RPCResponsePing"
       - $ref: "rpc/host-to-plugin/robot_model_provider_list_models.yaml#/$defs/RPCResponseRobotModelProviderListModels"
       - $ref: "rpc/host-to-plugin/robot_model_provider_generate.yaml#/$defs/RPCResponseRobotModelProviderGenerate"
+      - $ref: "rpc/host-to-plugin/robot_model_provider_structured_prompt.yaml#/$defs/RPCResponseRobotModelProviderStructuredPrompt"
+      - $ref: "rpc/host-to-plugin/robot_model_provider_embed_text.yaml#/$defs/RPCResponseRobotModelProviderEmbedText"
       - $ref: "rpc/host-to-plugin/robot_tool_call.yaml#/$defs/RPCResponseRobotToolCall"
 
   # -

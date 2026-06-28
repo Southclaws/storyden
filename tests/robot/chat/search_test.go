@@ -27,9 +27,7 @@ import (
 func TestRobotChatContentSearch(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelContentSearch),
 		sse.Build(),
@@ -95,9 +93,7 @@ func TestRobotChatContentSearch(t *testing.T) {
 func TestRobotChatThreadSearch(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelThreadSearch),
 		sse.Build(),
@@ -154,9 +150,7 @@ func TestRobotChatThreadSearch(t *testing.T) {
 func TestRobotChatReplySearch(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelReplySearch),
 		sse.Build(),
@@ -217,9 +211,7 @@ func TestRobotChatReplySearch(t *testing.T) {
 func TestRobotChatPostSearch(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelPostSearch),
 		sse.Build(),
@@ -276,9 +268,7 @@ func TestRobotChatPostSearch(t *testing.T) {
 func TestRobotChatMemberSearch(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelMemberSearch),
 		sse.Build(),

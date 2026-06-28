@@ -38,10 +38,10 @@ func (g *generator) Summarise(ctx context.Context, content datagraph.Content) (s
 		return "", fault.Wrap(err, fctx.With(ctx))
 	}
 
-	result, err := g.prompter.Prompt(ctx, template.String())
+	result, err := g.models.PromptText(ctx, template.String())
 	if err != nil {
 		return "", fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return result.Answer, nil
+	return result, nil
 }

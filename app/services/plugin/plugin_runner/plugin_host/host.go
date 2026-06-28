@@ -266,7 +266,10 @@ func (h *Host) registerModelProviders(id plugin.InstallationID, manifest *plugin
 		}
 
 		provider := model_ref.NewProvider(declaration.ID)
-		h.modelProviders.Put(plugin_llmprovider.New(provider, sess))
+		h.modelProviders.Put(plugin_llmprovider.New(provider, sess, plugin_llmprovider.Options{
+			StructuredOutput: declaration.StructuredOutput.Or(false),
+			Embeddings:       declaration.Embeddings.Or(false),
+		}))
 		providers = append(providers, provider)
 
 		name := declaration.Name.Or(declaration.ID)

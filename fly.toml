@@ -11,7 +11,6 @@ kill_timeout = 5
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
   EMAIL_PROVIDER          = "smtp"
-  LANGUAGE_MODEL_PROVIDER = "openai"
   MCP_ENABLED             = "true"
   PINECONE_CLOUD          = "aws"
   PINECONE_DIMENSIONS     = "3072"

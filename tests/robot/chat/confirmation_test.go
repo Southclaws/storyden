@@ -29,9 +29,7 @@ func TestRobotDeleteRequiresConfirmation(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -129,9 +127,7 @@ func TestRobotDeleteConfirmationAfterPriorToolCallWithoutRobotID(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -238,9 +234,7 @@ func TestRobotDeleteMultipleConfirmationsInSameTurn(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -381,9 +375,7 @@ func TestRobotSessionCurrentRobotFollowsRobotSwitch(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),

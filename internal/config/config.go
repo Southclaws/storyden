@@ -528,14 +528,6 @@ type Config struct {
 	   See [the documentation](https://storyden.org/docs/introduction/mcp) for more information.
 	*/
 	MCPEnabled bool `default:"false" envconfig:"MCP_ENABLED"`
-	/*
-	   The provider for language model features.
-
-	   `openai` is currently the only supported provider.
-	*/
-	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
-	// When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
-	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
 
 	// -
 	// Semdex

@@ -239,7 +239,6 @@ func withRobotRunPlugin(t *testing.T, permissions []string, run any) {
 	t.Helper()
 
 	integration.Test(t, &config.Config{
-		LanguageModelProvider:       "mock",
 		PluginMaxRestartAttempts:    1,
 		PluginMaxBackoffDuration:    100 * time.Millisecond,
 		PluginRuntimeCrashThreshold: 1 * time.Second,

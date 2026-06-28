@@ -27,9 +27,7 @@ import (
 func TestRobotCreateWithoutToolsPersistsEmptyToolList(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		fx.Invoke(func(
@@ -69,9 +67,7 @@ func TestRobotCreateWithoutToolsPersistsEmptyToolList(t *testing.T) {
 func TestRobotCreateToolPersistsTools(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -147,9 +143,7 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
 func TestRobotWithNoToolsRejectsToolCalls(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLibraryTool),
 		sse.Build(),
@@ -212,9 +206,7 @@ func TestRobotWithNoToolsRejectsToolCalls(t *testing.T) {
 func TestDefaultToolsContainsThrowAnError(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings("mock/../scripts/robot-chat-tool-error.yaml"),
 		sse.Build(),

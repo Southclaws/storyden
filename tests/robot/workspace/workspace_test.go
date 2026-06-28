@@ -41,7 +41,6 @@ func TestRobotWorkspaceMountsFromServiceRun(t *testing.T) {
 
 	integration.Test(t,
 		&config.Config{
-			LanguageModelProvider:  "mock",
 			RobotWorkspaceDataPath: workspaceRoot,
 		},
 		e2e.Setup(),

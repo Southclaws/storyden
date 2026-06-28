@@ -88,9 +88,7 @@ func TestRobotChatSSERequiresAuthWhenRobotsDisabled(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		sse.Build(),
 		fx.Invoke(func(
@@ -123,9 +121,7 @@ func TestRobotSessionsVisibility(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModel),
 		sse.Build(),

@@ -29,12 +29,12 @@ func (g *generator) SuggestTitle(ctx context.Context, content datagraph.Content)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	result, err := g.prompter.Prompt(ctx, template.String())
+	result, err := g.models.PromptText(ctx, template.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	titles := strings.Split(result.Answer, "\n")
+	titles := strings.Split(result, "\n")
 
 	trimmed := dt.Map(titles, strings.TrimSpace)
 

@@ -6,8 +6,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
 type Titler interface {
@@ -29,11 +29,11 @@ var (
 )
 
 type generator struct {
-	prompter ai.Prompter
+	models *llm_provider.Factory
 }
 
-func newGenerator(prompter ai.Prompter) *generator {
-	return &generator{prompter: prompter}
+func newGenerator(models *llm_provider.Factory) *generator {
+	return &generator{models: models}
 }
 
 func Build() fx.Option {

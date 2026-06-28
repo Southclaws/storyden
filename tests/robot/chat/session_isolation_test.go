@@ -25,9 +25,7 @@ import (
 func TestRobotSessionGetSharedAcrossRobotUsers(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -74,9 +72,7 @@ func TestRobotSessionGetSharedAcrossRobotUsers(t *testing.T) {
 func TestRobotSessionsListNoFilterReturnsAllSessions(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),
@@ -127,9 +123,7 @@ func TestRobotSessionsListNoFilterReturnsAllSessions(t *testing.T) {
 func TestSSEChatCanContinueSessionOwnedByAnotherRobotUser(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelAck),
 		sse.Build(),

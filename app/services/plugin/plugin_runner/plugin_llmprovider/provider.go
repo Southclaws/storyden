@@ -20,14 +20,23 @@ import (
 )
 
 type Provider struct {
-	provider model_ref.Provider
-	session  plugin_runner.Session
+	provider         model_ref.Provider
+	session          plugin_runner.Session
+	structuredOutput bool
+	embeddings       bool
 }
 
-func New(provider model_ref.Provider, session plugin_runner.Session) *Provider {
+type Options struct {
+	StructuredOutput bool
+	Embeddings       bool
+}
+
+func New(provider model_ref.Provider, session plugin_runner.Session, options Options) *Provider {
 	return &Provider{
-		provider: provider,
-		session:  session,
+		provider:         provider,
+		session:          session,
+		structuredOutput: options.StructuredOutput,
+		embeddings:       options.Embeddings,
 	}
 }
 
@@ -36,6 +45,10 @@ func (p *Provider) Provider() model_ref.Provider { return p.provider }
 func (p *Provider) RequiresAPIKey() bool { return false }
 
 func (p *Provider) Configure(llm_provider.Config) {}
+
+func (p *Provider) SupportsStructuredOutput() bool { return p.structuredOutput }
+
+func (p *Provider) SupportsEmbeddings() bool { return p.embeddings }
 
 func (p *Provider) ListModels(ctx context.Context) ([]model_ref.Info, error) {
 	id := xid.New()
@@ -121,6 +134,96 @@ func (p *Provider) ValidateModel(ctx context.Context, ref model_ref.ModelRef) er
 	}
 
 	return fmt.Errorf("model %q is not available for plugin provider %s", ref.Model, ref.Provider)
+}
+
+func (p *Provider) StructuredPrompt(ctx context.Context, ref model_ref.ModelRef, request llm_provider.StructuredPromptRequest) (string, error) {
+	if ref.Provider != p.provider {
+		return "", fmt.Errorf("model ref provider %q does not match plugin provider %q", ref.Provider, p.provider)
+	}
+	if !p.structuredOutput {
+		return "", fmt.Errorf("plugin provider %q does not support structured output", p.provider)
+	}
+
+	schema, ok := request.Schema.(map[string]any)
+	if !ok {
+		data, err := json.Marshal(request.Schema)
+		if err != nil {
+			return "", fmt.Errorf("marshal structured output schema: %w", err)
+		}
+		if err := json.Unmarshal(data, &schema); err != nil {
+			return "", fmt.Errorf("normalise structured output schema: %w", err)
+		}
+	}
+
+	id := xid.New()
+	resp, err := p.session.Send(ctx, id, &rpc.RPCRequestRobotModelProviderStructuredPrompt{
+		ID:      id,
+		Jsonrpc: "2.0",
+		Method:  "robot_model_provider_structured_prompt",
+		Params: rpc.RPCRequestRobotModelProviderStructuredPromptParams{
+			Provider:    p.provider.String(),
+			Model:       ref.Model.String(),
+			Description: request.Description,
+			Input:       request.Input,
+			Schema:      schema,
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	body, ok := resp.HostToPluginResponseUnionUnion.(*rpc.RPCResponseRobotModelProviderStructuredPrompt)
+	if !ok {
+		return "", fmt.Errorf("unexpected robot model provider structured prompt response: %T", resp.HostToPluginResponseUnionUnion)
+	}
+	if msg, ok := body.Error.Get(); ok && msg != "" {
+		return "", fmt.Errorf("plugin model provider returned structured output error: %s", msg)
+	}
+
+	content, ok := body.Content.Get()
+	if !ok || strings.TrimSpace(content) == "" {
+		return "", fmt.Errorf("plugin model provider returned empty structured output")
+	}
+
+	return content, nil
+}
+
+func (p *Provider) EmbedText(ctx context.Context, text string) ([]float32, error) {
+	if !p.embeddings {
+		return nil, fmt.Errorf("plugin provider %q does not support embeddings", p.provider)
+	}
+
+	id := xid.New()
+	resp, err := p.session.Send(ctx, id, &rpc.RPCRequestRobotModelProviderEmbedText{
+		ID:      id,
+		Jsonrpc: "2.0",
+		Method:  "robot_model_provider_embed_text",
+		Params: rpc.RPCRequestRobotModelProviderEmbedTextParams{
+			Provider: p.provider.String(),
+			Text:     text,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	body, ok := resp.HostToPluginResponseUnionUnion.(*rpc.RPCResponseRobotModelProviderEmbedText)
+	if !ok {
+		return nil, fmt.Errorf("unexpected robot model provider embed text response: %T", resp.HostToPluginResponseUnionUnion)
+	}
+	if msg, ok := body.Error.Get(); ok && msg != "" {
+		return nil, fmt.Errorf("plugin model provider returned embedding error: %s", msg)
+	}
+	if len(body.Embedding) == 0 {
+		return nil, fmt.Errorf("plugin model provider returned empty embedding")
+	}
+
+	embedding := make([]float32, len(body.Embedding))
+	for i, v := range body.Embedding {
+		embedding[i] = float32(v)
+	}
+
+	return embedding, nil
 }
 
 type pluginModel struct {

@@ -25,9 +25,7 @@ import (
 func TestRobotChatLibraryPageList(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLibraryPageList),
 		sse.Build(),
@@ -82,9 +80,7 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 func TestRobotChatLibrarySearchPages(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLibrarySearchPages),
 		sse.Build(),

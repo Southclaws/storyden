@@ -150,6 +150,26 @@ func TestFactoryRefreshProviderModelsWithKeyRecordsErrorsWithoutReplacingCache(t
 	assert.Equal(t, "provider unavailable", lastErr)
 }
 
+func TestFactoryGetEmbedderUsesEnabledEmbeddingProvider(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	factory, _, provider := newTestFactory(t)
+
+	provider.embedding = []float32{0.1, 0.2, 0.3}
+	provider.supportsEmbeddings = true
+
+	embedder, err := factory.GetEmbedder(ctx)
+	require.NoError(t, err)
+
+	embedding, err := embedder(ctx, "hello")
+	require.NoError(t, err)
+
+	assert.Equal(t, []float32{0.1, 0.2, 0.3}, embedding)
+	assert.Equal(t, "hello", provider.lastEmbeddingInput())
+	assert.Equal(t, "test-key", provider.lastAPIKey())
+}
+
 func TestFactoryEnsureModelAvailableRefreshesStaleCachedModelBestEffort(t *testing.T) {
 	t.Parallel()
 
@@ -222,14 +242,17 @@ func modelInfo(model model_ref.Model) model_ref.Info {
 }
 
 type fakeProvider struct {
-	mu             sync.Mutex
-	requiresAPIKey bool
-	apiKey         string
-	models         []model_ref.Info
-	listErr        error
-	validateErr    error
-	listCount      int
-	validateCount  int
+	mu                 sync.Mutex
+	requiresAPIKey     bool
+	apiKey             string
+	models             []model_ref.Info
+	listErr            error
+	validateErr        error
+	supportsEmbeddings bool
+	embedding          []float32
+	embeddingInput     string
+	listCount          int
+	validateCount      int
 }
 
 func (p *fakeProvider) Provider() model_ref.Provider { return testProvider }
@@ -269,6 +292,23 @@ func (p *fakeProvider) ValidateModel(ctx context.Context, ref model_ref.ModelRef
 	return p.validateErr
 }
 
+func (p *fakeProvider) SupportsEmbeddings() bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.supportsEmbeddings
+}
+
+func (p *fakeProvider) EmbedText(ctx context.Context, text string) ([]float32, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	p.embeddingInput = text
+	out := make([]float32, len(p.embedding))
+	copy(out, p.embedding)
+	return out, nil
+}
+
 func (p *fakeProvider) setModels(models ...model_ref.Info) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -295,4 +335,11 @@ func (p *fakeProvider) validateCalls() int {
 	defer p.mu.Unlock()
 
 	return p.validateCount
+}
+
+func (p *fakeProvider) lastEmbeddingInput() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return p.embeddingInput
 }

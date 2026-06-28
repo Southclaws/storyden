@@ -10,24 +10,24 @@ import (
 	"github.com/rs/xid"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
-	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
 type SessionNamer struct {
 	logger      *slog.Logger
-	prompter    ai.Prompter
+	models      *llm_provider.Factory
 	sessionRepo *robot_session.Repository
 }
 
 func NewSessionNamer(
 	logger *slog.Logger,
-	prompter ai.Prompter,
+	models *llm_provider.Factory,
 	sessionRepo *robot_session.Repository,
 ) *SessionNamer {
 	return &SessionNamer{
 		logger:      logger,
-		prompter:    prompter,
+		models:      models,
 		sessionRepo: sessionRepo,
 	}
 }
@@ -80,9 +80,9 @@ func (s *SessionNamer) MaybeNameSession(
 
 	prompt := fmt.Sprintf(namingPromptTemplate, userMessage)
 
-	result, err := ai.PromptObject(
+	result, err := llm_provider.PromptObject(
 		ctx,
-		s.prompter,
+		s.models,
 		"Generate a session name based on the user's first message",
 		prompt,
 		SessionNameResponse{},
