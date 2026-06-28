@@ -25,7 +25,7 @@ func newOpenAI(cfg config.Config) (*OpenAI, error) {
 
 func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 	res, err := o.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
-		Model: openai.ChatModelChatgpt4oLatest,
+		Model: openai.ChatModelGPT4_1,
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(input),
 		},
@@ -46,7 +46,7 @@ func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error) {
 	iter := func(yield func(string, error) bool) {
 		stream := o.client.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
-			Model: openai.ChatModelChatgpt4oLatest,
+			Model: openai.ChatModelGPT4_1,
 			Messages: []openai.ChatCompletionMessageParamUnion{
 				openai.UserMessage(input),
 			},
