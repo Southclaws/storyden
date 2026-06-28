@@ -104,12 +104,18 @@ func (w *CapabilityConfig) UnmarshalJSON(data []byte) error {
 
 type RobotLLMProviderCapabilityConfig struct {
 	Description opt.Optional[string] `json:"description,omitempty"`
+	// Whether this provider implements the embedding RPC for semantic indexing and retrieval.
+	//
+	Embeddings opt.Optional[bool] `json:"embeddings,omitempty"`
 	// Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.
 	//
 	ID string `json:"id"`
 	// Human-readable capability name.
 	Name opt.Optional[string] `json:"name,omitempty"`
-	Type string               `json:"type"`
+	// Whether this provider implements the structured prompt RPC for JSON Schema constrained single-shot outputs.
+	//
+	StructuredOutput opt.Optional[bool] `json:"structured_output,omitempty"`
+	Type             string             `json:"type"`
 	// Version of the host capability protocol implemented by this plugin.
 	Version string `json:"version"`
 }
@@ -938,6 +944,13 @@ type JsonRpcRequest struct {
 type RPCRequestPingParams struct {
 }
 
+type RPCRequestRobotModelProviderEmbedTextParams struct {
+	// Provider identifier declared by the plugin manifest.
+	Provider string `json:"provider"`
+	// Text to embed.
+	Text string `json:"text"`
+}
+
 type RobotModelProviderMessage struct {
 	Content    opt.Optional[string] `json:"content,omitempty"`
 	Name       opt.Optional[string] `json:"name,omitempty"`
@@ -964,6 +977,19 @@ type RPCRequestRobotModelProviderGenerateParams struct {
 type RPCRequestRobotModelProviderListModelsParams struct {
 	// Provider identifier declared by the plugin manifest.
 	Provider string `json:"provider"`
+}
+
+type RPCRequestRobotModelProviderStructuredPromptParams struct {
+	// Human-readable description of the structured output task.
+	Description string `json:"description"`
+	// User input or prompt text for the structured output request.
+	Input string `json:"input"`
+	// Model name within the provider namespace.
+	Model string `json:"model"`
+	// Provider identifier declared by the plugin manifest.
+	Provider string `json:"provider"`
+	// JSON Schema object the response must satisfy.
+	Schema map[string]interface{} `json:"schema"`
 }
 
 type RPCRequestRobotToolCallParams struct {
@@ -1027,6 +1053,10 @@ func (w *HostToPluginRequest) UnmarshalJSON(data []byte) error {
 		v = &RPCRequestRobotModelProviderListModels{}
 	case "robot_model_provider_generate":
 		v = &RPCRequestRobotModelProviderGenerate{}
+	case "robot_model_provider_structured_prompt":
+		v = &RPCRequestRobotModelProviderStructuredPrompt{}
+	case "robot_model_provider_embed_text":
+		v = &RPCRequestRobotModelProviderEmbedText{}
 	case "robot_tool_call":
 		v = &RPCRequestRobotToolCall{}
 	default:
@@ -1104,6 +1134,34 @@ func (RPCRequestRobotModelProviderGenerate) isHostToPluginRequest() {}
 
 func (RPCRequestRobotModelProviderGenerate) HostToPluginRequestType() string {
 	return "robot_model_provider_generate"
+}
+
+// Runs one single-shot structured output request through a plugin-backed Robot model provider.
+type RPCRequestRobotModelProviderStructuredPrompt struct {
+	ID      xid.ID                                             `json:"id"`
+	Jsonrpc string                                             `json:"jsonrpc"`
+	Method  string                                             `json:"method"`
+	Params  RPCRequestRobotModelProviderStructuredPromptParams `json:"params"`
+}
+
+func (RPCRequestRobotModelProviderStructuredPrompt) isHostToPluginRequest() {}
+
+func (RPCRequestRobotModelProviderStructuredPrompt) HostToPluginRequestType() string {
+	return "robot_model_provider_structured_prompt"
+}
+
+// Requests one text embedding from a plugin-backed Robot model provider.
+type RPCRequestRobotModelProviderEmbedText struct {
+	ID      xid.ID                                      `json:"id"`
+	Jsonrpc string                                      `json:"jsonrpc"`
+	Method  string                                      `json:"method"`
+	Params  RPCRequestRobotModelProviderEmbedTextParams `json:"params"`
+}
+
+func (RPCRequestRobotModelProviderEmbedText) isHostToPluginRequest() {}
+
+func (RPCRequestRobotModelProviderEmbedText) HostToPluginRequestType() string {
+	return "robot_model_provider_embed_text"
 }
 
 // Executes a manifest-declared Robot tool provided by a plugin.
@@ -1189,6 +1247,10 @@ func (w *HostToPluginResponseUnion) UnmarshalJSON(data []byte) error {
 		v = &RPCResponseRobotModelProviderListModels{}
 	case "robot_model_provider_generate":
 		v = &RPCResponseRobotModelProviderGenerate{}
+	case "robot_model_provider_structured_prompt":
+		v = &RPCResponseRobotModelProviderStructuredPrompt{}
+	case "robot_model_provider_embed_text":
+		v = &RPCResponseRobotModelProviderEmbedText{}
 	case "robot_tool_call":
 		v = &RPCResponseRobotToolCall{}
 	default:
@@ -1262,6 +1324,33 @@ func (RPCResponseRobotModelProviderGenerate) isHostToPluginResponseUnion() {}
 
 func (RPCResponseRobotModelProviderGenerate) HostToPluginResponseUnionType() string {
 	return "robot_model_provider_generate"
+}
+
+// Returns JSON text generated by a plugin-backed Robot model provider for a JSON Schema constrained structured output request.
+type RPCResponseRobotModelProviderStructuredPrompt struct {
+	// JSON text matching the requested schema.
+	Content opt.Optional[string] `json:"content,omitempty"`
+	Error   opt.Optional[string] `json:"error,omitempty"`
+	Method  string               `json:"method"`
+}
+
+func (RPCResponseRobotModelProviderStructuredPrompt) isHostToPluginResponseUnion() {}
+
+func (RPCResponseRobotModelProviderStructuredPrompt) HostToPluginResponseUnionType() string {
+	return "robot_model_provider_structured_prompt"
+}
+
+// Returns one text embedding from a plugin-backed Robot model provider.
+type RPCResponseRobotModelProviderEmbedText struct {
+	Embedding []float64            `json:"embedding,omitempty"`
+	Error     opt.Optional[string] `json:"error,omitempty"`
+	Method    string               `json:"method"`
+}
+
+func (RPCResponseRobotModelProviderEmbedText) isHostToPluginResponseUnion() {}
+
+func (RPCResponseRobotModelProviderEmbedText) HostToPluginResponseUnionType() string {
+	return "robot_model_provider_embed_text"
 }
 
 // Returns a structured result from a plugin-provided Robot tool.

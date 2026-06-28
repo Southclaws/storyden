@@ -13,6 +13,8 @@ capabilities:
     version: v1
     name: OpenRouter
     description: OpenRouter hosted model gateway.
+    structured_output: true
+    embeddings: true
 configuration_schema:
   fields:
     - id: api_key
@@ -22,4 +24,8 @@ configuration_schema:
     - id: model_ids
       label: Model IDs
       description: Comma or newline separated OpenRouter model IDs to expose to Robots. Leave empty to use the curated default set.
+      type: string
+    - id: embedding_model
+      label: Embedding Model
+      description: OpenRouter embedding model ID used for semantic indexing.
       type: string

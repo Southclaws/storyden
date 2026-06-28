@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
 type chromemRefIndex struct {
@@ -28,19 +27,13 @@ type chromemRefIndex struct {
 	hydrator *hydrate.Hydrator
 }
 
-func New(cfg config.Config, rh *hydrate.Hydrator, aip ai.Prompter) (semdex.Semdexer, error) {
+func New(cfg config.Config, rh *hydrate.Hydrator, ef semdex.Embedder) (semdex.Semdexer, error) {
 	db, err := chromem.NewPersistentDB(cfg.SemdexLocalPath, false)
 	if err != nil {
 		return nil, err
 	}
 
-	if _, ok := aip.(*ai.Disabled); ok {
-		return nil, fault.New("a language model provider must be enabled for the embedded semdexer to be enabled")
-	}
-
-	ef := aip.EmbeddingFunc()
-
-	collection, err := db.GetOrCreateCollection("semdex", nil, ef)
+	collection, err := db.GetOrCreateCollection("semdex", nil, chromem.EmbeddingFunc(ef))
 	if err != nil {
 		return nil, err
 	}

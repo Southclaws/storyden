@@ -11,8 +11,8 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
 var SuggestTagsPrompt = template.Must(template.New("").Parse(`Analyze the provided content and generate up to three relevant tags. Tags are either single words or multiple words separated only by a hyphen, no spaces.
@@ -46,7 +46,7 @@ func (g *generator) SuggestTags(ctx context.Context, content datagraph.Content, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	result, err := ai.PromptObject(ctx, g.prompter, "Suggest tags for content", template.String(), SuggestTagsResultSchema{})
+	result, err := llm_provider.PromptObject(ctx, g.models, "Suggest tags for content", template.String(), SuggestTagsResultSchema{})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

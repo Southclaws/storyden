@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 )
 
@@ -22,15 +21,13 @@ type pineconeSemdexer struct {
 	client   *pinecone.Client
 	index    *pinecone.Index
 	hydrator *hydrate.Hydrator
-	ef       ai.Embedder
+	ef       semdex.Embedder
 }
 
-func New(ctx context.Context, cfg config.Config, pc *pinecone.Client, rh *hydrate.Hydrator, aip ai.Prompter) (semdex.Semdexer, error) {
-	if _, ok := aip.(*ai.Disabled); ok {
+func New(ctx context.Context, cfg config.Config, pc *pinecone.Client, rh *hydrate.Hydrator, ef semdex.Embedder) (semdex.Semdexer, error) {
+	if ef == nil {
 		return nil, fault.New("a language model provider must be enabled for the pinecone semdexer to be enabled")
 	}
-
-	ef := aip.EmbeddingFunc()
 
 	index, err := pc.GetOrCreateIndex(ctx, cfg.PineconeIndex)
 	if err != nil {

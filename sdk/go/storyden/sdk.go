@@ -39,6 +39,10 @@ type Plugin struct {
 	robotModelProviderListModelsHandler   RobotModelProviderListModelsHandler
 	robotModelProviderGenerateHandlerMu   sync.RWMutex
 	robotModelProviderGenerateHandler     RobotModelProviderGenerateHandler
+	robotModelProviderStructuredHandlerMu sync.RWMutex
+	robotModelProviderStructuredHandler   RobotModelProviderStructuredPromptHandler
+	robotModelProviderEmbedTextHandlerMu  sync.RWMutex
+	robotModelProviderEmbedTextHandler    RobotModelProviderEmbedTextHandler
 	robotToolCallHandlerMu                sync.RWMutex
 	robotToolCallHandler                  RobotToolCallHandler
 
@@ -71,6 +75,8 @@ type EventHandler func(context.Context, rpc.EventPayload) error
 type ConfigureHandler func(context.Context, map[string]any) error
 type RobotModelProviderListModelsHandler func(context.Context, rpc.RPCRequestRobotModelProviderListModelsParams) (rpc.RPCResponseRobotModelProviderListModels, error)
 type RobotModelProviderGenerateHandler func(context.Context, rpc.RPCRequestRobotModelProviderGenerateParams) (rpc.RPCResponseRobotModelProviderGenerate, error)
+type RobotModelProviderStructuredPromptHandler func(context.Context, rpc.RPCRequestRobotModelProviderStructuredPromptParams) (rpc.RPCResponseRobotModelProviderStructuredPrompt, error)
+type RobotModelProviderEmbedTextHandler func(context.Context, rpc.RPCRequestRobotModelProviderEmbedTextParams) (rpc.RPCResponseRobotModelProviderEmbedText, error)
 type RobotToolCallHandler func(context.Context, rpc.RPCRequestRobotToolCallParams) (rpc.RPCResponseRobotToolCall, error)
 
 const (
@@ -131,6 +137,20 @@ func (p *Plugin) OnRobotModelProviderGenerate(handler RobotModelProviderGenerate
 	p.robotModelProviderGenerateHandler = handler
 	p.robotModelProviderGenerateHandlerMu.Unlock()
 	p.logger.Debug("register robot model provider generate handler")
+}
+
+func (p *Plugin) OnRobotModelProviderStructuredPrompt(handler RobotModelProviderStructuredPromptHandler) {
+	p.robotModelProviderStructuredHandlerMu.Lock()
+	p.robotModelProviderStructuredHandler = handler
+	p.robotModelProviderStructuredHandlerMu.Unlock()
+	p.logger.Debug("register robot model provider structured prompt handler")
+}
+
+func (p *Plugin) OnRobotModelProviderEmbedText(handler RobotModelProviderEmbedTextHandler) {
+	p.robotModelProviderEmbedTextHandlerMu.Lock()
+	p.robotModelProviderEmbedTextHandler = handler
+	p.robotModelProviderEmbedTextHandlerMu.Unlock()
+	p.logger.Debug("register robot model provider embed text handler")
 }
 
 func (p *Plugin) OnRobotToolCall(handler RobotToolCallHandler) {

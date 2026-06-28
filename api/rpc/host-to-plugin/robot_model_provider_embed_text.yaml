@@ -1,0 +1,45 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+$defs:
+  RPCRequestRobotModelProviderEmbedTextParams:
+    type: object
+    required:
+      - provider
+      - text
+    properties:
+      provider:
+        type: string
+        description: Provider identifier declared by the plugin manifest.
+      text:
+        type: string
+        description: Text to embed.
+
+  RPCRequestRobotModelProviderEmbedText:
+    description: >
+      Requests one text embedding from a plugin-backed Robot model provider.
+    allOf:
+      - $ref: "../rpc.yaml#/$defs/JsonRpcRequest"
+      - type: object
+        required: ["method", "params"]
+        properties:
+          method:
+            type: string
+            const: "robot_model_provider_embed_text"
+          params:
+            $ref: "#/$defs/RPCRequestRobotModelProviderEmbedTextParams"
+
+  RPCResponseRobotModelProviderEmbedText:
+    description: >
+      Returns one text embedding from a plugin-backed Robot model provider.
+    type: object
+    required: ["method"]
+    properties:
+      method:
+        type: string
+        const: "robot_model_provider_embed_text"
+      embedding:
+        type: array
+        items:
+          type: number
+          format: float
+      error:
+        type: string

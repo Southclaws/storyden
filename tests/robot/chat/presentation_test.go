@@ -33,9 +33,7 @@ func TestRobotPresentationMarkupRenderCard(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot_tests.WithRobotSettings(mockModelAck),
 		sse.Build(),

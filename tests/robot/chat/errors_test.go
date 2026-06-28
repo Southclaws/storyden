@@ -29,9 +29,7 @@ import (
 func TestRobotToolCallError(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelToolError),
 		sse.Build(),
@@ -95,9 +93,7 @@ func TestRobotLLMError(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
+		&config.Config{},
 		e2e.Setup(),
 		robot.WithRobotSettings(mockModelLLMError),
 		sse.Build(),

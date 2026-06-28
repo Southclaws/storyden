@@ -38,6 +38,10 @@ func (p *Plugin) handleMessage(message []byte) error {
 		return p.handleRobotModelProviderListModels(*r)
 	case *rpc.RPCRequestRobotModelProviderGenerate:
 		return p.handleRobotModelProviderGenerate(*r)
+	case *rpc.RPCRequestRobotModelProviderStructuredPrompt:
+		return p.handleRobotModelProviderStructuredPrompt(*r)
+	case *rpc.RPCRequestRobotModelProviderEmbedText:
+		return p.handleRobotModelProviderEmbedText(*r)
 	case *rpc.RPCRequestRobotToolCall:
 		return p.handleRobotToolCall(*r)
 	default:
@@ -217,6 +221,74 @@ func (p *Plugin) handleRobotModelProviderGenerate(req rpc.RPCRequestRobotModelPr
 			HostToPluginResponseUnionUnion: &resp,
 		}); err != nil {
 			p.logger.Error("failed to send robot model provider generate response",
+				slog.String("error", err.Error()))
+		}
+	}()
+
+	return nil
+}
+
+func (p *Plugin) handleRobotModelProviderStructuredPrompt(req rpc.RPCRequestRobotModelProviderStructuredPrompt) error {
+	p.robotModelProviderStructuredHandlerMu.RLock()
+	handler := p.robotModelProviderStructuredHandler
+	p.robotModelProviderStructuredHandlerMu.RUnlock()
+
+	if handler == nil {
+		return p.sendErrorResponse(req.ID, -32601, "robot model provider structured prompt handler is not registered")
+	}
+
+	go func() {
+		resp, err := handler(p.ctx, req.Params)
+		if err != nil {
+			if sendErr := p.sendErrorResponse(req.ID, -32000, err.Error()); sendErr != nil {
+				p.logger.Error("failed to send robot model provider structured prompt error response",
+					slog.String("error", sendErr.Error()))
+			}
+			return
+		}
+
+		if resp.Method == "" {
+			resp.Method = "robot_model_provider_structured_prompt"
+		}
+
+		if err := p.sendResponse(req.ID, rpc.HostToPluginResponseUnion{
+			HostToPluginResponseUnionUnion: &resp,
+		}); err != nil {
+			p.logger.Error("failed to send robot model provider structured prompt response",
+				slog.String("error", err.Error()))
+		}
+	}()
+
+	return nil
+}
+
+func (p *Plugin) handleRobotModelProviderEmbedText(req rpc.RPCRequestRobotModelProviderEmbedText) error {
+	p.robotModelProviderEmbedTextHandlerMu.RLock()
+	handler := p.robotModelProviderEmbedTextHandler
+	p.robotModelProviderEmbedTextHandlerMu.RUnlock()
+
+	if handler == nil {
+		return p.sendErrorResponse(req.ID, -32601, "robot model provider embed text handler is not registered")
+	}
+
+	go func() {
+		resp, err := handler(p.ctx, req.Params)
+		if err != nil {
+			if sendErr := p.sendErrorResponse(req.ID, -32000, err.Error()); sendErr != nil {
+				p.logger.Error("failed to send robot model provider embed text error response",
+					slog.String("error", sendErr.Error()))
+			}
+			return
+		}
+
+		if resp.Method == "" {
+			resp.Method = "robot_model_provider_embed_text"
+		}
+
+		if err := p.sendResponse(req.ID, rpc.HostToPluginResponseUnion{
+			HostToPluginResponseUnionUnion: &resp,
+		}); err != nil {
+			p.logger.Error("failed to send robot model provider embed text response",
 				slog.String("error", err.Error()))
 		}
 	}()

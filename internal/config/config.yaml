@@ -819,25 +819,11 @@
 
         See [the documentation](https://storyden.org/docs/introduction/mcp) for more information.
 
-    - env: "LANGUAGE_MODEL_PROVIDER"
-      name: LanguageModelProvider
-      type: string
-      description: |-
-        The provider for language model features.
-
-        `openai` is currently the only supported provider.
-
-    - env: "OPENAI_API_KEY"
-      name: OpenAIKey
-      type: string
-      description: |-
-        When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
-
 - section: Semdex
   description: |-
     The Semdex is a semantic index that provides vector-based storage of content. This is used for things like recommendations, search, etc.
 
-     The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
+     The Semdex works with the OpenAI Robot model provider to create embeddings of content. Thus, enabling the Semdex requires Robots settings to include an enabled OpenAI provider with an API key.
   fields:
     - env: "SEMDEX_PROVIDER"
       name: SemdexProvider

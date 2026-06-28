@@ -65,10 +65,6 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 
 	caps := Capabilities{}
 
-	if p.config.LanguageModelProvider != "" {
-		caps = append(caps, CapabilityGenAI)
-	}
-
 	if p.config.SemdexProvider != "" {
 		caps = append(caps, CapabilitySemdex)
 	}
@@ -86,8 +82,11 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 	}
 
 	if services, ok := settings.Services.Get(); ok {
-		if robots, ok := services.Robots.Get(); ok && robotsAvailable(robots) {
-			caps = append(caps, CapabilityRobots)
+		if robots, ok := services.Robots.Get(); ok {
+			if robotsAvailable(robots) {
+				caps = append(caps, CapabilityGenAI)
+				caps = append(caps, CapabilityRobots)
+			}
 		}
 	}
 

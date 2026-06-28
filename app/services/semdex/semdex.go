@@ -34,6 +34,8 @@ type Chunk struct {
 	Content string
 }
 
+type Embedder func(ctx context.Context, text string) ([]float32, error)
+
 type Searcher interface {
 	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error)
 	SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error)
