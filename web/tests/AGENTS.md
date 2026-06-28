@@ -28,3 +28,25 @@ Prefer user-visible interactions over implementation shortcuts. For example, if
 a user selects an item through a picker, the test should exercise the picker
 rather than navigating directly to the final URL, unless the test is specifically
 about route handling.
+
+## Flake Resistance
+
+- Wait for durable state transitions, not just visible text, before starting the
+  next user action. For example, after creating the first robot chat message,
+  wait until the route has changed from `/robots/chats/new` to the persisted
+  `/robots/chats/:id` route before sending another message.
+- Reacquire locators inside retryable interactions when the app may remount a
+  control during route confirmation, cache refresh, or optimistic updates. A
+  button that was enabled a moment ago may detach and reappear disabled if the
+  composer clears or remounts.
+- Prefer helper functions that retry the complete user action when a remount is
+  expected: fill the input, verify the input value, verify the submit control is
+  enabled, then click. Avoid retrying only the final click after earlier state
+  may have been lost.
+- Scope assertions to the latest/current UI element when previous messages,
+  retries, or projected tool output can legitimately render similar content.
+  Use `.last()` or a message/container-specific locator instead of a global
+  strict locator when repeated summaries are valid.
+- Treat long Playwright timeouts as a signal to inspect app state assumptions.
+  Slow CI usually explains small delays, not a 60 second wait for a disabled
+  control or a strict locator matching multiple valid elements.

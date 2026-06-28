@@ -207,24 +207,19 @@ test.describe("Robot Chat — tool confirmation", () => {
       await expect(page.getByText("Created Robot.")).toBeVisible({
         timeout: 15000,
       });
+      await waitForPersistedChatRoute(page);
 
       await sendMessage(page, "delete it");
 
       await expect(
-        page
-          .locator("summary")
-          .filter({ hasText: "Robot Delete" })
-          .filter({ hasText: "Needs approval" }),
+        robotDeleteSummary(page, "Needs approval").last(),
       ).toBeVisible({ timeout: 15000 });
       await expect(page.getByRole("button", { name: "Approve" })).toBeVisible();
 
       await page.getByRole("button", { name: "Approve" }).click();
 
       await expect(
-        page
-          .locator("summary")
-          .filter({ hasText: "Robot Delete" })
-          .filter({ hasText: "Tool complete" }),
+        robotDeleteSummary(page, "Tool complete").last(),
       ).toBeVisible({ timeout: 15000 });
       await expect(page.getByText("Delete flow finished.")).toBeVisible({
         timeout: 15000,

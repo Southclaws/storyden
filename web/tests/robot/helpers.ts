@@ -42,36 +42,32 @@ export async function goToNewChat(page: Page) {
 }
 
 export async function sendMessage(page: Page, text: string) {
-  const textarea = page.getByPlaceholder("Type a message...");
-  const sendButton = page.getByRole("button", {
-    name: "Send message",
-    exact: true,
-  });
   const respondingStatus = page
     .getByRole("status")
     .filter({ hasText: /is responding/ });
+  const sentMessage = page
+    .getByRole("article", { name: "You message" })
+    .filter({
+      hasText: text,
+    });
 
   await expect(respondingStatus).toHaveCount(0, { timeout: 15000 });
-  await expect(textarea).toBeEnabled({ timeout: 15000 });
 
-  await expect
-    .poll(
-      async () => {
-        await textarea.fill(text);
-        return textarea.inputValue();
-      },
-      { timeout: 15000 },
-    )
-    .toBe(text);
+  await expect(async () => {
+    const textarea = page.getByPlaceholder("Type a message...");
+    const sendButton = page.getByRole("button", {
+      name: "Send message",
+      exact: true,
+    });
 
-  await expect(sendButton).toBeEnabled({ timeout: 15000 });
-  await sendButton.click();
+    await expect(textarea).toBeEnabled({ timeout: 5000 });
+    await textarea.fill(text);
+    await expect(textarea).toHaveValue(text, { timeout: 5000 });
+    await expect(sendButton).toBeEnabled({ timeout: 5000 });
+    await sendButton.click({ timeout: 5000 });
+  }).toPass({ timeout: 15000 });
 
-  await expect(
-    page.getByRole("article", { name: "You message" }).filter({
-      hasText: text,
-    }),
-  ).toBeVisible({ timeout: 15000 });
+  await expect(sentMessage).toBeVisible({ timeout: 15000 });
 }
 
 export async function switchToRobot(page: Page, robotName: string) {
