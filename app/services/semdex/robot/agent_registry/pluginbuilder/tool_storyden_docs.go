@@ -41,8 +41,11 @@ is not discoverable from Go package symbols alone. This is not a general web
 browser: it only reads https://www.storyden.org/llms.txt and subpaths under
 https://www.storyden.org/docs/.
 
-Pages on storyden.org support Markdown responses. You can request paths with a
-".md" suffix, such as "/docs/plugins.md", and this tool sends
+Use "/docs/introduction/members/permissions" when choosing manifest access
+permissions for plugins that call Storyden host HTTP APIs.
+
+Pages on storyden.org support Markdown responses. This tool automatically
+requests the Markdown route for docs pages and sends
 "Accept: text/markdown, text/plain" so the response is agent-friendly.
 
 Start with "/llms.txt" to discover documentation entry points, then fetch
@@ -138,8 +141,16 @@ func storydenDocsURL(raw string) (*url.URL, error) {
 		return u, nil
 	}
 	if strings.HasPrefix(u.Path, "/docs/") || u.Path == "/docs" {
+		u.Path = storydenDocsMarkdownPath(u.Path)
 		return u, nil
 	}
 
 	return nil, fmt.Errorf("storyden docs path is not allowed: %s; use /llms.txt or /docs/...", u.Path)
+}
+
+func storydenDocsMarkdownPath(p string) string {
+	if p == "/docs" || strings.HasSuffix(p, ".md") {
+		return p
+	}
+	return p + ".md"
 }

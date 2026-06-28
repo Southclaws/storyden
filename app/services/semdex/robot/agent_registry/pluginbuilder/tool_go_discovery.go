@@ -213,6 +213,9 @@ func (a *Agent) ListGoPackages(ctx context.Context, in PackageListInput) (Packag
 			}
 			return PackageListResult{}, fmt.Errorf("decode go list output: %w", err)
 		}
+		if in.IncludeDeps && raw.Standard {
+			continue
+		}
 		if len(out.Packages) >= maxPackages {
 			out.Truncated = true
 			break

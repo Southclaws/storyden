@@ -13,16 +13,21 @@ import (
 
 func TestReadPluginLogsReturnsTail(t *testing.T) {
 	id := xid.New()
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			InstallationID: id.String(),
+			ManifestID:     "welcome-plugin",
+		},
+	})
 	agent := &Agent{
 		logs: fakePluginLogReader{
 			lines: []string{"line 1", "line 2", "line 3"},
 		},
 	}
 
-	result, err := agent.ReadPluginLogs(context.Background(), PluginLogsInput{
-		InstallationID: id.String(),
-		MaxLines:       2,
-		WaitMillis:     10,
+	result, err := agent.ReadPluginLogs(ctx, PluginLogsInput{
+		MaxLines:   2,
+		WaitMillis: 10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, id.String(), result.InstallationID)
@@ -30,11 +35,11 @@ func TestReadPluginLogsReturnsTail(t *testing.T) {
 	require.Equal(t, []string{"line 2", "line 3"}, result.Lines)
 }
 
-func TestReadPluginLogsRequiresInstallationID(t *testing.T) {
+func TestReadPluginLogsRequiresBoundInstallation(t *testing.T) {
 	agent := &Agent{logs: fakePluginLogReader{}}
 
-	_, err := agent.ReadPluginLogs(context.Background(), PluginLogsInput{})
-	require.ErrorContains(t, err, "installation_id is required")
+	_, err := agent.ReadPluginLogs(newPluginBuilderTestContext(nil), PluginLogsInput{})
+	require.ErrorContains(t, err, "no plugin installation is bound")
 }
 
 type fakePluginLogReader struct {

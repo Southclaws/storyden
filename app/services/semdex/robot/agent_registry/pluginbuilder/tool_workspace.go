@@ -29,7 +29,6 @@ type CreateWorkspaceInput struct {
 
 type WorkspaceInfo struct {
 	ID    string `json:"id"`
-	Path  string `json:"path"`
 	Files int    `json:"files"`
 }
 
@@ -53,7 +52,7 @@ func (a *Agent) addWorkspaceTools(add toolAdder) error {
 
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_info",
-		Description: "Get a managed plugin workspace path and file count.",
+		Description: "Get managed plugin workspace metadata and file count.",
 	}, func(ctx adktool.Context, args struct{}) (WorkspaceResult, error) {
 		result, err := a.Info(ctx)
 		if err != nil {
@@ -73,6 +72,9 @@ func (a *Agent) Create(ctx context.Context, in CreateWorkspaceInput) (WorkspaceR
 	}
 	if !workspaceIDPattern.MatchString(id) {
 		return WorkspaceResult{}, fmt.Errorf("invalid workspace id %q", id)
+	}
+	if err := ensurePluginBuildTarget(ctx, id, ""); err != nil {
+		return WorkspaceResult{}, err
 	}
 
 	name := strings.TrimSpace(in.Name)
@@ -118,6 +120,13 @@ func (a *Agent) Create(ctx context.Context, in CreateWorkspaceInput) (WorkspaceR
 		return WorkspaceResult{}, err
 	}
 
+	if err := a.setPluginBuildTarget(ctx, pluginBuildTarget{
+		Mode:       pluginBuildTargetModeNew,
+		ManifestID: id,
+	}); err != nil {
+		return WorkspaceResult{}, err
+	}
+
 	info.Workspace.ID = id
 	return info, nil
 }
@@ -136,7 +145,6 @@ func (a *Agent) Info(ctx context.Context) (WorkspaceResult, error) {
 	return WorkspaceResult{
 		Workspace: WorkspaceInfo{
 			ID:    "active",
-			Path:  a.workspaceRoot(),
 			Files: len(files),
 		},
 	}, nil

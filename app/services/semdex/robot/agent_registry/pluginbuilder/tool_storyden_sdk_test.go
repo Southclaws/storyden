@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -63,6 +64,8 @@ func TestStorydenSDKSearchFindsPluginRuntimeMethods(t *testing.T) {
 	require.NoError(t, err)
 	requireSymbol(t, result.Symbols, "BuildAPIClient", "method")
 	require.Contains(t, result.Hints[0].Message, "plugin_storyden_sdk_events")
+	requireSDKHint(t, result.Hints, "manifest.yaml must include access")
+	requireSDKHint(t, result.Hints, "stable bot account handle")
 }
 
 func TestStorydenSDKSearchHandlesNaturalMultiTermQueries(t *testing.T) {
@@ -90,6 +93,17 @@ func newStorydenSDKTestAgent(t *testing.T, ctx context.Context) *Agent {
 	writeWorkspaceFile(t, ctx, workspace, "main.go", "package main\n")
 
 	return &Agent{workspace: workspace}
+}
+
+func requireSDKHint(t *testing.T, hints []StorydenSDKHint, fragment string) {
+	t.Helper()
+
+	for _, hint := range hints {
+		if strings.Contains(hint.Message, fragment) {
+			return
+		}
+	}
+	require.Fail(t, "missing SDK hint", "fragment %q in %#v", fragment, hints)
 }
 
 func storydenRepoRoot(t *testing.T) string {

@@ -1,0 +1,462 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "access": {
+      "description": "Optional API access configuration for this plugin. When provided, the host can provision a bot account and access key for API calls via RPC.\n",
+      "example": {
+        "handle": "example-plugin",
+        "name": "Example Plugin",
+        "permissions": [
+          "CREATE_REACTION"
+        ]
+      },
+      "properties": {
+        "bio": {
+          "description": "Optional profile bio for the provisioned account.",
+          "example": "This account is managed by a Storyden plugin.",
+          "type": "string"
+        },
+        "handle": {
+          "description": "The account handle to provision for this plugin's API identity.\n",
+          "example": "example-plugin",
+          "type": "string"
+        },
+        "links": {
+          "description": "Optional profile links for the provisioned account.",
+          "example": [
+            {
+              "text": "Website",
+              "url": "https://example.com"
+            }
+          ],
+          "items": {
+            "example": {
+              "text": "Website",
+              "url": "https://example.com"
+            },
+            "properties": {
+              "text": {
+                "example": "Website",
+                "type": "string"
+              },
+              "url": {
+                "example": "https://example.com",
+                "format": "uri",
+                "type": "string"
+              }
+            },
+            "required": [
+              "text",
+              "url"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "description": "Optional profile metadata for the provisioned account.",
+          "example": {
+            "source": "plugin"
+          },
+          "type": "object"
+        },
+        "name": {
+          "description": "The account display name to provision for this plugin's API identity.\n",
+          "example": "Example Plugin",
+          "type": "string"
+        },
+        "permissions": {
+          "description": "The list of permission names requested for API access. See https://storyden.org/docs/introduction/members/permissions for available values and descriptions.\n",
+          "example": [
+            "CREATE_REACTION",
+            "CREATE_POST"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "handle",
+        "name",
+        "permissions"
+      ],
+      "type": "object"
+    },
+    "args": {
+      "description": "Arguments passed to the \"command\" invocation.\nThis field is used only for Supervised plugins. External plugins can omit it or provide placeholder values.\n",
+      "example": [
+        "--enable-coolness"
+      ],
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "author": {
+      "description": "The author of the plugin. Must match the pattern `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.\n(NOTE: May change in future.)\n",
+      "example": "you",
+      "type": "string"
+    },
+    "capabilities": {
+      "description": "Platform capabilities this plugin provides. Capabilities extend Storyden with host-defined integration points such as Robot model providers, authentication providers, or Robot tools.\n",
+      "example": [
+        {
+          "id": "openrouter",
+          "type": "robot.llm_provider",
+          "version": "v1"
+        }
+      ],
+      "items": {
+        "oneOf": [
+          {
+            "allOf": [
+              {
+                "properties": {
+                  "description": {
+                    "example": "OpenRouter hosted model gateway.",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.\n",
+                    "example": "openrouter",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Human-readable capability name.",
+                    "example": "OpenRouter",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Capability type discriminator.",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "Version of the host capability protocol implemented by this plugin.",
+                    "example": "v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "id",
+                  "version"
+                ],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "type": {
+                    "const": "robot.llm_provider",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "type": "object"
+              }
+            ]
+          },
+          {
+            "allOf": [
+              {
+                "properties": {
+                  "description": {
+                    "example": "OpenRouter hosted model gateway.",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "Stable capability identifier. For Robot LLM providers, this is the provider identifier used in `provider/model` refs. For Robot tool providers, this is the provider namespace used to build fully qualified Robot tool names.\n",
+                    "example": "openrouter",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]*$",
+                    "type": "string"
+                  },
+                  "name": {
+                    "description": "Human-readable capability name.",
+                    "example": "OpenRouter",
+                    "type": "string"
+                  },
+                  "type": {
+                    "description": "Capability type discriminator.",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "Version of the host capability protocol implemented by this plugin.",
+                    "example": "v1",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "id",
+                  "version"
+                ],
+                "type": "object"
+              },
+              {
+                "properties": {
+                  "tools": {
+                    "description": "Robot tools statically provided by this plugin.",
+                    "items": {
+                      "properties": {
+                        "annotations": {
+                          "properties": {
+                            "destructiveHint": {
+                              "type": "boolean"
+                            },
+                            "idempotentHint": {
+                              "type": "boolean"
+                            },
+                            "openWorldHint": {
+                              "type": "boolean"
+                            },
+                            "readOnlyHint": {
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "description": "Stable provider-local tool identifier.",
+                          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+                          "type": "string"
+                        },
+                        "input_schema": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "name": {
+                          "description": "Human-readable tool name.",
+                          "type": "string"
+                        },
+                        "output_schema": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "requires_confirmation": {
+                          "type": "boolean"
+                        },
+                        "title": {
+                          "description": "Optional display title for MCP clients and Robot builders.",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "description",
+                        "input_schema"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "type": {
+                    "const": "robot.tool_provider",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "tools"
+                ],
+                "type": "object"
+              }
+            ]
+          }
+        ]
+      },
+      "type": "array"
+    },
+    "command": {
+      "description": "The executable or script used to launch your plugin. If your plugin is a binary (Go, Rust, C, etc) then this should be a path to that binary, it's best to put it in the root of your plugin archive like `./myplugin.exe` or `./myplugin`. If your plugin is a script (Python, Node, etc) then this should be the interpreter's `$PATH` executable (e.g. `python` or `node`)  and you should include the script in the `args` field.\nThis field is used only for Supervised plugins. External plugins can provide a placeholder value and it will be ignored by the runtime.\nNote that Storyden cannot guarantee that the runtime environment defined by the person hosting Storyden will have any language's interpreter on the `$PATH`. If you are running your own instance and building a custom plugin, you should `FROM` the Storyden base image for your deployment so that you know what runtimes are available.\nIf you are distributing a plugin for others to use, we highly recommend that you use a statically compiled language such as Go, Rust or Zig for your plugin so that it's guaranteed to be compatible with any runtime.\n",
+      "example": "./myplugin.exe",
+      "type": "string"
+    },
+    "configuration_schema": {
+      "example": {
+        "fields": [
+          {
+            "description": "Where to send event notifications.",
+            "id": "webhook_url",
+            "label": "Webhook URL",
+            "type": "string"
+          }
+        ]
+      },
+      "properties": {
+        "fields": {
+          "items": {
+            "allOf": [
+              {
+                "properties": {
+                  "description": {
+                    "description": "A description of the configuration field.",
+                    "type": "string"
+                  },
+                  "id": {
+                    "description": "A unique identifier for this configuration field, used for\nreferencing the field in the plugin configuration object.\n",
+                    "type": "string"
+                  },
+                  "label": {
+                    "description": "A human-readable label for the configuration field.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "label",
+                  "description"
+                ],
+                "type": "object"
+              },
+              {
+                "oneOf": [
+                  {
+                    "properties": {
+                      "default": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "const": "string",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "properties": {
+                      "default": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "const": "number",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "type": "object"
+                  },
+                  {
+                    "properties": {
+                      "default": {
+                        "type": "boolean"
+                      },
+                      "type": {
+                        "const": "boolean",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "type": "object"
+                  }
+                ]
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "title": "PluginConfigurationSchema",
+      "type": "object"
+    },
+    "description": {
+      "description": "The description of the plugin. Displayed in Plugin Registries as well as in UI of Storyden installations when installed.\n",
+      "example": "Reacts with a 🔥 to every reply posted.",
+      "type": "string"
+    },
+    "events_consumed": {
+      "description": "The list of events the plugin subscribes to and will receive from the host via RPC. Events allow your plugins to react to things that humans or robots do on Storyden.\n",
+      "example": [
+        "EventThreadReplyCreated"
+      ],
+      "items": {
+        "enum": [
+          "EventThreadPublished",
+          "EventThreadUnpublished",
+          "EventThreadUpdated",
+          "EventThreadDeleted",
+          "EventThreadReplyCreated",
+          "EventThreadReplyDeleted",
+          "EventThreadReplyUpdated",
+          "EventThreadReplyPublished",
+          "EventThreadReplyUnpublished",
+          "EventPostLiked",
+          "EventPostUnliked",
+          "EventPostReacted",
+          "EventPostUnreacted",
+          "EventCategoryUpdated",
+          "EventCategoryDeleted",
+          "EventMemberMentioned",
+          "EventNodeCreated",
+          "EventNodeUpdated",
+          "EventNodeDeleted",
+          "EventNodePublished",
+          "EventNodeSubmittedForReview",
+          "EventNodeUnpublished",
+          "EventNodeVersionDraftCreated",
+          "EventNodeVersionDraftUpdated",
+          "EventNodeVersionDraftDeleted",
+          "EventNodeVersionDraftApplied",
+          "EventAccountCreated",
+          "EventAccountUpdated",
+          "EventAccountSuspended",
+          "EventAccountUnsuspended",
+          "EventModerationNoteCreated",
+          "EventModerationNoteDeleted",
+          "EventAccountWarned",
+          "EventAccountWarningUpdated",
+          "EventAccountWarningDeleted",
+          "EventReportCreated",
+          "EventReportUpdated",
+          "EventActivityCreated",
+          "EventActivityUpdated",
+          "EventActivityDeleted",
+          "EventActivityPublished",
+          "EventSettingsUpdated"
+        ],
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "description": "The unique identifier of the plugin. Must match the pattern `^[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$`.\n(NOTE: May change in future.)\n",
+      "example": "my-plugin",
+      "type": "string"
+    },
+    "name": {
+      "description": "The name of the plugin. This is not a unique identifier and is only used for display purposes within the Plugin Registry and Storyden installation.\n",
+      "example": "My Cool Plugin",
+      "type": "string"
+    },
+    "version": {
+      "description": "The version of the plugin. This is not used for any versioning or compatibility purposes by the runtime and is only used for display purposes currently.\n",
+      "example": "1.0.0",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "author",
+    "description",
+    "version",
+    "command"
+  ],
+  "title": "Manifest",
+  "type": "object"
+}

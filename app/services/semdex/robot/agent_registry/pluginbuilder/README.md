@@ -45,6 +45,12 @@ The workspace abstraction provides:
 This boundary keeps Plugin Builder portable across local, Windows, Unix, macOS,
 and remote sandbox providers.
 
+Each Plugin Builder chat edits one plugin. For a new plugin, the agent creates
+starter files in an empty active workspace. For an existing supervised plugin,
+the agent lists editable installed plugins, imports the selected plugin archive
+into an empty active workspace, and keeps working with that exact installation.
+If the user wants to work on a different plugin, they must start a new chat.
+
 ## Tool Model
 
 Tools are organized by file as `tool_<name>.go`. Each tool file owns its ADK
@@ -53,6 +59,7 @@ registration, input and output schemas, and implementation helpers.
 Current tool groups:
 
 - workspace starter and info tools
+- installed supervised plugin list/import tools for existing-plugin editing
 - workspace-relative file list/read/write/search tools
 - patch application
 - Go-specific workflows: `gofmt`, `go mod tidy`, `go vet`, and `go test`
@@ -67,6 +74,17 @@ Current tool groups:
 Tools should expose task-level inputs only. Environment details such as
 workspace ID, provider type, filesystem path roots, operating system, or command
 runtime are owned by the runner and workspace provider layers.
+
+The toolset is filtered by chat state:
+
+1. Before a plugin is selected, only workspace inspection, new-plugin scaffold,
+   installed-plugin listing, and installed-plugin import tools are visible.
+2. Once a plugin is selected, editing, discovery, validation, package, and
+   install tools become visible; create/import tools are hidden.
+3. Once the selected plugin has an installation, runtime log reading is visible.
+
+Runtime guards still enforce the same one-chat-one-plugin rule even if a stale
+or malformed state exposes an unexpected path.
 
 ### Go Discovery
 
@@ -84,9 +102,7 @@ relying on hard-coded reference text. Discovery is intentionally progressive:
 
 Every discovery response includes full package import paths so the agent can
 drill into subpackages and related imports without loading an entire dependency
-graph up front. `plugin_sdk_reference` remains useful for Storyden concepts,
-manifest gotchas, and common examples, but it is not exhaustive API
-documentation.
+graph up front.
 
 Symbol search is not regex or glob search. Queries such as `Event.*Reply` are
 invalid; the agent should search for plain terms such as `Event`, `Reply`, or
@@ -117,19 +133,32 @@ deeper inspection or third-party packages.
 Storyden-owned documentation. It can read `https://www.storyden.org/llms.txt`
 and subpaths under `https://www.storyden.org/docs/`, requesting Markdown/text
 responses for agent-friendly output. It is intentionally not a general web
-browser.
+browser. When choosing manifest `access.permissions`, fetch
+`/docs/introduction/members/permissions` and treat that page as the permission
+vocabulary.
+
+During discovery, Plugin Builder should decide whether the requested behavior
+can be implemented from delivered event payloads alone, or whether it needs to
+call Storyden host HTTP APIs to read or write installation data. If it needs
+host API calls, the implementation must use `BuildAPIClient` and the manifest
+must include `access` with a stable bot account handle, display name, and the
+narrow Storyden permission names required by those API operations. Use the
+permissions docs to choose those names, and avoid `ADMINISTRATOR` unless the
+user explicitly asked for broad administrator capability and no narrower
+permission satisfies the requested behavior. Do not add `access` for plugins
+that only consume events or use plugin RPC helpers that do not need host HTTP
+API credentials.
 
 ## Runtime Logs
 
-`plugin_logs_read` reads recent output from an installed supervised plugin by
-installation ID. It is the runtime evidence tool: use it when debugging whether
-a plugin started, handled an event, emitted an error, or produced the expected
-output.
+`plugin_logs_read` reads recent output from the installed supervised plugin
+bound to the current workspace. It is the runtime evidence tool: use it when
+debugging whether a plugin started, handled an event, emitted an error, or
+produced the expected output.
 
 Logs are separate from source and API discovery. If a user asks to check logs,
-the agent should call `plugin_logs_read` with the `installation_id` returned by
-`plugin_install`; it should not substitute Go symbol search, SDK reference text,
-or documentation lookup.
+the agent should call `plugin_logs_read`; it should not substitute Go symbol
+search, SDK reference text, or documentation lookup.
 
 ## Guardrails
 
@@ -140,25 +169,125 @@ or documentation lookup.
 - File access is workspace-relative and confined by the workspace provider.
 - AST parsing reads source bytes through the workspace abstraction; it does not
   require local filesystem paths.
-- Install operations go through the supervised plugin manager.
+- Install operations go through the supervised plugin manager and apply to the
+  plugin represented by the active workspace.
+- Existing-plugin editing starts by importing an installed supervised plugin;
+  subsequent install and log tools continue working with that same plugin.
 - The agent must not claim a plugin is installed or active unless the install
   tool returns success.
 
 ## Editing Strategy
 
+Plugin Builder should act as the maintainer of one Storyden plugin for the
+chat. Its operating loop is:
+
+1. Understand the requested Storyden outcome.
+2. Inspect the existing plugin when one exists.
+3. Plan the behaviour in terms of Storyden concepts and plugin boundaries.
+4. Discover the required Storyden SDK, event, API, manifest, configuration, and
+   permission details before relying on them.
+5. Implement the behaviour in Go and keep `manifest.yaml` aligned.
+6. Validate, fix failures where possible, then install or update only when the
+   plugin is ready.
+7. Use runtime logs to check startup and user-visible behaviour where possible.
+8. Compare the implementation against the original request before reporting
+   completion.
+
+The agent should not stop at a proposal when the available tools can complete
+the plugin change. If a core requested behaviour remains incomplete, it should
+continue working or clearly say what is not ready in user-visible terms.
+
 The default editing loop is:
 
-1. Create starter files or inspect existing workspace state.
-2. Read/search files and inspect Go source with AST tools where useful.
-3. Edit with patches or complete file writes.
-4. Run Go validation tools.
-5. Package and install/update the supervised plugin.
+1. Create starter files for a new plugin, or import an installed supervised
+   plugin into an empty workspace for an existing-plugin edit.
+2. Search or outline files to locate the relevant behavior, then read a small
+   line range around the exact code or text being changed.
+3. Update `manifest.yaml` with the structured manifest writer. Edit other
+   existing files with exact text replacement, or use complete file writes only
+   for new files and full rewrites.
+4. Run `plugin_validate` as the holistic readiness check.
+5. Use focused Go tools only to repair or recheck specific failed validation
+   areas.
+6. Install/update the supervised plugin. Installation packages internally; the
+   agent does not need a separate package artifact.
 
-Patch application is provider-independent for Go source files. The patch tool
-reads file bytes through the workspace abstraction, applies a semantic Go patch
-in process, and writes the transformed bytes back through the same abstraction.
-Hosted workspaces do not need external tools such as `git` to apply Go source
-edits.
+File inspection is line-oriented. Reads return the selected range, total line
+count, and a content revision. Search returns contextual snippets with the same
+revision information, and Go outlines return compact import, type, function,
+and method ranges so the agent can decide what to read next without loading
+entire files.
+
+Focused edits use exact text replacement. The edit tool reads file bytes through
+the workspace abstraction, verifies an optional expected revision, chooses the
+replacement location from the old text and optional line hint, and writes the
+transformed bytes back through the same abstraction. This works for Go source,
+module files, README files, and other text assets without requiring external
+tools such as `git` or GNU patch.
+
+Manifest edits are structured. The manifest writer uses the generated plugin
+manifest schema as its tool input shape, then decodes and validates through
+`rpc.ManifestFromMap` before writing `manifest.yaml`. This keeps field names
+such as `configuration_schema` aligned with the runtime manifest contract.
+
+Validation is centralized through `plugin_validate`. It checks manifest schema,
+manifest/code consistency, incomplete implementation markers, Go formatting,
+dependency tidiness, vet/lint, tests, and package archive validity. The
+individual Go tools remain available as repair instruments after a specific
+validation check fails.
+
+The active workspace is the source of truth for the plugin. Before broad
+changes, Plugin Builder should inspect the existing implementation and preserve
+the plugin's established architecture, style, and behavior unless the user
+requested otherwise. New work should fit into the plugin as a product: extend
+existing behavior where possible, avoid parallel implementations and duplicate
+configuration, and keep behavior manifest-driven.
+
+Plugin Builder is allowed to iterate with the user. It does not need to solve
+every product detail in one turn. It must not, however, present partial, stubbed,
+simulated, dry-run-only, or placeholder behavior as complete. Installed plugins
+should not contain TODOs, fake success paths, "would do this" behavior, or
+intentionally incomplete implementations. If a requested behavior is not ready,
+the agent should say what is ready and what still needs work in user-visible
+terms.
+
+Configurable plugins should read current stored configuration during startup and
+also handle later configuration updates. A configuration callback alone is not
+enough for behaviours that must start after install, update, or restart when the
+setting was already present. Missing required configuration should be logged
+clearly and disable the dependent behaviour where possible, without making the
+plugin look successful when it is idle.
+
+Plugin Builder should treat the plugin as software it owns. When touching nearby
+code, it may improve clarity, consolidate duplicated logic, remove obsolete
+unreachable code, and fix clearly safe correctness, validation, documentation,
+naming, or complexity issues. These improvements must not change unrelated
+user-visible behavior.
+
+Because Plugin Builder source is primarily maintained by robots, comments and
+lightweight documentation are useful state compression for later runs. Comments
+should preserve intent, assumptions, architectural decisions, Storyden concept
+mappings, capabilities, non-obvious SDK/API usage, and safety assumptions. They
+should explain why rather than narrating obvious syntax, and stale comments
+should be removed. Substantial plugins should maintain a concise `README.md`
+covering purpose, major behavior, affected Storyden concepts, user-visible
+changes, external integrations, and safety or moderation assumptions.
+
+## Runtime Logging
+
+Plugin Builder should add useful runtime logging with the Go standard library
+logger. Logs are for future robot maintenance and for non-technical user
+support, so they should describe what the plugin is doing in product terms.
+
+Every failure path should log what failed before returning the error, unless the
+caller already logs the same failure with better context. Important lifecycle and
+behavior points should have concise info logs: startup, configuration decisions,
+event receipt, skipped actions, external calls, successful user-visible actions,
+and shutdown when relevant.
+
+Logs must not leak secrets, tokens, credentials, or private user content. The
+goal is a healthy amount of "this is what's happening" signal, not noisy branch
+tracing.
 
 ## Package Boundaries
 

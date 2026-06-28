@@ -14,7 +14,8 @@ func TestStorydenDocsURLAllowsDocsAndLLMSText(t *testing.T) {
 		{input: "/llms.txt", want: "https://www.storyden.org/llms.txt"},
 		{input: "llms.txt", want: "https://www.storyden.org/llms.txt"},
 		{input: "/docs/plugins.md", want: "https://www.storyden.org/docs/plugins.md"},
-		{input: "https://storyden.org/docs/plugins?ignored=true#section", want: "https://www.storyden.org/docs/plugins"},
+		{input: "/docs/api/nodes/NodeCreate", want: "https://www.storyden.org/docs/api/nodes/NodeCreate.md"},
+		{input: "https://storyden.org/docs/plugins?ignored=true#section", want: "https://www.storyden.org/docs/plugins.md"},
 	} {
 		t.Run(tc.input, func(t *testing.T) {
 			u, err := storydenDocsURL(tc.input)

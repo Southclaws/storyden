@@ -27,9 +27,8 @@ type pluginLogReader interface {
 }
 
 type PluginLogsInput struct {
-	InstallationID string `json:"installation_id" jsonschema:"Supervised plugin installation ID returned by plugin_install"`
-	MaxLines       int    `json:"max_lines,omitempty" jsonschema:"Maximum recent log lines to return"`
-	WaitMillis     int    `json:"wait_millis,omitempty" jsonschema:"How long to wait for current log output before returning"`
+	MaxLines   int `json:"max_lines,omitempty" jsonschema:"Maximum recent log lines to return"`
+	WaitMillis int `json:"wait_millis,omitempty" jsonschema:"How long to wait for current log output before returning"`
 }
 
 type PluginLogsResult struct {
@@ -47,26 +46,27 @@ func (a *Agent) addLogTools(add toolAdder) error {
 Use this whenever the user asks to "check the logs", "see what happened at
 runtime", or debug whether an installed plugin reacted to an event.
 
-Required input:
-- installation_id: use the exact installation_id returned by plugin_install.
-
 This tool reads runtime output only. It does not inspect source code. Do not use
 plugin_go_symbol_search as a substitute for this tool when the user asks about
-logs.`,
+logs. It reads logs for the plugin bound to the current workspace.`,
 	}, func(ctx adktool.Context, args PluginLogsInput) (PluginLogsResult, error) {
 		return a.ReadPluginLogs(ctx, args)
 	}))
 }
 
 func (a *Agent) ReadPluginLogs(ctx context.Context, in PluginLogsInput) (PluginLogsResult, error) {
-	rawID := strings.TrimSpace(in.InstallationID)
-	if rawID == "" {
-		return PluginLogsResult{}, errors.New("installation_id is required; use the installation_id returned by plugin_install")
+	target, ok, err := pluginBuildTargetFromContext(ctx)
+	if err != nil {
+		return PluginLogsResult{}, err
+	}
+	if !ok || strings.TrimSpace(target.InstallationID) == "" {
+		return PluginLogsResult{}, errors.New("no plugin installation is bound to this workspace; install the plugin first")
 	}
 
+	rawID := strings.TrimSpace(target.InstallationID)
 	parsed, err := xid.FromString(rawID)
 	if err != nil {
-		return PluginLogsResult{}, fmt.Errorf("invalid installation_id: %w", err)
+		return PluginLogsResult{}, fmt.Errorf("invalid bound plugin installation: %w", err)
 	}
 
 	maxLines := in.MaxLines

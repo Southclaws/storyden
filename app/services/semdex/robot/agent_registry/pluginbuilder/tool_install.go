@@ -1,23 +1,29 @@
 package pluginbuilder
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
+	"sort"
+	"strings"
 
+	"github.com/goccy/go-yaml"
 	"github.com/rs/xid"
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type InstallInput struct {
-	InstallationID string `json:"installation_id,omitempty" jsonschema:"Existing supervised plugin installation ID to update"`
-	Activate       bool   `json:"activate,omitempty" jsonschema:"Activate or restart the supervised plugin after installing"`
-	UpdateIfExists bool   `json:"update_if_exists,omitempty" jsonschema:"Update the first installed supervised plugin with the same manifest ID"`
-	RunValidation  bool   `json:"run_validation,omitempty" jsonschema:"Deprecated; validation runs by default unless skip_validation is true"`
-	SkipValidation bool   `json:"skip_validation,omitempty" jsonschema:"Skip pre-install validation commands"`
+	Activate       bool `json:"activate,omitempty" jsonschema:"Activate or restart the supervised plugin after installing"`
+	SkipValidation bool `json:"skip_validation,omitempty" jsonschema:"Skip pre-install validation commands"`
 }
 
 type InstallResult struct {
@@ -28,10 +34,21 @@ type InstallResult struct {
 	PackageBytes   int    `json:"package_bytes"`
 }
 
+type packageArchive struct {
+	Manifest rpc.Manifest
+	Bytes    []byte
+	Files    []string
+}
+
+type manifestFile struct {
+	Path     string
+	Manifest rpc.Manifest
+}
+
 func (a *Agent) addInstallTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_install",
-		Description: "Package and install or update a managed plugin as a supervised Storyden plugin. Requires administrator context.",
+		Description: "Package and install or update a managed plugin as a supervised Storyden plugin.",
 	}, func(ctx adktool.Context, args InstallInput) (InstallResult, error) {
 		result, err := a.Install(ctx, args)
 		if err != nil {
@@ -47,34 +64,19 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 	}
 
 	if !in.SkipValidation {
-		if result, err := a.GoFormat(ctx); err != nil {
+		if result, err := a.Validate(ctx, ValidateInput{}); err != nil {
 			return InstallResult{}, err
 		} else if !result.Success {
-			return InstallResult{}, fmt.Errorf("gofmt failed: %s", result.Output)
-		}
-		if result, err := a.GoTidy(ctx); err != nil {
-			return InstallResult{}, err
-		} else if !result.Success {
-			return InstallResult{}, fmt.Errorf("go mod tidy failed: %s", result.Output)
-		}
-		if result, err := a.GoVet(ctx); err != nil {
-			return InstallResult{}, err
-		} else if !result.Success {
-			return InstallResult{}, fmt.Errorf("go vet failed: %s", result.Output)
-		}
-		if result, err := a.GoTest(ctx, GoTestInput{}); err != nil {
-			return InstallResult{}, err
-		} else if !result.Success {
-			return InstallResult{}, fmt.Errorf("go test failed: %s", result.Output)
+			return InstallResult{}, errors.New(result.Message)
 		}
 	}
 
-	pkg, err := a.PackageBytes(ctx)
+	pkg, err := a.packageBytes(ctx)
 	if err != nil {
 		return InstallResult{}, err
 	}
 
-	id, found, action, err := a.resolveInstallation(ctx, in.InstallationID, string(pkg.Manifest.ID), in.UpdateIfExists)
+	id, found, action, err := a.resolveInstallation(ctx, string(pkg.Manifest.ID))
 	if err != nil {
 		return InstallResult{}, err
 	}
@@ -105,6 +107,23 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 		active = true
 	}
 
+	targetMode := pluginBuildTargetModeNew
+	if target, ok, err := pluginBuildTargetFromContext(ctx); err != nil {
+		return InstallResult{}, err
+	} else if ok {
+		if target.Mode != "" {
+			targetMode = target.Mode
+		}
+	}
+
+	if err := a.setPluginBuildTarget(ctx, pluginBuildTarget{
+		Mode:           targetMode,
+		InstallationID: id.String(),
+		ManifestID:     string(pkg.Manifest.ID),
+	}); err != nil {
+		return InstallResult{}, err
+	}
+
 	return InstallResult{
 		Action:         action,
 		InstallationID: id.String(),
@@ -114,29 +133,179 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 	}, nil
 }
 
-func (a *Agent) resolveInstallation(ctx context.Context, installationID, manifestID string, updateIfExists bool) (pluginresource.InstallationID, bool, string, error) {
-	if installationID != "" {
-		id, err := xid.FromString(installationID)
+func (a *Agent) resolveInstallation(ctx context.Context, manifestID string) (pluginresource.InstallationID, bool, string, error) {
+	target, ok, err := pluginBuildTargetFromContext(ctx)
+	if err != nil {
+		return pluginresource.InstallationID{}, false, "", err
+	}
+	if ok {
+		if target.ManifestID != "" && target.ManifestID != manifestID {
+			return pluginresource.InstallationID{}, false, "", errors.New(pluginBuildTargetDifferentPluginMessage)
+		}
+		if target.InstallationID == "" {
+			if target.Mode == pluginBuildTargetModeNew {
+				return pluginresource.InstallationID{}, false, "", nil
+			}
+			return pluginresource.InstallationID{}, false, "", errors.New("this chat cannot update the selected plugin; start a new chat for that plugin")
+		}
+
+		id, err := xid.FromString(target.InstallationID)
 		if err != nil {
-			return pluginresource.InstallationID{}, false, "", fmt.Errorf("invalid installation_id: %w", err)
+			return pluginresource.InstallationID{}, false, "", fmt.Errorf("invalid bound plugin installation: %w", err)
 		}
 		return pluginresource.InstallationID(id), true, "updated", nil
 	}
 
-	if !updateIfExists {
-		return pluginresource.InstallationID{}, false, "", nil
-	}
+	return pluginresource.InstallationID{}, false, "", nil
+}
 
-	records, err := a.installer.List(ctx)
+func (a *Agent) packageBytes(ctx context.Context) (*packageArchive, error) {
+	workspace, err := a.Workspace(ctx)
 	if err != nil {
-		return pluginresource.InstallationID{}, false, "", err
+		return nil, err
+	}
+	return buildPackage(ctx, workspace)
+}
+
+func buildPackage(ctx context.Context, workspace workspaceprovider.Workspace) (*packageArchive, error) {
+	mf, err := readProjectManifest(ctx, workspace)
+	if err != nil {
+		return nil, err
 	}
 
-	for _, rec := range records {
-		if rec.Mode.Supervised() && string(rec.Manifest.ID) == manifestID {
-			return rec.InstallationID, true, "updated", nil
+	manifestJSON, err := json.MarshalIndent(mf.Manifest, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+	manifestJSON = append(manifestJSON, '\n')
+
+	files, err := packageWorkspaceFiles(ctx, workspace)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, files); err != nil {
+		return nil, err
+	}
+
+	var buf bytes.Buffer
+	zw := zip.NewWriter(&buf)
+	manifestHeader := &zip.FileHeader{Name: pluginresource.ArchiveManifestFileName, Method: zip.Deflate}
+	manifestHeader.SetMode(0o644)
+	writer, err := zw.CreateHeader(manifestHeader)
+	if err != nil {
+		return nil, err
+	}
+	if _, err := writer.Write(manifestJSON); err != nil {
+		return nil, err
+	}
+
+	written := []string{pluginresource.ArchiveManifestFileName}
+	for _, file := range files {
+		data, err := workspace.ReadFile(ctx, file.Path, -1)
+		if err != nil {
+			return nil, err
+		}
+		header := &zip.FileHeader{Name: file.Path, Method: zip.Deflate}
+		header.SetMode(file.Mode)
+		header.Method = zip.Deflate
+		writer, err := zw.CreateHeader(header)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := writer.Write(data.Content); err != nil {
+			return nil, err
+		}
+		written = append(written, file.Path)
+	}
+
+	if err := zw.Close(); err != nil {
+		return nil, err
+	}
+
+	validated, err := pluginresource.Binary(buf.Bytes()).Validate(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("validate package: %w", err)
+	}
+	if err := validated.Metadata.Validate(); err != nil {
+		return nil, fmt.Errorf("validate package manifest: %w", err)
+	}
+
+	return &packageArchive{Manifest: mf.Manifest, Bytes: buf.Bytes(), Files: written}, nil
+}
+
+func packageWorkspaceFiles(ctx context.Context, workspace workspaceprovider.Workspace) ([]workspaceprovider.FileInfo, error) {
+	listed, err := workspace.List(ctx, workspaceprovider.ListOptions{MaxFiles: 500})
+	if err != nil {
+		return nil, err
+	}
+
+	files := []workspaceprovider.FileInfo{}
+	for _, file := range listed {
+		name := file.Path
+		if name == ".DS_Store" || name == pluginresource.ArchiveManifestFileName {
+			continue
+		}
+		if strings.HasSuffix(name, ".zip") || name == manifestYAMLFilename {
+			continue
+		}
+		if file.Mode&fs.ModeSymlink != 0 {
+			continue
+		}
+		files = append(files, file)
+	}
+	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
+
+	return files, nil
+}
+
+func readProjectManifest(ctx context.Context, workspace workspaceprovider.Workspace) (*manifestFile, error) {
+	data, err := workspace.ReadFile(ctx, manifestYAMLFilename, -1)
+	if err != nil {
+		return nil, err
+	}
+	var raw map[string]any
+	if err := yaml.Unmarshal(data.Content, &raw); err != nil {
+		return nil, fmt.Errorf("parse manifest: %w", err)
+	}
+	if err := validateManifestRaw(raw); err != nil {
+		return nil, fmt.Errorf("validate manifest: %w", err)
+	}
+	manifest, err := rpc.ManifestFromMap(raw)
+	if err != nil {
+		return nil, fmt.Errorf("validate manifest: %w", err)
+	}
+	return &manifestFile{Path: data.Path, Manifest: *manifest}, nil
+}
+
+func validateHostAPIAccessManifest(ctx context.Context, workspace workspaceprovider.Workspace, manifest rpc.Manifest, files []workspaceprovider.FileInfo) error {
+	usesHostAPI, err := workspaceUsesBuildAPIClient(ctx, workspace, files)
+	if err != nil {
+		return err
+	}
+	if !usesHostAPI {
+		return nil
+	}
+	if _, ok := manifest.Access.Get(); ok {
+		return nil
+	}
+
+	return errors.New("manifest access is required because plugin code uses BuildAPIClient; add access with a stable bot account handle, display name, and narrow Storyden permissions for the API operations being called")
+}
+
+func workspaceUsesBuildAPIClient(ctx context.Context, workspace workspaceprovider.Workspace, files []workspaceprovider.FileInfo) (bool, error) {
+	for _, file := range files {
+		if !strings.HasSuffix(file.Path, ".go") {
+			continue
+		}
+		data, err := workspace.ReadFile(ctx, file.Path, -1)
+		if err != nil {
+			return false, err
+		}
+		if bytes.Contains(data.Content, []byte("BuildAPIClient(")) {
+			return true, nil
 		}
 	}
 
-	return pluginresource.InstallationID{}, false, "", nil
+	return false, nil
 }

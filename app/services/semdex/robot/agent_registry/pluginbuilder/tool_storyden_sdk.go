@@ -213,7 +213,8 @@ func (a *Agent) StorydenSDKSearch(ctx context.Context, in StorydenSDKSearchInput
 		Hints: []StorydenSDKHint{
 			{Message: "Use plugin_storyden_sdk_events for manifest event names and event payload fields."},
 			{Message: "Use plugin_go_symbol_detail with the returned import_path and symbol name when you need methods or full struct fields."},
-			{Message: "For Storyden host HTTP API calls inside event handlers, use client, err := pl.BuildAPIClient(ctx); do not construct raw openapi clients from plugin internals."},
+			{Message: "For Storyden host HTTP API calls, use client, err := pl.BuildAPIClient(ctx) and reuse the resulting client where appropriate; do not construct raw API clients from plugin internals."},
+			{Message: "If code uses BuildAPIClient, manifest.yaml must include access with a stable bot account handle, display name, and narrow Storyden permission names for the API operations being called."},
 			{Message: "Prefer generated WithResponse methods when checking HTTP status. If status is non-2xx, return fmt.Errorf with resp.Status() instead of returning nil or a stale err."},
 		},
 	}

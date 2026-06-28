@@ -30,6 +30,23 @@ func TestGoDiscoveryListsPackagesAndSymbols(t *testing.T) {
 	requireSymbol(t, symbols.Symbols, "HandleReply", "func")
 }
 
+func TestGoDiscoveryIncludeDepsSkipsStandardPackages(t *testing.T) {
+	ctx := context.Background()
+	agent := newDiscoveryTestAgent(t, ctx)
+
+	packages, err := agent.ListGoPackages(ctx, PackageListInput{
+		Pattern:     "./...",
+		IncludeDeps: true,
+		MaxPackages: 50,
+	})
+	require.NoError(t, err)
+	require.NotEmpty(t, packages.Packages)
+	requirePackage(t, packages.Packages, "example.com/plugin")
+	for _, pkg := range packages.Packages {
+		require.False(t, pkg.Standard, "standard package %s should be filtered from include_deps output", pkg.ImportPath)
+	}
+}
+
 func TestGoDiscoveryReturnsSymbolDetails(t *testing.T) {
 	ctx := context.Background()
 	agent := newDiscoveryTestAgent(t, ctx)
