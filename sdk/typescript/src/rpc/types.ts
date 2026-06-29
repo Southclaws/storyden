@@ -1113,6 +1113,8 @@ export interface RPCRequestRobotRunParams {
   message: string;
   // The Robot to invoke.
   robot_id: string;
+  // Optional existing Robot session ID to continue. If omitted, a new session is created.
+  session_id?: string;
   // Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
   workspace?: RPCRequestRobotRunParamsWorkspace;
 }

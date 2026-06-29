@@ -62,6 +62,10 @@ $defs:
               robot_id:
                 type: string
                 description: The Robot to invoke.
+              session_id:
+                type: string
+                format: xid
+                description: Optional existing Robot session ID to continue. If omitted, a new session is created.
               workspace:
                 type: object
                 description: Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.

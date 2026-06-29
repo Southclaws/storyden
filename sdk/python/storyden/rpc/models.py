@@ -987,6 +987,8 @@ class RPCRequestRobotRunParams(BaseModel):
     message: str = Field(min_length=1)
     """The Robot to invoke."""
     robot_id: str
+    """Optional existing Robot session ID to continue. If omitted, a new session is created."""
+    session_id: str | None = None
     """Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both."""
     workspace: RPCRequestRobotRunParamsWorkspace | None = None
 

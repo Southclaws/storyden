@@ -1484,6 +1484,8 @@ type RPCRequestRobotRunParams struct {
 	Message string `json:"message"`
 	// The Robot to invoke.
 	RobotID string `json:"robot_id"`
+	// Optional existing Robot session ID to continue. If omitted, a new session is created.
+	SessionID opt.Optional[xid.ID] `json:"session_id,omitempty"`
 	// Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
 	Workspace opt.Optional[RPCRequestRobotRunParamsWorkspace] `json:"workspace,omitempty"`
 }

@@ -24,6 +24,9 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 		Method: "robot_run",
 	}
 	sessionID := xid.New()
+	if requestedSessionID, ok := req.Params.SessionID.Get(); ok {
+		sessionID = requestedSessionID
+	}
 	result.SessionID = opt.New(sessionID)
 
 	accessConfig, ok := h.manifest.Metadata.Access.Get()

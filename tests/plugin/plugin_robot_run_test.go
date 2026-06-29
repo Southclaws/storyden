@@ -66,6 +66,40 @@ func TestExternalPluginRobotRunCompletedStructuredOutput(t *testing.T) {
 	})
 }
 
+func TestExternalPluginRobotRunContinuesProvidedSession(t *testing.T) {
+	withRobotRunPlugin(t, []string{"USE_ROBOTS"}, func(
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		adminSession openapi.RequestEditorFn,
+		pl *sdk.Plugin,
+		r *require.Assertions,
+	) {
+		scriptName := writeRobotRunScript(t, `steps:
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_finish_1
+          name: robot_run_finish
+          args:
+            status: "completed"
+            summary: "Robot run complete."
+      finish: "stop"
+`)
+		robotID := createRobotForRun(t, root, cl, adminSession, r, scriptName)
+
+		first := runRobotRPC(t, root, pl, robotID, "first turn")
+		sessionID, ok := first.SessionID.Get()
+		r.True(ok, "expected session_id")
+
+		second := runRobotRPC(t, root, pl, robotID, "second turn", sessionID)
+		continuedSessionID, ok := second.SessionID.Get()
+		r.True(ok, "expected continued session_id")
+		r.Equal(sessionID, continuedSessionID)
+		r.False(second.Error.Ok(), "unexpected error: %v", second.Error)
+	})
+}
+
 func TestExternalPluginRobotRunBypassesConfirmationForAssignedTool(t *testing.T) {
 	withRobotRunPlugin(t, []string{"USE_ROBOTS", "MANAGE_ROBOTS"}, func(
 		root context.Context,
@@ -358,16 +392,21 @@ func createRobotForRun(
 	return id
 }
 
-func runRobotRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.ID, message string) *rpc.RPCResponseRobotRun {
+func runRobotRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.ID, message string, sessionID ...xid.ID) *rpc.RPCResponseRobotRun {
 	t.Helper()
+
+	params := rpc.RPCRequestRobotRunParams{
+		Message: message,
+		RobotID: robotID.String(),
+	}
+	if len(sessionID) > 0 {
+		params.SessionID = opt.New(sessionID[0])
+	}
 
 	result, err := pl.Send(ctx, rpc.RPCRequestRobotRun{
 		Jsonrpc: "2.0",
 		Method:  "robot_run",
-		Params: rpc.RPCRequestRobotRunParams{
-			Message: message,
-			RobotID: robotID.String(),
-		},
+		Params:  params,
 	})
 	require.NoError(t, err)
 
