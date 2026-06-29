@@ -976,8 +976,8 @@ func TestWithDefaultTimeoutSetsTimeoutWhenMissing(t *testing.T) {
 	require.True(t, ok)
 
 	remaining := time.Until(deadline)
-	assert.Greater(t, remaining, 28*time.Second)
-	assert.LessOrEqual(t, remaining, 30*time.Second)
+	assert.Greater(t, remaining, 9*time.Minute)
+	assert.LessOrEqual(t, remaining, 10*time.Minute)
 }
 
 func TestWithDefaultTimeoutPreservesExistingDeadline(t *testing.T) {

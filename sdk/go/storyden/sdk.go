@@ -76,7 +76,7 @@ type RobotToolCallHandler func(context.Context, rpc.RPCRequestRobotToolCallParam
 const (
 	initialReconnectWait = 250 * time.Millisecond
 	maxReconnectWait     = 10 * time.Second
-	defaultRPCTimeout    = 30 * time.Second
+	defaultRPCTimeout    = 10 * time.Minute
 	maxRPCMessageBytes   = 4 << 20
 )
 
