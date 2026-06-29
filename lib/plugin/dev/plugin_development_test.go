@@ -1,4 +1,4 @@
-package pluginapi
+package dev
 
 import (
 	"archive/zip"

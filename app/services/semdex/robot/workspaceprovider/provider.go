@@ -13,6 +13,7 @@ import (
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/local"
+	spriteprovider "github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/sprites"
 	workspacecap "github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/workspace"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 )
@@ -47,8 +48,8 @@ type Registry struct {
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(NewRegistry, local.New),
-		fx.Invoke(registerLocal),
+		fx.Provide(NewRegistry, local.New, spriteprovider.New),
+		fx.Invoke(registerLocal, registerSprites),
 	)
 }
 
@@ -128,4 +129,10 @@ func WorkspaceFromState(ctx context.Context, registry *Registry) (Workspace, err
 
 func registerLocal(registry *Registry, provider *local.Provider) {
 	registry.Register(provider)
+}
+
+func registerSprites(registry *Registry, provider *spriteprovider.Provider) {
+	if provider.Enabled() {
+		registry.Register(provider)
+	}
 }

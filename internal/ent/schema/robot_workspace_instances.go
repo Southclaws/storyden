@@ -24,7 +24,7 @@ func (RobotWorkspaceInstance) Fields() []ent.Field {
 			GoType(xid.ID{}),
 
 		field.Enum("provider").
-			Values("local").
+			Values("local", "sprites").
 			Default("local").
 			Comment("Workspace provider type"),
 

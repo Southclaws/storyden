@@ -11592,6 +11592,7 @@ components:
     RobotWorkspaceProvider:
       description: Robot workspace provider type.
       type: string
+      enum: [local, sprites]
 
     RobotWorkspaceProviderInfo:
       type: object

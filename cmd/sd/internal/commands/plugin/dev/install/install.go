@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type InstallCommand *cobra.Command
@@ -28,7 +28,7 @@ If a supervised plugin with the same manifest ID already exists, its package is 
 `,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pkg, err := pluginapi.BuildPackage(cmd.Context(), dir, manifestPath)
+			pkg, err := plugindev.BuildPackage(cmd.Context(), dir, manifestPath)
 			if err != nil {
 				return err
 			}
@@ -38,7 +38,7 @@ If a supervised plugin with the same manifest ID already exists, its package is 
 				return err
 			}
 
-			plugin, updated, err := pluginapi.InstallSupervisedPackage(cmd.Context(), client.OpenAPI, pkg)
+			plugin, updated, err := plugindev.InstallSupervisedPackage(cmd.Context(), client.OpenAPI, pkg)
 			if err != nil {
 				return err
 			}
@@ -53,7 +53,7 @@ If a supervised plugin with the same manifest ID already exists, its package is 
 	}
 
 	command.Flags().StringVar(&dir, "dir", ".", "Plugin project directory")
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", pluginapi.ManifestFilename, "Path to plugin manifest YAML")
+	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
 
 	help.SetupMarkdownHelp(command)
 

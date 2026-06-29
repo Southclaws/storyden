@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type GetCommand *cobra.Command
@@ -23,7 +23,7 @@ func New(store *config.Store) GetCommand {
 			if err != nil {
 				return err
 			}
-			plugin, err := pluginapi.GetPlugin(cmd.Context(), client.OpenAPI, args[0])
+			plugin, err := plugindev.GetPlugin(cmd.Context(), client.OpenAPI, args[0])
 			if err != nil {
 				return err
 			}

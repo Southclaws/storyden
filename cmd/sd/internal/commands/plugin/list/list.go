@@ -10,8 +10,8 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type ListCommand *cobra.Command
@@ -33,7 +33,7 @@ func New(store *config.Store) ListCommand {
 			if err != nil {
 				return err
 			}
-			plugins, err := pluginapi.ListPlugins(cmd.Context(), client.OpenAPI)
+			plugins, err := plugindev.ListPlugins(cmd.Context(), client.OpenAPI)
 			if err != nil {
 				return err
 			}
@@ -60,8 +60,8 @@ func profile() render.Profile[openapi.Plugin] {
 	return render.Profile[openapi.Plugin]{Columns: []render.Column[openapi.Plugin]{
 		{Header: "ID", Render: func(p openapi.Plugin) string { return string(p.Id) }},
 		{Header: "NAME", Render: func(p openapi.Plugin) string { return p.Name }},
-		{Header: "MODE", Render: pluginapi.PluginMode},
-		{Header: "STATUS", Render: pluginapi.PluginStatus},
+		{Header: "MODE", Render: plugindev.PluginMode},
+		{Header: "STATUS", Render: plugindev.PluginStatus},
 		{Header: "VERSION", Render: func(p openapi.Plugin) string {
 			if p.Version == nil {
 				return ""

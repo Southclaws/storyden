@@ -7,6 +7,7 @@ import (
 	pluginnew "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/new"
 	pluginpackage "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/package"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/run"
+	"github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/symbols"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/validate"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
@@ -19,6 +20,7 @@ func New(
 	packageCommand pluginpackage.PackageCommand,
 	validateCommand validate.ValidateCommand,
 	installCommand install.InstallCommand,
+	symbolsCommand symbols.SymbolsCommand,
 ) DevCommand {
 	command := &cobra.Command{
 		Use:   "dev",
@@ -51,6 +53,7 @@ sd plugin dev install
 	command.AddCommand(packageCommand)
 	command.AddCommand(validateCommand)
 	command.AddCommand(installCommand)
+	command.AddCommand(symbolsCommand)
 
 	help.SetupMarkdownHelp(command)
 

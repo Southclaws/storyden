@@ -95,7 +95,8 @@ const DefaultProvider = ProviderLocal
 
 // Provider values.
 const (
-	ProviderLocal Provider = "local"
+	ProviderLocal   Provider = "local"
+	ProviderSprites Provider = "sprites"
 )
 
 func (pr Provider) String() string {
@@ -105,7 +106,7 @@ func (pr Provider) String() string {
 // ProviderValidator is a validator for the "provider" field enum values. It is called by the builders before save.
 func ProviderValidator(pr Provider) error {
 	switch pr {
-	case ProviderLocal:
+	case ProviderLocal, ProviderSprites:
 		return nil
 	default:
 		return fmt.Errorf("robotworkspaceinstance: invalid enum value for provider field: %q", pr)

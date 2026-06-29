@@ -13,6 +13,8 @@ import (
 	"golang.org/x/tools/go/packages"
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
+
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 const (
@@ -116,7 +118,7 @@ The query is a literal case-insensitive substring, not regex or wildcard search.
 func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput) (StorydenSDKEventsResult, error) {
 	query := strings.ToLower(strings.TrimSpace(in.Query))
 	if strings.ContainsAny(query, "*?[](){}^$|\\") {
-		return StorydenSDKEventsResult{}, fmt.Errorf("query must be a literal substring, not a regex or wildcard pattern; search for a plain term such as %q", firstPlainSearchTerm(query))
+		return StorydenSDKEventsResult{}, fmt.Errorf("query must be a literal substring, not a regex or wildcard pattern; search for a plain term such as %q", plugindev.FirstPlainSearchTerm(query))
 	}
 
 	maxEvents := in.MaxEvents
@@ -129,7 +131,7 @@ func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput
 		return StorydenSDKEventsResult{}, err
 	}
 
-	docs := packageDocs(pkg)
+	docs := plugindev.PackageDocs(pkg)
 	names := pkg.Types.Scope().Names()
 	sort.Strings(names)
 
@@ -174,10 +176,10 @@ func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput
 			ManifestConst: name,
 		}
 		if payloadObj != nil {
-			info.PayloadType = symbolSummary(pkg.PkgPath, payloadObj, docs[eventValue])
+			info.PayloadType = plugindev.SymbolSummary(pkg.PkgPath, payloadObj, docs[eventValue])
 			if typeName, ok := payloadObj.(*types.TypeName); ok {
 				if s, ok := typeName.Type().Underlying().(*types.Struct); ok {
-					info.Fields = structFields(s)
+					info.Fields = plugindev.StructFields(s)
 					info.FieldUsages = sdkFieldUsages(s)
 				}
 			}
@@ -194,7 +196,7 @@ func (a *Agent) StorydenSDKSearch(ctx context.Context, in StorydenSDKSearchInput
 		return StorydenSDKSearchResult{}, errors.New("query is required")
 	}
 	if strings.ContainsAny(query, "*?[](){}^$|\\") {
-		return StorydenSDKSearchResult{}, fmt.Errorf("query must be a literal substring, not a regex or wildcard pattern; search for a plain term such as %q", firstPlainSearchTerm(query))
+		return StorydenSDKSearchResult{}, fmt.Errorf("query must be a literal substring, not a regex or wildcard pattern; search for a plain term such as %q", plugindev.FirstPlainSearchTerm(query))
 	}
 
 	maxResults := in.MaxResults
@@ -225,7 +227,7 @@ func (a *Agent) StorydenSDKSearch(ctx context.Context, in StorydenSDKSearchInput
 		if err != nil {
 			return StorydenSDKSearchResult{}, err
 		}
-		out.Packages = append(out.Packages, packageInfoFromPackage(pkg))
+		out.Packages = append(out.Packages, plugindev.PackageInfoFromPackage(pkg))
 		searchStorydenSDKPackageSymbols(pkg, storydenSDKSearchQueries(query), maxResults, &out, visited, in.Area)
 		if out.Truncated {
 			break
@@ -258,7 +260,7 @@ func searchStorydenSDKPackageSymbols(pkg *packages.Package, queries []string, ma
 	}
 	visited[pkg.PkgPath] = true
 
-	docs := packageDocs(pkg)
+	docs := plugindev.PackageDocs(pkg)
 	names := pkg.Types.Scope().Names()
 	sort.Strings(names)
 	for _, name := range names {
@@ -273,7 +275,7 @@ func searchStorydenSDKPackageSymbols(pkg *packages.Package, queries []string, ma
 			}
 		}
 
-		summary := symbolSummary(pkg.PkgPath, obj, docs[name])
+		summary := plugindev.SymbolSummary(pkg.PkgPath, obj, docs[name])
 		haystack := strings.ToLower(summary.ImportPath + " " + summary.Name + " " + summary.Kind + " " + storydenSDKSearchableSignature(obj, summary.Signature) + " " + summary.Doc)
 		if !containsAnyLiteral(haystack, queries) {
 			continue
@@ -302,7 +304,7 @@ func searchStorydenSDKMethods(importPath string, typeName *types.TypeName, queri
 	if !ok {
 		return
 	}
-	for _, method := range namedMethods(named) {
+	for _, method := range plugindev.NamedMethods(named) {
 		if !ast.IsExported(method.Name) {
 			continue
 		}
@@ -325,7 +327,7 @@ func searchStorydenSDKMethods(importPath string, typeName *types.TypeName, queri
 
 func sdkFieldUsages(s *types.Struct) []SDKFieldUsage {
 	usages := []SDKFieldUsage{}
-	for _, field := range structFields(s) {
+	for _, field := range plugindev.StructFields(s) {
 		if !strings.HasSuffix(field.Name, "ID") {
 			continue
 		}

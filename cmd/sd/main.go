@@ -52,6 +52,7 @@ import (
 	plugindevnew "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/new"
 	plugindevpackage "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/package"
 	plugindevrun "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/run"
+	plugindevsymbols "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/symbols"
 	plugindevvalidate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/validate"
 	pluginget "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/get"
 	pluginlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/list"
@@ -201,6 +202,7 @@ func main() {
 			plugindevpackage.New,
 			plugindevvalidate.New,
 			plugindevinstall.New,
+			plugindevsymbols.New,
 			plugindev.New,
 			pluginlist.New,
 			pluginget.New,

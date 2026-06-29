@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type PackageCommand *cobra.Command
@@ -30,20 +30,20 @@ The package includes a generated ` + "`manifest.json`" + ` from ` + "`manifest.y
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path := outputPath
 			if path == "" {
-				mf, err := pluginapi.ReadProjectManifest(dir, manifestPath)
+				mf, err := plugindev.ReadProjectManifest(dir, manifestPath)
 				if err != nil {
 					return err
 				}
-				path = pluginapi.DefaultPackagePath(dir, mf.Manifest)
+				path = plugindev.DefaultPackagePath(dir, mf.Manifest)
 			}
 
 			excludes := []string{path}
-			pkg, err := pluginapi.BuildPackage(cmd.Context(), dir, manifestPath, excludes...)
+			pkg, err := plugindev.BuildPackage(cmd.Context(), dir, manifestPath, excludes...)
 			if err != nil {
 				return err
 			}
 
-			if err := pluginapi.WritePackageFile(path, pkg, force); err != nil {
+			if err := plugindev.WritePackageFile(path, pkg, force); err != nil {
 				return err
 			}
 
@@ -53,7 +53,7 @@ The package includes a generated ` + "`manifest.json`" + ` from ` + "`manifest.y
 	}
 
 	command.Flags().StringVar(&dir, "dir", ".", "Plugin project directory")
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", pluginapi.ManifestFilename, "Path to plugin manifest YAML")
+	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
 	command.Flags().StringVarP(&outputPath, "output", "o", "", "Output zip path")
 	command.Flags().BoolVar(&force, "force", false, "Overwrite an existing package")
 

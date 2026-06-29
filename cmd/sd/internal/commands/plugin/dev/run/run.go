@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type RunCommand *cobra.Command
@@ -33,7 +33,7 @@ Pass ` + "`--`" + ` followed by a command to override the manifest command for t
 `,
 		Args: cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			mf, err := pluginapi.ReadManifest(manifestPath)
+			mf, err := plugindev.ReadManifest(manifestPath)
 			if err != nil {
 				return err
 			}
@@ -43,27 +43,27 @@ Pass ` + "`--`" + ` followed by a command to override the manifest command for t
 				return err
 			}
 
-			plugin, err := pluginapi.EnsureExternalPlugin(cmd.Context(), client.OpenAPI, mf.Manifest, instanceID, noUpdate)
+			plugin, err := plugindev.EnsureExternalPlugin(cmd.Context(), client.OpenAPI, mf.Manifest, instanceID, noUpdate)
 			if err != nil {
 				return err
 			}
 
-			rpcURL, err := pluginapi.ExternalRPCURL(client.Endpoint, plugin.Token)
+			rpcURL, err := plugindev.ExternalRPCURL(client.Endpoint, plugin.Token)
 			if err != nil {
 				return err
 			}
 
-			runCommand, runArgs, err := pluginapi.CommandFromManifest(mf.Manifest, args)
+			runCommand, runArgs, err := plugindev.CommandFromManifest(mf.Manifest, args)
 			if err != nil {
 				return err
 			}
 
-			fmt.Fprintf(cmd.ErrOrStderr(), "Running %s with %s for plugin %s\n", runCommand, pluginapi.RPCURLEnvName, plugin.ID)
+			fmt.Fprintf(cmd.ErrOrStderr(), "Running %s with %s for plugin %s\n", runCommand, plugindev.RPCURLEnvName, plugin.ID)
 			return runPluginCommand(cmd.Context(), runCommand, runArgs, rpcURL, filepath.Dir(mf.Path))
 		},
 	}
 
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", pluginapi.ManifestFilename, "Path to plugin manifest YAML")
+	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
 	command.Flags().StringVar(&instanceID, "instance-id", "", "Existing plugin installation ID to update instead of matching by manifest id")
 	command.Flags().BoolVar(&noUpdate, "no-update", false, "Do not update an existing external plugin manifest before running")
 
@@ -80,6 +80,6 @@ func runPluginCommand(ctx context.Context, command string, args []string, rpcURL
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Env = append(os.Environ(), pluginapi.RPCURLEnvName+"="+rpcURL)
+	cmd.Env = append(os.Environ(), plugindev.RPCURLEnvName+"="+rpcURL)
 	return cmd.Run()
 }

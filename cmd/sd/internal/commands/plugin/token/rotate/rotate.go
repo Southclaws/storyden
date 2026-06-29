@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type RotateCommand *cobra.Command
@@ -23,7 +23,7 @@ func New(store *config.Store) RotateCommand {
 			if err != nil {
 				return err
 			}
-			token, err := pluginapi.CycleToken(cmd.Context(), client.OpenAPI, args[0])
+			token, err := plugindev.CycleToken(cmd.Context(), client.OpenAPI, args[0])
 			if err != nil {
 				return err
 			}

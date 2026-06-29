@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type DeleteCommand *cobra.Command
@@ -23,7 +23,7 @@ func New(store *config.Store) DeleteCommand {
 			if err != nil {
 				return err
 			}
-			if err := pluginapi.DeletePlugin(cmd.Context(), client.OpenAPI, args[0]); err != nil {
+			if err := plugindev.DeletePlugin(cmd.Context(), client.OpenAPI, args[0]); err != nil {
 				return err
 			}
 			fmt.Fprintf(cmd.OutOrStdout(), "Deleted plugin %s\n", args[0])

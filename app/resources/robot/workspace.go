@@ -40,7 +40,10 @@ func NewWorkspaceInstanceID(s string) (WorkspaceInstanceID, error) {
 
 type WorkspaceProvider string
 
-const WorkspaceProviderLocal WorkspaceProvider = "local"
+const (
+	WorkspaceProviderLocal   WorkspaceProvider = "local"
+	WorkspaceProviderSprites WorkspaceProvider = "sprites"
+)
 
 type Workspace struct {
 	ID        WorkspaceID

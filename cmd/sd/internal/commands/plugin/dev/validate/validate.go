@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	"github.com/Southclaws/storyden/cmd/sd/internal/pluginapi"
+	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
 type ValidateCommand *cobra.Command
@@ -24,7 +24,7 @@ Validate ` + "`manifest.yaml`" + ` and the supervised plugin package that would 
 `,
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			pkg, err := pluginapi.BuildPackage(cmd.Context(), dir, manifestPath)
+			pkg, err := plugindev.BuildPackage(cmd.Context(), dir, manifestPath)
 			if err != nil {
 				return err
 			}
@@ -35,7 +35,7 @@ Validate ` + "`manifest.yaml`" + ` and the supervised plugin package that would 
 	}
 
 	command.Flags().StringVar(&dir, "dir", ".", "Plugin project directory")
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", pluginapi.ManifestFilename, "Path to plugin manifest YAML")
+	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
 
 	help.SetupMarkdownHelp(command)
 

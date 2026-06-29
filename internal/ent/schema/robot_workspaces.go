@@ -27,7 +27,7 @@ func (RobotWorkspace) Fields() []ent.Field {
 			Comment("Human-readable description of the workspace template"),
 
 		field.Enum("provider").
-			Values("local").
+			Values("local", "sprites").
 			Default("local").
 			Comment("Workspace provider type"),
 
