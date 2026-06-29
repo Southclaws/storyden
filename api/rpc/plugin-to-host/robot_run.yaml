@@ -61,7 +61,6 @@ $defs:
                 description: Input message for the robot.
               robot_id:
                 type: string
-                format: xid
                 description: The Robot to invoke.
               workspace:
                 type: object

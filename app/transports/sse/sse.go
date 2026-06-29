@@ -11,7 +11,6 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/rs/xid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault/fmsg"
@@ -219,11 +218,6 @@ func newChatHandler(
 			robotRef = ownerRobotID
 		}
 
-		robotID := opt.NewEmpty[xid.ID]()
-		if id, err := xid.FromString(robotRef); err == nil {
-			robotID = opt.New(id)
-		}
-
 		workspaceSpec, err := workspaceMountSpecFromRequest(req.Workspace)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -296,10 +290,9 @@ func newChatHandler(
 			slog.Any("context", req.Context),
 		)
 
-		stream := chatAgent.Run(ctx, robotID, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
+		stream := chatAgent.Run(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
 			Mode:      storydenagent.ModeInteractive,
 			Source:    storydenagent.SourceInteractiveChat,
-			RobotID:   opt.New(robotRef),
 			Workspace: workspaceSpec,
 		})
 

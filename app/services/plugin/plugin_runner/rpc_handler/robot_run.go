@@ -61,7 +61,7 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 
 	stream := h.robotAgent.Run(
 		runCtx,
-		opt.New(req.Params.RobotID),
+		req.Params.RobotID,
 		pluginAccount.ID.String(),
 		sessionID.String(),
 		&genai.Content{

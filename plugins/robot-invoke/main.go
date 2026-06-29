@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/xid"
-
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	"github.com/Southclaws/storyden/sdk/go/storyden"
 )
@@ -61,16 +59,11 @@ func main() {
 		}
 	}()
 
-	robotID, err := xid.FromString(robotIDString)
-	if err != nil {
-		exitError(logger, "parse robot id", err)
-	}
-
 	req := rpc.RPCRequestRobotRun{
 		Jsonrpc: "2.0",
 		Method:  "robot_run",
 		Params: rpc.RPCRequestRobotRunParams{
-			RobotID: robotID,
+			RobotID: robotIDString,
 			Message: prompt,
 		},
 	}

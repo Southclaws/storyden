@@ -1483,7 +1483,7 @@ type RPCRequestRobotRunParams struct {
 	// Input message for the robot.
 	Message string `json:"message"`
 	// The Robot to invoke.
-	RobotID xid.ID `json:"robot_id"`
+	RobotID string `json:"robot_id"`
 	// Optional workspace mount request. Provide either workspace_id or workspace_instance_id, not both.
 	Workspace opt.Optional[RPCRequestRobotRunParamsWorkspace] `json:"workspace,omitempty"`
 }

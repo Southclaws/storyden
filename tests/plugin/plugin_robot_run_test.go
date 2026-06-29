@@ -366,7 +366,7 @@ func runRobotRPC(t *testing.T, ctx context.Context, pl *sdk.Plugin, robotID xid.
 		Method:  "robot_run",
 		Params: rpc.RPCRequestRobotRunParams{
 			Message: message,
-			RobotID: robotID,
+			RobotID: robotID.String(),
 		},
 	})
 	require.NoError(t, err)

@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -78,7 +77,7 @@ func (p *Plugin) BuildAPIClient(ctx context.Context) (*openapi.ClientWithRespons
 	)
 }
 
-func (p *Plugin) RunRobot(ctx context.Context, robotID xid.ID, message string) (string, error) {
+func (p *Plugin) RunRobot(ctx context.Context, robotID string, message string) (string, error) {
 	req := rpc.RPCRequestRobotRun{
 		Jsonrpc: "2.0",
 		Method:  "robot_run",

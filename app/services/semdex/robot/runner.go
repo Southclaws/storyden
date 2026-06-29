@@ -165,7 +165,7 @@ func New(
 
 func (s *Agent) Run(
 	ctx context.Context,
-	robotID opt.Optional[xid.ID],
+	robotRef string,
 	userID,
 	sessionID string,
 	content *genai.Content,
@@ -174,16 +174,9 @@ func (s *Agent) Run(
 ) iter.Seq2[*adksession.Event, error] {
 	runOptions := resolveRunOptions(options)
 
-	robotRef := strings.TrimSpace(runOptions.RobotID.OrZero())
+	robotRef = strings.TrimSpace(robotRef)
 	if robotRef == "" {
-		if id, ok := robotID.Get(); ok {
-			robotRef = id.String()
-		} else {
-			return errorSeq(fmt.Errorf("robot ID is required"))
-		}
-	}
-	if _, ok := runOptions.RobotID.Get(); !ok {
-		runOptions.RobotID = opt.New(robotRef)
+		return errorSeq(fmt.Errorf("robot ID is required"))
 	}
 
 	spec, err := s.resolveAgentSpec(ctx, robotRef)
@@ -388,6 +381,7 @@ func (s *Agent) runResolvedAgent(
 	return s.RunADKAgent(ctx, agent_registry.ADKRunRequest{
 		AppName:              spec.AppName,
 		Agent:                llmAgent,
+		RobotRef:             spec.RobotRef,
 		UserID:               userID,
 		SessionID:            sessionID,
 		Content:              content,
@@ -426,7 +420,7 @@ func (s *Agent) RunADKAgent(
 		return errorSeq(fmt.Errorf("create adk runner: %w", err))
 	}
 
-	if err := s.ensureSession(ctx, req.AppName, req.UserID, req.SessionID, req.Options); err != nil {
+	if err := s.ensureSession(ctx, req.AppName, req.RobotRef, req.UserID, req.SessionID); err != nil {
 		return errorSeq(err)
 	}
 	if err := s.mountWorkspaceForRun(ctx, req.UserID, req.SessionID, req.DefaultWorkspaceID, req.Options); err != nil {
@@ -572,7 +566,7 @@ func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.
 	}
 }
 
-func (s *Agent) ensureSession(ctx context.Context, robotName, userID, sessionID string, options RunOptions) error {
+func (s *Agent) ensureSession(ctx context.Context, robotName, robotRef, userID, sessionID string) error {
 	get, err := s.sessions.Get(ctx, &adksession.GetRequest{
 		AppName:   robotName,
 		UserID:    userID,
@@ -585,7 +579,7 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, userID, sessionID 
 			slog.Any("session", get.Session),
 		)
 
-		if err := s.setCurrentRobotForRun(ctx, get.Session, options); err != nil {
+		if err := s.setCurrentRobotForRun(ctx, get.Session, robotRef); err != nil {
 			return err
 		}
 		s.updateSessionName(ctx, get.Session)
@@ -595,9 +589,8 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, userID, sessionID 
 		return err
 	}
 
-	state := map[string]any{}
-	if robotID, ok := options.RobotID.Get(); ok {
-		state["current_robot_id"] = robotID
+	state := map[string]any{
+		"current_robot_id": robotRef,
 	}
 
 	create, err := s.sessions.Create(ctx, &adksession.CreateRequest{
@@ -618,22 +611,17 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, userID, sessionID 
 	return nil
 }
 
-func (s *Agent) setCurrentRobotForRun(ctx context.Context, sess adksession.Session, options RunOptions) error {
-	robotID, ok := options.RobotID.Get()
-	if !ok {
-		return nil
-	}
-
+func (s *Agent) setCurrentRobotForRun(ctx context.Context, sess adksession.Session, robotRef string) error {
 	state := map[string]any{}
 	if sess.State() != nil {
 		for key, value := range sess.State().All() {
 			state[key] = value
 		}
-		if err := sess.State().Set("current_robot_id", robotID); err != nil {
+		if err := sess.State().Set("current_robot_id", robotRef); err != nil {
 			return err
 		}
 	}
-	state["current_robot_id"] = robotID
+	state["current_robot_id"] = robotRef
 
 	sessionID, err := robot.NewSessionID(sess.ID())
 	if err != nil {

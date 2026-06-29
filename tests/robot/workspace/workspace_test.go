@@ -133,7 +133,7 @@ func runRobot(
 
 	events := agent.Run(
 		ctx,
-		opt.New(xid.ID(robotID)),
+		xid.ID(robotID).String(),
 		accountID.String(),
 		sessionID.String(),
 		genai.NewContentFromText("hello", genai.RoleUser),

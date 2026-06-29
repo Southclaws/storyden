@@ -42,9 +42,8 @@ type WorkspaceMountSpec struct {
 }
 
 type RunOptions struct {
-	Mode    RunMode
-	Source  RunSource
-	RobotID opt.Optional[string]
+	Mode   RunMode
+	Source RunSource
 
 	Workspace opt.Optional[WorkspaceMountSpec]
 }
@@ -52,6 +51,7 @@ type RunOptions struct {
 type ADKRunRequest struct {
 	AppName              string
 	Agent                adkagent.Agent
+	RobotRef             string
 	UserID               string
 	SessionID            string
 	Content              *genai.Content
