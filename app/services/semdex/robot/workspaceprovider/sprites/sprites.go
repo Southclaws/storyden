@@ -444,7 +444,7 @@ func (w *Workspace) Run(ctx context.Context, spec workspacecap.CommandSpec) (wor
 
 func defaultCommandEnv() []string {
 	return []string{
-		"PATH=/root/go/bin:/go/bin:/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin",
+		"PATH=/root/go/bin:/.sprite/languages/python/pyenv/shims:/.sprite/languages/python/pyenv/bin:/.sprite/languages/deno/bin:/.sprite/languages/bun/bin:/.sprite/languages/rust/cargo/bin:/.sprite/languages/ruby/rbenv/shims:/.sprite/languages/ruby/rbenv/bin:/.sprite/languages/go/current/bin:/.sprite/languages/node/nvm/versions/node/v22.20.0/bin:/home/sprite/.local/bin:/.sprite/bin:/go/bin:/usr/local/go/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
 		"GOBIN=/root/go/bin",
 		"GOPATH=/root/go",
 	}
