@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauth_remote "github.com/Southclaws/storyden/app/resources/oauth/remote"

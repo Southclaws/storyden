@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/fx"
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/local"

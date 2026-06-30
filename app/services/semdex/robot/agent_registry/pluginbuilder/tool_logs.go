@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/rs/xid"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_logger"
@@ -49,7 +49,7 @@ runtime", or debug whether an installed plugin reacted to an event.
 This tool reads runtime output only. It does not inspect source code. Do not use
 plugin_go_symbol_search as a substitute for this tool when the user asks about
 logs. It reads logs for the plugin bound to the current workspace.`,
-	}, func(ctx adktool.Context, args PluginLogsInput) (PluginLogsResult, error) {
+	}, func(ctx adkagent.Context, args PluginLogsInput) (PluginLogsResult, error) {
 		return a.ReadPluginLogs(ctx, args)
 	}))
 }

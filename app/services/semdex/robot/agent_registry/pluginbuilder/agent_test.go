@@ -8,8 +8,8 @@ import (
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/adk/session"
-	adktool "google.golang.org/adk/tool"
+	"google.golang.org/adk/v2/session"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 )
 

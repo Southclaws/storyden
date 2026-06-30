@@ -10,8 +10,9 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/rs/xid"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
@@ -93,7 +94,7 @@ func newTool(
 					InputSchema:         def.InputSchema,
 					RequireConfirmation: def.RequiresConfirmation && !robot_tools.ConfirmationDisabled(ctx),
 				},
-				func(ctx tool.Context, args map[string]interface{}) (robot_tools.ToolResult[map[string]interface{}], error) {
+				func(ctx agent.Context, args map[string]interface{}) (robot_tools.ToolResult[map[string]interface{}], error) {
 					return execute(ctx, sess, providerID, declaration.ID, run, args), nil
 				},
 			)

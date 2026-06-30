@@ -4,8 +4,9 @@ import (
 	"context"
 	"log/slog"
 
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/lib/mcp"
@@ -43,7 +44,7 @@ func (tt *tagTools) newTagListTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolTagListInput) (*mcp.ToolTagListOutput, error) {
+				func(ctx agent.Context, args mcp.ToolTagListInput) (*mcp.ToolTagListOutput, error) {
 					return tt.ExecuteTagList(ctx, args)
 				},
 			)

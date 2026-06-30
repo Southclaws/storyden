@@ -3,7 +3,7 @@ package llm_provider
 import (
 	"context"
 
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 )

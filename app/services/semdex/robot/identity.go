@@ -10,9 +10,9 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
@@ -199,7 +199,7 @@ func (s *Agent) robotNameResolver() robotNameResolver {
 }
 
 func projectRobotSwitchesBeforeModel(logger *slog.Logger, resolve robotNameResolver) llmagent.BeforeModelCallback {
-	return func(ctx agent.CallbackContext, req *model.LLMRequest) (*model.LLMResponse, error) {
+	return func(ctx agent.Context, req *model.LLMRequest) (*model.LLMResponse, error) {
 		rewritten := projectRobotSwitches(ctx, req, resolve)
 		if rewritten > 0 {
 			logger.Info("projected robot switch history",

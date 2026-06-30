@@ -8,7 +8,7 @@ import (
 
 	"github.com/anthropics/anthropic-sdk-go"
 	anthropicoption "github.com/anthropics/anthropic-sdk-go/option"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"

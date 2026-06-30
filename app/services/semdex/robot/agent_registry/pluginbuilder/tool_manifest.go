@@ -9,8 +9,8 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/google/jsonschema-go/jsonschema"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	libplugin "github.com/Southclaws/storyden/lib/plugin"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -29,7 +29,7 @@ func (a *Agent) addManifestTools(add toolAdder) error {
 		Name:        "plugin_manifest_write",
 		Description: manifestWriteDescription,
 		InputSchema: pluginManifestToolInputSchema(),
-	}, func(ctx adktool.Context, args map[string]any) (ManifestWriteResult, error) {
+	}, func(ctx adkagent.Context, args map[string]any) (ManifestWriteResult, error) {
 		result, err := a.WriteManifest(ctx, args)
 		if err != nil {
 			return ManifestWriteResult{}, err

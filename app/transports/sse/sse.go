@@ -16,8 +16,8 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	adksession "google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/rbac"

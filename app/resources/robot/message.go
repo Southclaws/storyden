@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"google.golang.org/adk/session"
+	"google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"

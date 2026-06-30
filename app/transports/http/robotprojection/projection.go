@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	adksession "google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot"

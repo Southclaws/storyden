@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 )
 
 type ASTInput struct {
@@ -32,7 +32,7 @@ func (a *Agent) addASTTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_ast",
 		Description: "Parse a Go source file and return its package name, imports, functions, and type declarations.",
-	}, func(ctx adktool.Context, args ASTInput) (ASTResult, error) {
+	}, func(ctx adkagent.Context, args ASTInput) (ASTResult, error) {
 		result, err := a.AST(ctx, args)
 		if err != nil {
 			return ASTResult{}, err

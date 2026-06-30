@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/adk/agent"
+	"google.golang.org/adk/v2/agent"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"

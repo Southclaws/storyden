@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 )
 
 const (
@@ -50,7 +50,7 @@ requests the Markdown route for docs pages and sends
 
 Start with "/llms.txt" to discover documentation entry points, then fetch
 specific "/docs/..." paths as needed.`,
-	}, func(ctx adktool.Context, args StorydenDocsInput) (StorydenDocsResult, error) {
+	}, func(ctx adkagent.Context, args StorydenDocsInput) (StorydenDocsResult, error) {
 		return FetchStorydenDocs(ctx, args)
 	}))
 }

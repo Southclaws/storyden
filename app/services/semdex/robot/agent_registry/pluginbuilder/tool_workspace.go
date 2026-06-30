@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/goccy/go-yaml"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -40,7 +40,7 @@ func (a *Agent) addWorkspaceTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_create",
 		Description: "Create a managed Go plugin workspace with manifest.yaml, go.mod, main.go, and README.md starter files.",
-	}, func(ctx adktool.Context, args CreateWorkspaceInput) (WorkspaceResult, error) {
+	}, func(ctx adkagent.Context, args CreateWorkspaceInput) (WorkspaceResult, error) {
 		result, err := a.Create(ctx, args)
 		if err != nil {
 			return WorkspaceResult{}, err
@@ -53,7 +53,7 @@ func (a *Agent) addWorkspaceTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_info",
 		Description: "Get managed plugin workspace metadata and file count.",
-	}, func(ctx adktool.Context, args struct{}) (WorkspaceResult, error) {
+	}, func(ctx adkagent.Context, args struct{}) (WorkspaceResult, error) {
 		result, err := a.Info(ctx)
 		if err != nil {
 			return WorkspaceResult{}, err

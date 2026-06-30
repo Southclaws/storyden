@@ -11,14 +11,14 @@ import (
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
-	"google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/artifact"
-	"google.golang.org/adk/memory"
-	"google.golang.org/adk/model"
-	"google.golang.org/adk/runner"
-	adksession "google.golang.org/adk/session"
-	adktool "google.golang.org/adk/tool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/artifact"
+	"google.golang.org/adk/v2/memory"
+	"google.golang.org/adk/v2/model"
+	"google.golang.org/adk/v2/runner"
+	adksession "google.golang.org/adk/v2/session"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -306,7 +306,7 @@ func (s *Agent) runResolvedAgent(
 	// build a quick table of our own tool definitions here, keyed by name, then
 	// in the hook, look up our tool using the name to get permissions to check.
 	tooltable := lo.KeyBy(toolList, func(t *tools.Tool) string { return t.Name() })
-	checkToolRBAC := func(ctx adktool.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
+	checkToolRBAC := func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
 		t := tooltable[tool.Name()]
 		if t == nil {
 			return nil, nil
@@ -533,7 +533,7 @@ func (s *Agent) canReuseWorkspaceMount(ctx context.Context, sessionID robot.Sess
 //
 // RELATED: Vercel AI SDK client-side tools, Google ADK tool confirmation (Python-only)
 func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.BeforeToolCallback {
-	return func(ctx adktool.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
+	return func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
 		if tool.IsLongRunning() {
 			if options.Mode == ModeUnattended {
 				logger.Info("blocking long-running tool in unattended run",

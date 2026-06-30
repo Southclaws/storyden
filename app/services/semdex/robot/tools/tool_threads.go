@@ -7,8 +7,9 @@ import (
 	"net/url"
 	"time"
 
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -81,7 +82,7 @@ func (tt *threadTools) newThreadCreateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadCreateInput) (*mcp.ToolThreadCreateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadCreateInput) (*mcp.ToolThreadCreateOutput, error) {
 					return tt.ExecuteThreadCreate(ctx, args)
 				},
 			)
@@ -188,7 +189,7 @@ func (tt *threadTools) newThreadListTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadListInput) (*mcp.ToolThreadListOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadListInput) (*mcp.ToolThreadListOutput, error) {
 					return tt.ExecuteThreadList(ctx, args)
 				},
 			)
@@ -256,7 +257,7 @@ func (tt *threadTools) newThreadGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadGetInput) (*mcp.ToolThreadGetOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadGetInput) (*mcp.ToolThreadGetOutput, error) {
 					return tt.ExecuteThreadGet(ctx, args)
 				},
 			)
@@ -329,7 +330,7 @@ func (tt *threadTools) newThreadUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadUpdateInput) (*mcp.ToolThreadUpdateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadUpdateInput) (*mcp.ToolThreadUpdateOutput, error) {
 					return tt.ExecuteThreadUpdate(ctx, args)
 				},
 			)
@@ -414,7 +415,7 @@ func (tt *threadTools) newThreadReplyTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadReplyInput) (*mcp.ToolThreadReplyOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadReplyInput) (*mcp.ToolThreadReplyOutput, error) {
 					return tt.ExecuteThreadReply(ctx, args)
 				},
 			)
@@ -470,7 +471,7 @@ func (tt *threadTools) newCategoryListTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args map[string]any) (*mcp.ToolCategoryListOutput, error) {
+				func(ctx agent.Context, args map[string]any) (*mcp.ToolCategoryListOutput, error) {
 					return tt.ExecuteCategoryList(ctx, args)
 				},
 			)

@@ -6,10 +6,10 @@ import (
 	"log/slog"
 	"strings"
 
-	agentpkg "google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/model"
-	adktool "google.golang.org/adk/tool"
+	agentpkg "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/model"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 )
 
@@ -90,7 +90,7 @@ func errString(err error) string {
 }
 
 func logBeforeModel(logger *slog.Logger) llmagent.BeforeModelCallback {
-	return func(ctx agentpkg.CallbackContext, req *model.LLMRequest) (*model.LLMResponse, error) {
+	return func(ctx agentpkg.Context, req *model.LLMRequest) (*model.LLMResponse, error) {
 		logger.Info("agent model request",
 			slog.String("agent", ctx.AgentName()),
 			slog.String("invocation", ctx.InvocationID()),
@@ -102,7 +102,7 @@ func logBeforeModel(logger *slog.Logger) llmagent.BeforeModelCallback {
 }
 
 func logAfterModel(logger *slog.Logger) llmagent.AfterModelCallback {
-	return func(ctx agentpkg.CallbackContext, resp *model.LLMResponse, respErr error) (*model.LLMResponse, error) {
+	return func(ctx agentpkg.Context, resp *model.LLMResponse, respErr error) (*model.LLMResponse, error) {
 		if respErr != nil {
 			logger.Error("agent model error",
 				slog.String("agent", ctx.AgentName()),
@@ -125,7 +125,7 @@ func logAfterModel(logger *slog.Logger) llmagent.AfterModelCallback {
 }
 
 func logBeforeTool(logger *slog.Logger) llmagent.BeforeToolCallback {
-	return func(ctx adktool.Context, tl adktool.Tool, args map[string]any) (map[string]any, error) {
+	return func(ctx agentpkg.Context, tl adktool.Tool, args map[string]any) (map[string]any, error) {
 		logger.Info("agent tool start",
 			slog.String("tool", tl.Name()),
 			slog.String("call_id", ctx.FunctionCallID()),
@@ -138,7 +138,7 @@ func logBeforeTool(logger *slog.Logger) llmagent.BeforeToolCallback {
 }
 
 func logAfterTool(logger *slog.Logger) llmagent.AfterToolCallback {
-	return func(ctx adktool.Context, tl adktool.Tool, args map[string]any, result map[string]any, err error) (map[string]any, error) {
+	return func(ctx agentpkg.Context, tl adktool.Tool, args map[string]any, result map[string]any, err error) (map[string]any, error) {
 		level := slog.LevelInfo
 		msg := "agent tool complete"
 		if err != nil {

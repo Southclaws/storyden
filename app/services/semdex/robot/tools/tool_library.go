@@ -9,8 +9,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -116,7 +117,7 @@ func (lt *libraryTools) newLibraryRequestPageTool() *Tool {
 					InputSchema:   toolDef.InputSchema,
 					IsLongRunning: true,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryRequestPageInput) (*mcp.ToolLibraryRequestPageOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryRequestPageInput) (*mcp.ToolLibraryRequestPageOutput, error) {
 					return &mcp.ToolLibraryRequestPageOutput{}, nil
 				},
 			)
@@ -136,7 +137,7 @@ func (lt *libraryTools) newLibraryPageTreeTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageTreeInput) (*mcp.ToolLibraryPageTreeOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPageTreeInput) (*mcp.ToolLibraryPageTreeOutput, error) {
 					return lt.ExecuteLibraryPageTree(ctx, args)
 				},
 			)
@@ -211,7 +212,7 @@ func (lt *libraryTools) newLibraryPageGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageGetInput) (*mcp.ToolLibraryPageGetOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPageGetInput) (*mcp.ToolLibraryPageGetOutput, error) {
 					return lt.ExecuteLibraryPageGet(ctx, args)
 				},
 			)
@@ -251,7 +252,7 @@ func (lt *libraryTools) newLibraryPageCreateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageCreateInput) (*mcp.ToolLibraryPageCreateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPageCreateInput) (*mcp.ToolLibraryPageCreateOutput, error) {
 					return lt.ExecuteLibraryPageCreate(ctx, args)
 				},
 			)
@@ -355,7 +356,7 @@ func (lt *libraryTools) newLibraryPageUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageUpdateInput) (*mcp.ToolLibraryPageUpdateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPageUpdateInput) (*mcp.ToolLibraryPageUpdateOutput, error) {
 					return lt.ExecuteLibraryPageUpdate(ctx, args)
 				},
 			)
@@ -441,7 +442,7 @@ func (lt *libraryTools) newLibrarySearchPagesTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibrarySearchPagesInput) (*mcp.ToolLibrarySearchPagesOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibrarySearchPagesInput) (*mcp.ToolLibrarySearchPagesOutput, error) {
 					return lt.ExecuteLibrarySearchPages(ctx, args)
 				},
 			)
@@ -495,7 +496,7 @@ func (lt *libraryTools) newLibraryPagePropertySchemaGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertySchemaGetInput) (*mcp.ToolLibraryPagePropertySchemaGetOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPagePropertySchemaGetInput) (*mcp.ToolLibraryPagePropertySchemaGetOutput, error) {
 					return lt.ExecuteLibraryPagePropertySchemaGet(ctx, args)
 				},
 			)
@@ -548,7 +549,7 @@ func (lt *libraryTools) newLibraryPagePropertySchemaUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertySchemaUpdateInput) (*mcp.ToolLibraryPagePropertySchemaUpdateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPagePropertySchemaUpdateInput) (*mcp.ToolLibraryPagePropertySchemaUpdateOutput, error) {
 					return lt.ExecuteLibraryPagePropertySchemaUpdate(ctx, args)
 				},
 			)
@@ -613,7 +614,7 @@ func (lt *libraryTools) newLibraryPagePropertiesUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertiesUpdateInput) (*mcp.ToolLibraryPagePropertiesUpdateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLibraryPagePropertiesUpdateInput) (*mcp.ToolLibraryPagePropertiesUpdateOutput, error) {
 					return lt.ExecuteLibraryPagePropertiesUpdate(ctx, args)
 				},
 			)

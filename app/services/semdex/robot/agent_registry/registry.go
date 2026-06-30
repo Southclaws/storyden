@@ -9,8 +9,8 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"

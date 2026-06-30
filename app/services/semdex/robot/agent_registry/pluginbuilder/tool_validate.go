@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -39,7 +39,7 @@ func (a *Agent) addValidateTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_validate",
 		Description: "Run holistic plugin validation: manifest schema, manifest/code consistency, Go formatting, dependencies, vet/lint, tests, and package archive validation.",
-	}, func(ctx adktool.Context, args ValidateInput) (ValidateResult, error) {
+	}, func(ctx adkagent.Context, args ValidateInput) (ValidateResult, error) {
 		return a.Validate(ctx, args)
 	}))
 }

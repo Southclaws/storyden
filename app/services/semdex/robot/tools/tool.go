@@ -7,8 +7,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/lib/mcp"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
+	adktool "google.golang.org/adk/v2/tool"
 )
 
 // ToolResult is just because adk doesn't allow returning an error. Since adk

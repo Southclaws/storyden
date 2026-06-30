@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"

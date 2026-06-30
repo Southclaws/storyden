@@ -12,8 +12,8 @@ import (
 	"go/token"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -133,7 +133,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_list",
 		Description: "List files in a managed plugin workspace.",
-	}, func(ctx adktool.Context, args ListFilesInput) (ListFilesResult, error) {
+	}, func(ctx adkagent.Context, args ListFilesInput) (ListFilesResult, error) {
 		result, err := a.ListFiles(ctx, args)
 		if err != nil {
 			return ListFilesResult{}, err
@@ -146,7 +146,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_read",
 		Description: "Read a line range from a workspace-relative text file. Use start_line/max_lines, around_line/context_lines, or symbol/context_lines for Go files.",
-	}, func(ctx adktool.Context, args ReadFileInput) (ReadFileResult, error) {
+	}, func(ctx adkagent.Context, args ReadFileInput) (ReadFileResult, error) {
 		result, err := a.ReadFile(ctx, args)
 		if err != nil {
 			return ReadFileResult{}, err
@@ -159,7 +159,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_outline",
 		Description: "Return a compact outline of a Go source file with import, type, function, and method line ranges.",
-	}, func(ctx adktool.Context, args FileOutlineInput) (FileOutlineResult, error) {
+	}, func(ctx adkagent.Context, args FileOutlineInput) (FileOutlineResult, error) {
 		result, err := a.FileOutline(ctx, args)
 		if err != nil {
 			return FileOutlineResult{}, err
@@ -172,7 +172,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_write",
 		Description: "Write complete content to a workspace-relative file. Prefer plugin_file_edit for focused changes to existing files.",
-	}, func(ctx adktool.Context, args WriteFileInput) (WriteFileResult, error) {
+	}, func(ctx adkagent.Context, args WriteFileInput) (WriteFileResult, error) {
 		result, err := a.WriteFile(ctx, args)
 		if err != nil {
 			return WriteFileResult{}, err
@@ -185,7 +185,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_search",
 		Description: "Search text in workspace files and return contextual snippets with line numbers and file revisions.",
-	}, func(ctx adktool.Context, args SearchInput) (SearchResult, error) {
+	}, func(ctx adkagent.Context, args SearchInput) (SearchResult, error) {
 		result, err := a.Search(ctx, args)
 		if err != nil {
 			return SearchResult{}, err

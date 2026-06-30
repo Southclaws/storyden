@@ -8,8 +8,8 @@ import (
 	"math"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 )
 
 type EditFileInput struct {
@@ -32,7 +32,7 @@ func (a *Agent) addEditTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_edit",
 		Description: editFileDescription,
-	}, func(ctx adktool.Context, args EditFileInput) (EditFileResult, error) {
+	}, func(ctx adkagent.Context, args EditFileInput) (EditFileResult, error) {
 		result, err := a.EditFile(ctx, args)
 		if err != nil {
 			return EditFileResult{}, err

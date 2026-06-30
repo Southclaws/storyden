@@ -13,8 +13,8 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/rs/xid"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
@@ -49,7 +49,7 @@ func (a *Agent) addInstallTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_install",
 		Description: "Package and install or update a managed plugin as a supervised Storyden plugin.",
-	}, func(ctx adktool.Context, args InstallInput) (InstallResult, error) {
+	}, func(ctx adkagent.Context, args InstallInput) (InstallResult, error) {
 		result, err := a.Install(ctx, args)
 		if err != nil {
 			return InstallResult{}, err

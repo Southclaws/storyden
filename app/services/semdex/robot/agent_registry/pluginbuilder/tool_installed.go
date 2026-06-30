@@ -14,8 +14,8 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/rs/xid"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
@@ -56,7 +56,7 @@ func (a *Agent) addInstalledPluginTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_installed_list",
 		Description: "List installed supervised plugins that can be imported into the active workspace for editing.",
-	}, func(ctx adktool.Context, args struct{}) (InstalledPluginsResult, error) {
+	}, func(ctx adkagent.Context, args struct{}) (InstalledPluginsResult, error) {
 		return a.ListInstalledPlugins(ctx)
 	})); err != nil {
 		return err
@@ -65,7 +65,7 @@ func (a *Agent) addInstalledPluginTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_import_installation",
 		Description: "Import one installed supervised plugin archive into an empty active workspace for this chat to edit.",
-	}, func(ctx adktool.Context, args ImportInstalledPluginInput) (ImportInstalledPluginResult, error) {
+	}, func(ctx adkagent.Context, args ImportInstalledPluginInput) (ImportInstalledPluginResult, error) {
 		return a.ImportInstalledPlugin(ctx, args)
 	}))
 }

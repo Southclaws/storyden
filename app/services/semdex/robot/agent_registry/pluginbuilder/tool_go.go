@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -28,7 +28,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_fmt",
 		Description: "Run gofmt -w . in the managed plugin workspace.",
-	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
+	}, func(ctx adkagent.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoFormat(ctx)
 		if err != nil {
 			return CommandResult{}, err
@@ -41,7 +41,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_vet",
 		Description: "Run go vet ./... and Plugin Builder semantic lint checks in the managed plugin workspace.",
-	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
+	}, func(ctx adkagent.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoVet(ctx)
 		if err != nil {
 			return CommandResult{}, err
@@ -54,7 +54,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_tidy",
 		Description: "Run go mod tidy in the managed plugin workspace to resolve module dependencies and write go.sum.",
-	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
+	}, func(ctx adkagent.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoTidy(ctx)
 		if err != nil {
 			return CommandResult{}, err
@@ -67,7 +67,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_test",
 		Description: "Run go test in the managed plugin workspace. The optional pattern defaults to ./...",
-	}, func(ctx adktool.Context, args GoTestInput) (CommandResult, error) {
+	}, func(ctx adkagent.Context, args GoTestInput) (CommandResult, error) {
 		result, err := a.GoTest(ctx, args)
 		if err != nil {
 			return CommandResult{}, err

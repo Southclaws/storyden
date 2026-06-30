@@ -9,8 +9,9 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -73,7 +74,7 @@ func (st *searchTools) newContentSearchTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolContentSearchInput) (*mcp.ToolContentSearchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolContentSearchInput) (*mcp.ToolContentSearchOutput, error) {
 					return st.ExecuteContentSearch(ctx, args)
 				},
 			)
@@ -169,7 +170,7 @@ func (st *searchTools) newThreadSearchTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolThreadSearchInput) (*mcp.ToolThreadSearchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolThreadSearchInput) (*mcp.ToolThreadSearchOutput, error) {
 					return st.ExecuteThreadSearch(ctx, args)
 				},
 			)
@@ -243,7 +244,7 @@ func (st *searchTools) newReplySearchTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolReplySearchInput) (*mcp.ToolReplySearchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolReplySearchInput) (*mcp.ToolReplySearchOutput, error) {
 					return st.ExecuteReplySearch(ctx, args)
 				},
 			)
@@ -313,7 +314,7 @@ func (st *searchTools) newPostSearchTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolPostSearchInput) (*mcp.ToolPostSearchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolPostSearchInput) (*mcp.ToolPostSearchOutput, error) {
 					return st.ExecutePostSearch(ctx, args)
 				},
 			)
@@ -388,7 +389,7 @@ func (st *searchTools) newMemberSearchTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolMemberSearchInput) (*mcp.ToolMemberSearchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolMemberSearchInput) (*mcp.ToolMemberSearchOutput, error) {
 					return st.ExecuteMemberSearch(ctx, args)
 				},
 			)

@@ -5,8 +5,9 @@ import (
 	"log/slog"
 	"net/url"
 
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/lib/mcp"
@@ -44,7 +45,7 @@ func (lt *linkTools) newLinkCreateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLinkCreateInput) (*mcp.ToolLinkCreateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolLinkCreateInput) (*mcp.ToolLinkCreateOutput, error) {
 					return lt.ExecuteLinkCreate(ctx, args)
 				},
 			)

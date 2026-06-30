@@ -12,8 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/google/uuid"
-	adkmodel "google.golang.org/adk/model"
-	adksession "google.golang.org/adk/session"
+	adkmodel "google.golang.org/adk/v2/model"
+	adksession "google.golang.org/adk/v2/session"
 	"google.golang.org/genai"
 )
 
@@ -120,7 +120,7 @@ func persistClientToolResult(
 	accountID account.AccountID,
 	content *genai.Content,
 ) error {
-	event := adksession.NewEvent(uuid.NewString())
+	event := adksession.NewEvent(ctx, uuid.NewString())
 	event.Author = "user"
 	event.LLMResponse = adkmodel.LLMResponse{Content: content}
 

@@ -6,8 +6,9 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/rs/xid"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
 )
@@ -42,7 +43,7 @@ func newUnattendedFinishTool() (tool.Tool, error) {
 			Description: "Finish an unattended Robot invocation with its structured final status. This must be the final action in every unattended run.",
 			InputSchema: unattendedFinishInputSchema(),
 		},
-		func(ctx tool.Context, args unattendedFinishInput) (unattendedFinishInput, error) {
+		func(ctx agent.Context, args unattendedFinishInput) (unattendedFinishInput, error) {
 			return args, nil
 		},
 	)

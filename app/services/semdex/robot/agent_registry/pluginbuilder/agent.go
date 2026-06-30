@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"go.uber.org/fx"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
+	adktool "google.golang.org/adk/v2/tool"
 
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"

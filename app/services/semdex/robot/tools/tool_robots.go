@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	"github.com/google/jsonschema-go/jsonschema"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/pagination"
@@ -98,7 +99,7 @@ func (rt *robotTools) newRobotSwitchTool() *Tool {
 					InputSchema:   inputSchema,
 					IsLongRunning: true,
 				},
-				func(ctx tool.Context, args mcp.ToolRobotSwitchInput) (*mcp.ToolRobotSwitchOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotSwitchInput) (*mcp.ToolRobotSwitchOutput, error) {
 					return rt.ExecuteRobotSwitch(ctx, args)
 				},
 			)
@@ -142,7 +143,7 @@ func (rt *robotTools) newSystemRobotToolCatalogTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args map[string]any) (*mcp.ToolSystemRobotToolCatalogOutput, error) {
+				func(ctx agent.Context, args map[string]any) (*mcp.ToolSystemRobotToolCatalogOutput, error) {
 					return rt.ExecuteGetAllToolNames(ctx, args)
 				},
 			)
@@ -210,7 +211,7 @@ func (rt *robotTools) newRobotCreateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: inputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolRobotCreateInput) (*mcp.ToolRobotCreateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotCreateInput) (*mcp.ToolRobotCreateOutput, error) {
 					return rt.ExecuteCreateRobot(ctx, args)
 				},
 			)
@@ -278,7 +279,7 @@ func (rt *robotTools) newRobotListTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolRobotListInput) (*mcp.ToolRobotListOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotListInput) (*mcp.ToolRobotListOutput, error) {
 					return rt.ExecuteListRobots(ctx, args)
 				},
 			)
@@ -328,7 +329,7 @@ func (rt *robotTools) newRobotGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolRobotGetInput) (*mcp.ToolRobotGetOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotGetInput) (*mcp.ToolRobotGetOutput, error) {
 					return rt.ExecuteGetRobot(ctx, args)
 				},
 			)
@@ -375,7 +376,7 @@ func (rt *robotTools) newRobotUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: inputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolRobotUpdateInput) (*mcp.ToolRobotUpdateOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotUpdateInput) (*mcp.ToolRobotUpdateOutput, error) {
 					return rt.ExecuteUpdateRobot(ctx, args)
 				},
 			)
@@ -450,7 +451,7 @@ func (rt *robotTools) newRobotDeleteTool() *Tool {
 					InputSchema:         toolDef.InputSchema,
 					RequireConfirmation: toolDef.RequiresConfirmation && !confirmationDisabled(ctx),
 				},
-				func(ctx tool.Context, args mcp.ToolRobotDeleteInput) (*mcp.ToolRobotDeleteOutput, error) {
+				func(ctx agent.Context, args mcp.ToolRobotDeleteInput) (*mcp.ToolRobotDeleteOutput, error) {
 					return rt.ExecuteDeleteRobot(ctx, args)
 				},
 			)
@@ -489,7 +490,7 @@ func newThrowAnErrorTool() *Tool {
 					Name:        def.Name,
 					Description: def.Description,
 				},
-				func(ctx tool.Context, _ input) (map[string]any, error) {
+				func(ctx agent.Context, _ input) (map[string]any, error) {
 					return nil, fmt.Errorf("intentional tool error for testing")
 				},
 			)

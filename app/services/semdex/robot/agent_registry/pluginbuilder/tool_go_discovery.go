@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"golang.org/x/tools/go/packages"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
@@ -65,7 +65,7 @@ for example "github.com/Southclaws/storyden/lib/plugin/..." or
 
 Every result includes import_path. Pass that exact import_path to
 plugin_go_package_symbols or plugin_go_symbol_detail to dive deeper.`,
-	}, func(ctx adktool.Context, args PackageListInput) (PackageListResult, error) {
+	}, func(ctx adkagent.Context, args PackageListInput) (PackageListResult, error) {
 		return a.ListGoPackages(ctx, args)
 	})); err != nil {
 		return err
@@ -83,7 +83,7 @@ to go.mod and running plugin_go_tidy.
 
 The response includes symbol names, kinds, signatures, docs, imports, and the
 owning import_path so you can recursively inspect related packages.`,
-	}, func(ctx adktool.Context, args PackageSymbolsInput) (PackageSymbolsResult, error) {
+	}, func(ctx adkagent.Context, args PackageSymbolsInput) (PackageSymbolsResult, error) {
 		return a.GoPackageSymbols(ctx, args)
 	})); err != nil {
 		return err
@@ -97,7 +97,7 @@ Use this when package_symbols shows a promising type or function. For types, thi
 returns fields, methods, and interface methods where available. This is the
 closest tool to editor "go to definition" plus "show methods" for the plugin
 builder.`,
-	}, func(ctx adktool.Context, args SymbolDetailInput) (SymbolDetailResult, error) {
+	}, func(ctx adkagent.Context, args SymbolDetailInput) (SymbolDetailResult, error) {
 		return a.GoSymbolDetail(ctx, args)
 	})); err != nil {
 		return err
@@ -116,7 +116,7 @@ can return a lot of packages.
 The query is a literal case-insensitive substring, not a regex, glob, or
 wildcard. Do not send queries such as "Event.*Reply"; search for "Event",
 "Reply", or another plain word instead.`,
-	}, func(ctx adktool.Context, args SymbolSearchInput) (SymbolSearchResult, error) {
+	}, func(ctx adkagent.Context, args SymbolSearchInput) (SymbolSearchResult, error) {
 		return a.GoSymbolSearch(ctx, args)
 	}))
 }
