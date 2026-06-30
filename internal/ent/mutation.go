@@ -46607,28 +46607,29 @@ func (m *RobotSessionMessageMutation) ResetEdge(name string) error {
 // RobotWorkspaceMutation represents an operation that mutates the RobotWorkspace nodes in the graph.
 type RobotWorkspaceMutation struct {
 	config
-	op               Op
-	typ              string
-	id               *xid.ID
-	created_at       *time.Time
-	updated_at       *time.Time
-	name             *string
-	description      *string
-	provider         *robotworkspace.Provider
-	_config          *map[string]interface{}
-	metadata         *map[string]interface{}
-	clearedFields    map[string]struct{}
-	creator          *xid.ID
-	clearedcreator   bool
-	robots           map[xid.ID]struct{}
-	removedrobots    map[xid.ID]struct{}
-	clearedrobots    bool
-	instances        map[xid.ID]struct{}
-	removedinstances map[xid.ID]struct{}
-	clearedinstances bool
-	done             bool
-	oldValue         func(context.Context) (*RobotWorkspace, error)
-	predicates       []predicate.RobotWorkspace
+	op                       Op
+	typ                      string
+	id                       *xid.ID
+	created_at               *time.Time
+	updated_at               *time.Time
+	name                     *string
+	description              *string
+	provider                 *robotworkspace.Provider
+	_config                  *map[string]interface{}
+	allow_untrusted_commands *bool
+	metadata                 *map[string]interface{}
+	clearedFields            map[string]struct{}
+	creator                  *xid.ID
+	clearedcreator           bool
+	robots                   map[xid.ID]struct{}
+	removedrobots            map[xid.ID]struct{}
+	clearedrobots            bool
+	instances                map[xid.ID]struct{}
+	removedinstances         map[xid.ID]struct{}
+	clearedinstances         bool
+	done                     bool
+	oldValue                 func(context.Context) (*RobotWorkspace, error)
+	predicates               []predicate.RobotWorkspace
 }
 
 var _ ent.Mutation = (*RobotWorkspaceMutation)(nil)
@@ -46977,6 +46978,42 @@ func (m *RobotWorkspaceMutation) ResetConfig() {
 	delete(m.clearedFields, robotworkspace.FieldConfig)
 }
 
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (m *RobotWorkspaceMutation) SetAllowUntrustedCommands(b bool) {
+	m.allow_untrusted_commands = &b
+}
+
+// AllowUntrustedCommands returns the value of the "allow_untrusted_commands" field in the mutation.
+func (m *RobotWorkspaceMutation) AllowUntrustedCommands() (r bool, exists bool) {
+	v := m.allow_untrusted_commands
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAllowUntrustedCommands returns the old "allow_untrusted_commands" field's value of the RobotWorkspace entity.
+// If the RobotWorkspace object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotWorkspaceMutation) OldAllowUntrustedCommands(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAllowUntrustedCommands is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAllowUntrustedCommands requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAllowUntrustedCommands: %w", err)
+	}
+	return oldValue.AllowUntrustedCommands, nil
+}
+
+// ResetAllowUntrustedCommands resets all changes to the "allow_untrusted_commands" field.
+func (m *RobotWorkspaceMutation) ResetAllowUntrustedCommands() {
+	m.allow_untrusted_commands = nil
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *RobotWorkspaceMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -47244,7 +47281,7 @@ func (m *RobotWorkspaceMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotWorkspaceMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, robotworkspace.FieldCreatedAt)
 	}
@@ -47262,6 +47299,9 @@ func (m *RobotWorkspaceMutation) Fields() []string {
 	}
 	if m._config != nil {
 		fields = append(fields, robotworkspace.FieldConfig)
+	}
+	if m.allow_untrusted_commands != nil {
+		fields = append(fields, robotworkspace.FieldAllowUntrustedCommands)
 	}
 	if m.metadata != nil {
 		fields = append(fields, robotworkspace.FieldMetadata)
@@ -47289,6 +47329,8 @@ func (m *RobotWorkspaceMutation) Field(name string) (ent.Value, bool) {
 		return m.Provider()
 	case robotworkspace.FieldConfig:
 		return m.Config()
+	case robotworkspace.FieldAllowUntrustedCommands:
+		return m.AllowUntrustedCommands()
 	case robotworkspace.FieldMetadata:
 		return m.Metadata()
 	case robotworkspace.FieldCreatedBy:
@@ -47314,6 +47356,8 @@ func (m *RobotWorkspaceMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldProvider(ctx)
 	case robotworkspace.FieldConfig:
 		return m.OldConfig(ctx)
+	case robotworkspace.FieldAllowUntrustedCommands:
+		return m.OldAllowUntrustedCommands(ctx)
 	case robotworkspace.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case robotworkspace.FieldCreatedBy:
@@ -47368,6 +47412,13 @@ func (m *RobotWorkspaceMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetConfig(v)
+		return nil
+	case robotworkspace.FieldAllowUntrustedCommands:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAllowUntrustedCommands(v)
 		return nil
 	case robotworkspace.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -47470,6 +47521,9 @@ func (m *RobotWorkspaceMutation) ResetField(name string) error {
 		return nil
 	case robotworkspace.FieldConfig:
 		m.ResetConfig()
+		return nil
+	case robotworkspace.FieldAllowUntrustedCommands:
+		m.ResetAllowUntrustedCommands()
 		return nil
 	case robotworkspace.FieldMetadata:
 		m.ResetMetadata()

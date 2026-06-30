@@ -40,11 +40,13 @@ func TestRobotWorkspaceCRUDAndRobotDefaultWorkspace(t *testing.T) {
 				workspaceName := "workspace-" + uuid.NewString()
 				description := "Workspace for Robot CRUD tests"
 				provider := openapi.RobotWorkspaceProvider("local")
+				allowUntrustedCommands := true
 				createWorkspace := tests.AssertRequest(cl.RobotWorkspaceCreateWithResponse(root,
 					openapi.RobotWorkspaceCreateJSONRequestBody{
-						Name:        workspaceName,
-						Description: description,
-						Provider:    &provider,
+						Name:                   workspaceName,
+						Description:            description,
+						Provider:               &provider,
+						AllowUntrustedCommands: &allowUntrustedCommands,
 					},
 					adminSession,
 				))(t, http.StatusOK)
@@ -52,6 +54,7 @@ func TestRobotWorkspaceCRUDAndRobotDefaultWorkspace(t *testing.T) {
 				assert.Equal(t, workspaceName, createWorkspace.JSON200.Name)
 				assert.Equal(t, description, createWorkspace.JSON200.Description)
 				assert.Equal(t, provider, createWorkspace.JSON200.Provider)
+				assert.True(t, createWorkspace.JSON200.AllowUntrustedCommands)
 				assert.Equal(t, adminAcc.ID.String(), createWorkspace.JSON200.CreatedBy.Id)
 
 				getWorkspace := tests.AssertRequest(cl.RobotWorkspaceGetWithResponse(root,
@@ -59,6 +62,7 @@ func TestRobotWorkspaceCRUDAndRobotDefaultWorkspace(t *testing.T) {
 					adminSession,
 				))(t, http.StatusOK)
 				assert.Equal(t, createWorkspace.JSON200.Id, getWorkspace.JSON200.Id)
+				assert.True(t, getWorkspace.JSON200.AllowUntrustedCommands)
 
 				createdRobot := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{

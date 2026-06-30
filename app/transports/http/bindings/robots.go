@@ -262,6 +262,9 @@ func (r *Robots) RobotWorkspaceCreate(ctx context.Context, request openapi.Robot
 	if request.Body.Config != nil {
 		opts = append(opts, robot_workspace.WithConfig(*request.Body.Config))
 	}
+	if request.Body.AllowUntrustedCommands != nil {
+		opts = append(opts, robot_workspace.WithAllowUntrustedCommands(*request.Body.AllowUntrustedCommands))
+	}
 	if request.Body.Meta != nil {
 		opts = append(opts, robot_workspace.WithMetadata(*request.Body.Meta))
 	}
@@ -307,6 +310,9 @@ func (r *Robots) RobotWorkspaceUpdate(ctx context.Context, request openapi.Robot
 	}
 	if request.Body.Config != nil {
 		opts = append(opts, robot_workspace.WithConfig(*request.Body.Config))
+	}
+	if request.Body.AllowUntrustedCommands != nil {
+		opts = append(opts, robot_workspace.WithAllowUntrustedCommands(*request.Body.AllowUntrustedCommands))
 	}
 	if request.Body.Meta != nil {
 		opts = append(opts, robot_workspace.WithMetadata(*request.Body.Meta))
@@ -1143,15 +1149,16 @@ func serialiseRobots(robots []*robot.Robot) []openapi.Robot {
 
 func serialiseRobotWorkspace(w *robot.Workspace) openapi.RobotWorkspace {
 	return openapi.RobotWorkspace{
-		Id:          openapi.Identifier(w.ID.String()),
-		CreatedAt:   w.CreatedAt,
-		UpdatedAt:   w.UpdatedAt,
-		Name:        w.Name,
-		Description: w.Description,
-		Provider:    openapi.RobotWorkspaceProvider(w.Provider),
-		Config:      ensureMap(w.Config),
-		Meta:        openapi.Metadata(ensureMap(w.Metadata)),
-		CreatedBy:   serialiseProfileReferenceFromAccount(w.Creator),
+		Id:                     openapi.Identifier(w.ID.String()),
+		CreatedAt:              w.CreatedAt,
+		UpdatedAt:              w.UpdatedAt,
+		Name:                   w.Name,
+		Description:            w.Description,
+		Provider:               openapi.RobotWorkspaceProvider(w.Provider),
+		Config:                 ensureMap(w.Config),
+		AllowUntrustedCommands: w.AllowUntrustedCommands,
+		Meta:                   openapi.Metadata(ensureMap(w.Metadata)),
+		CreatedBy:              serialiseProfileReferenceFromAccount(w.Creator),
 	}
 }
 
@@ -1175,10 +1182,11 @@ func serialiseRobotWorkspaceMountPtr(mount *robot.WorkspaceMount) *openapi.Robot
 
 	meta := openapi.Metadata(ensureMap(mount.Metadata))
 	return &openapi.RobotWorkspaceMount{
-		WorkspaceId:         openapi.Identifier(mount.WorkspaceID.String()),
-		WorkspaceInstanceId: openapi.Identifier(mount.WorkspaceInstanceID.String()),
-		Provider:            openapi.RobotWorkspaceProvider(mount.Provider),
-		Meta:                &meta,
+		WorkspaceId:            openapi.Identifier(mount.WorkspaceID.String()),
+		WorkspaceInstanceId:    openapi.Identifier(mount.WorkspaceInstanceID.String()),
+		Provider:               openapi.RobotWorkspaceProvider(mount.Provider),
+		AllowUntrustedCommands: mount.AllowUntrustedCommands,
+		Meta:                   &meta,
 	}
 }
 

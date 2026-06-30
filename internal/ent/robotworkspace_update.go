@@ -99,6 +99,20 @@ func (_u *RobotWorkspaceUpdate) ClearConfig() *RobotWorkspaceUpdate {
 	return _u
 }
 
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (_u *RobotWorkspaceUpdate) SetAllowUntrustedCommands(v bool) *RobotWorkspaceUpdate {
+	_u.mutation.SetAllowUntrustedCommands(v)
+	return _u
+}
+
+// SetNillableAllowUntrustedCommands sets the "allow_untrusted_commands" field if the given value is not nil.
+func (_u *RobotWorkspaceUpdate) SetNillableAllowUntrustedCommands(v *bool) *RobotWorkspaceUpdate {
+	if v != nil {
+		_u.SetAllowUntrustedCommands(*v)
+	}
+	return _u
+}
+
 // SetMetadata sets the "metadata" field.
 func (_u *RobotWorkspaceUpdate) SetMetadata(v map[string]interface{}) *RobotWorkspaceUpdate {
 	_u.mutation.SetMetadata(v)
@@ -312,6 +326,9 @@ func (_u *RobotWorkspaceUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.ConfigCleared() {
 		_spec.ClearField(robotworkspace.FieldConfig, field.TypeJSON)
 	}
+	if value, ok := _u.mutation.AllowUntrustedCommands(); ok {
+		_spec.SetField(robotworkspace.FieldAllowUntrustedCommands, field.TypeBool, value)
+	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(robotworkspace.FieldMetadata, field.TypeJSON, value)
 	}
@@ -522,6 +539,20 @@ func (_u *RobotWorkspaceUpdateOne) SetConfig(v map[string]interface{}) *RobotWor
 // ClearConfig clears the value of the "config" field.
 func (_u *RobotWorkspaceUpdateOne) ClearConfig() *RobotWorkspaceUpdateOne {
 	_u.mutation.ClearConfig()
+	return _u
+}
+
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (_u *RobotWorkspaceUpdateOne) SetAllowUntrustedCommands(v bool) *RobotWorkspaceUpdateOne {
+	_u.mutation.SetAllowUntrustedCommands(v)
+	return _u
+}
+
+// SetNillableAllowUntrustedCommands sets the "allow_untrusted_commands" field if the given value is not nil.
+func (_u *RobotWorkspaceUpdateOne) SetNillableAllowUntrustedCommands(v *bool) *RobotWorkspaceUpdateOne {
+	if v != nil {
+		_u.SetAllowUntrustedCommands(*v)
+	}
 	return _u
 }
 
@@ -767,6 +798,9 @@ func (_u *RobotWorkspaceUpdateOne) sqlSave(ctx context.Context) (_node *RobotWor
 	}
 	if _u.mutation.ConfigCleared() {
 		_spec.ClearField(robotworkspace.FieldConfig, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.AllowUntrustedCommands(); ok {
+		_spec.SetField(robotworkspace.FieldAllowUntrustedCommands, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(robotworkspace.FieldMetadata, field.TypeJSON, value)

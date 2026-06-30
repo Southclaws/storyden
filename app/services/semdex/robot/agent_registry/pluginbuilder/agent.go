@@ -71,6 +71,10 @@ func (a *Agent) instruction(ctx adkagent.ReadonlyContext) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	untrustedCommandsInstruction := "- There is no shell, terminal, Bash, PowerShell, CMD, Python, npm, or arbitrary command execution available."
+	if pluginBuilderAllowUntrustedCommandsFromReadonlyContext(ctx) {
+		untrustedCommandsInstruction = "- This workspace allows arbitrary Bash command execution through plugin_run_bash. Use it when it is materially more effective than focused tools, keep work inside the managed plugin workspace, and do not expose secrets or private data."
+	}
 
 	return fmt.Sprintf(`
 You are Storyden’s plugin builder robot.
@@ -86,7 +90,7 @@ Environment assumptions:
 - You work inside a managed plugin workspace.
 - File names used with tools are relative names inside that workspace; you never need to know a filesystem location.
 - There is no Git repository or source control available.
-- There is no shell, terminal, Bash, PowerShell, CMD, Python, npm, or arbitrary command execution available.
+%s
 - Only the provided tools can inspect, edit, validate, package, install, or debug plugins.
 - Available tools are the complete operating environment. Do not imply or assume access to tools that are not listed.
 - Some tools are only valid after this chat has created, imported, installed, or activated a plugin. Follow the workflow order even when later-stage tools are visible.
@@ -274,7 +278,7 @@ Security posture:
 - Do not send data outside the Storyden installation unless the user explicitly requested an integration that requires it.
 - Do not add broad permissions when narrow permissions satisfy the request.
 - Do not build plugins that bypass Storyden permissions, moderation, authentication, or auditability.
-`, currentState), nil
+`, currentState, untrustedCommandsInstruction), nil
 }
 
 func pluginBuilderInstructionState(ctx adkagent.ReadonlyContext) (string, error) {
@@ -345,6 +349,10 @@ var pluginBuilderAllToolNames = []string{
 	"plugin_logs_read",
 }
 
+var pluginBuilderUntrustedCommandToolNames = []string{
+	"plugin_run_bash",
+}
+
 // pluginBuilderBoundToolNames = []string{
 // 	"plugin_workspace_info",
 // 	"plugin_manifest_write",
@@ -399,7 +407,11 @@ func (s *pluginBuilderToolset) Tools(ctx adkagent.ReadonlyContext) ([]adktool.To
 	// default:
 	// 	return s.toolsForNames(pluginBuilderEntryToolNames)
 	// }
-	return s.toolsForNames(pluginBuilderAllToolNames)
+	names := pluginBuilderAllToolNames
+	if pluginBuilderAllowUntrustedCommandsFromReadonlyContext(ctx) {
+		names = append(append([]string{}, names...), pluginBuilderUntrustedCommandToolNames...)
+	}
+	return s.toolsForNames(names)
 }
 
 func (s *pluginBuilderToolset) toolsForNames(names []string) ([]adktool.Tool, error) {
@@ -453,6 +465,7 @@ func (a *Agent) buildToolset() (adktool.Toolset, error) {
 		a.addEditTools,
 		a.addASTTools,
 		a.addGoTools,
+		a.addBashTools,
 		a.addValidateTools,
 		a.addStorydenSDKTools,
 		a.addGoDiscoveryTools,
@@ -511,6 +524,7 @@ func registerAgent(registry *agent_registry.Registry, builder *Agent) error {
 			"plugin_storyden_docs",
 			"plugin_install",
 			"plugin_logs_read",
+			"plugin_run_bash",
 		},
 	})
 }

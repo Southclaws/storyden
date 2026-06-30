@@ -86,6 +86,7 @@ const WorkspaceFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string(),
   provider: z.string().min(1, "Provider is required"),
+  allow_untrusted_commands: z.boolean(),
 });
 
 type WorkspaceForm = z.infer<typeof WorkspaceFormSchema>;
@@ -355,6 +356,16 @@ function RobotWorkspaceTemplateItem({
               >
                 {workspace.provider}
               </Badge>
+              {workspace.allow_untrusted_commands ? (
+                <Badge
+                  size="sm"
+                  borderColor="border.warning"
+                  backgroundColor="bg.warning"
+                  color="fg.warning"
+                >
+                  Shell
+                </Badge>
+              ) : null}
             </HStack>
 
             {workspace.description ? (
@@ -519,6 +530,7 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
       name: "",
       description: "",
       provider: "",
+      allow_untrusted_commands: false,
     },
     resolver: zodResolver(WorkspaceFormSchema),
   });
@@ -540,6 +552,7 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
       name: data.name,
       description: data.description,
       provider: data.provider,
+      allow_untrusted_commands: data.allow_untrusted_commands,
     };
 
     await handle(
@@ -616,6 +629,20 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
         {providersQuery.error ? <Unready error={providersQuery.error} /> : null}
         <FormErrorText>{form.formState.errors.provider?.message}</FormErrorText>
       </FormControl>
+
+      <Controller
+        control={form.control}
+        name="allow_untrusted_commands"
+        render={({ field }) => (
+          <Checkbox
+            size="sm"
+            checked={!!field.value}
+            onCheckedChange={({ checked }) => field.onChange(checked === true)}
+          >
+            Allow untrusted commands
+          </Checkbox>
+        )}
+      />
 
       <WStack justifyContent="end">
         <Button type="button" variant="ghost" onClick={onClose}>

@@ -95,6 +95,20 @@ func (_c *RobotWorkspaceCreate) SetConfig(v map[string]interface{}) *RobotWorksp
 	return _c
 }
 
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (_c *RobotWorkspaceCreate) SetAllowUntrustedCommands(v bool) *RobotWorkspaceCreate {
+	_c.mutation.SetAllowUntrustedCommands(v)
+	return _c
+}
+
+// SetNillableAllowUntrustedCommands sets the "allow_untrusted_commands" field if the given value is not nil.
+func (_c *RobotWorkspaceCreate) SetNillableAllowUntrustedCommands(v *bool) *RobotWorkspaceCreate {
+	if v != nil {
+		_c.SetAllowUntrustedCommands(*v)
+	}
+	return _c
+}
+
 // SetMetadata sets the "metadata" field.
 func (_c *RobotWorkspaceCreate) SetMetadata(v map[string]interface{}) *RobotWorkspaceCreate {
 	_c.mutation.SetMetadata(v)
@@ -209,6 +223,10 @@ func (_c *RobotWorkspaceCreate) defaults() {
 		v := robotworkspace.DefaultProvider
 		_c.mutation.SetProvider(v)
 	}
+	if _, ok := _c.mutation.AllowUntrustedCommands(); !ok {
+		v := robotworkspace.DefaultAllowUntrustedCommands
+		_c.mutation.SetAllowUntrustedCommands(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotworkspace.DefaultID()
 		_c.mutation.SetID(v)
@@ -238,6 +256,9 @@ func (_c *RobotWorkspaceCreate) check() error {
 		if err := robotworkspace.ProviderValidator(v); err != nil {
 			return &ValidationError{Name: "provider", err: fmt.Errorf(`ent: validator failed for field "RobotWorkspace.provider": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.AllowUntrustedCommands(); !ok {
+		return &ValidationError{Name: "allow_untrusted_commands", err: errors.New(`ent: missing required field "RobotWorkspace.allow_untrusted_commands"`)}
 	}
 	if _, ok := _c.mutation.CreatedBy(); !ok {
 		return &ValidationError{Name: "created_by", err: errors.New(`ent: missing required field "RobotWorkspace.created_by"`)}
@@ -309,6 +330,10 @@ func (_c *RobotWorkspaceCreate) createSpec() (*RobotWorkspace, *sqlgraph.CreateS
 	if value, ok := _c.mutation.Config(); ok {
 		_spec.SetField(robotworkspace.FieldConfig, field.TypeJSON, value)
 		_node.Config = value
+	}
+	if value, ok := _c.mutation.AllowUntrustedCommands(); ok {
+		_spec.SetField(robotworkspace.FieldAllowUntrustedCommands, field.TypeBool, value)
+		_node.AllowUntrustedCommands = value
 	}
 	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(robotworkspace.FieldMetadata, field.TypeJSON, value)
@@ -487,6 +512,18 @@ func (u *RobotWorkspaceUpsert) ClearConfig() *RobotWorkspaceUpsert {
 	return u
 }
 
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (u *RobotWorkspaceUpsert) SetAllowUntrustedCommands(v bool) *RobotWorkspaceUpsert {
+	u.Set(robotworkspace.FieldAllowUntrustedCommands, v)
+	return u
+}
+
+// UpdateAllowUntrustedCommands sets the "allow_untrusted_commands" field to the value that was provided on create.
+func (u *RobotWorkspaceUpsert) UpdateAllowUntrustedCommands() *RobotWorkspaceUpsert {
+	u.SetExcluded(robotworkspace.FieldAllowUntrustedCommands)
+	return u
+}
+
 // SetMetadata sets the "metadata" field.
 func (u *RobotWorkspaceUpsert) SetMetadata(v map[string]interface{}) *RobotWorkspaceUpsert {
 	u.Set(robotworkspace.FieldMetadata, v)
@@ -649,6 +686,20 @@ func (u *RobotWorkspaceUpsertOne) UpdateConfig() *RobotWorkspaceUpsertOne {
 func (u *RobotWorkspaceUpsertOne) ClearConfig() *RobotWorkspaceUpsertOne {
 	return u.Update(func(s *RobotWorkspaceUpsert) {
 		s.ClearConfig()
+	})
+}
+
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (u *RobotWorkspaceUpsertOne) SetAllowUntrustedCommands(v bool) *RobotWorkspaceUpsertOne {
+	return u.Update(func(s *RobotWorkspaceUpsert) {
+		s.SetAllowUntrustedCommands(v)
+	})
+}
+
+// UpdateAllowUntrustedCommands sets the "allow_untrusted_commands" field to the value that was provided on create.
+func (u *RobotWorkspaceUpsertOne) UpdateAllowUntrustedCommands() *RobotWorkspaceUpsertOne {
+	return u.Update(func(s *RobotWorkspaceUpsert) {
+		s.UpdateAllowUntrustedCommands()
 	})
 }
 
@@ -986,6 +1037,20 @@ func (u *RobotWorkspaceUpsertBulk) UpdateConfig() *RobotWorkspaceUpsertBulk {
 func (u *RobotWorkspaceUpsertBulk) ClearConfig() *RobotWorkspaceUpsertBulk {
 	return u.Update(func(s *RobotWorkspaceUpsert) {
 		s.ClearConfig()
+	})
+}
+
+// SetAllowUntrustedCommands sets the "allow_untrusted_commands" field.
+func (u *RobotWorkspaceUpsertBulk) SetAllowUntrustedCommands(v bool) *RobotWorkspaceUpsertBulk {
+	return u.Update(func(s *RobotWorkspaceUpsert) {
+		s.SetAllowUntrustedCommands(v)
+	})
+}
+
+// UpdateAllowUntrustedCommands sets the "allow_untrusted_commands" field to the value that was provided on create.
+func (u *RobotWorkspaceUpsertBulk) UpdateAllowUntrustedCommands() *RobotWorkspaceUpsertBulk {
+	return u.Update(func(s *RobotWorkspaceUpsert) {
+		s.UpdateAllowUntrustedCommands()
 	})
 }
 

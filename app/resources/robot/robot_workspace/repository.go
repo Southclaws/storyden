@@ -46,6 +46,12 @@ func WithConfig(v map[string]any) WorkspaceOption {
 	}
 }
 
+func WithAllowUntrustedCommands(v bool) WorkspaceOption {
+	return func(m *ent.RobotWorkspaceMutation) {
+		m.SetAllowUntrustedCommands(v)
+	}
+}
+
 func WithMetadata(v map[string]any) WorkspaceOption {
 	return func(m *ent.RobotWorkspaceMutation) {
 		m.SetMetadata(v)

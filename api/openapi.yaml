@@ -11611,7 +11611,16 @@ components:
 
     RobotWorkspaceProps:
       type: object
-      required: [name, description, provider, config, meta, created_by]
+      required:
+        [
+          name,
+          description,
+          provider,
+          config,
+          allow_untrusted_commands,
+          meta,
+          created_by,
+        ]
       properties:
         name:
           type: string
@@ -11625,6 +11634,9 @@ components:
           type: object
           additionalProperties: true
           description: Provider-specific template configuration.
+        allow_untrusted_commands:
+          type: boolean
+          description: Allow robots using this workspace template to run arbitrary shell commands.
         meta: { $ref: "#/components/schemas/Metadata" }
         created_by: { $ref: "#/components/schemas/ProfileReference" }
 
@@ -11650,7 +11662,11 @@ components:
 
     RobotWorkspaceMount:
       type: object
-      required: [workspace_id, workspace_instance_id, provider]
+      required:
+        - workspace_id
+        - workspace_instance_id
+        - provider
+        - allow_untrusted_commands
       properties:
         workspace_id:
           $ref: "#/components/schemas/Identifier"
@@ -11658,6 +11674,10 @@ components:
           $ref: "#/components/schemas/Identifier"
         provider:
           $ref: "#/components/schemas/RobotWorkspaceProvider"
+        allow_untrusted_commands:
+          type: boolean
+          description: |
+            Whether this mounted workspace allows arbitrary shell commands.
         meta: { $ref: "#/components/schemas/Metadata" }
 
     RobotSession:
@@ -11992,7 +12012,13 @@ components:
 
     RobotToolInfo:
       type: object
-      required: [id, callable_name, source, available, description, requires_confirmation]
+      required:
+        - id
+        - callable_name
+        - source
+        - available
+        - description
+        - requires_confirmation
       properties:
         id:
           type: string
@@ -12391,6 +12417,10 @@ components:
           type: object
           additionalProperties: true
           description: Provider-specific template configuration.
+        allow_untrusted_commands:
+          type: boolean
+          description: |
+            Allow robots using this template to run arbitrary shell commands.
         meta: { $ref: "#/components/schemas/Metadata" }
 
     RobotWorkspaceMutableProps:
@@ -12406,6 +12436,10 @@ components:
           type: object
           additionalProperties: true
           description: Provider-specific template configuration.
+        allow_untrusted_commands:
+          type: boolean
+          description: |
+            Allow robots using this template to run arbitrary shell commands.
         meta: { $ref: "#/components/schemas/Metadata" }
 
     RobotWorkspaceMountRequest:

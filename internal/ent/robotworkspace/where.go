@@ -76,6 +76,11 @@ func Description(v string) predicate.RobotWorkspace {
 	return predicate.RobotWorkspace(sql.FieldEQ(FieldDescription, v))
 }
 
+// AllowUntrustedCommands applies equality check predicate on the "allow_untrusted_commands" field. It's identical to AllowUntrustedCommandsEQ.
+func AllowUntrustedCommands(v bool) predicate.RobotWorkspace {
+	return predicate.RobotWorkspace(sql.FieldEQ(FieldAllowUntrustedCommands, v))
+}
+
 // CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
 func CreatedBy(v xid.ID) predicate.RobotWorkspace {
 	return predicate.RobotWorkspace(sql.FieldEQ(FieldCreatedBy, v))
@@ -329,6 +334,16 @@ func ConfigIsNil() predicate.RobotWorkspace {
 // ConfigNotNil applies the NotNil predicate on the "config" field.
 func ConfigNotNil() predicate.RobotWorkspace {
 	return predicate.RobotWorkspace(sql.FieldNotNull(FieldConfig))
+}
+
+// AllowUntrustedCommandsEQ applies the EQ predicate on the "allow_untrusted_commands" field.
+func AllowUntrustedCommandsEQ(v bool) predicate.RobotWorkspace {
+	return predicate.RobotWorkspace(sql.FieldEQ(FieldAllowUntrustedCommands, v))
+}
+
+// AllowUntrustedCommandsNEQ applies the NEQ predicate on the "allow_untrusted_commands" field.
+func AllowUntrustedCommandsNEQ(v bool) predicate.RobotWorkspace {
+	return predicate.RobotWorkspace(sql.FieldNEQ(FieldAllowUntrustedCommands, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

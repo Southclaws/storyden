@@ -1618,6 +1618,7 @@ var (
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "provider", Type: field.TypeEnum, Enums: []string{"local", "sprites"}, Default: "local"},
 		{Name: "config", Type: field.TypeJSON, Nullable: true},
+		{Name: "allow_untrusted_commands", Type: field.TypeBool, Default: false},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "created_by", Type: field.TypeString, Size: 20},
 	}
@@ -1629,7 +1630,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_workspaces_accounts_robot_workspaces",
-				Columns:    []*schema.Column{RobotWorkspacesColumns[8]},
+				Columns:    []*schema.Column{RobotWorkspacesColumns[9]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

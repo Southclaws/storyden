@@ -32,6 +32,8 @@ type RobotWorkspace struct {
 	Provider robotworkspace.Provider `json:"provider,omitempty"`
 	// Provider-specific workspace template configuration
 	Config map[string]interface{} `json:"config,omitempty"`
+	// Allow robots using this workspace template to run arbitrary shell commands
+	AllowUntrustedCommands bool `json:"allow_untrusted_commands,omitempty"`
 	// Arbitrary metadata used by clients to store domain specific information
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// CreatedBy holds the value of the "created_by" field.
@@ -91,6 +93,8 @@ func (*RobotWorkspace) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case robotworkspace.FieldConfig, robotworkspace.FieldMetadata:
 			values[i] = new([]byte)
+		case robotworkspace.FieldAllowUntrustedCommands:
+			values[i] = new(sql.NullBool)
 		case robotworkspace.FieldName, robotworkspace.FieldDescription, robotworkspace.FieldProvider:
 			values[i] = new(sql.NullString)
 		case robotworkspace.FieldCreatedAt, robotworkspace.FieldUpdatedAt:
@@ -155,6 +159,12 @@ func (_m *RobotWorkspace) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &_m.Config); err != nil {
 					return fmt.Errorf("unmarshal field config: %w", err)
 				}
+			}
+		case robotworkspace.FieldAllowUntrustedCommands:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field allow_untrusted_commands", values[i])
+			} else if value.Valid {
+				_m.AllowUntrustedCommands = value.Bool
 			}
 		case robotworkspace.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -238,6 +248,9 @@ func (_m *RobotWorkspace) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("config=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Config))
+	builder.WriteString(", ")
+	builder.WriteString("allow_untrusted_commands=")
+	builder.WriteString(fmt.Sprintf("%v", _m.AllowUntrustedCommands))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))

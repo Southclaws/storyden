@@ -12,6 +12,8 @@ import type { RobotWorkspaceInitialPropsConfig } from "./robotWorkspaceInitialPr
 import type { RobotWorkspaceProvider } from "./robotWorkspaceProvider";
 
 export interface RobotWorkspaceInitialProps {
+  /** Allow robots using this workspace template to run arbitrary shell commands. */
+  allow_untrusted_commands?: boolean;
   /** Provider-specific template configuration. */
   config?: RobotWorkspaceInitialPropsConfig;
   /** Human-readable description of the workspace template. */

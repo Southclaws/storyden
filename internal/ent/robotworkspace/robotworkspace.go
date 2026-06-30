@@ -28,6 +28,8 @@ const (
 	FieldProvider = "provider"
 	// FieldConfig holds the string denoting the config field in the database.
 	FieldConfig = "config"
+	// FieldAllowUntrustedCommands holds the string denoting the allow_untrusted_commands field in the database.
+	FieldAllowUntrustedCommands = "allow_untrusted_commands"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
@@ -72,6 +74,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldProvider,
 	FieldConfig,
+	FieldAllowUntrustedCommands,
 	FieldMetadata,
 	FieldCreatedBy,
 }
@@ -95,6 +98,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultAllowUntrustedCommands holds the default value on creation for the "allow_untrusted_commands" field.
+	DefaultAllowUntrustedCommands bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -158,6 +163,11 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // ByProvider orders the results by the provider field.
 func ByProvider(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProvider, opts...).ToFunc()
+}
+
+// ByAllowUntrustedCommands orders the results by the allow_untrusted_commands field.
+func ByAllowUntrustedCommands(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAllowUntrustedCommands, opts...).ToFunc()
 }
 
 // ByCreatedBy orders the results by the created_by field.

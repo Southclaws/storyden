@@ -1848,6 +1848,10 @@ func init() {
 	robotworkspaceDescName := robotworkspaceFields[0].Descriptor()
 	// robotworkspace.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	robotworkspace.NameValidator = robotworkspaceDescName.Validators[0].(func(string) error)
+	// robotworkspaceDescAllowUntrustedCommands is the schema descriptor for allow_untrusted_commands field.
+	robotworkspaceDescAllowUntrustedCommands := robotworkspaceFields[4].Descriptor()
+	// robotworkspace.DefaultAllowUntrustedCommands holds the default value on creation for the allow_untrusted_commands field.
+	robotworkspace.DefaultAllowUntrustedCommands = robotworkspaceDescAllowUntrustedCommands.Default.(bool)
 	// robotworkspaceDescID is the schema descriptor for id field.
 	robotworkspaceDescID := robotworkspaceMixinFields0[0].Descriptor()
 	// robotworkspace.DefaultID holds the default value on creation for the id field.

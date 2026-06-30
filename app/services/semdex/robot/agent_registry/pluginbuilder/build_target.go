@@ -83,6 +83,34 @@ func pluginBuildTargetFromReadonlyContext(ctx context.Context) (pluginBuildTarge
 	return pluginBuildTargetFromValue(mount.Metadata[pluginBuildTargetStateKey])
 }
 
+func pluginBuilderAllowUntrustedCommandsFromContext(ctx context.Context) bool {
+	stateProvider, ok := ctx.(pluginBuilderStateContext)
+	if !ok || stateProvider.State() == nil {
+		return false
+	}
+
+	state := map[string]any{}
+	for key, value := range stateProvider.State().All() {
+		state[key] = value
+	}
+	mount, ok := workspacestate.MountFromState(state).Get()
+	return ok && mount.AllowUntrustedCommands
+}
+
+func pluginBuilderAllowUntrustedCommandsFromReadonlyContext(ctx context.Context) bool {
+	stateProvider, ok := ctx.(pluginBuilderReadonlyStateContext)
+	if !ok || stateProvider.ReadonlyState() == nil {
+		return false
+	}
+
+	state := map[string]any{}
+	for key, value := range stateProvider.ReadonlyState().All() {
+		state[key] = value
+	}
+	mount, ok := workspacestate.MountFromState(state).Get()
+	return ok && mount.AllowUntrustedCommands
+}
+
 func pluginBuildTargetFromSessionState(state adksession.State) (pluginBuildTarget, bool, error) {
 	return pluginBuildTargetFromReadonlyState(state)
 }

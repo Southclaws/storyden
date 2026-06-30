@@ -11,6 +11,8 @@ import (
 	"google.golang.org/adk/session"
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 )
 
 func TestBuildToolsetContainsPluginTools(t *testing.T) {
@@ -53,6 +55,7 @@ func TestBuildToolsetContainsPluginTools(t *testing.T) {
 		"plugin_storyden_docs",
 		"plugin_install",
 		"plugin_logs_read",
+		"plugin_run_bash",
 	} {
 		assert.True(t, names[name], "missing tool %s", name)
 	}
@@ -68,6 +71,27 @@ func TestBuildToolsetTemporarilyExposesAllToolsWhenUnbound(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, pluginBuilderAllToolNames, pluginToolNames(tools))
+}
+
+func TestBuildToolsetAddsBashOnlyWhenWorkspaceAllowsUntrustedCommands(t *testing.T) {
+	toolset := newTestPluginBuilderToolset(t)
+
+	tools, err := toolset.Tools(newPluginBuilderReadonlyTestContext(nil))
+	require.NoError(t, err)
+	assert.NotContains(t, pluginToolNames(tools), "plugin_run_bash")
+
+	tools, err = toolset.Tools(newPluginBuilderReadonlyTestContext(map[string]any{
+		workspacestate.WorkspaceStateKey: map[string]any{
+			"workspace_id":             xid.New().String(),
+			"workspace_instance_id":    xid.New().String(),
+			"provider":                 "sprites",
+			"provider_state":           map[string]any{},
+			"allow_untrusted_commands": true,
+			"metadata":                 map[string]any{},
+		},
+	}))
+	require.NoError(t, err)
+	assert.Contains(t, pluginToolNames(tools), "plugin_run_bash")
 }
 
 func TestBuildToolsetTemporarilyExposesAllToolsWhenBoundToNewPlugin(t *testing.T) {
@@ -139,6 +163,27 @@ func TestInstructionIncludesUnboundState(t *testing.T) {
 	assert.NotContains(t, instruction, "plugin_sdk_reference")
 	assert.Contains(t, instruction, "Treat the plugin as your responsibility.")
 	assert.Contains(t, instruction, "Prefer comments explaining why rather than what.")
+	assert.Contains(t, instruction, "There is no shell, terminal")
+	assert.NotContains(t, instruction, "plugin_run_bash")
+}
+
+func TestInstructionIncludesUntrustedCommandAccessWhenWorkspaceAllowsIt(t *testing.T) {
+	agent := &Agent{}
+
+	instruction, err := agent.instruction(newPluginBuilderReadonlyTestContext(map[string]any{
+		workspacestate.WorkspaceStateKey: map[string]any{
+			"workspace_id":             xid.New().String(),
+			"workspace_instance_id":    xid.New().String(),
+			"provider":                 "sprites",
+			"provider_state":           map[string]any{},
+			"allow_untrusted_commands": true,
+			"metadata":                 map[string]any{},
+		},
+	}))
+	require.NoError(t, err)
+
+	assert.Contains(t, instruction, "plugin_run_bash")
+	assert.NotContains(t, instruction, "There is no shell, terminal")
 }
 
 func TestInstructionIncludesInstalledState(t *testing.T) {

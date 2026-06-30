@@ -57,12 +57,20 @@ func (m *WorkspaceManager) Mount(
 	}
 
 	var instance *robotresource.WorkspaceInstance
+	var workspace *robotresource.Workspace
 	var err error
 	if workspaceID, ok := spec.WorkspaceID.Get(); ok {
+		workspace, err = m.repo.Get(ctx, workspaceID)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 		instance, err = m.repo.CreateInstance(ctx, workspaceID, accountID, map[string]any{}, spec.Metadata)
 	} else {
 		instanceID, _ := spec.WorkspaceInstanceID.Get()
 		instance, err = m.repo.GetInstance(ctx, instanceID)
+		if err == nil {
+			workspace, err = m.repo.Get(ctx, instance.WorkspaceID)
+		}
 	}
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -84,11 +92,12 @@ func (m *WorkspaceManager) Mount(
 	}
 
 	mount := &robotresource.WorkspaceMount{
-		WorkspaceID:         instance.WorkspaceID,
-		WorkspaceInstanceID: instance.ID,
-		Provider:            instance.Provider,
-		ProviderState:       providerState,
-		Metadata:            instance.Metadata,
+		WorkspaceID:            instance.WorkspaceID,
+		WorkspaceInstanceID:    instance.ID,
+		Provider:               instance.Provider,
+		ProviderState:          providerState,
+		AllowUntrustedCommands: workspace.AllowUntrustedCommands,
+		Metadata:               instance.Metadata,
 	}
 
 	if err := m.storeMount(ctx, sessionID, mount); err != nil {

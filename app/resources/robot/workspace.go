@@ -50,11 +50,12 @@ type Workspace struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Name        string
-	Description string
-	Provider    WorkspaceProvider
-	Config      map[string]any
-	Metadata    map[string]any
+	Name                   string
+	Description            string
+	Provider               WorkspaceProvider
+	Config                 map[string]any
+	AllowUntrustedCommands bool
+	Metadata               map[string]any
 
 	Creator account.Account
 }
@@ -73,11 +74,12 @@ type WorkspaceInstance struct {
 }
 
 type WorkspaceMount struct {
-	WorkspaceID         WorkspaceID
-	WorkspaceInstanceID WorkspaceInstanceID
-	Provider            WorkspaceProvider
-	ProviderState       map[string]any
-	Metadata            map[string]any
+	WorkspaceID            WorkspaceID
+	WorkspaceInstanceID    WorkspaceInstanceID
+	Provider               WorkspaceProvider
+	ProviderState          map[string]any
+	AllowUntrustedCommands bool
+	Metadata               map[string]any
 }
 
 func MapWorkspace(in *ent.RobotWorkspace) (*Workspace, error) {
@@ -87,15 +89,16 @@ func MapWorkspace(in *ent.RobotWorkspace) (*Workspace, error) {
 	}
 
 	return &Workspace{
-		ID:          WorkspaceID(in.ID),
-		CreatedAt:   in.CreatedAt,
-		UpdatedAt:   in.UpdatedAt,
-		Name:        in.Name,
-		Description: in.Description,
-		Provider:    WorkspaceProvider(in.Provider),
-		Config:      in.Config,
-		Metadata:    in.Metadata,
-		Creator:     *creator,
+		ID:                     WorkspaceID(in.ID),
+		CreatedAt:              in.CreatedAt,
+		UpdatedAt:              in.UpdatedAt,
+		Name:                   in.Name,
+		Description:            in.Description,
+		Provider:               WorkspaceProvider(in.Provider),
+		Config:                 in.Config,
+		AllowUntrustedCommands: in.AllowUntrustedCommands,
+		Metadata:               in.Metadata,
+		Creator:                *creator,
 	}, nil
 }
 

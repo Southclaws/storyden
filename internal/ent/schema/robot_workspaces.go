@@ -35,6 +35,10 @@ func (RobotWorkspace) Fields() []ent.Field {
 			Optional().
 			Comment("Provider-specific workspace template configuration"),
 
+		field.Bool("allow_untrusted_commands").
+			Default(false).
+			Comment("Allow robots using this workspace template to run arbitrary shell commands"),
+
 		field.JSON("metadata", map[string]any{}).
 			Optional().
 			Comment("Arbitrary metadata used by clients to store domain specific information"),

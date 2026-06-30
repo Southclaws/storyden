@@ -13,6 +13,8 @@ import type { RobotWorkspacePropsConfig } from "./robotWorkspacePropsConfig";
 import type { RobotWorkspaceProvider } from "./robotWorkspaceProvider";
 
 export interface RobotWorkspaceProps {
+  /** Allow robots using this workspace template to run arbitrary shell commands. */
+  allow_untrusted_commands: boolean;
   /** Provider-specific template configuration. */
   config: RobotWorkspacePropsConfig;
   created_by: ProfileReference;

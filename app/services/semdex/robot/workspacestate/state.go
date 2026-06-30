@@ -12,11 +12,12 @@ const WorkspaceStateKey = "robot_workspace"
 
 func MountToState(mount *robotresource.WorkspaceMount) map[string]any {
 	return map[string]any{
-		"workspace_id":          mount.WorkspaceID.String(),
-		"workspace_instance_id": mount.WorkspaceInstanceID.String(),
-		"provider":              string(mount.Provider),
-		"provider_state":        mount.ProviderState,
-		"metadata":              mount.Metadata,
+		"workspace_id":             mount.WorkspaceID.String(),
+		"workspace_instance_id":    mount.WorkspaceInstanceID.String(),
+		"provider":                 string(mount.Provider),
+		"provider_state":           mount.ProviderState,
+		"allow_untrusted_commands": mount.AllowUntrustedCommands,
+		"metadata":                 mount.Metadata,
 	}
 }
 
@@ -31,11 +32,12 @@ func MountFromState(state map[string]any) opt.Optional[robotresource.WorkspaceMo
 	}
 
 	var payload struct {
-		WorkspaceID         string         `json:"workspace_id"`
-		WorkspaceInstanceID string         `json:"workspace_instance_id"`
-		Provider            string         `json:"provider"`
-		ProviderState       map[string]any `json:"provider_state"`
-		Metadata            map[string]any `json:"metadata"`
+		WorkspaceID            string         `json:"workspace_id"`
+		WorkspaceInstanceID    string         `json:"workspace_instance_id"`
+		Provider               string         `json:"provider"`
+		ProviderState          map[string]any `json:"provider_state"`
+		AllowUntrustedCommands bool           `json:"allow_untrusted_commands"`
+		Metadata               map[string]any `json:"metadata"`
 	}
 	data, err := json.Marshal(raw)
 	if err != nil {
@@ -55,10 +57,11 @@ func MountFromState(state map[string]any) opt.Optional[robotresource.WorkspaceMo
 	}
 
 	return opt.New(robotresource.WorkspaceMount{
-		WorkspaceID:         workspaceID,
-		WorkspaceInstanceID: instanceID,
-		Provider:            robotresource.WorkspaceProvider(payload.Provider),
-		ProviderState:       payload.ProviderState,
-		Metadata:            payload.Metadata,
+		WorkspaceID:            workspaceID,
+		WorkspaceInstanceID:    instanceID,
+		Provider:               robotresource.WorkspaceProvider(payload.Provider),
+		ProviderState:          payload.ProviderState,
+		AllowUntrustedCommands: payload.AllowUntrustedCommands,
+		Metadata:               payload.Metadata,
 	})
 }
