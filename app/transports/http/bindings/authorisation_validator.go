@@ -56,7 +56,17 @@ func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.Au
 
 	sessionRequired, perm := GetPermissionForOperation(op)
 	if perm == nil {
-		// No specific permission required, just need a session.
+		// No specific permission required, just need a session. Suspension must
+		// still be enforced here otherwise suspended accounts could perform any
+		// operation that maps to no specific permission (creating content,
+		// updating their account, authorising OAuth clients, etc.)
+		if sessionRequired {
+			if acc, ok := session.GetOptAccount(ctx).Get(); ok {
+				if err := acc.RejectSuspended(); err != nil {
+					return fault.Wrap(err, fctx.With(ctx))
+				}
+			}
+		}
 		return nil
 	}
 
