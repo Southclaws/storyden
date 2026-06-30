@@ -21,8 +21,10 @@ function resolvePath(kind: string, mark: string): string | undefined {
       return `/t/${mark}`;
     case DatagraphItemKind.reply:
       return `/t/locate/${mark}`;
-    case DatagraphItemKind.node:
-      return `/l/${mark}`;
+    case DatagraphItemKind.node: {
+      const slug = mark.includes("-") ? mark.slice(mark.indexOf("-") + 1) : mark;
+      return `/l/${slug}`;
+    }
     case DatagraphItemKind.collection:
       return `/c/${mark}`;
     case DatagraphItemKind.profile:
