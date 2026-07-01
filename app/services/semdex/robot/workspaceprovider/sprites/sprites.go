@@ -65,6 +65,8 @@ func New(cfg config.Config, accessKeys *access_key.Repository) *Provider {
 			spritesdk.WithHTTPClient(&http.Client{
 				Timeout: spritesHTTPTimeout,
 			}),
+			// https://github.com/superfly/sprites-go/issues/22
+			spritesdk.WithDisableControl(),
 		)
 	}
 	return p
