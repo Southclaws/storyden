@@ -86,8 +86,8 @@ require (
 	github.com/mocktools/go-smtp-mock/v2 v2.5.1
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/oapi-codegen/echo-middleware v1.0.2
-	github.com/oapi-codegen/nullable v1.1.0
-	github.com/oapi-codegen/runtime v1.4.1
+	github.com/oapi-codegen/nullable v1.2.0
+	github.com/oapi-codegen/runtime v1.4.2
 	github.com/oasdiff/yaml v0.0.9
 	github.com/openai/openai-go v1.12.0
 	github.com/openai/openai-go/v3 v3.8.1
@@ -232,7 +232,7 @@ require (
 	github.com/muesli/mango-pflag v0.1.0 // indirect
 	github.com/muesli/roff v0.1.0 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/oapi-codegen/oapi-codegen/v2 v2.7.0 // indirect
+	github.com/oapi-codegen/oapi-codegen/v2 v2.7.1 // indirect
 	github.com/oasdiff/yaml3 v0.0.9 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
