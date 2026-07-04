@@ -45,6 +45,64 @@ func TestWriteManifestWritesConfigurationSchema(t *testing.T) {
 	require.Equal(t, "discord_bot_token", field.ID)
 }
 
+func TestWriteManifestForcesManagedLaunchFields(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	toolCtx := &pluginBuilderTestContext{
+		Context: ctx,
+		state: pluginBuilderTestState{
+			pluginBuildTargetStateKey: pluginBuildTarget{
+				Mode:       pluginBuildTargetModeNew,
+				ManifestID: "discord-link-archiver",
+			},
+		},
+	}
+
+	raw := testManifestInput("discord-link-archiver")
+	raw["command"] = "./discord-link-archiver"
+	raw["args"] = []any{"--unexpected"}
+
+	_, err = agent.WriteManifest(toolCtx, raw)
+	require.NoError(t, err)
+
+	mf, err := readProjectManifest(ctx, workspace)
+	require.NoError(t, err)
+	require.Equal(t, managedPluginCommand, mf.Manifest.Command)
+	require.Equal(t, managedPluginArgs, mf.Manifest.Args)
+}
+
+func TestWriteManifestDoesNotRequireManagedLaunchFields(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	toolCtx := &pluginBuilderTestContext{
+		Context: ctx,
+		state: pluginBuilderTestState{
+			pluginBuildTargetStateKey: pluginBuildTarget{
+				Mode:       pluginBuildTargetModeNew,
+				ManifestID: "discord-link-archiver",
+			},
+		},
+	}
+
+	raw := testManifestInput("discord-link-archiver")
+	delete(raw, "command")
+	delete(raw, "args")
+
+	_, err = agent.WriteManifest(toolCtx, raw)
+	require.NoError(t, err)
+
+	mf, err := readProjectManifest(ctx, workspace)
+	require.NoError(t, err)
+	require.Equal(t, managedPluginCommand, mf.Manifest.Command)
+	require.Equal(t, managedPluginArgs, mf.Manifest.Args)
+}
+
 func TestWriteManifestRejectsConfigurationField(t *testing.T) {
 	ctx := context.Background()
 	workspace, err := localworkspace.NewWorkspace(t.TempDir())
@@ -277,6 +335,21 @@ func TestPluginManifestToolInputSchemaRejectsConfiguration(t *testing.T) {
 
 	err = schema.Validate(raw)
 	require.Error(t, err)
+}
+
+func TestPluginManifestToolInputSchemaHidesManagedLaunchFields(t *testing.T) {
+	schema := pluginManifestToolInputSchema()
+
+	require.NotContains(t, schema.Properties, "command")
+	require.NotContains(t, schema.Properties, "args")
+	require.NotContains(t, schema.Required, "command")
+
+	resolved, err := schema.Resolve(nil)
+	require.NoError(t, err)
+	raw := testManifestInput("discord-link-archiver")
+	delete(raw, "command")
+	delete(raw, "args")
+	require.NoError(t, resolved.Validate(raw))
 }
 
 func testManifestInput(id string) map[string]any {

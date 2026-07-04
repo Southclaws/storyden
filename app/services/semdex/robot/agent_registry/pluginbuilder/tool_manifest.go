@@ -24,6 +24,10 @@ type ManifestWriteResult struct {
 	Message  string `json:"message,omitempty"`
 }
 
+const managedPluginCommand = "go"
+
+var managedPluginArgs = []string{"run", "."}
+
 func (a *Agent) addManifestTools(add toolAdder) error {
 	return add(functiontool.New[map[string]any, ManifestWriteResult](functiontool.Config{
 		Name:        "plugin_manifest_write",
@@ -41,19 +45,20 @@ func (a *Agent) addManifestTools(add toolAdder) error {
 const manifestWriteDescription = `Write and validate manifest.yaml from structured manifest fields.
 
 Use this instead of plugin_file_edit or plugin_file_write when changing
-manifest.yaml. The input schema is the plugin manifest schema: use
-configuration_schema for plugin settings, never configuration. The tool
-validates the manifest before writing it.`
+manifest.yaml. Use configuration_schema for plugin settings, never
+configuration. The tool validates the manifest before writing it and manages
+runtime launch fields automatically.`
 
 func (a *Agent) WriteManifest(ctx context.Context, raw map[string]any) (ManifestWriteResult, error) {
 	if raw == nil {
 		return ManifestWriteResult{}, errors.New("manifest input is required")
 	}
-	if err := validateManifestRaw(raw); err != nil {
+	manifestRaw := normalizeManagedManifestRaw(raw)
+	if err := validateManifestRaw(manifestRaw); err != nil {
 		return ManifestWriteResult{}, err
 	}
 
-	manifest, err := rpc.ManifestFromMap(raw)
+	manifest, err := rpc.ManifestFromMap(manifestRaw)
 	if err != nil {
 		return ManifestWriteResult{}, fmt.Errorf("validate manifest: %w", err)
 	}
@@ -98,8 +103,26 @@ func (a *Agent) WriteManifest(ctx context.Context, raw map[string]any) (Manifest
 	}, nil
 }
 
+func normalizeManagedManifestRaw(raw map[string]any) map[string]any {
+	normalised := make(map[string]any, len(raw)+2)
+	for key, value := range raw {
+		normalised[key] = value
+	}
+	normalised["command"] = managedPluginCommand
+	normalised["args"] = managedPluginArgsAny()
+	return normalised
+}
+
+func managedPluginArgsAny() []any {
+	args := make([]any, len(managedPluginArgs))
+	for i, arg := range managedPluginArgs {
+		args[i] = arg
+	}
+	return args
+}
+
 func validateManifestRaw(raw map[string]any) error {
-	schema := pluginManifestToolInputSchema()
+	schema := pluginManifestValidationSchema()
 
 	if err := rejectUnknownManifestFields(raw, schema); err != nil {
 		return err
@@ -415,10 +438,40 @@ func minInt(values ...int) int {
 func pluginManifestToolInputSchema() *jsonschema.Schema {
 	schema := libplugin.GetManifestSchema()
 
+	schema.Description = "Storyden plugin manifest fields managed by the plugin builder. Use configuration_schema for plugin settings; configuration is not a valid field. Runtime launch fields are managed automatically."
+	if schema.Properties == nil {
+		schema.Properties = map[string]*jsonschema.Schema{}
+	}
+	delete(schema.Properties, "command")
+	delete(schema.Properties, "args")
+	schema.Required = removeRequiredFields(schema.Required, "command")
+
+	return schema
+}
+
+func pluginManifestValidationSchema() *jsonschema.Schema {
+	schema := libplugin.GetManifestSchema()
+
 	schema.Description = "Complete Storyden plugin manifest. Use configuration_schema for plugin settings; configuration is not a valid field."
 	if schema.Properties == nil {
 		schema.Properties = map[string]*jsonschema.Schema{}
 	}
 
 	return schema
+}
+
+func removeRequiredFields(required []string, fields ...string) []string {
+	remove := map[string]struct{}{}
+	for _, field := range fields {
+		remove[field] = struct{}{}
+	}
+
+	out := make([]string, 0, len(required))
+	for _, field := range required {
+		if _, ok := remove[field]; ok {
+			continue
+		}
+		out = append(out, field)
+	}
+	return out
 }
