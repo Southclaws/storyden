@@ -25,6 +25,8 @@ type integrationsSurface struct {
 	Spec string `json:"spec"`
 }
 
+const testAPIAddress = "http://localhost:8000"
+
 type integrationsDocument struct {
 	Version  int                   `json:"version"`
 	Surfaces []integrationsSurface `json:"surfaces"`
@@ -83,6 +85,9 @@ func TestIntegrationsDiscoveryMCPEnabled(t *testing.T) {
 			r.Len(doc.Surfaces, 2)
 			a.Equal("storyden-mcp", doc.Surfaces[1].Slug)
 			a.Equal("mcp", doc.Surfaces[1].Type)
+			// PublicWebAddress (:3000) and PublicAPIAddress (:8000) differ in this
+			// config; /mcp is mounted on the backend so it must use the API address.
+			a.Equal(testAPIAddress+"/mcp", doc.Surfaces[1].URL)
 
 			cardResp := getJSON(t, root, ts.URL+"/.well-known/mcp/server-card.json")
 			defer cardResp.Body.Close()
@@ -92,7 +97,7 @@ func TestIntegrationsDiscoveryMCPEnabled(t *testing.T) {
 			var card map[string]string
 			r.NoError(json.NewDecoder(cardResp.Body).Decode(&card))
 			r.Contains(card, "url")
-			a.Contains(card["url"], "/mcp")
+			a.Equal(testAPIAddress+"/mcp", card["url"])
 		}))
 	}))
 }
@@ -114,7 +119,7 @@ func mcpConfig(t *testing.T) *config.Config {
 
 	publicWebAddress, err := url.Parse("http://localhost:3000")
 	require.NoError(t, err)
-	publicAPIAddress, err := url.Parse("http://localhost:8000")
+	publicAPIAddress, err := url.Parse(testAPIAddress)
 	require.NoError(t, err)
 
 	return &config.Config{

@@ -154,7 +154,7 @@ func buildIntegrationsDocument(cfg config.Config, oauthBinding OAuth) integratio
 				Status:  "required",
 				Entries: []integrationsAuthEntry{accessKeyEntry},
 			},
-			URL:        webBase + "/mcp",
+			URL:        apiBase + "/mcp",
 			Transports: []string{"streamable-http"},
 		})
 	}

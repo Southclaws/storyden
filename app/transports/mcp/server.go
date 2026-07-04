@@ -47,7 +47,7 @@ func MountMCP(
 	}
 
 	mux.HandleFunc("/.well-known/mcp/server-card.json", func(w http.ResponseWriter, r *http.Request) {
-		mcpURL := strings.TrimSuffix(cfg.PublicWebAddress.String(), "/") + "/mcp"
+		mcpURL := strings.TrimSuffix(cfg.PublicAPIAddress.String(), "/") + "/mcp"
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "public, max-age=3600")

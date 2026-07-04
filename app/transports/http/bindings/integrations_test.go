@@ -60,7 +60,7 @@ func TestBuildIntegrationsDocumentMCPEnabled(t *testing.T) {
 	t.Parallel()
 
 	cfg := config.Config{
-		PublicAPIAddress: mustParseURL(t, "https://example.com"),
+		PublicAPIAddress: mustParseURL(t, "https://api.example.com"),
 		PublicWebAddress: mustParseURL(t, "https://example.com"),
 		MCPEnabled:       true,
 	}
@@ -73,7 +73,9 @@ func TestBuildIntegrationsDocumentMCPEnabled(t *testing.T) {
 	mcp := doc.Surfaces[1]
 	assert.Equal(t, "storyden-mcp", mcp.Slug)
 	assert.Equal(t, "mcp", mcp.Type)
-	assert.Equal(t, "https://example.com/mcp", mcp.URL)
+	// /mcp is mounted on the backend's own mux (same as /api), so it must be
+	// reachable via PublicAPIAddress, not the frontend's PublicWebAddress.
+	assert.Equal(t, "https://api.example.com/mcp", mcp.URL)
 	assert.Equal(t, []string{"streamable-http"}, mcp.Transports)
 	assert.Equal(t, "https://example.com/.well-known/integrations.json", mcp.Basis.Source)
 
