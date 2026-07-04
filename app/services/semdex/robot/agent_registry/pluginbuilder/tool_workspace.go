@@ -157,19 +157,10 @@ author: %s
 description: %s
 version: 0.1.0
 command: %s
-args:
-%s
+args: []
 events_consumed:
   - EventThreadPublished
-`, id, yamlQuote(name), author, yamlQuote(description), managedPluginCommand, renderManagedPluginArgsYAML())
-}
-
-func renderManagedPluginArgsYAML() string {
-	lines := make([]string, 0, len(managedPluginArgs))
-	for _, arg := range managedPluginArgs {
-		lines = append(lines, "  - "+yamlQuote(arg))
-	}
-	return strings.Join(lines, "\n")
+`, id, yamlQuote(name), author, yamlQuote(description), yamlQuote(packagedPluginCommand))
 }
 
 func yamlQuote(s string) string {

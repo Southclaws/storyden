@@ -318,13 +318,13 @@ func (r *localRuntime) stopProcess(cmd *exec.Cmd) {
 		return
 	}
 
-	if err := interruptProcess(cmd); err != nil {
+	if err := cmd.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
 
 		r.logger.Warn("failed to send interrupt signal, falling back to kill", slog.Any("error", err))
-		if killErr := killProcess(cmd); killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
+		if killErr := cmd.Process.Kill(); killErr != nil && !errors.Is(killErr, os.ErrProcessDone) {
 			r.logger.Error("failed to kill process after interrupt failure", slog.Any("error", killErr))
 		}
 		return
@@ -337,7 +337,7 @@ func (r *localRuntime) stopProcess(cmd *exec.Cmd) {
 		defer timer.Stop()
 		<-timer.C
 
-		if err := killProcess(cmd); err != nil {
+		if err := cmd.Process.Kill(); err != nil {
 			if !errors.Is(err, os.ErrProcessDone) {
 				r.logger.Warn("failed to kill process after graceful shutdown timeout", slog.Any("error", err))
 			}
@@ -407,7 +407,6 @@ func (r *localRuntime) startProcess(ctx context.Context) (*exec.Cmd, *plugin_log
 	}
 
 	cmd := exec.CommandContext(ctx, r.manifest.Metadata.Command, r.manifest.Metadata.Args...)
-	configureProcessCommand(cmd)
 	cmd.Dir = workdir
 	env := os.Environ()
 	env = append(env, "STORYDEN_RPC_URL="+rpcURL.String())

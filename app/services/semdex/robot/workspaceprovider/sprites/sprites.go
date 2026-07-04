@@ -413,7 +413,7 @@ func (w *Workspace) Run(ctx context.Context, spec workspacecap.CommandSpec) (wor
 
 	cmd := w.sprite.CommandContext(cmdCtx, spec.Command, spec.Args...)
 	cmd.Dir = w.workdir
-	cmd.Env = append([]string{}, defaultCommandEnv()...)
+	cmd.Env = append(defaultCommandEnv(), spec.Env...)
 	if spec.Stdin != "" {
 		cmd.Stdin = strings.NewReader(spec.Stdin)
 	}

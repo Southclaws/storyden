@@ -70,3 +70,18 @@ func TestWorkspaceRunUsesWorkspaceRoot(t *testing.T) {
 	require.True(t, result.Success, result.Output)
 	require.NotEmpty(t, strings.TrimSpace(result.Output))
 }
+
+func TestWorkspaceRunAppendsEnvironment(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	result, err := workspace.Run(ctx, workspacecap.CommandSpec{
+		Command: "go",
+		Args:    []string{"env", "GOOS"},
+		Env:     []string{"GOOS=js"},
+	})
+	require.NoError(t, err)
+	require.True(t, result.Success, result.Output)
+	require.Equal(t, "js", strings.TrimSpace(result.Output))
+}

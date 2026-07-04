@@ -24,10 +24,6 @@ type ManifestWriteResult struct {
 	Message  string `json:"message,omitempty"`
 }
 
-const managedPluginCommand = "go"
-
-var managedPluginArgs = []string{"run", "."}
-
 func (a *Agent) addManifestTools(add toolAdder) error {
 	return add(functiontool.New[map[string]any, ManifestWriteResult](functiontool.Config{
 		Name:        "plugin_manifest_write",
@@ -108,17 +104,9 @@ func normalizeManagedManifestRaw(raw map[string]any) map[string]any {
 	for key, value := range raw {
 		normalised[key] = value
 	}
-	normalised["command"] = managedPluginCommand
-	normalised["args"] = managedPluginArgsAny()
+	normalised["command"] = packagedPluginCommand
+	normalised["args"] = []any{}
 	return normalised
-}
-
-func managedPluginArgsAny() []any {
-	args := make([]any, len(managedPluginArgs))
-	for i, arg := range managedPluginArgs {
-		args[i] = arg
-	}
-	return args
 }
 
 func validateManifestRaw(raw map[string]any) error {
@@ -442,8 +430,12 @@ func pluginManifestToolInputSchema() *jsonschema.Schema {
 	if schema.Properties == nil {
 		schema.Properties = map[string]*jsonschema.Schema{}
 	}
-	delete(schema.Properties, "command")
-	delete(schema.Properties, "args")
+	if command := schema.Properties["command"]; command != nil {
+		command.Description = "Optional compatibility field. The plugin builder ignores this input and always writes the managed plugin runtime command."
+	}
+	if args := schema.Properties["args"]; args != nil {
+		args.Description = "Optional compatibility field. The plugin builder ignores this input and always writes the managed plugin runtime arguments."
+	}
 	schema.Required = removeRequiredFields(schema.Required, "command")
 
 	return schema

@@ -8,8 +8,10 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"runtime"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/goccy/go-yaml"
 	"github.com/rs/xid"
@@ -44,6 +46,17 @@ type manifestFile struct {
 	Path     string
 	Manifest rpc.Manifest
 }
+
+type pluginBuildRuntimeTarget struct {
+	GOOS   string
+	GOARCH string
+}
+
+const (
+	packagedPluginBinary  = "main.exe"
+	packagedPluginCommand = "./" + packagedPluginBinary
+	pluginBuildTimeout    = 5 * time.Minute
+)
 
 func (a *Agent) addInstallTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
@@ -168,12 +181,29 @@ func (a *Agent) packageBytes(ctx context.Context) (*packageArchive, error) {
 }
 
 func buildPackage(ctx context.Context, workspace workspaceprovider.Workspace) (*packageArchive, error) {
+	return buildPackageForTarget(ctx, workspace, hostPluginBuildRuntimeTarget())
+}
+
+func buildPackageForTarget(ctx context.Context, workspace workspaceprovider.Workspace, target pluginBuildRuntimeTarget) (*packageArchive, error) {
 	mf, err := readProjectManifest(ctx, workspace)
 	if err != nil {
 		return nil, err
 	}
 
-	manifestJSON, err := json.MarshalIndent(mf.Manifest, "", "  ")
+	sourceFiles, err := packageWorkspaceFiles(ctx, workspace)
+	if err != nil {
+		return nil, err
+	}
+	if err := validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, sourceFiles); err != nil {
+		return nil, err
+	}
+
+	if err := buildPackagedPluginBinary(ctx, workspace, target); err != nil {
+		return nil, err
+	}
+
+	packagedManifest := manifestWithPackagedRuntime(mf.Manifest)
+	manifestJSON, err := json.MarshalIndent(packagedManifest, "", "  ")
 	if err != nil {
 		return nil, err
 	}
@@ -181,10 +211,6 @@ func buildPackage(ctx context.Context, workspace workspaceprovider.Workspace) (*
 
 	files, err := packageWorkspaceFiles(ctx, workspace)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, files); err != nil {
 		return nil, err
 	}
 
@@ -231,7 +257,52 @@ func buildPackage(ctx context.Context, workspace workspaceprovider.Workspace) (*
 		return nil, fmt.Errorf("validate package manifest: %w", err)
 	}
 
-	return &packageArchive{Manifest: mf.Manifest, Bytes: buf.Bytes(), Files: written}, nil
+	return &packageArchive{Manifest: packagedManifest, Bytes: buf.Bytes(), Files: written}, nil
+}
+
+func hostPluginBuildRuntimeTarget() pluginBuildRuntimeTarget {
+	return pluginBuildRuntimeTarget{
+		GOOS:   runtime.GOOS,
+		GOARCH: runtime.GOARCH,
+	}
+}
+
+func buildPackagedPluginBinary(ctx context.Context, workspace workspaceprovider.Workspace, target pluginBuildRuntimeTarget) error {
+	if target.GOOS == "" || target.GOARCH == "" {
+		return errors.New("plugin build target GOOS and GOARCH are required")
+	}
+
+	result, err := workspace.Run(ctx, workspaceprovider.CommandSpec{
+		Command: "go",
+		Args:    []string{"build", "-trimpath", "-o", packagedPluginBinary, "."},
+		Env: []string{
+			"GOOS=" + target.GOOS,
+			"GOARCH=" + target.GOARCH,
+			"CGO_ENABLED=0",
+		},
+		Timeout: pluginBuildTimeout,
+	})
+	if err != nil {
+		return fmt.Errorf("build plugin binary for %s/%s: %w", target.GOOS, target.GOARCH, err)
+	}
+	if !result.Success {
+		message := strings.TrimSpace(result.Output)
+		if message == "" {
+			message = strings.TrimSpace(result.Error)
+		}
+		if message == "" {
+			message = "go build failed"
+		}
+		return fmt.Errorf("build plugin binary for %s/%s: %s", target.GOOS, target.GOARCH, message)
+	}
+
+	return nil
+}
+
+func manifestWithPackagedRuntime(manifest rpc.Manifest) rpc.Manifest {
+	manifest.Command = packagedPluginCommand
+	manifest.Args = nil
+	return manifest
 }
 
 func packageWorkspaceFiles(ctx context.Context, workspace workspaceprovider.Workspace) ([]workspaceprovider.FileInfo, error) {

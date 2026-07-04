@@ -304,7 +304,7 @@ func (w *Workspace) Run(ctx context.Context, spec workspacecap.CommandSpec) (wor
 
 	cmd := exec.CommandContext(cmdCtx, spec.Command, spec.Args...)
 	cmd.Dir = w.root
-	cmd.Env = os.Environ()
+	cmd.Env = append(os.Environ(), spec.Env...)
 	if spec.Stdin != "" {
 		cmd.Stdin = strings.NewReader(spec.Stdin)
 	}

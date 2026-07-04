@@ -49,6 +49,7 @@ type SearchResult struct {
 type CommandSpec struct {
 	Command string
 	Args    []string
+	Env     []string
 	Stdin   string
 	Timeout time.Duration
 }
