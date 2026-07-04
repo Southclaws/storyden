@@ -109,10 +109,10 @@ require (
 	go.opentelemetry.io/otel/sdk v1.43.0
 	go.opentelemetry.io/otel/trace v1.43.0
 	go.opentelemetry.io/proto/otlp v1.10.0
-	golang.org/x/exp v0.0.0-20260529124908-c761662dc8c9
-	golang.org/x/sync v0.20.0
-	golang.org/x/term v0.43.0
-	golang.org/x/tools v0.45.0
+	golang.org/x/exp v0.0.0-20260611194520-c48552f49976
+	golang.org/x/sync v0.21.0
+	golang.org/x/term v0.44.0
+	golang.org/x/tools v0.46.0
 	google.golang.org/adk v1.4.0
 	google.golang.org/api v0.279.0
 	google.golang.org/genai v1.57.0
@@ -335,11 +335,11 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.17.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.51.0
-	golang.org/x/mod v0.36.0 // indirect
-	golang.org/x/net v0.55.0
-	golang.org/x/sys v0.45.0 // indirect
-	golang.org/x/text v0.37.0
+	golang.org/x/crypto v0.53.0
+	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/net v0.56.0
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.38.0
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
