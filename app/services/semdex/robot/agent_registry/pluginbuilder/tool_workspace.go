@@ -182,37 +182,166 @@ func renderMainGo() string {
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"errors"
+	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
+	"time"
 
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 	"github.com/Southclaws/storyden/sdk/go/storyden"
 )
 
+const (
+	initialConfigRetryInterval = 2 * time.Second
+	configureTimeout           = 15 * time.Second
+)
+
+type pluginConfig struct {
+	// Add manifest configuration_schema fields here as this plugin grows.
+	// Missing user-provided configuration should leave the plugin running in an
+	// unconfigured state; do not exit the process while waiting for UI config.
+}
+
+type pluginApp struct {
+	plugin *storyden.Plugin
+	logger *slog.Logger
+
+	mu         sync.RWMutex
+	config     pluginConfig
+	configured bool
+}
+
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	slog.SetDefault(logger)
+
 	pl, err := storyden.New(ctx)
 	if err != nil {
-		log.Fatalf("failed to initialise plugin: %v", err)
+		logger.Error("failed to initialise plugin", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 	defer func() {
-		if err := pl.Shutdown(); err != nil {
-			log.Printf("shutdown error: %v", err)
+		if err := pl.Shutdown(); err != nil && !errors.Is(err, context.Canceled) {
+			logger.Warn("plugin shutdown returned error", slog.String("error", err.Error()))
 		}
 	}()
 
-	pl.OnThreadPublished(func(ctx context.Context, event *rpc.EventThreadPublished) error {
-		fmt.Printf("thread published: %+v\n", event)
-		return nil
-	})
+	app := &pluginApp{
+		plugin: pl,
+		logger: logger,
+	}
+
+	// Configuration is live. A supervised plugin can start before the user has
+	// entered settings in the UI; OnConfigure is called later when settings are
+	// saved. Keep the process alive and gate only the behaviours that require
+	// configuration.
+	pl.OnConfigure(app.handleConfigure)
+
+	pl.OnThreadPublished(app.handleThreadPublished)
+
+	go app.syncInitialConfig(ctx)
 
 	if err := pl.Run(ctx); err != nil {
-		log.Fatalf("plugin stopped: %v", err)
+		if errors.Is(err, context.Canceled) {
+			return
+		}
+		logger.Error("plugin stopped", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
+}
+
+func (a *pluginApp) handleConfigure(ctx context.Context, raw map[string]any) error {
+	timeoutCtx, cancel := context.WithTimeout(ctx, configureTimeout)
+	defer cancel()
+
+	return a.applyConfig(timeoutCtx, raw, true)
+}
+
+func (a *pluginApp) syncInitialConfig(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+
+		raw, err := a.plugin.GetConfig(ctx)
+		if err != nil {
+			a.logger.Debug("initial configuration not available yet", slog.String("error", err.Error()))
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(initialConfigRetryInterval):
+			}
+			continue
+		}
+
+		if err := a.applyConfig(ctx, raw, false); err != nil {
+			a.logger.Warn("stored configuration is invalid", slog.String("error", err.Error()))
+		}
+		return
+	}
+}
+
+func (a *pluginApp) applyConfig(ctx context.Context, raw map[string]any, requireComplete bool) error {
+	_ = ctx
+
+	cfg, complete, err := parseConfig(raw)
+	if err != nil {
+		return err
+	}
+	if !complete {
+		a.setUnconfigured()
+		a.logger.Info("plugin is waiting for configuration")
+		if requireComplete {
+			return errors.New("configuration is incomplete")
+		}
+		return nil
+	}
+
+	a.mu.Lock()
+	a.config = cfg
+	a.configured = true
+	a.mu.Unlock()
+
+	a.logger.Info("plugin configuration applied")
+	return nil
+}
+
+func parseConfig(raw map[string]any) (pluginConfig, bool, error) {
+	_ = raw
+
+	return pluginConfig{}, true, nil
+}
+
+func (a *pluginApp) setUnconfigured() {
+	a.mu.Lock()
+	a.config = pluginConfig{}
+	a.configured = false
+	a.mu.Unlock()
+}
+
+func (a *pluginApp) currentConfig() (pluginConfig, bool) {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+
+	return a.config, a.configured
+}
+
+func (a *pluginApp) handleThreadPublished(ctx context.Context, event *rpc.EventThreadPublished) error {
+	_, configured := a.currentConfig()
+	if !configured {
+		a.logger.Info("thread published event ignored because plugin is not configured", slog.String("thread_id", event.ID.String()))
+		return nil
+	}
+
+	a.logger.Info("thread published event received", slog.String("thread_id", event.ID.String()))
+	return nil
 }
 `
 }

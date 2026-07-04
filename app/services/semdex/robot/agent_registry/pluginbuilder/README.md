@@ -231,6 +231,14 @@ manifest schema as its tool input shape, then decodes and validates through
 `rpc.ManifestFromMap` before writing `manifest.yaml`. This keeps field names
 such as `configuration_schema` aligned with the runtime manifest contract.
 
+Plugin Builder instructions are self-contained because built-in Robots run in a
+network-restricted environment. Useful Storyden plugin conventions from external
+authoring guides should be distilled into this package instead of linked as
+runtime references. The managed tools in this package remain authoritative:
+`plugin_install` owns compile, package, upload/update, and activation, and the
+Robot should not use CLI packaging/install flows, manual command names, or
+portable archive instructions.
+
 Validation is centralized through `plugin_validate`. It checks manifest schema,
 manifest/code consistency, incomplete implementation markers, Go formatting,
 dependency tidiness, vet/lint, and tests. Package archive construction and
@@ -256,9 +264,21 @@ terms.
 Configurable plugins should read current stored configuration during startup and
 also handle later configuration updates. A configuration callback alone is not
 enough for behaviours that must start after install, update, or restart when the
-setting was already present. Missing required configuration should be logged
-clearly and disable the dependent behaviour where possible, without making the
-plugin look successful when it is idle.
+setting was already present. Configuration is live and may be absent on first
+boot until the user saves settings in the UI, so missing required configuration
+must not crash or exit a supervised plugin. It should be logged clearly and
+disable only dependent behaviour where possible, without making the plugin look
+successful when it is idle. Event handlers and robot capability handlers should
+return nil for skipped work caused by missing configuration after logging the
+skip; real operation failures should still return errors.
+
+Event subscriptions and handlers must stay aligned. If manifest.yaml lists an
+event in `events_consumed`, the Go source should register the matching SDK
+handler, and if the source registers an SDK event handler, manifest.yaml should
+list the corresponding event. Event handlers should be idempotent, use context
+timeouts for API or network work, and return errors for real operation failures.
+For generated `WithResponse` API calls, check non-2xx status codes explicitly;
+403 responses usually indicate missing or too-narrow manifest permissions.
 
 Plugin Builder should treat the plugin as software it owns. When touching nearby
 code, it may improve clarity, consolidate duplicated logic, remove obsolete
