@@ -56,7 +56,7 @@ func (h *Notifications) NotificationList(ctx context.Context, request openapi.No
 }
 
 func (h *Notifications) NotificationUpdate(ctx context.Context, request openapi.NotificationUpdateRequestObject) (openapi.NotificationUpdateResponseObject, error) {
-	_, err := session.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -69,7 +69,7 @@ func (h *Notifications) NotificationUpdate(ctx context.Context, request openapi.
 
 	status := opt.Map(opt.NewPtr(request.Body.Status), deserialiseNotificationStatus)
 
-	n, err := h.notifyWriter.SetRead(ctx, id, status.OrZero())
+	n, err := h.notifyWriter.SetRead(ctx, accountID, id, status.OrZero())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

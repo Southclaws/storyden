@@ -73,8 +73,9 @@ func (n *Writer) Notification(ctx context.Context,
 	return nr, nil
 }
 
-func (n *Writer) SetRead(ctx context.Context, id xid.ID, read bool) (*notification.NotificationRef, error) {
+func (n *Writer) SetRead(ctx context.Context, accountID account.AccountID, id xid.ID, read bool) (*notification.NotificationRef, error) {
 	r, err := n.db.Notification.UpdateOneID(id).
+		Where(entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID)))).
 		SetRead(read).
 		Save(ctx)
 	if err != nil {
