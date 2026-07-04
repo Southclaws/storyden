@@ -71,7 +71,7 @@ func TestEventsCRUD(t *testing.T) {
 				a.Equal(openapi.VisibilityPublished, create.JSON200.Visibility)
 				matchLocation(t, &location.Virtual{}, create.JSON200.Location)
 				a.Equal(14, *create.JSON200.Capacity)
-				a.Equal("<body><p>hello world</p></body>", create.JSON200.Thread.Body)
+				a.Equal("<body><p>hello world</p></body>", tests.StripBlockIDs(create.JSON200.Thread.Body))
 
 				r.Len(create.JSON200.Participants, 1)
 				a.Equal(adminAcc.ID.String(), create.JSON200.Participants[0].Profile.Id)

@@ -83,7 +83,9 @@ func (s *Service) CreateDraft(ctx context.Context, qk library.QueryKey, p DraftP
 	}
 
 	snapshot := snapshotFromNode(n)
-	applyDraftPartial(&snapshot, p)
+	if err := applyDraftPartial(&snapshot, p); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	version, err := s.versionWriter.Create(ctx, qk, acc.ID, nodeFilter, snapshotOptions(snapshot)...)
 	if err != nil {
@@ -123,7 +125,9 @@ func (s *Service) updateDraft(ctx context.Context, v *node_version.NodeVersion, 
 	}
 
 	snapshot := snapshotFromVersion(v)
-	applyDraftPartial(&snapshot, p)
+	if err := applyDraftPartial(&snapshot, p); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	updated, err := s.versionWriter.Update(ctx, v.ID, snapshotOptions(snapshot)...)
 	if err != nil {
@@ -308,7 +312,7 @@ func snapshotFromVersion(v *node_version.NodeVersion) draftSnapshot {
 	}
 }
 
-func applyDraftPartial(snapshot *draftSnapshot, p DraftPartial) {
+func applyDraftPartial(snapshot *draftSnapshot, p DraftPartial) error {
 	p.Name.Call(func(value string) { snapshot.Name = value })
 	p.Slug.Call(func(value mark.Slug) { snapshot.Slug = value.String() })
 
@@ -323,7 +327,22 @@ func applyDraftPartial(snapshot *draftSnapshot, p DraftPartial) {
 	if clearContent {
 		snapshot.Content = opt.NewEmpty[datagraph.Content]()
 	} else {
-		content.Call(func(value datagraph.Content) { snapshot.Content = opt.New(value) })
+		var err error
+		content.Call(func(value datagraph.Content) {
+			var stable datagraph.ContentWithBlocks
+			if previous, ok := snapshot.Content.Get(); ok {
+				stable, err = datagraph.NewRichTextWithChangedBlocks(previous, value)
+			} else {
+				stable, err = datagraph.NewRichTextWithNewBlocks(value)
+			}
+			if err != nil {
+				return
+			}
+			snapshot.Content = opt.New(stable.Content)
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	if props, ok := p.PropertiesSnapshot.Get(); ok {
@@ -331,6 +350,8 @@ func applyDraftPartial(snapshot *draftSnapshot, p DraftPartial) {
 	}
 
 	p.Metadata.Call(func(value map[string]any) { snapshot.Metadata = value })
+
+	return nil
 }
 
 func snapshotOptions(snapshot draftSnapshot) []node_version_writer.Option {

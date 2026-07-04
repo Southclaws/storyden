@@ -1,10 +1,12 @@
 package node_mutate
 
 import (
+	"log/slog"
 	"net/url"
 
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -53,6 +55,8 @@ func (p Partial) HasVersionedFields() bool {
 }
 
 type Manager struct {
+	logger         *slog.Logger
+	accountQuery   *account_querier.Querier
 	nodeQuerier    *node_querier.Querier
 	versionQuerier *node_version_querier.Querier
 	nodeWriter     *node_writer.Writer
@@ -69,6 +73,8 @@ type Manager struct {
 }
 
 func New(
+	logger *slog.Logger,
+	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	versionQuerier *node_version_querier.Querier,
 	nodeWriter *node_writer.Writer,
@@ -84,6 +90,8 @@ func New(
 	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
+		logger:         logger,
+		accountQuery:   accountQuery,
 		nodeQuerier:    nodeQuerier,
 		versionQuerier: versionQuerier,
 		nodeWriter:     nodeWriter,

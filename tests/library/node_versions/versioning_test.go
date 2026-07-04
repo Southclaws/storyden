@@ -84,7 +84,7 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 				a.Equal(updatedName, version.Name)
 				a.Equal(updatedSlug, string(version.Slug))
 				a.Equal(updatedDescription, version.Description.MustGet())
-				a.Equal("<body><p>Proposed content.</p></body>", version.Content.MustGet())
+				a.Equal("<body><p>Proposed content.</p></body>", tests.StripBlockIDs(version.Content.MustGet()))
 				a.Equal(meta, version.Meta)
 
 				proposedProperties := version.Properties
@@ -97,7 +97,7 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 				nodeBeforeApply, err := cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{})
 				tests.Ok(t, err, nodeBeforeApply)
 				a.Equal(name, nodeBeforeApply.JSON200.Name)
-				a.Equal("<body><p>Original content.</p></body>", *nodeBeforeApply.JSON200.Content)
+				a.Equal("<body><p>Original content.</p></body>", tests.StripBlockIDs(*nodeBeforeApply.JSON200.Content))
 
 				authorList, err := cl.NodeVersionListWithResponse(root, node.JSON200.Slug, nil, authorSession)
 				tests.Ok(t, err, authorList)
@@ -165,7 +165,7 @@ func TestNodeVersionProposalLifecycle(t *testing.T) {
 				r.NotNil(nodeAfterApply.JSON200.CurrentVersionId)
 				a.Equal(version.Id, string(*nodeAfterApply.JSON200.CurrentVersionId))
 				a.Equal("Proposed content.", nodeAfterApply.JSON200.Description)
-				a.Equal("<body><p>Proposed content.</p></body>", *nodeAfterApply.JSON200.Content)
+				a.Equal("<body><p>Proposed content.</p></body>", tests.StripBlockIDs(*nodeAfterApply.JSON200.Content))
 				r.Len(nodeAfterApply.JSON200.Properties, 1)
 				a.Equal("Release year", nodeAfterApply.JSON200.Properties[0].Name)
 				a.Equal("1992", nodeAfterApply.JSON200.Properties[0].Value)

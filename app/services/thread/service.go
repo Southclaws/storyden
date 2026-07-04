@@ -4,6 +4,7 @@ package thread
 
 import (
 	"context"
+	"log/slog"
 	"net/url"
 
 	"github.com/Southclaws/opt"
@@ -86,7 +87,8 @@ func Build() fx.Option {
 }
 
 type service struct {
-	ins spanner.Instrumentation
+	logger *slog.Logger
+	ins    spanner.Instrumentation
 
 	threadQuerier  *thread_querier.Querier
 	threadWriter   *thread_writer.Writer
@@ -101,6 +103,7 @@ type service struct {
 }
 
 func New(
+	logger *slog.Logger,
 	ins spanner.Builder,
 
 	threadQuerier *thread_querier.Querier,
@@ -115,7 +118,8 @@ func New(
 	systemReporter *system_report.Manager,
 ) Service {
 	return &service{
-		ins: ins.Build(),
+		logger: logger,
+		ins:    ins.Build(),
 
 		threadQuerier:  threadQuerier,
 		threadWriter:   threadWriter,

@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -51,6 +52,16 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 				fmsg.WithDesc("visibility change denied", "Only users with Manage Posts permission can change post visibility."))
 		}
 		userSetVisibility = true
+	}
+
+	if c, ok := partial.Content.Get(); ok {
+		prev := p.Content
+		stable, err := datagraph.NewRichTextWithChangedBlocks(prev, c)
+		if err != nil {
+			s.logger.Warn("block ID assignment failed", "error", err.Error())
+		} else {
+			partial.Content = opt.New(stable.Content)
+		}
 	}
 
 	oldVisibility := p.Visibility

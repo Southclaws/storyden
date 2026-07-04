@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -29,6 +30,14 @@ func (s *service) Create(ctx context.Context,
 ) (*thread.Thread, error) {
 	if err := authoriseMutation(ctx, partial); err != nil {
 		return nil, err
+	}
+
+	if content, ok := partial.Content.Get(); ok {
+		stable, err := datagraph.NewRichTextWithNewBlocks(content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		partial.Content = opt.New(stable.Content)
 	}
 
 	opts := partial.Opts()

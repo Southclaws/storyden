@@ -2,6 +2,7 @@ package node_mutate
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -36,7 +37,14 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	}, func() {
 		opts = append(opts, node_writer.WithPrimaryImageRemoved())
 	})
-	p.Content.Call(func(value datagraph.Content) { opts = append(opts, node_writer.WithContent(value)) })
+	p.Content.Call(func(value datagraph.Content) {
+		if n, ok := current.Get(); ok {
+			value = contentWithStableBlocks(n.Content, value, s.logger)
+		} else {
+			value = contentWithStableBlocks(opt.NewEmpty[datagraph.Content](), value, s.logger)
+		}
+		opts = append(opts, node_writer.WithContent(value))
+	})
 	p.Metadata.Call(func(value map[string]any) { opts = append(opts, node_writer.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssetsRemoved(value)) })
@@ -104,6 +112,23 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	return &preMutationResult{
 		opts: opts,
 	}, nil
+}
+
+func contentWithStableBlocks(previous opt.Optional[datagraph.Content], next datagraph.Content, logger *slog.Logger) datagraph.Content {
+	var stable datagraph.ContentWithBlocks
+	var err error
+
+	if previousContent, ok := previous.Get(); ok {
+		stable, err = datagraph.NewRichTextWithChangedBlocks(previousContent, next)
+	} else {
+		stable, err = datagraph.NewRichTextWithNewBlocks(next)
+	}
+	if err != nil {
+		logger.Warn("block ID assignment failed", slog.String("error", err.Error()))
+		return next
+	}
+
+	return stable.Content
 }
 
 func (s *Manager) buildAssetSourcesOpts(ctx context.Context, sources []string) ([]node_writer.Option, error) {

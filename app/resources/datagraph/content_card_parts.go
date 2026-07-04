@@ -83,33 +83,6 @@ func buildPartFromNodes(nodes []*html.Node, baseURL *url.URL) Content {
 	}
 }
 
-func cloneNodeDeep(n *html.Node) *html.Node {
-	clone := &html.Node{
-		Type:      n.Type,
-		DataAtom:  n.DataAtom,
-		Data:      n.Data,
-		Namespace: n.Namespace,
-		Attr:      make([]html.Attribute, len(n.Attr)),
-	}
-	copy(clone.Attr, n.Attr)
-
-	var last *html.Node
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		child := cloneNodeDeep(c)
-		child.Parent = clone
-		if last != nil {
-			last.NextSibling = child
-			child.PrevSibling = last
-		} else {
-			clone.FirstChild = child
-		}
-		last = child
-	}
-	clone.LastChild = last
-
-	return clone
-}
-
 func shortFromPlain(plain string) string {
 	paragraphs := []rune(plain)
 	end := int(math.Min(float64(len(paragraphs)-1), MaxSummaryLength))
