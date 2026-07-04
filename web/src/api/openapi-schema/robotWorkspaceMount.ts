@@ -12,7 +12,8 @@ import type { Metadata } from "./metadata";
 import type { RobotWorkspaceProvider } from "./robotWorkspaceProvider";
 
 export interface RobotWorkspaceMount {
-  /** Whether this mounted workspace allows arbitrary shell commands. */
+  /** Whether this mounted workspace allows arbitrary shell commands.
+   */
   allow_untrusted_commands: boolean;
   meta?: Metadata;
   provider: RobotWorkspaceProvider;

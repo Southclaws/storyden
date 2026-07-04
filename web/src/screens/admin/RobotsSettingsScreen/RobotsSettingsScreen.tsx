@@ -35,6 +35,7 @@ import {
   RobotWorkspace,
   RobotWorkspaceCreateBody,
   RobotWorkspaceInstance,
+  RobotWorkspaceProvider,
 } from "@/api/openapi-schema";
 import { RobotMCPOnboardingModal } from "@/components/robots/RobotMCPOnboardingModal";
 import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
@@ -85,7 +86,7 @@ type DefaultModelForm = z.infer<typeof DefaultModelFormSchema>;
 const WorkspaceFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string(),
-  provider: z.string().min(1, "Provider is required"),
+  provider: z.nativeEnum(RobotWorkspaceProvider),
   allow_untrusted_commands: z.boolean(),
 });
 
@@ -529,7 +530,6 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
     defaultValues: {
       name: "",
       description: "",
-      provider: "",
       allow_untrusted_commands: false,
     },
     resolver: zodResolver(WorkspaceFormSchema),

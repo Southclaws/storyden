@@ -11,7 +11,8 @@ import type { Metadata } from "./metadata";
 import type { RobotWorkspaceMutablePropsConfig } from "./robotWorkspaceMutablePropsConfig";
 
 export interface RobotWorkspaceMutableProps {
-  /** Allow robots using this workspace template to run arbitrary shell commands. */
+  /** Allow robots using this template to run arbitrary shell commands.
+   */
   allow_untrusted_commands?: boolean;
   /** Provider-specific template configuration. */
   config?: RobotWorkspaceMutablePropsConfig;

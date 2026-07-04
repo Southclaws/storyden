@@ -11,4 +11,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 /**
  * Robot workspace provider type.
  */
-export type RobotWorkspaceProvider = string;
+export type RobotWorkspaceProvider =
+  (typeof RobotWorkspaceProvider)[keyof typeof RobotWorkspaceProvider];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RobotWorkspaceProvider = {
+  local: "local",
+  sprites: "sprites",
+} as const;
