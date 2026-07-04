@@ -9,10 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AuthProviderIdentifier } from "./authProviderIdentifier";
 
-export interface AuthProvider {
-  /** The hyperlink to render for the user. */
-  link?: string;
-  /** The human-readable name of the provider. */
-  name: string;
-  provider: AuthProviderIdentifier;
-}
+/**
+ * Filter accounts by one or more active authentication services.
+ */
+export type AdminAccountsAuthServicesQueryParameter = AuthProviderIdentifier[];

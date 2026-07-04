@@ -323,12 +323,14 @@ export type DateRangePickerProps = ArkDatePicker.RootBaseProps & {
   active?: boolean;
   triggerClassName?: string;
   hideInputs?: boolean;
+  triggerLabel?: string;
 };
 
 export const DateRangePicker = ({
   active,
   triggerClassName,
   hideInputs,
+  triggerLabel,
   ...props
 }: DateRangePickerProps) => {
   return (
@@ -352,15 +354,28 @@ export const DateRangePicker = ({
           </>
         )}
         <Trigger asChild>
-          <IconButton
-            size="sm"
-            type="button"
-            variant={active ? "solid" : "subtle"}
-            aria-label="Open date picker"
-            className={triggerClassName}
-          >
-            <CalendarIcon />
-          </IconButton>
+          {triggerLabel ? (
+            <Button
+              size="sm"
+              type="button"
+              variant={active ? "solid" : "subtle"}
+              aria-label={triggerLabel}
+              className={triggerClassName}
+            >
+              <CalendarIcon />
+              {triggerLabel}
+            </Button>
+          ) : (
+            <IconButton
+              size="sm"
+              type="button"
+              variant={active ? "solid" : "subtle"}
+              aria-label="Open date picker"
+              className={triggerClassName}
+            >
+              <CalendarIcon />
+            </IconButton>
+          )}
         </Trigger>
       </Control>
       <Positioner>

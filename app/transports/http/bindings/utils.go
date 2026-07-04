@@ -51,8 +51,10 @@ func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 		UpdatedAt:      acc.UpdatedAt,
 		DeletedAt:      acc.DeletedAt.Ptr(),
 		Admin:          acc.Admin,
+		Kind:           openapi.AccountKind(acc.Kind.String()),
 		VerifiedStatus: serialiseAccountVerifiedStatus(acc.VerifiedStatus),
 		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddressPtr),
+		AuthServices:   dt.Map(acc.Auths, func(service string) openapi.AuthProviderIdentifier { return openapi.AuthProviderIdentifier(service) }),
 		Roles:          serialiseHeldRoleList(acc.Roles),
 		InvitedBy:      invitedBy.Ptr(),
 	}

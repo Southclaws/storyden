@@ -15,6 +15,7 @@ type OperationPermissions interface {
 	SendBeacon() (bool, *rbac.Permission)
 	AdminSettingsGet() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
+	AccountList() (bool, *rbac.Permission)
 	AuditEventList() (bool, *rbac.Permission)
 	EmailQueueList() (bool, *rbac.Permission)
 	EmailQueueRetry() (bool, *rbac.Permission)
@@ -266,6 +267,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminSettingsGet()
 	case "AdminSettingsUpdate":
 		return optable.AdminSettingsUpdate()
+	case "AccountList":
+		return optable.AccountList()
 	case "AuditEventList":
 		return optable.AuditEventList()
 	case "EmailQueueList":

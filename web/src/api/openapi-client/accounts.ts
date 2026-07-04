@@ -21,6 +21,8 @@ import type {
   AccountEmailVerifiedStatusUpdateBody,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
+  AccountListOKResponse,
+  AccountListParams,
   AccountManageCreateBody,
   AccountManageUpdateBody,
   AccountModerationNoteCreateBody,
@@ -45,6 +47,65 @@ import type {
   UnauthorisedResponse,
 } from "../openapi-schema";
 
+/**
+ * List accounts for administrative moderation purposes. This endpoint is
+intended for staff-facing member search and returns denser account data
+than the public profile listing such as email addresses, held auth
+services and administrative flags.
+
+Requires VIEW_ACCOUNTS. This is a read-only permission; account mutation
+endpoints require narrower management permissions like MANAGE_ACCOUNTS,
+MANAGE_SUSPENSIONS or ADMINISTRATOR.
+
+ */
+export const accountList = (params?: AccountListParams) => {
+  return fetcher<AccountListOKResponse>({
+    url: `/admin/accounts`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getAccountListKey = (params?: AccountListParams) =>
+  [`/admin/accounts`, ...(params ? [params] : [])] as const;
+
+export type AccountListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountList>>
+>;
+export type AccountListQueryError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAccountList = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(
+  params?: AccountListParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof accountList>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAccountListKey(params) : null));
+  const swrFn = () => accountList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 /**
  * Create a human account without creating an authentication method. This
 is intended for admin and integration driven account provisioning.
