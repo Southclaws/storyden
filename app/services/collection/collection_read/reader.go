@@ -69,9 +69,11 @@ func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*
 		// TODO: Apply to posts as well, but this needs some more work on post
 		// data structure sharing and exposing visibility of the thread properly
 
-		if vis == visibility.VisibilityDraft || i.MembershipType == collection.MembershipTypeSubmissionReview {
-			// Don't reveal draft collection items unless the requesting account
-			// is either the owner of the collection or the owner of the item.
+		if vis != visibility.VisibilityPublished || i.MembershipType == collection.MembershipTypeSubmissionReview {
+			// Don't reveal non-published collection items (drafts, unlisted or
+			// in-review nodes) unless the requesting account is either the owner
+			// of the collection or the owner of the item. This mirrors the
+			// canonical library visibility rule applied in node_querier.
 			return accountOwnsItem
 		}
 
