@@ -7,6 +7,7 @@ export type Props = {
   initialResult: PublicProfileListResult;
   query?: string;
   page?: number;
+  adminModeAvailable?: boolean;
 };
 
 export function useMemberIndexScreen({ initialResult, query, page }: Props) {

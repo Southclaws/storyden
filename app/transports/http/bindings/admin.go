@@ -14,13 +14,13 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/labstack/echo/v4"
 	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/rs/xid"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_search"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/audit"
@@ -34,6 +34,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/resources/sortrule"
 	"github.com/Southclaws/storyden/app/resources/timerange"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
@@ -50,6 +51,7 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Admin struct {
 	accountQuery      *account_querier.Querier
+	accountSearch     *account_search.Querier
 	profileQuery      *profile_querier.Querier
 	auditQuerier      *audit_querier.Querier
 	emailQueueQuerier *email_queue_querier.Querier
@@ -65,6 +67,7 @@ type Admin struct {
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
+	accountSearch *account_search.Querier,
 	profileQuery *profile_querier.Querier,
 	auditQuerier *audit_querier.Querier,
 	emailQueueQuerier *email_queue_querier.Querier,
@@ -80,6 +83,7 @@ func NewAdmin(
 ) Admin {
 	a := Admin{
 		accountQuery:      accountQuery,
+		accountSearch:     accountSearch,
 		profileQuery:      profileQuery,
 		auditQuerier:      auditQuerier,
 		emailQueueQuerier: emailQueueQuerier,
@@ -609,6 +613,97 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 	return openapi.AdminAccountBanRemove200JSONResponse{
 		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
 			Body: serialiseAccount(acc),
+		},
+	}, nil
+}
+
+func (a *Admin) AccountList(ctx context.Context, request openapi.AccountListRequestObject) (openapi.AccountListResponseObject, error) {
+	page := opt.NewPtrMap(request.Params.Page, func(s string) uint {
+		v, err := strconv.ParseUint(s, 10, 32)
+		if err != nil {
+			return 1
+		}
+		return uint(max(1, int(v)))
+	}).Or(1)
+
+	params := pagination.NewPageParams(page, 50)
+
+	filters := []account_search.Filter{}
+
+	if request.Params.Q != nil {
+		filters = append(filters, account_search.WithQuery(*request.Params.Q))
+	}
+
+	if request.Params.Sort != nil {
+		filters = append(filters, account_search.WithSortBy(sortrule.Parse(*request.Params.Sort)))
+	} else {
+		filters = append(filters, account_search.WithSortBy(sortrule.Parse("-created_at")))
+	}
+
+	if request.Params.Roles != nil && len(*request.Params.Roles) > 0 {
+		roleIDs := make([]xid.ID, 0, len(*request.Params.Roles))
+		for _, id := range *request.Params.Roles {
+			parsed, err := xid.FromString(string(id))
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+			}
+			roleIDs = append(roleIDs, parsed)
+		}
+		filters = append(filters, account_search.WithRoles(roleIDs))
+	}
+
+	if request.Params.Joined != nil {
+		tr, err := timerange.Parse(*request.Params.Joined)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		filters = append(filters, account_search.WithJoinedInRange(tr))
+	}
+
+	if request.Params.InvitedBy != nil && len(*request.Params.InvitedBy) > 0 {
+		handles := dt.Map(*request.Params.InvitedBy, func(h openapi.AccountHandle) string {
+			return string(h)
+		})
+		filters = append(filters, account_search.WithInvitedByHandles(handles))
+	}
+
+	if request.Params.Suspended != nil {
+		filters = append(filters, account_search.WithSuspended(*request.Params.Suspended))
+	}
+
+	if request.Params.Admin != nil {
+		filters = append(filters, account_search.WithAdmin(*request.Params.Admin))
+	}
+
+	if request.Params.Kind != nil {
+		kind, err := account.NewAccountKind(string(*request.Params.Kind))
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		filters = append(filters, account_search.WithKind(kind))
+	}
+
+	if request.Params.AuthService != nil && len(*request.Params.AuthService) > 0 {
+		filters = append(filters, account_search.WithAuthServices(dt.Map(*request.Params.AuthService, func(v openapi.AuthProviderIdentifier) string {
+			return string(v)
+		})))
+	}
+
+	result, err := a.accountSearch.Search(ctx, params, filters...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountList200JSONResponse{
+		AccountListOKJSONResponse: openapi.AccountListOKJSONResponse{
+			PageSize:    result.Size,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+			CurrentPage: result.CurrentPage,
+			NextPage:    result.NextPage.Ptr(),
+			Accounts: dt.Map(result.Items, func(acc *account.AccountWithEdges) openapi.Account {
+				return serialiseAccount(acc)
+			}),
 		},
 	}, nil
 }

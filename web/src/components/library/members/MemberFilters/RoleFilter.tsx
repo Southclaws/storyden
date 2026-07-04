@@ -10,7 +10,7 @@ import {
   MultiSelectPicker,
   MultiSelectPickerItem,
 } from "@/components/ui/MultiSelectPicker";
-import { isGuestRole, isMemberRole } from "@/lib/role/defaults";
+import { isDefaultRole } from "@/lib/role/defaults";
 import { deriveError } from "@/utils/error";
 
 const roleToMultiSelectItem = map(
@@ -21,8 +21,10 @@ const roleToMultiSelectItem = map(
   }),
 );
 
-const filterOutGuestRole = filter<Role>(
-  (role: Role) => !isGuestRole(role) && !isMemberRole(role),
+// Default roles are implicit or synthetic, so role-search predicates cannot
+// reliably match them through the account_roles join table.
+const filterSearchableRoles = filter<Role>(
+  (role: Role) => !isDefaultRole(role),
 );
 
 export function RoleFilter() {
@@ -32,7 +34,7 @@ export function RoleFilter() {
   );
 
   const { data, error } = useRoleList();
-  const allRoles = filterOutGuestRole(data?.roles || []);
+  const allRoles = filterSearchableRoles(data?.roles || []);
   const items = roleToMultiSelectItem(allRoles);
 
   const [searchResults, setSearchResults] = useState<MultiSelectPickerItem[]>(

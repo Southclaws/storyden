@@ -7,12 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.12-post
  */
-import type { AuthProviderIdentifier } from "./authProviderIdentifier";
 
-export interface AuthProvider {
-  /** The hyperlink to render for the user. */
-  link?: string;
-  /** The human-readable name of the provider. */
-  name: string;
-  provider: AuthProviderIdentifier;
-}
+export type AdminAccountsKindQueryParameter =
+  (typeof AdminAccountsKindQueryParameter)[keyof typeof AdminAccountsKindQueryParameter];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AdminAccountsKindQueryParameter = {
+  human: "human",
+  bot: "bot",
+} as const;
