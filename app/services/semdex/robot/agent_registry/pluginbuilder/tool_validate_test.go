@@ -136,7 +136,6 @@ args:
 	requireValidationCheck(t, result.Checks, "go_tidy", true)
 	requireValidationCheck(t, result.Checks, "go_vet", true)
 	requireValidationCheck(t, result.Checks, "go_test", true)
-	requireValidationCheck(t, result.Checks, "package_archive", true)
 }
 
 func requireValidationCheck(t *testing.T, checks []ValidationCheck, name string, success bool) {

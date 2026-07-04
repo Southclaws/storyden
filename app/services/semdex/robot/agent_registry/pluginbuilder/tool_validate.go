@@ -38,7 +38,7 @@ type ValidationCheck struct {
 func (a *Agent) addValidateTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_validate",
-		Description: "Run holistic plugin validation: manifest schema, manifest/code consistency, Go formatting, dependencies, vet/lint, tests, and package archive validation.",
+		Description: "Run plugin source validation: manifest schema, manifest/code consistency, Go formatting, dependencies, vet/lint, and tests. Packaging and compilation happen inside plugin_install.",
 	}, func(ctx adktool.Context, args ValidateInput) (ValidateResult, error) {
 		return a.Validate(ctx, args)
 	}))
@@ -55,21 +55,17 @@ func (a *Agent) Validate(ctx context.Context, in ValidateInput) (ValidateResult,
 	mf, err := readProjectManifest(ctx, workspace)
 	result.addError("manifest", "manifest.yaml parses and matches the plugin manifest schema", err)
 
-	staticOK := err == nil
 	var files []workspaceprovider.FileInfo
 	if mf != nil {
 		files, err = packageWorkspaceFiles(ctx, workspace)
 		result.addError("workspace_files", "workspace files can be listed for packaging", err)
-		staticOK = staticOK && err == nil
 
 		if err == nil {
 			err = validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, files)
 			result.addError("manifest_code_consistency", "manifest access matches Storyden host API client usage", err)
-			staticOK = staticOK && err == nil
 
 			err = validateNoIncompleteImplementationMarkers(ctx, workspace, files)
 			result.addError("implementation_completeness", "plugin source has no placeholder, stub, dry-run, or TODO implementation markers", err)
-			staticOK = staticOK && err == nil
 		}
 	}
 
@@ -82,11 +78,6 @@ func (a *Agent) Validate(ctx context.Context, in ValidateInput) (ValidateResult,
 		result.addCommand("go_vet", command, err)
 		command, err = a.GoTest(ctx, GoTestInput{})
 		result.addCommand("go_test", command, err)
-	}
-
-	if staticOK {
-		_, err = buildPackage(ctx, workspace)
-		result.addError("package_archive", "plugin package archive can be built and validated", err)
 	}
 
 	result.Success = true

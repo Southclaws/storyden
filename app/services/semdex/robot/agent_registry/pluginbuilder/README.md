@@ -209,8 +209,9 @@ The default editing loop is:
 4. Run `plugin_validate` as the holistic readiness check.
 5. Use focused Go tools only to repair or recheck specific failed validation
    areas.
-6. Install/update the supervised plugin. Installation packages internally; the
-   agent does not need a separate package artifact.
+6. Install/update the supervised plugin. Installation validates, compiles,
+   packages, uploads, and activates internally; the agent does not need a
+   separate package artifact.
 
 File inspection is line-oriented. Reads return the selected range, total line
 count, and a content revision. Search returns contextual snippets with the same
@@ -232,9 +233,10 @@ such as `configuration_schema` aligned with the runtime manifest contract.
 
 Validation is centralized through `plugin_validate`. It checks manifest schema,
 manifest/code consistency, incomplete implementation markers, Go formatting,
-dependency tidiness, vet/lint, tests, and package archive validity. The
-individual Go tools remain available as repair instruments after a specific
-validation check fails.
+dependency tidiness, vet/lint, and tests. Package archive construction and
+binary compilation are internal install steps so validation does not compile
+the plugin as a side effect. The individual Go tools remain available as repair
+instruments after a specific validation check fails.
 
 The active workspace is the source of truth for the plugin. Before broad
 changes, Plugin Builder should inspect the existing implementation and preserve

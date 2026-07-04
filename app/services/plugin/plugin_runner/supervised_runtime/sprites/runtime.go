@@ -472,7 +472,7 @@ func (r *runtime) ensureSpriteSynced(ctx context.Context) (*sprites.Sprite, stri
 		return sprite, workdir, nil
 	}
 
-	if !created && isSpriteDeploymentReady(fsys, markerPath, hash) {
+	if !created && isSpriteDeploymentReady(fsys, markerPath, hash, workdir, r.manifest.Metadata.Command) {
 		r.logger.Debug("sprite plugin deployment marker matches archive",
 			slog.String("workdir", workdir),
 			slog.String("hash", hash))
@@ -550,12 +550,39 @@ func archiveHash(bin []byte) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func isSpriteDeploymentReady(fsys sprites.FS, markerPath, expectedHash string) bool {
+func isSpriteDeploymentReady(fsys sprites.FS, markerPath, expectedHash, workdir, command string) bool {
 	b, err := fsys.ReadFile(markerPath)
 	if err != nil {
 		return false
 	}
-	return strings.TrimSpace(string(b)) == expectedHash
+	if strings.TrimSpace(string(b)) != expectedHash {
+		return false
+	}
+
+	if path, ok := commandPathInSpriteWorkdir(workdir, command); ok {
+		if _, err := fsys.Stat(path); err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+func commandPathInSpriteWorkdir(workdir, command string) (string, bool) {
+	if command == "" {
+		return "", false
+	}
+	if path.IsAbs(command) {
+		return command, true
+	}
+	if !strings.Contains(command, "/") {
+		return "", false
+	}
+	clean, err := joinWithinSprite(workdir, command)
+	if err != nil {
+		return "", false
+	}
+	return clean, true
 }
 
 func extractSDXArchiveToSprite(ctx context.Context, fsys sprites.FS, bin []byte, workdir string) (archiveExtractStats, error) {

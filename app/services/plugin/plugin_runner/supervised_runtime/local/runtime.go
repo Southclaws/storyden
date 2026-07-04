@@ -462,7 +462,7 @@ func (r *localRuntime) ensureExtractedSDXArchive() (string, error) {
 	}
 
 	markerPath := filepath.Join(pluginDir, deploymentMarker)
-	if isLocalDeploymentReady(markerPath, hash) {
+	if isLocalDeploymentReady(markerPath, hash, pluginDir, r.manifest.Metadata.Command) {
 		r.deployedArchiveHash = hash
 		return pluginDir, nil
 	}
@@ -485,13 +485,40 @@ func archiveHash(bin []byte) string {
 	return hex.EncodeToString(sum[:])
 }
 
-func isLocalDeploymentReady(markerPath, expectedHash string) bool {
+func isLocalDeploymentReady(markerPath, expectedHash, workdir, command string) bool {
 	b, err := os.ReadFile(markerPath)
 	if err != nil {
 		return false
 	}
 
-	return strings.TrimSpace(string(b)) == expectedHash
+	if strings.TrimSpace(string(b)) != expectedHash {
+		return false
+	}
+
+	if path, ok := commandPathInWorkdir(workdir, command); ok {
+		if _, err := os.Stat(path); err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+func commandPathInWorkdir(workdir, command string) (string, bool) {
+	if command == "" {
+		return "", false
+	}
+	if filepath.IsAbs(command) {
+		return command, true
+	}
+	if !strings.Contains(command, string(os.PathSeparator)) && !strings.Contains(command, "/") {
+		return "", false
+	}
+	path, err := joinWithin(workdir, command)
+	if err != nil {
+		return "", false
+	}
+	return path, true
 }
 
 func extractSDXArchiveToDir(bin []byte, workdir string) error {

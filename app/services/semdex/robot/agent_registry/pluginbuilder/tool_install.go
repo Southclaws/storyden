@@ -56,6 +56,7 @@ const (
 	packagedPluginBinary  = "main.exe"
 	packagedPluginCommand = "./" + packagedPluginBinary
 	pluginBuildTimeout    = 5 * time.Minute
+	pluginBuildFileWait   = 10 * time.Second
 )
 
 func (a *Agent) addInstallTools(add toolAdder) error {
@@ -93,6 +94,14 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 	if err != nil {
 		return InstallResult{}, err
 	}
+	targetMode := pluginBuildTargetModeNew
+	if target, ok, err := pluginBuildTargetFromContext(ctx); err != nil {
+		return InstallResult{}, err
+	} else if ok {
+		if target.Mode != "" {
+			targetMode = target.Mode
+		}
+	}
 
 	active := false
 	if !found {
@@ -113,28 +122,19 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 		}
 	}
 
-	if in.Activate {
-		if err := a.installer.SetActiveState(ctx, id, pluginresource.ActiveStateActive); err != nil {
-			return InstallResult{}, err
-		}
-		active = true
-	}
-
-	targetMode := pluginBuildTargetModeNew
-	if target, ok, err := pluginBuildTargetFromContext(ctx); err != nil {
-		return InstallResult{}, err
-	} else if ok {
-		if target.Mode != "" {
-			targetMode = target.Mode
-		}
-	}
-
 	if err := a.setPluginBuildTarget(ctx, pluginBuildTarget{
 		Mode:           targetMode,
 		InstallationID: id.String(),
 		ManifestID:     string(pkg.Manifest.ID),
 	}); err != nil {
 		return InstallResult{}, err
+	}
+
+	if in.Activate {
+		if err := a.installer.SetActiveState(ctx, id, pluginresource.ActiveStateActive); err != nil {
+			return InstallResult{}, err
+		}
+		active = true
 	}
 
 	return InstallResult{
@@ -169,7 +169,43 @@ func (a *Agent) resolveInstallation(ctx context.Context, manifestID string) (plu
 		return pluginresource.InstallationID(id), true, "updated", nil
 	}
 
+	if id, ok, err := a.findExistingSupervisedInstallation(ctx, manifestID); err != nil || ok {
+		return id, ok, "updated", err
+	}
+
 	return pluginresource.InstallationID{}, false, "", nil
+}
+
+func (a *Agent) findExistingSupervisedInstallation(ctx context.Context, manifestID string) (pluginresource.InstallationID, bool, error) {
+	if a == nil || a.installer == nil || strings.TrimSpace(manifestID) == "" {
+		return pluginresource.InstallationID{}, false, nil
+	}
+
+	records, err := a.installer.List(ctx)
+	if err != nil {
+		return pluginresource.InstallationID{}, false, err
+	}
+
+	var newest *pluginresource.Record
+	for _, rec := range records {
+		if rec == nil || rec.Manifest.ID != manifestID {
+			continue
+		}
+		if rec.Mode.External() {
+			return pluginresource.InstallationID{}, false, fmt.Errorf("plugin manifest id %q is already installed as an external plugin", manifestID)
+		}
+		if !rec.Mode.Supervised() {
+			continue
+		}
+		if newest == nil || rec.Created.After(newest.Created) {
+			newest = rec
+		}
+	}
+	if newest == nil {
+		return pluginresource.InstallationID{}, false, nil
+	}
+
+	return newest.InstallationID, true, nil
 }
 
 func (a *Agent) packageBytes(ctx context.Context) (*packageArchive, error) {
@@ -209,7 +245,7 @@ func buildPackageForTarget(ctx context.Context, workspace workspaceprovider.Work
 	}
 	manifestJSON = append(manifestJSON, '\n')
 
-	files, err := packageWorkspaceFiles(ctx, workspace)
+	binaryFile, err := waitForWorkspaceReadFile(ctx, workspace, packagedPluginBinary, pluginBuildFileWait)
 	if err != nil {
 		return nil, err
 	}
@@ -227,23 +263,23 @@ func buildPackageForTarget(ctx context.Context, workspace workspaceprovider.Work
 	}
 
 	written := []string{pluginresource.ArchiveManifestFileName}
-	for _, file := range files {
+	for _, file := range sourceFiles {
+		if file.Path == packagedPluginBinary {
+			continue
+		}
 		data, err := workspace.ReadFile(ctx, file.Path, -1)
 		if err != nil {
 			return nil, err
 		}
-		header := &zip.FileHeader{Name: file.Path, Method: zip.Deflate}
-		header.SetMode(file.Mode)
-		header.Method = zip.Deflate
-		writer, err := zw.CreateHeader(header)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := writer.Write(data.Content); err != nil {
+		if err := writeArchiveFile(zw, file.Path, file.Mode, data.Content); err != nil {
 			return nil, err
 		}
 		written = append(written, file.Path)
 	}
+	if err := writeArchiveFile(zw, packagedPluginBinary, 0o755, binaryFile.Content); err != nil {
+		return nil, err
+	}
+	written = append(written, packagedPluginBinary)
 
 	if err := zw.Close(); err != nil {
 		return nil, err
@@ -258,6 +294,51 @@ func buildPackageForTarget(ctx context.Context, workspace workspaceprovider.Work
 	}
 
 	return &packageArchive{Manifest: packagedManifest, Bytes: buf.Bytes(), Files: written}, nil
+}
+
+func writeArchiveFile(zw *zip.Writer, path string, mode fs.FileMode, content []byte) error {
+	header := &zip.FileHeader{Name: path, Method: zip.Deflate}
+	header.SetMode(mode)
+	writer, err := zw.CreateHeader(header)
+	if err != nil {
+		return err
+	}
+	if _, err := writer.Write(content); err != nil {
+		return err
+	}
+	return nil
+}
+
+func waitForWorkspaceReadFile(ctx context.Context, workspace workspaceprovider.Workspace, path string, timeout time.Duration) (workspaceprovider.ReadFileResult, error) {
+	deadline := time.NewTimer(timeout)
+	defer deadline.Stop()
+
+	ticker := time.NewTicker(250 * time.Millisecond)
+	defer ticker.Stop()
+
+	var lastErr error
+	for {
+		data, err := workspace.ReadFile(ctx, path, -1)
+		if err == nil {
+			return data, nil
+		} else {
+			lastErr = err
+		}
+
+		select {
+		case <-ctx.Done():
+			if lastErr != nil {
+				return workspaceprovider.ReadFileResult{}, lastErr
+			}
+			return workspaceprovider.ReadFileResult{}, ctx.Err()
+		case <-deadline.C:
+			if lastErr != nil {
+				return workspaceprovider.ReadFileResult{}, fmt.Errorf("build plugin binary: %s was not readable after go build: %w", path, lastErr)
+			}
+			return workspaceprovider.ReadFileResult{}, fmt.Errorf("build plugin binary: %s was not readable after go build", path)
+		case <-ticker.C:
+		}
+	}
 }
 
 func hostPluginBuildRuntimeTarget() pluginBuildRuntimeTarget {

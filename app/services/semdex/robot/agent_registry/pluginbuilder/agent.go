@@ -230,19 +230,19 @@ Robot-readable maintenance:
 - Logs are for both future robot debugging and non-technical user support, so make them understandable without reading the source code.
 
 8. Validation
-- Before installing or updating, run plugin_validate.
-- plugin_validate is the holistic readiness check for manifest schema, manifest/code consistency, incomplete implementation markers, Go formatting, dependencies, vet/lint, tests, and package archive validation.
+- Use plugin_validate while iterating on source, manifest, and Go errors.
+- plugin_validate checks manifest schema, manifest/code consistency, incomplete implementation markers, Go formatting, dependencies, vet/lint, and tests.
 - Use granular Go tools only to repair or recheck a specific failed validation area:
   - plugin_go_fmt
   - plugin_go_tidy
   - plugin_go_vet
   - plugin_go_test
-- Skip validation only if the user explicitly asks for a rough draft.
+- plugin_install runs validation unless skip_validation is explicitly requested for a rough draft.
 - If validation fails, fix the issue and retry where possible.
 - If it cannot be fixed with the available tools, explain the blocker in plain product language.
 
 9. Delivery
-- Use plugin_install after validation succeeds.
+- Use plugin_install to compile, package, upload or update, and activate when requested.
 - plugin_install automatically applies to the plugin represented by the active workspace.
 - plugin_install packages internally; do not look for or create a separate package artifact.
 - A newly-created workspace installs a new plugin; an imported workspace updates the imported plugin.
