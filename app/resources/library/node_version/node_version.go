@@ -79,7 +79,13 @@ func Map(v *ent.NodeVersion) (*NodeVersion, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	content, err := opt.MapErr(opt.NewPtr(v.Content), datagraph.NewRichText)
+	content, err := opt.MapErr(opt.NewPtr(v.Content), func(raw string) (datagraph.Content, error) {
+		content, err := datagraph.NewRichTextWithBlocks(raw)
+		if err != nil {
+			return datagraph.Content{}, err
+		}
+		return content.Content, nil
+	})
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

@@ -2,9 +2,12 @@
 package reply
 
 import (
+	"log/slog"
+
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply_querier"
@@ -41,6 +44,8 @@ func Build() fx.Option {
 }
 
 type Mutator struct {
+	logger         *slog.Logger
+	accountQuery   *account_querier.Querier
 	replyQuerier   *reply_querier.Querier
 	replyWriter    *reply_writer.Writer
 	fetcher        *fetcher.Fetcher
@@ -51,6 +56,8 @@ type Mutator struct {
 }
 
 func New(
+	logger *slog.Logger,
+	accountQuery *account_querier.Querier,
 	replyQuerier *reply_querier.Querier,
 	replyWriter *reply_writer.Writer,
 	fetcher *fetcher.Fetcher,
@@ -60,6 +67,8 @@ func New(
 	systemReporter *system_report.Manager,
 ) *Mutator {
 	return &Mutator{
+		logger:         logger,
+		accountQuery:   accountQuery,
 		replyQuerier:   replyQuerier,
 		replyWriter:    replyWriter,
 		fetcher:        fetcher,

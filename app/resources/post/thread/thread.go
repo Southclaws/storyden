@@ -83,7 +83,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		return *link_ref.Map(&in)
 	})
 
-	content, err := datagraph.NewRichText(m.Body)
+	content, err := datagraph.NewRichTextWithBlocks(m.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -99,7 +99,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
-			Content:    content,
+			Content:    content.Content,
 			Author:     *pro,
 			Assets:     dt.Map(m.Edges.Assets, asset.Map),
 			WebLink:    link,
@@ -139,7 +139,7 @@ func Mapper(
 			return *link_ref.Map(&in)
 		})
 
-		content, err := datagraph.NewRichText(m.Body)
+		content, err := datagraph.NewRichTextWithBlocks(m.Body)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -164,7 +164,7 @@ func Mapper(
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
-				Content:     content,
+				Content:     content.Content,
 				Author:      *pro,
 				Likes:       ls.Status(m.ID),
 				Collections: cs.Status(m.ID),
@@ -211,7 +211,7 @@ func MapRef(m *ent.Post) *ThreadRef {
 }
 
 func ItemRef(t *ent.Post) (datagraph.Item, error) {
-	content, err := datagraph.NewRichText(t.Body)
+	content, err := datagraph.NewRichTextWithBlocks(t.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -219,7 +219,7 @@ func ItemRef(t *ent.Post) (datagraph.Item, error) {
 	return &Thread{
 		Post: post.Post{
 			ID:      post.ID(t.ID),
-			Content: content,
+			Content: content.Content,
 			Meta:    t.Metadata,
 			Author: profile.Ref{
 				ID: account.AccountID(t.AccountPosts),

@@ -25,6 +25,14 @@ func (s *Mutator) Create(
 	parentID post.ID,
 	partial Partial,
 ) (*reply.Reply, error) {
+	if content, ok := partial.Content.Get(); ok {
+		stable, err := datagraph.NewRichTextWithNewBlocks(content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		partial.Content = opt.New(stable.Content)
+	}
+
 	opts := partial.Opts()
 	opts = append(opts, reply_writer.WithVisibility(visibility.VisibilityPublished))
 

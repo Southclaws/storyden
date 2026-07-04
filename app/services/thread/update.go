@@ -51,6 +51,16 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if c, ok := partial.Content.Get(); ok {
+		prev := thr.Content
+		stable, err := datagraph.NewRichTextWithChangedBlocks(prev, c)
+		if err != nil {
+			s.logger.Warn("block ID assignment failed", "error", err.Error())
+		} else {
+			partial.Content = opt.New(stable.Content)
+		}
+	}
+
 	oldVisibility := thr.Visibility
 	opts := partial.Opts()
 

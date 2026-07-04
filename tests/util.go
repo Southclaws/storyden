@@ -2,6 +2,7 @@ package tests
 
 import (
 	"net/http"
+	"regexp"
 	"testing"
 
 	"github.com/mitchellh/mapstructure"
@@ -9,6 +10,12 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
+
+var blockIDAttribute = regexp.MustCompile(`\sid="sdb_[^"]*"`)
+
+func StripBlockIDs(html string) string {
+	return blockIDAttribute.ReplaceAllString(html, "")
+}
 
 type WithStatusCode interface {
 	StatusCode() int

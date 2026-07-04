@@ -34,7 +34,7 @@ func TestContentToHTML(t *testing.T) {
 	// Markdown is converted to HTML when the flag is set.
 	out, err = contentToHTML("# Title\n\nA paragraph with **bold**.", true)
 	r.NoError(err)
-	r.Contains(out, "<h1>")
+	r.Contains(out, `<h1>Title</h1>`)
 	r.Contains(out, "Title")
 	r.Contains(out, "<strong>bold</strong>")
 	r.NotContains(out, "# Title")

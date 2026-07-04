@@ -98,7 +98,7 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	content, err := datagraph.NewRichText(in.Body)
+	content, err := datagraph.NewRichTextWithBlocks(in.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -127,7 +127,7 @@ func Map(in *ent.Post) (*Post, error) {
 
 		Title:      title,
 		Slug:       slug,
-		Content:    content,
+		Content:    content.Content,
 		Author:     *pro,
 		Reacts:     reacts,
 		Assets:     assets,

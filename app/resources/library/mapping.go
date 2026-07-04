@@ -53,7 +53,13 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 
 		assets := dt.Map(c.Edges.Assets, asset.Map)
 
-		richContent, err := opt.MapErr(opt.NewPtr(c.Content), datagraph.NewRichText)
+		richContent, err := opt.MapErr(opt.NewPtr(c.Content), func(raw string) (datagraph.Content, error) {
+			content, err := datagraph.NewRichTextWithBlocks(raw)
+			if err != nil {
+				return datagraph.Content{}, err
+			}
+			return content.Content, nil
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -112,7 +118,13 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 }
 
 func ItemRef(c *ent.Node) (datagraph.Item, error) {
-	content, err := opt.MapErr(opt.NewPtr(c.Content), datagraph.NewRichText)
+	content, err := opt.MapErr(opt.NewPtr(c.Content), func(raw string) (datagraph.Content, error) {
+		content, err := datagraph.NewRichTextWithBlocks(raw)
+		if err != nil {
+			return datagraph.Content{}, err
+		}
+		return content.Content, nil
+	})
 	if err != nil {
 		return nil, err
 	}

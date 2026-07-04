@@ -63,8 +63,8 @@ func BenchmarkSplitCardParts(b *testing.B) {
 		{"medium/no_splits", fixtureMediumContent},
 		{"large/no_splits", fixtureLargeContent},
 		{"medium/10_splits", fixtureSDRContent},
-		{"medium/5_splits", mustContent(buildHTMLWithSDRSeparators(benchParasMedium, 5))},
-		{"large/30_splits", mustContent(buildHTMLWithSDRSeparators(benchParasLarge, 30))},
+		{"medium/5_splits", mustBenchmarkContent(buildHTMLWithSDRSeparators(benchParasMedium, 5))},
+		{"large/30_splits", mustBenchmarkContent(buildHTMLWithSDRSeparators(benchParasLarge, 30))},
 	}
 	for _, tc := range cases {
 		b.Run(tc.name, func(b *testing.B) {
@@ -253,13 +253,13 @@ func buildMarkdownWithSDRLinks(paras, sdrs int) string {
 }
 
 var (
-	fixtureSmallContent  = mustContent(buildHTMLParagraphs(benchParasSmall))
-	fixtureMediumContent = mustContent(buildHTMLParagraphs(benchParasMedium))
-	fixtureLargeContent  = mustContent(buildHTMLParagraphs(benchParasLarge))
-	fixtureSDRContent    = mustContent(buildHTMLWithSDRSeparators(benchParasMedium, 10))
+	fixtureSmallContent  = mustBenchmarkContent(buildHTMLParagraphs(benchParasSmall))
+	fixtureMediumContent = mustBenchmarkContent(buildHTMLParagraphs(benchParasMedium))
+	fixtureLargeContent  = mustBenchmarkContent(buildHTMLParagraphs(benchParasLarge))
+	fixtureSDRContent    = mustBenchmarkContent(buildHTMLWithSDRSeparators(benchParasMedium, 10))
 )
 
-func mustContent(html string) Content {
+func mustBenchmarkContent(html string) Content {
 	c, err := NewRichText(html)
 	if err != nil {
 		panic(err)

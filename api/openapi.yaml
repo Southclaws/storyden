@@ -6950,10 +6950,23 @@ components:
 
     PostContent:
       description: |
-        The body text of a post within a thread. The type is either a string or
-        an object, depending on what was used during creation. Strings can be
-        used for basic plain text or markdown content and objects are used for
-        more complex types such as Slate.js editor documents.
+        Rich HTML content.
+
+        Storyden owns the HTML `id` attribute in this content. Client-supplied
+        `id` attributes are ignored and removed during sanitisation.
+
+        For block-aware resources such as threads, replies, library nodes, and
+        node versions, successful create and update operations assign stable
+        server-owned block IDs to addressable block elements using the `sdb_`
+        prefix, for example `<p id="sdb_d46b4s1fs0s8b8j6k2g0">`.
+        On updates, Storyden preserves existing `sdb_` block IDs where the
+        corresponding block can be matched across edits, so links and references
+        to specific blocks can remain stable as content moves.
+
+        Read operations do not assign missing block IDs. Content created before
+        block IDs were assigned, or content where a particular block has no
+        server-owned ID yet, may be returned without block IDs until that
+        resource is next written.
       type: string
 
     RelevanceScore:

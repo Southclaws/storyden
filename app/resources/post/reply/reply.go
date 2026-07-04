@@ -81,7 +81,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	content, err := datagraph.NewRichText(m.Body)
+	content, err := datagraph.NewRichTextWithBlocks(m.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -106,7 +106,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		Post: post.Post{
 			ID: post.ID(m.ID),
 
-			Content:    content,
+			Content:    content.Content,
 			Author:     *pro,
 			Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
 			Assets:     dt.Map(m.Edges.Assets, asset.Map),
@@ -172,7 +172,7 @@ func Mapper(
 			return nil, fault.Wrap(err)
 		}
 
-		content, err := datagraph.NewRichText(m.Body)
+		content, err := datagraph.NewRichTextWithBlocks(m.Body)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -188,7 +188,7 @@ func Mapper(
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
-				Content:     content,
+				Content:     content.Content,
 				Author:      *pro,
 				Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 				Likes:       ls.Status(m.ID),
@@ -247,7 +247,7 @@ func MapRef(m *ent.Post) *ReplyRef {
 }
 
 func ItemRef(r *ent.Post) (datagraph.Item, error) {
-	content, err := datagraph.NewRichText(r.Body)
+	content, err := datagraph.NewRichTextWithBlocks(r.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -264,7 +264,7 @@ func ItemRef(r *ent.Post) (datagraph.Item, error) {
 	return &Reply{
 		Post: post.Post{
 			ID:         post.ID(r.ID),
-			Content:    content,
+			Content:    content.Content,
 			Visibility: visibility.NewVisibilityFromEnt(r.Visibility),
 			Meta:       r.Metadata,
 			CreatedAt:  r.CreatedAt,
