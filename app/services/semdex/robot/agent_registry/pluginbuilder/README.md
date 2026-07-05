@@ -219,6 +219,13 @@ revision information, and Go outlines return compact import, type, function,
 and method ranges so the agent can decide what to read next without loading
 entire files.
 
+## Evaluation
+
+Use [EVAL_PLAYBOOK.md](./EVAL_PLAYBOOK.md) for the manual end-to-end eval loop:
+run a local backend, authenticate, attach a Robot workspace, send `/sse/chat`
+requests to `plugin_builder`, inspect transcripts and workspace state, improve
+tool contracts or validation, and rerun the same prompt.
+
 Focused edits use exact text replacement. The edit tool reads file bytes through
 the workspace abstraction, verifies an optional expected revision, chooses the
 replacement location from the old text and optional line hint, and writes the

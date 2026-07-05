@@ -13,40 +13,6 @@ import (
 
 var ErrPermissions = fault.New("invalid permissions", ftag.With(ftag.PermissionDenied))
 
-var AllPermissions = PermissionList{
-	PermissionCreatePost,
-	PermissionReadPublishedThreads,
-	PermissionCreateReaction,
-	PermissionManagePosts,
-	PermissionManageCategories,
-	PermissionCreateInvitation,
-	PermissionReadPublishedLibrary,
-	PermissionManageLibrary,
-	PermissionSubmitLibraryNode,
-	PermissionSubmitLibraryNodeChanges,
-	PermissionUploadAsset,
-	PermissionManageEvents,
-	PermissionListProfiles,
-	PermissionReadProfile,
-	PermissionCreateCollection,
-	PermissionListCollections,
-	PermissionReadCollection,
-	PermissionManageCollections,
-	PermissionCollectionSubmit,
-	PermissionUsePersonalAccessKeys,
-	PermissionUseOauthClients,
-	PermissionManageSettings,
-	PermissionManageAccounts,
-	PermissionManageWarnings,
-	PermissionManageSuspensions,
-	PermissionManageRoles,
-	PermissionManageReports,
-	PermissionViewAccounts,
-	PermissionViewModerationNotes,
-	PermissionManageModerationNotes,
-	PermissionAdministrator,
-}
-
 var readPermissions = []Permission{
 	PermissionReadPublishedThreads,
 	PermissionReadPublishedLibrary,

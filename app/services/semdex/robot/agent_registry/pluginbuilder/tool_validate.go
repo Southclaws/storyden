@@ -3,13 +3,18 @@ package pluginbuilder
 import (
 	"context"
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"regexp"
+	"strconv"
 	"strings"
 
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var incompleteImplementationWordPattern = regexp.MustCompile(`\b(todo|fixme|stub)\b`)
@@ -64,6 +69,9 @@ func (a *Agent) Validate(ctx context.Context, in ValidateInput) (ValidateResult,
 		if err == nil {
 			err = validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, files)
 			result.addError("manifest_code_consistency", "manifest access matches Storyden host API client usage", err)
+
+			err = validateConfigurationImplementation(ctx, workspace, mf.Manifest, files)
+			result.addError("configuration_implementation", "manifest configuration fields are handled by plugin source", err)
 
 			err = validateNoIncompleteImplementationMarkers(ctx, workspace, files)
 			result.addError("implementation_completeness", "plugin source has no placeholder, stub, dry-run, or TODO implementation markers", err)
@@ -154,6 +162,10 @@ func validationFailureSummary(result ValidateResult) string {
 }
 
 func validationNextAction(result ValidateResult) string {
+	if next := validationGoFailureNextAction(result); next != "" {
+		return next
+	}
+
 	for _, check := range result.Checks {
 		if check.Success {
 			continue
@@ -166,6 +178,8 @@ func validationNextAction(result ValidateResult) string {
 			return "Inspect the workspace with plugin_file_list and plugin_file_read, then repair missing or unreadable files."
 		case "manifest_code_consistency":
 			return "Align manifest.yaml with code. If code uses BuildAPIClient, add access with the narrow required permissions; otherwise remove unnecessary access/code."
+		case "configuration_implementation":
+			return "Handle every manifest configuration_schema field in Go source. Parse required settings from the raw configuration map, keep the plugin running while settings are missing, and rerun plugin_validate."
 		case "implementation_completeness":
 			return "Replace placeholders, TODOs, dry-run logic, or stub behavior with real plugin behavior before installing."
 		case "go_fmt":
@@ -182,6 +196,27 @@ func validationNextAction(result ValidateResult) string {
 	}
 
 	return "Review validation checks and rerun plugin_validate after making changes."
+}
+
+func validationGoFailureNextAction(result ValidateResult) string {
+	for _, check := range result.Checks {
+		if check.Success || (check.Name != "go_vet" && check.Name != "go_test") {
+			continue
+		}
+
+		text := strings.ToLower(strings.Join([]string{check.Message, check.Output, check.Error}, "\n"))
+		switch {
+		case strings.Contains(text, "robotrunwithresponse") ||
+			strings.Contains(text, "robotchatssewithresponse") ||
+			strings.Contains(text, "robotchatsse"):
+			return "Replace generated HTTP robot chat calls with pl.RunRobot(ctx, robotID, message), ensure manifest access.permissions includes USE_ROBOTS, then rerun plugin_validate."
+		case strings.Contains(text, "undefined") ||
+			strings.Contains(text, "unknown field") ||
+			strings.Contains(text, "has no field or method"):
+			return "Fix missing Go methods, fields, or types before semantic cleanup. Use plugin_storyden_sdk_search for Storyden APIs and plugin_go_package_symbols, plugin_go_symbol_detail, or plugin_go_symbol_search for external APIs; do not ask the user to choose around compile errors."
+		}
+	}
+	return ""
 }
 
 func validationCheckSummaryLine(check ValidationCheck) string {
@@ -204,6 +239,313 @@ func firstLine(s string) string {
 		return strings.TrimSpace(s[:i])
 	}
 	return strings.TrimSpace(s)
+}
+
+func validateConfigurationImplementation(ctx context.Context, workspace workspaceprovider.Workspace, manifest rpc.Manifest, files []workspaceprovider.FileInfo) error {
+	fieldIDs := manifestConfigurationFieldIDs(manifest)
+	if len(fieldIDs) == 0 {
+		return nil
+	}
+
+	handledFields := map[string]struct{}{}
+	emptyConfigStructs := []string{}
+	for _, file := range files {
+		if !strings.HasSuffix(file.Path, ".go") {
+			continue
+		}
+		data, err := workspace.ReadFile(ctx, file.Path, -1)
+		if err != nil {
+			return err
+		}
+		if isGeneratedGoSource(data.Content) {
+			continue
+		}
+		emptyConfigStructs = append(emptyConfigStructs, goEmptyConfigurationStructs(file.Path, data.Content)...)
+		for _, fieldID := range goConfigurationFieldReads(file.Path, data.Content) {
+			handledFields[fieldID] = struct{}{}
+		}
+	}
+	if len(emptyConfigStructs) > 0 {
+		return fmt.Errorf("empty configuration structs are placeholders, not runtime configuration handling: %s", strings.Join(emptyConfigStructs, ", "))
+	}
+
+	missing := []string{}
+	for _, fieldID := range fieldIDs {
+		if _, ok := handledFields[fieldID]; !ok {
+			missing = append(missing, fieldID)
+		}
+	}
+	if len(missing) > 0 {
+		return fmt.Errorf("configuration_schema fields are not read from runtime configuration in Go source: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+func goEmptyConfigurationStructs(path string, source []byte) []string {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, path, source, parser.ParseComments)
+	if err != nil {
+		return nil
+	}
+
+	var names []string
+	for _, decl := range file.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.TYPE {
+			continue
+		}
+		for _, spec := range genDecl.Specs {
+			typeSpec, ok := spec.(*ast.TypeSpec)
+			if !ok || !strings.Contains(strings.ToLower(typeSpec.Name.Name), "config") {
+				continue
+			}
+			structType, ok := typeSpec.Type.(*ast.StructType)
+			if !ok || structType.Fields == nil || len(structType.Fields.List) > 0 {
+				continue
+			}
+			names = append(names, typeSpec.Name.Name)
+		}
+	}
+	return names
+}
+
+func goConfigurationFieldReads(path string, source []byte) []string {
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, path, source, parser.ParseComments)
+	if err != nil {
+		return nil
+	}
+
+	stringConstants := map[string]string{}
+	for _, decl := range file.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.CONST {
+			continue
+		}
+		for _, spec := range genDecl.Specs {
+			valueSpec, ok := spec.(*ast.ValueSpec)
+			if !ok || len(valueSpec.Values) == 0 {
+				continue
+			}
+			for index, name := range valueSpec.Names {
+				valueIndex := index
+				if valueIndex >= len(valueSpec.Values) {
+					valueIndex = len(valueSpec.Values) - 1
+				}
+				lit, ok := valueSpec.Values[valueIndex].(*ast.BasicLit)
+				if !ok || lit.Kind != token.STRING {
+					continue
+				}
+				value, err := strconv.Unquote(lit.Value)
+				if err != nil {
+					continue
+				}
+				stringConstants[name.Name] = value
+			}
+		}
+	}
+
+	configStructFields := goConfigStructJSONFields(file)
+	configVars := map[string]string{}
+	jsonMarshalVars := map[string]struct{}{}
+
+	values := []string{}
+	ast.Inspect(file, func(node ast.Node) bool {
+		if valueSpec, ok := node.(*ast.ValueSpec); ok {
+			if typeIdent, ok := valueSpec.Type.(*ast.Ident); ok {
+				if _, ok := configStructFields[typeIdent.Name]; ok {
+					for _, name := range valueSpec.Names {
+						configVars[name.Name] = typeIdent.Name
+					}
+				}
+			}
+			return true
+		}
+
+		if assign, ok := node.(*ast.AssignStmt); ok {
+			for i, rhs := range assign.Rhs {
+				if call, ok := rhs.(*ast.CallExpr); ok && isJSONCall(call, "Marshal") && i < len(assign.Lhs) {
+					if name, ok := assign.Lhs[i].(*ast.Ident); ok {
+						jsonMarshalVars[name.Name] = struct{}{}
+					}
+					continue
+				}
+				if configTypeName, ok := configTypeFromExpression(rhs); ok && i < len(assign.Lhs) {
+					if name, ok := assign.Lhs[i].(*ast.Ident); ok {
+						configVars[name.Name] = configTypeName
+					}
+				}
+			}
+			return true
+		}
+
+		if call, ok := node.(*ast.CallExpr); ok && isJSONCall(call, "Unmarshal") && len(call.Args) >= 2 {
+			if sourceIdent, ok := call.Args[0].(*ast.Ident); ok {
+				if _, ok := jsonMarshalVars[sourceIdent.Name]; ok {
+					if configTypeName, ok := configVarTypeFromUnmarshalTarget(call.Args[1], configVars); ok {
+						values = append(values, configStructFields[configTypeName]...)
+					}
+				}
+			}
+			return true
+		}
+
+		if rangeStmt, ok := node.(*ast.RangeStmt); ok {
+			key, ok := rangeStmt.Key.(*ast.Ident)
+			if !ok || key.Name == "_" || rangeStmt.Body == nil {
+				return true
+			}
+			ast.Inspect(rangeStmt.Body, func(child ast.Node) bool {
+				switchStmt, ok := child.(*ast.SwitchStmt)
+				if !ok {
+					return true
+				}
+				tag, ok := switchStmt.Tag.(*ast.Ident)
+				if !ok || tag.Name != key.Name {
+					return true
+				}
+				for _, stmt := range switchStmt.Body.List {
+					caseClause, ok := stmt.(*ast.CaseClause)
+					if !ok {
+						continue
+					}
+					for _, expr := range caseClause.List {
+						switch typed := expr.(type) {
+						case *ast.BasicLit:
+							if typed.Kind != token.STRING {
+								continue
+							}
+							value, err := strconv.Unquote(typed.Value)
+							if err == nil {
+								values = append(values, value)
+							}
+						case *ast.Ident:
+							if value, ok := stringConstants[typed.Name]; ok {
+								values = append(values, value)
+							}
+						}
+					}
+				}
+				return true
+			})
+			return true
+		}
+
+		indexExpr, ok := node.(*ast.IndexExpr)
+		if !ok {
+			return true
+		}
+
+		switch index := indexExpr.Index.(type) {
+		case *ast.BasicLit:
+			if index.Kind != token.STRING {
+				return true
+			}
+			value, err := strconv.Unquote(index.Value)
+			if err != nil {
+				return true
+			}
+			values = append(values, value)
+		case *ast.Ident:
+			if value, ok := stringConstants[index.Name]; ok {
+				values = append(values, value)
+			}
+		}
+		return true
+	})
+	return values
+}
+
+func goConfigStructJSONFields(file *ast.File) map[string][]string {
+	out := map[string][]string{}
+	for _, decl := range file.Decls {
+		genDecl, ok := decl.(*ast.GenDecl)
+		if !ok || genDecl.Tok != token.TYPE {
+			continue
+		}
+		for _, spec := range genDecl.Specs {
+			typeSpec, ok := spec.(*ast.TypeSpec)
+			if !ok || !strings.Contains(strings.ToLower(typeSpec.Name.Name), "config") {
+				continue
+			}
+			structType, ok := typeSpec.Type.(*ast.StructType)
+			if !ok || structType.Fields == nil {
+				continue
+			}
+			for _, field := range structType.Fields.List {
+				if field.Tag == nil {
+					continue
+				}
+				tag, err := strconv.Unquote(field.Tag.Value)
+				if err != nil {
+					continue
+				}
+				jsonName := strings.Split(strings.TrimPrefix(tag, "json:\""), ",")[0]
+				jsonName = strings.TrimSuffix(jsonName, "\"")
+				if jsonName == "" || jsonName == "-" {
+					continue
+				}
+				out[typeSpec.Name.Name] = append(out[typeSpec.Name.Name], jsonName)
+			}
+		}
+	}
+	return out
+}
+
+func configTypeFromExpression(expr ast.Expr) (string, bool) {
+	switch typed := expr.(type) {
+	case *ast.CompositeLit:
+		if ident, ok := typed.Type.(*ast.Ident); ok {
+			return ident.Name, true
+		}
+	case *ast.UnaryExpr:
+		if typed.Op == token.AND {
+			return configTypeFromExpression(typed.X)
+		}
+	}
+	return "", false
+}
+
+func configVarTypeFromUnmarshalTarget(expr ast.Expr, configVars map[string]string) (string, bool) {
+	switch typed := expr.(type) {
+	case *ast.Ident:
+		value, ok := configVars[typed.Name]
+		return value, ok
+	case *ast.UnaryExpr:
+		if typed.Op == token.AND {
+			return configVarTypeFromUnmarshalTarget(typed.X, configVars)
+		}
+	}
+	return "", false
+}
+
+func isJSONCall(call *ast.CallExpr, name string) bool {
+	selector, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok || selector.Sel.Name != name {
+		return false
+	}
+	pkg, ok := selector.X.(*ast.Ident)
+	return ok && pkg.Name == "json"
+}
+
+func manifestConfigurationFieldIDs(manifest rpc.Manifest) []string {
+	schema, ok := manifest.ConfigurationSchema.Get()
+	if !ok {
+		return nil
+	}
+
+	ids := []string{}
+	for _, field := range schema.Fields {
+		switch typed := field.PluginConfigurationFieldUnion.(type) {
+		case *rpc.PluginConfigurationFieldString:
+			ids = append(ids, typed.ID)
+		case *rpc.PluginConfigurationFieldNumber:
+			ids = append(ids, typed.ID)
+		case *rpc.PluginConfigurationFieldBoolean:
+			ids = append(ids, typed.ID)
+		}
+	}
+	return ids
 }
 
 func validateNoIncompleteImplementationMarkers(ctx context.Context, workspace workspaceprovider.Workspace, files []workspaceprovider.FileInfo) error {
@@ -260,6 +602,12 @@ func incompleteImplementationMarker(line string) (string, bool) {
 		"would post",
 		"would call",
 		"would execute",
+		"for now",
+		"add manifest configuration_schema fields here",
+		"canned summary",
+		"fake summary",
+		"placeholder summary",
+		"requested from robot system",
 		"implement actual",
 		"implement later",
 		"finish later",

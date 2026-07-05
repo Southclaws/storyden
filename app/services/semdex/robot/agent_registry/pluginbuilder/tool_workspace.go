@@ -177,8 +177,6 @@ func renderGoMod(id string) string {
 	return fmt.Sprintf(`module storyden.local/plugins/%s
 
 go 1.26.4
-
-require github.com/Southclaws/storyden latest
 `, id)
 }
 
@@ -203,19 +201,12 @@ const (
 	configureTimeout           = 15 * time.Second
 )
 
-type pluginConfig struct {
-	// Add manifest configuration_schema fields here as this plugin grows.
-	// Missing user-provided configuration should leave the plugin running in an
-	// unconfigured state; do not exit the process while waiting for UI config.
-}
-
 type pluginApp struct {
 	plugin *storyden.Plugin
 	logger *slog.Logger
 
-	mu         sync.RWMutex
-	config     pluginConfig
-	configured bool
+	mu    sync.RWMutex
+	ready bool
 }
 
 func main() {
@@ -296,11 +287,7 @@ func (a *pluginApp) syncInitialConfig(ctx context.Context) {
 func (a *pluginApp) applyConfig(ctx context.Context, raw map[string]any, requireComplete bool) error {
 	_ = ctx
 
-	cfg, complete, err := parseConfig(raw)
-	if err != nil {
-		return err
-	}
-	if !complete {
+	if !hasRuntimeConfig(raw) {
 		a.setUnconfigured()
 		a.logger.Info("plugin is waiting for configuration")
 		if requireComplete {
@@ -310,37 +297,32 @@ func (a *pluginApp) applyConfig(ctx context.Context, raw map[string]any, require
 	}
 
 	a.mu.Lock()
-	a.config = cfg
-	a.configured = true
+	a.ready = true
 	a.mu.Unlock()
 
 	a.logger.Info("plugin configuration applied")
 	return nil
 }
 
-func parseConfig(raw map[string]any) (pluginConfig, bool, error) {
-	_ = raw
-
-	return pluginConfig{}, true, nil
+func hasRuntimeConfig(raw map[string]any) bool {
+	return len(raw) > 0
 }
 
 func (a *pluginApp) setUnconfigured() {
 	a.mu.Lock()
-	a.config = pluginConfig{}
-	a.configured = false
+	a.ready = false
 	a.mu.Unlock()
 }
 
-func (a *pluginApp) currentConfig() (pluginConfig, bool) {
+func (a *pluginApp) isReady() bool {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 
-	return a.config, a.configured
+	return a.ready
 }
 
 func (a *pluginApp) handleThreadPublished(ctx context.Context, event *rpc.EventThreadPublished) error {
-	_, configured := a.currentConfig()
-	if !configured {
+	if !a.isReady() {
 		a.logger.Info("thread published event ignored because plugin is not configured", slog.String("thread_id", event.ID.String()))
 		return nil
 	}

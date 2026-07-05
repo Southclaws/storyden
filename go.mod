@@ -336,7 +336,7 @@ require (
 	github.com/zclconf/go-cty v1.17.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.53.0
-	golang.org/x/mod v0.37.0 // indirect
+	golang.org/x/mod v0.37.0
 	golang.org/x/net v0.56.0
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0

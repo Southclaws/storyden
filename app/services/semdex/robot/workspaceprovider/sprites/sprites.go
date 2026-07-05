@@ -3,6 +3,7 @@ package sprites
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -10,7 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
-	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -260,46 +261,75 @@ type Workspace struct {
 }
 
 func (w *Workspace) List(ctx context.Context, opts workspacecap.ListOptions) ([]workspacecap.FileInfo, error) {
-	_ = ctx
 	maxFiles := opts.MaxFiles
 	if maxFiles <= 0 || maxFiles > 500 {
 		maxFiles = 200
 	}
 
-	files := []workspacecap.FileInfo{}
-	if err := fs.WalkDir(w.fsys, ".", func(name string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		if name == "." {
-			return nil
-		}
-		if d.IsDir() {
-			switch d.Name() {
-			case ".git", "node_modules", ".next":
-				return fs.SkipDir
-			}
-			return nil
-		}
-		if len(files) >= maxFiles {
-			return fs.SkipDir
-		}
-		info, err := d.Info()
-		if err != nil {
-			return err
-		}
-		files = append(files, workspacecap.FileInfo{
-			Path:    cleanOutputPath(name),
-			Size:    info.Size(),
-			Mode:    info.Mode(),
-			ModTime: info.ModTime().UTC().Format(time.RFC3339),
-		})
-		return nil
-	}); err != nil {
+	command := fmt.Sprintf(`find . \( -path './.git' -o -path './node_modules' -o -path './.next' -o -path './.storyden' -o -name '.keep' \) -prune -o -type f -printf '%%P	%%s	%%m	%%T@\n' | sort | head -n %d`, maxFiles)
+	result, err := w.Run(ctx, workspacecap.CommandSpec{
+		Command: "sh",
+		Args:    []string{"-lc", command},
+	})
+	if err != nil {
 		return nil, err
 	}
+	if !result.Success {
+		message := strings.TrimSpace(result.Output)
+		if message == "" {
+			message = strings.TrimSpace(result.Error)
+		}
+		if message == "" {
+			message = "find failed"
+		}
+		return nil, errors.New(message)
+	}
 
-	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
+	files, err := parseFindFileList(result.Output)
+	if err != nil {
+		return nil, err
+	}
+	if len(files) >= maxFiles {
+		return files[:maxFiles], nil
+	}
+	return files, nil
+}
+
+func parseFindFileList(output string) ([]workspacecap.FileInfo, error) {
+	files := []workspacecap.FileInfo{}
+	for _, line := range strings.Split(strings.TrimSpace(output), "\n") {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		parts := strings.Split(line, "\t")
+		if len(parts) != 4 {
+			return nil, fmt.Errorf("invalid find output line %q", line)
+		}
+		cleanPath := cleanOutputPath(parts[0])
+		if cleanPath == ".keep" {
+			continue
+		}
+		size, err := strconv.ParseInt(parts[1], 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid size for %s: %w", parts[0], err)
+		}
+		modeValue, err := strconv.ParseUint(parts[2], 8, 32)
+		if err != nil {
+			return nil, fmt.Errorf("invalid mode for %s: %w", parts[0], err)
+		}
+		modUnix, err := strconv.ParseFloat(parts[3], 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid mod time for %s: %w", parts[0], err)
+		}
+		seconds := int64(modUnix)
+		nanos := int64((modUnix - float64(seconds)) * 1_000_000_000)
+		files = append(files, workspacecap.FileInfo{
+			Path:    cleanPath,
+			Size:    size,
+			Mode:    fs.FileMode(modeValue),
+			ModTime: time.Unix(seconds, nanos).UTC().Format(time.RFC3339),
+		})
+	}
 	return files, nil
 }
 
@@ -341,8 +371,25 @@ func (w *Workspace) WriteFile(ctx context.Context, relpath string, data []byte) 
 	if len(data) > 512_000 {
 		return workspacecap.WriteFileResult{}, errors.New("content exceeds 512KB write limit")
 	}
-	if err := w.fsys.WriteFileContext(ctx, clean, data, 0o644); err != nil {
+	dir := path.Dir(clean)
+	command := fmt.Sprintf("mkdir -p -- %s && base64 -d > %s && chmod 0644 -- %s", shellQuote(dir), shellQuote(clean), shellQuote(clean))
+	result, err := w.Run(ctx, workspacecap.CommandSpec{
+		Command: "sh",
+		Args:    []string{"-lc", command},
+		Stdin:   base64.StdEncoding.EncodeToString(data),
+	})
+	if err != nil {
 		return workspacecap.WriteFileResult{}, err
+	}
+	if !result.Success {
+		message := strings.TrimSpace(result.Output)
+		if message == "" {
+			message = strings.TrimSpace(result.Error)
+		}
+		if message == "" {
+			message = "write failed"
+		}
+		return workspacecap.WriteFileResult{}, errors.New(message)
 	}
 	return workspacecap.WriteFileResult{Path: clean, Bytes: len(data)}, nil
 }
@@ -485,6 +532,10 @@ func resolvePath(relpath string) (string, error) {
 
 func cleanOutputPath(name string) string {
 	return strings.TrimPrefix(path.Clean(name), "./")
+}
+
+func shellQuote(value string) string {
+	return "'" + strings.ReplaceAll(value, "'", "'\"'\"'") + "'"
 }
 
 func cloneMap(in map[string]any) map[string]any {

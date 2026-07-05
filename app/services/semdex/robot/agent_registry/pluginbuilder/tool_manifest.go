@@ -12,6 +12,7 @@ import (
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	libplugin "github.com/Southclaws/storyden/lib/plugin"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -51,7 +52,9 @@ always forced to the Plugin Builder runtime command, even if supplied in input.
 Use this when changing plugin identity, events_consumed, configuration_schema,
 access permissions, capabilities, or description. Keep events_consumed aligned
 with registered SDK event handlers, and add access only when code calls
-BuildAPIClient or another host API credential flow.`
+BuildAPIClient or another host API credential flow. access.permissions must be
+exact Storyden RBAC permission names from the schema enum; use USE_ROBOTS for
+plugins that call RunRobot.`
 
 func (a *Agent) WriteManifest(ctx context.Context, raw map[string]any) (ManifestWriteResult, error) {
 	if raw == nil {
@@ -444,6 +447,7 @@ func pluginManifestToolInputSchema() *jsonschema.Schema {
 	if args := schema.Properties["args"]; args != nil {
 		args.Description = "Optional compatibility field. The plugin builder ignores this input and always writes the managed plugin runtime arguments."
 	}
+	applyAccessPermissionsEnum(schema)
 	schema.Required = removeRequiredFields(schema.Required, "command")
 
 	return schema
@@ -456,8 +460,32 @@ func pluginManifestValidationSchema() *jsonschema.Schema {
 	if schema.Properties == nil {
 		schema.Properties = map[string]*jsonschema.Schema{}
 	}
+	applyAccessPermissionsEnum(schema)
 
 	return schema
+}
+
+func applyAccessPermissionsEnum(schema *jsonschema.Schema) {
+	access := schema.Properties["access"]
+	if access == nil || access.Properties == nil {
+		return
+	}
+
+	permissions := access.Properties["permissions"]
+	if permissions == nil || permissions.Items == nil {
+		return
+	}
+
+	permissions.Description = "Exact Storyden RBAC permission names requested for API access. Use USE_ROBOTS for plugins that call RunRobot."
+	permissions.Items.Enum = pluginAccessPermissionEnum()
+}
+
+func pluginAccessPermissionEnum() []any {
+	values := make([]any, 0, len(rbac.AllPermissions))
+	for _, permission := range rbac.AllPermissions {
+		values = append(values, permission.String())
+	}
+	return values
 }
 
 func removeRequiredFields(required []string, fields ...string) []string {

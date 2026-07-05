@@ -96,7 +96,14 @@ func lintGoSource(path string, source []byte) ([]PluginLintIssue, error) {
 	var issues []PluginLintIssue
 	ast.Inspect(file, func(node ast.Node) bool {
 		call, ok := node.(*ast.CallExpr)
-		if !ok || !isEventHandlerRegistration(call) {
+		if !ok {
+			return true
+		}
+		if issue, ok := lintUnsupportedStorydenSDKCall(path, fset, call); ok {
+			issues = append(issues, issue)
+			return true
+		}
+		if !isEventHandlerRegistration(call) {
 			return true
 		}
 
@@ -112,6 +119,36 @@ func lintGoSource(path string, source []byte) ([]PluginLintIssue, error) {
 	})
 
 	return issues, nil
+}
+
+func lintUnsupportedStorydenSDKCall(path string, fset *token.FileSet, call *ast.CallExpr) (PluginLintIssue, bool) {
+	selector, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return PluginLintIssue{}, false
+	}
+
+	switch selector.Sel.Name {
+	case "HandleEventRPC":
+		return PluginLintIssue{
+			Path:    path,
+			Line:    fset.Position(selector.Sel.Pos()).Line,
+			Message: "Storyden plugin SDK has no HandleEventRPC method; use typed event helpers such as pl.OnThreadReplyCreated(...) or pl.OnActivityCreated(...), or use pl.On(eventName, handler) only when a typed helper is unavailable",
+		}, true
+	case "RobotRunWithResponse":
+		return PluginLintIssue{
+			Path:    path,
+			Line:    fset.Position(selector.Sel.Pos()).Line,
+			Message: "Storyden generated HTTP API has no RobotRunWithResponse plugin API; use pl.RunRobot(ctx, robotID, message) and add USE_ROBOTS access instead",
+		}, true
+	case "RobotChatSSE", "RobotChatSSEWithResponse":
+		return PluginLintIssue{
+			Path:    path,
+			Line:    fset.Position(selector.Sel.Pos()).Line,
+			Message: "Storyden RobotChatSSE is a UI streaming endpoint, not plugin-to-host robot execution; use pl.RunRobot(ctx, robotID, message) and use the returned summary",
+		}, true
+	default:
+		return PluginLintIssue{}, false
+	}
 }
 
 func isEventHandlerRegistration(call *ast.CallExpr) bool {

@@ -4,11 +4,23 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
+	"golang.org/x/mod/modfile"
 	adktool "google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
+)
+
+const storydenModulePath = "github.com/Southclaws/storyden"
+const storydenModuleCurrentRef = storydenModulePath + "@main"
+
+const (
+	goFormatTimeout = 30 * time.Second
+	goTidyTimeout   = 5 * time.Minute
+	goVetTimeout    = 5 * time.Minute
+	goTestTimeout   = 5 * time.Minute
 )
 
 type GoTestInput struct {
@@ -81,7 +93,7 @@ func (a *Agent) GoFormat(ctx context.Context) (CommandResult, error) {
 	if err != nil {
 		return CommandResult{}, err
 	}
-	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "gofmt", Args: []string{"-w", "."}}))
+	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "gofmt", Args: []string{"-w", "."}, Timeout: goFormatTimeout}))
 }
 
 func (a *Agent) GoVet(ctx context.Context) (CommandResult, error) {
@@ -89,7 +101,7 @@ func (a *Agent) GoVet(ctx context.Context) (CommandResult, error) {
 	if err != nil {
 		return CommandResult{}, err
 	}
-	result, err := commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"vet", "./..."}}))
+	result, err := commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"vet", "./..."}, Timeout: goVetTimeout}))
 	if err != nil || !result.Success {
 		return result, err
 	}
@@ -114,7 +126,13 @@ func (a *Agent) GoTidy(ctx context.Context) (CommandResult, error) {
 	if err != nil {
 		return CommandResult{}, err
 	}
-	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"mod", "tidy"}}))
+	if err := ensureStorydenModuleRequirement(ctx, workspace); err != nil {
+		return CommandResult{}, err
+	}
+	if result, err := ensureCurrentStorydenModule(ctx, workspace); err != nil || !result.Success {
+		return result, err
+	}
+	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"mod", "tidy"}, Timeout: goTidyTimeout}))
 }
 
 func (a *Agent) GoTest(ctx context.Context, in GoTestInput) (CommandResult, error) {
@@ -129,7 +147,7 @@ func (a *Agent) GoTest(ctx context.Context, in GoTestInput) (CommandResult, erro
 	if strings.HasPrefix(pattern, "-") || strings.ContainsAny(pattern, ";&|`$<>") {
 		return CommandResult{}, fmt.Errorf("invalid go test pattern %q", pattern)
 	}
-	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"test", pattern}}))
+	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{Command: "go", Args: []string{"test", pattern}, Timeout: goTestTimeout}))
 }
 
 func commandResult(result workspaceprovider.CommandResult, err error) (CommandResult, error) {
@@ -141,4 +159,117 @@ func commandResult(result workspaceprovider.CommandResult, err error) (CommandRe
 		Truncated:  result.Truncated,
 		DurationMS: result.DurationMS,
 	}, err
+}
+
+func ensureStorydenModuleRequirement(ctx context.Context, workspace workspaceprovider.Workspace) error {
+	data, err := workspace.ReadFile(ctx, "go.mod", -1)
+	if err != nil {
+		return err
+	}
+
+	file, err := modfile.Parse("go.mod", data.Content, nil)
+	if err != nil {
+		return fmt.Errorf("parse go.mod: %w", err)
+	}
+
+	if hasStorydenReplace(file) {
+		return nil
+	}
+
+	changed := false
+	for _, req := range file.Require {
+		if req.Mod.Path != storydenModulePath || req.Mod.Version != "v0.0.0" {
+			continue
+		}
+		if err := file.DropRequire(storydenModulePath); err != nil {
+			return err
+		}
+		changed = true
+	}
+	if !changed {
+		return nil
+	}
+
+	formatted, err := file.Format()
+	if err != nil {
+		return fmt.Errorf("format go.mod: %w", err)
+	}
+	_, err = workspace.WriteFile(ctx, "go.mod", formatted)
+	return err
+}
+
+func ensureCurrentStorydenModule(ctx context.Context, workspace workspaceprovider.Workspace) (CommandResult, error) {
+	needed, err := workspaceNeedsStorydenModule(ctx, workspace)
+	if err != nil {
+		return CommandResult{}, err
+	}
+	if !needed {
+		return CommandResult{Command: "go get " + storydenModuleCurrentRef, Success: true}, nil
+	}
+
+	replaced, err := workspaceHasStorydenReplace(ctx, workspace)
+	if err != nil {
+		return CommandResult{}, err
+	}
+	if replaced {
+		return CommandResult{Command: "go get " + storydenModuleCurrentRef, Success: true}, nil
+	}
+
+	return commandResult(workspace.Run(ctx, workspaceprovider.CommandSpec{
+		Command: "go",
+		Args:    []string{"get", storydenModuleCurrentRef},
+		Timeout: goTidyTimeout,
+	}))
+}
+
+func workspaceNeedsStorydenModule(ctx context.Context, workspace workspaceprovider.Workspace) (bool, error) {
+	data, err := workspace.ReadFile(ctx, "go.mod", -1)
+	if err != nil {
+		return false, err
+	}
+	if strings.Contains(string(data.Content), storydenModulePath) {
+		return true, nil
+	}
+
+	files, err := workspace.List(ctx, workspaceprovider.ListOptions{MaxFiles: 500})
+	if err != nil {
+		return false, err
+	}
+	for _, file := range files {
+		if !strings.HasSuffix(file.Path, ".go") {
+			continue
+		}
+		source, err := workspace.ReadFile(ctx, file.Path, -1)
+		if err != nil {
+			return false, err
+		}
+		if strings.Contains(string(source.Content), storydenModulePath) {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func workspaceHasStorydenReplace(ctx context.Context, workspace workspaceprovider.Workspace) (bool, error) {
+	data, err := workspace.ReadFile(ctx, "go.mod", -1)
+	if err != nil {
+		return false, err
+	}
+
+	file, err := modfile.Parse("go.mod", data.Content, nil)
+	if err != nil {
+		return false, fmt.Errorf("parse go.mod: %w", err)
+	}
+
+	return hasStorydenReplace(file), nil
+}
+
+func hasStorydenReplace(file *modfile.File) bool {
+	for _, replace := range file.Replace {
+		if replace.Old.Path == storydenModulePath {
+			return true
+		}
+	}
+	return false
 }

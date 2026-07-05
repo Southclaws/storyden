@@ -10,6 +10,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"strings"
 
 	adktool "google.golang.org/adk/tool"
@@ -64,14 +65,19 @@ type ReadFileResult struct {
 }
 
 type WriteFileInput struct {
-	Path    string `json:"path" jsonschema:"Workspace-relative file path"`
-	Content string `json:"content" jsonschema:"Complete new file content"`
+	Path              string `json:"path" jsonschema:"Workspace-relative file path"`
+	Content           string `json:"content" jsonschema:"Complete new file content"`
+	OverwriteExisting bool   `json:"overwrite_existing,omitempty" jsonschema:"Set true only when intentionally replacing an existing file after inspecting it. For normal changes to existing files, use plugin_file_edit instead."`
+	ExpectedRevision  string `json:"expected_revision,omitempty" jsonschema:"Required when overwriting an existing file. Use the revision returned by plugin_file_read, plugin_file_search, or plugin_file_outline."`
+	AllowAfterInstall bool   `json:"allow_after_install,omitempty" jsonschema:"Set true only when the user asked for another change after this chat already installed or activated the plugin. After any such edit, run plugin_validate and plugin_install again before final response."`
 }
 
 type WriteFileResult struct {
-	Path     string `json:"path"`
-	Bytes    int    `json:"bytes"`
-	Revision string `json:"revision"`
+	Path       string `json:"path"`
+	Bytes      int    `json:"bytes"`
+	Revision   string `json:"revision"`
+	Message    string `json:"message,omitempty"`
+	NextAction string `json:"next_action,omitempty"`
 }
 
 type SearchInput struct {
@@ -171,7 +177,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_write",
-		Description: "Write complete content to a workspace-relative file. Use for new files or intentional full rewrites only. Prefer plugin_file_edit for focused changes to existing files so surrounding robot-maintained context is preserved.",
+		Description: "Write complete content to a new workspace-relative file. For existing files, first inspect with plugin_file_read or plugin_file_outline and use plugin_file_edit for normal changes. Set overwrite_existing=true only after inspection when a full-file replacement is intentionally safer than focused edits.",
 	}, func(ctx adktool.Context, args WriteFileInput) (WriteFileResult, error) {
 		result, err := a.WriteFile(ctx, args)
 		if err != nil {
@@ -257,8 +263,31 @@ func (a *Agent) FileOutline(ctx context.Context, in FileOutlineInput) (FileOutli
 }
 
 func (a *Agent) WriteFile(ctx context.Context, in WriteFileInput) (WriteFileResult, error) {
+	if strings.TrimSpace(in.Path) == "" {
+		return WriteFileResult{}, errors.New("path is required")
+	}
+
+	afterInstall, err := requirePostInstallEditIntent(ctx, in.AllowAfterInstall)
+	if err != nil {
+		return WriteFileResult{}, err
+	}
+
 	workspace, err := a.Workspace(ctx)
 	if err != nil {
+		return WriteFileResult{}, err
+	}
+
+	if snapshot, err := a.readTextSnapshot(ctx, in.Path); err == nil {
+		if !in.OverwriteExisting {
+			return WriteFileResult{}, fmt.Errorf("%s already exists; inspect it with plugin_file_read or plugin_file_outline and use plugin_file_edit for focused changes, or set overwrite_existing=true only for an intentional full rewrite", in.Path)
+		}
+		if strings.TrimSpace(in.ExpectedRevision) == "" {
+			return WriteFileResult{}, fmt.Errorf("%s already exists; expected_revision is required when overwrite_existing=true. Re-read the file and pass the returned revision, or use plugin_file_edit for focused changes", in.Path)
+		}
+		if in.ExpectedRevision != snapshot.Revision {
+			return WriteFileResult{}, fmt.Errorf("file %q changed since revision %s; re-read before overwriting", snapshot.Path, in.ExpectedRevision)
+		}
+	} else if !errors.Is(err, fs.ErrNotExist) {
 		return WriteFileResult{}, err
 	}
 
@@ -267,9 +296,11 @@ func (a *Agent) WriteFile(ctx context.Context, in WriteFileInput) (WriteFileResu
 		return WriteFileResult{}, err
 	}
 	return WriteFileResult{
-		Path:     result.Path,
-		Bytes:    result.Bytes,
-		Revision: contentRevision([]byte(in.Content)),
+		Path:       result.Path,
+		Bytes:      result.Bytes,
+		Revision:   contentRevision([]byte(in.Content)),
+		Message:    "file written",
+		NextAction: workspaceEditNextAction(afterInstall),
 	}, nil
 }
 

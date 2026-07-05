@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 
 	localworkspace "github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/local"
@@ -185,4 +186,56 @@ func TestEditFileRejectsBinaryFiles(t *testing.T) {
 	})
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "NUL byte")
+}
+
+func TestEditFileRejectsPostInstallEditWithoutExplicitIntent(t *testing.T) {
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			Mode:           pluginBuildTargetModeNew,
+			InstallationID: xid.New().String(),
+			ManifestID:     "welcome-plugin",
+		},
+	})
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "README.md", []byte("# Welcome\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	_, err = agent.EditFile(ctx, EditFileInput{
+		Path:    "README.md",
+		OldText: "Welcome",
+		NewText: "Updated",
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "already installed")
+	require.Contains(t, err.Error(), "allow_after_install=true")
+}
+
+func TestEditFileAllowsExplicitPostInstallEditAndMarksInstallStale(t *testing.T) {
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			Mode:           pluginBuildTargetModeNew,
+			InstallationID: xid.New().String(),
+			ManifestID:     "welcome-plugin",
+		},
+	})
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "README.md", []byte("# Welcome\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	result, err := agent.EditFile(ctx, EditFileInput{
+		Path:              "README.md",
+		OldText:           "Welcome",
+		NewText:           "Updated",
+		AllowAfterInstall: true,
+	})
+	require.NoError(t, err)
+	require.True(t, result.Changed)
+	require.Contains(t, result.NextAction, "installed plugin package is now stale")
+	require.Contains(t, result.NextAction, "plugin_install")
 }

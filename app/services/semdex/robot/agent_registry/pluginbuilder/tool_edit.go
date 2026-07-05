@@ -13,19 +13,21 @@ import (
 )
 
 type EditFileInput struct {
-	Path             string `json:"path" jsonschema:"Workspace-relative text file path to edit"`
-	OldText          string `json:"old_text" jsonschema:"Exact current text to replace"`
-	NewText          string `json:"new_text" jsonschema:"Replacement text"`
-	ExpectedRevision string `json:"expected_revision,omitempty" jsonschema:"Optional file revision returned by plugin_file_read, plugin_file_search, or plugin_file_outline"`
-	ExpectedLine     int    `json:"expected_line,omitempty" jsonschema:"Optional 1-based line near the intended replacement. Required when old_text appears multiple times."`
+	Path              string `json:"path" jsonschema:"Workspace-relative text file path to edit"`
+	OldText           string `json:"old_text" jsonschema:"Exact current text to replace"`
+	NewText           string `json:"new_text" jsonschema:"Replacement text"`
+	ExpectedRevision  string `json:"expected_revision,omitempty" jsonschema:"Optional file revision returned by plugin_file_read, plugin_file_search, or plugin_file_outline"`
+	ExpectedLine      int    `json:"expected_line,omitempty" jsonschema:"Optional 1-based line near the intended replacement. Required when old_text appears multiple times."`
+	AllowAfterInstall bool   `json:"allow_after_install,omitempty" jsonschema:"Set true only when the user asked for another change after this chat already installed or activated the plugin. After any such edit, run plugin_validate and plugin_install again before final response."`
 }
 
 type EditFileResult struct {
-	Path     string `json:"path"`
-	Changed  bool   `json:"changed"`
-	Bytes    int    `json:"bytes"`
-	Revision string `json:"revision"`
-	Message  string `json:"message,omitempty"`
+	Path       string `json:"path"`
+	Changed    bool   `json:"changed"`
+	Bytes      int    `json:"bytes"`
+	Revision   string `json:"revision"`
+	Message    string `json:"message,omitempty"`
+	NextAction string `json:"next_action,omitempty"`
 }
 
 func (a *Agent) addEditTools(add toolAdder) error {
@@ -54,6 +56,7 @@ Rules:
 - If old_text appears more than once, provide expected_line near the intended occurrence.
 - This tool only edits text files and rejects NUL bytes.
 - This tool does not run validation. After code or manifest edits, run the validation tools in the normal workflow.
+- If this chat already installed the plugin, do not edit files unless the user requested another change. In that case set allow_after_install=true and run plugin_install again before final response.
 
 If expected_revision is stale, re-read the file before editing.`
 
@@ -66,6 +69,11 @@ func (a *Agent) EditFile(ctx context.Context, in EditFileInput) (EditFileResult,
 	}
 	if strings.Contains(in.OldText, "\x00") || strings.Contains(in.NewText, "\x00") {
 		return EditFileResult{}, errors.New("edit text contains NUL byte")
+	}
+
+	afterInstall, err := requirePostInstallEditIntent(ctx, in.AllowAfterInstall)
+	if err != nil {
+		return EditFileResult{}, err
 	}
 
 	snapshot, err := a.readTextSnapshot(ctx, in.Path)
@@ -106,11 +114,12 @@ func (a *Agent) EditFile(ctx context.Context, in EditFileInput) (EditFileResult,
 	}
 
 	return EditFileResult{
-		Path:     written.Path,
-		Changed:  true,
-		Bytes:    written.Bytes,
-		Revision: contentRevision([]byte(next)),
-		Message:  "edit applied",
+		Path:       written.Path,
+		Changed:    true,
+		Bytes:      written.Bytes,
+		Revision:   contentRevision([]byte(next)),
+		Message:    "edit applied",
+		NextAction: workspaceEditNextAction(afterInstall),
 	}, nil
 }
 

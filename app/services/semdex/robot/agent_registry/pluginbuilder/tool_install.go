@@ -245,6 +245,21 @@ func buildPackageForTarget(ctx context.Context, workspace workspaceprovider.Work
 	if err := validateHostAPIAccessManifest(ctx, workspace, mf.Manifest, sourceFiles); err != nil {
 		return nil, err
 	}
+	if err := ensureStorydenModuleRequirement(ctx, workspace); err != nil {
+		return nil, err
+	}
+	if result, err := ensureCurrentStorydenModule(ctx, workspace); err != nil {
+		return nil, err
+	} else if !result.Success {
+		message := strings.TrimSpace(result.Output)
+		if message == "" {
+			message = strings.TrimSpace(result.Error)
+		}
+		if message == "" {
+			message = "go get failed"
+		}
+		return nil, fmt.Errorf("update Storyden plugin SDK module: %s", message)
+	}
 
 	if err := buildPackagedPluginBinary(ctx, workspace, target); err != nil {
 		return nil, err

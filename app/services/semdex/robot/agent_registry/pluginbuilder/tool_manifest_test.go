@@ -109,6 +109,69 @@ func TestWriteManifestDoesNotRequireManagedLaunchFields(t *testing.T) {
 	require.Empty(t, mf.Manifest.Args)
 }
 
+func TestWriteManifestRejectsUnknownAccessPermission(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	toolCtx := &pluginBuilderTestContext{
+		Context: ctx,
+		state: pluginBuilderTestState{
+			pluginBuildTargetStateKey: pluginBuildTarget{
+				Mode:       pluginBuildTargetModeNew,
+				ManifestID: "chatty-discord-responder",
+			},
+		},
+	}
+
+	raw := testManifestInput("chatty-discord-responder")
+	raw["access"] = map[string]any{
+		"handle": "chatty-discord-bot",
+		"name":   "Chatty Discord Bot",
+		"permissions": []any{
+			"POST_ACTIVITY",
+			"ROBOT_RUN",
+		},
+	}
+
+	_, err = agent.WriteManifest(toolCtx, raw)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "validate manifest schema")
+	require.Contains(t, err.Error(), "POST_ACTIVITY")
+	require.Contains(t, err.Error(), "does not equal any of")
+	require.Contains(t, err.Error(), "USE_ROBOTS")
+}
+
+func TestWriteManifestAllowsUseRobotsAccessPermission(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	toolCtx := &pluginBuilderTestContext{
+		Context: ctx,
+		state: pluginBuilderTestState{
+			pluginBuildTargetStateKey: pluginBuildTarget{
+				Mode:       pluginBuildTargetModeNew,
+				ManifestID: "chatty-discord-responder",
+			},
+		},
+	}
+
+	raw := testManifestInput("chatty-discord-responder")
+	raw["access"] = map[string]any{
+		"handle": "chatty-discord-bot",
+		"name":   "Chatty Discord Bot",
+		"permissions": []any{
+			"USE_ROBOTS",
+		},
+	}
+
+	_, err = agent.WriteManifest(toolCtx, raw)
+	require.NoError(t, err)
+}
+
 func TestWriteManifestRejectsConfigurationField(t *testing.T) {
 	ctx := context.Background()
 	workspace, err := localworkspace.NewWorkspace(t.TempDir())
@@ -396,6 +459,30 @@ func TestPluginManifestToolInputSchemaAcceptsManagedLaunchFields(t *testing.T) {
 	delete(raw, "command")
 	delete(raw, "args")
 	require.NoError(t, resolved.Validate(raw))
+}
+
+func TestPluginManifestToolInputSchemaEnumsAccessPermissions(t *testing.T) {
+	schema := pluginManifestToolInputSchema()
+	permissions := schema.Properties["access"].Properties["permissions"]
+	require.NotNil(t, permissions)
+	require.NotNil(t, permissions.Items)
+	require.Contains(t, permissions.Items.Enum, "USE_ROBOTS")
+	require.NotContains(t, permissions.Items.Enum, "ROBOT_RUN")
+
+	resolved, err := schema.Resolve(nil)
+	require.NoError(t, err)
+
+	raw := testManifestInput("chatty-discord-responder")
+	raw["access"] = map[string]any{
+		"handle": "chatty-discord-bot",
+		"name":   "Chatty Discord Bot",
+		"permissions": []any{
+			"ROBOT_RUN",
+		},
+	}
+
+	err = resolved.Validate(raw)
+	require.Error(t, err)
 }
 
 func testManifestInput(id string) map[string]any {

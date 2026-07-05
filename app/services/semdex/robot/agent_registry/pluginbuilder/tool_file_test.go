@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
 
 	localworkspace "github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider/local"
@@ -106,6 +107,155 @@ func (p *Plugin) Handle(ctx context.Context) error {
 	require.Contains(t, result.Symbols, OutlineSymbol{Kind: "type", Name: "Plugin", StartLine: 8, EndLine: 10})
 	require.Contains(t, result.Symbols, OutlineSymbol{Kind: "func", Name: "New", StartLine: 12, EndLine: 14})
 	require.Contains(t, result.Symbols, OutlineSymbol{Kind: "method", Name: "Handle", Receiver: "Plugin", StartLine: 16, EndLine: 19})
+}
+
+func TestWriteFileAllowsNewFiles(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	result, err := agent.WriteFile(ctx, WriteFileInput{
+		Path:    "notes.txt",
+		Content: "hello\n",
+	})
+	require.NoError(t, err)
+	require.Equal(t, "notes.txt", result.Path)
+	require.Equal(t, len("hello\n"), result.Bytes)
+	require.NotEmpty(t, result.Revision)
+	require.Contains(t, result.NextAction, "validate")
+}
+
+func TestWriteFileRejectsExistingFilesWithoutOverwrite(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "main.go", []byte("package main\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	_, err = agent.WriteFile(ctx, WriteFileInput{
+		Path:    "main.go",
+		Content: "package main\n\nfunc main() {}\n",
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "plugin_file_edit")
+	require.Contains(t, err.Error(), "overwrite_existing=true")
+}
+
+func TestWriteFileCanExplicitlyOverwriteExistingFiles(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "main.go", []byte("package main\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	read, err := agent.ReadFile(ctx, ReadFileInput{Path: "main.go"})
+	require.NoError(t, err)
+
+	result, err := agent.WriteFile(ctx, WriteFileInput{
+		Path:              "main.go",
+		Content:           "package main\n\nfunc main() {}\n",
+		OverwriteExisting: true,
+		ExpectedRevision:  read.Revision,
+	})
+	require.NoError(t, err)
+	require.Equal(t, "main.go", result.Path)
+
+	written, err := workspace.ReadFile(ctx, "main.go", -1)
+	require.NoError(t, err)
+	require.Equal(t, "package main\n\nfunc main() {}\n", string(written.Content))
+}
+
+func TestWriteFileRejectsExistingOverwriteWithoutRevision(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "main.go", []byte("package main\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	_, err = agent.WriteFile(ctx, WriteFileInput{
+		Path:              "main.go",
+		Content:           "package main\n\nfunc main() {}\n",
+		OverwriteExisting: true,
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "expected_revision is required")
+	require.Contains(t, err.Error(), "Re-read the file")
+}
+
+func TestWriteFileRejectsExistingOverwriteWithStaleRevision(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "main.go", []byte("package main\n"))
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	read, err := agent.ReadFile(ctx, ReadFileInput{Path: "main.go"})
+	require.NoError(t, err)
+
+	_, err = workspace.WriteFile(ctx, "main.go", []byte("package main\n\nconst changed = true\n"))
+	require.NoError(t, err)
+
+	_, err = agent.WriteFile(ctx, WriteFileInput{
+		Path:              "main.go",
+		Content:           "package main\n\nfunc main() {}\n",
+		OverwriteExisting: true,
+		ExpectedRevision:  read.Revision,
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "changed since revision")
+}
+
+func TestWriteFileRejectsPostInstallEditWithoutExplicitIntent(t *testing.T) {
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			Mode:           pluginBuildTargetModeNew,
+			InstallationID: xid.New().String(),
+			ManifestID:     "welcome-plugin",
+		},
+	})
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	_, err = agent.WriteFile(ctx, WriteFileInput{
+		Path:    "README.md",
+		Content: "# Welcome\n",
+	})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "already installed")
+	require.Contains(t, err.Error(), "allow_after_install=true")
+}
+
+func TestWriteFileAllowsExplicitPostInstallEditAndMarksInstallStale(t *testing.T) {
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			Mode:           pluginBuildTargetModeNew,
+			InstallationID: xid.New().String(),
+			ManifestID:     "welcome-plugin",
+		},
+	})
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	agent := &Agent{workspace: workspace}
+	result, err := agent.WriteFile(ctx, WriteFileInput{
+		Path:              "README.md",
+		Content:           "# Welcome\n",
+		AllowAfterInstall: true,
+	})
+	require.NoError(t, err)
+	require.Equal(t, "README.md", result.Path)
+	require.Contains(t, result.NextAction, "installed plugin package is now stale")
+	require.Contains(t, result.NextAction, "plugin_install")
 }
 
 func TestSearchReturnsContextualSnippetsAndRespectsPath(t *testing.T) {

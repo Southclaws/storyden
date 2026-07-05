@@ -2,11 +2,12 @@ package pluginbuilder
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"go/ast"
-	"go/constant"
 	"go/types"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -15,6 +16,8 @@ import (
 	"google.golang.org/adk/tool/functiontool"
 
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
+	storydensdk "github.com/Southclaws/storyden/sdk/go/storyden"
 )
 
 const (
@@ -56,6 +59,7 @@ type StorydenSDKEventsResult struct {
 type StorydenSDKEventInfo struct {
 	Event         string          `json:"event"`
 	ManifestConst string          `json:"manifest_const"`
+	HandlerMethod string          `json:"handler_method"`
 	PayloadType   GoSymbolSummary `json:"payload_type"`
 	Fields        []GoFieldInfo   `json:"fields,omitempty"`
 	FieldUsages   []SDKFieldUsage `json:"field_usages,omitempty"`
@@ -116,6 +120,7 @@ The query is a literal case-insensitive substring, not regex or wildcard search.
 }
 
 func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput) (StorydenSDKEventsResult, error) {
+	_ = ctx
 	query := strings.ToLower(strings.TrimSpace(in.Query))
 	if strings.ContainsAny(query, "*?[](){}^$|\\") {
 		return StorydenSDKEventsResult{}, fmt.Errorf("query must be a literal substring, not a regex or wildcard pattern; search for a plain term such as %q", plugindev.FirstPlainSearchTerm(query))
@@ -126,42 +131,21 @@ func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput
 		maxEvents = 60
 	}
 
-	pkg, err := a.loadGoPackage(ctx, storydenSDKRPCPackage)
-	if err != nil {
-		return StorydenSDKEventsResult{}, err
-	}
-
-	docs := plugindev.PackageDocs(pkg)
-	names := pkg.Types.Scope().Names()
-	sort.Strings(names)
-
-	payloads := map[string]types.Object{}
-	for _, name := range names {
-		obj := pkg.Types.Scope().Lookup(name)
-		if _, ok := obj.(*types.TypeName); ok && strings.HasPrefix(name, "Event") {
-			payloads[name] = obj
-		}
-	}
-
 	out := StorydenSDKEventsResult{
 		ImportPath: storydenSDKRPCPackage,
 		Events:     []StorydenSDKEventInfo{},
 		Hints: []StorydenSDKHint{
 			{Message: "Use event values such as EventThreadReplyCreated in manifest.yaml events_consumed."},
 			{Message: "Use payload type names such as *rpc.EventThreadReplyCreated in event handler signatures."},
+			{Message: "Register event handlers with the returned handler_method, for example pl.OnThreadReplyCreated(...). Do not call nonexistent methods such as HandleEventRPC."},
+			{Message: "Activity events are Storyden activity records, not Discord gateway messages or Discord user activity. For Discord message handling, register handlers with the Discord client and do not add Storyden Activity events unless the requested behavior is explicitly about Storyden activity records."},
 			{Message: "When passing Storyden resource IDs to generated openapi parameters, use event.Field.String(); never use string(event.Field[:])."},
 		},
 	}
 
-	for _, name := range names {
-		if !strings.HasPrefix(name, "EventEvent") {
-			continue
-		}
-		obj, ok := pkg.Types.Scope().Lookup(name).(*types.Const)
-		if !ok {
-			continue
-		}
-		eventValue := strings.Trim(constant.StringVal(obj.Val()), `"`)
+	for _, event := range rpc.EventValues {
+		eventValue := string(event)
+		name := "Event" + eventValue
 		if query != "" && !strings.Contains(strings.ToLower(name+" "+eventValue), query) {
 			continue
 		}
@@ -170,21 +154,7 @@ func (a *Agent) StorydenSDKEvents(ctx context.Context, in StorydenSDKEventsInput
 			break
 		}
 
-		payloadObj := payloads[eventValue]
-		info := StorydenSDKEventInfo{
-			Event:         eventValue,
-			ManifestConst: name,
-		}
-		if payloadObj != nil {
-			info.PayloadType = plugindev.SymbolSummary(pkg.PkgPath, payloadObj, docs[eventValue])
-			if typeName, ok := payloadObj.(*types.TypeName); ok {
-				if s, ok := typeName.Type().Underlying().(*types.Struct); ok {
-					info.Fields = plugindev.StructFields(s)
-					info.FieldUsages = sdkFieldUsages(s)
-				}
-			}
-		}
-		out.Events = append(out.Events, info)
+		out.Events = append(out.Events, storydenSDKEventInfo(eventValue))
 	}
 
 	return out, nil
@@ -202,6 +172,10 @@ func (a *Agent) StorydenSDKSearch(ctx context.Context, in StorydenSDKSearchInput
 	maxResults := in.MaxResults
 	if maxResults <= 0 || maxResults > 300 {
 		maxResults = 100
+	}
+
+	if result, ok := staticStorydenSDKSearch(query, in.Area, maxResults); ok {
+		return result, nil
 	}
 
 	paths, err := storydenSDKPackagesForArea(in.Area)
@@ -235,6 +209,107 @@ func (a *Agent) StorydenSDKSearch(ctx context.Context, in StorydenSDKSearchInput
 	}
 
 	return out, nil
+}
+
+func staticStorydenSDKSearch(query, area string, maxResults int) (StorydenSDKSearchResult, bool) {
+	normalisedArea := strings.ToLower(strings.TrimSpace(area))
+	if isRobotRunQuery(query) {
+		switch normalisedArea {
+		case "", "all", "plugin", "runtime", "storyden", "rpc", "http_api", "http", "api", "openapi", "operations", "operation":
+			return staticStorydenPluginSearch(query, maxResults), true
+		}
+	}
+
+	switch normalisedArea {
+	case "plugin", "runtime", "storyden":
+		return staticStorydenPluginSearch(query, maxResults), true
+	case "events":
+		return staticStorydenEventSearch(query, maxResults), true
+	default:
+		return StorydenSDKSearchResult{}, false
+	}
+}
+
+func isRobotRunQuery(query string) bool {
+	normalised := strings.ToLower(strings.TrimSpace(query))
+	if normalised == "run" || normalised == "robot" || normalised == "robots" {
+		return true
+	}
+	return strings.Contains(normalised, "robot_run") ||
+		strings.Contains(normalised, "runrobot") ||
+		strings.Contains(normalised, "run robot") ||
+		strings.Contains(normalised, "robot run") ||
+		strings.Contains(normalised, "run a robot") ||
+		strings.Contains(normalised, "call robot")
+}
+
+func staticStorydenPluginSearch(query string, maxResults int) StorydenSDKSearchResult {
+	out := StorydenSDKSearchResult{
+		Packages: []PackageInfo{{
+			ImportPath: storydenSDKPackage,
+			Name:       "storyden",
+		}},
+		Symbols: []GoSymbolSummary{},
+		Hints: []StorydenSDKHint{
+			{Message: "Use plugin_storyden_sdk_events for manifest event names, event payload fields, and event handler methods."},
+			{Message: "Use pl.RunRobot(ctx, robotID, message) for robot_run; manifest access.permissions must include USE_ROBOTS."},
+			{Message: "Do not use generated HTTP RobotChatSSE, RobotChatSSEWithResponse, or UI chat streaming endpoints from plugins; those are for UI clients, not plugin-to-host robot execution."},
+			{Message: "For Storyden host HTTP API calls, use client, err := pl.BuildAPIClient(ctx) and reuse the resulting client where appropriate; do not construct raw API clients from plugin internals."},
+			{Message: "If code uses BuildAPIClient or RunRobot, manifest.yaml must include access with a stable bot account handle, display name, and narrow Storyden permission names for the API operations being called."},
+		},
+	}
+
+	queries := storydenSDKSearchQueries(query)
+	pluginType := reflect.TypeOf((*storydensdk.Plugin)(nil))
+	for i := 0; i < pluginType.NumMethod(); i++ {
+		method := pluginType.Method(i)
+		haystack := strings.ToLower(storydenSDKPackage + " " + method.Name + " " + camelToSnake(method.Name) + " method " + method.Type.String())
+		if !containsAnyLiteral(haystack, queries) {
+			continue
+		}
+		if len(out.Symbols) >= maxResults {
+			out.Truncated = true
+			break
+		}
+		out.Symbols = append(out.Symbols, GoSymbolSummary{
+			ImportPath: storydenSDKPackage,
+			Name:       method.Name,
+			Kind:       "method",
+			Signature:  method.Type.String(),
+		})
+	}
+
+	return out
+}
+
+func staticStorydenEventSearch(query string, maxResults int) StorydenSDKSearchResult {
+	out := StorydenSDKSearchResult{
+		Packages: []PackageInfo{{
+			ImportPath: storydenSDKRPCPackage,
+			Name:       "rpc",
+		}},
+		Symbols: []GoSymbolSummary{},
+		Hints: []StorydenSDKHint{
+			{Message: "Use plugin_storyden_sdk_events for complete event records including handler_method and payload fields."},
+			{Message: "Activity events are Storyden activity records, not Discord gateway messages or Discord user activity."},
+		},
+	}
+
+	for _, event := range rpc.EventValues {
+		eventValue := string(event)
+		info := storydenSDKEventInfo(eventValue)
+		haystack := strings.ToLower(info.Event + " " + info.ManifestConst + " " + info.HandlerMethod + " " + info.PayloadType.Name)
+		if !containsAnyLiteral(haystack, storydenSDKSearchQueries(query)) {
+			continue
+		}
+		if len(out.Symbols) >= maxResults {
+			out.Truncated = true
+			break
+		}
+		out.Symbols = append(out.Symbols, info.PayloadType)
+	}
+
+	return out
 }
 
 func storydenSDKPackagesForArea(area string) ([]string, error) {
@@ -344,6 +419,93 @@ func sdkFieldUsages(s *types.Struct) []SDKFieldUsage {
 	return usages
 }
 
+func storydenSDKEventInfo(event string) StorydenSDKEventInfo {
+	info := StorydenSDKEventInfo{
+		Event:         event,
+		ManifestConst: "Event" + event,
+		HandlerMethod: storydenEventHandlerMethod(event),
+		PayloadType: GoSymbolSummary{
+			ImportPath: storydenSDKRPCPackage,
+			Name:       event,
+			Kind:       "type",
+			Signature:  "struct",
+		},
+	}
+
+	payloadType := eventPayloadType(event)
+	if payloadType == nil {
+		return info
+	}
+
+	info.PayloadType.Name = payloadType.Name()
+	info.Fields = reflectStructFields(payloadType)
+	info.FieldUsages = reflectSDKFieldUsages(info.Fields)
+	return info
+}
+
+func eventPayloadType(event string) reflect.Type {
+	data, err := json.Marshal(map[string]any{"event": event})
+	if err != nil {
+		return nil
+	}
+
+	var payload rpc.EventPayload
+	if err := json.Unmarshal(data, &payload); err != nil {
+		return nil
+	}
+	if payload.EventPayloadUnion == nil {
+		return nil
+	}
+
+	t := reflect.TypeOf(payload.EventPayloadUnion)
+	if t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+	if t.Kind() != reflect.Struct {
+		return nil
+	}
+	return t
+}
+
+func reflectStructFields(t reflect.Type) []GoFieldInfo {
+	fields := []GoFieldInfo{}
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		if field.PkgPath != "" {
+			continue
+		}
+		fields = append(fields, GoFieldInfo{
+			Name: field.Name,
+			Type: field.Type.String(),
+			Tag:  string(field.Tag),
+		})
+	}
+	return fields
+}
+
+func reflectSDKFieldUsages(fields []GoFieldInfo) []SDKFieldUsage {
+	usages := []SDKFieldUsage{}
+	for _, field := range fields {
+		if !strings.HasSuffix(field.Name, "ID") {
+			continue
+		}
+		if !strings.HasSuffix(field.Type, ".ID") && field.Type != "xid.ID" {
+			continue
+		}
+		usages = append(usages, SDKFieldUsage{
+			Field:      field.Name,
+			Type:       field.Type,
+			Expression: "event." + field.Name + ".String()",
+			Use:        "Use this string form for generated openapi path/query parameters and log messages.",
+		})
+	}
+	return usages
+}
+
+func storydenEventHandlerMethod(event string) string {
+	return "On" + strings.TrimPrefix(event, "Event")
+}
+
 func storydenSDKSearchQueries(query string) []string {
 	queries := []string{query}
 	replacements := map[string]string{
@@ -351,6 +513,7 @@ func storydenSDKSearchQueries(query string) []string {
 		"reactions": "react",
 		"replied":   "reply",
 		"replies":   "reply",
+		"robot_run": "runrobot",
 	}
 	for from, to := range replacements {
 		if strings.Contains(query, from) {
@@ -364,6 +527,17 @@ func storydenSDKSearchQueries(query string) []string {
 		}
 	}
 	return dedupeStrings(queries)
+}
+
+func camelToSnake(value string) string {
+	var b strings.Builder
+	for i, r := range value {
+		if i > 0 && r >= 'A' && r <= 'Z' {
+			b.WriteByte('_')
+		}
+		b.WriteRune(r)
+	}
+	return strings.ToLower(b.String())
 }
 
 func containsAnyLiteral(haystack string, needles []string) bool {

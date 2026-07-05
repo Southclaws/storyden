@@ -14,6 +14,7 @@ import (
 )
 
 const pluginBuildTargetDifferentPluginMessage = "this chat is already working on a different plugin; start a new chat to work on another plugin"
+const pluginBuilderPostInstallEditMessage = "this plugin is already installed in this chat; do not edit workspace files after a successful install unless the user requested another change. If a new change is required, set allow_after_install=true, then run plugin_validate and plugin_install again before saying done"
 
 const (
 	pluginBuildTargetStateKey     = "plugin_builder_target"
@@ -201,4 +202,25 @@ func ensurePluginBuildTarget(ctx context.Context, manifestID string, installatio
 		return errors.New(pluginBuildTargetDifferentPluginMessage)
 	}
 	return nil
+}
+
+func requirePostInstallEditIntent(ctx context.Context, allowed bool) (bool, error) {
+	target, ok, err := pluginBuildTargetFromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	if !ok || strings.TrimSpace(target.InstallationID) == "" {
+		return false, nil
+	}
+	if !allowed {
+		return true, errors.New(pluginBuilderPostInstallEditMessage)
+	}
+	return true, nil
+}
+
+func workspaceEditNextAction(afterInstall bool) string {
+	if afterInstall {
+		return "Workspace changed after install; the installed plugin package is now stale. Run plugin_validate and plugin_install again before saying done."
+	}
+	return "Inspect or validate the affected behavior before installing."
 }

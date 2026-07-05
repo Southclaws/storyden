@@ -35,6 +35,27 @@ func TestReadPluginLogsReturnsTail(t *testing.T) {
 	require.Equal(t, []string{"line 2", "line 3"}, result.Lines)
 }
 
+func TestReadPluginLogsShapesWaitingForConfigurationState(t *testing.T) {
+	id := xid.New()
+	ctx := newPluginBuilderTestContext(map[string]any{
+		pluginBuildTargetStateKey: pluginBuildTarget{
+			InstallationID: id.String(),
+			ManifestID:     "discord-plugin",
+		},
+	})
+	agent := &Agent{
+		logs: fakePluginLogReader{
+			lines: []string{`time=2026-07-05T12:37:29.345+01:00 level=INFO msg="plugin is waiting for configuration (missing discord_token or discord_channel_id)"`},
+		},
+	}
+
+	result, err := agent.ReadPluginLogs(ctx, PluginLogsInput{WaitMillis: 10})
+	require.NoError(t, err)
+	require.Equal(t, "plugin started and is waiting for user configuration", result.Message)
+	require.Contains(t, result.NextAction, "Stop inspecting internals")
+	require.Contains(t, result.NextAction, "settings they need to provide")
+}
+
 func TestReadPluginLogsRequiresBoundInstallation(t *testing.T) {
 	agent := &Agent{logs: fakePluginLogReader{}}
 

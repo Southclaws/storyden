@@ -16,6 +16,18 @@ func TestRenderMainGoIncludesLiveConfigurationSkeleton(t *testing.T) {
 
 	require.Contains(t, source, "pl.OnConfigure(app.handleConfigure)")
 	require.Contains(t, source, "go app.syncInitialConfig(ctx)")
-	require.Contains(t, source, "Missing user-provided configuration should leave the plugin running")
+	require.NotContains(t, source, "type pluginConfig struct")
+	require.NotContains(t, source, "values map[string]any")
+	require.NotContains(t, source, "Add manifest configuration_schema fields")
+	require.Contains(t, source, "hasRuntimeConfig(raw)")
 	require.Contains(t, source, "thread published event ignored because plugin is not configured")
+}
+
+func TestRenderGoModLetsGoTidyResolveStorydenVersion(t *testing.T) {
+	source := renderGoMod("example-plugin")
+
+	require.Contains(t, source, "module storyden.local/plugins/example-plugin")
+	require.Contains(t, source, "go 1.26.4")
+	require.NotContains(t, source, "github.com/Southclaws/storyden latest")
+	require.NotContains(t, source, "github.com/Southclaws/storyden v0.0.0")
 }

@@ -36,6 +36,7 @@ type PluginLogsResult struct {
 	Lines          []string `json:"lines"`
 	Truncated      bool     `json:"truncated"`
 	Message        string   `json:"message"`
+	NextAction     string   `json:"next_action,omitempty"`
 }
 
 func (a *Agent) addLogTools(add toolAdder) error {
@@ -115,10 +116,15 @@ func (a *Agent) ReadPluginLogs(ctx context.Context, in PluginLogsInput) (PluginL
 
 func pluginLogsResult(installationID string, lines []string, truncated bool) PluginLogsResult {
 	message := "no log lines were available before the read timed out"
+	nextAction := "If install succeeded and there are no startup errors, give a concise user-facing summary of what is active and what configuration is needed."
 	if len(lines) > 0 {
 		message = fmt.Sprintf("read %d recent log lines", len(lines))
 		if truncated {
 			message = fmt.Sprintf("read the last %d log lines; earlier lines were omitted", len(lines))
+		}
+		if logsShowWaitingForConfiguration(lines) {
+			message = "plugin started and is waiting for user configuration"
+			nextAction = "Stop inspecting internals. Tell the user the plugin is active and list only the settings they need to provide in the UI."
 		}
 	}
 
@@ -127,5 +133,16 @@ func pluginLogsResult(installationID string, lines []string, truncated bool) Plu
 		Lines:          lines,
 		Truncated:      truncated,
 		Message:        message,
+		NextAction:     nextAction,
 	}
+}
+
+func logsShowWaitingForConfiguration(lines []string) bool {
+	for _, line := range lines {
+		lower := strings.ToLower(line)
+		if strings.Contains(lower, "waiting for configuration") || strings.Contains(lower, "waiting for user configuration") {
+			return true
+		}
+	}
+	return false
 }

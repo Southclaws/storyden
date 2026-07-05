@@ -89,6 +89,63 @@ func register(pl Plugin) {
 	require.True(t, result.Success, result.Format())
 }
 
+func TestPluginLintFlagsUnsupportedStorydenEventRPCMethod(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	writeWorkspaceFile(t, ctx, workspace, "main.go", `package main
+
+import "context"
+
+type Plugin struct{}
+type EventActivityCreated struct{}
+
+func register(pl Plugin) {
+	pl.HandleEventRPC("EventActivityCreated", func(ctx context.Context, ev *EventActivityCreated) error {
+		return nil
+	})
+}
+`)
+
+	agent := &Agent{workspace: workspace}
+
+	result, err := agent.PluginLint(ctx)
+	require.NoError(t, err)
+	require.False(t, result.Success)
+	require.Len(t, result.Issues, 1)
+	require.Contains(t, result.Issues[0].Message, "no HandleEventRPC method")
+	require.Contains(t, result.Issues[0].Message, "pl.OnActivityCreated")
+}
+
+func TestPluginLintFlagsRobotChatSSEForPluginRobotRuns(t *testing.T) {
+	ctx := context.Background()
+	workspace, err := localworkspace.NewWorkspace(t.TempDir())
+	require.NoError(t, err)
+
+	writeWorkspaceFile(t, ctx, workspace, "main.go", `package main
+
+import "context"
+
+type Client struct{}
+
+func (c Client) RobotChatSSEWithResponse(context.Context, string) error { return nil }
+
+func run(ctx context.Context, client Client) error {
+	return client.RobotChatSSEWithResponse(ctx, "robot")
+}
+`)
+
+	agent := &Agent{workspace: workspace}
+
+	result, err := agent.PluginLint(ctx)
+	require.NoError(t, err)
+	require.False(t, result.Success)
+	require.Len(t, result.Issues, 1)
+	require.Contains(t, result.Issues[0].Message, "UI streaming endpoint")
+	require.Contains(t, result.Issues[0].Message, "pl.RunRobot")
+}
+
 func TestPluginLintFlagsBareErrReturnedForHTTPStatusFailure(t *testing.T) {
 	ctx := context.Background()
 	workspace, err := localworkspace.NewWorkspace(t.TempDir())
