@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/url"
 	"strconv"
-	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -246,7 +245,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: etag.Time.Format(time.RFC1123),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		}, nil
@@ -269,7 +268,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: etag.Time.Format(time.RFC1123),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		},
