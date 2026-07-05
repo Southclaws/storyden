@@ -34,6 +34,8 @@ type InstallResult struct {
 	ManifestID     string `json:"manifest_id"`
 	Active         bool   `json:"active"`
 	PackageBytes   int    `json:"package_bytes"`
+	Message        string `json:"message,omitempty"`
+	NextAction     string `json:"next_action,omitempty"`
 }
 
 type packageArchive struct {
@@ -62,7 +64,7 @@ const (
 func (a *Agent) addInstallTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_install",
-		Description: "Package and install or update a managed plugin as a supervised Storyden plugin.",
+		Description: "Final delivery step for the managed plugin. Validates source unless skip_validation is true, compiles the plugin exactly once for the Storyden host OS/architecture, packages the archive internally, installs a new supervised plugin or updates the bound installation, remembers the installation ID for this chat, and optionally activates it. Use this when the implementation is ready; do not call any separate package/archive tool.",
 	}, func(ctx adktool.Context, args InstallInput) (InstallResult, error) {
 		result, err := a.Install(ctx, args)
 		if err != nil {
@@ -137,12 +139,22 @@ func (a *Agent) Install(ctx context.Context, in InstallInput) (InstallResult, er
 		active = true
 	}
 
+	message := "Plugin " + action + "."
+	nextAction := "If the plugin was activated, use plugin_logs_read to verify startup and runtime behavior when useful."
+	if active {
+		message = "Plugin " + action + " and activated."
+	} else {
+		nextAction = "Call plugin_install with activate=true when the user wants this plugin running."
+	}
+
 	return InstallResult{
 		Action:         action,
 		InstallationID: id.String(),
 		ManifestID:     string(pkg.Manifest.ID),
 		Active:         active,
 		PackageBytes:   len(pkg.Bytes),
+		Message:        message,
+		NextAction:     nextAction,
 	}, nil
 }
 

@@ -43,7 +43,15 @@ const manifestWriteDescription = `Write and validate manifest.yaml from structur
 Use this instead of plugin_file_edit or plugin_file_write when changing
 manifest.yaml. Use configuration_schema for plugin settings, never
 configuration. The tool validates the manifest before writing it and manages
-runtime launch fields automatically.`
+runtime launch fields automatically.
+
+Side effects: writes manifest.yaml. The managed fields command and args are
+always forced to the Plugin Builder runtime command, even if supplied in input.
+
+Use this when changing plugin identity, events_consumed, configuration_schema,
+access permissions, capabilities, or description. Keep events_consumed aligned
+with registered SDK event handlers, and add access only when code calls
+BuildAPIClient or another host API credential flow.`
 
 func (a *Agent) WriteManifest(ctx context.Context, raw map[string]any) (ManifestWriteResult, error) {
 	if raw == nil {

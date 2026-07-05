@@ -55,7 +55,7 @@ type archiveImportFile struct {
 func (a *Agent) addInstalledPluginTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_installed_list",
-		Description: "List installed supervised plugins that can be imported into the active workspace for editing.",
+		Description: "List installed supervised plugins that can be imported for editing. Use when the user wants to modify, fix, or inspect an existing installed plugin by name. Returns supervised plugins only, with IDs for plugin_workspace_import_installation.",
 	}, func(ctx adktool.Context, args struct{}) (InstalledPluginsResult, error) {
 		return a.ListInstalledPlugins(ctx)
 	})); err != nil {
@@ -64,7 +64,7 @@ func (a *Agent) addInstalledPluginTools(add toolAdder) error {
 
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_import_installation",
-		Description: "Import one installed supervised plugin archive into an empty active workspace for this chat to edit.",
+		Description: "Import one installed supervised plugin archive into an empty active workspace for this chat. Use after plugin_installed_list when editing an existing plugin. Side effects: writes archive files into the workspace and binds this chat to that installation so plugin_install updates it instead of creating a duplicate.",
 	}, func(ctx adktool.Context, args ImportInstalledPluginInput) (ImportInstalledPluginResult, error) {
 		return a.ImportInstalledPlugin(ctx, args)
 	}))

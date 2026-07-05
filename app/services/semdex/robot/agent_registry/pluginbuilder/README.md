@@ -272,6 +272,14 @@ successful when it is idle. Event handlers and robot capability handlers should
 return nil for skipped work caused by missing configuration after logging the
 skip; real operation failures should still return errors.
 
+External integration setup values should be modeled as configuration instead of
+questions that block development. When a requested plugin needs credentials,
+destination IDs, user IDs, channel IDs, guild IDs, project IDs, webhook URLs, or
+similar values that were not provided, Plugin Builder should add clear
+`configuration_schema` fields and keep the plugin safely unconfigured until the
+user fills them in. Compiler errors and missing SDK methods are development
+failures for Plugin Builder to solve with discovery tools, not user questions.
+
 Event subscriptions and handlers must stay aligned. If manifest.yaml lists an
 event in `events_consumed`, the Go source should register the matching SDK
 handler, and if the source registers an SDK event handler, manifest.yaml should

@@ -31,7 +31,7 @@ type SymbolInfo struct {
 func (a *Agent) addASTTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_ast",
-		Description: "Parse a Go source file and return its package name, imports, functions, and type declarations.",
+		Description: "Parse one Go source file and return package name, imports, functions, and type declarations. Use for structural inspection when plugin_file_outline is not enough. Does not execute code or inspect dependencies.",
 	}, func(ctx adktool.Context, args ASTInput) (ASTResult, error) {
 		result, err := a.AST(ctx, args)
 		if err != nil {

@@ -19,9 +19,10 @@ type ValidateInput struct {
 }
 
 type ValidateResult struct {
-	Success bool              `json:"success"`
-	Checks  []ValidationCheck `json:"checks"`
-	Message string            `json:"message,omitempty"`
+	Success    bool              `json:"success"`
+	Checks     []ValidationCheck `json:"checks"`
+	Message    string            `json:"message,omitempty"`
+	NextAction string            `json:"next_action,omitempty"`
 }
 
 type ValidationCheck struct {
@@ -38,7 +39,7 @@ type ValidationCheck struct {
 func (a *Agent) addValidateTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_validate",
-		Description: "Run plugin source validation: manifest schema, manifest/code consistency, Go formatting, dependencies, vet/lint, and tests. Packaging and compilation happen inside plugin_install.",
+		Description: "Check whether plugin source is ready to install. Runs manifest schema checks, manifest/code consistency checks, incomplete-implementation checks, gofmt, go mod tidy, go vet, plugin semantic lint, and go test. Use while iterating on source. Does not compile, package, upload, activate, or read runtime logs; plugin_install performs the single compile/package/install path.",
 	}, func(ctx adktool.Context, args ValidateInput) (ValidateResult, error) {
 		return a.Validate(ctx, args)
 	}))
@@ -89,8 +90,10 @@ func (a *Agent) Validate(ctx context.Context, in ValidateInput) (ValidateResult,
 	}
 	if result.Success {
 		result.Message = "plugin validation passed"
+		result.NextAction = "Source validation passed. Use plugin_install to compile once, package, upload or update, and activate when requested."
 	} else {
 		result.Message = validationFailureSummary(result)
+		result.NextAction = validationNextAction(result)
 	}
 
 	return result, nil
@@ -142,19 +145,58 @@ func validationFailureSummary(result ValidateResult) string {
 		if check.Success {
 			continue
 		}
-		message := strings.TrimSpace(check.Message)
-		if message == "" {
-			message = strings.TrimSpace(check.Error)
-		}
-		if message == "" {
-			message = "failed"
-		}
-		failures = append(failures, fmt.Sprintf("%s: %s", check.Name, firstLine(message)))
+		failures = append(failures, fmt.Sprintf("%s: %s", check.Name, validationCheckSummaryLine(check)))
 	}
 	if len(failures) == 0 {
 		return "plugin validation failed"
 	}
 	return "plugin validation failed: " + strings.Join(failures, "; ")
+}
+
+func validationNextAction(result ValidateResult) string {
+	for _, check := range result.Checks {
+		if check.Success {
+			continue
+		}
+
+		switch check.Name {
+		case "manifest":
+			return "Fix manifest fields with plugin_manifest_write, then rerun plugin_validate."
+		case "workspace_files":
+			return "Inspect the workspace with plugin_file_list and plugin_file_read, then repair missing or unreadable files."
+		case "manifest_code_consistency":
+			return "Align manifest.yaml with code. If code uses BuildAPIClient, add access with the narrow required permissions; otherwise remove unnecessary access/code."
+		case "implementation_completeness":
+			return "Replace placeholders, TODOs, dry-run logic, or stub behavior with real plugin behavior before installing."
+		case "go_fmt":
+			return "Run plugin_go_fmt or fix the formatting error, then rerun plugin_validate."
+		case "go_tidy":
+			return "Fix module/dependency issues, rerun plugin_go_tidy, then rerun plugin_validate."
+		case "go_vet":
+			return "Fix Go vet or Plugin Builder semantic lint failures, then rerun plugin_validate. If a method, field, type, or package is missing, use plugin_go_package_symbols, plugin_go_symbol_detail, or plugin_go_symbol_search to discover the actual API instead of asking the user."
+		case "go_test":
+			return "Fix failing tests or compilation errors, then rerun plugin_validate. If a method, field, type, or package is missing, use plugin_go_package_symbols, plugin_go_symbol_detail, or plugin_go_symbol_search to discover the actual API instead of asking the user."
+		default:
+			return fmt.Sprintf("Fix the failed %s check, then rerun plugin_validate.", check.Name)
+		}
+	}
+
+	return "Review validation checks and rerun plugin_validate after making changes."
+}
+
+func validationCheckSummaryLine(check ValidationCheck) string {
+	candidates := []string{check.Message, check.Output, check.Error}
+	for _, candidate := range candidates {
+		for _, line := range strings.Split(candidate, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" || strings.HasPrefix(line, "# ") || line == "FAIL" {
+				continue
+			}
+			return line
+		}
+	}
+
+	return "failed"
 }
 
 func firstLine(s string) string {

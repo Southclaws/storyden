@@ -138,6 +138,37 @@ args:
 	requireValidationCheck(t, result.Checks, "go_test", true)
 }
 
+func TestValidationFailureSummarySkipsGoPackageHeaders(t *testing.T) {
+	result := ValidateResult{Checks: []ValidationCheck{
+		{
+			Name:    "go_vet",
+			Success: false,
+			Message: "# storyden.local/plugins/discord-boot-tagger\n# [storyden.local/plugins/discord-boot-tagger]\nvet: ./main.go:64:24: sess.UserChannels undefined (type *discordgo.Session has no field or method UserChannels)",
+		},
+		{
+			Name:    "go_test",
+			Success: false,
+			Output:  "# storyden.local/plugins/discord-boot-tagger\n./main.go:4:2: \"context\" imported and not used\nFAIL\tstoryden.local/plugins/discord-boot-tagger [build failed]\nFAIL\n",
+		},
+	}}
+
+	summary := validationFailureSummary(result)
+	require.Contains(t, summary, "go_vet: vet: ./main.go:64:24: sess.UserChannels undefined")
+	require.Contains(t, summary, "go_test: ./main.go:4:2: \"context\" imported and not used")
+	require.NotContains(t, summary, "go_vet: # storyden.local")
+	require.NotContains(t, summary, "go_test: # storyden.local")
+}
+
+func TestValidationNextActionForGoErrorsPointsToDiscovery(t *testing.T) {
+	result := ValidateResult{Checks: []ValidationCheck{
+		{Name: "go_vet", Success: false},
+	}}
+
+	next := validationNextAction(result)
+	require.Contains(t, next, "plugin_go_package_symbols")
+	require.Contains(t, next, "instead of asking the user")
+}
+
 func requireValidationCheck(t *testing.T, checks []ValidationCheck, name string, success bool) {
 	t.Helper()
 

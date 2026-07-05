@@ -27,7 +27,7 @@ type CommandResult struct {
 func (a *Agent) addGoTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_fmt",
-		Description: "Run gofmt -w . in the managed plugin workspace.",
+		Description: "Format all Go files in the managed plugin workspace with gofmt. Use after editing Go code or when plugin_validate reports go_fmt. Side effect: rewrites Go files.",
 	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoFormat(ctx)
 		if err != nil {
@@ -40,7 +40,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_vet",
-		Description: "Run go vet ./... and Plugin Builder semantic lint checks in the managed plugin workspace.",
+		Description: "Run go vet ./... plus Plugin Builder semantic lint checks. Use to diagnose compile/lint readiness after code edits. Does not install or package the plugin. If this fails, fix the reported Go or plugin-lifecycle issue before plugin_install.",
 	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoVet(ctx)
 		if err != nil {
@@ -53,7 +53,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_tidy",
-		Description: "Run go mod tidy in the managed plugin workspace to resolve module dependencies and write go.sum.",
+		Description: "Run go mod tidy to resolve imports and update go.mod/go.sum. Use after adding, removing, or changing imports or dependencies. Side effect: rewrites module files.",
 	}, func(ctx adktool.Context, args struct{}) (CommandResult, error) {
 		result, err := a.GoTidy(ctx)
 		if err != nil {
@@ -66,7 +66,7 @@ func (a *Agent) addGoTools(add toolAdder) error {
 
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_go_test",
-		Description: "Run go test in the managed plugin workspace. The optional pattern defaults to ./...",
+		Description: "Run go test for the managed plugin workspace. The optional pattern defaults to ./.... Use after implementation changes to catch compile errors and test failures. Does not compile the final supervised binary; plugin_install does that once.",
 	}, func(ctx adktool.Context, args GoTestInput) (CommandResult, error) {
 		result, err := a.GoTest(ctx, args)
 		if err != nil {

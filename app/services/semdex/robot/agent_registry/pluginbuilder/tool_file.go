@@ -132,7 +132,7 @@ type textFileSnapshot struct {
 func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_list",
-		Description: "List files in a managed plugin workspace.",
+		Description: "List workspace files with paths, sizes, and modification times. Use to orient before reading or editing. This returns metadata only, not file contents; use plugin_file_read, plugin_file_search, or plugin_file_outline for source context.",
 	}, func(ctx adktool.Context, args ListFilesInput) (ListFilesResult, error) {
 		result, err := a.ListFiles(ctx, args)
 		if err != nil {
@@ -145,7 +145,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_read",
-		Description: "Read a line range from a workspace-relative text file. Use start_line/max_lines, around_line/context_lines, or symbol/context_lines for Go files.",
+		Description: "Read targeted text from one workspace file. Prefer focused reads over whole-file reads: use start_line/max_lines, around_line/context_lines, or symbol/context_lines for Go files. Returns line numbers and a revision for precise follow-up edits.",
 	}, func(ctx adktool.Context, args ReadFileInput) (ReadFileResult, error) {
 		result, err := a.ReadFile(ctx, args)
 		if err != nil {
@@ -158,7 +158,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_outline",
-		Description: "Return a compact outline of a Go source file with import, type, function, and method line ranges.",
+		Description: "Return a compact Go source outline: package, imports, types, functions, and methods with line ranges. Use before reading large Go files to choose the smallest useful line range.",
 	}, func(ctx adktool.Context, args FileOutlineInput) (FileOutlineResult, error) {
 		result, err := a.FileOutline(ctx, args)
 		if err != nil {
@@ -171,7 +171,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_write",
-		Description: "Write complete content to a workspace-relative file. Prefer plugin_file_edit for focused changes to existing files.",
+		Description: "Write complete content to a workspace-relative file. Use for new files or intentional full rewrites only. Prefer plugin_file_edit for focused changes to existing files so surrounding robot-maintained context is preserved.",
 	}, func(ctx adktool.Context, args WriteFileInput) (WriteFileResult, error) {
 		result, err := a.WriteFile(ctx, args)
 		if err != nil {
@@ -184,7 +184,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_search",
-		Description: "Search text in workspace files and return contextual snippets with line numbers and file revisions.",
+		Description: "Search workspace text files for a literal case-insensitive substring and return contextual snippets with line numbers and revisions. Use before broad edits to find all relevant behavior. For Go structure, prefer plugin_file_outline after identifying candidate files.",
 	}, func(ctx adktool.Context, args SearchInput) (SearchResult, error) {
 		result, err := a.Search(ctx, args)
 		if err != nil {

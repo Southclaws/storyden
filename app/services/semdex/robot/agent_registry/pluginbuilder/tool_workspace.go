@@ -33,13 +33,15 @@ type WorkspaceInfo struct {
 }
 
 type WorkspaceResult struct {
-	Workspace WorkspaceInfo `json:"workspace"`
+	Workspace  WorkspaceInfo `json:"workspace"`
+	Message    string        `json:"message,omitempty"`
+	NextAction string        `json:"next_action,omitempty"`
 }
 
 func (a *Agent) addWorkspaceTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_create",
-		Description: "Create a managed Go plugin workspace with manifest.yaml, go.mod, main.go, and README.md starter files.",
+		Description: "Create the initial managed Go plugin workspace for this chat. Writes manifest.yaml, go.mod, main.go, and README.md starter files with Storyden SDK, live configuration, event-handler, and shutdown patterns. Use only when creating a new plugin in an empty workspace; import existing supervised plugins with plugin_workspace_import_installation instead.",
 	}, func(ctx adktool.Context, args CreateWorkspaceInput) (WorkspaceResult, error) {
 		result, err := a.Create(ctx, args)
 		if err != nil {
@@ -52,7 +54,7 @@ func (a *Agent) addWorkspaceTools(add toolAdder) error {
 
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_workspace_info",
-		Description: "Get managed plugin workspace metadata and file count.",
+		Description: "Inspect whether this chat already has a managed plugin workspace and how many files it currently sees. Use at the start of a task to decide whether to create a new plugin, import an installed plugin, or continue editing the existing plugin. This does not read source content; use plugin_file_list/read/search for files.",
 	}, func(ctx adktool.Context, args struct{}) (WorkspaceResult, error) {
 		result, err := a.Info(ctx)
 		if err != nil {
@@ -128,6 +130,8 @@ func (a *Agent) Create(ctx context.Context, in CreateWorkspaceInput) (WorkspaceR
 	}
 
 	info.Workspace.ID = id
+	info.Message = "Plugin workspace created with managed Go starter files."
+	info.NextAction = "Inspect or edit main.go and manifest.yaml for the requested behavior, then use plugin_validate while iterating and plugin_install when ready."
 	return info, nil
 }
 
@@ -147,6 +151,7 @@ func (a *Agent) Info(ctx context.Context) (WorkspaceResult, error) {
 			ID:    "active",
 			Files: len(files),
 		},
+		Message: "Active plugin workspace metadata.",
 	}, nil
 }
 

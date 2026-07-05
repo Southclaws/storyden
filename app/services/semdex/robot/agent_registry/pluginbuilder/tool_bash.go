@@ -23,7 +23,7 @@ type RunBashInput struct {
 func (a *Agent) addBashTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_run_bash",
-		Description: "Run an arbitrary Bash command in the managed plugin workspace. Only available when the workspace template allows untrusted commands.",
+		Description: "Run one synchronous Bash command in the managed plugin workspace. Only available when the workspace template allows untrusted commands. Use for one-shot inspection or commands not covered by focused tools. Do not use for long-running dev servers, background processes, secrets, deployment, packaging, or install; prefer focused plugin_* tools whenever they exist.",
 	}, func(ctx adktool.Context, args RunBashInput) (CommandResult, error) {
 		return a.RunBash(ctx, args)
 	}))
