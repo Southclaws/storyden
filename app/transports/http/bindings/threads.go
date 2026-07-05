@@ -245,7 +245,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: httpDate(etag.Time),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		}, nil
@@ -268,7 +268,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: httpDate(etag.Time),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		},

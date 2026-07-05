@@ -1,4 +1,4 @@
-package bindings
+package cachecontrol
 
 import (
 	"net/http"
@@ -19,7 +19,7 @@ func TestHTTPDateIsSpecCompliant(t *testing.T) {
 
 	in := time.Date(2026, 7, 5, 8, 30, 0, 0, loc)
 
-	got := httpDate(in)
+	got := HTTPDate(in)
 
 	assert.True(t, strings.HasSuffix(got, " GMT"), "http dates must end in GMT, got %q", got)
 	assert.NotContains(t, got, "UTC", "http dates must not use the UTC zone abbreviation")

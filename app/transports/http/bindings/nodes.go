@@ -249,7 +249,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 		return openapi.NodeGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: httpDate(etag.Time),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		}, nil
@@ -270,7 +270,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
 				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				LastModified: httpDate(etag.Time),
+				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		},
@@ -378,7 +378,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseUpdatedNode(node),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				LastModified: httpDate(node.UpdatedAt),
+				LastModified: cachecontrol.HTTPDate(node.UpdatedAt),
 				CacheControl: "private, no-cache, no-store, must-revalidate",
 			},
 		},
@@ -461,7 +461,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				LastModified: httpDate(node.UpdatedAt),
+				LastModified: cachecontrol.HTTPDate(node.UpdatedAt),
 			},
 		},
 	}, nil
@@ -556,7 +556,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				LastModified: httpDate(node.UpdatedAt),
+				LastModified: cachecontrol.HTTPDate(node.UpdatedAt),
 			},
 		},
 	}, nil
@@ -576,7 +576,7 @@ func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveA
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				LastModified: httpDate(node.UpdatedAt),
+				LastModified: cachecontrol.HTTPDate(node.UpdatedAt),
 			},
 		},
 	}, nil
@@ -651,7 +651,7 @@ func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpda
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseNodeWithItems(n),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				LastModified: httpDate(n.UpdatedAt),
+				LastModified: cachecontrol.HTTPDate(n.UpdatedAt),
 			},
 		},
 	}, nil

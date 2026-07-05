@@ -10,6 +10,7 @@ import (
 
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -189,7 +190,7 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 
 			limit := status.Limit
 			remaining := status.Remaining
-			resetTime := status.Reset.UTC().Format(http.TimeFormat)
+			resetTime := cachecontrol.HTTPDate(status.Reset)
 
 			w.Header().Set(RateLimitLimit, strconv.FormatUint(uint64(limit), 10))
 			w.Header().Set(RateLimitRemaining, strconv.FormatUint(uint64(remaining), 10))
