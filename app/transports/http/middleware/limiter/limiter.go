@@ -189,7 +189,7 @@ func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
 
 			limit := status.Limit
 			remaining := status.Remaining
-			resetTime := status.Reset.UTC().Format(time.RFC1123)
+			resetTime := status.Reset.UTC().Format(http.TimeFormat)
 
 			w.Header().Set(RateLimitLimit, strconv.FormatUint(uint64(limit), 10))
 			w.Header().Set(RateLimitRemaining, strconv.FormatUint(uint64(remaining), 10))

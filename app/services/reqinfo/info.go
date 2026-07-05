@@ -90,5 +90,5 @@ func notEmpty(s string) bool {
 }
 
 func parseConditionalRequestTime(in string) (time.Time, error) {
-	return time.Parse(time.RFC1123, in)
+	return http.ParseTime(in)
 }

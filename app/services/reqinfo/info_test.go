@@ -9,6 +9,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestParseConditionalRequestTimeAcceptsAllHTTPDateFormats(t *testing.T) {
+	t.Parallel()
+
+	want := time.Date(1994, time.November, 6, 8, 49, 37, 0, time.UTC)
+
+	// the three date formats an http recipient must accept per rfc 7231
+	cases := map[string]string{
+		"imf-fixdate": "Sun, 06 Nov 1994 08:49:37 GMT",
+		"rfc850":      "Sunday, 06-Nov-94 08:49:37 GMT",
+		"asctime":     "Sun Nov  6 08:49:37 1994",
+	}
+
+	for name, raw := range cases {
+		got, err := parseConditionalRequestTime(raw)
+		assert.NoError(t, err, name)
+		assert.True(t, got.Equal(want), "%s: got %v", name, got)
+	}
+}
+
 func TestGettersPanicWithoutRequestInfo(t *testing.T) {
 	t.Parallel()
 
