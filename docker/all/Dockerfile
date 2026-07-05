@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 
 COPY ./app ./app
 COPY ./lib ./lib
+COPY ./sdk ./sdk
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 
