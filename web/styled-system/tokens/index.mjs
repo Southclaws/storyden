@@ -3059,6 +3059,10 @@ const tokens = {
     "value": "10px",
     "variable": "var(--blurs-frosted)"
   },
+  "shadows.subtle": {
+    "value": "0px 1px 2px 0px var(--colors-gray-light-a2), 0px 0px 1px 0px var(--colors-gray-light-a3)",
+    "variable": "var(--shadows-subtle)"
+  },
   "opacity.0": {
     "value": "0",
     "variable": "var(--opacity-0)"

@@ -1,8 +1,7 @@
 import { PropsWithChildren, ReactNode } from "react";
 
-import { Navigation } from "@/components/site/Navigation/Navigation";
-
 import { MotdBanner } from "@/components/site/MotdBanner/MotdBanner";
+import { Navigation } from "@/components/site/Navigation/Navigation";
 import { getSettings } from "@/lib/settings/settings-server";
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
@@ -14,6 +13,9 @@ export async function Default({
   contextpane,
   children,
 }: PropsWithChildren<Props>) {
+  // Keep accepting the parallel route slot while the context pane is out of the layout.
+  void contextpane;
+
   const settings = await getSettings();
 
   return (
@@ -24,7 +26,7 @@ export async function Default({
       backgroundColor="bg.site"
       vaul-drawer-wrapper=""
     >
-      <Navigation contextpane={contextpane}>
+      <Navigation>
         <styled.main
           containerType="inline-size"
           width="full"

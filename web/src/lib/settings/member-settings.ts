@@ -3,17 +3,14 @@ import z from "zod";
 import { Account } from "@/api/openapi-schema";
 
 import { EditorSettingsSchema } from "./editor";
-import { FrontendConfiguration, Settings } from "./settings";
-import { SidebarSettingsSchema } from "./sidebar";
+import { FrontendConfiguration } from "./settings";
 
 const MemberCustomSettingsParseSchema = z.object({
   editor: EditorSettingsSchema.optional(),
-  sidebar: SidebarSettingsSchema.optional(),
 });
 
 export const MemberCustomSettingsSchema = z.object({
   editor: EditorSettingsSchema,
-  sidebar: SidebarSettingsSchema,
 });
 export type MemberCustomSettings = z.infer<typeof MemberCustomSettingsSchema>;
 
@@ -25,9 +22,6 @@ export type Member = Account & {
 export const DefaultMemberSettings: MemberCustomSettings = {
   editor: {
     mode: "richtext",
-  },
-  sidebar: {
-    defaultState: "closed",
   },
 };
 
@@ -48,12 +42,6 @@ export function parseMemberSettings(
         rawMeta.editor?.mode ??
         global?.editor.mode ??
         DefaultMemberSettings.editor.mode,
-    },
-    sidebar: {
-      defaultState:
-        rawMeta.sidebar?.defaultState ??
-        global?.sidebar.defaultState ??
-        DefaultMemberSettings.sidebar.defaultState,
     },
   };
 

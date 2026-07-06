@@ -97,17 +97,6 @@ export default defineConfig({
           };
         },
       },
-      FrostedGlass: {
-        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
-        properties: {},
-        transform() {
-          return {
-            backgroundColor: "bg.opaque",
-            backdropBlur: "frosted",
-            backdropFilter: "auto",
-          };
-        },
-      },
       Floating: {
         description: `Floating overlay elements.`,
         properties: {},
@@ -142,7 +131,7 @@ export default defineConfig({
             flexDirection: "column",
             gap: "1",
             width: "full",
-            boxShadow: "sm",
+            boxShadow: "subtle",
             borderRadius: "lg",
             backgroundColor: "bg.default",
             padding,
