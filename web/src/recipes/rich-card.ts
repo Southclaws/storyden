@@ -39,7 +39,7 @@ export const richCard = defineSlotRecipe({
       gap: "0",
       overflow: "hidden",
       borderRadius: "var(--card-border-radius)",
-      boxShadow: "sm",
+      boxShadow: "subtle",
       backgroundColor: "bg.default",
     },
 

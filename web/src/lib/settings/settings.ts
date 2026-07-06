@@ -11,7 +11,6 @@ import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { EditorSettingsSchema } from "./editor";
 import { DefaultFeedConfig, FeedConfigSchema } from "./feed";
-import { DefaultSidebarSettings, SidebarSettingsSchema } from "./sidebar";
 
 export const DefaultEditorSettings = {
   mode: "richtext" as const,
@@ -34,7 +33,6 @@ export type MotdMetadata = z.infer<typeof MotdMetadataSchema>;
 export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
   editor: DefaultEditorSettings,
-  sidebar: DefaultSidebarSettings,
   signatures: {
     enabled: true,
     maxHeight: 160,
@@ -61,7 +59,6 @@ export const FrontendConfigurationSchema = z
   .object({
     feed: FeedConfigSchema,
     editor: EditorSettingsSchema.default(DefaultEditorSettings),
-    sidebar: SidebarSettingsSchema.default(DefaultSidebarSettings),
     signatures: z
       .object({
         enabled: z.boolean().default(true),

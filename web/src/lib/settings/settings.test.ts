@@ -63,10 +63,13 @@ test("parseSettings keeps valid metadata and applies nested defaults", () => {
 
   assert.equal(parsed.metadata.feed, {
     layout: { type: "grid" },
-    source: { type: "categories", threadListMode: "uncategorised", quickShare: "enabled" },
+    source: {
+      type: "categories",
+      threadListMode: "uncategorised",
+      quickShare: "enabled",
+    },
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
 });
 
 test("parseSettings falls back to defaults for invalid metadata", () => {
@@ -97,7 +100,7 @@ test("parseSettings falls back to defaults for invalid metadata", () => {
   assert.equal(parsed.metadata, DefaultFrontendConfig);
 });
 
-test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
+test("parseAdminSettings fills missing editor with defaults", () => {
   const parsed = parseAdminSettings(
     baseAdminSettings({
       metadata: {
@@ -114,7 +117,6 @@ test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
     source: { type: "threads", quickShare: "enabled" },
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
 });
 
 test("parseSettings keeps valid motd metadata type", () => {
