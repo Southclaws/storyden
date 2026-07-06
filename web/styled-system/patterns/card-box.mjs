@@ -10,7 +10,7 @@ transform(props20) {
     flexDirection: "column",
     gap: "1",
     width: "full",
-    boxShadow: "sm",
+    boxShadow: "subtle",
     borderRadius: "lg",
     backgroundColor: "bg.default",
     padding,

@@ -49,22 +49,6 @@ export function InterfaceSettingsForm(props: Props) {
         </FormControl>
 
         <FormControl>
-          <FormLabel>Default sidebar state</FormLabel>
-          <RadioGroupField
-            control={control}
-            name="sidebarDefaultState"
-            items={[
-              { label: "Open", value: "open" },
-              { label: "Closed", value: "closed" },
-            ]}
-          />
-          <FormHelperText>
-            Choose the default state for the sidebar when members first visit or
-            when they haven't set a preference.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
           <FormLabel>Signatures</FormLabel>
           <Controller
             control={control}

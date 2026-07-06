@@ -7,7 +7,6 @@ import { categoryListCached } from "@/lib/category/server-category-list";
 import { nodeListCached } from "@/lib/library/server-node-list";
 import { type Settings } from "@/lib/settings/settings";
 import { Box, styled } from "@/styled-system/jsx";
-import { Floating } from "@/styled-system/patterns";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 
@@ -66,8 +65,8 @@ function NavigationPaneContent({
       height="full"
       alignItems="end"
       flexDirection="column"
-      borderRadius="md"
-      className={Floating()}
+      borderRadius="none"
+      className="navigation__surface"
     >
       <AdminZone
         initialSession={initialSession}

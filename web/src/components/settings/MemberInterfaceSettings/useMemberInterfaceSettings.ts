@@ -3,13 +3,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
-import { useSession } from "@/auth";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import { Member } from "@/lib/settings/member-settings";
 
 export const FormSchema = z.object({
   editorMode: z.enum(["richtext", "markdown"]),
-  sidebarDefaultState: z.enum(["open", "closed"]),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -23,7 +21,6 @@ export function useMemberInterfaceSettings({ session }: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       editorMode: session.meta.editor.mode,
-      sidebarDefaultState: session.meta.sidebar.defaultState,
     },
   });
 
@@ -35,9 +32,6 @@ export function useMemberInterfaceSettings({ session }: Props) {
             ...session.meta,
             editor: {
               mode: data.editorMode,
-            },
-            sidebar: {
-              defaultState: data.sidebarDefaultState,
             },
           },
         });

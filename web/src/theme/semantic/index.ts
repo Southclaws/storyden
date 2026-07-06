@@ -16,6 +16,26 @@ export const semanticTokens = defineSemanticTokens({
   blurs: {
     frosted: { value: "10px" },
   },
+  shadows: {
+    subtle: {
+      value: [
+        {
+          offsetX: 0,
+          offsetY: 1,
+          blur: 2,
+          spread: 0,
+          color: "{colors.gray.light.a2}",
+        },
+        {
+          offsetX: 0,
+          offsetY: 0,
+          blur: 1,
+          spread: 0,
+          color: "{colors.gray.light.a3}",
+        },
+      ],
+    },
+  },
   opacity: {
     0: { value: "0" },
     1: { value: "0.1" },

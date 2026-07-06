@@ -6,7 +6,6 @@ import { handle } from "@/api/client";
 import { EditorModeSchema } from "@/lib/settings/editor";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { AdminSettings } from "@/lib/settings/settings";
-import { SidebarDefaultStateSchema } from "@/lib/settings/sidebar";
 
 export type Props = {
   settings: AdminSettings;
@@ -14,7 +13,6 @@ export type Props = {
 
 export const FormSchema = z.object({
   editorMode: EditorModeSchema,
-  sidebarDefaultState: SidebarDefaultStateSchema,
   signaturesEnabled: z.boolean(),
   signatureMaxHeight: z.number().int().min(32).max(2000),
   signatureMaxChars: z.number().int().min(1).max(10000),
@@ -27,7 +25,6 @@ export function useInterfaceSettings({ settings }: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       editorMode: settings.metadata.editor.mode,
-      sidebarDefaultState: settings.metadata.sidebar.defaultState,
       signaturesEnabled: settings.metadata.signatures.enabled,
       signatureMaxHeight: settings.metadata.signatures.maxHeight,
       signatureMaxChars:
@@ -43,9 +40,6 @@ export function useInterfaceSettings({ settings }: Props) {
             ...settings.metadata,
             editor: {
               mode: data.editorMode,
-            },
-            sidebar: {
-              defaultState: data.sidebarDefaultState,
             },
             signatures: {
               enabled: data.signaturesEnabled,

@@ -259,6 +259,181 @@ body {
   pointer-events: none;
 }
 
+/*
+  Navigation shell grid.
+
+  The in-flow layout uses this grid for content placement. The fixed overlay
+  reuses it for the sticky side navigation only. The top bar has its own
+  viewport-wide grid so the title stays optically centered.
+*/
+.navigation__container {
+  --navigation-sidebar-width: 18rem;
+  --navigation-column-gap: var(--spacing-8);
+  --navigation-content-offset: var(--spacing-8);
+  --navigation-topbar-height: 3rem;
+  --navigation-viewport-padding: var(--spacing-2);
+  --navigation-shell-width: calc(
+    var(--sizes-breakpoint-lg) + var(--navigation-sidebar-width) +
+      var(--navigation-column-gap)
+  );
+}
+
+.navigation__grid {
+  min-height: 100dvh;
+}
+
+.navigation__grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+
+  --grid-col-padding-outer: var(--spacing-2);
+  --grid-col-padding-inner: var(--spacing-8);
+  --grid-col-padding-inner-right: 0px;
+  --grid-row-padding-outer: var(--spacing-5);
+  --grid-row-padding-inner: var(--spacing-3);
+
+  grid-template-rows:
+    var(--grid-row-padding-outer)
+    1fr
+    var(--grid-row-padding-inner)
+    auto
+    var(--grid-row-padding-outer);
+
+  grid-template-columns:
+    minmax(var(--grid-col-padding-outer), 1fr)
+    1fr
+    var(--grid-col-padding-inner)
+    minmax(0, var(--sizes-breakpoint-lg))
+    var(--grid-col-padding-inner-right)
+    1fr
+    minmax(var(--grid-col-padding-outer), 1fr);
+
+  grid-template-areas:
+    " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
+    " padleft  .         main     main     main     main      padright "
+    " padleft  .         .        .        .        .         padright "
+    " padleft  .         .        navpill  .        .         padright "
+    " padbl    padbot    padbot   padbot   padbot   padbot    padbr    ";
+}
+
+.navigation__main {
+  grid-area: main;
+  height: 100%;
+}
+
+.navigation__topbar {
+  display: none;
+}
+
+.navigation__leftbar {
+  display: none;
+}
+
+.navigation__navpill {
+  display: block;
+  grid-area: navpill;
+}
+
+.navigation__surface {
+  background-color: var(--colors-bg-site);
+  background-color: color-mix(in srgb, var(--colors-bg-site) 80%, transparent);
+  -webkit-backdrop-filter: blur(var(--blurs-frosted));
+  backdrop-filter: blur(var(--blurs-frosted));
+}
+
+@media screen and (min-width: 768px) {
+  .navigation__fixed-grid {
+    position: absolute;
+    inset: 0;
+  }
+
+  .navigation__grid {
+    display: grid;
+    width: min(
+      calc(
+        100% - var(--navigation-viewport-padding) -
+          var(--navigation-viewport-padding)
+      ),
+      var(--navigation-shell-width)
+    );
+    margin-inline: auto;
+
+    --navigation-viewport-padding: var(--spacing-4);
+    --navigation-sidebar-width: 16rem;
+    --navigation-column-gap: var(--spacing-6);
+
+    grid-template-rows:
+      var(--navigation-topbar-height)
+      var(--navigation-content-offset)
+      minmax(0, 1fr);
+
+    grid-template-columns:
+      var(--navigation-sidebar-width)
+      var(--navigation-column-gap)
+      minmax(0, 1fr);
+
+    grid-template-areas:
+      " .       .       .      "
+      " padmid  padmid  padmid "
+      " leftbar .       main   ";
+  }
+
+  .navigation__topbar {
+    pointer-events: all;
+
+    display: grid;
+    width: 100%;
+    height: var(--navigation-topbar-height);
+    align-items: center;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    padding-inline-end: var(--spacing-1);
+    padding-inline-start: var(--spacing-3);
+  }
+
+  .navigation__topbar-left {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    min-width: 0;
+    justify-self: start;
+  }
+
+  .navigation__topbar-middle {
+    grid-column: 2/3;
+    grid-row: 1/2;
+    min-width: 0;
+    max-width: 50vw;
+    justify-self: center;
+  }
+
+  .navigation__topbar-right {
+    grid-column: 3/4;
+    grid-row: 1/2;
+    min-width: 0;
+    justify-self: end;
+  }
+
+  .navigation__leftbar {
+    display: block;
+    grid-area: leftbar;
+    max-height: 100%;
+    min-height: 0;
+    pointer-events: all;
+  }
+
+  .navigation__navpill {
+    display: none;
+  }
+}
+
+@media screen and (min-width: 1280px) {
+  .navigation__grid {
+    --navigation-viewport-padding: var(--spacing-6);
+    --navigation-sidebar-width: 18rem;
+    --navigation-column-gap: var(--spacing-8);
+  }
+}
+
 /* Nice scrollbars for everything but the main browser viewport. */
 body *::-webkit-scrollbar {
   width: var(--spacing-scroll-gutter);
