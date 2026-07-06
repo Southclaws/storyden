@@ -1,7 +1,9 @@
 package plugin_test
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -220,6 +222,55 @@ func TestSupervisedPluginUpdatePackageRejectsManifestIDMismatch(t *testing.T) {
 			)(t, http.StatusOK)
 			r.NotNil(getResp.JSON200.Version)
 			r.Equal("1.0.0", *getResp.JSON200.Version)
+		}))
+	}))
+}
+
+func TestSupervisedPluginDownloadPackageReturnsStoredArchive(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, &config.Config{
+		PluginMaxRestartAttempts:    1,
+		PluginMaxBackoffDuration:    100 * time.Millisecond,
+		PluginRuntimeCrashThreshold: 1 * time.Second,
+		PluginRuntimeCrashBackoff:   100 * time.Millisecond,
+	}, e2e.Setup(), rpc_transport.Build(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		accountWrite *account_writer.Writer,
+		runner plugin_runner.Host,
+		ts *httptest.Server,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+
+			setRunnerServerURLForTests(runner, ts.URL)
+
+			adminSession, _ := createAdminSession(root, cl, sh, accountWrite, r)
+			archivePath := packageTestPluginArchive(t, "test_data/supervised_config", "supervised_config")
+			pluginFile, err := os.Open(archivePath)
+			r.NoError(err)
+			defer pluginFile.Close()
+
+			original, err := io.ReadAll(pluginFile)
+			r.NoError(err)
+			_, err = pluginFile.Seek(0, io.SeekStart)
+			r.NoError(err)
+
+			addResp := tests.AssertRequest(
+				cl.PluginAddWithBodyWithResponse(root, "application/zip", pluginFile, adminSession),
+			)(t, http.StatusOK)
+			r.NotNil(addResp.JSON200)
+
+			downloadResp := tests.AssertRequest(
+				cl.PluginDownloadPackageWithResponse(root, addResp.JSON200.Id, adminSession),
+			)(t, http.StatusOK)
+
+			r.Equal("application/zip", downloadResp.HTTPResponse.Header.Get("Content-Type"))
+			r.Contains(downloadResp.HTTPResponse.Header.Get("Content-Disposition"), "supervised-config-test.zip")
+			r.True(bytes.Equal(original, downloadResp.Body))
 		}))
 	}))
 }

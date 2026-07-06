@@ -48,6 +48,7 @@ import (
 	plugindeactivate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/deactivate"
 	plugindelete "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/delete"
 	plugindev "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev"
+	plugindevdownload "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/download"
 	plugindevinstall "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/install"
 	plugindevnew "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/new"
 	plugindevpackage "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/package"
@@ -202,6 +203,7 @@ func main() {
 			plugindevpackage.New,
 			plugindevvalidate.New,
 			plugindevinstall.New,
+			plugindevdownload.New,
 			plugindevsymbols.New,
 			plugindev.New,
 			pluginlist.New,

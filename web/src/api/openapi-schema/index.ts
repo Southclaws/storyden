@@ -642,6 +642,7 @@ export * from "./pluginConfigurationSchema";
 export * from "./pluginCycleToken";
 export * from "./pluginCycleTokenOKResponse";
 export * from "./pluginDescription";
+export * from "./pluginDownloadPackageOKResponse";
 export * from "./pluginExternalProps";
 export * from "./pluginExternalPropsMode";
 export * from "./pluginGetConfigurationOKResponse";

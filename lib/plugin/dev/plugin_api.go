@@ -149,6 +149,17 @@ func GetPlugin(ctx context.Context, client *openapi.ClientWithResponses, id stri
 	return (*openapi.Plugin)(response.JSON200), nil
 }
 
+func DownloadPackage(ctx context.Context, client *openapi.ClientWithResponses, id string) ([]byte, error) {
+	response, err := client.PluginDownloadPackageWithResponse(ctx, openapi.PluginIDParam(id))
+	if err != nil {
+		return nil, err
+	}
+	if response.StatusCode() != http.StatusOK {
+		return nil, requestError("plugin package download request", response, response.Body)
+	}
+	return response.Body, nil
+}
+
 func DeletePlugin(ctx context.Context, client *openapi.ClientWithResponses, id string) error {
 	response, err := client.PluginDeleteWithResponse(ctx, openapi.PluginIDParam(id))
 	if err != nil {

@@ -11,6 +11,7 @@ import type {
   NoContentResponse,
   PluginAddBody,
   PluginCycleTokenOKResponse,
+  PluginDownloadPackageOKResponse,
   PluginGetConfigurationOKResponse,
   PluginGetConfigurationSchemaOKResponse,
   PluginGetLogsOKResponse,
@@ -254,6 +255,36 @@ export const pluginUpdateManifest = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(pluginUpdateManifestBody),
+    },
+  );
+};
+
+/**
+ * Download the original package archive for a supervised plugin
+installation.
+
+The response body is the same zip archive bytes that were uploaded
+when the plugin was installed or last updated.
+
+ */
+export type pluginDownloadPackageResponse = {
+  data: PluginDownloadPackageOKResponse;
+  status: number;
+};
+
+export const getPluginDownloadPackageUrl = (pluginInstanceId: string) => {
+  return `/plugins/${pluginInstanceId}/package`;
+};
+
+export const pluginDownloadPackage = async (
+  pluginInstanceId: string,
+  options?: RequestInit,
+): Promise<pluginDownloadPackageResponse> => {
+  return fetcher<Promise<pluginDownloadPackageResponse>>(
+    getPluginDownloadPackageUrl(pluginInstanceId),
+    {
+      ...options,
+      method: "GET",
     },
   );
 };

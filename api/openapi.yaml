@@ -793,6 +793,23 @@ paths:
         "200": { $ref: "#/components/responses/PluginGetOK" }
 
   /plugins/{plugin_instance_id}/package:
+    get:
+      operationId: PluginDownloadPackage
+      description: |
+        Download the original package archive for a supervised plugin
+        installation.
+
+        The response body is the same zip archive bytes that were uploaded
+        when the plugin was installed or last updated.
+      tags: [plugins]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginDownloadPackageOK" }
+
     patch:
       operationId: PluginUpdatePackage
       description: |
@@ -5586,6 +5603,19 @@ components:
         text/event-stream:
           schema:
             type: string
+
+    PluginDownloadPackageOK:
+      description: OK
+      headers:
+        Content-Disposition:
+          schema:
+            type: string
+          description: Suggested attachment filename for the plugin package.
+      content:
+        application/zip:
+          schema:
+            type: string
+            format: binary
 
     PluginCycleTokenOK:
       description: OK

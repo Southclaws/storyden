@@ -54,6 +54,7 @@ var (
 	OperationIDPluginGetLogs                          = OperationID{`PluginGetLogs`}
 	OperationIDPluginCycleToken                       = OperationID{`PluginCycleToken`}
 	OperationIDPluginUpdateManifest                   = OperationID{`PluginUpdateManifest`}
+	OperationIDPluginDownloadPackage                  = OperationID{`PluginDownloadPackage`}
 	OperationIDPluginUpdatePackage                    = OperationID{`PluginUpdatePackage`}
 	OperationIDPluginGetConfigurationSchema           = OperationID{`PluginGetConfigurationSchema`}
 	OperationIDPluginGetConfiguration                 = OperationID{`PluginGetConfiguration`}
@@ -371,6 +372,8 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDPluginCycleToken, nil
 	case string(`PluginUpdateManifest`):
 		return OperationIDPluginUpdateManifest, nil
+	case string(`PluginDownloadPackage`):
+		return OperationIDPluginDownloadPackage, nil
 	case string(`PluginUpdatePackage`):
 		return OperationIDPluginUpdatePackage, nil
 	case string(`PluginGetConfigurationSchema`):

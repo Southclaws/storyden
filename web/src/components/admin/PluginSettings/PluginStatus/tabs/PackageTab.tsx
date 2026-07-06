@@ -3,7 +3,10 @@ import { useSWRConfig } from "swr";
 
 import { fetcher, handle } from "@/api/client";
 import { mutateTransaction } from "@/api/mutate";
-import { getPluginGetKey } from "@/api/openapi-client/plugins";
+import {
+  getPluginGetKey,
+  pluginDownloadPackage,
+} from "@/api/openapi-client/plugins";
 import { Plugin } from "@/api/openapi-schema";
 import { PluginArchiveUpload } from "@/components/admin/PluginSettings/PluginArchiveUpload";
 import { useConfirmation } from "@/components/site/useConfirmation";
@@ -32,6 +35,7 @@ export function PackageTab({ plugin }: Props) {
   const { mutate } = useSWRConfig();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<PackageTabError | null>(null);
   const [success, setSuccess] = useState<PackageTabSuccess | null>(null);
 
@@ -91,6 +95,31 @@ export function PackageTab({ plugin }: Props) {
     }
   }
 
+  async function handleDownloadPackage() {
+    if (isDownloading) {
+      return;
+    }
+
+    setIsDownloading(true);
+    setError(null);
+
+    await handle(
+      async () => {
+        const archive = await pluginDownloadPackage(plugin.id);
+        downloadBlob(archive, pluginPackageFilename(plugin));
+      },
+      {
+        errorToast: false,
+        onError: async (err) => {
+          setError(normaliseError(err));
+        },
+        cleanup: async () => {
+          setIsDownloading(false);
+        },
+      },
+    );
+  }
+
   return (
     <LStack gap="4">
       <styled.p fontSize="sm" color="fg.muted">
@@ -125,7 +154,18 @@ export function PackageTab({ plugin }: Props) {
         }
       />
 
-      <WStack justifyContent="end" alignItems="end">
+      <WStack>
+        <Button
+          size="sm"
+          variant="subtle"
+          onClick={handleDownloadPackage}
+          disabled={isDownloading || isUploading}
+          loading={isDownloading}
+          loadingText="Downloading..."
+        >
+          Download package
+        </Button>
+
         {isConfirming ? (
           <HStack gap="2">
             <Button
@@ -252,4 +292,26 @@ function toStringOrNull(input: unknown): string | null {
 
   const value = input.trim();
   return value === "" ? null : value;
+}
+
+function pluginPackageFilename(plugin: Plugin): string {
+  const manifestID = plugin.manifest["id"];
+
+  if (typeof manifestID === "string" && manifestID.trim() !== "") {
+    return `${manifestID.trim()}.zip`;
+  }
+
+  return `${plugin.id}.zip`;
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.rel = "noopener";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

@@ -54,6 +54,7 @@ Stream supervised plugin logs:
 ~~~bash
 sd plugin logs <plugin-instance-id>
 ~~~
+
 `,
 	}
 

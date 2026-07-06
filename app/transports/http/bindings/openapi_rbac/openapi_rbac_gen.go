@@ -45,6 +45,7 @@ type OperationPermissions interface {
 	PluginGetLogs() (bool, *rbac.Permission)
 	PluginCycleToken() (bool, *rbac.Permission)
 	PluginUpdateManifest() (bool, *rbac.Permission)
+	PluginDownloadPackage() (bool, *rbac.Permission)
 	PluginUpdatePackage() (bool, *rbac.Permission)
 	PluginGetConfigurationSchema() (bool, *rbac.Permission)
 	PluginGetConfiguration() (bool, *rbac.Permission)
@@ -327,6 +328,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.PluginCycleToken()
 	case "PluginUpdateManifest":
 		return optable.PluginUpdateManifest()
+	case "PluginDownloadPackage":
+		return optable.PluginDownloadPackage()
 	case "PluginUpdatePackage":
 		return optable.PluginUpdatePackage()
 	case "PluginGetConfigurationSchema":

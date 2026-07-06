@@ -14,6 +14,42 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
+func (m *Manager) DownloadPackage(
+	ctx context.Context,
+	id plugin.InstallationID,
+) ([]byte, string, error) {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := m.requirePluginsEnabled(ctx); err != nil {
+		return nil, "", err
+	}
+
+	rec, err := m.pluginQuerier.Get(ctx, id)
+	if err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if rec.Mode.External() {
+		return nil, "", fault.Wrap(
+			fault.New("cannot download external plugin package"),
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc(
+				"invalid plugin mode",
+				"Only supervised plugins have stored package archives.",
+			),
+		)
+	}
+
+	data, err := m.pluginQuerier.LoadBinary(ctx, id)
+	if err != nil {
+		return nil, "", fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return data, rec.Manifest.ID, nil
+}
+
 func (m *Manager) UpdatePackage(
 	ctx context.Context,
 	id plugin.InstallationID,

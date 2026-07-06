@@ -174,6 +174,10 @@ func (m *Mapping) PluginUpdatePackage() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
 
+func (m *Mapping) PluginDownloadPackage() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) PluginCycleToken() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionAdministrator
 }
