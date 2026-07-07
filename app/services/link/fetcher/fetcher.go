@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -20,10 +21,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var errEmptyLink = fault.New("empty link")
+
+const assetFetchTimeout = 30 * time.Second
 
 type Fetcher struct {
 	logger   *slog.Logger
@@ -32,6 +36,7 @@ type Fetcher struct {
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
 	bus      *pubsub.Bus
+	client   *http.Client
 }
 
 func New(
@@ -49,6 +54,7 @@ func New(
 		lr:       lr,
 		sc:       sc,
 		bus:      bus,
+		client:   httpsafe.NewClient(httpsafe.Config{Timeout: assetFetchTimeout}),
 	}
 }
 
@@ -152,7 +158,12 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 }
 
 func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, error) {
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	resp, err := s.client.Do(req)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
