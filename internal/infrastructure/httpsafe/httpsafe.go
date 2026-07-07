@@ -123,6 +123,7 @@ func Guard(resolve ResolveFunc, dial DialFunc) DialFunc {
 // Config tunes a guarded client
 type Config struct {
 	Timeout      time.Duration
+	DialTimeout  time.Duration
 	MaxRedirects int
 	UseEnvProxy  bool
 	Resolver     ResolveFunc
@@ -137,7 +138,12 @@ func NewClient(cfg Config) *http.Client {
 		resolve = net.DefaultResolver.LookupNetIP
 	}
 
-	dialer := &net.Dialer{Timeout: cfg.Timeout}
+	// dial timeout falls back to the overall timeout so streaming callers can set only DialTimeout
+	dialTimeout := cfg.DialTimeout
+	if dialTimeout == 0 {
+		dialTimeout = cfg.Timeout
+	}
+	dialer := &net.Dialer{Timeout: dialTimeout}
 
 	var proxy func(*http.Request) (*url.URL, error)
 	if cfg.UseEnvProxy {

@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/oauthremotetoken"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 	storydenmcp "github.com/Southclaws/storyden/lib/mcp"
 	"github.com/google/jsonschema-go/jsonschema"
 	sdkauth "github.com/modelcontextprotocol/go-sdk/auth"
@@ -46,6 +47,7 @@ type Manager struct {
 	settings *settings.SettingsRepository
 	tokens   *oauthremotetoken.Service
 	config   config.Config
+	client   *http.Client
 }
 
 func New(
@@ -65,6 +67,7 @@ func New(
 		settings: settings,
 		tokens:   tokens,
 		config:   cfg,
+		client:   httpsafe.NewClient(httpsafe.Config{DialTimeout: probeTimeout}),
 	}
 
 	lc.Append(fx.StartHook(func() error {
@@ -294,7 +297,7 @@ func (m *Manager) Probe(ctx context.Context, rawURL string, bearerToken string) 
 		EndpointURL: input.String(),
 	}
 
-	if card, cardURL, err := fetchServerCard(probeCtx, input); err == nil {
+	if card, cardURL, err := fetchServerCard(probeCtx, m.client, input); err == nil {
 		result.ServerCard = &card
 		result.ServerCardURL = cardURL
 		if input.Path == "" || input.Path == "/" {
@@ -484,6 +487,7 @@ func (m *Manager) connect(ctx context.Context, server mcp.Server) (*sdkmcp.Clien
 		Endpoint:             server.EndpointURL,
 		DisableStandaloneSSE: true,
 		OAuthHandler:         staticBearer(bearerToken),
+		HTTPClient:           m.client,
 	}
 	s, err1 := client.Connect(ctx, transport, nil)
 	if err1 == nil {
@@ -492,7 +496,8 @@ func (m *Manager) connect(ctx context.Context, server mcp.Server) (*sdkmcp.Clien
 
 	// fall back to sse transport for older servers
 	transport = &sdkmcp.SSEClientTransport{
-		Endpoint: server.EndpointURL,
+		Endpoint:   server.EndpointURL,
+		HTTPClient: m.client,
 	}
 	s, err2 := client.Connect(ctx, transport, nil)
 	if err2 == nil {
@@ -703,7 +708,7 @@ func serverCardURL(input *url.URL) string {
 	return u.String()
 }
 
-func fetchServerCard(ctx context.Context, input *url.URL) (ServerCard, string, error) {
+func fetchServerCard(ctx context.Context, client *http.Client, input *url.URL) (ServerCard, string, error) {
 	cardURL := serverCardURL(input)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, cardURL, nil)
 	if err != nil {
@@ -711,7 +716,7 @@ func fetchServerCard(ctx context.Context, input *url.URL) (ServerCard, string, e
 	}
 	req.Header.Set("Accept", "application/json")
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return ServerCard{}, cardURL, err
 	}
