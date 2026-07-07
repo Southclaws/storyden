@@ -14,24 +14,13 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/storyden/app/resources/plugin"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 )
 
 const (
 	pluginFetchTimeout      = 30 * time.Second
 	pluginFetchMaxRedirects = 5
 )
-
-var disallowedHostPrefixes = []netip.Prefix{
-	netip.MustParsePrefix("10.0.0.0/8"),
-	netip.MustParsePrefix("100.64.0.0/10"),
-	netip.MustParsePrefix("127.0.0.0/8"),
-	netip.MustParsePrefix("169.254.0.0/16"),
-	netip.MustParsePrefix("172.16.0.0/12"),
-	netip.MustParsePrefix("192.168.0.0/16"),
-	netip.MustParsePrefix("::1/128"),
-	netip.MustParsePrefix("fc00::/7"),
-	netip.MustParsePrefix("fe80::/10"),
-}
 
 var lookupNetIP = net.DefaultResolver.LookupNetIP
 
@@ -81,32 +70,11 @@ func validatePluginSourceURL(u url.URL) error {
 }
 
 func isDisallowedHost(host string) bool {
-	host = strings.TrimSpace(strings.ToLower(host))
-	if host == "" {
-		return true
-	}
-	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
-		return true
-	}
-
-	addr, err := netip.ParseAddr(host)
-	if err != nil {
-		return false
-	}
-	return isDisallowedAddr(addr)
+	return httpsafe.IsDisallowedHost(host)
 }
 
 func isDisallowedAddr(addr netip.Addr) bool {
-	addr = addr.Unmap()
-	if addr.IsLoopback() || addr.IsLinkLocalMulticast() || addr.IsMulticast() || addr.IsUnspecified() {
-		return true
-	}
-	for _, prefix := range disallowedHostPrefixes {
-		if prefix.Contains(addr) {
-			return true
-		}
-	}
-	return false
+	return httpsafe.IsDisallowedAddr(addr)
 }
 
 func validateResolvedHost(ctx context.Context, host string) error {
@@ -145,37 +113,12 @@ func fetchPluginArchive(ctx context.Context, u url.URL) ([]byte, error) {
 		return nil, err
 	}
 
-	client := &http.Client{
-		Timeout: pluginFetchTimeout,
-		Transport: &http.Transport{
-			Proxy: http.ProxyFromEnvironment,
-			DialContext: func(dialCtx context.Context, network, address string) (net.Conn, error) {
-				host, _, err := net.SplitHostPort(address)
-				if err != nil {
-					host = address
-				}
-
-				if err := validateResolvedHost(dialCtx, host); err != nil {
-					return nil, err
-				}
-
-				dialer := net.Dialer{Timeout: pluginFetchTimeout}
-				return dialer.DialContext(dialCtx, network, address)
-			},
-		},
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			if len(via) >= pluginFetchMaxRedirects {
-				return fault.New("too many redirects while fetching plugin")
-			}
-			if err := validatePluginSourceURL(*req.URL); err != nil {
-				return err
-			}
-			if len(via) > 0 && strings.EqualFold(via[len(via)-1].URL.Scheme, "https") && !strings.EqualFold(req.URL.Scheme, "https") {
-				return fault.New("refusing insecure redirect from https to http")
-			}
-			return nil
-		},
-	}
+	client := httpsafe.NewClient(httpsafe.Config{
+		Timeout:      pluginFetchTimeout,
+		MaxRedirects: pluginFetchMaxRedirects,
+		UseEnvProxy:  true,
+		Resolver:     lookupNetIP,
+	})
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {

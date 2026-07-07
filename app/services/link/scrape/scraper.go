@@ -4,13 +4,17 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 )
+
+const scrapeFetchTimeout = 30 * time.Second
 
 var errFailedToScrape = fault.New("failed to scrape")
 
@@ -27,10 +31,14 @@ type WebContent struct {
 	Content     datagraph.Content
 }
 
-type webScraper struct{}
+type webScraper struct {
+	client *http.Client
+}
 
 func New() Scraper {
-	return &webScraper{}
+	return &webScraper{
+		client: httpsafe.NewClient(httpsafe.Config{Timeout: scrapeFetchTimeout}),
+	}
 }
 
 func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, error) {
@@ -61,10 +69,11 @@ func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, err
 	req.Header.Add("Upgrade-Insecure-Requests", "1")
 	req.Header.Add("User-Agent", `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36`)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.client.Do(req)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))

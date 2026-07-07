@@ -23,3 +23,23 @@ func Test_scraper_Scrape(t *testing.T) {
 	assert.Equal(t, "https://ogp.me/logo.png", wc.Image)
 	assert.Equal(t, "https://ogp.me/favicon.ico", wc.Favicon)
 }
+
+func Test_scraper_Scrape_RefusesInternalHosts(t *testing.T) {
+	t.Parallel()
+	sc := New()
+
+	
+	for _, raw := range []string{
+		"http://127.0.0.1/",
+		"http://localhost/",
+		"http://192.168.0.1/",
+		"http://169.254.169.254/latest/meta-data/",
+		"http://[::1]/",
+	} {
+		u, err := url.Parse(raw)
+		require.NoError(t, err)
+
+		_, err = sc.Scrape(context.Background(), *u)
+		assert.Error(t, err, raw)
+	}
+}

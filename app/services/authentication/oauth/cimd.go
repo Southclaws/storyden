@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpsafe"
 )
 
 var (
@@ -31,18 +32,6 @@ var (
 	cimdMaxCacheTTL            = time.Hour
 	cimdMaxCacheEntries        = 4096
 )
-
-var cimdDisallowedPrefixes = []netip.Prefix{
-	netip.MustParsePrefix("10.0.0.0/8"),
-	netip.MustParsePrefix("100.64.0.0/10"),
-	netip.MustParsePrefix("127.0.0.0/8"),
-	netip.MustParsePrefix("169.254.0.0/16"),
-	netip.MustParsePrefix("172.16.0.0/12"),
-	netip.MustParsePrefix("192.168.0.0/16"),
-	netip.MustParsePrefix("::1/128"),
-	netip.MustParsePrefix("fc00::/7"),
-	netip.MustParsePrefix("fe80::/10"),
-}
 
 var cimdLookupNetIP = net.DefaultResolver.LookupNetIP
 
@@ -277,19 +266,8 @@ func (s *Service) fetchClientMetadata(ctx context.Context, u *url.URL) (*clientM
 	client := &http.Client{
 		Timeout: cimdFetchTimeout,
 		Transport: &http.Transport{
-			Proxy: nil,
-			DialContext: func(dialCtx context.Context, network, address string) (net.Conn, error) {
-				host, _, err := net.SplitHostPort(address)
-				if err != nil {
-					host = address
-				}
-				if !allowInsecure {
-					if err := cimdValidateResolvedHost(dialCtx, host); err != nil {
-						return nil, err
-					}
-				}
-				return (&net.Dialer{Timeout: cimdFetchTimeout}).DialContext(dialCtx, network, address)
-			},
+			Proxy:           nil,
+			DialContext:     cimdDialContext(allowInsecure),
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: allowInsecure},
 		},
 		CheckRedirect: func(*http.Request, []*http.Request) error {
@@ -504,62 +482,21 @@ func cimdCacheTTL(h http.Header) time.Duration {
 	return cimdDefaultCacheTTL
 }
 
-func cimdIsDisallowedHost(host string) bool {
-	host = strings.TrimSpace(strings.ToLower(host))
-	if host == "" {
-		return true
+// cimdDialContext guards outbound dials unless insecure fetching is enabled
+func cimdDialContext(allowInsecure bool) httpsafe.DialFunc {
+	dialer := &net.Dialer{Timeout: cimdFetchTimeout}
+	if allowInsecure {
+		return dialer.DialContext
 	}
-	if host == "localhost" || strings.HasSuffix(host, ".localhost") {
-		return true
-	}
+	return httpsafe.Guard(cimdLookupNetIP, dialer.DialContext)
+}
 
-	addr, err := netip.ParseAddr(host)
-	if err != nil {
-		return false
-	}
-	return cimdIsDisallowedAddr(addr)
+func cimdIsDisallowedHost(host string) bool {
+	return httpsafe.IsDisallowedHost(host)
 }
 
 func cimdIsDisallowedAddr(addr netip.Addr) bool {
-	addr = addr.Unmap()
-	if addr.IsLoopback() || addr.IsLinkLocalMulticast() || addr.IsLinkLocalUnicast() || addr.IsMulticast() || addr.IsUnspecified() {
-		return true
-	}
-	for _, prefix := range cimdDisallowedPrefixes {
-		if prefix.Contains(addr) {
-			return true
-		}
-	}
-	return false
-}
-
-func cimdValidateResolvedHost(ctx context.Context, host string) error {
-	host = strings.TrimSpace(host)
-	if host == "" {
-		return fault.New("cimd metadata host is required")
-	}
-	if cimdIsDisallowedHost(host) {
-		return fault.New("cimd metadata host is not allowed")
-	}
-
-	if _, err := netip.ParseAddr(host); err == nil {
-		return nil
-	}
-
-	addrs, err := cimdLookupNetIP(ctx, "ip", host)
-	if err != nil {
-		return fault.Wrap(err)
-	}
-	if len(addrs) == 0 {
-		return fault.New("cimd metadata host did not resolve to any addresses")
-	}
-	for _, addr := range addrs {
-		if cimdIsDisallowedAddr(addr) {
-			return fault.New("cimd metadata host resolves to a disallowed address")
-		}
-	}
-
-	return nil
+	return httpsafe.IsDisallowedAddr(addr)
 }
 
 func cimdPrevalidateHost(ctx context.Context, host string) error {
