@@ -167,6 +167,7 @@ func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, erro
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		ctx = fctx.WithMeta(ctx, "status", resp.Status)

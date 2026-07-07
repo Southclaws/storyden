@@ -19,8 +19,9 @@ func TestIsDisallowedAddr(t *testing.T) {
 	for _, ip := range []string{"8.8.8.8", "1.1.1.1", "2606:4700:4700::1111"} {
 		assert.False(t, IsDisallowedAddr(netip.MustParseAddr(ip)), ip)
 	}
-	// ipv4-mapped ipv6 form of the metadata address must also be caught
+	// ipv4-mapped and nat64 forms of the metadata address must also be caught
 	assert.True(t, IsDisallowedAddr(netip.MustParseAddr("::ffff:169.254.169.254")))
+	assert.True(t, IsDisallowedAddr(netip.MustParseAddr("64:ff9b::169.254.169.254")))
 }
 
 func TestGuardRejectsDisallowedResolution(t *testing.T) {

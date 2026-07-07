@@ -73,6 +73,7 @@ func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, err
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))
