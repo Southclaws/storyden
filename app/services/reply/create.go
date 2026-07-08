@@ -41,6 +41,10 @@ func (s *Mutator) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(parentID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate thread cache"))
+	}
+
 	wasMovedToReview := false
 	if content, ok := partial.Content.Get(); ok {
 		result, err := s.cpm.CheckContent(ctx, xid.ID(p.ID), datagraph.KindReply, "", content)
@@ -55,11 +59,11 @@ func (s *Mutator) Create(
 			}
 			p = updatedReply
 			wasMovedToReview = true
-		}
-	}
 
-	if err := s.cache.Invalidate(ctx, xid.ID(parentID)); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate thread cache"))
+			if err := s.cache.Invalidate(ctx, xid.ID(parentID)); err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to invalidate thread cache"))
+			}
+		}
 	}
 
 	replyToAuthorID := opt.Map(p.ReplyTo, func(r reply.Reply) account.AccountID {
