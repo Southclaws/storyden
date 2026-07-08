@@ -6,6 +6,7 @@ import (
 	"hash/crc32"
 	"image"
 	"image/png"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -35,6 +36,32 @@ func TestDecodeRejectsOversizedDimensions(t *testing.T) {
 	_, _, err := Decode(bytes.NewReader(pngHeader(side, side)))
 	require.ErrorIs(t, err, ErrImageTooLarge)
 }
+
+func TestDecodeAllowsExactMaxPixels(t *testing.T) {
+	t.Parallel()
+
+	// 8000x8000 == MaxPixels and the check is >, so this must not be rejected for size
+	side := 8000
+	require.Equal(t, int64(MaxPixels), int64(side)*int64(side))
+
+	// the header carries no pixel data so decode still fails, but not on the size guard
+	_, _, err := Decode(bytes.NewReader(pngHeader(side, side)))
+	require.Error(t, err)
+	assert.NotErrorIs(t, err, ErrImageTooLarge)
+}
+
+func TestDecodeRejectsOversizedEncodedInput(t *testing.T) {
+	t.Parallel()
+
+	r := io.MultiReader(bytes.NewReader(pngHeader(1, 1)), infiniteReader{})
+
+	_, _, err := Decode(r)
+	require.ErrorIs(t, err, ErrEncodedTooLarge)
+}
+
+type infiniteReader struct{}
+
+func (infiniteReader) Read(p []byte) (int, error) { return len(p), nil }
 
 // pngHeader builds a valid png signature and IHDR chunk so DecodeConfig can read
 // the declared dimensions without any pixel data present

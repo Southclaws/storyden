@@ -4,7 +4,6 @@ package imagesafe
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"image"
 	_ "image/gif"
 	_ "image/jpeg"
@@ -18,7 +17,10 @@ const MaxPixels = 64 * 1000 * 1000
 // maxEncodedBytes bounds how much encoded data we buffer before decoding
 const maxEncodedBytes = 64 << 20
 
-var ErrImageTooLarge = errors.New("image dimensions exceed the allowed size")
+var (
+	ErrImageTooLarge   = errors.New("image dimensions exceed the allowed size")
+	ErrEncodedTooLarge = errors.New("encoded image exceeds the allowed size")
+)
 
 // Decode reads an image but rejects oversized dimensions before allocating pixels
 func Decode(r io.Reader) (image.Image, string, error) {
@@ -27,14 +29,15 @@ func Decode(r io.Reader) (image.Image, string, error) {
 		return nil, "", err
 	}
 	if int64(len(data)) > maxEncodedBytes {
-		return nil, "", fmt.Errorf("image exceeds %d bytes", int64(maxEncodedBytes))
+		return nil, "", ErrEncodedTooLarge
 	}
 
 	cfg, format, err := image.DecodeConfig(bytes.NewReader(data))
 	if err != nil {
 		return nil, "", err
 	}
-	if int64(cfg.Width)*int64(cfg.Height) > MaxPixels {
+	// non-positive dimensions can appear from integer wrap on 32-bit and must not slip past the pixel budget
+	if cfg.Width <= 0 || cfg.Height <= 0 || int64(cfg.Width)*int64(cfg.Height) > MaxPixels {
 		return nil, format, ErrImageTooLarge
 	}
 
