@@ -4,11 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"image"
-	_ "image/gif"
-	_ "image/jpeg"
 	"image/png"
-	_ "image/png"
 	"io"
 	"strings"
 
@@ -23,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/imagesafe"
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
@@ -84,7 +81,7 @@ func (s *service) uploadSizes(ctx context.Context, or io.Reader, sizes []Size) e
 		return fault.Wrap(errBadFormat, fctx.With(ctx))
 	}
 
-	source, t, err := image.Decode(r)
+	source, t, err := imagesafe.Decode(r)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
