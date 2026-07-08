@@ -24,15 +24,11 @@ var (
 
 // Decode reads an image but rejects oversized dimensions before allocating pixels
 func Decode(r io.Reader) (image.Image, string, error) {
-	data, err := io.ReadAll(io.LimitReader(r, maxEncodedBytes+1))
-	if err != nil {
-		return nil, "", err
-	}
-	if int64(len(data)) > maxEncodedBytes {
-		return nil, "", ErrEncodedTooLarge
-	}
+	limited := io.LimitReader(r, maxEncodedBytes+1)
 
-	cfg, format, err := image.DecodeConfig(bytes.NewReader(data))
+	// decodeconfig only reads the header, so tee those bytes and reject a dimension bomb before buffering the whole image
+	var header bytes.Buffer
+	cfg, format, err := image.DecodeConfig(io.TeeReader(limited, &header))
 	if err != nil {
 		return nil, "", err
 	}
@@ -41,7 +37,15 @@ func Decode(r io.Reader) (image.Image, string, error) {
 		return nil, format, ErrImageTooLarge
 	}
 
-	img, format, err := image.Decode(bytes.NewReader(data))
+	data, err := io.ReadAll(io.MultiReader(&header, limited))
+	if err != nil {
+		return nil, format, err
+	}
+	if int64(len(data)) > maxEncodedBytes {
+		return nil, format, ErrEncodedTooLarge
+	}
+
+	img, _, err := image.Decode(bytes.NewReader(data))
 	if err != nil {
 		return nil, format, err
 	}
