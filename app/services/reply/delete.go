@@ -41,12 +41,12 @@ func (s *Mutator) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
+	err = s.replyWriter.Delete(ctx, postID)
+	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.replyWriter.Delete(ctx, postID)
-	if err != nil {
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

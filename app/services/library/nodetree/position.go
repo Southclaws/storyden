@@ -115,12 +115,12 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	// Now handle re-ordering of the node using the before/after/index params.
 
 	if beforeID, ok := opts.Before.Get(); ok {
-		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
+		n, err := p.nodeChildren.MoveBefore(ctx, thisnode, beforeID)
+		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		n, err := p.nodeChildren.MoveBefore(ctx, thisnode, beforeID)
-		if err != nil {
+		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -133,12 +133,12 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if afterID, ok := opts.After.Get(); ok {
-		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
+		n, err := p.nodeChildren.MoveAfter(ctx, thisnode, afterID)
+		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		n, err := p.nodeChildren.MoveAfter(ctx, thisnode, afterID)
-		if err != nil {
+		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
@@ -151,12 +151,12 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 	}
 
 	if index, ok := opts.Index.Get(); ok {
-		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
+		n, err := p.nodeChildren.MoveIndex(ctx, thisnode, index)
+		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		n, err := p.nodeChildren.MoveIndex(ctx, thisnode, index)
-		if err != nil {
+		if err := p.cache.Invalidate(ctx, thisnode.GetSlug()); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 

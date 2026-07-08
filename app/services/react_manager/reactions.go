@@ -57,12 +57,12 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
+	r, err := s.reactWriter.Add(ctx, accountID, xid.ID(postID), emoji)
+	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := s.reactWriter.Add(ctx, accountID, xid.ID(postID), emoji)
-	if err != nil {
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -109,12 +109,12 @@ func (s *Reactor) Remove(ctx context.Context, reactID reaction.ReactID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
+	err = s.reactWriter.Remove(ctx, accountID, reactID)
+	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.reactWriter.Remove(ctx, accountID, reactID)
-	if err != nil {
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
