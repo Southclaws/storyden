@@ -38,13 +38,13 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, xid.ID(id)); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
 	err = s.threadWriter.Delete(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(id)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	s.bus.Publish(ctx, &rpc.EventThreadDeleted{

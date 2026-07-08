@@ -65,11 +65,8 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		}
 	}
 
-	if err := s.cache.Invalidate(ctx, n.GetSlug()); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	oldVisibility := n.Visibility
+	previousSlug := n.GetSlug()
 
 	pre, err := s.preMutation(ctx, p, opt.NewPtr(n))
 	if err != nil {
@@ -96,6 +93,10 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		}
 
 		n.Properties = opt.New(*updatedProperties)
+	}
+
+	if err := s.cache.Invalidate(ctx, previousSlug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	// Emit update event

@@ -120,10 +120,6 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 }
 
 func (s *service) Update(ctx context.Context, slug string, partial Partial) (*category.Category, error) {
-	if err := s.cache.Invalidate(ctx, slug); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	opts := []category.Option{}
 
 	if v, ok := partial.Name.Get(); ok {
@@ -153,16 +149,16 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, slug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: cat.Slug})
 
 	return cat, nil
 }
 
 func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category.Category, error) {
-	if err := s.cache.Invalidate(ctx, slug); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	parentOpt, deleteParent := move.Parent.Get()
 	parentProvided := deleteParent
 	var parentID *category.CategoryID
@@ -194,6 +190,10 @@ func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category
 		After:          afterID,
 	})
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, slug); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
