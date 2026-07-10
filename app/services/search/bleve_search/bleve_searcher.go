@@ -321,7 +321,7 @@ func (s *BleveSearcher) Index(ctx context.Context, item datagraph.Item) error {
 		Name:        item.GetName(),
 		Slug:        item.GetSlug(),
 		Description: item.GetDesc(),
-		Content:     item.GetContent().Plaintext(), // We index plaintext only.
+		Content:     searcher.SearchableText(item),
 		CreatedAt:   item.GetCreated().Unix(),
 	}
 
