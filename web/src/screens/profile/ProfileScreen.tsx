@@ -27,6 +27,7 @@ import {
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
+import { slugify } from "@/utils/slugify";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
 
@@ -36,6 +37,8 @@ export function ProfileScreen(props: Props) {
   if (!ready) {
     return <Unready error={error} />;
   }
+
+  const { onChange: onHandleChange, ...handleProps } = form.register("handle");
 
   const { session, profile } = data;
   const { isSelf, isEditing, canViewAccount, signaturesEnabled } = state;
@@ -81,7 +84,11 @@ export function ProfileScreen(props: Props) {
                       px="2"
                       borderTop="none"
                       borderTopRadius="none"
-                      {...form.register("handle")}
+                      {...handleProps}
+                      onChange={(e) => {
+                        e.target.value = slugify(e.target.value);
+                        onHandleChange(e);
+                      }}
                     />
                   </LStack>
                   <RoleBadgeList roles={profile.roles} />

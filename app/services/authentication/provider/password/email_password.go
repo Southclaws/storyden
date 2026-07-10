@@ -3,6 +3,7 @@ package password
 import (
 	"context"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -33,6 +34,8 @@ func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, pa
 	}
 
 	if h, ok := handle.Get(); ok {
+		h = strings.ToLower(h)
+		handle = opt.New(h)
 		_, exists, err := p.accountQuery.LookupByHandle(ctx, h)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
