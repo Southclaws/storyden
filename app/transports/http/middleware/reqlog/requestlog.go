@@ -2,6 +2,7 @@ package reqlog
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"runtime/debug"
@@ -10,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/servertiming"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
@@ -26,15 +28,41 @@ func New(ins spanner.Builder) *Middleware {
 type withStatus struct {
 	http.ResponseWriter
 	statusCode int
+	wrote      bool
+	beforeSend func(http.Header)
 }
 
 func (w *withStatus) Unwrap() http.ResponseWriter {
 	return w.ResponseWriter
 }
 
-func (lrw *withStatus) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
+func (w *withStatus) WriteHeader(code int) {
+	if w.wrote {
+		return
+	}
+	w.wrote = true
+	w.statusCode = code
+	if w.beforeSend != nil {
+		w.beforeSend(w.Header())
+	}
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *withStatus) Write(p []byte) (int, error) {
+	if !w.wrote {
+		w.WriteHeader(http.StatusOK)
+	}
+	return w.ResponseWriter.Write(p)
+}
+
+func (w *withStatus) ReadFrom(r io.Reader) (int64, error) {
+	if !w.wrote {
+		w.WriteHeader(http.StatusOK)
+	}
+	if rf, ok := w.ResponseWriter.(io.ReaderFrom); ok {
+		return rf.ReadFrom(r)
+	}
+	return io.Copy(w.ResponseWriter, r)
 }
 
 func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
@@ -46,8 +74,6 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 			// log entries should be in the form "GET /a/b/c".
 			title := r.Method + " " + r.URL.Path
-
-			wr := &withStatus{ResponseWriter: w}
 			clientAddress := reqinfo.GetClientAddress(r.Context())
 			if clientAddress == "" {
 				clientAddress = r.RemoteAddr
@@ -62,7 +88,25 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 			)
 			defer span.End()
 
+			collector := servertiming.NewCollector()
+			ctx = servertiming.WithCollector(ctx, collector)
+
+			wr := &withStatus{
+				ResponseWriter: w,
+				beforeSend: func(h http.Header) {
+					if value := collector.HeaderValue(); value != "" {
+						h.Set("Server-Timing", value)
+					}
+				},
+			}
+
 			defer func() {
+				if !wr.wrote {
+					if value := collector.HeaderValue(); value != "" {
+						wr.Header().Set("Server-Timing", value)
+					}
+				}
+
 				span.Annotate(
 					kv.Duration("duration", time.Since(start)),
 					kv.Int("http.response.status_code", wr.statusCode),
