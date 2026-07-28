@@ -297,6 +297,8 @@ type Config struct {
 	KeycloakClientSecret string `envconfig:"OAUTH_KEYCLOAK_CLIENT_SECRET"`
 	// The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
 	KeycloakIssuerURL url.URL `envconfig:"OAUTH_KEYCLOAK_ISSUER_URL"`
+	// The display name shown for the Keycloak login button.
+	KeycloakDisplayName string `default:"Keycloak" envconfig:"OAUTH_KEYCLOAK_DISPLAY_NAME"`
 	// Enable Storyden's built-in OAuth2/OIDC authorization server endpoints.
 	OAuthEnabled bool `envconfig:"OAUTH_ENABLED"`
 	// Access token lifetime for Storyden OAuth tokens.

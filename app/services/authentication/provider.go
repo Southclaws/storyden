@@ -21,6 +21,12 @@ type Provider interface {
 	Token() authentication.TokenType
 }
 
+// DisplayNamer is implemented by providers that expose a configurable,
+// human-readable name, overriding the default name derived from Service().
+type DisplayNamer interface {
+	DisplayName() string
+}
+
 type OAuthProvider interface {
 	// Link will, for providers that support it, provide a URL to a third-party
 	// authenticator. OAuth providers use this to start the authentication flow.

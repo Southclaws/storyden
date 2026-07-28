@@ -49,6 +49,7 @@ func New(
 				Enabled:      cfg.KeycloakEnabled,
 				ClientID:     cfg.KeycloakClientID,
 				ClientSecret: cfg.KeycloakClientSecret,
+				DisplayName:  cfg.KeycloakDisplayName,
 			},
 		}, nil
 	}
@@ -69,6 +70,7 @@ func New(
 			Enabled:      cfg.KeycloakEnabled,
 			ClientID:     cfg.KeycloakClientID,
 			ClientSecret: cfg.KeycloakClientSecret,
+			DisplayName:  cfg.KeycloakDisplayName,
 		},
 		register: register,
 		ed:       ed,
@@ -82,6 +84,15 @@ func (p *Provider) Service() authentication.Service { return service }
 
 // Token returns the token type used by this provider (always OAuth).
 func (p *Provider) Token() authentication.TokenType { return tokenType }
+
+// DisplayName returns the human-readable name to show for this provider,
+// falling back to "Keycloak" when no custom display name is configured.
+func (p *Provider) DisplayName() string {
+	if p.config.DisplayName == "" {
+		return "Keycloak"
+	}
+	return p.config.DisplayName
+}
 
 // Enabled reports whether the provider is enabled via config.
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
