@@ -1,0 +1,1718 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/opencli-dev/opencli/main/schema/opencli.schema.json
+$schema: https://raw.githubusercontent.com/opencli-dev/opencli/main/schema/opencli.schema.json
+
+# OpenCLI specification for `sd` (cmd/sd)
+
+opencli: "0.1.0"
+
+info:
+  title: sd
+  version: "0.1.0"
+  description: Command-line interface for working with Storyden instances.
+  longDescription: |
+    The **sd** command-line tool provides an interface for working with Storyden
+    instances. Authenticate against an instance's public web/API address with
+    `sd auth login`, then read and write nodes, threads, and other content.
+  homepage: https://github.com/Southclaws/storyden
+  documentationUrl: https://docs.storyden.org/cli
+  binaryName: sd
+  contact:
+    name: Storyden
+    url: https://storyden.org
+  license:
+    name: MPL-2.0
+    url: https://www.mozilla.org/en-US/MPL/2.0/
+
+exitCodes:
+  - code: 0
+    label: OK
+    description: The command completed successfully.
+  - code: 1
+    label: Error
+    description: A generic runtime error occurred.
+  - code: 2
+    label: NotFound
+    description: The requested resource did not exist.
+  - code: 4
+    label: Unauthorized
+    description: The instance rejected the request as unauthenticated or forbidden; run `sd auth login` again.
+
+commands:
+  - name: auth
+    description: Authenticate with Storyden instances.
+    tags: [auth, security]
+    commands:
+      - name: login
+        operationId: authLogin
+        description: Log in to a Storyden instance.
+        longDescription: |
+          Authenticate against an instance's public web/API address. With no
+          URL, either reuses the current context's endpoint or prompts for one
+          interactively. Defaults to an interactive OAuth device-code flow;
+          pass `--access-key` (or `--access-key-stdin`) to authenticate with a
+          static access key instead.
+        arguments:
+          - name: STORYDEN_API_URL
+            description: The instance's public web/API address. Prompted for interactively if omitted.
+            format: uri
+            required: false
+        flags:
+          - name: auth-storage
+            description: Where to store credentials.
+            choices: [auto, credential-store, file]
+            default: auto
+          - name: access-key
+            description: Authenticate with a static access key instead of the OAuth device flow.
+            type: boolean
+          - name: access-key-stdin
+            description: Like --access-key, but read the key from stdin.
+            type: boolean
+        stdin:
+          description: The access key, when --access-key-stdin is set.
+          format: text
+        examples:
+          - command: sd auth login https://demo.storyden.org
+            description: Log in interactively via OAuth device flow.
+          - command: sd auth login https://demo.storyden.org --access-key
+            description: Log in with an access key (prompted).
+
+      - name: remove
+        operationId: authRemove
+        description: Remove a Storyden auth context.
+        arguments:
+          - $ref: "#/components/arguments/context-name"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: The named context does not exist, or no contexts are configured at all.
+
+      - name: switch
+        operationId: authSwitch
+        description: Switch the active Storyden auth context.
+        arguments:
+          - $ref: "#/components/arguments/context-name"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: The named context does not exist, or no contexts are configured at all.
+
+  - name: config
+    description: Inspect and manage sd configuration.
+    commands:
+      - name: path
+        operationId: configPath
+        description: Print the sd config file path.
+
+  - name: info
+    operationId: info
+    description: Show basic information about the current Storyden instance.
+    flags:
+      - name: format
+        description: Output format.
+        choices: [plain, json]
+        default: plain
+    output:
+      formatFlag: format
+      formats:
+        - format: plain
+          default: true
+          description: Styled terminal summary of the instance.
+        - format: json
+          description: Instance info as JSON.
+          schema:
+            $ref: "#/components/schemas/InstanceInfo"
+    commands:
+      - name: metadata
+        operationId: infoMetadata
+        description: Show raw instance metadata as JSON.
+        output:
+          formats:
+            - format: json
+              default: true
+              description: The instance's raw metadata object.
+              schema:
+                $ref: "#/components/schemas/Metadata"
+
+  - name: search
+    operationId: search
+    description: Search all Storyden content.
+    arguments:
+      - name: QUERY
+        description: The search query.
+    flags:
+      - name: kind
+        description: "Filter by datagraph item kind (repeatable, comma-separated): post, thread, reply, node, collection, profile, event."
+        repeatable: true
+        splitOnComma: true
+        choices: [post, thread, reply, node, collection, profile, event]
+      - name: authors
+        description: Filter by author account IDs or handles (repeatable, comma-separated).
+        repeatable: true
+        splitOnComma: true
+      - name: categories
+        description: Filter by category slugs (repeatable, comma-separated).
+        repeatable: true
+        splitOnComma: true
+      - name: tags
+        description: Filter by tag names (repeatable, comma-separated).
+        repeatable: true
+        splitOnComma: true
+      - $ref: "#/components/flags/page"
+      - $ref: "#/components/flags/limit"
+      - $ref: "#/components/flags/all"
+      - $ref: "#/components/flags/list-format"
+      - $ref: "#/components/flags/output-profile"
+    examples:
+      - command: sd search "design system"
+      - command: sd search "release notes" --kind thread,post
+      - command: sd search widget --authors southclaws --categories hardware
+      - command: sd search widget --all --format jsonl
+    output:
+      formatFlag: format
+      formats:
+        - format: auto
+          default: true
+          description: Plain table, easy to read in terminals and scripts.
+        - format: plain
+          description: Plain, one-record-per-line tabular text.
+        - format: json
+          description: A single page of results (or, with --all, every result as a bare array).
+          schema:
+            $ref: "#/components/schemas/SearchResult"
+        - format: jsonl
+          description: One result item per line as newline-delimited JSON.
+          schema:
+            $ref: "#/components/schemas/DatagraphItem"
+
+  - name: node
+    aliases: [nodes, n]
+    description: Work with Storyden nodes (pages).
+    tags: [nodes]
+    commands:
+      - name: list
+        operationId: nodeList
+        description: List Storyden nodes.
+        flags:
+          - $ref: "#/components/flags/all"
+          - $ref: "#/components/flags/page"
+          - $ref: "#/components/flags/limit"
+          - name: depth
+            description: Maximum child depth to return (0 = root nodes only).
+            type: integer
+            default: 0
+          - name: parent
+            description: Limit to children of this node (accepts slug; resolves to node id automatically).
+          - name: node-id
+            description: Limit to descendants of this node id.
+          - name: root-only
+            description: Filter to nodes with no parent.
+            type: boolean
+          - name: has-link
+            description: Filter to nodes that have a link attached.
+            type: boolean
+          - name: no-link
+            description: Filter to nodes that have no link attached.
+            type: boolean
+          - name: link-domain
+            description: Filter to nodes whose link.domain matches (repeatable, comma-separated).
+            repeatable: true
+            splitOnComma: true
+          - name: link-scheme
+            description: Filter to nodes whose link.url uses this scheme.
+            choices: [http, https]
+          - name: link-url-contains
+            description: Filter to nodes whose link.url contains this substring.
+          - name: name-contains
+            description: Filter to nodes whose name contains this substring (case-insensitive).
+          - name: owner-handle
+            description: Filter to nodes owned by this account handle.
+          - name: visibility
+            description: Filter by visibility (repeatable, comma-separated).
+            repeatable: true
+            splitOnComma: true
+            choices: [draft, review, published, unlisted]
+          - name: search
+            short: q
+            description: Server-side full-text search query.
+          - name: node-format
+            description: "Server response shape: flat (every match) or tree (roots with nested children)."
+            choices: [flat, tree]
+            default: flat
+          - $ref: "#/components/flags/list-format"
+          - $ref: "#/components/flags/output-profile"
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [has-link, no-link]
+            description: A node either has a link filter applied or excluded, not both.
+        examples:
+          - command: sd node list
+          - command: sd node list --all --format jsonl
+          - command: sd node list --link-domain youtube.com,youtu.be
+          - command: sd node list --format json > nodes.json
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: Plain table, easy to read in terminals and scripts.
+            - format: plain
+              description: Plain, one-record-per-line tabular text for grep/awk.
+            - format: json
+              description: A single page of results (or, with --all, every result as a bare array).
+              schema:
+                $ref: "#/components/schemas/NodeListResult"
+            - format: jsonl
+              description: One node per line as newline-delimited JSON; pairs with --all.
+              schema:
+                $ref: "#/components/schemas/NodeWithChildren"
+
+      - name: get
+        operationId: nodeGet
+        aliases: [show]
+        description: Get a node by its slug.
+        arguments:
+          - $ref: "#/components/arguments/node-slug"
+        flags:
+          - $ref: "#/components/flags/get-format"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No node exists with the given slug.
+        output:
+          formatFlag: format
+          formats:
+            - format: markdown
+              default: true
+              description: Rich terminal rendering of the node.
+            - format: json
+              description: The full node.
+              schema:
+                $ref: "#/components/schemas/NodeWithChildren"
+            - format: yaml
+              description: The full node (same shape as json).
+              schema:
+                $ref: "#/components/schemas/NodeWithChildren"
+
+      - name: create
+        operationId: nodeCreate
+        description: Create a new node.
+        longDescription: |
+          Create a node from inline content or a file. Content may be HTML, or
+          Markdown that is converted to HTML when --markdown is set.
+        flags:
+          - name: name
+            description: Node name.
+            required: true
+          - name: slug
+            description: Node slug (auto-generated if not provided).
+          - name: description
+            description: Node description.
+          - name: content
+            description: Node content as HTML (or Markdown with --markdown).
+          - name: content-file
+            description: Read content from a file (use - for stdin).
+            type: file
+          - name: markdown
+            description: Treat content as Markdown and convert it to HTML.
+            type: boolean
+          - name: url
+            description: External URL to attach as the node's link.
+            format: uri
+          - name: parent
+            description: Parent node slug.
+          - name: tags
+            description: Tags to attach (repeatable, comma-separated).
+            repeatable: true
+            splitOnComma: true
+          - name: visibility
+            description: Node visibility.
+            choices: [draft, review, published, unlisted]
+          - name: hide-child-tree
+            description: Hide this node's children from tree views.
+            type: boolean
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [content, content-file]
+            description: Supply content inline or from a file, not both.
+        stdin:
+          description: Node content, used when --content-file is '-'.
+          format: text
+        examples:
+          - command: sd node create --name "My Page"
+          - command: sd node create --name "Notes" --markdown --content "# Title"
+          - command: sd node create --name "Getting Started" --parent docs
+          - command: sd node create --name "Docs" --content-file page.html
+
+      - name: update
+        operationId: nodeUpdate
+        description: Update an existing node.
+        longDescription: |
+          Every flag is a partial update: only the fields whose flags are set
+          are changed. --json accepts a full or partial NodeMutableProps
+          object instead (mutually exclusive with the discrete field flags),
+          which can also reach fields with no dedicated flag (meta, asset
+          ids, primary image asset id).
+        arguments:
+          - $ref: "#/components/arguments/node-slug"
+        flags:
+          - name: name
+            description: New node name.
+          - name: new-slug
+            description: New slug to rename the node to.
+          - name: description
+            description: New node description.
+          - name: content
+            description: New node content as HTML (or Markdown with --markdown).
+          - name: content-file
+            description: Read new content from a file (use - for stdin).
+            type: file
+          - name: markdown
+            description: Treat --content/--content-file as Markdown and convert it to HTML.
+            type: boolean
+          - name: url
+            description: External URL to attach as the node's link.
+            format: uri
+          - name: clear-url
+            description: Remove the node's attached link.
+            type: boolean
+          - name: hide-child-tree
+            description: Hide this node's children from tree views.
+            type: boolean
+            trackChanged: true
+          - name: tags
+            description: Replace the node's tags (repeatable, comma-separated).
+            repeatable: true
+            splitOnComma: true
+          - name: json
+            description: A full or partial NodeMutableProps JSON body (use - for stdin), instead of discrete field flags.
+            type: file
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [content, content-file]
+            description: Supply content inline or from a file, not both.
+          - type: mutuallyExclusive
+            flags: [url, clear-url]
+            description: Set a new link or clear the existing one, not both.
+          - type: mutuallyExclusive
+            flags: [json, name]
+            description: Use --json for a raw partial update, or discrete field flags, not both.
+        stdin:
+          description: New content, used when --content-file is '-', or the JSON body when --json is '-'.
+          format: text
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No node exists with the given slug.
+
+      - name: delete
+        operationId: nodeDelete
+        aliases: [rm]
+        description: Delete one or more nodes.
+        longDescription: |
+          Deletes each named node. Any children of a deleted node are
+          re-parented to --target (or become root nodes if --target is
+          unset).
+        arguments:
+          - name: SLUG
+            description: Slugs of the nodes to delete.
+            placeholder: slug
+            variadic: true
+        flags:
+          - name: target
+            description: Target node slug to re-parent orphaned children.
+          - $ref: "#/components/flags/from-stdin"
+          - $ref: "#/components/flags/dry-run"
+          - $ref: "#/components/flags/batch-format"
+        stdin:
+          description: Node identifiers, one per line, when --from-stdin is set.
+          format: text
+        output:
+          formatFlag: format
+          formats:
+            - format: plain
+              default: true
+              description: One ok/fail line per node, plus a summary.
+            - format: jsonl
+              description: One BatchResult per line as newline-delimited JSON.
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+
+      - name: move
+        operationId: nodeMove
+        description: Move one or more nodes in the hierarchy.
+        arguments:
+          - name: SLUG
+            description: Slugs of the nodes to move.
+            placeholder: slug
+            variadic: true
+        flags:
+          - name: parent
+            description: New parent node slug.
+          - name: to-root
+            description: Move the node(s) to become root nodes.
+            type: boolean
+          - name: before
+            description: Position before this sibling slug (only valid with a single target node).
+          - name: after
+            description: Position after this sibling slug (only valid with a single target node).
+          - $ref: "#/components/flags/from-stdin"
+          - $ref: "#/components/flags/dry-run"
+          - $ref: "#/components/flags/batch-format"
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [parent, to-root]
+            description: Move under a new parent or to the root, not both.
+          - type: mutuallyExclusive
+            flags: [before, after]
+            description: Position before or after a sibling, not both.
+        stdin:
+          description: Node identifiers, one per line, when --from-stdin is set.
+          format: text
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: One or more of the named nodes did not exist.
+        output:
+          formatFlag: format
+          formats:
+            - format: plain
+              default: true
+              description: One ok/fail line per node, plus a summary.
+            - format: jsonl
+              description: One BatchResult per line as newline-delimited JSON.
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+
+      - name: visibility
+        operationId: nodeVisibility
+        description: Update node visibility.
+        arguments:
+          - name: SLUG
+            description: Slugs of the nodes to update.
+            placeholder: slug
+            variadic: true
+        flags:
+          - name: visibility
+            description: The visibility to set.
+            choices: [draft, review, published, unlisted]
+            required: true
+          - $ref: "#/components/flags/from-stdin"
+          - $ref: "#/components/flags/dry-run"
+          - $ref: "#/components/flags/batch-format"
+        stdin:
+          description: Node identifiers, one per line, when --from-stdin is set.
+          format: text
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: One or more of the named nodes did not exist.
+        output:
+          formatFlag: format
+          formats:
+            - format: plain
+              default: true
+              description: One ok/fail line per node, plus a summary.
+            - format: jsonl
+              description: One BatchResult per line as newline-delimited JSON.
+              schema:
+                $ref: "#/components/schemas/BatchResult"
+
+      - name: children
+        operationId: nodeChildren
+        description: List children of a node.
+        arguments:
+          - $ref: "#/components/arguments/node-slug"
+        flags:
+          - $ref: "#/components/flags/all"
+          - $ref: "#/components/flags/page"
+          - $ref: "#/components/flags/limit"
+          - $ref: "#/components/flags/list-format"
+          - $ref: "#/components/flags/output-profile"
+          - name: sort
+            description: Server-side sort order for children.
+          - name: link-domain
+            repeatable: true
+            splitOnComma: true
+            description: Filter to nodes whose link.domain matches (repeatable, comma-separated; applied client-side after fetching).
+          - name: link-url-contains
+            description: Filter to nodes whose link.url contains this substring (client-side).
+          - name: link-scheme
+            choices: [http, https]
+            description: Filter to nodes whose link.url uses this scheme (client-side).
+          - name: has-link
+            type: boolean
+            description: Filter to nodes that have a link attached (client-side).
+          - name: no-link
+            type: boolean
+            description: Filter to nodes that have no link attached (client-side).
+          - name: root-only
+            type: boolean
+            description: Filter to nodes with no parent (client-side).
+          - name: owner-handle
+            description: Filter to nodes owned by this account handle (client-side).
+          - name: name-contains
+            description: Filter to nodes whose name contains this substring, case-insensitive (client-side).
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [has-link, no-link]
+            description: A node either has a link filter applied or excluded, not both.
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No node exists with the given slug.
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: Plain table, easy to read in terminals and scripts.
+            - format: plain
+              description: Plain, one-record-per-line tabular text.
+            - format: json
+              description: A single page of results (or, with --all, every result as a bare array).
+              schema:
+                $ref: "#/components/schemas/NodeListResult"
+            - format: jsonl
+              description: One node per line as newline-delimited JSON; pairs with --all.
+              schema:
+                $ref: "#/components/schemas/NodeWithChildren"
+
+      - name: open
+        operationId: nodeOpen
+        description: Print or launch a node's attached link URL.
+        arguments:
+          - $ref: "#/components/arguments/node-slug"
+        flags:
+          - name: launch
+            description: Open the URL in the system's default browser.
+            type: boolean
+          - name: force
+            description: Launch even when stdout is not a terminal.
+            type: boolean
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No node exists with the given slug, or it has no attached link.
+
+      - name: search
+        operationId: nodeSearch
+        description: Full-text search for nodes.
+        arguments:
+          - name: QUERY
+            description: The search query.
+        flags:
+          - $ref: "#/components/flags/all"
+          - $ref: "#/components/flags/page"
+          - $ref: "#/components/flags/limit"
+          - $ref: "#/components/flags/list-format"
+          - $ref: "#/components/flags/output-profile"
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: Plain table, easy to read in terminals and scripts.
+            - format: plain
+              description: Plain, one-record-per-line tabular text.
+            - format: json
+              description: A single page of results (or, with --all, every result as a bare array). Note this returns the lighter Node shape, without children/properties.
+              schema:
+                $ref: "#/components/schemas/SearchNodeListResult"
+            - format: jsonl
+              description: One node per line as newline-delimited JSON; pairs with --all.
+              schema:
+                $ref: "#/components/schemas/Node"
+
+      - name: tree
+        operationId: nodeTree
+        description: Show nodes as a tree.
+        arguments:
+          - name: SLUG
+            description: Root of the subtree to display. The whole tree from the root if omitted.
+            placeholder: slug
+            required: false
+        flags:
+          - name: depth
+            description: Maximum depth to display.
+            type: integer
+            default: 10
+          - name: visibility
+            description: Server-side filter by visibility (repeatable, comma-separated).
+            repeatable: true
+            splitOnComma: true
+            choices: [draft, review, published, unlisted]
+          - name: link-domain
+            repeatable: true
+            splitOnComma: true
+            description: Prune to nodes whose link.domain matches, keeping ancestors of any match (repeatable, comma-separated; client-side).
+          - name: link-url-contains
+            description: Prune to nodes whose link.url contains this substring (client-side).
+          - name: link-scheme
+            choices: [http, https]
+            description: Prune to nodes whose link.url uses this scheme (client-side).
+          - name: has-link
+            type: boolean
+            description: Prune to nodes that have a link attached (client-side).
+          - name: no-link
+            type: boolean
+            description: Prune to nodes that have no link attached (client-side).
+          - name: root-only
+            type: boolean
+            description: Prune to nodes with no parent (client-side).
+          - name: owner-handle
+            description: Prune to nodes owned by this account handle (client-side).
+          - name: name-contains
+            description: Prune to nodes whose name contains this substring, case-insensitive (client-side).
+          - name: format
+            description: Output format.
+            choices: [auto, plain, json]
+            default: auto
+        flagGroups:
+          - type: mutuallyExclusive
+            flags: [has-link, no-link]
+            description: A node either has a link filter applied or excluded, not both.
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: ASCII tree, connectors drawn for terminals and scripts alike.
+            - format: plain
+              description: Same ASCII tree as auto (kept as a distinct value for scripting consistency with other list commands).
+            - format: json
+              description: The tree as nested JSON.
+              schema:
+                $ref: "#/components/schemas/NodeListResult"
+
+      - name: meta
+        description: Get or set raw node metadata.
+        commands:
+          - name: get
+            operationId: nodeMetaGet
+            description: Get node metadata as JSON.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No node exists with the given slug.
+            output:
+              formats:
+                - format: json
+                  default: true
+                  description: The node's metadata object.
+                  schema:
+                    $ref: "#/components/schemas/Metadata"
+
+          - name: set
+            operationId: nodeMetaSet
+            description: Replace node metadata with a JSON object.
+            longDescription: |
+              This is a full replace, not a merge. The object may be given
+              inline, via --file, or on stdin — supply exactly one of the
+              JSON argument or --file/stdin.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - name: JSON
+                description: The metadata object as a JSON string. Reads --file or stdin if omitted.
+                required: false
+            flags:
+              - name: file
+                description: Path to a JSON file containing the metadata object (use - for stdin).
+                type: file
+            stdin:
+              description: The metadata object, when neither the inline argument nor --file is given.
+              format: json
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No node exists with the given slug.
+
+      - name: assets
+        description: Upload, download, attach, and remove node assets.
+        commands:
+          - name: upload
+            operationId: nodeAssetsUpload
+            description: Upload a local file and attach it to a node.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - name: FILE
+                description: Path to the local file to upload.
+                type: file
+            flags:
+              - name: name
+                description: Filename to store the asset as (defaults to the local file's basename).
+              - name: primary
+                description: Set the uploaded asset as the node's primary image.
+                type: boolean
+
+          - name: add
+            operationId: nodeAssetsAdd
+            description: Attach an already-uploaded asset to a node.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - $ref: "#/components/arguments/asset-id"
+            flags:
+              - name: primary
+                description: Set the asset as the node's primary image.
+                type: boolean
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: The node or the asset did not exist.
+
+          - name: remove
+            operationId: nodeAssetsRemove
+            description: Detach an asset from a node.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - $ref: "#/components/arguments/asset-id"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: The node or the asset did not exist.
+
+          - name: download
+            operationId: nodeAssetsDownload
+            description: Download an asset attached to a node.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - name: ASSET
+                description: Asset ID, filename, or path — matched against the node's attached assets.
+            flags:
+              - $ref: "#/components/flags/output-file"
+              - $ref: "#/components/flags/force"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: The node did not exist, or no attached asset matched the given selector.
+
+          - name: primary
+            description: Set, clear, or download the node's primary image.
+            commands:
+              - name: set
+                operationId: nodeAssetsPrimarySet
+                description: Set the node's primary image to an already-attached asset.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                  - $ref: "#/components/arguments/asset-id"
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: The node or the asset did not exist.
+
+              - name: clear
+                operationId: nodeAssetsPrimaryClear
+                description: Clear the node's primary image.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: No node exists with the given slug.
+
+              - name: download
+                operationId: nodeAssetsPrimaryDownload
+                description: Download the node's primary image.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                flags:
+                  - $ref: "#/components/flags/output-file"
+                  - $ref: "#/components/flags/force"
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: No node exists with the given slug, or it has no primary image.
+
+      - name: properties
+        description: Manage node properties.
+        commands:
+          - name: get
+            operationId: nodePropertiesGet
+            description: Get property values for a node.
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+            flags:
+              - $ref: "#/components/flags/properties-format"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No node exists with the given slug.
+            output:
+              formatFlag: format
+              formats:
+                - format: json
+                  default: true
+                  description: The node's property values.
+                  schema:
+                    $ref: "#/components/schemas/PropertyList"
+                - format: yaml
+                  description: The node's property values (same shape as json).
+                  schema:
+                    $ref: "#/components/schemas/PropertyList"
+
+          - name: set
+            operationId: nodePropertiesSet
+            description: Set property values for a node.
+            longDescription: |
+              Each TOKEN is `name=value` to set an existing property (its
+              type is looked up automatically), or `name:type=value` to
+              create a new property (type is one of text, number, boolean,
+              timestamp).
+            arguments:
+              - $ref: "#/components/arguments/node-slug"
+              - name: TOKEN
+                description: "A name=value or name:type=value property assignment."
+                variadic: true
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No node exists with the given slug.
+
+          - name: schema
+            description: Manage node property schemas.
+            commands:
+              - name: get
+                operationId: nodePropertiesSchemaGet
+                description: Get the property schema shared by a node and its siblings.
+                longDescription: |
+                  Reads `<slug>`'s parent's child-property-schema — i.e. the
+                  schema that applies to `<slug>` and every other child of
+                  the same parent.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                flags:
+                  - $ref: "#/components/flags/properties-format"
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: No node exists with the given slug.
+                output:
+                  formatFlag: format
+                  formats:
+                    - format: json
+                      default: true
+                      description: The property schema.
+                      schema:
+                        $ref: "#/components/schemas/PropertySchemaList"
+                    - format: yaml
+                      description: The property schema (same shape as json).
+                      schema:
+                        $ref: "#/components/schemas/PropertySchemaList"
+
+              - name: set
+                operationId: nodePropertiesSchemaSet
+                description: Set the property schema shared by a node and its siblings.
+                longDescription: |
+                  Sets `<slug>`'s parent's child-property-schema — i.e. the
+                  schema that will then apply to `<slug>` and every other
+                  child of the same parent. Each TOKEN is
+                  `field:type:sort`, where type is one of text, number,
+                  boolean, timestamp and sort is asc or desc.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                  - name: TOKEN
+                    description: "A field:type:sort schema field definition."
+                    variadic: true
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: No node exists with the given slug.
+
+              - name: children
+                operationId: nodePropertiesSchemaChildren
+                description: Set the property schema for a node's children.
+                longDescription: |
+                  The complement of `schema set`: sets the schema that will
+                  apply to `<slug>`'s own children (rather than its
+                  siblings). Each TOKEN is `field:type:sort`, same syntax as
+                  `schema set`.
+                arguments:
+                  - $ref: "#/components/arguments/node-slug"
+                  - name: TOKEN
+                    description: "A field:type:sort schema field definition."
+                    variadic: true
+                exitCodes:
+                  - code: 2
+                    label: NotFound
+                    description: No node exists with the given slug.
+
+  - name: plugin
+    description: Build, develop, and manage Storyden plugins.
+    commands:
+      - name: get
+        operationId: pluginGet
+        aliases: [status]
+        description: Get plugin status and manifest information.
+        arguments:
+          - $ref: "#/components/arguments/plugin-instance-id"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No plugin instance exists with the given ID.
+        output:
+          formats:
+            - format: json
+              default: true
+              description: The plugin's status and manifest.
+              schema:
+                $ref: "#/components/schemas/Plugin"
+
+      - name: list
+        operationId: pluginList
+        description: List plugins installed on the current instance.
+        flags:
+          - $ref: "#/components/flags/list-format"
+          - $ref: "#/components/flags/output-profile"
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: Plain table, easy to read in terminals and scripts.
+            - format: plain
+              description: Plain, one-record-per-line tabular text.
+            - format: json
+              description: Every installed plugin as a bare array (this command has no pagination).
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Plugin"
+            - format: jsonl
+              description: One plugin per line as newline-delimited JSON.
+              schema:
+                $ref: "#/components/schemas/Plugin"
+
+      - name: delete
+        operationId: pluginDelete
+        description: Delete a plugin from the current instance.
+        arguments:
+          - $ref: "#/components/arguments/plugin-instance-id"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No plugin instance exists with the given ID.
+
+      - name: activate
+        operationId: pluginActivate
+        description: Start a supervised plugin.
+        arguments:
+          - $ref: "#/components/arguments/plugin-instance-id"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No plugin instance exists with the given ID.
+        output:
+          formats:
+            - format: json
+              default: true
+              description: The plugin's updated status.
+              schema:
+                $ref: "#/components/schemas/Plugin"
+
+      - name: deactivate
+        operationId: pluginDeactivate
+        description: Stop a supervised plugin.
+        arguments:
+          - $ref: "#/components/arguments/plugin-instance-id"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No plugin instance exists with the given ID.
+        output:
+          formats:
+            - format: json
+              default: true
+              description: The plugin's updated status.
+              schema:
+                $ref: "#/components/schemas/Plugin"
+
+      - name: logs
+        operationId: pluginLogs
+        description: Stream supervised plugin logs.
+        longDescription: |
+          Streams log lines until the plugin's log stream closes or the
+          command is interrupted. There is currently no --follow/--tail/
+          --since — this always streams from the beginning, unbounded.
+        arguments:
+          - $ref: "#/components/arguments/plugin-instance-id"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No plugin instance exists with the given ID.
+
+      - name: token
+        description: Manage external plugin RPC tokens.
+        commands:
+          - name: rotate
+            operationId: pluginTokenRotate
+            description: Regenerate and print an external plugin RPC token.
+            longDescription: |
+              The new token is shown once, in plain text, and is not
+              recoverable afterwards — save it immediately.
+            arguments:
+              - $ref: "#/components/arguments/plugin-instance-id"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No plugin instance exists with the given ID.
+
+      - name: dev
+        description: Create, run, package, validate, and install plugin projects.
+        commands:
+          - name: new
+            operationId: pluginDevNew
+            description: Create a minimal plugin project.
+            arguments:
+              - name: DIRECTORY
+                description: Directory to create the project in.
+                type: path
+            flags:
+              - name: command
+                description: Command used to run the plugin during dev (defaults to ./<directory-name>).
+              - name: author
+                description: Plugin author slug (defaults to an environment/git-derived value).
+              - $ref: "#/components/flags/force"
+
+          - name: run
+            operationId: pluginDevRun
+            description: Run a local plugin with STORYDEN_RPC_URL set from the current instance.
+            longDescription: |
+              With no COMMAND, runs the command from the plugin's manifest.
+              Pass a command (conventionally after --) to override it.
+            arguments:
+              - name: COMMAND
+                description: Command and arguments to run instead of the manifest's own command, conventionally after --.
+                required: false
+                variadic: true
+            flags:
+              - $ref: "#/components/flags/manifest"
+              - name: instance-id
+                description: Existing plugin installation ID to update instead of matching by manifest id.
+              - name: no-update
+                description: Skip updating the existing external plugin manifest before running.
+                type: boolean
+
+          - name: package
+            operationId: pluginDevPackage
+            description: Create a supervised plugin package zip.
+            flags:
+              - $ref: "#/components/flags/dir"
+              - $ref: "#/components/flags/manifest"
+              - $ref: "#/components/flags/output-file"
+              - $ref: "#/components/flags/force"
+
+          - name: validate
+            operationId: pluginDevValidate
+            description: Validate a plugin manifest and supervised package.
+            flags:
+              - $ref: "#/components/flags/dir"
+              - $ref: "#/components/flags/manifest"
+
+          - name: install
+            operationId: pluginDevInstall
+            description: Install or update a local plugin as supervised.
+            flags:
+              - $ref: "#/components/flags/dir"
+              - $ref: "#/components/flags/manifest"
+
+          - name: download
+            operationId: pluginDevDownload
+            description: Download an installed plugin package.
+            arguments:
+              - $ref: "#/components/arguments/plugin-instance-id"
+            flags:
+              - $ref: "#/components/flags/dir"
+              - name: no-unzip
+                description: Save the zip without extracting it.
+                type: boolean
+              - $ref: "#/components/flags/force"
+            exitCodes:
+              - code: 2
+                label: NotFound
+                description: No plugin instance exists with the given ID.
+
+          - name: symbols
+            description: Discover Go packages and symbols in a plugin project.
+            commands:
+              - name: packages
+                operationId: pluginDevSymbolsPackages
+                description: List Go packages in a plugin project.
+                flags:
+                  - $ref: "#/components/flags/dir"
+                  - name: pattern
+                    description: Go package pattern to scan.
+                    default: "./..."
+                  - name: include-deps
+                    description: Include third-party dependency packages.
+                    type: boolean
+                  - $ref: "#/components/flags/limit"
+                output:
+                  formats:
+                    - format: json
+                      default: true
+                      description: Discovered packages.
+                      schema:
+                        type: object
+                        description: Plugin-tooling-internal result shape (not part of the public Storyden API).
+
+              - name: package
+                operationId: pluginDevSymbolsPackage
+                description: List exported symbols in a Go package.
+                arguments:
+                  - name: IMPORT_PATH
+                    description: The Go package's import path.
+                flags:
+                  - $ref: "#/components/flags/dir"
+                  - name: include-unexported
+                    description: Include unexported symbols.
+                    type: boolean
+                  - $ref: "#/components/flags/limit"
+                output:
+                  formats:
+                    - format: json
+                      default: true
+                      description: Discovered symbols.
+                      schema:
+                        type: object
+                        description: Plugin-tooling-internal result shape (not part of the public Storyden API).
+
+              - name: detail
+                operationId: pluginDevSymbolsDetail
+                description: Show detail for a single Go symbol.
+                arguments:
+                  - name: IMPORT_PATH
+                    description: The Go package's import path.
+                  - name: SYMBOL
+                    description: The symbol name.
+                flags:
+                  - $ref: "#/components/flags/dir"
+                output:
+                  formats:
+                    - format: json
+                      default: true
+                      description: Symbol detail.
+                      schema:
+                        type: object
+                        description: Plugin-tooling-internal result shape (not part of the public Storyden API).
+
+              - name: search
+                operationId: pluginDevSymbolsSearch
+                description: Search Go symbols in a plugin project.
+                longDescription: |
+                  This searches Go source symbols within a local plugin
+                  project — unrelated to `sd search` (Storyden content) or
+                  `sd node search` (nodes only).
+                arguments:
+                  - name: QUERY
+                    description: The symbol search query.
+                flags:
+                  - $ref: "#/components/flags/dir"
+                  - name: pattern
+                    description: Go package pattern to scan.
+                    default: "./..."
+                  - name: include-deps
+                    description: Include third-party dependency packages.
+                    type: boolean
+                  - name: include-unexported
+                    description: Include unexported symbols.
+                    type: boolean
+                  - $ref: "#/components/flags/limit"
+                output:
+                  formats:
+                    - format: json
+                      default: true
+                      description: Matching symbols.
+                      schema:
+                        type: object
+                        description: Plugin-tooling-internal result shape (not part of the public Storyden API).
+
+  - name: thread
+    description: Work with Storyden threads.
+    commands:
+      - name: get
+        operationId: threadGet
+        description: Get a thread by its mark.
+        arguments:
+          - $ref: "#/components/arguments/thread-mark"
+        flags:
+          - $ref: "#/components/flags/get-format"
+        exitCodes:
+          - code: 2
+            label: NotFound
+            description: No thread exists with the given mark.
+        examples:
+          - command: sd thread get my-thread --format json
+          - command: sd thread get my-thread --format yaml
+        output:
+          formatFlag: format
+          formats:
+            - format: markdown
+              default: true
+              description: Rich terminal rendering of the thread body and metadata.
+            - format: json
+              description: The full thread.
+              schema:
+                $ref: "#/components/schemas/Thread"
+            - format: yaml
+              description: The full thread (same shape as json).
+              schema:
+                $ref: "#/components/schemas/Thread"
+
+      - name: list
+        operationId: threadList
+        description: List recent Storyden threads.
+        flags:
+          - $ref: "#/components/flags/all"
+          - $ref: "#/components/flags/page"
+          - $ref: "#/components/flags/limit"
+          - $ref: "#/components/flags/list-format"
+          - $ref: "#/components/flags/output-profile"
+        examples:
+          - command: sd thread list
+          - command: sd thread list --all --format jsonl
+        output:
+          formatFlag: format
+          formats:
+            - format: auto
+              default: true
+              description: Plain table of recent threads.
+            - format: plain
+              description: Plain, one-record-per-line tabular text.
+            - format: json
+              description: A single page of results (or, with --all, every result as a bare array).
+              schema:
+                $ref: "#/components/schemas/ThreadListResult"
+            - format: jsonl
+              description: One thread per line as newline-delimited JSON.
+              schema:
+                $ref: "#/components/schemas/Thread"
+
+  - name: tui
+    operationId: tui
+    description: Explore Storyden content in an interactive TUI.
+    longDescription: |
+      Launches an interactive terminal explorer. Has no flags or arguments
+      and no machine-readable output — it requires a real terminal.
+
+components:
+  flags:
+    page:
+      name: page
+      description: Page to request.
+      type: integer
+      default: 1
+    limit:
+      name: limit
+      description: Stop after N matches (0 = no limit).
+      type: integer
+      default: 0
+    all:
+      name: all
+      description: Fetch every page, streaming output as it goes.
+      type: boolean
+    from-stdin:
+      name: from-stdin
+      description: Read identifiers from stdin (one per line), appended after any positional arguments.
+      type: boolean
+    dry-run:
+      name: dry-run
+      short: n
+      description: Show the plan without making any changes.
+      type: boolean
+    force:
+      name: force
+      description: Overwrite/proceed without confirmation.
+      type: boolean
+    dir:
+      name: dir
+      description: Plugin project directory.
+      type: path
+      default: "."
+    manifest:
+      name: manifest
+      short: m
+      description: Path to the plugin manifest file.
+      type: file
+      default: manifest.yaml
+    output-file:
+      name: output-file
+      description: Output file path (defaults to a name derived from the source being written).
+
+    # --- shared output-format vocabulary ---
+    list-format:
+      name: format
+      description: "Output format: auto, plain, json, jsonl."
+      choices: [auto, plain, json, jsonl]
+      default: auto
+    get-format:
+      name: format
+      short: f
+      description: Output format.
+      choices: [json, markdown, yaml]
+      default: markdown
+    properties-format:
+      name: format
+      short: f
+      description: Output format.
+      choices: [json, yaml]
+      default: json
+    batch-format:
+      name: format
+      description: Per-item result format.
+      choices: [plain, jsonl]
+      default: plain
+    output-profile:
+      name: output
+      short: o
+      description: "Column profile: default, wide."
+      choices: [default, wide]
+      default: default
+
+  arguments:
+    node-slug:
+      name: SLUG
+      description: The slug identifying the node.
+      placeholder: slug
+    thread-mark:
+      name: THREAD_MARK
+      description: The mark (slug) identifying the thread.
+      placeholder: thread-mark
+    asset-id:
+      name: ASSET_ID
+      description: The asset's ID.
+      placeholder: asset-id
+    plugin-instance-id:
+      name: PLUGIN_INSTANCE_ID
+      description: The plugin instance's ID.
+      placeholder: plugin-instance-id
+    context-name:
+      name: CONTEXT_NAME
+      description: Name of the auth context. Prompts interactively to pick one if omitted.
+      placeholder: context
+      required: false
+
+  schemas:
+    PaginatedResult:
+      type: object
+      description: >-
+        Composed into every paginated list result. These fields are present
+        for a single page; with --all, a command aggregates every page into
+        one bare array and omits them (there is no single "current page").
+      properties:
+        page_size: { type: integer }
+        results: { type: integer }
+        total_pages: { type: integer }
+        current_page: { type: integer }
+        next_page: { type: integer }
+
+    Visibility:
+      type: string
+      enum: [draft, review, published, unlisted]
+
+    ProfileReference:
+      type: object
+      description: A minimal reference to an account.
+      required: [id, handle, name]
+      properties:
+        id: { type: string }
+        handle: { type: string }
+        name: { type: string }
+        roles:
+          type: array
+          items: { type: string }
+
+    Asset:
+      type: object
+      required: [id, filename, path, mime_type, width, height]
+      properties:
+        id: { type: string }
+        filename: { type: string }
+        path:
+          type: string
+          description: The API path of the asset (GET /assets/...).
+        mime_type: { type: string }
+        width: { type: number }
+        height: { type: number }
+
+    LinkReference:
+      type: object
+      required: [url, slug, domain]
+      properties:
+        url: { type: string, format: uri }
+        slug: { type: string }
+        domain: { type: string }
+        title: { type: string }
+        description: { type: string }
+        favicon_image: { $ref: "#/components/schemas/Asset" }
+        primary_image: { $ref: "#/components/schemas/Asset" }
+
+    TagReference:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
+        colour: { type: string }
+
+    Node:
+      type: object
+      description: A node without its children (as returned by search results).
+      required:
+        [
+          id,
+          slug,
+          name,
+          description,
+          owner,
+          visibility,
+          tags,
+          assets,
+          hide_child_tree,
+        ]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        content:
+          type: string
+          description: Rich HTML content.
+        owner: { $ref: "#/components/schemas/ProfileReference" }
+        link: { $ref: "#/components/schemas/LinkReference" }
+        primary_image: { $ref: "#/components/schemas/Asset" }
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/Asset" }
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/TagReference" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
+        hide_child_tree: { type: boolean }
+        current_version_id: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        deletedAt: { type: string, format: date-time }
+
+    NodeWithChildren:
+      type: object
+      description: The full node shape, including children, properties, and child property schema.
+      required: [children, properties, child_property_schema]
+      allOf:
+        - $ref: "#/components/schemas/Node"
+        - type: object
+          properties:
+            properties:
+              $ref: "#/components/schemas/PropertyList"
+            child_property_schema:
+              $ref: "#/components/schemas/PropertySchemaList"
+            children:
+              type: array
+              items: { $ref: "#/components/schemas/NodeWithChildren" }
+
+    NodeListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [nodes]
+          properties:
+            nodes:
+              type: array
+              items: { $ref: "#/components/schemas/NodeWithChildren" }
+
+    SearchNodeListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [nodes]
+          properties:
+            nodes:
+              type: array
+              items: { $ref: "#/components/schemas/Node" }
+
+    Property:
+      type: object
+      required: [fid, name, type, value, sort]
+      properties:
+        fid: { type: string }
+        name: { type: string }
+        type:
+          type: string
+          enum: [text, number, timestamp, boolean]
+        value: { type: string }
+        sort: { type: string }
+
+    PropertyList:
+      type: array
+      items: { $ref: "#/components/schemas/Property" }
+
+    PropertySchema:
+      type: object
+      required: [fid, name, type, sort]
+      properties:
+        fid: { type: string }
+        name: { type: string }
+        type:
+          type: string
+          enum: [text, number, timestamp, boolean]
+        sort: { type: string }
+
+    PropertySchemaList:
+      type: array
+      items: { $ref: "#/components/schemas/PropertySchema" }
+
+    BatchResult:
+      type: object
+      description: The result of one item in a batch operation (node delete/move/visibility).
+      required: [id, ok]
+      properties:
+        id: { type: string }
+        ok: { type: boolean }
+        name:
+          type: string
+          description: Per-command context; e.g. the node's name, or "name → visibility" for a visibility change.
+        error: { type: string }
+
+    ReplyStatus:
+      type: object
+      required: [replies, replied]
+      properties:
+        replies:
+          type: integer
+          description: The total number of replies to the thread.
+        replied:
+          type: integer
+          description: If requested by an authenticated account, how many of those replies are theirs.
+
+    CategoryReference:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    Thread:
+      type: object
+      required: [id, mark, title, body, author, visibility]
+      properties:
+        id: { type: string }
+        mark: { type: string }
+        title: { type: string }
+        description: { type: string }
+        body:
+          type: string
+          description: Rich HTML content.
+        author: { $ref: "#/components/schemas/ProfileReference" }
+        category: { $ref: "#/components/schemas/CategoryReference" }
+        link: { $ref: "#/components/schemas/LinkReference" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
+        pinned:
+          type: integer
+          description: Pin rank among other pinned threads; 0 means not pinned.
+        tags:
+          type: array
+          items: { $ref: "#/components/schemas/TagReference" }
+        assets:
+          type: array
+          items: { $ref: "#/components/schemas/Asset" }
+        reply_status: { $ref: "#/components/schemas/ReplyStatus" }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+
+    ThreadListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [threads]
+          properties:
+            threads:
+              type: array
+              items: { $ref: "#/components/schemas/Thread" }
+
+    DatagraphItem:
+      type: object
+      description: A discriminated search result item; `ref`'s exact shape depends on `kind`.
+      required: [kind, ref]
+      properties:
+        kind:
+          type: string
+          enum: [post, thread, reply, node, collection, profile, event]
+        ref:
+          type: object
+          description: The referenced resource; shape depends on kind (Thread for thread/post, Node for node, ProfileReference-like for profile, and so on).
+
+    SearchResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/DatagraphItem" }
+
+    Metadata:
+      type: object
+      description: Arbitrary metadata for a resource.
+      additionalProperties: true
+
+    Info:
+      type: object
+      required: [title, api_address, web_address]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        content:
+          {
+            type: string,
+            description: "Rich HTML overview content for the instance.",
+          }
+        web_address: { type: string, format: uri }
+        api_address: { type: string, format: uri }
+        authentication_mode: { type: string }
+        registration_mode: { type: string }
+        accent_colour: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        motd:
+          type: object
+          properties:
+            content: { type: string }
+
+    InstanceInfo:
+      type: object
+      required: [endpoint, base_url, info]
+      properties:
+        context: { type: string }
+        endpoint: { type: string }
+        base_url: { type: string }
+        info: { $ref: "#/components/schemas/Info" }
+
+    PluginManifest:
+      type: object
+      description: The plugin's manifest.yaml, parsed.
+      additionalProperties: true
+
+    Plugin:
+      type: object
+      required: [id, added_at, name, status, manifest, connection]
+      properties:
+        id: { type: string }
+        added_at: { type: string, format: date-time }
+        name: { type: string }
+        description: { type: string }
+        version: { type: string }
+        status:
+          type: string
+          description: "e.g. running, stopped, error."
+        manifest: { $ref: "#/components/schemas/PluginManifest" }
+        connection:
+          type: object
+          description: How this plugin is run — supervised (mode only) or external (mode + a static bearer token).
+          required: [mode]
+          properties:
+            mode:
+              type: string
+              enum: [supervised, external]
+            token:
+              type: string
+              description: Present only when mode is external.

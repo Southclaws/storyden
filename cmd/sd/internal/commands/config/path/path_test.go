@@ -2,6 +2,7 @@ package path
 
 import (
 	"bytes"
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 )
 
@@ -19,10 +21,9 @@ func TestPathCommand(t *testing.T) {
 
 		configPath := filepath.Join(t.TempDir(), "storyden", "config.yaml")
 		var stdout bytes.Buffer
-		command := (*cobra.Command)(New(config.NewFileStoreAt(configPath)))
-		command.SetOut(&stdout)
+		handler := New(config.NewFileStoreAt(configPath))
 
-		r.NoError(command.Execute())
+		r.NoError(handler(context.Background(), &cobra.Command{}, cligen.IO{Out: &stdout}, cligen.ConfigPathParams{}))
 
 		a.Equal(configPath+"\n", stdout.String())
 	})

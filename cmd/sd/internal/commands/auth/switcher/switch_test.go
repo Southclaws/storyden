@@ -2,6 +2,7 @@ package switcher
 
 import (
 	"bytes"
+	"context"
 	"path/filepath"
 	"testing"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 )
 
@@ -25,13 +27,8 @@ func TestSwitchCommand(t *testing.T) {
 		r.NoError(store.Save(cfg))
 
 		var stdout bytes.Buffer
-		root := &cobra.Command{Use: "sd"}
-		root.SetOut(&stdout)
-		root.SetErr(&bytes.Buffer{})
-		root.AddCommand((*cobra.Command)(New(store)))
-		root.SetArgs([]string{"switch", "prod"})
-
-		r.NoError(root.Execute())
+		handler := New(store)
+		r.NoError(handler(context.Background(), &cobra.Command{}, cligen.IO{Out: &stdout, Err: &bytes.Buffer{}}, cligen.AuthSwitchParams{ContextName: "prod"}))
 
 		loaded, err := store.Load()
 		r.NoError(err)

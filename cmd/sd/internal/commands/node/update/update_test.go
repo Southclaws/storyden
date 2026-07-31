@@ -4,8 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 )
 
 func TestReadJSONPropsFromStdin(t *testing.T) {
@@ -53,13 +54,9 @@ func TestReadJSONPropsRequiresObject(t *testing.T) {
 func TestBuildMutablePropsRejectsJSONWithFieldFlags(t *testing.T) {
 	r := require.New(t)
 
-	cmd := &cobra.Command{}
-	cmd.Flags().String("name", "", "")
-	r.NoError(cmd.Flags().Set("name", "Flag Name"))
-
-	_, err := buildMutableProps(cmd, mutablePropsInput{
-		name:      "Flag Name",
-		jsonInput: "-",
+	_, err := buildMutableProps(cligen.IO{}, cligen.NodeUpdateParams{
+		Name: "Flag Name",
+		Json: "-",
 	})
 	r.ErrorContains(err, "cannot combine --json with --name")
 }

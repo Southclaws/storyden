@@ -10,110 +10,40 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
-type SetCommand *cobra.Command
+func New(store *config.Store) cligen.NodePropertiesSetHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodePropertiesSetParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) SetCommand {
-	longHelp := `# Set Property Values
+		// First, fetch existing properties to get their FIDs
+		existingProps, err := fetchNodeProperties(ctx, client.OpenAPI, p.Slug)
+		if err != nil {
+			return err
+		}
 
-Set property values on a node.
+		propMutations, err := parseProperties(p.Token, existingProps)
+		if err != nil {
+			return err
+		}
 
-## How Properties Work
+		result, err := setProperties(ctx, client.OpenAPI, p.Slug, propMutations)
+		if err != nil {
+			return err
+		}
 
-Properties are key-value pairs attached to nodes. All sibling nodes share the same
-property schema (defined keys and types). The CLI automatically handles property IDs
-for you when updating existing properties.
+		fmt.Fprintf(io.Out, "Updated properties for node: %s\n", p.Slug)
+		for _, prop := range result.Properties {
+			fmt.Fprintf(io.Out, "  %s (%s): %v\n", prop.Name, prop.Type, prop.Value)
+		}
 
-## Syntax
-
-**For NEW properties** (not in schema yet):
-~~~
-name:type=value
-~~~
-
-**For EXISTING properties** (already in schema):
-~~~
-name=value
-~~~
-
-The CLI fetches existing properties and infers types automatically.
-
-## Available Types
-
-- **text** - String values
-- **number** - Numeric values
-- **boolean** - true/false values
-- **timestamp** - ISO 8601 date/time values
-
-## Examples
-
-Create new properties (type required):
-~~~bash
-sd node properties set my-node status:text=draft priority:number=1
-~~~
-
-Update existing properties (type auto-detected):
-~~~bash
-sd node properties set my-node status=published priority=2
-~~~
-
-Mix new and existing properties:
-~~~bash
-sd node properties set my-node status=active new_field:text=hello
-~~~
-
-## See Also
-
-- ` + "`sd node properties schema set`" + ` - Update property schema for this node and its siblings
-- ` + "`sd node properties get`" + ` - View current property values
-`
-
-	command := &cobra.Command{
-		Use:   "set <slug> <property>=<value>...",
-		Short: "Set property values for a node",
-		Long:  longHelp,
-		Args:  cobra.MinimumNArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-			properties := args[1:]
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			// First, fetch existing properties to get their FIDs
-			existingProps, err := fetchNodeProperties(cmd.Context(), client.OpenAPI, slug)
-			if err != nil {
-				return err
-			}
-
-			propMutations, err := parseProperties(properties, existingProps)
-			if err != nil {
-				return err
-			}
-
-			result, err := setProperties(cmd.Context(), client.OpenAPI, slug, propMutations)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Updated properties for node: %s\n", slug)
-			for _, prop := range result.Properties {
-				fmt.Fprintf(cmd.OutOrStdout(), "  %s (%s): %v\n", prop.Name, prop.Type, prop.Value)
-			}
-
-			return nil
-		},
+		return nil
 	}
-
-	// Setup beautiful markdown help rendering
-	help.SetupMarkdownHelp(command)
-
-	return SetCommand(command)
 }
 
 func setProperties(

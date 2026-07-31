@@ -15,14 +15,12 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/cli"
-	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/login"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/remove"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/auth/switcher"
-	configcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/config/path"
 	infocmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/info"
-	nodecmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/node"
 	nodeassets "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/assets"
 	nodechildren "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/children"
 	nodecreate "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/create"
@@ -32,9 +30,7 @@ import (
 	nodemeta "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/meta"
 	nodemove "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/move"
 	nodeopen "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/open"
-	nodeproperties "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties"
 	propertiesget "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/get"
-	propertiesschema "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema"
 	schemachildren "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/children"
 	schemaget "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/get"
 	schemaset "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/properties/schema/set"
@@ -43,11 +39,9 @@ import (
 	nodetree "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/tree"
 	nodeupdate "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/update"
 	nodevisibility "github.com/Southclaws/storyden/cmd/sd/internal/commands/node/visibility"
-	plugincmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin"
 	pluginactivate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/activate"
 	plugindeactivate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/deactivate"
 	plugindelete "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/delete"
-	plugindev "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev"
 	plugindevdownload "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/download"
 	plugindevinstall "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/install"
 	plugindevnew "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/dev/new"
@@ -58,10 +52,8 @@ import (
 	pluginget "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/get"
 	pluginlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/list"
 	pluginlogs "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/logs"
-	plugintoken "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token"
 	plugintokenrotate "github.com/Southclaws/storyden/cmd/sd/internal/commands/plugin/token/rotate"
 	searchcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/search"
-	threadcmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread"
 	threadget "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/get"
 	threadlist "github.com/Southclaws/storyden/cmd/sd/internal/commands/thread/list"
 	tuicmd "github.com/Southclaws/storyden/cmd/sd/internal/commands/tui"
@@ -71,19 +63,27 @@ import (
 
 func newRootCommand(
 	streams cli.Streams,
-	authCommand auth.AuthCommand,
-	configCommand configcmd.ConfigCommand,
-	infoCommand infocmd.InfoCommand,
-	threadCommand threadcmd.ThreadCommand,
-	nodeCommand nodecmd.NodeCommand,
-	pluginCommand plugincmd.PluginCommand,
-	searchCommand searchcmd.SearchCommand,
-	tuiCommand tuicmd.TUICommand,
+	authCommand cligen.AuthCommand,
+	configCommand cligen.ConfigCommand,
+	infoCommand cligen.InfoCommand,
+	searchCommand cligen.SearchCommand,
+	nodeCommand cligen.NodeCommand,
+	pluginCommand cligen.PluginCommand,
+	threadCommand cligen.ThreadCommand,
+	tuiCommand cligen.TuiCommand,
 ) *cobra.Command {
-	root := &cobra.Command{
-		Use:   "sd",
-		Short: "Storyden CLI",
-		Long: `# Storyden CLI
+	root := cligen.NewRootCommand(
+		authCommand,
+		configCommand,
+		infoCommand,
+		searchCommand,
+		nodeCommand,
+		pluginCommand,
+		threadCommand,
+		tuiCommand,
+	)
+
+	root.Long = `# Storyden CLI
 
 The **sd** command-line tool provides a powerful interface for working with Storyden instances.
 
@@ -121,23 +121,13 @@ sd auth login https://instance1.com
 sd auth login https://instance2.com
 sd auth switch
 ~~~
-`,
-		SilenceUsage:  true,
-		SilenceErrors: true,
-	}
+`
+	root.SilenceUsage = true
+	root.SilenceErrors = true
 
 	root.SetIn(streams.In)
 	root.SetOut(streams.Out)
 	root.SetErr(streams.Err)
-
-	root.AddCommand((*cobra.Command)(authCommand))
-	root.AddCommand((*cobra.Command)(configCommand))
-	root.AddCommand((*cobra.Command)(infoCommand))
-	root.AddCommand((*cobra.Command)(threadCommand))
-	root.AddCommand((*cobra.Command)(nodeCommand))
-	root.AddCommand((*cobra.Command)(pluginCommand))
-	root.AddCommand((*cobra.Command)(searchCommand))
-	root.AddCommand((*cobra.Command)(tuiCommand))
 
 	help.SetupMarkdownHelp(root)
 	carapace.Gen(root)
@@ -166,17 +156,27 @@ func main() {
 			storeconfig.NewStore,
 			cli.NewStreams,
 			newLogger,
+
+			// auth
 			login.New,
 			remove.New,
 			switcher.New,
-			auth.New,
+			cligen.NewAuthCommand,
+
+			// config
 			path.New,
-			configcmd.New,
+			cligen.NewConfigCommand,
+
+			// info
 			infocmd.New,
-			threadlist.New,
-			threadget.New,
-			threadcmd.New,
-			tuicmd.New,
+			infocmd.NewMetadata,
+			cligen.NewInfoCommand,
+
+			// search
+			searchcmd.New,
+			cligen.NewSearchCommand,
+
+			// node
 			nodelist.New,
 			nodetree.New,
 			nodeget.New,
@@ -186,8 +186,15 @@ func main() {
 			nodemove.New,
 			nodeopen.New,
 			nodesearch.New,
-			nodemeta.New,
-			nodeassets.New,
+			nodemeta.NewGet,
+			nodemeta.NewSet,
+			nodeassets.NewUpload,
+			nodeassets.NewAdd,
+			nodeassets.NewRemove,
+			nodeassets.NewDownload,
+			nodeassets.NewPrimarySet,
+			nodeassets.NewPrimaryClear,
+			nodeassets.NewPrimaryDownload,
 			nodevisibility.New,
 			nodechildren.New,
 			propertiesget.New,
@@ -195,17 +202,19 @@ func main() {
 			schemaget.New,
 			schemaset.New,
 			schemachildren.New,
-			propertiesschema.New,
-			nodeproperties.New,
-			nodecmd.New,
+			cligen.NewNodeCommand,
+
+			// plugin
 			plugindevnew.New,
 			plugindevrun.New,
 			plugindevpackage.New,
 			plugindevvalidate.New,
 			plugindevinstall.New,
 			plugindevdownload.New,
-			plugindevsymbols.New,
-			plugindev.New,
+			plugindevsymbols.NewPackages,
+			plugindevsymbols.NewPackage,
+			plugindevsymbols.NewDetail,
+			plugindevsymbols.NewSearch,
 			pluginlist.New,
 			pluginget.New,
 			plugindelete.New,
@@ -213,9 +222,17 @@ func main() {
 			plugindeactivate.New,
 			pluginlogs.New,
 			plugintokenrotate.New,
-			plugintoken.New,
-			plugincmd.New,
-			searchcmd.New,
+			cligen.NewPluginCommand,
+
+			// thread
+			threadlist.New,
+			threadget.New,
+			cligen.NewThreadCommand,
+
+			// tui
+			tuicmd.New,
+			cligen.NewTuiCommand,
+
 			newRootCommand,
 		),
 		fx.Invoke(configureDefaultLogger),

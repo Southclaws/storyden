@@ -12,32 +12,31 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 )
-
-func TestValidateFormat(t *testing.T) {
-	r := require.New(t)
-
-	r.NoError(validateFormat("plain"))
-	r.NoError(validateFormat("json"))
-	r.ErrorContains(validateFormat("xml"), "--format must be one of: plain, json")
-}
 
 func TestRenderPlain(t *testing.T) {
 	r := require.New(t)
 
-	result := instanceInfo{
-		Context:  "local",
+	accentColour := "#ffcc00"
+	authMode := "email"
+	description := "Community hub"
+	content := `<body><p>Welcome <strong>home</strong></p><ul><li>Build things</li></ul></body>`
+	registrationMode := "invitation"
+	contextName := "local"
+
+	result := cligen.InstanceInfo{
+		Context:  &contextName,
 		Endpoint: "https://example.com",
 		BaseURL:  "https://example.com/api",
-		Info: openapi.Info{
-			AccentColour:       "#ffcc00",
-			ApiAddress:         "https://api.example.com",
-			AuthenticationMode: "email",
-			Capabilities:       openapi.InstanceCapabilityList{"oauth", "plugins"},
-			Content:            `<body><p>Welcome <strong>home</strong></p><ul><li>Build things</li></ul></body>`,
-			Description:        "Community hub",
-			OnboardingStatus:   "requires_category",
-			RegistrationMode:   "invitation",
+		Info: cligen.Info{
+			AccentColour:       &accentColour,
+			APIAddress:         "https://api.example.com",
+			AuthenticationMode: &authMode,
+			Capabilities:       []string{"oauth", "plugins"},
+			Content:            &content,
+			Description:        &description,
+			RegistrationMode:   &registrationMode,
 			Title:              "Storyden",
 			WebAddress:         "https://example.com",
 		},

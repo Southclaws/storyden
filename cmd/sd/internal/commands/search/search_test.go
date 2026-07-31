@@ -12,12 +12,15 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
+// TestOptionsValidate covers only the empty-query check that remains
+// options.validate()'s job; --kind's enum choices (post/thread/reply/node/
+// collection/profile/event, case-sensitive) are now validated by generated
+// code before the handler ever runs.
 func TestOptionsValidate(t *testing.T) {
 	r := require.New(t)
 
-	r.NoError((&options{Query: "docs", Kinds: []string{"node", "THREAD"}}).validate())
+	r.NoError((&options{Query: "docs", Kinds: []string{"node", "thread"}}).validate())
 	r.ErrorContains((&options{Query: " "}).validate(), "search query must not be empty")
-	r.ErrorContains((&options{Query: "docs", Kinds: []string{"garbage"}}).validate(), "invalid --kind")
 }
 
 func TestFetchSearchSendsEveryAPIParameter(t *testing.T) {

@@ -1,79 +1,67 @@
 package remove
 
 import (
+	"context"
 	"fmt"
 	"sort"
 
 	"charm.land/huh/v2"
+
 	"github.com/spf13/cobra"
 
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/tui"
 )
 
-type RemoveCommand *cobra.Command
+// noContextsError is the single canonical message for "no contexts
+// configured", shared with switcher so the two commands no longer disagree
+// on wording for the same condition.
+const noContextsError = "no auth contexts found; run sd auth login first"
 
-func New(store *config.Store) RemoveCommand {
-	command := &cobra.Command{
-		Use:   "remove [context]",
-		Short: "Remove a Storyden auth context",
-		Long: `# Remove Authentication Context
+func New(store *config.Store) cligen.AuthRemoveHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.AuthRemoveParams) error {
+		cfg, err := store.Load()
+		if err != nil {
+			return err
+		}
 
-Remove a saved Storyden authentication context.
+		names := contextNames(cfg)
+		if len(names) == 0 {
+			return fmt.Errorf(noContextsError)
+		}
 
-Run without arguments to choose a context interactively:
-~~~bash
-sd auth remove
-~~~
-
-Remove a context directly:
-~~~bash
-sd auth remove localhost-8000
-~~~
-`,
-		Args: cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cfg, err := store.Load()
-			if err != nil {
+		selected := ""
+		if p.ContextName != "" {
+			selected = p.ContextName
+			if _, ok := cfg.Contexts[selected]; !ok {
+				return fmt.Errorf("unknown context %q", selected)
+			}
+		} else {
+			selected = cfg.CurrentContext
+			if err := selectContext(ctx, io, cfg, names, &selected); err != nil {
 				return err
 			}
+		}
 
-			names := contextNames(cfg)
-			if len(names) == 0 {
-				return fmt.Errorf("no auth contexts found")
-			}
+		wasCurrent := selected == cfg.CurrentContext
 
-			selected := ""
-			if len(args) == 1 {
-				selected = args[0]
-				if _, ok := cfg.Contexts[selected]; !ok {
-					return fmt.Errorf("unknown context %q", selected)
-				}
-			} else {
-				selected = cfg.CurrentContext
-				if err := selectContext(cmd, cfg, names, &selected); err != nil {
-					return err
-				}
-			}
+		if err := removeContext(store, cfg, selected); err != nil {
+			return err
+		}
 
-			if err := removeContext(store, cfg, selected); err != nil {
-				return err
-			}
+		fmt.Fprintf(io.Out, "%s %s\n", tui.Accent.Render("Removed context:"), selected)
 
-			fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", tui.Accent.Render("Removed context:"), selected)
+		if wasCurrent && cfg.CurrentContext != "" {
+			fmt.Fprintf(io.Err, "Warning: removed context was current; switched to %q. Use `sd auth switch` to choose a different context.\n", cfg.CurrentContext)
+		}
 
-			if cfg.CurrentContext != "" {
-				fmt.Fprintf(cmd.OutOrStdout(), "%s %s\n", tui.Accent.Render("Current context:"), cfg.CurrentContext)
-			}
+		if cfg.CurrentContext != "" {
+			fmt.Fprintf(io.Out, "%s %s\n", tui.Accent.Render("Current context:"), cfg.CurrentContext)
+		}
 
-			return nil
-		},
+		return nil
 	}
-
-	help.SetupMarkdownHelp(command)
-
-	return RemoveCommand(command)
 }
 
 func removeContext(store *config.Store, cfg *config.Config, name string) error {
@@ -99,7 +87,7 @@ func nextCurrentContext(cfg *config.Config) string {
 	return names[0]
 }
 
-func selectContext(cmd *cobra.Command, cfg *config.Config, names []string, selected *string) error {
+func selectContext(ctx context.Context, io cligen.IO, cfg *config.Config, names []string, selected *string) error {
 	options := make([]huh.Option[string], 0, len(names))
 	for _, name := range names {
 		label := name
@@ -107,23 +95,23 @@ func selectContext(cmd *cobra.Command, cfg *config.Config, names []string, selec
 			label += " " + tui.Muted.Render("(current)")
 		}
 
-		if ctx, ok := cfg.Contexts[name]; ok && ctx.APIURL != "" {
-			label += tui.Muted.Render("  " + ctx.APIURL)
+		if entry, ok := cfg.Contexts[name]; ok && entry.APIURL != "" {
+			label += tui.Muted.Render("  " + entry.APIURL)
 		}
 
 		options = append(options, huh.NewOption(label, name))
 	}
 
 	return tui.NewForm(
-		cmd.InOrStdin(),
-		cmd.ErrOrStderr(),
+		io.In,
+		io.Err,
 		huh.NewGroup(
 			huh.NewSelect[string]().
 				Title(tui.Title.Render("Choose a Storyden context to remove")).
 				Options(options...).
 				Value(selected),
 		),
-	).RunWithContext(cmd.Context())
+	).RunWithContext(ctx)
 }
 
 func contextNames(cfg *config.Config) []string {

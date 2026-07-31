@@ -6,7 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -21,14 +20,6 @@ func TestSanitizePlainText(t *testing.T) {
 	got := render.SanitizePlainText("<b>Hello</b>\x1b[31m<script>alert(1)</script>\x00")
 
 	a.Equal("Hello", got)
-}
-
-func TestNewDefaultsToMarkdown(t *testing.T) {
-	command := New(nil)
-
-	format := (*cobra.Command)(command).Flags().Lookup("format")
-	require.NotNil(t, format)
-	assert.Equal(t, formatMarkdown, format.DefValue)
 }
 
 func TestNodeMarkdownIncludesNodeContextAndConvertedContent(t *testing.T) {

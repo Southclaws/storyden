@@ -14,21 +14,18 @@ import (
 	domainvisibility "github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
-
-type ListCommand *cobra.Command
 
 // serverQuery groups every server-side query parameter the user can set via
 // flags, so the fetch closure stays tidy.
 type serverQuery struct {
-	author     string // deprecated alias for owner handle, also reused as server-side filter
 	visibility []string
 	search     string
 	nodeID     string
@@ -36,192 +33,126 @@ type serverQuery struct {
 	nodeFormat string // tree or flat
 }
 
-func New(store *config.Store) ListCommand {
-	flags := &listflags.Flags{}
-	filterFlags := &filter.NodeFlags{}
-	var author string
-	var visibility []string
-	var search string
-	var nodeID string
-	var parent string
-	var depth int
-	var depthSet bool
-	var nodeFormat string
+func New(store *config.Store) cligen.NodeListHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeListParams) (cligen.NodeListResult, error) {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Format),
+			Output: string(p.Output),
+		}
+		opts := filter.NodeOptions{
+			LinkDomains:     p.LinkDomain,
+			LinkURLContains: p.LinkUrlContains,
+			LinkScheme:      string(p.LinkScheme),
+			NoLink:          p.NoLink,
+			HasLink:         p.HasLink,
+			RootOnly:        p.RootOnly,
+			OwnerHandle:     p.OwnerHandle,
+			NameContains:    p.NameContains,
+		}
 
-	command := &cobra.Command{
-		Use: "list",
-		Long: `# List Nodes
+		if err := flags.Validate(); err != nil {
+			return cligen.NodeListResult{}, err
+		}
+		if err := validateVisibilities(p.Visibility); err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-Browse all nodes with plain output, JSON, or JSONL.
+		nodeID := p.NodeId
+		if p.Parent != "" && nodeID != "" {
+			return cligen.NodeListResult{}, fmt.Errorf("--parent and --node-id are mutually exclusive")
+		}
 
-The default ` + "`auto`" + ` format prints a plain table that is easy to read in terminals and scripts. Use ` + "`sd tui`" + ` for the interactive explorer.
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-## Examples
-
-List nodes:
-~~~bash
-sd node list
-~~~
-
-Stream every page as JSONL:
-~~~bash
-sd node list --all --format jsonl
-~~~
-
-Filter to root-level nodes only:
-~~~bash
-sd node list --root-only
-~~~
-
-Filter by linked domain (repeatable):
-~~~bash
-sd node list --link-domain youtube.com --link-domain youtu.be
-~~~
-
-Filter by visibility (comma-separated):
-~~~bash
-sd node list --visibility review,draft
-~~~
-
-Filter by owner handle and name substring:
-~~~bash
-sd node list --owner-handle southclaws --name-contains design
-~~~
-
-List all nodes under a specific parent (by slug):
-~~~bash
-sd node list --parent web-development
-~~~
-
-Full-text search on the server:
-~~~bash
-sd node list --search "design system"
-~~~
-
-Stop after the first 10 matches across pages:
-~~~bash
-sd node list --all --limit 10 --link-domain youtube.com
-~~~
-
-Export to JSON:
-~~~bash
-sd node list --format json > nodes.json
-~~~
-`,
-		Short: "List Storyden nodes",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-			if err := filterFlags.Validate(); err != nil {
-				return err
-			}
-			if err := validateVisibilities(visibility); err != nil {
-				return err
-			}
-
-			// --author is the back-compat alias for --owner-handle. Resolve
-			// precedence: explicit --owner-handle wins.
-			if filterFlags.OwnerHandle == "" && author != "" {
-				filterFlags.OwnerHandle = author
-			}
-
-			if parent != "" && nodeID != "" {
-				return fmt.Errorf("--parent and --node-id are mutually exclusive")
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
+		// --parent resolves a human-readable slug to the node ID required by
+		// the server-side NodeId filter.
+		if p.Parent != "" {
+			parentNode, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Parent)
 			if err != nil {
-				return err
+				return cligen.NodeListResult{}, fmt.Errorf("could not find parent node %q: %w", p.Parent, err)
 			}
+			nodeID = string(parentNode.Id)
+		}
 
-			// --parent resolves a human-readable slug to the node ID required
-			// by the server-side NodeId filter.
-			if parent != "" {
-				parentNode, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, parent)
-				if err != nil {
-					return fmt.Errorf("could not find parent node %q: %w", parent, err)
-				}
-				nodeID = string(parentNode.Id)
-			}
+		query := serverQuery{
+			visibility: p.Visibility,
+			search:     p.Search,
+			nodeID:     nodeID,
+			nodeFormat: string(p.NodeFormat),
+		}
+		depth := p.Depth
+		query.depth = &depth
 
-			if nodeFormat != "" && nodeFormat != "tree" && nodeFormat != "flat" {
-				return fmt.Errorf("--node-format must be tree or flat")
-			}
+		fetch := func(page int) (*openapi.NodeListResult, error) {
+			return fetchNodes(ctx, client.OpenAPI, page, query)
+		}
 
-			query := serverQuery{
-				author:     author,
-				visibility: visibility,
-				search:     search,
-				nodeID:     nodeID,
-				nodeFormat: nodeFormat,
-			}
-			if depthSet {
-				d := depth
-				query.depth = &d
-			}
-
-			fetch := func(page int) (*openapi.NodeListResult, error) {
-				return fetchNodes(cmd.Context(), client.OpenAPI, page, query)
-			}
-
-			return run(cmd.OutOrStdout(), flags, filterFlags.Build(), fetch)
-		},
+		return run(cio.Out, flags, opts, fetch)
 	}
-
-	flags.Bind(command)
-	filterFlags.Bind(command)
-	command.Flags().StringVar(&author, "author", "", "Filter by author handle (alias for --owner-handle)")
-	command.Flags().StringSliceVar(&visibility, "visibility", nil, "Filter by visibility (comma-separated: draft, review, published, unlisted)")
-	command.Flags().StringVarP(&search, "search", "q", "", "Server-side full-text search query")
-	command.Flags().StringVar(&nodeID, "node-id", "", "Limit to descendants of this node id")
-	command.Flags().StringVar(&parent, "parent", "", "Limit to children of this node (accepts slug; resolves to node id automatically)")
-	command.Flags().IntVar(&depth, "depth", 0, "Maximum child depth to return (0 = root nodes only)")
-	command.Flags().StringVar(&nodeFormat, "node-format", "flat", "Server response shape: flat (default, every match) or tree (roots with nested children)")
-
-	// Track whether --depth was explicitly set; cobra has no native way to
-	// distinguish 0-from-default and 0-from-user, so we read it post-parse.
-	command.PreRunE = func(cmd *cobra.Command, args []string) error {
-		depthSet = cmd.Flags().Changed("depth")
-		return nil
-	}
-
-	command.Flags().MarkDeprecated("author", "use --owner-handle")
-
-	help.SetupMarkdownHelp(command)
-
-	return ListCommand(command)
 }
 
-func run(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
+// run dispatches on the resolved format. json's result is returned rather
+// than written directly — codegen's generated RunE encodes it according to
+// the OpenCLI-declared NodeListResult schema. Every other format still
+// writes directly to out, same as before.
+func run(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) (cligen.NodeListResult, error) {
 	format := flags.ResolveFormat(out)
 
 	switch format {
 	case listflags.FormatJSON:
-		if flags.All {
-			return runJSONAll(out, flags, opts, fetch)
-		}
-		result, err := fetch(flags.Page)
-		if err != nil {
-			return err
-		}
-		// Apply client-side filters to the single-page JSON output too, so
-		// the shape is consistent regardless of whether --all is set.
-		result.Nodes = filter.FilterNodes(result.Nodes, opts)
-		if flags.Limit > 0 && len(result.Nodes) > flags.Limit {
-			result.Nodes = result.Nodes[:flags.Limit]
-		}
-		return outputfmt.JSON(out, result)
+		return runJSON(flags, opts, fetch)
 
 	case listflags.FormatJSONL:
-		return runJSONL(out, flags, opts, fetch)
+		return cligen.NodeListResult{}, runJSONL(out, flags, opts, fetch)
 
 	case listflags.FormatPlain:
-		return runPlain(out, flags, opts, fetch)
+		return cligen.NodeListResult{}, runPlain(out, flags, opts, fetch)
 
 	default:
-		return fmt.Errorf("unsupported format %q", flags.Format)
+		return cligen.NodeListResult{}, fmt.Errorf("unsupported format %q", flags.Format)
 	}
+}
+
+func runJSON(flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) (cligen.NodeListResult, error) {
+	if flags.All {
+		all := []openapi.NodeWithChildren{}
+		err := iterPages(flags, fetch, func(page *openapi.NodeListResult) (bool, error) {
+			for _, n := range page.Nodes {
+				if !filter.MatchNode(n, opts) {
+					continue
+				}
+				all = append(all, n)
+				if flags.Limit > 0 && len(all) >= flags.Limit {
+					return false, nil
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
+		return cligenconv.Convert[cligen.NodeListResult](struct {
+			Nodes []openapi.NodeWithChildren `json:"nodes"`
+		}{Nodes: all})
+	}
+
+	page, err := fetch(flags.Page)
+	if err != nil {
+		return cligen.NodeListResult{}, err
+	}
+	// Apply client-side filters to the single-page JSON output too, so the
+	// shape is consistent regardless of whether --all is set.
+	page.Nodes = filter.FilterNodes(page.Nodes, opts)
+	if flags.Limit > 0 && len(page.Nodes) > flags.Limit {
+		page.Nodes = page.Nodes[:flags.Limit]
+	}
+	return cligenconv.Convert[cligen.NodeListResult](page)
 }
 
 func runPlain(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
@@ -291,28 +222,6 @@ func runJSONL(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fe
 	return err
 }
 
-func runJSONAll(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
-	all := []openapi.NodeWithChildren{}
-	err := iterPages(flags, fetch, func(page *openapi.NodeListResult) (bool, error) {
-		for _, n := range page.Nodes {
-			if !filter.MatchNode(n, opts) {
-				continue
-			}
-			all = append(all, n)
-			if flags.Limit > 0 && len(all) >= flags.Limit {
-				return false, nil
-			}
-		}
-		return true, nil
-	})
-	if err != nil {
-		return err
-	}
-	return outputfmt.JSON(out, struct {
-		Nodes []openapi.NodeWithChildren `json:"nodes"`
-	}{Nodes: all})
-}
-
 func iterPages(flags *listflags.Flags, fetch func(int) (*openapi.NodeListResult, error), onPage func(*openapi.NodeListResult) (bool, error)) error {
 	page := flags.Page
 	for {
@@ -363,11 +272,6 @@ func fetchNodes(
 
 	params := &openapi.NodeListParams{
 		Page: &pageQuery,
-	}
-
-	if q.author != "" {
-		handle := openapi.AccountHandle(q.author)
-		params.Author = &handle
 	}
 
 	if len(q.visibility) > 0 {

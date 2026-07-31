@@ -1,12 +1,19 @@
 package pluginnew
 
-import "testing"
+import (
+	"context"
+	"testing"
+
+	"github.com/spf13/cobra"
+
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+)
 
 func TestNewRejectsDirectoryWithoutSlug(t *testing.T) {
-	cmd := New()
-	(*cmd).SetArgs([]string{"."})
+	handler := New()
 
-	if err := (*cmd).Execute(); err == nil {
+	err := handler(context.Background(), &cobra.Command{}, cligen.IO{}, cligen.PluginDevNewParams{Directory: "."})
+	if err == nil {
 		t.Fatal("expected error")
 	}
 }

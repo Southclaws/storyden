@@ -12,108 +12,44 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/batch"
-	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
-type VisibilityCommand *cobra.Command
+func New(store *config.Store) cligen.NodeVisibilityHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeVisibilityParams) error {
+		ids, err := resolveIDs(p.Slug, p.FromStdin)
+		if err != nil {
+			return err
+		}
+		if len(ids) == 0 {
+			return fmt.Errorf("no nodes specified; pass slugs as positional args or use --from-stdin")
+		}
 
-func New(store *config.Store) VisibilityCommand {
-	var fromStdin bool
-	var dryRun bool
-	var format string
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "visibility <slug>... <visibility>",
-		Short: "Update node visibility",
-		Long: `# Update Node Visibility
+		emit, summary := emitters(cio, p.Format)
 
-Control who can see your node and where it appears. The last positional argument is always the new visibility; everything before it is treated as a node identifier (slug or xid). Pass ` + "`--from-stdin`" + ` to read identifiers from stdin and supply only the visibility positionally.
-
-## Visibility Levels
-
-- **draft** - Only you can see it (work in progress)
-- **review** - Moderators can see it (pending approval)
-- **published** - Everyone can see and find it (public content)
-- **unlisted** - Accessible by direct link but not searchable (shared but not promoted)
-
-## Examples
-
-Publish a draft:
-~~~bash
-sd node visibility my-page published
-~~~
-
-Publish several pages at once:
-~~~bash
-sd node visibility page-1 page-2 page-3 published
-~~~
-
-Preview without making changes:
-~~~bash
-sd node visibility article review --dry-run
-~~~
-
-Pipe identifiers from a list command:
-~~~bash
-sd node list --visibility review --link-domain tenor.com --format jsonl \
-  | sd node visibility published --from-stdin
-~~~
-`,
-		Args: cobra.MinimumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			visibility := args[len(args)-1]
-			slugArgs := args[:len(args)-1]
-
-			if err := validateVisibility(visibility); err != nil {
-				return err
-			}
-
-			ids, err := resolveIDs(slugArgs, fromStdin)
-			if err != nil {
-				return err
-			}
-			if len(ids) == 0 {
-				return fmt.Errorf("no nodes specified; pass slugs as positional args or use --from-stdin")
-			}
-			if format != "" && format != listflags.FormatPlain && format != listflags.FormatJSONL {
-				return fmt.Errorf("--format must be plain or jsonl")
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			emit, summary := emitters(cmd, format)
-
-			ok := batch.Run(cmd.Context(), ids,
-				func(ctx context.Context, id string) (string, error) {
-					node, err := updateVisibility(ctx, client.OpenAPI, id, visibility)
-					if err != nil {
-						return "", err
-					}
-					return fmt.Sprintf("%s → %s", node.Name, node.Visibility), nil
-				},
-				batch.Options{DryRun: dryRun},
-				emit,
-				summary,
-			)
-			if !ok {
-				return fmt.Errorf("one or more visibility updates failed")
-			}
-			return nil
-		},
+		ok := batch.Run(ctx, ids,
+			func(ctx context.Context, id string) (string, error) {
+				node, err := updateVisibility(ctx, client.OpenAPI, id, string(p.Visibility))
+				if err != nil {
+					return "", err
+				}
+				return fmt.Sprintf("%s → %s", node.Name, node.Visibility), nil
+			},
+			batch.Options{DryRun: p.DryRun},
+			emit,
+			summary,
+		)
+		if !ok {
+			return fmt.Errorf("one or more visibility updates failed")
+		}
+		return nil
 	}
-
-	command.Flags().BoolVar(&fromStdin, "from-stdin", false, "Read identifiers from stdin (one per line, plain or JSONL)")
-	command.Flags().BoolVar(&dryRun, "dry-run", false, "Show the plan without making any changes")
-	command.Flags().StringVar(&format, "format", "", "Per-item result format: plain (default), jsonl")
-
-	help.SetupMarkdownHelp(command)
-
-	return VisibilityCommand(command)
 }
 
 func resolveIDs(args []string, fromStdin bool) ([]string, error) {
@@ -127,11 +63,11 @@ func resolveIDs(args []string, fromStdin bool) ([]string, error) {
 	return args, nil
 }
 
-func emitters(cmd *cobra.Command, format string) (func(batch.Result), func(int, int)) {
-	if format == listflags.FormatJSONL {
-		return batch.JSONLEmitter(cmd.OutOrStdout()), nil
+func emitters(cio cligen.IO, format cligen.NodeVisibilityFormat) (func(batch.Result), func(int, int)) {
+	if format == cligen.NodeVisibilityFormatJsonl {
+		return batch.JSONLEmitter(cio.Out), nil
 	}
-	return batch.PlainEmitter(cmd.ErrOrStderr()), batch.PlainSummary(cmd.ErrOrStderr())
+	return batch.PlainEmitter(cio.Err), batch.PlainSummary(cio.Err)
 }
 
 func updateVisibility(
@@ -171,13 +107,4 @@ func visibilityUpdateError(response *openapi.NodeUpdateVisibilityResponse) error
 	}
 
 	return fmt.Errorf("visibility update request failed: %s", response.Status())
-}
-
-func validateVisibility(visibility string) error {
-	switch openapi.Visibility(visibility) {
-	case openapi.VisibilityDraft, openapi.VisibilityReview, openapi.VisibilityPublished, openapi.VisibilityUnlisted:
-		return nil
-	default:
-		return fmt.Errorf("invalid visibility %q; must be one of: draft, review, published, unlisted", visibility)
-	}
 }

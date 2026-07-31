@@ -10,66 +10,41 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
-type RunCommand *cobra.Command
+func New(store *config.Store) cligen.PluginDevRunHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.PluginDevRunParams) error {
+		mf, err := plugindev.ReadManifest(p.Manifest)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) RunCommand {
-	var manifestPath string
-	var instanceID string
-	var noUpdate bool
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "run [-- command args...]",
-		Short: "Run a local plugin with STORYDEN_RPC_URL from the current instance",
-		Long: `# Run Plugin
+		plugin, err := plugindev.EnsureExternalPlugin(ctx, client.OpenAPI, mf.Manifest, p.InstanceId, p.NoUpdate)
+		if err != nil {
+			return err
+		}
 
-Read ` + "`manifest.yaml`" + `, register or update it as an external plugin on the current Storyden instance, build a WebSocket RPC URL from the plugin's static external token, and run the manifest command with ` + "`STORYDEN_RPC_URL`" + ` in the environment.
+		rpcURL, err := plugindev.ExternalRPCURL(client.Endpoint, plugin.Token)
+		if err != nil {
+			return err
+		}
 
-Pass ` + "`--`" + ` followed by a command to override the manifest command for this run.
-`,
-		Args: cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			mf, err := plugindev.ReadManifest(manifestPath)
-			if err != nil {
-				return err
-			}
+		runCommand, runArgs, err := plugindev.CommandFromManifest(mf.Manifest, p.Command)
+		if err != nil {
+			return err
+		}
 
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			plugin, err := plugindev.EnsureExternalPlugin(cmd.Context(), client.OpenAPI, mf.Manifest, instanceID, noUpdate)
-			if err != nil {
-				return err
-			}
-
-			rpcURL, err := plugindev.ExternalRPCURL(client.Endpoint, plugin.Token)
-			if err != nil {
-				return err
-			}
-
-			runCommand, runArgs, err := plugindev.CommandFromManifest(mf.Manifest, args)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.ErrOrStderr(), "Running %s with %s for plugin %s\n", runCommand, plugindev.RPCURLEnvName, plugin.ID)
-			return runPluginCommand(cmd.Context(), runCommand, runArgs, rpcURL, filepath.Dir(mf.Path))
-		},
+		fmt.Fprintf(io.Err, "Running %s with %s for plugin %s\n", runCommand, plugindev.RPCURLEnvName, plugin.ID)
+		return runPluginCommand(ctx, runCommand, runArgs, rpcURL, filepath.Dir(mf.Path))
 	}
-
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
-	command.Flags().StringVar(&instanceID, "instance-id", "", "Existing plugin installation ID to update instead of matching by manifest id")
-	command.Flags().BoolVar(&noUpdate, "no-update", false, "Do not update an existing external plugin manifest before running")
-
-	help.SetupMarkdownHelp(command)
-
-	return RunCommand(command)
 }
 
 func runPluginCommand(ctx context.Context, command string, args []string, rpcURL string, dir string) error {

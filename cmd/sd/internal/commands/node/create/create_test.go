@@ -6,17 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidateVisibility(t *testing.T) {
-	r := require.New(t)
-
-	r.NoError(validateVisibility(""))
-	r.NoError(validateVisibility("draft"))
-	r.NoError(validateVisibility("review"))
-	r.NoError(validateVisibility("published"))
-	r.NoError(validateVisibility("unlisted"))
-	r.ErrorContains(validateVisibility("private"), "invalid --visibility: private")
-}
-
 func TestContentToHTML(t *testing.T) {
 	r := require.New(t)
 

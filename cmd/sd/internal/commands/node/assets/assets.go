@@ -15,364 +15,178 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 )
 
-type AssetsCommand *cobra.Command
+func NewUpload(store *config.Store) cligen.NodeAssetsUploadHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsUploadParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) AssetsCommand {
-	command := &cobra.Command{
-		Use:   "assets",
-		Short: "Upload, download, attach, and remove node assets",
-		Long: `# Node Assets
+		assetName := p.Name
+		if assetName == "" {
+			assetName = filepath.Base(p.File)
+		}
 
-Work with files attached to nodes.
+		asset, err := uploadAsset(ctx, client.OpenAPI, p.File, assetName)
+		if err != nil {
+			return err
+		}
 
-Assets can be uploaded from local files, attached to a node, removed from a node, or downloaded from an existing node attachment.
+		node, err := attachAsset(ctx, client.OpenAPI, p.Slug, asset.Id, p.Primary)
+		if err != nil {
+			return err
+		}
 
-Primary images are handled separately with ` + "`sd node assets primary`" + `. They are used as cover or hero images on pages and may not appear in the normal attached assets list.
-`,
+		fmt.Fprintf(io.Out, "Uploaded asset: %s (id: %s)\n", asset.Filename, asset.Id)
+		fmt.Fprintf(io.Out, "Attached to node: %s (slug: %s)\n", node.Name, node.Slug)
+		return nil
 	}
-
-	command.AddCommand(newUploadCommand(store))
-	command.AddCommand(newAddCommand(store))
-	command.AddCommand(newRemoveCommand(store))
-	command.AddCommand(newDownloadCommand(store))
-	command.AddCommand(newPrimaryCommand(store))
-
-	help.SetupMarkdownHelp(command)
-
-	return AssetsCommand(command)
 }
 
-func newUploadCommand(store *config.Store) *cobra.Command {
-	var name string
-	var primary bool
+func NewPrimarySet(store *config.Store) cligen.NodeAssetsPrimarySetHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsPrimarySetParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "upload <slug> <file>",
-		Short: "Upload a file and attach it to a node",
-		Long: `# Upload a Node Asset
+		node, err := setPrimaryAsset(ctx, client.OpenAPI, p.Slug, p.AssetId)
+		if err != nil {
+			return err
+		}
 
-Upload a local file to Storyden and attach it to a node.
-
-## Examples
-
-Upload an image:
-~~~bash
-sd node assets upload docs ./diagram.png
-~~~
-
-Upload and mark as the primary image:
-~~~bash
-sd node assets upload docs ./cover.png --primary
-~~~
-`,
-		Args: cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			assetName := name
-			if assetName == "" {
-				assetName = filepath.Base(args[1])
-			}
-
-			asset, err := uploadAsset(cmd.Context(), client.OpenAPI, args[1], assetName)
-			if err != nil {
-				return err
-			}
-
-			node, err := attachAsset(cmd.Context(), client.OpenAPI, args[0], asset.Id, primary)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Uploaded asset: %s (id: %s)\n", asset.Filename, asset.Id)
-			fmt.Fprintf(cmd.OutOrStdout(), "Attached to node: %s (slug: %s)\n", node.Name, node.Slug)
-			return nil
-		},
+		fmt.Fprintf(io.Out, "Set primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
+		return nil
 	}
-
-	command.Flags().StringVar(&name, "name", "", "Asset filename to store")
-	command.Flags().BoolVar(&primary, "primary", false, "Set the asset as the node's primary image")
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
-func newPrimaryCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "primary",
-		Short: "Set, clear, or download the node primary image",
-		Long: `# Node Primary Image
+func NewPrimaryClear(store *config.Store) cligen.NodeAssetsPrimaryClearHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsPrimaryClearParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-Work with a node's primary image. This is the cover or hero image used on pages and is separate from the normal attached assets list.
-`,
+		node, err := clearPrimaryAsset(ctx, client.OpenAPI, p.Slug)
+		if err != nil {
+			return err
+		}
+
+		fmt.Fprintf(io.Out, "Cleared primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
+		return nil
 	}
-
-	command.AddCommand(newPrimarySetCommand(store))
-	command.AddCommand(newPrimaryClearCommand(store))
-	command.AddCommand(newPrimaryDownloadCommand(store))
-
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
-func newPrimarySetCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "set <slug> <asset-id>",
-		Short: "Set the node primary image",
-		Long: `# Set Node Primary Image
+func NewPrimaryDownload(store *config.Store) cligen.NodeAssetsPrimaryDownloadHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsPrimaryDownloadParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-Set the asset used as a node's cover or hero image.
+		node, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Slug)
+		if err != nil {
+			return err
+		}
+		if node.PrimaryImage == nil {
+			return fmt.Errorf("node has no primary image")
+		}
 
-## Examples
+		asset := *node.PrimaryImage
+		data, err := downloadAsset(ctx, client.OpenAPI, assetFilename(asset))
+		if err != nil {
+			return err
+		}
 
-Set by asset ID:
-~~~bash
-sd node assets primary set docs d8cg...
-~~~
-`,
-		Args: cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
+		target := p.OutputFile
+		if target == "" {
+			target = asset.Filename
+		}
 
-			node, err := setPrimaryAsset(cmd.Context(), client.OpenAPI, args[0], args[1])
-			if err != nil {
-				return err
-			}
+		if err := writeAssetData(io.Out, data, target, p.Force); err != nil {
+			return err
+		}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Set primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
-			return nil
-		},
+		if target != "-" {
+			fmt.Fprintf(io.Out, "Downloaded primary image: %s -> %s\n", asset.Filename, target)
+		}
+		return nil
 	}
-
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
-func newPrimaryClearCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "clear <slug>",
-		Short: "Clear the node primary image",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
+func NewAdd(store *config.Store) cligen.NodeAssetsAddHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsAddParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-			node, err := clearPrimaryAsset(cmd.Context(), client.OpenAPI, args[0])
-			if err != nil {
-				return err
-			}
+		node, err := attachAsset(ctx, client.OpenAPI, p.Slug, p.AssetId, p.Primary)
+		if err != nil {
+			return err
+		}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Cleared primary image for node: %s (slug: %s)\n", node.Name, node.Slug)
-			return nil
-		},
+		fmt.Fprintf(io.Out, "Attached asset %s to node: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
+		return nil
 	}
-
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
-func newPrimaryDownloadCommand(store *config.Store) *cobra.Command {
-	var output string
-	var force bool
+func NewRemove(store *config.Store) cligen.NodeAssetsRemoveHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsRemoveParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "download <slug>",
-		Short: "Download the node primary image",
-		Long: `# Download Node Primary Image
+		node, err := removeAsset(ctx, client.OpenAPI, p.Slug, p.AssetId)
+		if err != nil {
+			return err
+		}
 
-Download the asset used as a node's cover or hero image.
-
-## Examples
-
-Download to the asset filename:
-~~~bash
-sd node assets primary download docs
-~~~
-
-Download to a specific file:
-~~~bash
-sd node assets primary download docs --output cover.png
-~~~
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			node, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, args[0])
-			if err != nil {
-				return err
-			}
-			if node.PrimaryImage == nil {
-				return fmt.Errorf("node has no primary image")
-			}
-
-			asset := *node.PrimaryImage
-			data, err := downloadAsset(cmd.Context(), client.OpenAPI, assetFilename(asset))
-			if err != nil {
-				return err
-			}
-
-			target := output
-			if target == "" {
-				target = asset.Filename
-			}
-
-			if err := writeAssetData(cmd.OutOrStdout(), data, target, force); err != nil {
-				return err
-			}
-
-			if target != "-" {
-				fmt.Fprintf(cmd.OutOrStdout(), "Downloaded primary image: %s -> %s\n", asset.Filename, target)
-			}
-			return nil
-		},
+		fmt.Fprintf(io.Out, "Removed asset %s from node: %s (slug: %s)\n", p.AssetId, node.Name, node.Slug)
+		return nil
 	}
-
-	command.Flags().StringVarP(&output, "output", "o", "", "Output file path (use - for stdout)")
-	command.Flags().BoolVar(&force, "force", false, "Overwrite the output file if it exists")
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
-func newAddCommand(store *config.Store) *cobra.Command {
-	var primary bool
+func NewDownload(store *config.Store) cligen.NodeAssetsDownloadHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodeAssetsDownloadParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "add <slug> <asset-id>",
-		Short: "Attach an existing asset to a node",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
+		node, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Slug)
+		if err != nil {
+			return err
+		}
 
-			node, err := attachAsset(cmd.Context(), client.OpenAPI, args[0], args[1], primary)
-			if err != nil {
-				return err
-			}
+		asset, err := findAsset(node.Assets, p.Asset)
+		if err != nil {
+			return err
+		}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Attached asset %s to node: %s (slug: %s)\n", args[1], node.Name, node.Slug)
-			return nil
-		},
+		data, err := downloadAsset(ctx, client.OpenAPI, assetFilename(asset))
+		if err != nil {
+			return err
+		}
+
+		target := p.OutputFile
+		if target == "" {
+			target = asset.Filename
+		}
+
+		if err := writeAssetData(io.Out, data, target, p.Force); err != nil {
+			return err
+		}
+
+		fmt.Fprintf(io.Out, "Downloaded asset: %s -> %s\n", asset.Filename, target)
+		return nil
 	}
-
-	command.Flags().BoolVar(&primary, "primary", false, "Set the asset as the node's primary image")
-	help.SetupMarkdownHelp(command)
-
-	return command
-}
-
-func newRemoveCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "remove <slug> <asset-id>",
-		Short: "Remove an asset from a node",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			node, err := removeAsset(cmd.Context(), client.OpenAPI, args[0], args[1])
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Removed asset %s from node: %s (slug: %s)\n", args[1], node.Name, node.Slug)
-			return nil
-		},
-	}
-
-	help.SetupMarkdownHelp(command)
-
-	return command
-}
-
-func newDownloadCommand(store *config.Store) *cobra.Command {
-	var output string
-	var force bool
-
-	command := &cobra.Command{
-		Use:   "download <slug> <asset>",
-		Short: "Download an attached node asset",
-		Long: `# Download a Node Asset
-
-Download an asset that is already attached to a node. The asset can be identified by asset ID, filename, or API path.
-
-## Examples
-
-Download by asset ID:
-~~~bash
-sd node assets download docs d8cg... --output cover.png
-~~~
-
-Download by filename:
-~~~bash
-sd node assets download docs cover.png
-~~~
-`,
-		Args: cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			node, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, args[0])
-			if err != nil {
-				return err
-			}
-
-			asset, err := findAsset(node.Assets, args[1])
-			if err != nil {
-				return err
-			}
-
-			data, err := downloadAsset(cmd.Context(), client.OpenAPI, assetFilename(asset))
-			if err != nil {
-				return err
-			}
-
-			target := output
-			if target == "" {
-				target = asset.Filename
-			}
-
-			if err := writeAssetData(cmd.OutOrStdout(), data, target, force); err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Downloaded asset: %s -> %s\n", asset.Filename, target)
-			return nil
-		},
-	}
-
-	command.Flags().StringVarP(&output, "output", "o", "", "Output file path (use - for stdout)")
-	command.Flags().BoolVar(&force, "force", false, "Overwrite the output file if it exists")
-	help.SetupMarkdownHelp(command)
-
-	return command
 }
 
 func uploadAsset(

@@ -12,105 +12,40 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
 	"github.com/Southclaws/storyden/cmd/sd/internal/batch"
-	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
-type DeleteCommand *cobra.Command
+func New(store *config.Store) cligen.NodeDeleteHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeDeleteParams) error {
+		ids, err := resolveIDs(p.Slug, p.FromStdin)
+		if err != nil {
+			return err
+		}
+		if len(ids) == 0 {
+			return fmt.Errorf("no nodes specified; pass slugs as arguments or use --from-stdin")
+		}
 
-func New(store *config.Store) DeleteCommand {
-	var target string
-	var fromStdin bool
-	var dryRun bool
-	var format string
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-	command := &cobra.Command{
-		Use:   "delete <slug>...",
-		Short: "Delete one or more nodes",
-		Long: `# Delete a Node
+		emit, summary := emitters(cio, p.Format)
 
-Permanently delete one or more nodes. Children of each deleted node are moved to a new parent.
-
-**Warning**: This operation cannot be undone! Use ` + "`--dry-run`" + ` to preview the plan.
-
-## What Happens to Children?
-
-When you delete a node, its children are automatically moved:
-- By default, they move to the deleted node's parent
-- Or use ` + "`--target`" + ` to specify a different parent
-- Root-level nodes' children become root-level
-
-## Examples
-
-Delete a node:
-~~~bash
-sd node delete old-page
-~~~
-
-Delete several nodes at once:
-~~~bash
-sd node delete old-page archive-1 archive-2
-~~~
-
-Preview without making any changes:
-~~~bash
-sd node delete old-page --dry-run
-~~~
-
-Pipe identifiers from a list command:
-~~~bash
-sd node list --visibility draft --format jsonl | sd node delete --from-stdin
-~~~
-
-Delete and move children to a specific parent:
-~~~bash
-sd node delete deprecated --target archive
-~~~
-`,
-		Args: cobra.ArbitraryArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ids, err := resolveIDs(args, fromStdin)
-			if err != nil {
-				return err
-			}
-			if len(ids) == 0 {
-				return fmt.Errorf("no nodes specified; pass slugs as arguments or use --from-stdin")
-			}
-			if format != "" && format != listflags.FormatPlain && format != listflags.FormatJSONL {
-				return fmt.Errorf("--format must be plain or jsonl")
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			emit, summary := emitters(cmd, format)
-
-			ok := batch.Run(cmd.Context(), ids,
-				func(ctx context.Context, id string) (string, error) {
-					return id, deleteNode(ctx, client.OpenAPI, id, target)
-				},
-				batch.Options{DryRun: dryRun},
-				emit,
-				summary,
-			)
-			if !ok {
-				return fmt.Errorf("one or more deletions failed")
-			}
-			return nil
-		},
+		ok := batch.Run(ctx, ids,
+			func(ctx context.Context, id string) (string, error) {
+				return id, deleteNode(ctx, client.OpenAPI, id, p.Target)
+			},
+			batch.Options{DryRun: p.DryRun},
+			emit,
+			summary,
+		)
+		if !ok {
+			return fmt.Errorf("one or more deletions failed")
+		}
+		return nil
 	}
-
-	command.Flags().StringVar(&target, "target", "", "Target node slug for orphaned children")
-	command.Flags().BoolVar(&fromStdin, "from-stdin", false, "Read identifiers from stdin (one per line, plain or JSONL)")
-	command.Flags().BoolVar(&dryRun, "dry-run", false, "Show the plan without making any changes")
-	command.Flags().StringVar(&format, "format", "", "Per-item result format: plain (default), jsonl")
-
-	help.SetupMarkdownHelp(command)
-
-	return DeleteCommand(command)
 }
 
 func resolveIDs(args []string, fromStdin bool) ([]string, error) {
@@ -127,11 +62,11 @@ func resolveIDs(args []string, fromStdin bool) ([]string, error) {
 // emitters returns (per-item emit, end-of-run summary). JSONL routes per-item
 // results to stdout so they can be piped; plain routes to stderr so stdout
 // stays empty for shell composition.
-func emitters(cmd *cobra.Command, format string) (func(batch.Result), func(int, int)) {
-	if format == listflags.FormatJSONL {
-		return batch.JSONLEmitter(cmd.OutOrStdout()), nil
+func emitters(cio cligen.IO, format cligen.NodeDeleteFormat) (func(batch.Result), func(int, int)) {
+	if format == cligen.NodeDeleteFormatJsonl {
+		return batch.JSONLEmitter(cio.Out), nil
 	}
-	return batch.PlainEmitter(cmd.ErrOrStderr()), batch.PlainSummary(cmd.ErrOrStderr())
+	return batch.PlainEmitter(cio.Err), batch.PlainSummary(cio.Err)
 }
 
 func deleteNode(

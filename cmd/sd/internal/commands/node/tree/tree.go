@@ -14,117 +14,81 @@ import (
 	domainvisibility "github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/nodeapi"
 )
 
-type TreeCommand *cobra.Command
+func New(store *config.Store) cligen.NodeTreeHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeTreeParams) (cligen.NodeListResult, error) {
+		// codegen validates repeatable+choices flags as plain string lists
+		// (each item isn't individually enum-checked yet), so this manual
+		// check is still load-bearing, not just defensive.
+		if err := validateVisibilities(p.Visibility); err != nil {
+			return cligen.NodeListResult{}, err
+		}
+		if p.Depth < 0 {
+			return cligen.NodeListResult{}, fmt.Errorf("--depth must be greater than or equal to zero")
+		}
 
-func New(store *config.Store) TreeCommand {
-	var depth int
-	var visibility []string
-	filterFlags := &filter.NodeFlags{}
+		opts := filter.NodeOptions{
+			LinkDomains:     p.LinkDomain,
+			LinkURLContains: p.LinkUrlContains,
+			LinkScheme:      string(p.LinkScheme),
+			NoLink:          p.NoLink,
+			HasLink:         p.HasLink,
+			RootOnly:        p.RootOnly,
+			OwnerHandle:     p.OwnerHandle,
+			NameContains:    p.NameContains,
+		}
 
-	command := &cobra.Command{
-		Use:   "tree [slug]",
-		Short: "Show nodes as a tree",
-		Long: `# Display Node Tree
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-Visualize your entire content hierarchy as a tree, or a subtree rooted at a specific node.
-
-The tree shows all nodes with ` + "`└──`" + ` and ` + "`├──`" + ` branch indicators, displaying each node's name and slug.
-
-## Examples
-
-Show full tree:
-~~~bash
-sd node tree
-~~~
-
-Show subtree rooted at a specific node:
-~~~bash
-sd node tree design
-~~~
-
-Limit depth:
-~~~bash
-sd node tree --depth 2
-~~~
-
-Limit depth within a subtree:
-~~~bash
-sd node tree web-development --depth 2
-~~~
-
-Filter by visibility (comma-separated):
-~~~bash
-sd node tree --visibility published,unlisted
-~~~
-
-Show only subtrees that match a name:
-~~~bash
-sd node tree --name-contains design
-~~~
-
-Generate site map:
-~~~bash
-sd node tree > sitemap.txt
-~~~
-
-Use ` + "`sd node children`" + ` to list just the direct children of a specific node.
-`,
-		Args: cobra.MaximumNArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if depth < 0 {
-				return fmt.Errorf("--depth must be greater than or equal to zero")
-			}
-			if err := validateVisibilities(visibility); err != nil {
-				return err
-			}
-			if err := filterFlags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
+		var rootLabel string
+		var nodeID string
+		if p.Slug != "" {
+			root, err := nodeapi.Fetch(ctx, client.OpenAPI, p.Slug)
 			if err != nil {
-				return err
+				return cligen.NodeListResult{}, fmt.Errorf("could not find node %q: %w", p.Slug, err)
 			}
+			rootLabel = string(root.Name) + " [slug=" + p.Slug + "]"
+			nodeID = string(root.Id)
+		}
 
-			var rootLabel string
-			var nodeID string
-			if len(args) == 1 {
-				root, err := nodeapi.Fetch(cmd.Context(), client.OpenAPI, args[0])
-				if err != nil {
-					return fmt.Errorf("could not find node %q: %w", args[0], err)
-				}
-				rootLabel = string(root.Name) + " [slug=" + args[0] + "]"
-				nodeID = string(root.Id)
-			}
+		result, err := fetchTree(ctx, client.OpenAPI, p.Depth, p.Visibility, nodeID)
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-			result, err := fetchTree(cmd.Context(), client.OpenAPI, depth, visibility, nodeID)
-			if err != nil {
-				return err
-			}
+		nodes := result.Nodes
+		if !opts.Empty() {
+			nodes = pruneTree(nodes, opts)
+		}
 
-			opts := filterFlags.Build()
-			nodes := result.Nodes
-			if !opts.Empty() {
-				nodes = pruneTree(nodes, opts)
-			}
-
-			return renderTree(cmd.OutOrStdout(), nodes, rootLabel)
-		},
+		switch p.Format {
+		case cligen.NodeTreeFormatJson:
+			return cligenconv.Convert[cligen.NodeListResult](struct {
+				PageSize    int                        `json:"page_size"`
+				Results     int                        `json:"results"`
+				TotalPages  int                        `json:"total_pages"`
+				CurrentPage int                        `json:"current_page"`
+				Nodes       []openapi.NodeWithChildren `json:"nodes"`
+			}{
+				PageSize:    result.PageSize,
+				Results:     result.Results,
+				TotalPages:  result.TotalPages,
+				CurrentPage: result.CurrentPage,
+				Nodes:       nodes,
+			})
+		default:
+			return cligen.NodeListResult{}, renderTree(cio.Out, nodes, rootLabel)
+		}
 	}
-
-	command.Flags().IntVar(&depth, "depth", 10, "Maximum child depth to request")
-	command.Flags().StringSliceVar(&visibility, "visibility", nil, "Filter by visibility (comma-separated: draft, review, published, unlisted)")
-	filterFlags.Bind(command)
-
-	help.SetupMarkdownHelp(command)
-
-	return TreeCommand(command)
 }
 
 func fetchTree(

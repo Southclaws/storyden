@@ -10,100 +10,34 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
-type ChildrenCommand *cobra.Command
+func New(store *config.Store) cligen.NodePropertiesSchemaChildrenHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodePropertiesSchemaChildrenParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) ChildrenCommand {
-	longHelp := `# Update Children Property Schema
+		schema, err := parseSchema(p.Token)
+		if err != nil {
+			return err
+		}
 
-Updates the property schema of the children of this node.
+		result, err := setChildrenSchema(ctx, client.OpenAPI, p.Slug, schema)
+		if err != nil {
+			return err
+		}
 
-## How Property Schemas Work
+		fmt.Fprintf(io.Out, "Updated children property schema for node: %s\n", p.Slug)
+		for _, field := range result.Properties {
+			fmt.Fprintf(io.Out, "  %s (%s) [%s]\n", field.Name, field.Type, field.Sort)
+		}
 
-All children of a node use the same schema for properties, resulting in a table-like
-structure and behaviour. This means:
-
-- All **sibling nodes** share the same property schema
-- When you update a child's schema, it affects **all its siblings**
-- Setting a children schema defines what properties the **children will have**
-
-## Schema Format
-
-Each field is specified as:
-~~~
-name:type:sort
-~~~
-
-Where:
-- **name** - The property field name
-- **type** - Property type (text, number, boolean, timestamp)
-- **sort** - Sort order (asc, desc)
-
-## Examples
-
-Define schema for children of 'docs':
-~~~bash
-sd node properties schema children docs status:text:asc priority:number:desc
-~~~
-
-Now when you create children of 'docs', they will all have these properties:
-~~~bash
-sd node create --parent docs --name "Page 1"
-sd node properties get page-1  # Shows status and priority (initially empty)
-sd node properties set page-1 status=draft priority=1
-~~~
-
-Multiple properties:
-~~~bash
-sd node properties schema children tutorials difficulty:text:asc duration:number:asc hands-on:boolean:desc
-~~~
-
-## See Also
-
-- ` + "`sd node properties schema set`" + ` - Update schema for this node and its siblings
-- ` + "`sd node properties set`" + ` - Set property values
-`
-
-	command := &cobra.Command{
-		Use:   "children <slug> <field>:<type>:<sort>...",
-		Short: "Set property schema for a node's children",
-		Long:  longHelp,
-		Args:  cobra.MinimumNArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-			fields := args[1:]
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			schema, err := parseSchema(fields)
-			if err != nil {
-				return err
-			}
-
-			result, err := setChildrenSchema(cmd.Context(), client.OpenAPI, slug, schema)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Updated children property schema for node: %s\n", slug)
-			for _, field := range result.Properties {
-				fmt.Fprintf(cmd.OutOrStdout(), "  %s (%s) [%s]\n", field.Name, field.Type, field.Sort)
-			}
-
-			return nil
-		},
+		return nil
 	}
-
-	// Setup beautiful markdown help rendering
-	help.SetupMarkdownHelp(command)
-
-	return ChildrenCommand(command)
 }
 
 func setChildrenSchema(

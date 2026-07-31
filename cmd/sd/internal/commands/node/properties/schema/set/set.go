@@ -10,104 +10,34 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 )
 
-type SetCommand *cobra.Command
+func New(store *config.Store) cligen.NodePropertiesSchemaSetHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.NodePropertiesSchemaSetParams) error {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return err
+		}
 
-func New(store *config.Store) SetCommand {
-	longHelp := `# Update Property Schema
+		schema, err := parseSchema(p.Token)
+		if err != nil {
+			return err
+		}
 
-Updates the property schema of this node and its siblings.
+		result, err := setSchema(ctx, client.OpenAPI, p.Slug, schema)
+		if err != nil {
+			return err
+		}
 
-## How Property Schemas Work
+		fmt.Fprintf(io.Out, "Updated property schema for node: %s\n", p.Slug)
+		for _, field := range result.Properties {
+			fmt.Fprintf(io.Out, "  %s (%s) [%s]\n", field.Name, field.Type, field.Sort)
+		}
 
-All children of a node use the same schema for properties, resulting in a table-like
-structure and behaviour. When you update a node's schema:
-
-- It affects **this node and all its siblings** (nodes with the same parent)
-- All siblings will share the same property keys and types
-- Values can differ between siblings, but the schema is shared
-
-## Schema Format
-
-Each field is specified as:
-~~~
-name:type:sort
-~~~
-
-Where:
-- **name** - The property field name
-- **type** - Property type (text, number, boolean, timestamp)
-- **sort** - Sort order (asc, desc)
-
-## Type Casting
-
-Property schemas are loosely structured and can automatically cast their values sometimes.
-A failed cast will not change data and instead just yield an empty value when reading.
-However, changing the schema back to the original type (or a type compatible with what
-the type was before changing) will retain the original data upon next read.
-
-This permits easy schema experimentation and undo without data loss.
-
-## Examples
-
-Update schema for a node and its siblings:
-~~~bash
-sd node properties schema set page-1 status:text:asc priority:number:desc
-~~~
-
-This affects page-1 and all its siblings (page-2, page-3, etc if they share a parent).
-
-Multiple properties with different types:
-~~~bash
-sd node properties schema set my-node title:text:asc count:number:desc completed:boolean:asc
-~~~
-
-## See Also
-
-- ` + "`sd node properties schema children`" + ` - Update schema for this node's children
-- ` + "`sd node properties set`" + ` - Set property values
-`
-
-	command := &cobra.Command{
-		Use:   "set <slug> <field>:<type>:<sort>...",
-		Short: "Set property schema for a node and its siblings",
-		Long:  longHelp,
-		Args:  cobra.MinimumNArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-			fields := args[1:]
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			schema, err := parseSchema(fields)
-			if err != nil {
-				return err
-			}
-
-			result, err := setSchema(cmd.Context(), client.OpenAPI, slug, schema)
-			if err != nil {
-				return err
-			}
-
-			fmt.Fprintf(cmd.OutOrStdout(), "Updated property schema for node: %s\n", slug)
-			for _, field := range result.Properties {
-				fmt.Fprintf(cmd.OutOrStdout(), "  %s (%s) [%s]\n", field.Name, field.Type, field.Sort)
-			}
-
-			return nil
-		},
+		return nil
 	}
-
-	// Setup beautiful markdown help rendering
-	help.SetupMarkdownHelp(command)
-
-	return SetCommand(command)
 }
 
 func setSchema(

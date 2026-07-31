@@ -2,6 +2,7 @@ package login
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/tui"
 )
@@ -47,29 +49,6 @@ func TestContextName(t *testing.T) {
 	})
 }
 
-func TestAccessKeyStdinExample(t *testing.T) {
-	t.Run("windows uses powershell", func(t *testing.T) {
-		shell, command := accessKeyStdinExample("windows")
-
-		assert.Equal(t, "powershell", shell)
-		assert.Equal(t, `$env:STORYDEN_ACCESS_KEY | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`, command)
-	})
-
-	t.Run("macos uses zsh", func(t *testing.T) {
-		shell, command := accessKeyStdinExample("darwin")
-
-		assert.Equal(t, "zsh", shell)
-		assert.Equal(t, `printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`, command)
-	})
-
-	t.Run("linux uses bash", func(t *testing.T) {
-		shell, command := accessKeyStdinExample("linux")
-
-		assert.Equal(t, "bash", shell)
-		assert.Equal(t, `printf '%s' "$STORYDEN_ACCESS_KEY" | sd auth login http://localhost:8000 --access-key-stdin --auth-storage file`, command)
-	})
-}
-
 func TestLoginCommand(t *testing.T) {
 	t.Run("stores access key auth without OAuth discovery", func(t *testing.T) {
 		a := assert.New(t)
@@ -77,17 +56,18 @@ func TestLoginCommand(t *testing.T) {
 
 		configPath := filepath.Join(t.TempDir(), "storyden", "config.yaml")
 		store := config.NewFileStoreAt(configPath)
-		command := (*cobra.Command)(New(store))
-		command.SetArgs([]string{
-			"http://localhost:8000",
-			"--access-key-stdin",
-			"--auth-storage", "file",
-		})
-		command.SetIn(strings.NewReader("sdak_test_access_key\n"))
+		handler := New(store)
 		var stdout bytes.Buffer
-		command.SetOut(&stdout)
 
-		r.NoError(command.Execute())
+		r.NoError(handler(context.Background(), &cobra.Command{}, cligen.IO{
+			In:  strings.NewReader("sdak_test_access_key\n"),
+			Out: &stdout,
+			Err: &bytes.Buffer{},
+		}, cligen.AuthLoginParams{
+			StorydenApiUrl: "http://localhost:8000",
+			AccessKeyStdin: true,
+			AuthStorage:    cligen.AuthLoginAuthStorageFile,
+		}))
 
 		cfg, err := store.Load()
 		r.NoError(err)
@@ -165,13 +145,12 @@ func TestLoginCommand(t *testing.T) {
 		var stdout bytes.Buffer
 		var stderr bytes.Buffer
 		store := config.NewFileStoreAt(filepath.Join(t.TempDir(), "storyden", "config.yaml"))
-		root := &cobra.Command{Use: "sd"}
-		root.SetOut(&stdout)
-		root.SetErr(&stderr)
-		root.AddCommand((*cobra.Command)(New(store)))
-		root.SetArgs([]string{"login", server.URL + "/api"})
+		handler := New(store)
 
-		r.NoError(root.Execute())
+		r.NoError(handler(context.Background(), &cobra.Command{}, cligen.IO{Out: &stdout, Err: &stderr}, cligen.AuthLoginParams{
+			StorydenApiUrl: server.URL + "/api",
+			AuthStorage:    cligen.AuthLoginAuthStorageAuto,
+		}))
 
 		cfg, err := store.Load()
 		r.NoError(err)
@@ -271,7 +250,7 @@ func TestEndpointFromArgs(t *testing.T) {
 		cfg.SetCurrentContext("local")
 		r.NoError(store.Save(cfg))
 
-		endpoint, err := endpointFromArgs(&cobra.Command{}, nil, store)
+		endpoint, err := endpointFromArgs(context.Background(), cligen.IO{}, nil, store)
 		r.NoError(err)
 
 		a.Equal("http://localhost:8000", endpoint)

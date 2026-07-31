@@ -1,63 +1,37 @@
 package packagecmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
 
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 )
 
-type PackageCommand *cobra.Command
-
-func New() PackageCommand {
-	var dir string
-	var manifestPath string
-	var outputPath string
-	var force bool
-
-	command := &cobra.Command{
-		Use:   "package",
-		Short: "Create a supervised plugin package zip",
-		Long: `# Package Plugin
-
-Create a zip archive for supervised plugin distribution.
-
-The package includes a generated ` + "`manifest.json`" + ` from ` + "`manifest.yaml`" + ` and the project files in the plugin directory.
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			path := outputPath
-			if path == "" {
-				mf, err := plugindev.ReadProjectManifest(dir, manifestPath)
-				if err != nil {
-					return err
-				}
-				path = plugindev.DefaultPackagePath(dir, mf.Manifest)
-			}
-
-			excludes := []string{path}
-			pkg, err := plugindev.BuildPackage(cmd.Context(), dir, manifestPath, excludes...)
+func New() cligen.PluginDevPackageHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.PluginDevPackageParams) error {
+		path := p.OutputFile
+		if path == "" {
+			mf, err := plugindev.ReadProjectManifest(p.Dir, p.Manifest)
 			if err != nil {
 				return err
 			}
+			path = plugindev.DefaultPackagePath(p.Dir, mf.Manifest)
+		}
 
-			if err := plugindev.WritePackageFile(path, pkg, force); err != nil {
-				return err
-			}
+		excludes := []string{path}
+		pkg, err := plugindev.BuildPackage(ctx, p.Dir, p.Manifest, excludes...)
+		if err != nil {
+			return err
+		}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Created plugin package %s (%d files)\n", path, len(pkg.Files))
-			return nil
-		},
+		if err := plugindev.WritePackageFile(path, pkg, p.Force); err != nil {
+			return err
+		}
+
+		fmt.Fprintf(io.Out, "Created plugin package %s (%d files)\n", path, len(pkg.Files))
+		return nil
 	}
-
-	command.Flags().StringVar(&dir, "dir", ".", "Plugin project directory")
-	command.Flags().StringVarP(&manifestPath, "manifest", "m", plugindev.ManifestFilename, "Path to plugin manifest YAML")
-	command.Flags().StringVarP(&outputPath, "output", "o", "", "Output zip path")
-	command.Flags().BoolVar(&force, "force", false, "Overwrite an existing package")
-
-	help.SetupMarkdownHelp(command)
-
-	return PackageCommand(command)
 }

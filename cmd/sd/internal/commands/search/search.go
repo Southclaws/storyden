@@ -11,20 +11,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/carapace-sh/carapace"
+	"github.com/Southclaws/opt"
 	"github.com/spf13/cobra"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
-
-type SearchCommand *cobra.Command
 
 type options struct {
 	Query      string
@@ -34,73 +32,41 @@ type options struct {
 	Tags       []string
 }
 
-func New(store *config.Store) SearchCommand {
-	flags := &listflags.Flags{}
-	opts := &options{}
+func New(store *config.Store) cligen.SearchHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.SearchParams) (cligen.SearchResult, error) {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Format),
+			Output: string(p.Output),
+		}
+		opts := &options{
+			Query:      p.Query,
+			Kinds:      p.Kind,
+			Authors:    p.Authors,
+			Categories: p.Categories,
+			Tags:       p.Tags,
+		}
 
-	command := &cobra.Command{
-		Use:   "search <query>",
-		Short: "Search all Storyden content",
-		Long: `# Search
+		if err := opts.validate(); err != nil {
+			return cligen.SearchResult{}, err
+		}
+		if err := flags.Validate(); err != nil {
+			return cligen.SearchResult{}, err
+		}
 
-Search the Storyden datagraph across nodes, threads, replies, posts, and profiles.
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.SearchResult{}, err
+		}
 
-## Examples
+		fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
+			return fetchSearch(ctx, client.OpenAPI, opts, page)
+		}
 
-Search all content:
-~~~bash
-sd search "design system"
-~~~
-
-Search only nodes and threads:
-~~~bash
-sd search "release notes" --kind node --kind thread
-~~~
-
-Filter by author, category, and tag:
-~~~bash
-sd search "triage" --authors southclaws --categories docs --tags review
-~~~
-
-Stream all matches as JSONL:
-~~~bash
-sd search "agents" --all --format jsonl
-~~~
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			opts.Query = args[0]
-			if err := opts.validate(); err != nil {
-				return err
-			}
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
-				return fetchSearch(cmd.Context(), client.OpenAPI, opts, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(io.Out, flags, fetch)
 	}
-
-	command.Flags().StringSliceVar(&opts.Kinds, "kind", nil, "Filter by datagraph item kind: "+strings.Join(searchKinds, ", "))
-	command.Flags().StringSliceVar(&opts.Authors, "authors", nil, "Filter by author account IDs or handles; repeat or comma-separate")
-	command.Flags().StringSliceVar(&opts.Categories, "categories", nil, "Filter by category slugs; repeat or comma-separate")
-	command.Flags().StringSliceVar(&opts.Tags, "tags", nil, "Filter by tag names; repeat or comma-separate")
-	flags.Bind(command)
-	carapace.Gen(command).FlagCompletion(carapace.ActionMap{
-		"kind": carapace.ActionValues(searchKinds...),
-	})
-	help.SetupMarkdownHelp(command)
-
-	return SearchCommand(command)
 }
 
 func (o *options) validate() error {
@@ -108,50 +74,36 @@ func (o *options) validate() error {
 		return fmt.Errorf("search query must not be empty")
 	}
 
-	for _, kind := range o.Kinds {
-		if _, ok := validKinds[strings.ToLower(strings.TrimSpace(kind))]; !ok {
-			return fmt.Errorf("invalid --kind %q; must be one of: %s", kind, strings.Join(searchKinds, ", "))
-		}
-	}
-
 	return nil
 }
 
-var searchKinds = []string{"post", "thread", "reply", "node", "collection", "profile", "event"}
-
-var validKinds = mapFromSlice(searchKinds)
-
-func mapFromSlice(values []string) map[string]struct{} {
-	mapped := make(map[string]struct{}, len(values))
-	for _, value := range values {
-		mapped[value] = struct{}{}
-	}
-	return mapped
-}
-
-func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
+// run dispatches on the resolved format. json's result is returned rather
+// than written directly — codegen's generated RunE encodes it according to
+// the OpenCLI-declared SearchResult schema. Every other format still writes
+// directly to out, same as before.
+func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) (cligen.SearchResult, error) {
 	format := flags.ResolveFormat(out)
 
 	switch format {
 	case listflags.FormatJSON:
 		if flags.All {
-			return runJSONAll(out, flags, fetch)
+			return runJSONAll(flags, fetch)
 		}
 		result, err := fetch(flags.Page)
 		if err != nil {
-			return err
+			return cligen.SearchResult{}, err
 		}
 		result.Items = limitItems(result.Items, flags.Limit)
-		return outputfmt.JSON(out, result)
+		return cligenconv.Convert[cligen.SearchResult](result)
 
 	case listflags.FormatJSONL:
-		return runJSONL(out, flags, fetch)
+		return cligen.SearchResult{}, runJSONL(out, flags, fetch)
 
 	case listflags.FormatPlain:
-		return runPlain(out, flags, fetch)
+		return cligen.SearchResult{}, runPlain(out, flags, fetch)
 
 	default:
-		return fmt.Errorf("unsupported format %q", flags.Format)
+		return cligen.SearchResult{}, fmt.Errorf("unsupported format %q", flags.Format)
 	}
 }
 
@@ -216,7 +168,7 @@ func runJSONL(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.D
 	return err
 }
 
-func runJSONAll(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
+func runJSONAll(flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) (cligen.SearchResult, error) {
 	all := []openapi.DatagraphItem{}
 	err := iterPages(flags, fetch, func(page *openapi.DatagraphSearchResult) (bool, error) {
 		for _, item := range page.Items {
@@ -228,9 +180,9 @@ func runJSONAll(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi
 		return true, nil
 	})
 	if err != nil {
-		return err
+		return cligen.SearchResult{}, err
 	}
-	return outputfmt.JSON(out, openapi.DatagraphSearchResult{Items: all})
+	return cligenconv.Convert[cligen.SearchResult](openapi.DatagraphSearchResult{Items: all})
 }
 
 func iterPages(flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error), onPage func(*openapi.DatagraphSearchResult) (bool, error)) error {

@@ -8,13 +8,18 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 )
 
-func TestRenderYAMLUsesStructuredEncoding(t *testing.T) {
+// TestYAMLMatchesJSONShape locks in the format-parity fix: --format yaml
+// describes the exact same fields as --format json (including Fid), rather
+// than the hand-shaped subset the command used to emit.
+func TestYAMLMatchesJSONShape(t *testing.T) {
 	r := require.New(t)
 
 	schema := []openapi.PropertySchema{
 		{
+			Fid:  "field_1",
 			Name: "status: #1",
 			Type: openapi.PropertyTypeText,
 			Sort: "asc",
@@ -23,16 +28,11 @@ func TestRenderYAMLUsesStructuredEncoding(t *testing.T) {
 
 	var out bytes.Buffer
 
-	r.NoError(renderYAML(&out, schema))
+	r.NoError(output.YAML(&out, schema))
 
-	var decoded struct {
-		Schema []struct {
-			Name string `yaml:"name"`
-			Type string `yaml:"type"`
-			Sort string `yaml:"sort"`
-		} `yaml:"schema"`
-	}
+	var decoded []map[string]string
 	r.NoError(yaml.Unmarshal(out.Bytes(), &decoded))
-	r.Len(decoded.Schema, 1)
-	r.Equal("status: #1", decoded.Schema[0].Name)
+	r.Len(decoded, 1)
+	r.Equal("field_1", decoded[0]["fid"])
+	r.Equal("status: #1", decoded[0]["name"])
 }

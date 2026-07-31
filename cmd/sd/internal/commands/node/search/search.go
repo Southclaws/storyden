@@ -13,105 +13,117 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Southclaws/opt"
 	"github.com/spf13/cobra"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type SearchCommand *cobra.Command
+func New(store *config.Store) cligen.NodeSearchHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeSearchParams) (cligen.SearchNodeListResult, error) {
+		if strings.TrimSpace(p.Query) == "" {
+			return cligen.SearchNodeListResult{}, fmt.Errorf("search query must not be empty")
+		}
 
-func New(store *config.Store) SearchCommand {
-	flags := &listflags.Flags{}
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Format),
+			Output: string(p.Output),
+		}
+		if err := flags.Validate(); err != nil {
+			return cligen.SearchNodeListResult{}, err
+		}
 
-	command := &cobra.Command{
-		Use:   "search <query>",
-		Short: "Full-text search for nodes",
-		Long: `# Search Nodes
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.SearchNodeListResult{}, err
+		}
 
-Run a full-text query against the datagraph and return matching nodes. Posts, threads, and other kinds are filtered out so the output shape matches the rest of the node list commands.
+		fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
+			return fetchSearch(ctx, client.OpenAPI, p.Query, page)
+		}
 
-## Examples
-
-Search for nodes containing a phrase:
-~~~bash
-sd node search "design system"
-~~~
-
-Stream every match across all pages as JSONL:
-~~~bash
-sd node search "agents" --all --format jsonl
-~~~
-
-Stop after the first 10 matches:
-~~~bash
-sd node search "go" --limit 10
-~~~
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			query := args[0]
-			if strings.TrimSpace(query) == "" {
-				return fmt.Errorf("search query must not be empty")
-			}
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.DatagraphSearchResult, error) {
-				return fetchSearch(cmd.Context(), client.OpenAPI, query, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(cio.Out, flags, fetch)
 	}
-
-	flags.Bind(command)
-	help.SetupMarkdownHelp(command)
-
-	return SearchCommand(command)
 }
 
-func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
+// run dispatches on the resolved format. json's result is returned rather
+// than written directly — codegen's generated RunE encodes it according to
+// the OpenCLI-declared SearchNodeListResult schema. Every other format still
+// writes directly to out, same as before.
+func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) (cligen.SearchNodeListResult, error) {
 	format := flags.ResolveFormat(out)
 
 	switch format {
 	case listflags.FormatJSON:
-		if flags.All {
-			return runJSONAll(out, flags, fetch)
-		}
-		result, err := fetch(flags.Page)
-		if err != nil {
-			return err
-		}
-		nodes := extractNodes(result)
-		if flags.Limit > 0 && len(nodes) > flags.Limit {
-			nodes = nodes[:flags.Limit]
-		}
-		return outputfmt.JSON(out, struct {
-			Nodes []openapi.Node `json:"nodes"`
-		}{Nodes: nodes})
+		return runJSON(flags, fetch)
 
 	case listflags.FormatJSONL:
-		return runJSONL(out, flags, fetch)
+		return cligen.SearchNodeListResult{}, runJSONL(out, flags, fetch)
 
 	case listflags.FormatPlain:
-		return runPlain(out, flags, fetch)
+		return cligen.SearchNodeListResult{}, runPlain(out, flags, fetch)
 
 	default:
-		return fmt.Errorf("unsupported format %q", flags.Format)
+		return cligen.SearchNodeListResult{}, fmt.Errorf("unsupported format %q", flags.Format)
 	}
+}
+
+func runJSON(flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) (cligen.SearchNodeListResult, error) {
+	if flags.All {
+		all := []openapi.Node{}
+		err := iterPages(flags, fetch, func(page *openapi.DatagraphSearchResult) (bool, error) {
+			for _, n := range extractNodes(page) {
+				all = append(all, n)
+				if flags.Limit > 0 && len(all) >= flags.Limit {
+					return false, nil
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return cligen.SearchNodeListResult{}, err
+		}
+		return cligenconv.Convert[cligen.SearchNodeListResult](struct {
+			Nodes []openapi.Node `json:"nodes"`
+		}{Nodes: all})
+	}
+
+	result, err := fetch(flags.Page)
+	if err != nil {
+		return cligen.SearchNodeListResult{}, err
+	}
+	nodes := extractNodes(result)
+	if flags.Limit > 0 && len(nodes) > flags.Limit {
+		nodes = nodes[:flags.Limit]
+	}
+	// Single page: include pagination metadata, matching the spec's
+	// SearchNodeListResult schema — consistent with every other list-shaped
+	// command's single-page JSON, unlike the bare array this used to return
+	// regardless of --all.
+	return cligenconv.Convert[cligen.SearchNodeListResult](struct {
+		PageSize    int            `json:"page_size"`
+		Results     int            `json:"results"`
+		TotalPages  int            `json:"total_pages"`
+		CurrentPage int            `json:"current_page"`
+		NextPage    *int           `json:"next_page,omitempty"`
+		Nodes       []openapi.Node `json:"nodes"`
+	}{
+		PageSize:    result.PageSize,
+		Results:     result.Results,
+		TotalPages:  result.TotalPages,
+		CurrentPage: result.CurrentPage,
+		NextPage:    result.NextPage,
+		Nodes:       nodes,
+	})
 }
 
 func runPlain(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
@@ -172,25 +184,6 @@ func runJSONL(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.D
 	}
 	_, err = emit(result)
 	return err
-}
-
-func runJSONAll(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error)) error {
-	all := []openapi.Node{}
-	err := iterPages(flags, fetch, func(page *openapi.DatagraphSearchResult) (bool, error) {
-		for _, n := range extractNodes(page) {
-			all = append(all, n)
-			if flags.Limit > 0 && len(all) >= flags.Limit {
-				return false, nil
-			}
-		}
-		return true, nil
-	})
-	if err != nil {
-		return err
-	}
-	return outputfmt.JSON(out, struct {
-		Nodes []openapi.Node `json:"nodes"`
-	}{Nodes: all})
 }
 
 func iterPages(flags *listflags.Flags, fetch func(int) (*openapi.DatagraphSearchResult, error), onPage func(*openapi.DatagraphSearchResult) (bool, error)) error {

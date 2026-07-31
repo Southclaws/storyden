@@ -13,117 +13,105 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 	"github.com/Southclaws/storyden/cmd/sd/internal/filter"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type ChildrenCommand *cobra.Command
+func New(store *config.Store) cligen.NodeChildrenHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.NodeChildrenParams) (cligen.NodeListResult, error) {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Format),
+			Output: string(p.Output),
+		}
+		opts := filter.NodeOptions{
+			LinkDomains:     p.LinkDomain,
+			LinkURLContains: p.LinkUrlContains,
+			LinkScheme:      string(p.LinkScheme),
+			NoLink:          p.NoLink,
+			HasLink:         p.HasLink,
+			RootOnly:        p.RootOnly,
+			OwnerHandle:     p.OwnerHandle,
+			NameContains:    p.NameContains,
+		}
 
-func New(store *config.Store) ChildrenCommand {
-	flags := &listflags.Flags{}
-	filterFlags := &filter.NodeFlags{}
-	var sort string
+		if err := flags.Validate(); err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-	command := &cobra.Command{
-		Use:   "children <slug>",
-		Short: "List children of a node",
-		Long: `# List Node Children
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
 
-List all direct children of a node. This shows only immediate children, not grandchildren.
+		fetch := func(page int) (*openapi.NodeListResult, error) {
+			return fetchChildren(ctx, client.OpenAPI, p.Slug, page, p.Sort)
+		}
 
-## Examples
-
-List children:
-~~~bash
-sd node children docs
-~~~
-
-Wide columns:
-~~~bash
-sd node children docs -o wide
-~~~
-
-Stream every page as JSONL:
-~~~bash
-sd node children docs --all --format jsonl
-~~~
-
-Get as JSON:
-~~~bash
-sd node children docs --format json
-~~~
-
-Sort children:
-~~~bash
-sd node children docs --sort name
-~~~
-
-Use ` + "`sd node tree`" + ` to see the full hierarchy including grandchildren.
-`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			slug := args[0]
-
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-			if err := filterFlags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.NodeListResult, error) {
-				return fetchChildren(cmd.Context(), client.OpenAPI, slug, page, sort)
-			}
-
-			return run(cmd.OutOrStdout(), flags, filterFlags.Build(), fetch)
-		},
+		return run(cio.Out, flags, opts, fetch)
 	}
-
-	flags.Bind(command)
-	filterFlags.Bind(command)
-	command.Flags().StringVar(&sort, "sort", "", "Sort order")
-
-	help.SetupMarkdownHelp(command)
-
-	return ChildrenCommand(command)
 }
 
-func run(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
+// run dispatches on the resolved format. json's result is returned rather
+// than written directly — codegen's generated RunE encodes it according to
+// the OpenCLI-declared NodeListResult schema. Every other format still
+// writes directly to out, same as before.
+func run(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) (cligen.NodeListResult, error) {
 	format := flags.ResolveFormat(out)
 
 	switch format {
 	case listflags.FormatJSON:
-		if flags.All {
-			return runJSONAll(out, flags, opts, fetch)
-		}
-		result, err := fetch(flags.Page)
-		if err != nil {
-			return err
-		}
-		result.Nodes = filter.FilterNodes(result.Nodes, opts)
-		if flags.Limit > 0 && len(result.Nodes) > flags.Limit {
-			result.Nodes = result.Nodes[:flags.Limit]
-		}
-		return outputfmt.JSON(out, result)
+		return runJSON(flags, opts, fetch)
 
 	case listflags.FormatJSONL:
-		return runJSONL(out, flags, opts, fetch)
+		return cligen.NodeListResult{}, runJSONL(out, flags, opts, fetch)
 
 	case listflags.FormatPlain:
-		return runPlain(out, flags, opts, fetch)
+		return cligen.NodeListResult{}, runPlain(out, flags, opts, fetch)
 
 	default:
-		return fmt.Errorf("unsupported format %q", flags.Format)
+		return cligen.NodeListResult{}, fmt.Errorf("unsupported format %q", flags.Format)
 	}
+}
+
+func runJSON(flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) (cligen.NodeListResult, error) {
+	if flags.All {
+		all := []openapi.NodeWithChildren{}
+		err := iterPages(flags, fetch, func(page *openapi.NodeListResult) (bool, error) {
+			for _, n := range page.Nodes {
+				if !filter.MatchNode(n, opts) {
+					continue
+				}
+				all = append(all, n)
+				if flags.Limit > 0 && len(all) >= flags.Limit {
+					return false, nil
+				}
+			}
+			return true, nil
+		})
+		if err != nil {
+			return cligen.NodeListResult{}, err
+		}
+		return cligenconv.Convert[cligen.NodeListResult](struct {
+			Nodes []openapi.NodeWithChildren `json:"nodes"`
+		}{Nodes: all})
+	}
+
+	page, err := fetch(flags.Page)
+	if err != nil {
+		return cligen.NodeListResult{}, err
+	}
+	page.Nodes = filter.FilterNodes(page.Nodes, opts)
+	if flags.Limit > 0 && len(page.Nodes) > flags.Limit {
+		page.Nodes = page.Nodes[:flags.Limit]
+	}
+	return cligenconv.Convert[cligen.NodeListResult](page)
 }
 
 func runPlain(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
@@ -191,28 +179,6 @@ func runJSONL(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fe
 	}
 	_, err = emit(result)
 	return err
-}
-
-func runJSONAll(out io.Writer, flags *listflags.Flags, opts filter.NodeOptions, fetch func(int) (*openapi.NodeListResult, error)) error {
-	all := []openapi.NodeWithChildren{}
-	err := iterPages(flags, fetch, func(page *openapi.NodeListResult) (bool, error) {
-		for _, n := range page.Nodes {
-			if !filter.MatchNode(n, opts) {
-				continue
-			}
-			all = append(all, n)
-			if flags.Limit > 0 && len(all) >= flags.Limit {
-				return false, nil
-			}
-		}
-		return true, nil
-	})
-	if err != nil {
-		return err
-	}
-	return outputfmt.JSON(out, struct {
-		Nodes []openapi.NodeWithChildren `json:"nodes"`
-	}{Nodes: all})
 }
 
 func iterPages(flags *listflags.Flags, fetch func(int) (*openapi.NodeListResult, error), onPage func(*openapi.NodeListResult) (bool, error)) error {

@@ -11,142 +11,109 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
+
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
 	"github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 	"github.com/Southclaws/storyden/cmd/sd/internal/tui"
 )
 
-type InfoCommand *cobra.Command
-
-const (
-	formatPlain = "plain"
-	formatJSON  = "json"
-)
-
 var hslPattern = regexp.MustCompile(`(?i)^hsla?\(\s*([0-9.]+)\s*,\s*([0-9.]+)%\s*,\s*([0-9.]+)%`)
 
-type instanceInfo struct {
-	Context  string       `json:"context,omitempty"`
-	Endpoint string       `json:"endpoint"`
-	BaseURL  string       `json:"base_url"`
-	Info     openapi.Info `json:"info"`
+func New(store *config.Store) cligen.InfoHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.InfoParams) (cligen.InstanceInfo, error) {
+		contextName, configuredEndpoint, err := currentContext(store)
+		if err != nil {
+			return cligen.InstanceInfo{}, err
+		}
+
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.InstanceInfo{}, err
+		}
+
+		info, err := fetchInfo(ctx, client.OpenAPI)
+		if err != nil {
+			return cligen.InstanceInfo{}, err
+		}
+
+		result := cligen.InstanceInfo{
+			Context:  &contextName,
+			Endpoint: configuredEndpoint,
+			BaseURL:  client.BaseURL,
+			Info:     toInfo(*info),
+		}
+		if result.Endpoint == "" {
+			result.Endpoint = client.Endpoint
+		}
+
+		if p.Format == cligen.InfoFormatPlain {
+			if err := renderPlain(io.Out, result); err != nil {
+				return cligen.InstanceInfo{}, err
+			}
+		}
+
+		return result, nil
+	}
 }
 
-func New(store *config.Store) InfoCommand {
-	var format string
+func NewMetadata(store *config.Store) cligen.InfoMetadataHandler {
+	return func(ctx context.Context, cmd *cobra.Command, io cligen.IO, p cligen.InfoMetadataParams) (cligen.Metadata, error) {
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return nil, err
+		}
 
-	command := &cobra.Command{
-		Use:   "info",
-		Short: "Show basic information about the current Storyden instance",
-		Long: `# Instance Information
+		info, err := fetchInfo(ctx, client.OpenAPI)
+		if err != nil {
+			return nil, err
+		}
 
-Show top-line information about the Storyden instance for the current auth context.
+		if info.Metadata == nil {
+			return nil, nil
+		}
 
-This is the quickest way for agents and scripts to confirm which instance they are authenticated into and what public capabilities/settings it exposes.
-
-## Examples
-
-Show human-readable instance information:
-~~~bash
-sd info
-~~~
-
-Get the full payload as JSON:
-~~~bash
-sd info --format json
-~~~
-
-Get raw instance metadata:
-~~~bash
-sd info metadata
-~~~
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := validateFormat(format); err != nil {
-				return err
-			}
-
-			contextName, configuredEndpoint, err := currentContext(store)
-			if err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			info, err := fetchInfo(cmd.Context(), client.OpenAPI)
-			if err != nil {
-				return err
-			}
-
-			result := instanceInfo{
-				Context:  contextName,
-				Endpoint: configuredEndpoint,
-				BaseURL:  client.BaseURL,
-				Info:     *info,
-			}
-			if result.Endpoint == "" {
-				result.Endpoint = client.Endpoint
-			}
-
-			return renderOutput(cmd.OutOrStdout(), format, result)
-		},
+		return cligen.Metadata(*info.Metadata), nil
 	}
-
-	command.Flags().StringVar(&format, "format", formatPlain, "Output format: plain or json")
-	command.AddCommand(newMetadataCommand(store))
-	help.SetupMarkdownHelp(command)
-
-	return InfoCommand(command)
 }
 
-func newMetadataCommand(store *config.Store) *cobra.Command {
-	command := &cobra.Command{
-		Use:   "metadata",
-		Short: "Show raw instance metadata as JSON",
-		Long: `# Instance Metadata
-
-Show the raw metadata object from the current Storyden instance's public info payload.
-
-## Examples
-
-~~~bash
-sd info metadata
-~~~
-`,
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			info, err := fetchInfo(cmd.Context(), client.OpenAPI)
-			if err != nil {
-				return err
-			}
-
-			metadata := openapi.Metadata{}
-			if info.Metadata != nil {
-				metadata = openapi.Metadata(*info.Metadata)
-			}
-
-			return output.JSON(cmd.OutOrStdout(), metadata)
-		},
+// toInfo maps the HTTP API's Info shape to the OpenCLI-schema-generated
+// Info type: the two are the same data, but the generated type's enum-like
+// fields are plain strings rather than the API client's named types.
+func toInfo(info openapi.Info) cligen.Info {
+	motd := (*cligen.InfoMotd)(nil)
+	if info.Motd != nil {
+		motd = &cligen.InfoMotd{Content: &info.Motd.Content}
 	}
 
-	help.SetupMarkdownHelp(command)
+	capabilities := make([]string, len(info.Capabilities))
+	for i, c := range info.Capabilities {
+		capabilities[i] = string(c)
+	}
 
-	return command
+	description := info.Description
+	authMode := string(info.AuthenticationMode)
+	registrationMode := string(info.RegistrationMode)
+	accentColour := info.AccentColour
+	content := info.Content
+
+	return cligen.Info{
+		Title:              info.Title,
+		Description:        &description,
+		Content:            &content,
+		WebAddress:         info.WebAddress,
+		APIAddress:         info.ApiAddress,
+		AuthenticationMode: &authMode,
+		RegistrationMode:   &registrationMode,
+		AccentColour:       &accentColour,
+		Capabilities:       capabilities,
+		Motd:               motd,
+	}
 }
 
 func currentContext(store *config.Store) (string, string, error) {
@@ -179,36 +146,25 @@ func fetchInfo(ctx context.Context, client *openapi.ClientWithResponses) (*opena
 	return (*openapi.Info)(response.JSON200), nil
 }
 
-func renderOutput(out io.Writer, format string, result instanceInfo) error {
-	switch format {
-	case formatPlain:
-		return renderPlain(out, result)
-	case formatJSON:
-		return output.JSON(out, result)
-	default:
-		return fmt.Errorf("unsupported format %q", format)
-	}
-}
-
-func renderPlain(out io.Writer, result instanceInfo) error {
+func renderPlain(out io.Writer, result cligen.InstanceInfo) error {
 	terminal := output.IsTerminal(out)
 	styles := infoStyles(terminal)
 
 	fmt.Fprintln(out, styles.Title.Render(result.Info.Title))
-	if result.Info.Description != "" {
-		fmt.Fprintln(out, styles.Description.Render(result.Info.Description))
+	if str(result.Info.Description) != "" {
+		fmt.Fprintln(out, styles.Description.Render(str(result.Info.Description)))
 	}
 	fmt.Fprintln(out)
 
 	fields := [][2]string{
-		{"Context", result.Context},
+		{"Context", str(result.Context)},
 		{"Endpoint", result.Endpoint},
 		{"Web address", result.Info.WebAddress},
-		{"API address", result.Info.ApiAddress},
+		{"API address", result.Info.APIAddress},
 		{"API client base", result.BaseURL},
-		{"Authentication", string(result.Info.AuthenticationMode)},
-		{"Registration", string(result.Info.RegistrationMode)},
-		{"Accent colour", accentColour(result.Info.AccentColour, terminal)},
+		{"Authentication", str(result.Info.AuthenticationMode)},
+		{"Registration", str(result.Info.RegistrationMode)},
+		{"Accent colour", accentColour(str(result.Info.AccentColour), terminal)},
 	}
 	writeFields(out, fields, styles)
 
@@ -221,20 +177,27 @@ func renderPlain(out io.Writer, result instanceInfo) error {
 	}
 
 	if result.Info.Motd != nil {
-		if motd, err := overviewMarkdown(result.Info.Motd.Content); err == nil && motd != "" {
+		if motd, err := overviewMarkdown(str(result.Info.Motd.Content)); err == nil && motd != "" {
 			fmt.Fprintln(out)
 			fmt.Fprintln(out, styles.Section.Render("Message"))
 			fmt.Fprintln(out, renderMarkdown(motd, out))
 		}
 	}
 
-	if overview, err := overviewMarkdown(result.Info.Content); err == nil && overview != "" {
+	if overview, err := overviewMarkdown(str(result.Info.Content)); err == nil && overview != "" {
 		fmt.Fprintln(out)
 		fmt.Fprintln(out, styles.Section.Render("Overview"))
 		fmt.Fprintln(out, renderMarkdown(overview, out))
 	}
 
 	return nil
+}
+
+func str(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
 }
 
 type styles struct {
@@ -279,7 +242,7 @@ func writeFields(out io.Writer, fields [][2]string, styles styles) {
 	}
 }
 
-func prettyCapability(value openapi.InstanceCapability) string {
+func prettyCapability(value string) string {
 	text := strings.ReplaceAll(string(value), "_", " ")
 	if text == "" {
 		return ""
@@ -396,13 +359,4 @@ func contrastColour(hex string) string {
 		return "#000000"
 	}
 	return "#FFFFFF"
-}
-
-func validateFormat(format string) error {
-	switch format {
-	case formatPlain, formatJSON:
-		return nil
-	default:
-		return fmt.Errorf("--format must be one of: plain, json")
-	}
 }

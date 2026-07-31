@@ -13,110 +13,65 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/api"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligen"
+	"github.com/Southclaws/storyden/cmd/sd/internal/cligenconv"
 	"github.com/Southclaws/storyden/cmd/sd/internal/commands/listflags"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
-	"github.com/Southclaws/storyden/cmd/sd/internal/help"
-	outputfmt "github.com/Southclaws/storyden/cmd/sd/internal/output"
 	"github.com/Southclaws/storyden/cmd/sd/internal/render"
 )
 
-type ListCommand *cobra.Command
+func New(store *config.Store) cligen.ThreadListHandler {
+	return func(ctx context.Context, cmd *cobra.Command, cio cligen.IO, p cligen.ThreadListParams) (cligen.ThreadListResult, error) {
+		flags := &listflags.Flags{
+			Page:   p.Page,
+			Limit:  p.Limit,
+			All:    p.All,
+			Format: string(p.Format),
+			Output: string(p.Output),
+		}
+		if err := flags.Validate(); err != nil {
+			return cligen.ThreadListResult{}, err
+		}
 
-func New(store *config.Store) ListCommand {
-	flags := &listflags.Flags{}
+		client, err := api.NewAuthenticatedClient(ctx, store)
+		if err != nil {
+			return cligen.ThreadListResult{}, err
+		}
 
-	command := &cobra.Command{
-		Use:   "list",
-		Short: "List recent Storyden threads",
-		Long: `# List Discussion Threads
+		fetch := func(page int) (*openapi.ThreadListResult, error) {
+			return fetchThreads(ctx, client.OpenAPI, page)
+		}
 
-Browse recent discussion threads with plain output or JSON. Use ` + "`sd tui`" + ` for the interactive explorer.
-
-## Examples
-
-List recent threads:
-~~~bash
-sd thread list
-~~~
-
-Plain format for scripting:
-~~~bash
-sd thread list --format plain
-~~~
-
-Wide output with extra columns:
-~~~bash
-sd thread list --output wide
-~~~
-
-Stream every page as JSONL:
-~~~bash
-sd thread list --all --format jsonl
-~~~
-
-Stop after the first 20 threads:
-~~~bash
-sd thread list --limit 20
-~~~
-
-Export to JSON:
-~~~bash
-sd thread list --format json > threads.json
-~~~
-
-Navigate pages:
-~~~bash
-sd thread list --page 2
-~~~
-
-`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := flags.Validate(); err != nil {
-				return err
-			}
-
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
-			if err != nil {
-				return err
-			}
-
-			fetch := func(page int) (*openapi.ThreadListResult, error) {
-				return fetchThreads(cmd.Context(), client.OpenAPI, page)
-			}
-
-			return run(cmd.OutOrStdout(), flags, fetch)
-		},
+		return run(cio.Out, flags, fetch)
 	}
-
-	flags.Bind(command)
-
-	help.SetupMarkdownHelp(command)
-
-	return ListCommand(command)
 }
 
-func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.ThreadListResult, error)) error {
+// run dispatches on the resolved format. json's result is returned rather
+// than written directly — codegen's generated RunE encodes it according to
+// the OpenCLI-declared ThreadListResult schema. Every other format still
+// writes directly to out, same as before.
+func run(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.ThreadListResult, error)) (cligen.ThreadListResult, error) {
 	format := flags.ResolveFormat(out)
 
 	switch format {
 	case listflags.FormatJSON:
 		if flags.All {
-			return runJSONAll(out, flags, fetch)
+			return runJSONAll(flags, fetch)
 		}
 		result, err := fetch(flags.Page)
 		if err != nil {
-			return err
+			return cligen.ThreadListResult{}, err
 		}
-		return outputfmt.JSON(out, result)
+		return cligenconv.Convert[cligen.ThreadListResult](result)
 
 	case listflags.FormatJSONL:
-		return runJSONL(out, flags, fetch)
+		return cligen.ThreadListResult{}, runJSONL(out, flags, fetch)
 
 	case listflags.FormatPlain:
-		return runPlain(out, flags, fetch)
+		return cligen.ThreadListResult{}, runPlain(out, flags, fetch)
 
 	default:
-		return fmt.Errorf("unsupported format %q", flags.Format)
+		return cligen.ThreadListResult{}, fmt.Errorf("unsupported format %q", flags.Format)
 	}
 }
 
@@ -180,7 +135,7 @@ func runJSONL(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.T
 	return err
 }
 
-func runJSONAll(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi.ThreadListResult, error)) error {
+func runJSONAll(flags *listflags.Flags, fetch func(int) (*openapi.ThreadListResult, error)) (cligen.ThreadListResult, error) {
 	all := []openapi.ThreadReference{}
 	err := iterPages(flags, fetch, func(page *openapi.ThreadListResult) (bool, error) {
 		all = append(all, page.Threads...)
@@ -191,9 +146,9 @@ func runJSONAll(out io.Writer, flags *listflags.Flags, fetch func(int) (*openapi
 		return true, nil
 	})
 	if err != nil {
-		return err
+		return cligen.ThreadListResult{}, err
 	}
-	return outputfmt.JSON(out, struct {
+	return cligenconv.Convert[cligen.ThreadListResult](struct {
 		Threads []openapi.ThreadReference `json:"threads"`
 	}{Threads: all})
 }
