@@ -50,6 +50,16 @@ type Manager struct {
 	client   *http.Client
 }
 
+type HTTPClient struct {
+	Client *http.Client
+}
+
+func NewHTTPClient() HTTPClient {
+	return HTTPClient{
+		Client: httpsafe.NewClient(httpsafe.Config{DialTimeout: probeTimeout}),
+	}
+}
+
 func New(
 	lc fx.Lifecycle,
 	ctx context.Context,
@@ -59,6 +69,7 @@ func New(
 	settings *settings.SettingsRepository,
 	tokens *oauthremotetoken.Service,
 	cfg config.Config,
+	client HTTPClient,
 ) *Manager {
 	m := Manager{
 		logger:   logger,
@@ -67,7 +78,7 @@ func New(
 		settings: settings,
 		tokens:   tokens,
 		config:   cfg,
-		client:   httpsafe.NewClient(httpsafe.Config{DialTimeout: probeTimeout}),
+		client:   client.Client,
 	}
 
 	lc.Append(fx.StartHook(func() error {
