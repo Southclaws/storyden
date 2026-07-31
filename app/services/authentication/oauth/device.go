@@ -65,12 +65,10 @@ func (s *Service) StartDeviceAuthorization(ctx context.Context, clientID string,
 	if err != nil {
 		return nil, nil, err
 	}
-	rawToken, err := randomToken(8)
+	userCode, err := generateUserCode()
 	if err != nil {
 		return nil, nil, err
 	}
-	raw := strings.ToUpper(rawToken)
-	userCode := raw[:4] + "-" + raw[4:8]
 
 	if _, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, time.Now()); err != nil {
 		return nil, nil, err

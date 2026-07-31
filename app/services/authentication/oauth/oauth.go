@@ -247,6 +247,28 @@ func randomToken(n int) (string, error) {
 	return b64url(b), nil
 }
 
+// userCodeAlphabet is Crockford's base32 alphabet: it excludes -, _ (so
+// codes are unambiguous once hyphens are stripped for lookup) and the
+// 0/O/1/I/L/U confusables that are hard to tell apart when read off a screen.
+const userCodeAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+
+// generateUserCode produces an 8-character user code formatted as XXXX-XXXX
+// from userCodeAlphabet. 256 is an exact multiple of len(userCodeAlphabet)
+// (32), so masking a random byte to 5 bits introduces no modulo bias.
+func generateUserCode() (string, error) {
+	b := make([]byte, 8)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+
+	out := make([]byte, 8)
+	for i, v := range b {
+		out[i] = userCodeAlphabet[v&0x1F]
+	}
+
+	return string(out[:4]) + "-" + string(out[4:]), nil
+}
+
 func hashString(v string) string {
 	s := sha256.Sum256([]byte(v))
 	return hex.EncodeToString(s[:])
