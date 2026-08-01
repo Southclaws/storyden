@@ -101,5 +101,11 @@ Storyden backend is a Go application using Uber Fx dependency injection and a 3-
 
 ## Design Context
 
-For UI/UX/visual/frontend tasks, use `.impeccable.md` as the source of truth for design direction and principles.
-For non-frontend tasks, treat `.impeccable.md` as optional context.
+For UI/UX/visual/frontend tasks, use the modern Impeccable artifacts in this order:
+
+- `PRODUCT.md` is the source of truth for durable product context, users, positioning, constraints, brand commitments, and accessibility requirements.
+- `DESIGN.md` is the source of truth for the incumbent visual system, including normative design tokens, layout, typography, component principles, and visual guardrails.
+- `.impeccable/design.json` is the generated tooling sidecar for `DESIGN.md`; refresh both together with `$impeccable document` rather than hand-maintaining competing visual rules.
+- `.impeccable/surfaces/*.md`, when present, contains strategy for a specific surface and takes precedence only within that surface's scope.
+
+Use `$impeccable init` when durable product context needs to be created or refreshed, `$impeccable document` when the implemented visual system needs to be captured or refreshed, and `$impeccable doctor` to diagnose artifact drift. The current code, Panda semantic tokens, components, and rendered interface remain the evidence behind these artifacts.
