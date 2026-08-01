@@ -33,20 +33,17 @@ export const Playground: Story = {};
 export const Variants: Story = {
   render: () => (
     <LStack gap="4" alignItems="start">
-      <HStack gap="3" flexWrap="wrap">
-        <Button variant="solid">Solid</Button>
-        <Button variant="subtle">Subtle</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
-      </HStack>
-      <HStack gap="3" flexWrap="wrap">
-        <Button size="xs">Extra small</Button>
-        <Button size="sm">Small</Button>
-        <Button size="md">Medium</Button>
-        <Button size="lg">Large</Button>
-        <Button size="xl">Extra large</Button>
-      </HStack>
+      {(["solid", "subtle", "outline", "ghost", "link"] as const).map(
+        (variant) => (
+          <HStack key={variant} gap="3" flexWrap="wrap">
+            {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
+              <Button key={size} variant={variant} size={size}>
+                {variant} {size}
+              </Button>
+            ))}
+          </HStack>
+        ),
+      )}
     </LStack>
   ),
 };

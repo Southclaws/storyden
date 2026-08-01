@@ -32,12 +32,21 @@ export const Playground: Story = {};
 
 export const Sizes: Story = {
   render: () => (
-    <LStack gap="3" maxW="md">
-      <Input size="xs" placeholder="Extra small" />
-      <Input size="sm" placeholder="Small" />
-      <Input size="md" placeholder="Medium" />
-      <Input size="lg" placeholder="Large" />
-      <Input size="xl" placeholder="Extra large" />
+    <LStack gap="4" maxW="md">
+      {(["outline", "ghost"] as const).map((variant) => (
+        <LStack key={variant} gap="3">
+          {(["2xs", "xs", "sm", "md", "lg", "xl", "2xl"] as const).map(
+            (size) => (
+              <Input
+                key={size}
+                size={size}
+                variant={variant}
+                placeholder={`${variant} ${size}`}
+              />
+            ),
+          )}
+        </LStack>
+      ))}
     </LStack>
   ),
 };
