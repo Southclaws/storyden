@@ -8,7 +8,13 @@ export const accent = {
   default: {
     value: {
       _osLight: "var(--accent-colour-flat-fill-400)",
-      _osDark: "var(--accent-colour-flat-fill-500)",
+      _osDark: "var(--accent-colour-dark-fill-500)",
+    },
+  },
+  fg: {
+    value: {
+      _osLight: "var(--accent-colour-flat-text-400)",
+      _osDark: "var(--accent-colour-dark-text-500)",
     },
   },
   subtle: {

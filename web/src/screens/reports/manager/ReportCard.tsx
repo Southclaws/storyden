@@ -137,8 +137,6 @@ export function ReportCard({ report }: Props) {
         <WStack>
           <Button
             type="button"
-            size="xs"
-            variant="subtle"
             disabled={isAcknowledged || isResolved}
             onClick={handleAcknowledge}
           >
@@ -146,7 +144,6 @@ export function ReportCard({ report }: Props) {
           </Button>
           <Button
             type="button"
-            size="xs"
             variant="solid"
             disabled={isResolved}
             onClick={handleResolve}

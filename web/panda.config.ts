@@ -2,7 +2,7 @@ import { defineConfig, defineTextStyles } from "@pandacss/dev";
 
 import { admonition } from "@/components/ui/admonition/Admonition.recipe";
 import { alert } from "@/components/ui/alert/Alert.recipe";
-import { badge } from "@/components/ui/badge/Badge.recipe";
+import { badge, badgeColorPalettes } from "@/components/ui/badge/Badge.recipe";
 import { button } from "@/components/ui/button/Button.recipe";
 import { cardBox } from "@/components/ui/card-box/CardBox.recipe";
 import { checkbox } from "@/components/ui/checkbox/Checkbox.recipe";
@@ -47,6 +47,13 @@ export default defineConfig({
   jsxFramework: "react",
   exclude: [],
   staticCss: {
+    css: [
+      {
+        properties: {
+          colorPalette: [...badgeColorPalettes],
+        },
+      },
+    ],
     recipes: {
       button: [
         {

@@ -58,171 +58,171 @@ const tokens = defineTokens.colors({
 const semanticTokens = defineSemanticTokens.colors({
   "1": {
     value: {
-      base: "{colors.neutral.light.1}",
-      osDark: "{colors.neutral.dark.1}",
+      _osLight: "{colors.neutral.light.1}",
+      _osDark: "{colors.neutral.dark.1}",
     },
   },
   "2": {
     value: {
-      base: "{colors.neutral.light.2}",
-      osDark: "{colors.neutral.dark.2}",
+      _osLight: "{colors.neutral.light.2}",
+      _osDark: "{colors.neutral.dark.2}",
     },
   },
   "3": {
     value: {
-      base: "{colors.neutral.light.3}",
-      osDark: "{colors.neutral.dark.3}",
+      _osLight: "{colors.neutral.light.3}",
+      _osDark: "{colors.neutral.dark.3}",
     },
   },
   "4": {
     value: {
-      base: "{colors.neutral.light.4}",
-      osDark: "{colors.neutral.dark.4}",
+      _osLight: "{colors.neutral.light.4}",
+      _osDark: "{colors.neutral.dark.4}",
     },
   },
   "5": {
     value: {
-      base: "{colors.neutral.light.5}",
-      osDark: "{colors.neutral.dark.5}",
+      _osLight: "{colors.neutral.light.5}",
+      _osDark: "{colors.neutral.dark.5}",
     },
   },
   "6": {
     value: {
-      base: "{colors.neutral.light.6}",
-      osDark: "{colors.neutral.dark.6}",
+      _osLight: "{colors.neutral.light.6}",
+      _osDark: "{colors.neutral.dark.6}",
     },
   },
   "7": {
     value: {
-      base: "{colors.neutral.light.7}",
-      osDark: "{colors.neutral.dark.7}",
+      _osLight: "{colors.neutral.light.7}",
+      _osDark: "{colors.neutral.dark.7}",
     },
   },
   "8": {
     value: {
-      base: "{colors.neutral.light.8}",
-      osDark: "{colors.neutral.dark.8}",
+      _osLight: "{colors.neutral.light.8}",
+      _osDark: "{colors.neutral.dark.8}",
     },
   },
   "9": {
     value: {
-      base: "{colors.neutral.light.9}",
-      osDark: "{colors.neutral.dark.9}",
+      _osLight: "{colors.neutral.light.9}",
+      _osDark: "{colors.neutral.dark.9}",
     },
   },
   "10": {
     value: {
-      base: "{colors.neutral.light.10}",
-      osDark: "{colors.neutral.dark.10}",
+      _osLight: "{colors.neutral.light.10}",
+      _osDark: "{colors.neutral.dark.10}",
     },
   },
   "11": {
     value: {
-      base: "{colors.neutral.light.11}",
-      osDark: "{colors.neutral.dark.11}",
+      _osLight: "{colors.neutral.light.11}",
+      _osDark: "{colors.neutral.dark.11}",
     },
   },
   "12": {
     value: {
-      base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}",
+      _osLight: "{colors.neutral.light.12}",
+      _osDark: "{colors.neutral.dark.12}",
     },
   },
   a1: {
     value: {
-      base: "{colors.neutral.light.a1}",
-      osDark: "{colors.neutral.dark.a1}",
+      _osLight: "{colors.neutral.light.a1}",
+      _osDark: "{colors.neutral.dark.a1}",
     },
   },
   a2: {
     value: {
-      base: "{colors.neutral.light.a2}",
-      osDark: "{colors.neutral.dark.a2}",
+      _osLight: "{colors.neutral.light.a2}",
+      _osDark: "{colors.neutral.dark.a2}",
     },
   },
   a3: {
     value: {
-      base: "{colors.neutral.light.a3}",
-      osDark: "{colors.neutral.dark.a3}",
+      _osLight: "{colors.neutral.light.a3}",
+      _osDark: "{colors.neutral.dark.a3}",
     },
   },
   a4: {
     value: {
-      base: "{colors.neutral.light.a4}",
-      osDark: "{colors.neutral.dark.a4}",
+      _osLight: "{colors.neutral.light.a4}",
+      _osDark: "{colors.neutral.dark.a4}",
     },
   },
   a5: {
     value: {
-      base: "{colors.neutral.light.a5}",
-      osDark: "{colors.neutral.dark.a5}",
+      _osLight: "{colors.neutral.light.a5}",
+      _osDark: "{colors.neutral.dark.a5}",
     },
   },
   a6: {
     value: {
-      base: "{colors.neutral.light.a6}",
-      osDark: "{colors.neutral.dark.a6}",
+      _osLight: "{colors.neutral.light.a6}",
+      _osDark: "{colors.neutral.dark.a6}",
     },
   },
   a7: {
     value: {
-      base: "{colors.neutral.light.a7}",
-      osDark: "{colors.neutral.dark.a7}",
+      _osLight: "{colors.neutral.light.a7}",
+      _osDark: "{colors.neutral.dark.a7}",
     },
   },
   a8: {
     value: {
-      base: "{colors.neutral.light.a8}",
-      osDark: "{colors.neutral.dark.a8}",
+      _osLight: "{colors.neutral.light.a8}",
+      _osDark: "{colors.neutral.dark.a8}",
     },
   },
   a9: {
     value: {
-      base: "{colors.neutral.light.a9}",
-      osDark: "{colors.neutral.dark.a9}",
+      _osLight: "{colors.neutral.light.a9}",
+      _osDark: "{colors.neutral.dark.a9}",
     },
   },
   a10: {
     value: {
-      base: "{colors.neutral.light.a10}",
-      osDark: "{colors.neutral.dark.a10}",
+      _osLight: "{colors.neutral.light.a10}",
+      _osDark: "{colors.neutral.dark.a10}",
     },
   },
   a11: {
     value: {
-      base: "{colors.neutral.light.a11}",
-      osDark: "{colors.neutral.dark.a11}",
+      _osLight: "{colors.neutral.light.a11}",
+      _osDark: "{colors.neutral.dark.a11}",
     },
   },
   a12: {
     value: {
-      base: "{colors.neutral.light.a12}",
-      osDark: "{colors.neutral.dark.a12}",
+      _osLight: "{colors.neutral.light.a12}",
+      _osDark: "{colors.neutral.dark.a12}",
     },
   },
 
   default: {
     value: {
-      base: "{colors.neutral.light.9}",
-      osDark: "{colors.neutral.dark.9}",
+      _osLight: "{colors.neutral.light.9}",
+      _osDark: "{colors.neutral.dark.9}",
     },
   },
   emphasized: {
     value: {
-      base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}",
+      _osLight: "{colors.neutral.light.12}",
+      _osDark: "{colors.neutral.dark.12}",
     },
   },
   fg: {
     value: {
-      base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}",
+      _osLight: "black",
+      _osDark: "white",
     },
   },
   text: {
     value: {
-      base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}",
+      _osLight: "{colors.neutral.light.12}",
+      _osDark: "{colors.neutral.dark.12}",
     },
   },
 });

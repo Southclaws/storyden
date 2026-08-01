@@ -10,7 +10,6 @@ import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import {
-  badgeColourCSS,
   getDatagraphKindColour,
   getDatagraphKindLabel,
 } from "../../../datagraph/DatagraphItemCard";
@@ -30,7 +29,6 @@ export function DatagraphSearchItem({ result, handleNavigate }: Props) {
 
   const label = getDatagraphKindLabel(result.kind);
   const colour = getDatagraphKindColour(result.kind);
-  const cssVars = badgeColourCSS(colour);
 
   return (
     <Command.Item value={result.name} onSelect={handleSelect}>
@@ -50,14 +48,7 @@ export function DatagraphSearchItem({ result, handleNavigate }: Props) {
             )}
           </LStack>
         </HStack>
-        <Badge
-          size="sm"
-          style={cssVars}
-          backgroundColor="var(--colors-color-palette-bg)"
-          borderColor="var(--colors-color-palette-bo)"
-          color="var(--colors-color-palette-fg)"
-          flexShrink="0"
-        >
+        <Badge size="sm" colorPalette={colour} flexShrink="0">
           {label}
         </Badge>
       </HStack>

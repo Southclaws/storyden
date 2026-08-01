@@ -223,11 +223,6 @@ export function MultiSelectPicker({
                     }}
                     size={badgeSize}
                     style={colourStyles}
-                    bgColor={colourStyles ? "colorPalette.bg" : undefined}
-                    borderColor={
-                      colourStyles ? "colorPalette.border" : undefined
-                    }
-                    color={colourStyles ? "colorPalette.fg" : undefined}
                   >
                     {item.label}
                   </Badge>
