@@ -7,9 +7,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/invopop/jsonschema"
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/packages/param"
-	"github.com/openai/openai-go/shared"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/packages/param"
+	"github.com/openai/openai-go/v3/responses"
 )
 
 func PromptObject[T any](ctx context.Context, prompter Prompter, description, input string, schema T) (*T, error) {
@@ -22,19 +22,28 @@ func PromptObject[T any](ctx context.Context, prompter Prompter, description, in
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	var schemaMap map[string]any
+	encodedSchema, err := json.Marshal(serialisedSchema)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := json.Unmarshal(encodedSchema, &schemaMap); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-	res, err := s.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
+	res, err := s.client.Responses.New(ctx, responses.ResponseNewParams{
 		Model: openai.ChatModelGPT4_1,
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage(input),
+		Store: param.NewOpt(false),
+		Input: responses.ResponseNewParamsInputUnion{
+			OfString: openai.String(input),
 		},
-		ResponseFormat: openai.ChatCompletionNewParamsResponseFormatUnion{
-			OfJSONSchema: &shared.ResponseFormatJSONSchemaParam{
-				JSONSchema: shared.ResponseFormatJSONSchemaJSONSchemaParam{
+		Text: responses.ResponseTextConfigParam{
+			Format: responses.ResponseFormatTextConfigUnionParam{
+				OfJSONSchema: &responses.ResponseFormatTextJSONSchemaConfigParam{
 					Name:        "json_schema",
 					Strict:      param.NewOpt(true),
 					Description: param.NewOpt(description),
-					Schema:      serialisedSchema,
+					Schema:      schemaMap,
 				},
 			},
 		},
@@ -42,22 +51,13 @@ func PromptObject[T any](ctx context.Context, prompter Prompter, description, in
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-	if len(res.Choices) == 0 {
-		return nil, fault.New("result choices are empty")
+	if res.Status != responses.ResponseStatusCompleted {
+		return nil, fault.Wrap(openAIResponseError(*res), fctx.With(ctx))
 	}
-
-	if res.Choices[0].Message.JSON.Content.Raw() == "" {
+	payload := res.OutputText()
+	if payload == "" {
 		return nil, fault.New("result json is empty")
 	}
-
-	choice := res.Choices[0]
-
-	if choice.Message.JSON.Content.Valid() == false {
-		// TODO: Retry a few times with a backoff?
-		return nil, fault.New("result is not valid JSON")
-	}
-
-	payload := choice.Message.Content
 
 	var result T
 	err = json.Unmarshal([]byte(payload), &result)
