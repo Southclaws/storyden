@@ -12,6 +12,7 @@ export const combobox = defineSlotRecipe({
       width: "full",
     },
     control: {
+      display: "flex",
       position: "relative",
     },
     label: {
@@ -19,16 +20,20 @@ export const combobox = defineSlotRecipe({
       fontWeight: "medium",
     },
     trigger: {
+      alignItems: "center",
       bottom: "0",
       color: "fg.muted",
+      display: "flex",
+      justifyContent: "center",
+      p: "0!",
       position: "absolute",
       right: "0",
       top: "0",
     },
     content: {
       background: "bg.default",
-      borderRadius: "l2",
-      boxShadow: "lg",
+      borderRadius: "sm",
+      boxShadow: "overlay",
       display: "flex",
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",
@@ -52,7 +57,7 @@ export const combobox = defineSlotRecipe({
     },
     item: {
       alignItems: "center",
-      borderRadius: "l1",
+      borderRadius: "xs",
       cursor: "pointer",
       display: "flex",
       justifyContent: "space-between",
@@ -86,18 +91,17 @@ export const combobox = defineSlotRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
   },
   variants: {
     size: {
-      xs: {
+      sm: {
         content: { p: "0.5", gap: "1", borderRadius: "sm" },
         item: { textStyle: "xs", px: "2", height: "6", borderRadius: "xs" },
         itemIndicator: {
           "& :where(svg)": {
-            width: "4",
-            height: "4",
-            textStyle: "sm",
+            width: "3.5",
+            height: "3.5",
           },
         },
         itemGroupLabel: {
@@ -105,27 +109,19 @@ export const combobox = defineSlotRecipe({
           py: "1.5",
         },
         label: { textStyle: "xs" },
-        trigger: { right: "2.5" },
-      },
-      sm: {
-        content: { p: "0.5", gap: "1" },
-        item: { textStyle: "sm", px: "2", height: "9" },
-        itemIndicator: {
+        input: { paddingRight: "6!" },
+        trigger: {
+          height: "full!",
+          width: "6!",
           "& :where(svg)": {
-            width: "4",
-            height: "4",
+            height: "3.5!",
+            width: "3.5!",
           },
         },
-        itemGroupLabel: {
-          px: "2",
-          py: "1.5",
-        },
-        label: { textStyle: "sm" },
-        trigger: { right: "2.5" },
       },
       md: {
-        content: { p: "1", gap: "1" },
-        item: { textStyle: "md", px: "2", height: "10" },
+        content: { p: "0.5", gap: "1" },
+        item: { textStyle: "sm", px: "2", height: "8" },
         itemIndicator: {
           "& :where(svg)": {
             width: "4",
@@ -137,11 +133,19 @@ export const combobox = defineSlotRecipe({
           py: "1.5",
         },
         label: { textStyle: "sm" },
-        trigger: { right: "3" },
+        input: { paddingRight: "8!" },
+        trigger: {
+          height: "full!",
+          width: "8!",
+          "& :where(svg)": {
+            height: "4!",
+            width: "4!",
+          },
+        },
       },
       lg: {
-        content: { p: "1.5", gap: "1" },
-        item: { textStyle: "md", px: "2", height: "11" },
+        content: { p: "1", gap: "1" },
+        item: { textStyle: "md", px: "2", height: "10" },
         itemIndicator: {
           "& :where(svg)": {
             width: "5",
@@ -152,8 +156,16 @@ export const combobox = defineSlotRecipe({
           px: "2",
           py: "1.5",
         },
-        label: { textStyle: "sm" },
-        trigger: { right: "3.5" },
+        label: { textStyle: "md" },
+        input: { paddingRight: "10!" },
+        trigger: {
+          height: "full!",
+          width: "10!",
+          "& :where(svg)": {
+            height: "5!",
+            width: "5!",
+          },
+        },
       },
     },
   },

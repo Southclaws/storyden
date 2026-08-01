@@ -1,5 +1,4 @@
 import { Asset, Link } from "@/api/openapi-schema";
-
 import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
@@ -18,7 +17,7 @@ export function LinkView({ link, asset }: Props) {
       bgColor="bg.subtle"
       overflow="hidden"
       height="24"
-      shadow="sm"
+      shadow="surface"
     >
       {asset && (
         <Box flexGrow="1" flexShrink="0" width="32">

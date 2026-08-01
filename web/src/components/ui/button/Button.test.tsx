@@ -29,8 +29,13 @@ describe("Button", () => {
   it("renders a spinner when loading is true without loadingText", () => {
     const { container } = render(<Button loading>Retry Now</Button>);
 
-    expect(screen.getByRole("button")).toBeDisabled();
-    expect(screen.queryByText("Retry Now")).not.toBeInTheDocument();
-    expect(container.querySelector("button > div")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Retry Now" })).toBeDisabled();
+    expect(screen.getByRole("button")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByText("Retry Now")).toHaveClass(
+      "button__loading-content",
+    );
+    expect(
+      container.querySelector(".button__loading-indicator"),
+    ).not.toBeNull();
   });
 });

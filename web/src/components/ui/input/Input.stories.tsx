@@ -9,13 +9,13 @@ const meta = {
   component: Input,
   args: {
     placeholder: "Search community...",
-    size: "md",
+    size: "sm",
     variant: "outline",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["2xs", "xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["sm", "md", "lg"],
     },
     variant: {
       control: "select",
@@ -35,16 +35,14 @@ export const Sizes: Story = {
     <LStack gap="4" maxW="md">
       {(["outline", "ghost"] as const).map((variant) => (
         <LStack key={variant} gap="3">
-          {(["2xs", "xs", "sm", "md", "lg", "xl", "2xl"] as const).map(
-            (size) => (
-              <Input
-                key={size}
-                size={size}
-                variant={variant}
-                placeholder={`${variant} ${size}`}
-              />
-            ),
-          )}
+          {(["sm", "md", "lg"] as const).map((size) => (
+            <Input
+              key={size}
+              size={size}
+              variant={variant}
+              placeholder={`${variant} ${size}`}
+            />
+          ))}
         </LStack>
       ))}
     </LStack>

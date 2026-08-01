@@ -21,7 +21,7 @@ export function ScrollToTop({ children = "scroll to top" }: ScrollToTopProps) {
       href="#"
       className={button({
         variant: "subtle",
-        size: "xs",
+        size: "sm",
       })}
       onClick={handleClick}
     >

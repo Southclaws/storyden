@@ -8,14 +8,24 @@ import red from "@/theme/base/colours/red";
 import { accent } from "./accent";
 import { bg } from "./bg";
 import { border } from "./border";
+import { canvas } from "./canvas";
 import { conicGradient } from "./conic-gradient";
+import { content } from "./content";
 import { fg } from "./fg";
+import { interactive } from "./interactive";
+import { status } from "./status";
+import { surface } from "./surface";
 import { visibility } from "./visibility";
 
 export const colours = defineSemanticTokens.colors({
+  canvas,
+  surface,
+  content,
   bg,
   fg,
   border,
+  interactive,
+  status,
   visibility,
   conicGradient,
   accent,

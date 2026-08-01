@@ -3,10 +3,11 @@ import { defineSlotRecipe } from "@pandacss/dev";
 
 const itemStyle = {
   alignItems: "center",
-  borderRadius: "l1",
+  borderRadius: "xs",
   cursor: "pointer",
   display: "flex",
   fontWeight: "medium",
+  gap: "2",
   textStyle: "sm",
   transitionDuration: "fast",
   transitionProperty: "background, color",
@@ -50,8 +51,8 @@ export const menu = defineSlotRecipe({
       background: "bg.opaque",
       backdropBlur: "frosted",
       backdropFilter: "auto",
-      borderRadius: "l2",
-      boxShadow: "lg",
+      borderRadius: "sm",
+      boxShadow: "overlay",
       display: "flex",
       flexDirection: "column",
       outline: "none",

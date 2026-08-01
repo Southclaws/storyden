@@ -47,9 +47,6 @@ const groupVariantMap = {
   ],
   "attached": [
     "true"
-  ],
-  "grow": [
-    "true"
   ]
 }
 

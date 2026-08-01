@@ -4,13 +4,13 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ButtonVariant {
   /**
- * @default "solid"
+ * @default "subtle"
  */
-variant: "solid" | "outline" | "ghost" | "link" | "subtle"
+variant: "solid" | "outline" | "ghost" | "subtle"
 /**
- * @default "md"
+ * @default "sm"
  */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+size: "sm" | "md" | "lg"
 }
 
 type ButtonVariantMap = {

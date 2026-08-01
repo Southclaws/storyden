@@ -66,7 +66,7 @@ export function OperationCostOverrideAddForm({
                 <Input size="sm" />
               </Combobox.Input>
               <Combobox.Trigger asChild>
-                <IconButton variant="link" aria-label="open" size="xs">
+                <IconButton variant="ghost" aria-label="open" size="sm">
                   <ChevronUpDownIcon />
                 </IconButton>
               </Combobox.Trigger>

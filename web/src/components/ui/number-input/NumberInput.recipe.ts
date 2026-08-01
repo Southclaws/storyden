@@ -11,10 +11,12 @@ const trigger = {
   flex: "1",
   justifyContent: "center",
   lineHeight: "1",
+  minHeight: "0",
+  overflow: "hidden",
   transition: "common",
   userSelect: "none",
-  _icon: {
-    boxSize: "1em",
+  "& svg": {
+    flexShrink: "0",
   },
   _hover: {
     bg: "gray.surface.bg.hover",
@@ -31,6 +33,7 @@ export const numberInput = defineSlotRecipe({
     root: {
       isolation: "isolate",
       position: "relative",
+      width: "full",
       _disabled: {
         layerStyle: "disabled",
       },
@@ -43,6 +46,7 @@ export const numberInput = defineSlotRecipe({
       height: "calc(100% - 2px)",
       insetEnd: "0px",
       margin: "1px",
+      overflow: "hidden",
       position: "absolute",
       top: "0",
       width: "var(--stepper-width)",
@@ -51,7 +55,6 @@ export const numberInput = defineSlotRecipe({
     input: {
       ...input?.base,
       verticalAlign: "top",
-      pe: "calc(var(--stepper-width) + 0.5rem)",
     },
     label: {
       color: "fg.default",
@@ -59,50 +62,83 @@ export const numberInput = defineSlotRecipe({
     },
     incrementTrigger: {
       ...trigger,
-      borderTopRightRadius: "l2",
+      borderTopRightRadius: "sm",
     },
     decrementTrigger: {
       ...trigger,
-      borderBottomRightRadius: "l2",
+      borderBottomRightRadius: "sm",
     },
   },
   defaultVariants: {
-    size: "md",
-    variant: "outline",
+    size: "sm",
   },
   variants: {
     size: {
       sm: {
-        control: {
-          "--stepper-width": "sizes.4.5",
-        },
-        input: input?.variants?.["size"]?.["sm"],
-      },
-      md: {
-        control: {
-          "--stepper-width": "sizes.5",
-        },
-        input: input?.variants?.["size"]?.["md"],
-      },
-      lg: {
-        control: {
-          "--stepper-width": "sizes.5.5",
-        },
-        input: input?.variants?.["size"]?.["lg"],
-      },
-      xl: {
-        control: {
+        root: {
           "--stepper-width": "sizes.6",
         },
-        input: input?.variants?.["size"]?.["xl"],
+        decrementTrigger: {
+          "& svg": {
+            height: "2",
+            width: "2",
+          },
+        },
+        incrementTrigger: {
+          "& svg": {
+            height: "2",
+            width: "2",
+          },
+        },
+        input: {
+          ...input?.variants?.["size"]?.["sm"],
+          px: "2",
+          pe: "calc(var(--stepper-width) + 0.5rem)!",
+        },
       },
-    },
-    variant: {
-      outline: {
-        input: input?.variants?.["variant"]?.["outline"],
+      md: {
+        root: {
+          "--stepper-width": "sizes.8",
+        },
+        decrementTrigger: {
+          "& svg": {
+            height: "2.5",
+            width: "2.5",
+          },
+        },
+        incrementTrigger: {
+          "& svg": {
+            height: "2.5",
+            width: "2.5",
+          },
+        },
+        input: {
+          ...input?.variants?.["size"]?.["md"],
+          px: "2.5",
+          pe: "calc(var(--stepper-width) + 0.5rem)!",
+        },
       },
-      ghost: {
-        input: input?.variants?.["variant"]?.["ghost"],
+      lg: {
+        root: {
+          "--stepper-width": "sizes.10",
+        },
+        decrementTrigger: {
+          "& svg": {
+            height: "3",
+            width: "3",
+          },
+        },
+        incrementTrigger: {
+          "& svg": {
+            height: "3",
+            width: "3",
+          },
+        },
+        input: {
+          ...input?.variants?.["size"]?.["lg"],
+          px: "3",
+          pe: "calc(var(--stepper-width) + 0.5rem)!",
+        },
       },
     },
   },

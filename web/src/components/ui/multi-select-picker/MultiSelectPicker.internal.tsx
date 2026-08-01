@@ -1,5 +1,6 @@
 import { Portal } from "@ark-ui/react";
 import { useEffect, useRef, useState } from "react";
+import { cx } from "styled-system/css";
 
 import * as Menu from "@/components/ui/menu";
 import { Box, HStack, WStack } from "@/styled-system/jsx";
@@ -8,6 +9,7 @@ import {
   InputVariantProps,
   MenuVariantProps,
   input,
+  multiSelectPicker,
 } from "@/styled-system/recipes";
 import { deriveColour } from "@/utils/colour";
 
@@ -41,6 +43,12 @@ type Props = {
   menuVariantProps?: MenuVariantProps;
   inputVariantProps?: InputVariantProps;
 };
+
+function selectedBadgeSize(size: Props["size"]) {
+  if (size === "lg") return "lg";
+  if (size === "md") return "md";
+  return "sm";
+}
 
 export function MultiSelectPicker({
   value,
@@ -160,6 +168,7 @@ export function MultiSelectPicker({
   const filteredQueryResults = queryResults?.filter(
     (result) => !value.some((v) => v.value === result.value),
   );
+  const badgeSize = selectedBadgeSize(size);
 
   const showCreateNew =
     allowNewValues &&
@@ -190,9 +199,7 @@ export function MultiSelectPicker({
           ref={containerRef}
           gap="1"
           w="full"
-          className={input({
-            size,
-          })}
+          className={cx(input({ size }), multiSelectPicker({ size }))}
           overflowX="clip"
           overflowY="hidden"
           position="relative"
@@ -214,6 +221,7 @@ export function MultiSelectPicker({
                     ref={(el) => {
                       badgeRefs.current[index] = el;
                     }}
+                    size={badgeSize}
                     style={colourStyles}
                     bgColor={colourStyles ? "colorPalette.bg" : undefined}
                     borderColor={

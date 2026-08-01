@@ -7,7 +7,7 @@ transform() {
     backgroundColor: "bg.opaque",
     backdropBlur: "frosted",
     backdropFilter: "auto",
-    boxShadow: "sm"
+    boxShadow: "floating"
   };
 }}
 

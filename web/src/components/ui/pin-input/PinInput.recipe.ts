@@ -12,7 +12,6 @@ export const pinInput = defineSlotRecipe({
     },
     control: {
       display: "flex",
-      gap: "2",
     },
     label: {
       color: "fg.default",
@@ -24,56 +23,44 @@ export const pinInput = defineSlotRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
   },
   variants: {
     size: {
-      xs: {
-        label: {
-          textStyle: "sm",
-        },
-        input: {
-          width: "8",
-        },
-      },
       sm: {
+        control: {
+          gap: "1.5",
+        },
         label: {
-          textStyle: "sm",
+          textStyle: "xs",
         },
         input: {
-          width: "9",
+          minWidth: "6!",
+          width: "6",
         },
       },
       md: {
+        control: {
+          gap: "2",
+        },
         label: {
           textStyle: "sm",
         },
         input: {
-          width: "10",
+          minWidth: "8!",
+          width: "8",
         },
       },
       lg: {
-        label: {
-          textStyle: "sm",
+        control: {
+          gap: "2.5",
         },
-        input: {
-          width: "11",
-        },
-      },
-      xl: {
         label: {
           textStyle: "md",
         },
         input: {
-          width: "12",
-        },
-      },
-      "2xl": {
-        label: {
-          textStyle: "md",
-        },
-        input: {
-          width: "16",
+          minWidth: "10!",
+          width: "10",
         },
       },
     },

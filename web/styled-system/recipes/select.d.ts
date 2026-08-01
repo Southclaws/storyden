@@ -8,9 +8,9 @@ interface SelectVariant {
  */
 variant: "outline" | "ghost"
 /**
- * @default "md"
+ * @default "sm"
  */
-size: "xs" | "sm" | "md" | "lg"
+size: "sm" | "md" | "lg"
 }
 
 type SelectVariantMap = {

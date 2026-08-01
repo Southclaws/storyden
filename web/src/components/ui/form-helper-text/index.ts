@@ -1,1 +1,4 @@
-export * from "./FormHelperText.internal";
+export {
+  FormFeedback as FormHelperText,
+  type FormFeedbackProps as FormHelperTextProps,
+} from "../form-feedback";

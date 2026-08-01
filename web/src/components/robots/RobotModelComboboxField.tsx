@@ -81,7 +81,7 @@ export function RobotModelComboboxField<T extends FieldValues>({
               <Combobox.Trigger asChild>
                 <IconButton
                   type="button"
-                  variant="link"
+                  variant="ghost"
                   aria-label="Select model"
                   size="sm"
                 >

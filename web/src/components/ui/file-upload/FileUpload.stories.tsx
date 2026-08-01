@@ -33,7 +33,7 @@ export const Dropzone: Story = {
                 <FileUpload.ItemName />
                 <FileUpload.ItemSizeText />
                 <FileUpload.ItemDeleteTrigger asChild>
-                  <Button size="xs" variant="ghost">
+                  <Button size="sm" variant="ghost">
                     <DeleteIcon />
                     Remove
                   </Button>

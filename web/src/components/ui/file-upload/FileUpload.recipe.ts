@@ -18,7 +18,7 @@ export const fileUpload = defineSlotRecipe({
     dropzone: {
       alignItems: "center",
       background: "bg.default",
-      borderRadius: "l3",
+      borderRadius: "md",
       borderWidth: "1px",
       display: "flex",
       flexDirection: "column",
@@ -31,7 +31,7 @@ export const fileUpload = defineSlotRecipe({
     item: {
       animation: "fadeIn 0.25s ease-out",
       background: "bg.default",
-      borderRadius: "l3",
+      borderRadius: "md",
       borderWidth: "1px",
       columnGap: "3",
       display: "grid",

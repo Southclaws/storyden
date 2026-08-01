@@ -54,7 +54,7 @@ export const Default: Story = {
                   <HStack gap="3">
                     <ColorPicker.EyeDropperTrigger asChild>
                       <IconButton
-                        size="xs"
+                        size="sm"
                         variant="outline"
                         aria-label="Pick a color"
                       >

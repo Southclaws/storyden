@@ -4,7 +4,7 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface CheckboxVariant {
   /**
- * @default "md"
+ * @default "sm"
  */
 size: "sm" | "md" | "lg"
 }

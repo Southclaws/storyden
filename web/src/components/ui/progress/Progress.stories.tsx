@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { HStack, LStack } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Grid } from "@/styled-system/jsx";
 
 import { ProgressCircle, ProgressHorizontal } from ".";
 
@@ -38,19 +39,41 @@ export const Circle: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <LStack gap="5" maxW="md">
-      {(["sm", "md", "lg"] as const).map((size) => (
-        <ProgressHorizontal key={size} size={size} value={64}>
-          Progress {size}
-        </ProgressHorizontal>
-      ))}
-      <HStack gap="5">
-        {(["sm", "md", "lg"] as const).map((size) => (
-          <ProgressCircle key={size} size={size} value={64}>
-            {size}
-          </ProgressCircle>
-        ))}
-      </HStack>
-    </LStack>
+    <Grid
+      alignItems="center"
+      columnGap="6"
+      gridTemplateColumns="3rem minmax(0, 1fr) 4rem"
+      maxW="2xl"
+      rowGap="5"
+      w="full"
+    >
+      <Text color="fg.muted" fontWeight="semibold" size="xs">
+        Size
+      </Text>
+      <Text color="fg.muted" fontWeight="semibold" size="xs">
+        Linear
+      </Text>
+      <Text color="fg.muted" fontWeight="semibold" size="xs">
+        Circular
+      </Text>
+
+      <Text fontWeight="semibold" size="sm">
+        SM
+      </Text>
+      <ProgressHorizontal size="sm" value={64} />
+      <ProgressCircle size="sm" value={64} />
+
+      <Text fontWeight="semibold" size="sm">
+        MD
+      </Text>
+      <ProgressHorizontal size="md" value={64} />
+      <ProgressCircle size="md" value={64} />
+
+      <Text fontWeight="semibold" size="sm">
+        LG
+      </Text>
+      <ProgressHorizontal size="lg" value={64} />
+      <ProgressCircle size="lg" value={64} />
+    </Grid>
   ),
 };

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { LStack } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Grid } from "@/styled-system/jsx";
 
 import { NumberInput } from ".";
 
@@ -11,17 +12,11 @@ const meta = {
     defaultValue: "12",
     min: 0,
     max: 100,
-    size: "md",
-    variant: "outline",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["sm", "md", "lg", "xl"],
-    },
-    variant: {
-      control: "select",
-      options: ["outline", "ghost"],
+      options: ["sm", "md", "lg"],
     },
   },
 } satisfies Meta<typeof NumberInput>;
@@ -30,29 +25,57 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Playground: Story = {};
+export const Playground: Story = {
+  render: (args) => <NumberInput {...args} maxW="sm" />,
+};
 
-export const Variants: Story = {
+export const Sizes: Story = {
   render: () => (
-    <LStack gap="3" maxW="sm">
-      {(["sm", "md", "lg", "xl"] as const).map((size) => (
-        <NumberInput
-          key={size}
-          size={size}
-          defaultValue="12"
-          inputProps={{ "aria-label": `Number input ${size}` }}
-        />
-      ))}
+    <Grid
+      alignItems="center"
+      columnGap="4"
+      gridTemplateColumns="3rem minmax(0, 1fr)"
+      maxW="sm"
+      rowGap="3"
+      w="full"
+    >
+      <Text fontWeight="semibold" size="sm">
+        SM
+      </Text>
       <NumberInput
-        variant="ghost"
-        defaultValue="24"
-        inputProps={{ "aria-label": "Ghost number input" }}
+        size="sm"
+        defaultValue="12"
+        inputProps={{ "aria-label": "Number input sm" }}
       />
+
+      <Text fontWeight="semibold" size="sm">
+        MD
+      </Text>
       <NumberInput
-        scrubber
-        defaultValue="36"
-        inputProps={{ "aria-label": "Scrubbable number input" }}
+        size="md"
+        defaultValue="12"
+        inputProps={{ "aria-label": "Number input md" }}
       />
-    </LStack>
+
+      <Text fontWeight="semibold" size="sm">
+        LG
+      </Text>
+      <NumberInput
+        size="lg"
+        defaultValue="12"
+        inputProps={{ "aria-label": "Number input lg" }}
+      />
+    </Grid>
+  ),
+};
+
+export const Scrubber: Story = {
+  render: () => (
+    <NumberInput
+      scrubber
+      defaultValue="36"
+      maxW="sm"
+      inputProps={{ "aria-label": "Scrubbable number input" }}
+    />
   ),
 };

@@ -2,7 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const inputGroupDefaultVariants = {
-  "size": "md"
+  "size": "sm"
 }
 const inputGroupCompoundVariants = []
 
@@ -35,11 +35,9 @@ export const inputGroup = /* @__PURE__ */ Object.assign(inputGroupFn, {
   variantKeys: inputGroupVariantKeys,
   variantMap: {
   "size": [
-    "xs",
     "sm",
     "md",
-    "lg",
-    "xl"
+    "lg"
   ]
 },
   splitVariantProps(props) {

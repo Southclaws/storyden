@@ -69,7 +69,7 @@ export function FormColourPickerField<T extends FieldValues>(
                         <HStack gap="3">
                           <ColorPicker.EyeDropperTrigger asChild>
                             <IconButton
-                              size="xs"
+                              size="sm"
                               variant="outline"
                               aria-label="Pick a color"
                             >
@@ -85,7 +85,7 @@ export function FormColourPickerField<T extends FieldValues>(
                         </HStack>
                         <HStack>
                           <ColorPicker.ChannelInput channel="hex" asChild>
-                            <Input size="2xs" />
+                            <Input h="6" minW="7" px="1.5" fontSize="xs" />
                           </ColorPicker.ChannelInput>
                         </HStack>
                         <Stack gap="1.5">

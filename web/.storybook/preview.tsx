@@ -1,5 +1,4 @@
 import type { Preview, ReactRenderer } from "@storybook/nextjs-vite";
-import type { CSSProperties } from "react";
 import { useEffect } from "react";
 import { Toaster } from "sonner";
 import type { DecoratorFunction } from "storybook";
@@ -10,7 +9,11 @@ import { FALLBACK_COLOUR, getColourVariants } from "../src/utils/colour";
 
 import "./preview.css";
 
-const storydenThemeVars = getColourVariants(FALLBACK_COLOUR) as CSSProperties;
+const storydenThemeCss = `:root {
+  ${Object.entries(getColourVariants(FALLBACK_COLOUR))
+    .map(([property, value]) => `${property}: ${value};`)
+    .join("\n  ")}
+}`;
 
 const withStorydenProviders: DecoratorFunction<ReactRenderer> = (
   Story,
@@ -35,14 +38,17 @@ const withStorydenProviders: DecoratorFunction<ReactRenderer> = (
   const layout = context.parameters.layout ?? "padded";
 
   return (
-    <div className="storybook-preview" style={storydenThemeVars}>
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <div className="storybook-preview__story" data-layout={layout}>
-          <Story />
-        </div>
-        <Toaster />
-      </SWRConfig>
-    </div>
+    <>
+      <style>{storydenThemeCss}</style>
+      <div className="storybook-preview">
+        <SWRConfig value={{ provider: () => new Map() }}>
+          <div className="storybook-preview__story" data-layout={layout}>
+            <Story />
+          </div>
+          <Toaster />
+        </SWRConfig>
+      </div>
+    </>
   );
 };
 

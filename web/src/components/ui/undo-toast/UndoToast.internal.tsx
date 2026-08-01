@@ -136,7 +136,7 @@ export function showUndoToast({
         borderColor="border.default"
         borderRadius="lg"
         padding="3"
-        boxShadow="lg"
+        boxShadow="floating"
         minWidth="sm"
         maxWidth="md"
       >

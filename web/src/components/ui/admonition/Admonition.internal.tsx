@@ -49,7 +49,7 @@ export function Admonition(props: PropsWithChildren<AdmonitionProps>) {
         </VStack>
         <IconButton
           type="button"
-          size="xs"
+          size="sm"
           variant="ghost"
           aria-label="Close"
           onClick={handleClose}

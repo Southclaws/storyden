@@ -25,7 +25,7 @@ export const Default: Story = {
       },
     ],
     children: (
-      <Button size="xs" variant="subtle">
+      <Button size="sm" variant="subtle">
         New page
       </Button>
     ),

@@ -6,7 +6,7 @@ export const button = defineRecipe({
   base: {
     alignItems: "center",
     appearance: "none",
-    borderRadius: "l2",
+    borderRadius: "sm",
     cursor: "pointer",
     display: "inline-flex",
     fontWeight: "semibold",
@@ -20,13 +20,26 @@ export const button = defineRecipe({
     userSelect: "none",
     verticalAlign: "middle",
     whiteSpace: "nowrap",
+    "& .button__loading-content": {
+      alignItems: "center",
+      display: "inline-flex",
+      gap: "inherit",
+      opacity: "0",
+    },
+    "& .button__loading-indicator": {
+      alignItems: "center",
+      display: "flex",
+      inset: "0",
+      justifyContent: "center",
+      position: "absolute",
+    },
     _hidden: {
       display: "none",
     },
   },
   defaultVariants: {
-    variant: "solid",
-    size: "md",
+    variant: "subtle",
+    size: "sm",
   },
   variants: {
     variant: {
@@ -55,7 +68,7 @@ export const button = defineRecipe({
       },
       outline: {
         borderWidth: "1px",
-        borderColor: "colorPalette.a7",
+        borderColor: "border.subtle",
         color: "fg.subtle",
         colorPalette: "gray",
         _hover: {
@@ -111,19 +124,6 @@ export const button = defineRecipe({
           outlineOffset: "2px",
         },
       },
-      link: {
-        verticalAlign: "baseline",
-        _disabled: {
-          color: "border.disabled",
-          cursor: "not-allowed",
-          _hover: {
-            color: "border.disabled",
-          },
-        },
-        height: "auto!",
-        px: "0!",
-        minW: "0!",
-      },
       subtle: {
         colorPalette: "accent",
         background: "bg.muted/80",
@@ -151,7 +151,7 @@ export const button = defineRecipe({
       },
     },
     size: {
-      xs: {
+      sm: {
         h: "6",
         minW: "6",
         textStyle: "xs",
@@ -165,7 +165,7 @@ export const button = defineRecipe({
           height: "4",
         },
       },
-      sm: {
+      md: {
         h: "8",
         minW: "8",
         textStyle: "sm",
@@ -176,7 +176,7 @@ export const button = defineRecipe({
           height: "4",
         },
       },
-      md: {
+      lg: {
         h: "10",
         minW: "10",
         textStyle: "sm",
@@ -185,39 +185,6 @@ export const button = defineRecipe({
         "& svg": {
           width: "5",
           height: "5",
-        },
-      },
-      lg: {
-        h: "11",
-        minW: "11",
-        textStyle: "md",
-        px: "4.5",
-        gap: "2",
-        "& svg": {
-          width: "5",
-          height: "5",
-        },
-      },
-      xl: {
-        h: "12",
-        minW: "12",
-        textStyle: "md",
-        px: "5",
-        gap: "2.5",
-        "& svg": {
-          width: "5",
-          height: "5",
-        },
-      },
-      "2xl": {
-        h: "16",
-        minW: "16",
-        textStyle: "lg",
-        px: "7",
-        gap: "3",
-        "& svg": {
-          width: "6",
-          height: "6",
         },
       },
     },

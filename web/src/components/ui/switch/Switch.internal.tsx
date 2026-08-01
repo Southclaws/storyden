@@ -32,6 +32,7 @@ export const Switch = forwardRef<HTMLLabelElement, SwitchProps>(
         <ArkSwitch.Control className={styles.control}>
           <ArkSwitch.Thumb className={styles.thumb} />
         </ArkSwitch.Control>
+        <ArkSwitch.HiddenInput />
         {children && (
           <ArkSwitch.Label className={styles.label}>{children}</ArkSwitch.Label>
         )}

@@ -14,19 +14,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: [
-        "xs",
-        "sm",
-        "md",
-        "lg",
-        "xl",
-        "2xl",
-        "3xl",
-        "4xl",
-        "5xl",
-        "6xl",
-        "7xl",
-      ],
+      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
     },
     variant: {
       control: "select",
@@ -44,21 +32,7 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   render: () => (
     <LStack gap="2">
-      {(
-        [
-          "xs",
-          "sm",
-          "md",
-          "lg",
-          "xl",
-          "2xl",
-          "3xl",
-          "4xl",
-          "5xl",
-          "6xl",
-          "7xl",
-        ] as const
-      ).map((size) => (
+      {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
         <Text key={size} size={size}>
           Text {size}
         </Text>
