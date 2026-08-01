@@ -33,6 +33,7 @@ func PromptObject[T any](ctx context.Context, prompter Prompter, description, in
 
 	res, err := s.client.Responses.New(ctx, responses.ResponseNewParams{
 		Model: openai.ChatModelGPT4_1,
+		Store: param.NewOpt(false),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(input),
 		},
@@ -49,6 +50,9 @@ func PromptObject[T any](ctx context.Context, prompter Prompter, description, in
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if res.Status != responses.ResponseStatusCompleted {
+		return nil, fault.Wrap(openAIResponseError(*res), fctx.With(ctx))
 	}
 	payload := res.OutputText()
 	if payload == "" {

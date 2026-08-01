@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/packages/param"
 	"github.com/openai/openai-go/v3/responses"
 	"google.golang.org/adk/model"
 	"google.golang.org/genai"
@@ -18,6 +19,7 @@ func (o *OpenAI) GenerateContent(ctx context.Context, req *model.LLMRequest, str
 
 	params := responses.ResponseNewParams{
 		Model: openai.ChatModel(o.modelName),
+		Store: param.NewOpt(false),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfInputItemList: input,
 		},
@@ -43,11 +45,14 @@ func (o *OpenAI) generateContentSync(ctx context.Context, params responses.Respo
 		return
 	}
 
-	content := convertOpenAIResponseToGenaiContent(*res)
+	if res.Status == responses.ResponseStatusFailed {
+		yield(nil, fault.Wrap(openAIResponseError(*res), fctx.With(ctx)))
+		return
+	}
 
 	yield(&model.LLMResponse{
-		Content:      content,
-		FinishReason: convertOpenAIResponseStatusToGenai(string(res.Status)),
+		Content:      convertOpenAIResponseToGenaiContent(*res),
+		FinishReason: convertOpenAIResponseToGenaiFinishReason(*res),
 		TurnComplete: true,
 	}, nil)
 }
@@ -83,17 +88,22 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params responses.Res
 			}
 		}
 
-		if event.Type == "response.completed" {
+		if event.Type == "response.completed" || event.Type == "response.incomplete" {
 			yield(&model.LLMResponse{
 				Content:      convertOpenAIResponseToGenaiContent(event.Response),
-				FinishReason: convertOpenAIResponseStatusToGenai(string(event.Response.Status)),
+				FinishReason: convertOpenAIResponseToGenaiFinishReason(event.Response),
 				TurnComplete: true,
 			}, nil)
 			return
 		}
 
-		if event.Type == "response.failed" || event.Type == "response.incomplete" {
-			yield(nil, fault.New("response ended with status: "+string(event.Response.Status)))
+		if event.Type == "response.failed" {
+			yield(nil, fault.Wrap(openAIResponseError(event.Response), fctx.With(ctx)))
+			return
+		}
+
+		if event.Type == "error" {
+			yield(nil, fault.Wrap(fault.New("openai response error: "+event.Message), fctx.With(ctx)))
 			return
 		}
 	}
@@ -107,7 +117,7 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params responses.Res
 		content := &genai.Content{Role: genai.RoleModel, Parts: []*genai.Part{{Text: fullContent}}}
 		yield(&model.LLMResponse{
 			Content:      content,
-			FinishReason: genai.FinishReasonStop,
+			FinishReason: genai.FinishReasonUnspecified,
 			TurnComplete: true,
 		}, nil)
 	}

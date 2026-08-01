@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
+	"github.com/openai/openai-go/v3/packages/param"
 	"github.com/openai/openai-go/v3/responses"
 	"github.com/philippgille/chromem-go"
 
@@ -27,6 +28,7 @@ func newOpenAI(cfg config.Config) (*OpenAI, error) {
 func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 	res, err := o.client.Responses.New(ctx, responses.ResponseNewParams{
 		Model: openai.ChatModelGPT4_1,
+		Store: param.NewOpt(false),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(input),
 		},
@@ -35,6 +37,9 @@ func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if res.Status != responses.ResponseStatusCompleted {
+		return nil, fault.Wrap(openAIResponseError(*res), fctx.With(ctx))
+	}
 	if res.OutputText() == "" {
 		return nil, fault.New("result is empty")
 	}
@@ -48,6 +53,7 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield fun
 	iter := func(yield func(string, error) bool) {
 		stream := o.client.Responses.NewStreaming(ctx, responses.ResponseNewParams{
 			Model: openai.ChatModelGPT4_1,
+			Store: param.NewOpt(false),
 			Input: responses.ResponseNewParamsInputUnion{
 				OfString: openai.String(input),
 			},
@@ -71,6 +77,14 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield fun
 					return
 				}
 			}
+			if event.Type == "error" {
+				yield("", fault.Wrap(fault.New("openai response error: "+event.Message), fctx.With(ctx)))
+				return
+			}
+			if event.Type == "response.failed" || event.Type == "response.incomplete" {
+				yield("", fault.Wrap(openAIResponseError(event.Response), fctx.With(ctx)))
+				return
+			}
 		}
 
 		if err := stream.Err(); err != nil {
@@ -80,6 +94,16 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield fun
 	}
 
 	return iter, nil
+}
+
+func openAIResponseError(response responses.Response) error {
+	if response.Status == responses.ResponseStatusIncomplete && response.IncompleteDetails.Reason != "" {
+		return fault.New("openai response incomplete: " + response.IncompleteDetails.Reason)
+	}
+	if response.Error.Message != "" {
+		return fault.New("openai response failed: " + string(response.Error.Code) + ": " + response.Error.Message)
+	}
+	return fault.New("openai response ended with status: " + string(response.Status))
 }
 
 func (o *OpenAI) EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error) {
