@@ -418,7 +418,7 @@ body {
   outline: none;
   pointer-events: none;
   transform: translateY(var(--navigation-drawer-slide-offset));
-  transition: var(--navigation-drawer-transition);
+  transition: none;
   visibility: hidden;
 }
 
@@ -472,6 +472,7 @@ body {
   opacity: 1;
   pointer-events: all;
   transform: none;
+  transition: var(--navigation-drawer-transition);
   transition-delay: var(--navigation-drawer-transition-delay-open);
   visibility: visible;
 }
@@ -550,6 +551,11 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .navigation__leftbar {
+    transition: none;
+  }
+
+  .navigation__fixed-grid[data-mobile-navigation-open="true"]
+    .navigation__leftbar {
     transition: none;
   }
 }
