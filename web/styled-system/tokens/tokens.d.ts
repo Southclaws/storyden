@@ -5,7 +5,7 @@ export type ColorPalette = "current" | "black" | "white" | "amber" | "amber.ligh
 
 export type AnimationToken = "backdrop-in" | "backdrop-out" | "dialog-in" | "dialog-out" | "drawer-in-left" | "drawer-out-left" | "drawer-in-right" | "drawer-out-right" | "skeleton-pulse" | "fade-in" | "collapse-in" | "collapse-out" | "spin" | "target-pulse"
 
-export type BlurToken = "sm" | "base" | "md" | "lg" | "xl" | "2xl" | "3xl" | "frosted"
+export type BlurToken = "sm" | "base" | "md" | "lg" | "xl" | "2xl" | "3xl" | "subtle" | "frosted"
 
 export type BorderToken = "none"
 

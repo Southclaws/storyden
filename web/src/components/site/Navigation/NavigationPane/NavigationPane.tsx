@@ -6,7 +6,6 @@ import {
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { nodeListCached } from "@/lib/library/server-node-list";
 import { type Settings } from "@/lib/settings/settings";
-import { Box, styled } from "@/styled-system/jsx";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 
@@ -60,24 +59,17 @@ function NavigationPaneContent({
   initialSettings,
 }: Props) {
   return (
-    <styled.header
-      display="flex"
-      height="full"
-      alignItems="end"
-      flexDirection="column"
-      borderRadius="none"
-      className="navigation__surface"
-    >
+    <header className="navigation-pane navigation__surface">
       <AdminZone
         initialSession={initialSession}
         initialSettings={initialSettings}
       />
-      <Box id="desktop-nav-box" w="full" height="full" minH="0" p="2">
+      <div id="desktop-nav-box" className="navigation-pane__content">
         <ContentNavigationList
           initialNodeList={initialNodeList}
           initialCategoryList={initialCategoryList}
         />
-      </Box>
-    </styled.header>
+      </div>
+    </header>
   );
 }

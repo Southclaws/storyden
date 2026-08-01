@@ -3055,8 +3055,12 @@ const tokens = {
     "value": "var(--fonts-inter-display)",
     "variable": "var(--fonts-heading)"
   },
+  "blurs.subtle": {
+    "value": "var(--blurs-sm)",
+    "variable": "var(--blurs-subtle)"
+  },
   "blurs.frosted": {
-    "value": "10px",
+    "value": "var(--blurs-base)",
     "variable": "var(--blurs-frosted)"
   },
   "shadows.subtle": {

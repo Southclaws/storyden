@@ -14,7 +14,8 @@ export const semanticTokens = defineSemanticTokens({
     heading: { value: "{fonts.interDisplay}" },
   },
   blurs: {
-    frosted: { value: "10px" },
+    subtle: { value: "{blurs.sm}" },
+    frosted: { value: "{blurs.base}" },
   },
   shadows: {
     subtle: {

@@ -21,6 +21,7 @@ export function ContentNavigationList(props: Props) {
 
   return (
     <styled.nav
+      aria-label="Site navigation"
       display="flex"
       flexDir="column"
       gap="4"

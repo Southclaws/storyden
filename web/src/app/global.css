@@ -56,6 +56,80 @@
     calc(var(--global-font-size-h6) / 4) + 4vw,
     var(--global-font-size-h6)
   );
+
+  /* Navigation shell */
+  --navigation-layer: var(--z-index-docked, 10);
+  --navigation-content-width-max: var(--sizes-breakpoint-lg);
+  --navigation-shell-viewport-padding: var(--spacing-2);
+  --navigation-shell-viewport-padding-desktop: var(--spacing-4);
+  --navigation-shell-viewport-padding-wide: var(--spacing-6);
+  --navigation-sidebar-width: 18rem;
+  --navigation-sidebar-width-desktop: 16rem;
+  --navigation-sidebar-width-wide: 18rem;
+  --navigation-content-column-gap: var(--spacing-8);
+  --navigation-content-column-gap-desktop: var(--spacing-6);
+  --navigation-content-column-gap-wide: var(--spacing-8);
+  --navigation-content-offset-block: var(--spacing-8);
+  --navigation-topbar-height: 3rem;
+  --navigation-topbar-title-width-max: 50vw;
+  --navigation-shell-width: calc(
+    var(--navigation-content-width-max) + var(--navigation-sidebar-width) +
+      var(--navigation-content-column-gap)
+  );
+
+  /* Navigation mobile grid */
+  --navigation-mobile-grid-inline-edge: var(
+    --navigation-shell-viewport-padding
+  );
+  --navigation-mobile-grid-inline-gap: var(--spacing-8);
+  --navigation-mobile-grid-inline-gap-end: 0px;
+  --navigation-mobile-grid-block-edge: var(--spacing-5);
+  --navigation-mobile-grid-block-gap: var(--spacing-3);
+
+  /* Navigation drawer */
+  --navigation-drawer-layer: 1;
+  --navigation-drawer-offset-block-start: var(--spacing-2);
+  --navigation-drawer-offset-block-end: var(--spacing-24);
+  --navigation-drawer-slide-offset: var(--spacing-2);
+  --navigation-drawer-transition:
+    opacity 150ms ease, transform 150ms ease, visibility 0s linear 150ms;
+  --navigation-drawer-transition-delay-open: 0s;
+  --navigation-drawer-width-tablet: var(--sizes-lg);
+
+  /* Navigation mobile command bar */
+  --navigation-commandbar-layer: 2;
+  --navigation-commandbar-width-mobile: var(--spacing-96);
+  --navigation-commandbar-padding: var(--spacing-2);
+  --navigation-commandbar-border-color: var(--colors-border-muted);
+  --navigation-commandbar-border-radius: var(--radii-xl);
+  --navigation-commandbar-item-gap: var(--spacing-2);
+  --navigation-commandbar-site-icon-size: var(--spacing-8);
+  --navigation-commandbar-site-icon-radius: var(--radii-md);
+
+  /* Navigation pane */
+  --navigation-pane-border-radius-mobile: var(--radii-xl);
+  --navigation-pane-border-radius-desktop: 0;
+  --navigation-pane-content-padding: var(--spacing-2);
+
+  /* Navigation top bar */
+  --navigation-topbar-padding-inline-start: var(--spacing-3);
+  --navigation-topbar-padding-inline-end: var(--spacing-1);
+
+  /* Navigation surfaces */
+  --navigation-surface-background-fallback: var(--colors-bg-site);
+  --navigation-surface-background: color-mix(
+    in srgb,
+    var(--colors-bg-site) 80%,
+    transparent
+  );
+  --navigation-surface-blur: var(--blurs-frosted);
+  --navigation-scrim-background: color-mix(
+    in srgb,
+    var(--colors-bg-site) 80%,
+    transparent
+  );
+  --navigation-scrim-blur: var(--blurs-subtle);
+  --navigation-scrim-transition: all 250ms ease;
 }
 
 @media (min-width: 768px) {
@@ -267,15 +341,7 @@ body {
   viewport-wide grid so the title stays optically centered.
 */
 .navigation__container {
-  --navigation-sidebar-width: 18rem;
-  --navigation-column-gap: var(--spacing-8);
-  --navigation-content-offset: var(--spacing-8);
-  --navigation-topbar-height: 3rem;
-  --navigation-viewport-padding: var(--spacing-2);
-  --navigation-shell-width: calc(
-    var(--sizes-breakpoint-lg) + var(--navigation-sidebar-width) +
-      var(--navigation-column-gap)
-  );
+  width: 100%;
 }
 
 .navigation__grid {
@@ -287,27 +353,21 @@ body {
   width: 100%;
   height: 100%;
 
-  --grid-col-padding-outer: var(--spacing-2);
-  --grid-col-padding-inner: var(--spacing-8);
-  --grid-col-padding-inner-right: 0px;
-  --grid-row-padding-outer: var(--spacing-5);
-  --grid-row-padding-inner: var(--spacing-3);
-
   grid-template-rows:
-    var(--grid-row-padding-outer)
+    var(--navigation-mobile-grid-block-edge)
     1fr
-    var(--grid-row-padding-inner)
+    var(--navigation-mobile-grid-block-gap)
     auto
-    var(--grid-row-padding-outer);
+    var(--navigation-mobile-grid-block-edge);
 
   grid-template-columns:
-    minmax(var(--grid-col-padding-outer), 1fr)
+    minmax(var(--navigation-mobile-grid-inline-edge), 1fr)
     1fr
-    var(--grid-col-padding-inner)
-    minmax(0, var(--sizes-breakpoint-lg))
-    var(--grid-col-padding-inner-right)
+    var(--navigation-mobile-grid-inline-gap)
+    minmax(0, var(--navigation-content-width-max))
+    var(--navigation-mobile-grid-inline-gap-end)
     1fr
-    minmax(var(--grid-col-padding-outer), 1fr);
+    minmax(var(--navigation-mobile-grid-inline-edge), 1fr);
 
   grid-template-areas:
     " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
@@ -322,55 +382,206 @@ body {
   height: 100%;
 }
 
+.navigation__fixed {
+  position: fixed;
+  z-index: var(--navigation-layer);
+  inset-block-start: 0;
+  inset-inline: 0;
+  height: 100dvh;
+  pointer-events: none;
+}
+
+.navigation__fixed-grid {
+  position: absolute;
+  inset: 0;
+}
+
 .navigation__topbar {
   display: none;
 }
 
 .navigation__leftbar {
-  display: none;
+  position: fixed;
+  z-index: var(--navigation-drawer-layer);
+  inset-block-start: var(--navigation-drawer-offset-block-start);
+  inset-block-end: calc(
+    env(safe-area-inset-bottom) + var(--navigation-drawer-offset-block-end)
+  );
+  inset-inline: var(--navigation-shell-viewport-padding);
+  display: block;
+  min-height: 0;
+  block-size: calc(
+    100dvh - var(--navigation-drawer-offset-block-start) -
+      env(safe-area-inset-bottom) - var(--navigation-drawer-offset-block-end)
+  );
+  opacity: 0;
+  outline: none;
+  pointer-events: none;
+  transform: translateY(var(--navigation-drawer-slide-offset));
+  transition: var(--navigation-drawer-transition);
+  visibility: hidden;
 }
 
 .navigation__navpill {
   display: block;
   grid-area: navpill;
+  grid-column: 1 / -1;
+  z-index: var(--navigation-commandbar-layer);
+  inline-size: min(
+    calc(
+      100% - var(--navigation-shell-viewport-padding) -
+        var(--navigation-shell-viewport-padding)
+    ),
+    var(--navigation-commandbar-width-mobile)
+  );
+  pointer-events: all;
+  justify-self: center;
 }
 
 .navigation__surface {
-  background-color: var(--colors-bg-site);
-  background-color: color-mix(in srgb, var(--colors-bg-site) 80%, transparent);
-  -webkit-backdrop-filter: blur(var(--blurs-frosted));
-  backdrop-filter: blur(var(--blurs-frosted));
+  background-color: var(--navigation-surface-background-fallback);
+  background-color: var(--navigation-surface-background);
+  -webkit-backdrop-filter: blur(var(--navigation-surface-blur));
+  backdrop-filter: blur(var(--navigation-surface-blur));
+}
+
+.navigation__mobile-scrim {
+  position: fixed;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background-color: transparent;
+  cursor: default;
+  opacity: 0;
+  pointer-events: none;
+  transition: var(--navigation-scrim-transition);
+}
+
+.navigation__fixed-grid[data-mobile-navigation-open="true"]
+  .navigation__mobile-scrim {
+  background-color: var(--navigation-scrim-background);
+  backdrop-filter: blur(var(--navigation-scrim-blur));
+  opacity: 1;
+  pointer-events: all;
+}
+
+.navigation__fixed-grid[data-mobile-navigation-open="true"]
+  .navigation__leftbar {
+  opacity: 1;
+  pointer-events: all;
+  transform: none;
+  transition-delay: var(--navigation-drawer-transition-delay-open);
+  visibility: visible;
+}
+
+.navigation__mobile-commandbar {
+  inline-size: 100%;
+}
+
+.navigation__mobile-commandbar-inner {
+  display: flex;
+  inline-size: 100%;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  padding: var(--navigation-commandbar-padding);
+  border: 1px solid var(--navigation-commandbar-border-color);
+  border-radius: var(--navigation-commandbar-border-radius);
+  background-color: var(--navigation-surface-background);
+  -webkit-backdrop-filter: blur(var(--navigation-surface-blur));
+  backdrop-filter: blur(var(--navigation-surface-blur));
+}
+
+.navigation__mobile-commandbar-items {
+  display: flex;
+  inline-size: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--navigation-commandbar-item-gap);
+}
+
+.navigation__mobile-site-icon {
+  display: block;
+  overflow: hidden;
+  flex: none;
+  inline-size: var(--navigation-commandbar-site-icon-size);
+  block-size: var(--navigation-commandbar-site-icon-size);
+  border-radius: var(--navigation-commandbar-site-icon-radius);
+}
+
+.navigation__mobile-site-icon img {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.navigation-pane {
+  display: flex;
+  overflow: hidden;
+  block-size: 100%;
+  align-items: end;
+  flex-direction: column;
+  border-radius: var(--navigation-pane-border-radius-mobile);
+}
+
+.navigation-pane__content {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: var(--navigation-pane-content-padding);
+}
+
+@media screen and (min-width: 480px) and (max-width: 767px) {
+  .navigation__leftbar {
+    inset-inline: 0;
+    inline-size: min(
+      calc(
+        100% - var(--navigation-shell-viewport-padding) -
+          var(--navigation-shell-viewport-padding)
+      ),
+      var(--navigation-drawer-width-tablet)
+    );
+    margin-inline: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation__leftbar {
+    transition: none;
+  }
 }
 
 @media screen and (min-width: 768px) {
-  .navigation__fixed-grid {
-    position: absolute;
-    inset: 0;
-  }
-
   .navigation__grid {
     display: grid;
     width: min(
       calc(
-        100% - var(--navigation-viewport-padding) -
-          var(--navigation-viewport-padding)
+        100% - var(--navigation-shell-viewport-padding) -
+          var(--navigation-shell-viewport-padding)
       ),
       var(--navigation-shell-width)
     );
     margin-inline: auto;
 
-    --navigation-viewport-padding: var(--spacing-4);
-    --navigation-sidebar-width: 16rem;
-    --navigation-column-gap: var(--spacing-6);
+    --navigation-shell-viewport-padding: var(
+      --navigation-shell-viewport-padding-desktop
+    );
+    --navigation-sidebar-width: var(--navigation-sidebar-width-desktop);
+    --navigation-content-column-gap: var(
+      --navigation-content-column-gap-desktop
+    );
 
     grid-template-rows:
       var(--navigation-topbar-height)
-      var(--navigation-content-offset)
+      var(--navigation-content-offset-block)
       minmax(0, 1fr);
 
     grid-template-columns:
       var(--navigation-sidebar-width)
-      var(--navigation-column-gap)
+      var(--navigation-content-column-gap)
       minmax(0, 1fr);
 
     grid-template-areas:
@@ -387,8 +598,8 @@ body {
     height: var(--navigation-topbar-height);
     align-items: center;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    padding-inline-end: var(--spacing-1);
-    padding-inline-start: var(--spacing-3);
+    padding-inline-end: var(--navigation-topbar-padding-inline-end);
+    padding-inline-start: var(--navigation-topbar-padding-inline-start);
   }
 
   .navigation__topbar-left {
@@ -402,7 +613,7 @@ body {
     grid-column: 2/3;
     grid-row: 1/2;
     min-width: 0;
-    max-width: 50vw;
+    max-width: var(--navigation-topbar-title-width-max);
     justify-self: center;
   }
 
@@ -414,23 +625,40 @@ body {
   }
 
   .navigation__leftbar {
-    display: block;
     grid-area: leftbar;
+    position: static;
+    z-index: auto;
+    display: block;
+    block-size: auto;
     max-height: 100%;
     min-height: 0;
+    opacity: 1;
     pointer-events: all;
+    transform: none;
+    transition: none;
+    visibility: visible;
   }
 
   .navigation__navpill {
     display: none;
   }
+
+  .navigation__mobile-scrim {
+    display: none;
+  }
+
+  .navigation-pane {
+    border-radius: var(--navigation-pane-border-radius-desktop);
+  }
 }
 
 @media screen and (min-width: 1280px) {
   .navigation__grid {
-    --navigation-viewport-padding: var(--spacing-6);
-    --navigation-sidebar-width: 18rem;
-    --navigation-column-gap: var(--spacing-8);
+    --navigation-shell-viewport-padding: var(
+      --navigation-shell-viewport-padding-wide
+    );
+    --navigation-sidebar-width: var(--navigation-sidebar-width-wide);
+    --navigation-content-column-gap: var(--navigation-content-column-gap-wide);
   }
 }
 
