@@ -16,13 +16,13 @@ export const combobox = defineSlotRecipe({
       position: "relative",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     trigger: {
       alignItems: "center",
       bottom: "0",
-      color: "fg.muted",
+      color: "text.subtle",
       display: "flex",
       justifyContent: "center",
       p: "0!",
@@ -31,9 +31,12 @@ export const combobox = defineSlotRecipe({
       top: "0",
     },
     content: {
-      background: "bg.default",
+      background: "background.overlay",
+      borderColor: "border.strong",
       borderRadius: "sm",
+      borderWidth: "thin",
       boxShadow: "overlay",
+      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",
@@ -52,7 +55,7 @@ export const combobox = defineSlotRecipe({
       _focusVisible: {
         outlineOffset: "2px",
         outline: "2px solid",
-        outlineColor: "border.outline",
+        outlineColor: "border.default",
       },
     },
     item: {
@@ -65,13 +68,13 @@ export const combobox = defineSlotRecipe({
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
       _hover: {
-        background: "bg.muted",
+        background: "control.hoverBackground",
       },
       _highlighted: {
-        background: "bg.muted",
+        background: "selection.background",
       },
       _disabled: {
-        color: "fg.disabled",
+        color: "text.disabled",
         cursor: "not-allowed",
         _hover: {
           background: "transparent",

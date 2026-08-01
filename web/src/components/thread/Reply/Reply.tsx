@@ -7,8 +7,9 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
 import { Timestamp } from "@/components/site/Timestamp";
+import { CardBox } from "@/components/ui/card-box";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
-import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 
 import { Byline } from "../../content/Byline";
@@ -34,13 +35,8 @@ export function Reply(props: Props) {
   } = useReply(props);
   const isTargeted = useFragmentScroll(props.reply.id);
 
-  const {
-    initialSession,
-    thread,
-    reply,
-    currentPage,
-    initialSignatureConfig,
-  } = props;
+  const { initialSession, thread, reply, currentPage, initialSignatureConfig } =
+    props;
 
   const isInReview = reply.visibility === "review";
 
@@ -59,7 +55,7 @@ export function Reply(props: Props) {
         "&[data-targeted]": {
           animation: "target-pulse",
         },
-        backgroundColor: isInReview ? "bg.warning/30" : undefined,
+        backgroundColor: isInReview ? "status.warning.surface/30" : undefined,
       }}
     >
       <styled.form
@@ -197,11 +193,11 @@ function InReplyTo({ to, thread }: { to: ReplyType; thread: Thread }) {
     <WStack
       gap="1"
       fontSize="xs"
-      color="fg.muted"
+      color="text.subtle"
       px="2"
       py="1"
       borderRadius="md"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       w="full"
       minW="0"
     >

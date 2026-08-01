@@ -87,7 +87,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
       <LStack gap="5">
         <LStack gap="1">
           <Heading size="sm">Create OAuth Client</Heading>
-          <styled.p color="fg.muted" fontSize="sm">
+          <styled.p color="text.subtle" fontSize="sm">
             Configure your OAuth client for different integration types.
           </styled.p>
         </LStack>
@@ -118,7 +118,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                         <styled.span fontWeight="medium">
                           App Integration
                         </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
+                        <styled.span color="text.subtle" fontSize="xs">
                           For third-party apps like MCP clients
                           (authorization_code + refresh_token, confidential,
                           PKCE required)
@@ -134,7 +134,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                         <styled.span fontWeight="medium">
                           Public App
                         </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
+                        <styled.span color="text.subtle" fontSize="xs">
                           For browser/mobile apps (authorization_code +
                           refresh_token, public, PKCE required)
                         </styled.span>
@@ -149,7 +149,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                         <styled.span fontWeight="medium">
                           Machine Client
                         </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
+                        <styled.span color="text.subtle" fontSize="xs">
                           For server-to-server (client_credentials,
                           confidential, no redirect URIs)
                         </styled.span>
@@ -236,7 +236,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                         <styled.span fontWeight="medium">
                           {permission.name}
                         </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
+                        <styled.span color="text.subtle" fontSize="xs">
                           {permission.description}
                         </styled.span>
                       </LStack>
@@ -276,7 +276,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 function SecretField({ label, value }: { label: string; value: string }) {
   return (
     <LStack gap="2">
-      <Heading size="sm" color="fg.muted">
+      <Heading size="sm" color="text.subtle">
         {label}
       </Heading>
       <Clipboard.Root w="full" value={value}>

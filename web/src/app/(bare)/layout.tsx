@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { PropsWithChildren } from "react";
 
-import { Fullpage } from "@/layouts/Fullpage";
-
 import { BackAction } from "@/components/site/Action/Back";
 import { HomeAnchor } from "@/components/site/Navigation/Anchors/Home";
+import { CardBox } from "@/components/ui/card-box";
+import { Fullpage } from "@/layouts/Fullpage";
 import { getSettings } from "@/lib/settings/settings-server";
 import { css } from "@/styled-system/css";
-import { CardBox, VStack, WStack, styled } from "@/styled-system/jsx";
+import { VStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 import { getIconURL } from "@/utils/icon";
 

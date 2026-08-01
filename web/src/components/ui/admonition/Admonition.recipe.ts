@@ -8,9 +8,11 @@ export const admonition = defineRecipe({
     flexGrow: "0",
     gap: "2",
     justifyContent: "space-between",
-    borderColor: "border.muted",
+    backgroundColor: "background.inset",
+    borderColor: "border.default",
     borderRadius: "lg",
     borderWidth: "1px",
+    color: "text.default",
     outline: 0,
     position: "relative",
     transitionDuration: "normal",
@@ -21,17 +23,16 @@ export const admonition = defineRecipe({
   },
   variants: {
     kind: {
-      neutral: {
-        backgroundColor: "white.a6",
-      },
+      neutral: {},
       success: {
         backgroundColor: "status.success.surface",
         borderColor: "status.success.border",
         color: "status.success.content",
       },
       failure: {
-        backgroundColor: "bg.destructive",
-        color: "fg.default",
+        backgroundColor: "status.danger.surface",
+        borderColor: "status.danger.border",
+        color: "status.danger.content",
       },
     },
   },

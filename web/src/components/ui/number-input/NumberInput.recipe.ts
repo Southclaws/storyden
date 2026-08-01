@@ -5,7 +5,7 @@ import { input } from "../input/Input.recipe";
 
 const trigger = {
   alignItems: "center",
-  color: "fg.muted",
+  color: "text.subtle",
   cursor: "pointer",
   display: "flex",
   flex: "1",
@@ -57,7 +57,7 @@ export const numberInput = defineSlotRecipe({
       verticalAlign: "top",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     incrementTrigger: {

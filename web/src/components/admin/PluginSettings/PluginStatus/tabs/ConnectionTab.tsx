@@ -61,12 +61,12 @@ export function ConnectionTab({ plugin }: Props) {
 
   return (
     <LStack gap="4">
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         This plugin is an External plugin. This means Storyden does not manage
         its process lifecycle and cannot provide connection information. Use
         this token to connect the plugin to Storyden via RPC.
       </styled.p>
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         External plugins are responsible for handling its own restarting and
         reconnection.
       </styled.p>
@@ -85,7 +85,7 @@ export function ConnectionTab({ plugin }: Props) {
       </Alert.Root>
 
       <LStack gap="1">
-        <styled.p fontSize="xs" color="fg.muted">
+        <styled.p fontSize="xs" color="text.subtle">
           Plugin token
         </styled.p>
 
@@ -106,7 +106,7 @@ export function ConnectionTab({ plugin }: Props) {
       </LStack>
 
       <LStack gap="1">
-        <styled.p fontSize="xs" color="fg.muted">
+        <styled.p fontSize="xs" color="text.subtle">
           Development environment variable
         </styled.p>
         <Clipboard.Root w="full" value={envURL}>
@@ -127,7 +127,7 @@ export function ConnectionTab({ plugin }: Props) {
 
       <HStack w="full" justify="end">
         <InfoTip title="Regenerating Plugin Token">
-          <styled.p fontSize="sm" color="fg.muted">
+          <styled.p fontSize="sm" color="text.subtle">
             This will immediately invalidate the old token and force the plugin
             to disconnect if it&apos;s currently connected.
           </styled.p>

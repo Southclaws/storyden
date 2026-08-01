@@ -1,10 +1,10 @@
 "use client";
 
 import {
-  closestCenter,
   DndContext,
   DragEndEvent,
   PointerSensor,
+  closestCenter,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -231,7 +231,7 @@ function SortableRoleCard({
               width="5"
               height="5"
               padding="0"
-              color="fg.muted"
+              color="text.subtle"
               cursor={isDragging ? "grabbing" : "grab"}
               aria-label={`Reorder role ${role.name}`}
               {...attributes}

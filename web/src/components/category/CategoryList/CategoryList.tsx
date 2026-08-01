@@ -339,7 +339,7 @@ function CategoryTreeNode({
     : "";
 
   const highlightStyles = css({
-    background: isHighlighted ? "bg.selected" : undefined,
+    background: isHighlighted ? "interactive.selected.surface" : undefined,
   });
 
   return (
@@ -524,7 +524,9 @@ function DropIndicator({
           left: 0,
           right: 0,
           height: "3px",
-          background: active ? "var(--colors-bg-muted)" : "transparent",
+          background: active
+            ? "var(--colors-selection-background)"
+            : "transparent",
           opacity: active ? 1 : 0,
           transition: "opacity 0.2s",
           pointerEvents: "none",

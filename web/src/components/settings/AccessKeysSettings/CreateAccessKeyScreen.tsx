@@ -59,13 +59,13 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
               Authorization header with requests to the API.
             </p>
 
-            <Heading size="sm" color="fg.muted">
+            <Heading size="sm" color="text.subtle">
               Header format:
             </Heading>
 
             <pre>Authorization: Bearer {createdSecret}</pre>
 
-            <Heading size="sm" color="fg.muted">
+            <Heading size="sm" color="text.subtle">
               API and MCP endpoints:
             </Heading>
 

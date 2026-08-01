@@ -21,7 +21,7 @@ export function MetaGrid({ children, columns }: MetaGridProps) {
         }
       }
       gap={{ base: "2", md: "3" }}
-      color="fg.muted"
+      color="text.subtle"
       fontSize="xs"
       w="full"
     >
@@ -42,7 +42,7 @@ export function MetaItem({
       <styled.dt
         fontSize="xs"
         fontWeight="bold"
-        color="fg.muted"
+        color="text.subtle"
         textTransform="uppercase"
       >
         {label}

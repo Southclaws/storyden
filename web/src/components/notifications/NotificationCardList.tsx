@@ -22,7 +22,7 @@ export function NotificationCardList({ notifications, onMove }: Props) {
   if (notifications.length === 0) {
     return (
       <Center h="96" w="full" display="flex" flexDirection="column" gap="1">
-        <styled.p color="fg.muted">no notifications.</styled.p>
+        <styled.p color="text.subtle">no notifications.</styled.p>
       </Center>
     );
   }
@@ -67,7 +67,7 @@ function NotificationSource(props: NotificationItem) {
   return (
     <HStack>
       <LStack gap="0">
-        <styled.span color="fg.subtle">system message</styled.span>
+        <styled.span color="text.muted">system message</styled.span>
       </LStack>
     </HStack>
   );
@@ -94,7 +94,7 @@ function StatusControl({
       title="Mark as unread"
       onClick={handleChangeStatus}
     >
-      <InboxIcon color="fg.subtle" />
+      <InboxIcon color="text.muted" />
     </IconButton>
   ) : (
     <IconButton
@@ -103,7 +103,7 @@ function StatusControl({
       title="Mark as read"
       onClick={handleChangeStatus}
     >
-      <ArchiveIcon color="fg.subtle" />
+      <ArchiveIcon color="text.muted" />
     </IconButton>
   );
 }

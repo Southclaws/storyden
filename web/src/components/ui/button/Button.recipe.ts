@@ -45,11 +45,11 @@ export const button = defineRecipe({
     variant: {
       solid: {
         background: "colorPalette.default",
-        color: "bg.default",
+        color: "text.inverse",
         colorPalette: "accent",
         _hover: {
           background: "colorPalette.default/80",
-          color: "bg.default",
+          color: "text.inverse",
         },
         _focusVisible: {
           outline: "2px solid",
@@ -57,19 +57,19 @@ export const button = defineRecipe({
           outlineOffset: "2px",
         },
         _disabled: {
-          color: "fg.disabled",
-          background: "bg.disabled",
+          color: "text.disabled",
+          background: "control.disabledBackground",
           cursor: "not-allowed",
           _hover: {
-            color: "fg.disabled",
-            background: "bg.disabled",
+            color: "text.disabled",
+            background: "control.disabledBackground",
           },
         },
       },
       outline: {
         borderWidth: "1px",
-        borderColor: "border.subtle",
-        color: "fg.subtle",
+        borderColor: "border.muted",
+        color: "text.muted",
         colorPalette: "gray",
         _hover: {
           background: "colorPalette.subtle",
@@ -77,12 +77,12 @@ export const button = defineRecipe({
         },
         _disabled: {
           borderColor: "border.disabled",
-          color: "fg.disabled",
+          color: "text.disabled",
           cursor: "not-allowed",
           _hover: {
             background: "transparent",
             borderColor: "border.disabled",
-            color: "fg.disabled",
+            color: "text.disabled",
           },
         },
         _focusVisible: {
@@ -93,7 +93,7 @@ export const button = defineRecipe({
         _selected: {
           background: "accent.default",
           borderColor: "accent.default",
-          color: "accent.fg",
+          color: "text.inverse",
           _hover: {
             background: "accent.default/80",
             borderColor: "accent.default/80",
@@ -101,21 +101,21 @@ export const button = defineRecipe({
         },
       },
       ghost: {
-        color: "fg.subtle",
+        color: "text.muted",
         colorPalette: "accent",
         _hover: {
           background: "colorPalette.subtle",
-          color: "fg.default",
+          color: "text.default",
         },
         _selected: {
           background: "colorPalette.muted",
         },
         _disabled: {
-          color: "fg.disabled",
+          color: "text.disabled",
           cursor: "not-allowed",
           _hover: {
             background: "transparent",
-            color: "fg.disabled",
+            color: "text.disabled",
           },
         },
         _focusVisible: {
@@ -126,13 +126,13 @@ export const button = defineRecipe({
       },
       subtle: {
         colorPalette: "accent",
-        background: "bg.muted/80",
-        color: "fg.subtle",
+        background: "control.subtleBackground/80",
+        color: "text.muted",
         backdropBlur: "sm",
         backdropFilter: "auto",
         _hover: {
           background: "colorPalette.subtle",
-          color: "fg.default",
+          color: "text.default",
         },
         _focusVisible: {
           outline: "2px solid",
@@ -140,12 +140,12 @@ export const button = defineRecipe({
           outlineOffset: "2px",
         },
         _disabled: {
-          background: "bg.disabled",
-          color: "fg.disabled",
+          background: "control.disabledBackground",
+          color: "text.disabled",
           cursor: "not-allowed",
           _hover: {
-            background: "bg.disabled",
-            color: "fg.disabled",
+            background: "control.disabledBackground",
+            color: "text.disabled",
           },
         },
       },

@@ -1,5 +1,4 @@
 import { PublicProfileList } from "@/api/openapi-schema";
-
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Timestamp } from "@/components/site/Timestamp";
@@ -43,7 +42,7 @@ export function MemberList({ profiles }: Props) {
                     {profile.invited_by ? (
                       <MemberBadge profile={profile.invited_by} name="handle" />
                     ) : (
-                      <styled.p color="fg.subtle" fontStyle="italic">
+                      <styled.p color="text.muted" fontStyle="italic">
                         n/a
                       </styled.p>
                     )}
@@ -55,7 +54,7 @@ export function MemberList({ profiles }: Props) {
                     <LStack gap="1" alignItems="end">
                       <Timestamp created={profile.createdAt} large />
                       {isBanned && (
-                        <styled.p color="fg.destructive">
+                        <styled.p color="status.danger.content">
                           banned{" "}
                           <Timestamp created={profile.deletedAt!} large />
                         </styled.p>
@@ -90,7 +89,7 @@ export function MemberList({ profiles }: Props) {
                 <VStack alignItems="stretch">
                   <HStack justifyContent="space-between" gap="2">
                     <styled.span
-                      color="fg.subtle"
+                      color="text.muted"
                       fontSize="sm"
                       fontWeight="medium"
                     >
@@ -101,7 +100,7 @@ export function MemberList({ profiles }: Props) {
 
                   <HStack justifyContent="space-between" gap="2">
                     <styled.span
-                      color="fg.subtle"
+                      color="text.muted"
                       fontSize="sm"
                       fontWeight="medium"
                     >
@@ -114,7 +113,7 @@ export function MemberList({ profiles }: Props) {
 
                   <HStack justifyContent="space-between" gap="2">
                     <styled.span
-                      color="fg.subtle"
+                      color="text.muted"
                       fontSize="sm"
                       fontWeight="medium"
                     >
@@ -128,7 +127,7 @@ export function MemberList({ profiles }: Props) {
                         />
                       ) : (
                         <styled.span
-                          color="fg.subtle"
+                          color="text.muted"
                           fontStyle="italic"
                           fontSize="sm"
                         >
@@ -142,13 +141,13 @@ export function MemberList({ profiles }: Props) {
                     <Box
                       mt="1"
                       p="2"
-                      bg="bg.error"
+                      bg="status.danger.surface"
                       borderRadius="md"
                       borderWidth="thin"
-                      borderColor="border.error"
+                      borderColor="status.danger.border"
                     >
                       <styled.p
-                        color="fg.error"
+                        color="status.danger.content"
                         fontSize="sm"
                         fontWeight="medium"
                       >

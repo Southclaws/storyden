@@ -15,7 +15,7 @@ export const progress = defineSlotRecipe({
     track: {
       borderRadius: "full",
       overflow: "hidden",
-      backgroundColor: "bg.muted",
+      backgroundColor: "control.trackBackground",
     },
     range: {
       height: "full",
@@ -24,11 +24,11 @@ export const progress = defineSlotRecipe({
       transition: "all",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     valueText: {
-      color: "fg.muted",
+      color: "text.subtle",
       textAlign: "center",
     },
     circle: {
@@ -37,7 +37,7 @@ export const progress = defineSlotRecipe({
       justifyContent: "center",
     },
     circleTrack: {
-      stroke: "bg.muted",
+      stroke: "control.trackBackground",
       strokeWidth: "4px",
     },
     circleRange: {

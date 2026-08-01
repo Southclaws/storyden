@@ -27,7 +27,7 @@ export function Devices(props: Props) {
             key={v.id}
             display="flex"
             flexDir="column"
-            borderColor="border.muted"
+            borderColor="border.strong"
             borderWidth="thin"
             borderRadius="md"
             p="2"

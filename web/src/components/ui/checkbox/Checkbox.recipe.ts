@@ -10,7 +10,7 @@ export const checkbox = defineSlotRecipe({
       display: "flex",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     control: {
@@ -25,7 +25,7 @@ export const checkbox = defineSlotRecipe({
       transitionProperty: "border-color, background",
       transitionTimingFunction: "default",
       _hover: {
-        background: "bg.subtle",
+        background: "control.hoverBackground",
       },
       _checked: {
         background: "colorPalette.default",
@@ -44,7 +44,7 @@ export const checkbox = defineSlotRecipe({
       "&:has(+ :focus-visible)": {
         outlineOffset: "2px",
         outline: "2px solid",
-        outlineColor: "border.outline",
+        outlineColor: "border.default",
         _checked: {
           outlineColor: "colorPalette.default",
         },

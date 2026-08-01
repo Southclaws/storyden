@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import { PluginStatusBadge } from "./PluginStatusBadge";
 import { useSelectedPlugin } from "./useSelectedPlugin";
@@ -72,7 +72,7 @@ export function PluginItem({ plugin }: Props) {
         </WStack>
 
         <WStack alignItems="end">
-          <styled.p fontSize="xs" color="fg.muted">
+          <styled.p fontSize="xs" color="text.subtle">
             Installed: <time>{formatDate(plugin.added_at, "PPpp")}</time>
           </styled.p>
 
@@ -82,7 +82,7 @@ export function PluginItem({ plugin }: Props) {
                 <Button
                   size="xs"
                   variant="subtle"
-                  bgColor="bg.destructive"
+                  bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
                 >
                   Confirm Delete
@@ -100,7 +100,7 @@ export function PluginItem({ plugin }: Props) {
         </WStack>
 
         {isError && isPluginStatusError(plugin.status) && (
-          <styled.p fontSize="xs" color="fg.error">
+          <styled.p fontSize="xs" color="status.danger.content">
             Error: {plugin.status.message}
           </styled.p>
         )}

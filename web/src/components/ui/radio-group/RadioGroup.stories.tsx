@@ -56,14 +56,14 @@ export const Sizes: Story = {
     <LStack gap="6">
       {(["sm", "md", "lg"] as const).map((size) => (
         <LStack key={size} gap="2">
-          <styled.span color="fg.muted" textStyle="xs">
+          <styled.span color="text.subtle" textStyle="xs">
             {size}
           </styled.span>
           <Example size={size} defaultValue="public" />
         </LStack>
       ))}
       <LStack gap="2">
-        <styled.span color="fg.muted" textStyle="xs">
+        <styled.span color="text.subtle" textStyle="xs">
           Horizontal
         </styled.span>
         <Example size="md" orientation="horizontal" defaultValue="members" />

@@ -16,7 +16,7 @@ export const inputGroup = defineSlotRecipe({
     },
     element: {
       alignItems: "center",
-      color: "fg.muted",
+      color: "text.subtle",
       display: "flex",
       fontSize: "var(--input-group-element-font-size)",
       height: "full",
@@ -29,7 +29,7 @@ export const inputGroup = defineSlotRecipe({
       zIndex: "2",
       _icon: {
         boxSize: "var(--input-group-icon-size)",
-        color: "fg.subtle",
+        color: "text.muted",
       },
     },
   },

@@ -3,7 +3,7 @@ import { styled } from "@/styled-system/jsx";
 
 const formErrorText = cva({
   base: {
-    color: "fg.destructive",
+    color: "status.danger.content",
     fontSize: "xs",
   },
 });

@@ -30,7 +30,7 @@ export function Breadcrumbs({
     >
       <HStack
         w="full"
-        color="fg.subtle"
+        color="text.muted"
         overflowX="scroll"
         pt="scrollGutter"
         mt="-scrollGutter"

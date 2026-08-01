@@ -82,7 +82,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
 
   return (
     <LStack gap="2" w="full">
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         Defines plugin metadata and which features the plugin has access to.
       </styled.p>
 
@@ -91,7 +91,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
         borderWidth="thin"
         borderColor="border.default"
         borderRadius="md"
-        bgColor={editable ? "bg.default" : "bg.subtle"}
+        bgColor={editable ? "background.surface" : "background.inset"}
         p="3"
       >
         <styled.textarea
@@ -114,7 +114,7 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
 
       {editable && (
         <WStack justifyContent="space-between">
-          <styled.p fontSize="xs" color="fg.muted">
+          <styled.p fontSize="xs" color="text.subtle">
             Updating the manifest will force the plugin to disconnect.
           </styled.p>
           <Button

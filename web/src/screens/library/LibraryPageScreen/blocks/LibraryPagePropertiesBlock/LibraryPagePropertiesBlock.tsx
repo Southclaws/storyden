@@ -31,10 +31,10 @@ export function LibraryPagePropertiesBlock() {
               borderRadius="sm"
               textOverflow="ellipsis"
               overflowX="hidden"
-              color="fg.muted"
+              color="text.subtle"
               _hover={{
-                color: "fg.default",
-                background: "bg.muted",
+                color: "text.default",
+                background: "control.hoverBackground",
                 cursor: "pointer",
               }}
             >
@@ -46,8 +46,8 @@ export function LibraryPagePropertiesBlock() {
               w="min"
               borderRadius="sm"
               _hover={{
-                color: "fg.default",
-                background: "bg.muted",
+                color: "text.default",
+                background: "control.hoverBackground",
                 cursor: "pointer",
               }}
             >
@@ -95,7 +95,7 @@ function LibraryPagePropertiesBlockEditable() {
           {current.map((p) => {
             return (
               <HStack key={p.fid} display="table-row">
-                <styled.dt display="table-cell" p="1" color="fg.muted">
+                <styled.dt display="table-cell" p="1" color="text.subtle">
                   <Input
                     variant="ghost"
                     defaultValue={p.name}
@@ -114,7 +114,7 @@ function LibraryPagePropertiesBlockEditable() {
                   <IconButton
                     type="button"
                     variant="ghost"
-                    color="fg.destructive"
+                    color="status.danger.content"
                     size="sm"
                     onClick={handleRemoveProperty(p.name)}
                   >

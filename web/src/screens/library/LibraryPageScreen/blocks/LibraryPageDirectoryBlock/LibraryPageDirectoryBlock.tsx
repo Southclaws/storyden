@@ -62,7 +62,7 @@ export function LibraryPageDirectoryBlockContents() {
 
   return (
     <LStack w="full" gap="2">
-      <WStack bgColor="bg.subtle" borderRadius="sm" p="1">
+      <WStack bgColor="background.inset" borderRadius="sm" p="1">
         <TagBadgeList
           tags={tags}
           type="button"

@@ -29,7 +29,7 @@ export function RoleBadgeList({ roles, onlyBadgeRole, limit }: Props) {
       {isLimited && (
         <Popover.Root>
           <Popover.Trigger>
-            <Badge color="fg.muted" size="sm">
+            <Badge color="text.subtle" size="sm">
               +{rest}
             </Badge>
           </Popover.Trigger>

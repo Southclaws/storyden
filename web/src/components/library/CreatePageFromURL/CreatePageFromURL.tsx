@@ -179,10 +179,16 @@ export function CreatePageFromURLAction({
             <HStack gap="2" justify="space-between">
               {match(importState.step)
                 .with("complete", () => (
-                  <CheckCircleIcon color="fg.success" fill="bg.success" />
+                  <CheckCircleIcon
+                    color="status.success.content"
+                    fill="status.success.surface"
+                  />
                 ))
                 .with("failed", () => (
-                  <WarningIcon color="fg.warning" fill="bg.warning" />
+                  <WarningIcon
+                    color="status.warning.content"
+                    fill="status.warning.surface"
+                  />
                 ))
                 .otherwise(() => (
                   <Spinner />
@@ -227,8 +233,8 @@ export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
 function getImportStateColor(state: ImportStep): UtilityValues["color"] {
   switch (state) {
     case "failed":
-      return "fg.warning";
+      return "status.warning.content";
     default:
-      return "fg.muted";
+      return "text.subtle";
   }
 }

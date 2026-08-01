@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
+import { CardBox } from "@/components/ui/card-box";
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -22,15 +23,9 @@ import {
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
 import { css } from "@/styled-system/css";
-import {
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import {
   ALL_EVENT_TYPES,
@@ -162,13 +157,13 @@ function AuditEventItem({ event }: AuditEventItemProps) {
       <LStack gap="2">
         <WStack gap="2" alignItems="center">
           <Badge>{eventLabel}</Badge>
-          <styled.time fontSize="xs" color="fg.muted">
+          <styled.time fontSize="xs" color="text.subtle">
             {formatDate(event.timestamp, "PPpp")}
           </styled.time>
         </WStack>
 
         <HStack>
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             Enacted by:
           </styled.p>
 
@@ -191,7 +186,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
   switch (event.type) {
     case AuditEventType.thread_deleted:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <styled.p fontSize="sm" color="text.muted">
           Thread:{" "}
           <Link
             href={`/t/locate?id=${event.thread_id}`}
@@ -204,7 +199,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
 
     case AuditEventType.thread_reply_deleted:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <styled.p fontSize="sm" color="text.muted">
           Reply:{" "}
           <Link
             href={`/t/locate?id=${event.reply_id}`}
@@ -217,7 +212,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
 
     case AuditEventType.account_suspended:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <styled.p fontSize="sm" color="text.muted">
           Account:{" "}
           <Link
             href={`/m/${event.account_id}`}
@@ -230,7 +225,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
 
     case AuditEventType.account_unsuspended:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <styled.p fontSize="sm" color="text.muted">
           Account:{" "}
           <Link
             href={`/m/${event.account_id}`}
@@ -245,7 +240,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
     case AuditEventType.moderation_note_deleted:
       return (
         <LStack gap="1">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             Account:{" "}
             <Link
               href={`/m/${event.account_id}`}
@@ -254,7 +249,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
               <code>{event.account_id}</code>
             </Link>
           </styled.p>
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             Note: <code>{event.note_id}</code>
           </styled.p>
         </LStack>
@@ -263,7 +258,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
     case AuditEventType.account_content_purged:
       return (
         <LStack gap="1">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             Account:{" "}
             <Link
               href={`/m/${event.account_id}`}
@@ -274,7 +269,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
           </styled.p>
           {event.included && event.included.length > 0 && (
             <HStack gap="1" flexWrap="wrap">
-              <styled.p fontSize="sm" color="fg.subtle">
+              <styled.p fontSize="sm" color="text.muted">
                 Purged Content:
               </styled.p>
               {event.included.map((type) => (

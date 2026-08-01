@@ -9,12 +9,13 @@ import {
   getAccountGetKey,
 } from "@/api/openapi-client/accounts";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { SaveIcon } from "@/components/ui/icons/Save";
 import { Input } from "@/components/ui/input";
 import { useProfileMutations } from "@/lib/profile/mutation";
-import { CardBox, HStack } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
 import { wstack } from "@/styled-system/patterns";
 
 export const FormSchema = z.object({

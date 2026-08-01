@@ -32,7 +32,7 @@ export function DeletedMemberIdent({ size, label }: Props) {
       gap={size === "lg" ? "2" : "1"}
     >
       <Box flexShrink="0" style={{ width, height: width }}>
-        <DeletedMemberIcon w="full" h="full" color="fg.muted" />
+        <DeletedMemberIcon w="full" h="full" color="text.subtle" />
       </Box>
       <styled.p
         className="deleted-member-ident__label"
@@ -43,7 +43,7 @@ export function DeletedMemberIdent({ size, label }: Props) {
         textWrap="nowrap"
         textOverflow="ellipsis"
         lineHeight="tight"
-        color="fg.subtle"
+        color="text.muted"
       >
         {label ?? "@deleted"}
       </styled.p>

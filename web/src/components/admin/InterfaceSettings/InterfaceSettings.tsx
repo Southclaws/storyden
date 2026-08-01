@@ -1,6 +1,7 @@
 import { Controller } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
@@ -8,7 +9,7 @@ import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { FormNumberInputField } from "@/components/ui/number-input";
 import { FormRadioGroupField } from "@/components/ui/radio-group";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
+import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useInterfaceSettings } from "./useInterfaceSettings";

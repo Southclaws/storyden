@@ -6,7 +6,7 @@ export const text = defineRecipe({
   variants: {
     variant: {
       heading: {
-        color: "fg.default",
+        color: "text.default",
         fontWeight: "semibold",
       },
     },

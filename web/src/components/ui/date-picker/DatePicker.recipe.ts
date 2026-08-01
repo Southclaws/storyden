@@ -10,12 +10,14 @@ export const datePicker = defineSlotRecipe({
       display: "flex",
       flexDirection: "column",
       gap: "1.5",
-      background: "bg.default",
     },
     content: {
-      background: "bg.default",
+      background: "background.overlay",
+      borderColor: "border.strong",
       borderRadius: "md",
+      borderWidth: "thin",
       boxShadow: "overlay",
+      color: "text.default",
       display: "flex",
       flexDirection: "column",
       gap: "3",
@@ -38,12 +40,12 @@ export const datePicker = defineSlotRecipe({
       gap: "2",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
       textStyle: "sm",
     },
     tableHeader: {
-      color: "fg.muted",
+      color: "text.muted",
       fontWeight: "semibold",
       height: "10",
       textStyle: "sm",
@@ -73,7 +75,7 @@ export const datePicker = defineSlotRecipe({
         },
       },
       "&[data-in-range]": {
-        background: "bg.muted",
+        background: "selection.background",
       },
       _selected: {
         _before: {

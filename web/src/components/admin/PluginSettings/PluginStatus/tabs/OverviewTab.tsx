@@ -67,7 +67,7 @@ export function OverviewTab({ plugin }: Props) {
         </Alert.Root>
       )}
 
-      <styled.p fontSize="sm" color="fg.default">
+      <styled.p fontSize="sm" color="text.default">
         {plugin.description || "No description provided."}
       </styled.p>
 
@@ -87,7 +87,7 @@ export function OverviewTab({ plugin }: Props) {
 
         <SubsectionTitle>Events consumed</SubsectionTitle>
         {events.length === 0 ? (
-          <styled.p fontSize="sm" color="fg.muted">
+          <styled.p fontSize="sm" color="text.subtle">
             This plugin does not consume any events.
           </styled.p>
         ) : (
@@ -98,7 +98,7 @@ export function OverviewTab({ plugin }: Props) {
                 fontSize="xs"
                 fontFamily="mono"
                 p="2"
-                bgColor="bg.subtle"
+                bgColor="background.inset"
                 borderRadius="sm"
               >
                 {eventName}
@@ -109,15 +109,15 @@ export function OverviewTab({ plugin }: Props) {
       </LStack>
 
       <WStack>
-        <styled.p fontSize="xs" color="fg.subtle">
+        <styled.p fontSize="xs" color="text.muted">
           installed:&nbsp;
-          <styled.code color="fg.muted">
+          <styled.code color="text.subtle">
             {formatDate(plugin.added_at, "PPp")}
           </styled.code>
         </styled.p>
 
-        <styled.p fontSize="xs" color="fg.subtle">
-          id:&nbsp;<styled.code color="fg.muted">{plugin.id}</styled.code>
+        <styled.p fontSize="xs" color="text.muted">
+          id:&nbsp;<styled.code color="text.subtle">{plugin.id}</styled.code>
         </styled.p>
       </WStack>
     </LStack>
@@ -135,7 +135,7 @@ function OverviewField({
 }) {
   return (
     <WStack justifyContent="space-between" alignItems="start" gap="4">
-      <styled.p fontSize="xs" color="fg.muted">
+      <styled.p fontSize="xs" color="text.subtle">
         {label}
       </styled.p>
       <styled.p
@@ -152,7 +152,7 @@ function OverviewField({
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <styled.h3 fontSize="sm" fontWeight="semibold" color="fg.default">
+    <styled.h3 fontSize="sm" fontWeight="semibold" color="text.default">
       {children}
     </styled.h3>
   );
@@ -160,7 +160,7 @@ function SectionTitle({ children }: { children: string }) {
 
 function SubsectionTitle({ children }: { children: string }) {
   return (
-    <styled.h4 fontSize="sm" fontWeight="medium" color="fg.subtle">
+    <styled.h4 fontSize="sm" fontWeight="medium" color="text.muted">
       {children}
     </styled.h4>
   );
@@ -172,7 +172,7 @@ function CommandLine({ command, args }: { command: string; args: string }) {
       borderWidth="thin"
       borderColor="border.default"
       borderRadius="md"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       overflow="hidden"
     >
       <WStack gap="0" alignItems="stretch">
@@ -182,7 +182,7 @@ function CommandLine({ command, args }: { command: string; args: string }) {
           fontSize="xs"
           fontFamily="mono"
           fontWeight="semibold"
-          bgColor="bg.default"
+          bgColor="background.surface"
           borderRightWidth="thin"
           borderRightColor="border.default"
           whiteSpace="nowrap"
@@ -194,7 +194,7 @@ function CommandLine({ command, args }: { command: string; args: string }) {
           py="2"
           fontSize="xs"
           fontFamily="mono"
-          color={args === "-" ? "fg.muted" : "fg.default"}
+          color={args === "-" ? "text.subtle" : "text.default"}
           wordBreak="break-word"
         >
           {args}

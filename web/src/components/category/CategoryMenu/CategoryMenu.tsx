@@ -90,7 +90,9 @@ export function CategoryMenu(props: Props) {
             <Menu.ItemGroup id="account">
               <Menu.ItemGroupLabel>
                 <Heading size="sm">{category.name}</Heading>
-                <styled.span color="fg.subtle">discussion category</styled.span>
+                <styled.span color="text.muted">
+                  discussion category
+                </styled.span>
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />

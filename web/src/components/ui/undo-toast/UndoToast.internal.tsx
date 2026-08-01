@@ -102,7 +102,7 @@ function UndoToastContent({
         style={{
           width: "100%",
           height: "0.25rem",
-          backgroundColor: "var(--colors-bg-muted)",
+          backgroundColor: "var(--colors-control-track-background)",
           borderRadius: "9999px",
           overflow: "hidden",
         }}
@@ -131,10 +131,11 @@ export function showUndoToast({
   const toastId = toast.custom(
     (t) => (
       <Box
-        backgroundColor="bg.default"
+        backgroundColor="background.overlay"
         borderWidth="thin"
-        borderColor="border.default"
+        borderColor="border.strong"
         borderRadius="lg"
+        color="text.default"
         padding="3"
         boxShadow="floating"
         minWidth="sm"

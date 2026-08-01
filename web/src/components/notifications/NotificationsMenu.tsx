@@ -51,7 +51,7 @@ export function NotificationsMenu(props: Props) {
               <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
                 <LStack fontSize="sm">
                   <WStack>
-                    <styled.p color="fg.muted">
+                    <styled.p color="text.subtle">
                       Notifications ({unreads})
                     </styled.p>
 
@@ -69,7 +69,7 @@ export function NotificationsMenu(props: Props) {
               <Menu.Separator />
 
               {isEmpty ? (
-                <Center w="full" py="4" color="fg.muted" fontSize="xs">
+                <Center w="full" py="4" color="text.subtle" fontSize="xs">
                   You&apos;re all caught up!
                 </Center>
               ) : (

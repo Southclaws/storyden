@@ -3,7 +3,7 @@ import { styled } from "@/styled-system/jsx";
 
 const formLabel = cva({
   base: {
-    color: "fg.default",
+    color: "text.default",
     fontSize: "sm",
     marginBottom: "2",
   },

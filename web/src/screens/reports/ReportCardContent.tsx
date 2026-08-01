@@ -45,8 +45,8 @@ export function ReportCardContent({ report }: Props) {
 
   if (!item) {
     return (
-      <Box p="3" borderRadius="md" bg="bg.muted">
-        <styled.p color="fg.muted" fontStyle="italic">
+      <Box p="3" borderRadius="md" bg="background.inset">
+        <styled.p color="text.subtle" fontStyle="italic">
           Content no longer available
         </styled.p>
       </Box>
@@ -64,8 +64,8 @@ export function ReportCardContent({ report }: Props) {
       return <ProfileContent item={item} reportID={report.id} />;
     default:
       return (
-        <Box p="3" borderRadius="md" bg="bg.muted">
-          <styled.p color="fg.muted">Unknown content type</styled.p>
+        <Box p="3" borderRadius="md" bg="background.inset">
+          <styled.p color="text.subtle">Unknown content type</styled.p>
         </Box>
       );
   }
@@ -81,7 +81,7 @@ function PostContent({ reportID, item }: PostContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -95,10 +95,10 @@ function PostContent({ reportID, item }: PostContentProps) {
               {ref.title || "(Untitled post)"}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
-        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+        <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
           <MemberBadge profile={ref.author} size="sm" name="handle" />
 
           {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -118,7 +118,7 @@ function NodeContent({ reportID, item }: NodeContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -132,17 +132,17 @@ function NodeContent({ reportID, item }: NodeContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
         <LStack>
           <div>
-            <styled.p fontSize="sm" color="fg.subtle" lineClamp={3}>
+            <styled.p fontSize="sm" color="text.muted" lineClamp={3}>
               {ref.description}
             </styled.p>
           </div>
 
-          <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+          <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
             <MemberBadge profile={ref.owner} size="sm" name="handle" />
 
             {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -163,7 +163,7 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -177,10 +177,10 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
-        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+        <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
           <MemberBadge profile={ref} size="sm" name="handle" />
 
           {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -193,9 +193,9 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
 function ContentDeletedBadge() {
   return (
     <Badge
-      bg="bg.destructive"
-      color="fg.destructive"
-      borderColor="border.destructive"
+      bg="status.danger.surface"
+      color="status.danger.content"
+      borderColor="status.danger.border"
     >
       Content deleted
     </Badge>

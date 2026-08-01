@@ -14,7 +14,7 @@ export const table = defineSlotRecipe({
       },
     },
     caption: {
-      color: "fg.subtle",
+      color: "text.muted",
     },
     cell: {
       verticalAlign: "middle",
@@ -27,7 +27,7 @@ export const table = defineSlotRecipe({
       },
     },
     header: {
-      color: "fg.muted",
+      color: "text.subtle",
       fontWeight: "medium",
       textAlign: "left",
       verticalAlign: "middle",
@@ -53,7 +53,7 @@ export const table = defineSlotRecipe({
           overflowX: "scroll",
         },
         head: {
-          bg: "bg.subtle",
+          bg: "background.inset",
         },
         row: {
           "& td, & th": {
@@ -67,10 +67,10 @@ export const table = defineSlotRecipe({
       plain: {
         row: {
           _hover: {
-            bg: "bg.subtle",
+            bg: "control.hoverBackground",
           },
           _selected: {
-            bg: "bg.muted",
+            bg: "selection.background",
           },
         },
       },

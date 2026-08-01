@@ -103,7 +103,7 @@ export function RobotConfigurationForm(props: Props) {
             resize="vertical"
             _focus={{
               outline: "none",
-              borderColor: "border.accent",
+              borderColor: "accent.default",
             }}
           />
           <FormErrorText>
@@ -123,7 +123,7 @@ export function RobotConfigurationForm(props: Props) {
           {modelError ? (
             <FormErrorText>Failed to load robot models.</FormErrorText>
           ) : (
-            <styled.p color="fg.muted" fontSize="sm">
+            <styled.p color="text.subtle" fontSize="sm">
               {isCreating
                 ? "Leave unset to use the configured default model."
                 : "Choose one of the enabled provider models."}
@@ -202,7 +202,7 @@ function RobotDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
             <styled.p fontSize="sm">
               This will permanently delete this robot.
             </styled.p>
-            <styled.p fontSize="sm" color="fg.muted">
+            <styled.p fontSize="sm" color="text.subtle">
               Existing robot chat sessions will remain, but this robot will no
               longer be available.
             </styled.p>

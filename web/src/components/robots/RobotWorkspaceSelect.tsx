@@ -84,7 +84,7 @@ export function RobotWorkspaceSelect({
               <Select.ItemText>
                 {item.label}
                 {"description" in item && item.description ? (
-                  <styled.span color="fg.muted" ml="1">
+                  <styled.span color="text.subtle" ml="1">
                     {item.description}
                   </styled.span>
                 ) : null}

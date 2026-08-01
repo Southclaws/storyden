@@ -4,6 +4,7 @@ import { admonition } from "@/components/ui/admonition/Admonition.recipe";
 import { alert } from "@/components/ui/alert/Alert.recipe";
 import { badge } from "@/components/ui/badge/Badge.recipe";
 import { button } from "@/components/ui/button/Button.recipe";
+import { cardBox } from "@/components/ui/card-box/CardBox.recipe";
 import { checkbox } from "@/components/ui/checkbox/Checkbox.recipe";
 import { clipboard } from "@/components/ui/clipboard/Clipboard.recipe";
 import { colorPicker } from "@/components/ui/color-picker/ColorPicker.recipe";
@@ -129,48 +130,6 @@ export default defineConfig({
           };
         },
       },
-      Floating: {
-        description: `Floating overlay elements.`,
-        properties: {},
-        transform() {
-          return {
-            backgroundColor: "bg.opaque",
-            backdropBlur: "frosted",
-            backdropFilter: "auto",
-            boxShadow: "floating",
-          };
-        },
-      },
-      CardBox: {
-        description: `A card component that can be used to display content in a container with a border and a shadow.`,
-        properties: {
-          kind: {
-            type: "enum",
-            value: ["edge", "default"],
-          },
-          display: {
-            type: "property",
-            value: "display",
-          },
-        },
-        transform(props) {
-          const { kind, display, ...rest } = props;
-
-          const padding = kind === "edge" ? "0" : "2";
-
-          return {
-            display,
-            flexDirection: "column",
-            gap: "1",
-            width: "full",
-            boxShadow: "surface",
-            borderRadius: "lg",
-            backgroundColor: "bg.default",
-            padding,
-            ...rest,
-          };
-        },
-      },
       menuItemColorPalette: {
         description: `A color palette for menu items.`,
         properties: {},
@@ -217,6 +176,7 @@ export default defineConfig({
         badge: badge,
         checkbox: checkbox,
         button: button,
+        cardBox: cardBox,
         group: group,
         input: input,
         multiSelectPicker: multiSelectPicker,
@@ -257,7 +217,9 @@ export default defineConfig({
         },
         targetPulse: {
           "0%, 100%": { backgroundColor: "transparent" },
-          "50%": { backgroundColor: "var(--colors-bg-emphasized)" },
+          "50%": {
+            backgroundColor: "var(--colors-interactive-emphasized-surface)",
+          },
         },
       },
       textStyles: defineTextStyles({

@@ -23,7 +23,7 @@ export async function Default({
       minHeight="dvh"
       width="full"
       flexDirection="row"
-      backgroundColor="bg.site"
+      backgroundColor="background.canvas"
       vaul-drawer-wrapper=""
     >
       <Navigation>

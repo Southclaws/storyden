@@ -60,7 +60,7 @@ function ControlRow({ label, size }: { label: string; size: ControlSize }) {
   return (
     <styled.div
       alignItems="start"
-      borderBottomColor="border.subtle"
+      borderBottomColor="border.muted"
       borderBottomWidth="thin"
       display="grid"
       gap="3"
@@ -71,14 +71,10 @@ function ControlRow({ label, size }: { label: string; size: ControlSize }) {
       paddingY="4"
     >
       <styled.div display="flex" flexDirection="column" gap="1">
-        <styled.strong
-          color="content.default"
-          fontSize="sm"
-          fontWeight="medium"
-        >
+        <styled.strong color="text.default" fontSize="sm" fontWeight="medium">
           {label}
         </styled.strong>
-        <styled.code color="content.muted" fontFamily="mono" fontSize="xs">
+        <styled.code color="text.subtle" fontFamily="mono" fontSize="xs">
           {`size="${size}"`}
         </styled.code>
       </styled.div>
@@ -95,7 +91,7 @@ export const ControlSizing: Story = {
   render: () => (
     <styled.main
       boxSizing="border-box"
-      color="content.default"
+      color="text.default"
       display="flex"
       flexDirection="column"
       gap="8"
@@ -108,7 +104,7 @@ export const ControlSizing: Story = {
         <styled.h1 fontSize="2xl" fontWeight="semibold" lineHeight="tight">
           Form control sizing
         </styled.h1>
-        <styled.p color="content.subtle" fontSize="md" lineHeight="relaxed">
+        <styled.p color="text.muted" fontSize="md" lineHeight="relaxed">
           Compare Button, Input, and Select sizing in the same form row while
           tuning dense product defaults.
         </styled.p>
@@ -117,9 +113,9 @@ export const ControlSizing: Story = {
       <styled.section display="flex" flexDirection="column">
         <styled.div
           alignItems="end"
-          borderBottomColor="border.subtle"
+          borderBottomColor="border.muted"
           borderBottomWidth="thin"
-          color="content.subtle"
+          color="text.muted"
           display="grid"
           fontSize="sm"
           fontWeight="medium"

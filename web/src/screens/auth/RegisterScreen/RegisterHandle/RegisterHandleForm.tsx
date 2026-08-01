@@ -38,7 +38,7 @@ export function RegisterHandleForm(props: Props) {
         required
         {...register("identifier")}
       />
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.identifier?.message}
       </styled.p>
       <Flex alignItems="center" gap="2">
@@ -70,13 +70,13 @@ export function RegisterHandleForm(props: Props) {
           </>
         )}
       </Flex>
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.token?.message}
       </styled.p>
       <Button type="submit" w="full" onClick={handlePassword}>
         Register
       </Button>
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.root?.message}
       </styled.p>
     </styled.form>

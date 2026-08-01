@@ -87,14 +87,14 @@ export function ReportModal({
         onSubmit={handleSubmit}
         className={lstack()}
       >
-        <styled.div color="fg.muted">{description}</styled.div>
+        <styled.div color="text.subtle">{description}</styled.div>
 
         {subject && (
           <styled.div
             borderWidth="thin"
             borderRadius="md"
-            borderColor="border.subtle"
-            background="bg.subtle"
+            borderColor="border.muted"
+            background="background.inset"
             padding="3"
           >
             {subject}

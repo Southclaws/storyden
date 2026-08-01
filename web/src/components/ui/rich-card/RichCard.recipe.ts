@@ -1,5 +1,14 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
+export const richCardShell = {
+  "--card-border-radius": "radii.lg",
+  backgroundColor: "background.surface",
+  borderColor: "border.default",
+  borderRadius: "var(--card-border-radius)",
+  borderWidth: "thin",
+  color: "text.default",
+} as const;
+
 export const richCard = defineSlotRecipe({
   className: "rich-card",
   slots: [
@@ -25,10 +34,11 @@ export const richCard = defineSlotRecipe({
       width: "full",
     },
     root: {
-      "--card-border-radius": "radii.lg",
       "--card-backdrop-index": "1",
       "--card-media-index": "2",
       "--card-content-index": "4",
+
+      ...richCardShell,
 
       position: "relative",
       display: "grid",
@@ -38,9 +48,7 @@ export const richCard = defineSlotRecipe({
       minHeight: "0",
       gap: "0",
       overflow: "hidden",
-      borderRadius: "var(--card-border-radius)",
       boxShadow: "surface",
-      backgroundColor: "bg.default",
     },
 
     headerContainer: {
@@ -124,17 +132,17 @@ export const richCard = defineSlotRecipe({
     backgroundColor: {
       default: {
         root: {
-          backgroundColor: "bg.default",
+          backgroundColor: "background.surface",
         },
       },
       emphasized: {
         root: {
-          backgroundColor: "bg.emphasized",
+          backgroundColor: "selection.background",
         },
       },
       accent: {
         root: {
-          backgroundColor: "bg.accent",
+          backgroundColor: "accent.default",
         },
       },
     },
@@ -407,7 +415,7 @@ export const richCard = defineSlotRecipe({
           borderRadius: "sm",
           padding: "1",
 
-          background: "bg.canvas/60",
+          background: "background.canvas/60",
           backdropBlur: "frosted",
           backdropGrayscale: "0.5",
           backdropFilter: "auto",
@@ -447,7 +455,7 @@ export const richCard = defineSlotRecipe({
         mediaBackdropContainer: {
           gridRow: "content-start / edge-end",
           gridColumn: "edge-start / edge-end",
-          background: "bg.canvas/90",
+          background: "background.canvas/90",
           backdropBlur: "frosted",
           backdropGrayscale: "0.5",
           backdropFilter: "auto",

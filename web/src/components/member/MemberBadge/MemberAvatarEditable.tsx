@@ -27,7 +27,7 @@ export function MemberAvatarEditable({ profile }: Props) {
           p="0"
           borderRadius="full"
           variant="subtle"
-          color="bg.default"
+          color="text.inverse"
         >
           <MediaAddIcon width="6" height="6" />
         </Button>

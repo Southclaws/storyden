@@ -4,11 +4,12 @@ import { LinkReference } from "@/api/openapi-schema";
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
 import { FormComposeField } from "@/components/content/ContentComposer";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Card } from "@/components/ui/rich-card";
 import { Spinner } from "@/components/ui/spinner";
-import { CardBox, Flex, HStack, WStack } from "@/styled-system/jsx";
+import { Flex, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
@@ -27,7 +28,7 @@ export function QuickShare(props: Props) {
   }
 
   return (
-    <CardBox bgColor="bg.default">
+    <CardBox bgColor="background.surface">
       <form
         className={lstack({
           gap: "2",

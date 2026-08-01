@@ -1,9 +1,8 @@
 "use client";
 
-import { Unready } from "@/components/site/Unready";
-
 import { NodeCardRows } from "@/components/library/NodeCardList";
 import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
+import { Unready } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
 
@@ -23,10 +22,10 @@ export function DraftListScreen(props: Props) {
     <VStack w="full" alignItems="start">
       <Heading>Your drafts</Heading>
 
-      <Heading color="fg.subtle">Threads</Heading>
+      <Heading color="text.muted">Threads</Heading>
       <ThreadReferenceList threads={threads} />
 
-      <Heading color="fg.subtle">Library</Heading>
+      <Heading color="text.muted">Library</Heading>
       <NodeCardRows libraryPath={libraryPath} context="generic" nodes={nodes} />
     </VStack>
   );

@@ -2,7 +2,6 @@ import { formatDate, formatDistance, formatDistanceStrict } from "date-fns";
 import { Fragment } from "react";
 
 import { Account, Thread } from "@/api/openapi-schema";
-
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { VStack, styled } from "@/styled-system/jsx";
 
@@ -75,7 +74,7 @@ export function IntervalDivider({ interval }: IntervalDividerProps) {
   const title = `${startLabel} - ${formatDistanceStrict(interval.start, interval.end)} - ${endLabel}`;
 
   return (
-    <VStack w="full" color="fg.subtle" fontSize="xs">
+    <VStack w="full" color="text.muted" fontSize="xs">
       <time title={title}>
         {formatDistance(interval.start, interval.end)} later
       </time>

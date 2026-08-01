@@ -98,7 +98,7 @@ function AuditShell({
   return (
     <styled.main
       boxSizing="border-box"
-      color="content.default"
+      color="text.default"
       display="flex"
       flexDirection="column"
       gap="8"
@@ -111,7 +111,7 @@ function AuditShell({
         <styled.h1 fontSize="2xl" fontWeight="semibold" lineHeight="tight">
           {title}
         </styled.h1>
-        <styled.p color="content.subtle" fontSize="md" lineHeight="relaxed">
+        <styled.p color="text.muted" fontSize="md" lineHeight="relaxed">
           {description}
         </styled.p>
       </styled.header>
@@ -136,7 +136,7 @@ function Section({
           {title}
         </styled.h2>
         {description && (
-          <styled.p color="content.subtle" fontSize="sm">
+          <styled.p color="text.muted" fontSize="sm">
             {description}
           </styled.p>
         )}
@@ -157,7 +157,7 @@ function Matrix({
 
   return (
     <styled.div
-      borderTopColor="border.subtle"
+      borderTopColor="border.muted"
       borderTopWidth="thin"
       display="grid"
       gap="0"
@@ -165,9 +165,9 @@ function Matrix({
     >
       <styled.div
         alignItems="end"
-        borderBottomColor="border.subtle"
+        borderBottomColor="border.muted"
         borderBottomWidth="thin"
-        color="content.subtle"
+        color="text.muted"
         display="grid"
         fontSize="sm"
         fontWeight="medium"
@@ -199,7 +199,7 @@ function MatrixRow({
   return (
     <styled.div
       alignItems="center"
-      borderBottomColor="border.subtle"
+      borderBottomColor="border.muted"
       borderBottomWidth="thin"
       display="grid"
       gap="3"
@@ -212,7 +212,7 @@ function MatrixRow({
           {label}
         </styled.strong>
         {meta && (
-          <styled.code color="content.muted" fontFamily="mono" fontSize="xs">
+          <styled.code color="text.subtle" fontFamily="mono" fontSize="xs">
             {meta}
           </styled.code>
         )}
@@ -419,7 +419,7 @@ function ExampleFileUpload() {
         <FileUpload.Trigger asChild>
           <Button variant="outline">Choose files</Button>
         </FileUpload.Trigger>
-        <styled.span color="fg.muted" fontSize="sm">
+        <styled.span color="text.subtle" fontSize="sm">
           Drag image files here
         </styled.span>
       </FileUpload.Dropzone>

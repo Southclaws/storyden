@@ -1,6 +1,7 @@
 import { PluginActiveState, PluginList } from "@/api/openapi-schema";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
+import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { PluginAddTrigger } from "./PluginAddModal/PluginAddModal";
@@ -26,7 +27,7 @@ export function PluginSettingsIndex({ plugins }: Props) {
         <PluginAddTrigger />
       </WStack>
 
-      <styled.p color="fg.muted">
+      <styled.p color="text.subtle">
         {hasInactive ? (
           <span>
             {totalPlugins} plugins, {activePlugins} active.

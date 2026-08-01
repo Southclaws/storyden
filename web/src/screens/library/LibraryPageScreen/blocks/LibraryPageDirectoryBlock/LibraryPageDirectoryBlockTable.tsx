@@ -115,10 +115,10 @@ export function LibraryPageDirectoryBlockTable({
                     "data-active": "",
                   })}
                   _hover={{
-                    bg: "bg.muted",
+                    bg: "control.hoverBackground",
                   }}
                   _active={{
-                    bg: "bg.muted",
+                    bg: "control.hoverBackground",
                   }}
                   p="0"
                 >
@@ -179,7 +179,7 @@ export function LibraryPageDirectoryBlockTable({
           <Table.Foot
             borderBottomStyle="solid"
             borderBottomWidth="thin"
-            borderBlockColor="border.subtle"
+            borderBlockColor="border.muted"
           >
             <Table.Row>
               <Table.Cell colSpan={columns.length}>
@@ -327,9 +327,9 @@ function Row({
             // class is also used in the page edit level, need to
             // create a second level of hover grouping or something.
             // _groupHover={{
-            //   bg: "bg.muted",
+            //   bg: "control.hoverBackground",
             // }}
-            _hover={{ bg: "bg.subtle" }}
+            _hover={{ bg: "control.hoverBackground" }}
             position="relative"
           >
             {editing ? (
@@ -365,7 +365,7 @@ function Row({
                               width="5"
                               height="5"
                               padding="0"
-                              color="fg.muted"
+                              color="text.subtle"
                               onClick={handleMenuToggle}
                             >
                               <DragHandleIcon width="4" />
@@ -438,7 +438,9 @@ function Row({
                   .with("fixed:name", () => (
                     <Link href={column.href ?? "#"}>
                       {column.value || (
-                        <styled.em color="fg.muted">(untitled page)</styled.em>
+                        <styled.em color="text.subtle">
+                          (untitled page)
+                        </styled.em>
                       )}
                     </Link>
                   ))

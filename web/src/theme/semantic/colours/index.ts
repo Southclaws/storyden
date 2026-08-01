@@ -6,24 +6,26 @@ import green from "@/theme/base/colours/green";
 import red from "@/theme/base/colours/red";
 
 import { accent } from "./accent";
-import { bg } from "./bg";
+import { background } from "./background";
+import { badge } from "./badge";
 import { border } from "./border";
-import { canvas } from "./canvas";
 import { conicGradient } from "./conic-gradient";
-import { content } from "./content";
-import { fg } from "./fg";
+import { control } from "./control";
 import { interactive } from "./interactive";
+import { scrim } from "./scrim";
+import { selection } from "./selection";
 import { status } from "./status";
-import { surface } from "./surface";
+import { text } from "./text";
 import { visibility } from "./visibility";
 
 export const colours = defineSemanticTokens.colors({
-  canvas,
-  surface,
-  content,
-  bg,
-  fg,
+  background,
+  badge,
+  text,
   border,
+  control,
+  scrim,
+  selection,
   interactive,
   status,
   visibility,
@@ -36,28 +38,28 @@ export const colours = defineSemanticTokens.colors({
   amber: amber.semanticTokens,
 
   cardBackgroundGradient: {
-    value: "linear-gradient(90deg, var(--colors-bg), transparent)",
+    value: "linear-gradient(90deg, {colors.background.surface}, transparent)",
   },
   backgroundGradientH: {
-    value: "linear-gradient(90deg, var(--colors-bg), transparent)",
+    value: "linear-gradient(90deg, {colors.background.surface}, transparent)",
   },
   backgroundGradientV: {
-    value: "linear-gradient(0deg, var(--colors-bg), transparent)",
+    value: "linear-gradient(0deg, {colors.background.surface}, transparent)",
   },
   "overflow-fade": {
     value: {
       _osLight:
-        "linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 1) 80%)",
+        "linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 1) 80%)",
       _osDark:
-        "linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 1) 80%)",
+        "linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 1) 80%)",
     },
   },
   "scroll-fade-top": {
     value: {
       _osLight:
-        "linear-gradient(to bottom, {colors.bg.site} 0%, transparent 100%)",
+        "linear-gradient(to bottom, {colors.background.canvas} 0%, transparent 100%)",
       _osDark:
-        "linear-gradient(to bottom, {colors.bg.site} 0%, transparent 100%)",
+        "linear-gradient(to bottom, {colors.background.canvas} 0%, transparent 100%)",
     },
   },
 });

@@ -8,9 +8,10 @@ import {
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { PageVersionStatusBadge } from "./LibraryPageScreen/PageVersionStatusBadge";
 
@@ -45,14 +46,14 @@ export function LibraryPageVersionHistoryScreen({
           <Heading fontSize="heading.2" fontWeight="bold">
             {node.name}
           </Heading>
-          <styled.p color="fg.muted" fontSize="sm">
+          <styled.p color="text.subtle" fontSize="sm">
             Version history
           </styled.p>
         </LStack>
       </WStack>
 
       {versions.length === 0 ? (
-        <styled.p color="fg.muted" fontSize="sm">
+        <styled.p color="text.subtle" fontSize="sm">
           No versions or drafts yet.
         </styled.p>
       ) : (
@@ -86,7 +87,7 @@ function VersionHistoryItem({
       <LStack>
         <WStack>
           <PageVersionStatusBadge status={version.status} />
-          <styled.span color="fg.muted" fontSize="xs">
+          <styled.span color="text.subtle" fontSize="xs">
             <Timestamp created={version.updated_at} /> ago
           </styled.span>
         </WStack>

@@ -54,7 +54,7 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
 
   return (
     <LStack gap="4">
-      <styled.p color="fg.muted">
+      <styled.p color="text.subtle">
         Upload a Storyden Plugin (.sdx or .zip) file to extend Storyden's
         functionality.
       </styled.p>

@@ -102,7 +102,7 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
               dangerouslySetInnerHTML={{ __html: previewHTML }}
             />
           ) : (
-            <styled.p height="14" color="fg.muted" fontStyle="italic">
+            <styled.p height="14" color="text.subtle" fontStyle="italic">
               empty...
             </styled.p>
           )}
@@ -125,12 +125,12 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
             appearance="none"
             border="none"
             outline="none"
-            color="fg.default"
+            color="text.default"
             fontSize="md"
             transitionDuration="normal"
             transitionTimingFunction="default"
             _placeholder={{
-              color: "fg.default",
+              color: "text.default",
             }}
             style={{
               border: "none",
@@ -170,14 +170,14 @@ function SDRInlineReference({
         px: "2",
         verticalAlign: "baseline",
         borderRadius: "full",
-        backgroundColor: "bg.muted",
-        color: "fg.default",
+        backgroundColor: "background.inset",
+        color: "text.default",
         textDecoration: "none",
         fontWeight: "medium",
         fontSize: "xs",
         whiteSpace: "nowrap",
         _hover: {
-          backgroundColor: "bg.subtle",
+          backgroundColor: "control.hoverBackground",
           textDecoration: "none",
         },
       })}

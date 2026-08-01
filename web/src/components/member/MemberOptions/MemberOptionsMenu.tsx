@@ -3,9 +3,8 @@ import Link from "next/link";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
 
-import { useSession } from "@/auth";
-
 import { Permission, ProfileReference } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
@@ -96,8 +95,11 @@ export function MemberOptionsMenu({
                 <MemberWarningTrigger profile={profile}>
                   <Menu.Item
                     value="warn"
-                    color="fg.warning"
-                    _hover={{ color: "fg.warning", background: "bg.warning" }}
+                    color="status.warning.content"
+                    _hover={{
+                      color: "status.warning.content",
+                      background: "status.warning.surface",
+                    }}
                   >
                     Warn member
                   </Menu.Item>
@@ -108,10 +110,10 @@ export function MemberOptionsMenu({
                 <MemberSuspensionTrigger profile={profile}>
                   <Menu.Item
                     value="suspend"
-                    color="fg.destructive"
+                    color="status.danger.content"
                     _hover={{
-                      color: "fg.destructive",
-                      background: "bg.destructive",
+                      color: "status.danger.content",
+                      background: "status.danger.surface",
                     }}
                   >
                     {profile.suspended ? "Reinstate" : "Suspend"}

@@ -101,14 +101,14 @@ export function LinkPasteMenu({ editor }: Props) {
       className={css({
         zIndex: "popover",
         borderRadius: "md",
-        backgroundColor: "bg.subtle/80",
+        backgroundColor: "background.overlay/80",
         backdropBlur: "frosted",
         backdropFilter: "auto",
         boxShadow: "floating",
         padding: "1",
       })}
     >
-      <styled.p color="fg.muted" fontSize="sm">
+      <styled.p color="text.subtle" fontSize="sm">
         Show link as
       </styled.p>
       <HStack gap="1">

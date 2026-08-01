@@ -45,7 +45,7 @@ export function WarningsPanel({
     <LStack gap="3">
       {data.total === 0 || data.warnings.length === 0 ? (
         <Box borderWidth="thin" borderRadius="sm" p="2">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             No warning history for this account yet.
           </styled.p>
         </Box>
@@ -192,7 +192,7 @@ function WarningRecordCard({
     <Box
       borderWidth="thin"
       borderRadius="sm"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       p="2"
       w="full"
     >
@@ -218,7 +218,7 @@ function WarningRecordCard({
         <HStack gap="1" flexWrap="wrap">
           <Timestamp
             created={warning.issued_at}
-            color="fg.muted"
+            color="text.subtle"
             fontSize="xs"
           />
 
@@ -258,7 +258,7 @@ function WarningRecordCard({
                   <Button
                     size="xs"
                     variant="subtle"
-                    bgColor="bg.destructive"
+                    bgColor="status.danger.surface"
                     onClick={handleConfirmAction}
                     loading={isDeleting}
                   >

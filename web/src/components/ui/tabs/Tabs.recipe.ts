@@ -34,7 +34,7 @@ export const tabs = defineSlotRecipe({
     },
     trigger: {
       alignItems: "center",
-      color: "fg.muted",
+      color: "text.subtle",
       cursor: "pointer",
       display: "inline-flex",
       flexShrink: "0",
@@ -47,19 +47,19 @@ export const tabs = defineSlotRecipe({
       whiteSpace: "nowrap",
       zIndex: "1",
       _disabled: {
-        color: "fg.disabled",
+        color: "text.disabled",
         cursor: "not-allowed",
         _hover: {
-          color: "fg.disabled",
+          color: "text.disabled",
         },
       },
       _hover: {
-        color: "fg.muted",
+        color: "text.subtle",
       },
       _selected: {
-        color: "fg.default",
+        color: "text.default",
         _hover: {
-          color: "fg.default",
+          color: "text.default",
         },
       },
       _vertical: {
@@ -80,7 +80,7 @@ export const tabs = defineSlotRecipe({
           px: "1",
           backgroundColor: {
             _osLight: "gray.a2",
-            _osDark: "bg.canvas",
+            _osDark: "background.canvas",
           },
           _horizontal: {
             alignItems: "center",
@@ -92,8 +92,8 @@ export const tabs = defineSlotRecipe({
         },
         indicator: {
           backgroundColor: {
-            _osLight: "bg.default",
-            _osDark: "bg.subtle",
+            _osLight: "background.surface",
+            _osDark: "background.inset",
           },
 
           boxShadow: "surface",
@@ -156,8 +156,8 @@ export const tabs = defineSlotRecipe({
             borderBottomLeftRadius: "sm",
           },
           _selected: {
-            background: "bg.default",
-            borderColor: "border.subtle",
+            background: "background.surface",
+            borderColor: "border.muted",
             _horizontal: {
               borderBottomColor: "transparent",
             },
@@ -168,8 +168,8 @@ export const tabs = defineSlotRecipe({
         },
         content: {
           borderWidth: "1px",
-          borderColor: "border.subtle",
-          background: "bg.default",
+          borderColor: "border.muted",
+          background: "background.surface",
           width: "full",
         },
       },

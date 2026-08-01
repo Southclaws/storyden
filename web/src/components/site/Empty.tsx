@@ -7,7 +7,7 @@ import { EmptyIcon } from "../ui/icons/Empty";
 /** @deprecated use EmptyState */
 export function Empty({ children }: PropsWithChildren) {
   return (
-    <VStack alignItems="center" color="fg.muted">
+    <VStack alignItems="center" color="text.subtle">
       <EmptyIcon />
       <styled.p fontStyle="italic" textWrap="nowrap">
         {children}

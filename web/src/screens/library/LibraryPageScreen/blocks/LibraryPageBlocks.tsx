@@ -238,8 +238,8 @@ function LibraryPageBlockEditable({
           ref={elementRef}
           w="full"
           h={{ base: "6", md: "full" }}
-          bgColor="bg.muted/50"
-          color="fg.subtle"
+          bgColor="selection.background/50"
+          color="text.muted"
           borderRadius="sm"
           visibility="hidden"
           _groupHover={{
@@ -273,7 +273,7 @@ function LibraryPageBlockEditable({
                     width="5"
                     height="5"
                     padding="0"
-                    color="fg.muted"
+                    color="text.subtle"
                     onClick={handleMenuToggle}
                   >
                     <DragHandleIcon width="4" />

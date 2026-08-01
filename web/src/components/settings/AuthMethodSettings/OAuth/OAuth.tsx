@@ -1,10 +1,10 @@
 import { AccountAuthMethod, AuthProvider } from "@/api/openapi-schema";
-
 import { Timestamp } from "@/components/site/Timestamp";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
 import { OAuthProvider } from "@/lib/auth/oauth";
-import { CardBox, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
+import { LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 type Props = {
@@ -22,7 +22,7 @@ export function OAuth({ active, available }: Props) {
         to log in easily and may also provide additional features.
       </styled.p>
 
-      <Heading size="sm" color="fg.subtle">
+      <Heading size="sm" color="text.muted">
         Active
       </Heading>
 
@@ -33,7 +33,7 @@ export function OAuth({ active, available }: Props) {
               <CardBox>
                 <Heading size="sm">{v.name}</Heading>
 
-                <WStack color="fg.muted" alignItems="end">
+                <WStack color="text.subtle" alignItems="end">
                   <styled.span>
                     Added&nbsp;
                     <Timestamp created={v.created_at} large />
@@ -46,12 +46,12 @@ export function OAuth({ active, available }: Props) {
           ))}
         </styled.ul>
       ) : (
-        <styled.p color="fg.muted">
+        <styled.p color="text.subtle">
           You currently have no linked accounts.
         </styled.p>
       )}
 
-      <Heading size="sm" color="fg.subtle">
+      <Heading size="sm" color="text.muted">
         Available
       </Heading>
 
@@ -72,7 +72,7 @@ export function OAuth({ active, available }: Props) {
           ))}
         </styled.ul>
       ) : (
-        <styled.p color="fg.muted">
+        <styled.p color="text.subtle">
           {active.length > 0
             ? "There are no more authentication providers available."
             : "There are currently no authentication providers available."}

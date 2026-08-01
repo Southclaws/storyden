@@ -272,7 +272,7 @@ function ThreadStats({ thread }: { thread: Thread }) {
   const replyLabel = replyCount === 1 ? "reply" : "replies";
 
   return (
-    <HStack gap="4" color="fg.muted">
+    <HStack gap="4" color="text.subtle">
       <styled.span
         display="flex"
         gap="1"

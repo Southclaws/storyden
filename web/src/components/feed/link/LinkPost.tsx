@@ -1,10 +1,9 @@
 import { Link as LinkSchema, ThreadReference } from "@/api/openapi-schema";
 import { Anchor } from "@/components/site/Anchor";
-
 import { Empty } from "@/components/site/Empty";
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
-import { CardBox } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { getAssetURL } from "@/utils/asset";
 
 import { FeedItemByline } from "../FeedItemByline/FeedItemByline";
@@ -19,7 +18,7 @@ export function LinkPost(props: Props) {
   const asset = link.assets?.[0] ?? props.thread.assets?.[0];
 
   return (
-    <styled.article className={CardBox({ kind: "edge" })}>
+    <styled.article className={cardBox({ kind: "edge" })}>
       <Box display="flex" w="full" height="16">
         <Box flexGrow="1" flexShrink="0" width="32">
           {asset ? (

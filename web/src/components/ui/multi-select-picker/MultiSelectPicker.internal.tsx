@@ -238,11 +238,11 @@ export function MultiSelectPicker({
                   <HStack
                     position="absolute"
                     right="-0.5"
-                    bg="bg.muted"
-                    color="fg.default"
+                    bg="control.background"
+                    color="text.default"
                     backdropBlur="frosted"
                     backdropFilter="auto"
-                    mask="linear-gradient(to right, rgb(from {colors.bg.subtle} r g b / 0) 0%, rgb(from {colors.bg.subtle} r g b / 0.8) 100%)"
+                    mask="linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 0.8) 100%)"
                     fontWeight="semibold"
                     pointerEvents="none"
                     height="full"
@@ -254,7 +254,7 @@ export function MultiSelectPicker({
                   <HStack
                     position="absolute"
                     right="-0.5"
-                    color="fg.default"
+                    color="text.default"
                     bg="overflow-fade"
                     fontWeight="semibold"
                     pointerEvents="none"
@@ -268,7 +268,7 @@ export function MultiSelectPicker({
               )}
             </>
           ) : (
-            <Text size="sm" color="fg.muted">
+            <Text size="sm" color="text.subtle">
               {inputPlaceholder || "Select items..."}
             </Text>
           )}
@@ -357,7 +357,7 @@ export function MultiSelectPicker({
                   !filteredQueryResults?.length &&
                   !showCreateNew && (
                     <Menu.ItemGroup p="2">
-                      <Text size="sm" color="fg.subtle">
+                      <Text size="sm" color="text.muted">
                         No results found
                       </Text>
                     </Menu.ItemGroup>

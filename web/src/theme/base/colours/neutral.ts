@@ -2,18 +2,18 @@ import { defineSemanticTokens, defineTokens } from "@pandacss/dev";
 
 const tokens = defineTokens.colors({
   light: {
-    "1": { value: "#fcfcfc" },
-    "2": { value: "#f9f9f9" },
-    "3": { value: "#f0f0f0" },
-    "4": { value: "#e8e8e8" },
-    "5": { value: "#e0e0e0" },
-    "6": { value: "#d9d9d9" },
-    "7": { value: "#cecece" },
-    "8": { value: "#bbbbbb" },
-    "9": { value: "#8d8d8d" },
-    "10": { value: "#838383" },
-    "11": { value: "#646464" },
-    "12": { value: "#202020" },
+    "1": { value: "#fcfcfc" }, // 1 App background
+    "2": { value: "#f9f9f9" }, // 2 Subtle background
+    "3": { value: "#f0f0f0" }, // 3 UI element background
+    "4": { value: "#e8e8e8" }, // 4 Hovered UI element background
+    "5": { value: "#e0e0e0" }, // 5 Active / Selected UI element background
+    "6": { value: "#d9d9d9" }, // 6 Subtle borders and separators
+    "7": { value: "#cecece" }, // 7 UI element border and focus rings
+    "8": { value: "#bbbbbb" }, // 8 Hovered UI element border
+    "9": { value: "#8d8d8d" }, // 9 Solid backgrounds
+    "10": { value: "#838383" }, // 10 Hovered solid backgrounds
+    "11": { value: "#646464" }, // 11 Low-contrast text
+    "12": { value: "#202020" }, // 12 High-contrast text
     a1: { value: "#00000003" },
     a2: { value: "#00000006" },
     a3: { value: "#0000000f" },
@@ -204,26 +204,26 @@ const semanticTokens = defineSemanticTokens.colors({
   default: {
     value: {
       base: "{colors.neutral.light.9}",
-      osDark: "{colors.neutral.dark.9}"
-    }
+      osDark: "{colors.neutral.dark.9}",
+    },
   },
   emphasized: {
     value: {
       base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}"
+      osDark: "{colors.neutral.dark.12}",
     },
   },
   fg: {
     value: {
       base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}"
-    }
+      osDark: "{colors.neutral.dark.12}",
+    },
   },
   text: {
     value: {
       base: "{colors.neutral.light.12}",
-      osDark: "{colors.neutral.dark.12}"
-    }
+      osDark: "{colors.neutral.dark.12}",
+    },
   },
 });
 

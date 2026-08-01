@@ -15,16 +15,10 @@ import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
 import { Unready } from "@/components/site/Unready";
+import { CardBox } from "@/components/ui/card-box";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
-import {
-  Box,
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  styled,
-} from "@/styled-system/jsx";
+import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
@@ -115,7 +109,7 @@ export function ProfileScreen(props: Props) {
           </Flex>
 
           <HStack gap="1">
-            <styled.p color="fg.muted" wordBreak="keep-all">
+            <styled.p color="text.subtle" wordBreak="keep-all">
               Joined{" "}
               <styled.time textWrap="nowrap">
                 {formatDistanceToNow(new Date(profile.createdAt), {
@@ -126,7 +120,7 @@ export function ProfileScreen(props: Props) {
             <DotSeparator />
             <HStack
               gap="1"
-              color="fg.subtle"
+              color="text.muted"
               wordBreak="keep-all"
               textWrap="nowrap"
             >
@@ -138,7 +132,7 @@ export function ProfileScreen(props: Props) {
           </HStack>
 
           {isEmpty && !isEditing ? (
-            <styled.p color="fg.subtle" fontStyle="italic">
+            <styled.p color="text.muted" fontStyle="italic">
               This profile has no bio yet...
             </styled.p>
           ) : (
@@ -153,7 +147,7 @@ export function ProfileScreen(props: Props) {
 
           {signaturesEnabled &&
             (isSignatureEmpty && !isEditing ? (
-              <styled.p color="fg.subtle" fontStyle="italic">
+              <styled.p color="text.muted" fontStyle="italic">
                 This profile has no signature yet...
               </styled.p>
             ) : (

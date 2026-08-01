@@ -24,16 +24,16 @@ export const badge = defineRecipe({
         color: "colorPalette.fg",
       },
       subtle: {
-        background: "bg.subtle",
-        borderColor: "border.subtle",
+        background: "badge.background",
+        borderColor: "border.muted",
         borderWidth: "1px",
-        color: "fg.default",
+        color: "text.default",
         "& svg": {
-          color: "fg.subtle",
+          color: "text.muted",
         },
       },
       outline: {
-        color: "fg.default",
+        color: "text.default",
         borderWidth: "2px",
         borderColor: "border.default",
       },

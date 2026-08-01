@@ -222,7 +222,7 @@ export function LibraryPageEditMenu({ node }: Props) {
             )}
 
             {versions.length === 0 ? (
-              <styled.p px="1" py="1" color="fg.muted" fontSize="xs">
+              <styled.p px="1" py="1" color="text.subtle" fontSize="xs">
                 No versions or drafts yet.
               </styled.p>
             ) : (
@@ -277,7 +277,7 @@ function VersionMenuItem({
       borderRadius="sm"
       px="2"
       py="2"
-      _hover={{ bgColor: "bg.muted" }}
+      _hover={{ bgColor: "control.hoverBackground" }}
     >
       <WStack alignItems="start">
         <PageVersionStatusBadge status={version.status} />
@@ -298,7 +298,7 @@ function VersionMenuItem({
           name="handle"
           avatar="visible"
         />
-        <styled.span color="fg.muted" fontSize="xs">
+        <styled.span color="text.subtle" fontSize="xs">
           <Timestamp created={version.updated_at} /> ago
         </styled.span>
       </WStack>

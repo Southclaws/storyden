@@ -19,7 +19,7 @@ export function EditAvatarScreen(props: Props) {
         onUpload={handleSave}
         showPreviews
       />
-      <HStack color="fg.subtle">
+      <HStack color="text.muted">
         <InfoIcon width="4" />
         <p>You can pinch or use a mouse wheel to zoom/crop.</p>
       </HStack>

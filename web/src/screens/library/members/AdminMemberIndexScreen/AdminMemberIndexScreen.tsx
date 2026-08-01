@@ -17,6 +17,7 @@ import { Timestamp } from "@/components/site/Timestamp";
 import { Unready } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Group } from "@/components/ui/group";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { MembersIcon } from "@/components/ui/icons/Members";
@@ -24,7 +25,6 @@ import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
 import {
   Box,
-  CardBox,
   Flex,
   Grid,
   HStack,
@@ -73,7 +73,12 @@ export function AdminMemberIndexScreen(props: Props) {
           placeholder="Search members by name, handle, ID, or email"
         />
 
-        <LinkButton size="md" variant="subtle" bg="bg.warning" href="/m">
+        <LinkButton
+          size="md"
+          variant="subtle"
+          bg="status.warning.surface"
+          href="/m"
+        >
           <MembersIcon />
         </LinkButton>
       </Group>
@@ -194,12 +199,16 @@ export function AdminMemberIndexScreen(props: Props) {
 
                     <Timestamp
                       created={account.joined}
-                      color="fg.subtle"
+                      color="text.muted"
                       large
                     />
                   </WStack>
 
-                  <styled.code color="fg.muted" fontSize="xs" fontFamily="mono">
+                  <styled.code
+                    color="text.subtle"
+                    fontSize="xs"
+                    fontFamily="mono"
+                  >
                     {account.id}
                   </styled.code>
 
@@ -214,7 +223,7 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Emails">
                         <VStack alignItems="stretch" gap="1.5">
                           {account.email_addresses.length === 0 ? (
-                            <styled.span color="fg.muted" fontSize="sm">
+                            <styled.span color="text.subtle" fontSize="sm">
                               No email addresses
                             </styled.span>
                           ) : (
@@ -240,7 +249,7 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Roles">
                         <HStack gap="2" flexWrap="wrap">
                           {account.roles.length === 0 ? (
-                            <styled.span color="fg.muted" fontSize="sm">
+                            <styled.span color="text.subtle" fontSize="sm">
                               No roles
                             </styled.span>
                           ) : (
@@ -258,7 +267,7 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Auth services">
                         <HStack gap="2" flexWrap="wrap">
                           {authServices.length === 0 ? (
-                            <styled.span color="fg.muted" fontSize="sm">
+                            <styled.span color="text.subtle" fontSize="sm">
                               None
                             </styled.span>
                           ) : (
@@ -287,7 +296,7 @@ export function AdminMemberIndexScreen(props: Props) {
                             avatar="hidden"
                           />
                         ) : (
-                          <styled.span color="fg.subtle" fontStyle="italic">
+                          <styled.span color="text.muted" fontStyle="italic">
                             n/a
                           </styled.span>
                         )}
@@ -350,7 +359,7 @@ function BooleanFilterMenu(props: {
 function InfoBlock(props: React.PropsWithChildren<{ label: string }>) {
   return (
     <LStack gap="2" alignItems="stretch">
-      <styled.span fontSize="sm" color="fg.subtle" fontWeight="medium">
+      <styled.span fontSize="sm" color="text.muted" fontWeight="medium">
         {props.label}
       </styled.span>
       {props.children}

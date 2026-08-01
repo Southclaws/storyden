@@ -37,7 +37,7 @@ export function LoginHandleForm() {
         required
         {...register("identifier")}
       />
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.identifier?.message}
       </styled.p>
       <Flex alignItems="center" gap="2">
@@ -51,13 +51,13 @@ export function LoginHandleForm() {
           {...register("token")}
         />
       </Flex>
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.token?.message}
       </styled.p>
       <Button type="submit" w="full" onClick={handlePassword}>
         Login
       </Button>
-      <styled.p color="fg.error" fontSize="sm">
+      <styled.p color="status.danger.content" fontSize="sm">
         {errors.root?.message}
       </styled.p>
     </styled.form>

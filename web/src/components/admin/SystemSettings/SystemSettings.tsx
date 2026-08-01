@@ -9,6 +9,7 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -17,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { FormSelectField } from "@/components/ui/select";
 import { FormSliderField } from "@/components/ui/slider";
 import { API_ADDRESS } from "@/config";
-import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
@@ -133,13 +134,14 @@ export function SystemSettingsForm(props: Props) {
         </p>
 
         <p>
-          Members: <styled.strong color="fg.info">{rateLimit}</styled.strong>{" "}
+          Members:{" "}
+          <styled.strong color="status.info.content">{rateLimit}</styled.strong>{" "}
           operations every{" "}
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
             {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
           </styled.strong>{" "}
           (~
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
             {memberRequestsPerMinute}
           </styled.strong>{" "}
           requests per minute).
@@ -147,13 +149,15 @@ export function SystemSettingsForm(props: Props) {
 
         <p>
           Guests:{" "}
-          <styled.strong color="fg.info">{guestRateLimit}</styled.strong>{" "}
+          <styled.strong color="status.info.content">
+            {guestRateLimit}
+          </styled.strong>{" "}
           operations every{" "}
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
             {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
           </styled.strong>{" "}
           (~
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
             {guestRequestsPerMinute}
           </styled.strong>{" "}
           requests per minute).
@@ -450,13 +454,13 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
   const warnings = getClientIPWarnings(ssrClientInfo, browserClientInfo);
 
   return (
-    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
+    <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
       <styled.p>
         This client IP test runs automatically and compares what Storyden sees
         from an SSR-origin call and a browser-origin call.
       </styled.p>
 
-      {error && <styled.p color="fg.error">{error}</styled.p>}
+      {error && <styled.p color="status.danger.content">{error}</styled.p>}
 
       {warnings.length > 0 && (
         <Alert.Root>
@@ -639,7 +643,7 @@ function RateLimitTester() {
   }
 
   return (
-    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
+    <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
       <styled.p>
         This is your current rate limit status. Click the &quot;Test&quot;
         button to consume one request.

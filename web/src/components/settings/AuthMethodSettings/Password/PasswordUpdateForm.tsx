@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { CardBox, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { usePasswordUpdate } from "./usePasswordUpdate";

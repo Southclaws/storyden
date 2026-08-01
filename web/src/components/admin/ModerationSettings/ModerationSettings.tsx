@@ -4,6 +4,7 @@ import { Controller } from "react-hook-form";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -12,14 +13,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
 import { FormNumberInputField } from "@/components/ui/number-input";
-import {
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useModerationSettings } from "./useModerationSettings";

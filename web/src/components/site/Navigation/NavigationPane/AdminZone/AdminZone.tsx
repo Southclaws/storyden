@@ -71,11 +71,11 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
       pl="3"
       pr="2"
       py="1"
-      bgColor="bg.warning"
+      bgColor="status.warning.surface"
       borderTopRadius="md"
     >
       <HStack w="full" fontSize="xs" justify="space-between">
-        <HStack gap="1" color="fg.warning">
+        <HStack gap="1" color="status.warning.content">
           <AdminIcon w="4" />
           <AnimatePresence mode="wait">
             <MotionSpan

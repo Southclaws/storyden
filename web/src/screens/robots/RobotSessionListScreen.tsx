@@ -13,18 +13,12 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { LinkButton } from "@/components/ui/link-button";
-import {
-  CardBox,
-  HStack,
-  LStack,
-  VStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 type Props = {
@@ -129,10 +123,10 @@ function RobotSessionCard({ session }: RobotSessionCardProps) {
       <Link href={`/robots/chats/${session.id}`}>
         <LStack gap="2">
           <WStack alignItems="center">
-            <styled.p fontSize="sm" color="fg.subtle">
+            <styled.p fontSize="sm" color="text.muted">
               {session.name}
             </styled.p>
-            <styled.time fontSize="xs" color="fg.muted">
+            <styled.time fontSize="xs" color="text.subtle">
               {timeAgo}
             </styled.time>
           </WStack>

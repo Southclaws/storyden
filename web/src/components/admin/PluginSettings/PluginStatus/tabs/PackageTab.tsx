@@ -122,7 +122,7 @@ export function PackageTab({ plugin }: Props) {
 
   return (
     <LStack gap="4">
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         Upload a replacement plugin package.{" "}
         {plugin.status.active_state === "active"
           ? "This will restart the plugin with the new version."

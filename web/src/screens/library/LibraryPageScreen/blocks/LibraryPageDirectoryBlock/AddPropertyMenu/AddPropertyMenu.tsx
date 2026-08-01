@@ -136,7 +136,7 @@ export function AddPropertyMenu({
 
               {unavailable && (
                 <Menu.ItemGroup>
-                  <styled.p fontSize="xs" color="fg.muted">
+                  <styled.p fontSize="xs" color="text.subtle">
                     Properties require at least one sub-page.
                   </styled.p>
                 </Menu.ItemGroup>

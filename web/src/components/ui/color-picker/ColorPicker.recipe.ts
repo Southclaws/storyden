@@ -11,7 +11,7 @@ export const colorPicker = defineSlotRecipe({
       gap: "1.5",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
       textStyle: "sm",
     },
@@ -33,9 +33,12 @@ export const colorPicker = defineSlotRecipe({
       },
     },
     content: {
-      background: "bg.default",
+      background: "background.overlay",
+      borderColor: "border.strong",
       borderRadius: "md",
+      borderWidth: "thin",
       boxShadow: "overlay",
+      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",
@@ -77,14 +80,14 @@ export const colorPicker = defineSlotRecipe({
       display: "grid",
       gridTemplateColumns: "repeat(7, 1fr)",
       gap: "2",
-      background: "bg.default",
+      background: "background.overlay",
     },
     swatch: {
       height: "6",
       width: "6",
       borderRadius: "sm",
       boxShadow:
-        "0 0 0 1px var(--colors-border-emphasized), 0 0 0 2px var(--colors-bg-default) inset",
+        "0 0 0 1px var(--colors-border-strong), 0 0 0 2px var(--colors-background-overlay) inset",
     },
     channelSliderThumb: {
       borderRadius: "full",

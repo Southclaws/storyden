@@ -3,7 +3,6 @@
 import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "@/api/openapi-schema";
-
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
@@ -29,7 +28,7 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
       w="full"
       maxW="prose"
       borderRadius="2xl"
-      bgColor={complete ? "bg.success" : "bg.subtle"}
+      bgColor={complete ? "status.success.surface" : "background.inset"}
     >
       <HStack w="full" gap="2">
         <Box>
@@ -44,8 +43,8 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
               <CheckCircleIcon
                 width="8"
                 height="8"
-                color="fg.success"
-                fill="bg.success"
+                color="status.success.content"
+                fill="status.success.surface"
               />
             ) : (
               <styled.p fontWeight="bold">{props.step}</styled.p>
