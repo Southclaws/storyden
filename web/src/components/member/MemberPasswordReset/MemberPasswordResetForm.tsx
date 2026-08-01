@@ -124,7 +124,7 @@ function MemberPasswordResetFormWithEmail({
       <styled.p>Send a password reset email to {profile.name}?</styled.p>
 
       {!hasVerifiedEmailAddress && (
-        <styled.p fontSize="sm" color="fg.error">
+        <styled.p fontSize="sm" color="status.danger.content">
           This account has no verified email address configured.
         </styled.p>
       )}
@@ -135,11 +135,11 @@ function MemberPasswordResetFormWithEmail({
             Recipient email
           </styled.span>
           <styled.p
-            bg="bg.muted"
+            bg="background.inset"
             borderColor="border.default"
             borderRadius="md"
             borderWidth="hairline"
-            color="fg.default"
+            color="text.default"
             fontSize="sm"
             px="3"
             py="2"
@@ -180,7 +180,7 @@ function MemberPasswordResetFormWithEmail({
         </Select.Root>
       )}
 
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         An email will be sent to their verified email address with instructions
         to reset their password. The link will be valid for 1 hour.
       </styled.p>
@@ -259,7 +259,7 @@ function MemberPasswordResetFormWithLink({ profile, onClose }: Props) {
     <VStack alignItems="start" gap="4">
       <styled.p>Generate a password reset link for {profile.name}?</styled.p>
 
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         A password reset email cannot be sent for this member. A password reset
         link will be generated for you to copy and send through another
         communication method.

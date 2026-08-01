@@ -29,7 +29,7 @@ export const treeView = defineSlotRecipe({
     branchControl: {
       alignItems: "center",
       borderRadius: "sm",
-      color: "fg.subtle",
+      color: "text.muted",
       display: "flex",
       fontWeight: "medium",
       gap: "1",
@@ -48,12 +48,12 @@ export const treeView = defineSlotRecipe({
         fontWeight: "medium",
       },
       _hover: {
-        background: "bg.emphasized",
-        color: "fg.emphasized",
+        background: "interactive.emphasized.surface",
+        color: "interactive.emphasized.content",
       },
       _selected: {
-        backgroundColor: "bg.selected",
-        color: "fg.selected",
+        backgroundColor: "interactive.selected.surface",
+        color: "interactive.selected.content",
       },
     },
     branchIndicator: {
@@ -73,7 +73,7 @@ export const treeView = defineSlotRecipe({
     },
     item: {
       borderRadius: "sm",
-      color: "fg.muted",
+      color: "text.subtle",
       cursor: "pointer",
       fontWeight: "medium",
       position: "relative",
@@ -86,7 +86,7 @@ export const treeView = defineSlotRecipe({
       "&[data-depth='1']": {
         ps: "calc(((var(--depth)) * 22px) + 22px)",
         fontWeight: "medium",
-        color: "fg.muted",
+        color: "text.subtle",
         _selected: {
           _before: {
             bg: "transparent",
@@ -94,15 +94,15 @@ export const treeView = defineSlotRecipe({
         },
       },
       _hover: {
-        backgroundColor: "bg.emphasized",
-        color: "fg.emphasized",
+        backgroundColor: "interactive.emphasized.surface",
+        color: "interactive.emphasized.content",
       },
       _selected: {
-        backgroundColor: "bg.selected",
-        color: "fg.selected",
+        backgroundColor: "interactive.selected.surface",
+        color: "interactive.selected.content",
         _hover: {
-          backgroundColor: "bg.emphasized",
-          color: "fg.emphasized",
+          backgroundColor: "interactive.emphasized.surface",
+          color: "interactive.emphasized.content",
         },
         _before: {
           content: '""',
@@ -111,7 +111,7 @@ export const treeView = defineSlotRecipe({
           top: "0",
           width: "2px",
           height: "full",
-          bg: "fg.default",
+          bg: "text.default",
           zIndex: "1",
         },
       },

@@ -8,7 +8,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.tomato.light.11}",
+        _osLight: "{colors.tomato.light.12}",
         _osDark: "{colors.tomato.dark.11}",
       },
     },
@@ -28,7 +28,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.green.light.11}",
+        _osLight: "{colors.green.light.12}",
         _osDark: "{colors.green.dark.11}",
       },
     },
@@ -48,7 +48,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.amber.light.11}",
+        _osLight: "{colors.amber.light.12}",
         _osDark: "{colors.amber.dark.11}",
       },
     },
@@ -68,7 +68,7 @@ export const status = {
     },
     content: {
       value: {
-        _osLight: "{colors.blue.light.11}",
+        _osLight: "{colors.blue.light.12}",
         _osDark: "{colors.blue.dark.11}",
       },
     },

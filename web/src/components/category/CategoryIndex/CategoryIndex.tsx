@@ -53,7 +53,7 @@ export function CategoryIndex({
             .when(
               (c) => c === 0,
               () => (
-                <styled.p color="fg.muted">
+                <styled.p color="text.subtle">
                   No categories yet. Create one?
                 </styled.p>
               ),
@@ -61,14 +61,14 @@ export function CategoryIndex({
             .when(
               (c) => c === 1,
               () => (
-                <styled.p color="fg.muted">
+                <styled.p color="text.subtle">
                   There is {categoryCount} category available to start a
                   discussion.
                 </styled.p>
               ),
             )
             .otherwise(() => (
-              <styled.p color="fg.muted">
+              <styled.p color="text.subtle">
                 There are {categoryCount} categories available to start
                 discussions.
               </styled.p>

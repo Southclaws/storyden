@@ -208,11 +208,11 @@ function ShowMore({
 }: { showingMore: boolean } & DOMAttributes<HTMLAnchorElement>) {
   return (
     <styled.p display="flex" justifyContent="space-between">
-      <styled.span color="fg.muted">{showingMore || "..."}</styled.span>
+      <styled.span color="text.subtle">{showingMore || "..."}</styled.span>
       <styled.a
         fontSize="sm"
         cursor="pointer"
-        color="fg.accent"
+        color="accent.text"
         _hover={{
           textDecoration: "underline",
         }}

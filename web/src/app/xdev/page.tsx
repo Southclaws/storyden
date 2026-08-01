@@ -35,7 +35,7 @@ export default function Page() {
   const [darkText, darkFill] = partition(dark, (v) => v.includes("text"));
 
   return (
-    <Box bg="bg.default">
+    <Box bg="background.surface">
       <HStack gap="0" pt="20">
         {/* Left Sidebar - Fixed */}
         <Box
@@ -44,18 +44,18 @@ export default function Page() {
           top="20"
           bottom="0"
           w="64"
-          bg="bg.opaque"
+          bg="background.overlay"
           backdropBlur="frosted"
           backdropFilter="auto"
           borderRightWidth="thin"
-          borderRightColor="border.subtle"
+          borderRightColor="border.muted"
           p="4"
           display={{ base: "none", lg: "block" }}
           overflowY="auto"
         >
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="fg.subtle">
+              <Text size="sm" fontWeight="semibold" color="text.muted">
                 Navigation
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
@@ -73,7 +73,7 @@ export default function Page() {
             </VStack>
 
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="fg.subtle">
+              <Text size="sm" fontWeight="semibold" color="text.muted">
                 Categories
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
@@ -100,7 +100,7 @@ export default function Page() {
             {/* Accent Color Palette Tester */}
             <Box
               w="full"
-              bg="bg.subtle"
+              bg="background.inset"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -166,7 +166,7 @@ export default function Page() {
             {/* Button Variants & States */}
             <Box
               w="full"
-              bg="bg.default"
+              bg="background.surface"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -178,7 +178,7 @@ export default function Page() {
 
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Solid
                     </Text>
                     <Button variant="solid" size="sm">
@@ -194,7 +194,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Outline
                     </Text>
                     <Button variant="outline" size="sm">
@@ -210,7 +210,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Ghost
                     </Text>
                     <Button variant="ghost" size="sm">
@@ -226,7 +226,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Subtle
                     </Text>
                     <Button variant="subtle" size="sm">
@@ -244,7 +244,7 @@ export default function Page() {
 
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Color Palettes
                     </Text>
                     <Button>Default</Button>
@@ -254,7 +254,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       With Icons
                     </Text>
                     <Button>
@@ -277,7 +277,7 @@ export default function Page() {
             {/* Typography Showcase */}
             <Box
               w="full"
-              bg="bg.subtle"
+              bg="background.inset"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -288,37 +288,37 @@ export default function Page() {
                 </Text>
 
                 <VStack gap="3" alignItems="start" w="full">
-                  <Text size="2xl" color="fg.default">
+                  <Text size="2xl" color="text.default">
                     2XL Heading
                   </Text>
-                  <Text size="xl" color="fg.default">
+                  <Text size="xl" color="text.default">
                     XL Heading
                   </Text>
-                  <Text size="lg" color="fg.default">
+                  <Text size="lg" color="text.default">
                     Large Text
                   </Text>
-                  <Text size="md" color="fg.default">
+                  <Text size="md" color="text.default">
                     Medium Text (Body)
                   </Text>
-                  <Text size="sm" color="fg.subtle">
+                  <Text size="sm" color="text.muted">
                     Small Text (Secondary)
                   </Text>
-                  <Text size="xs" color="fg.muted">
+                  <Text size="xs" color="text.subtle">
                     Extra Small Text (Captions)
                   </Text>
                 </VStack>
 
                 <VStack gap="2" alignItems="start" w="full" mt="4">
-                  <Text size="sm" color="fg.subtle">
+                  <Text size="sm" color="text.muted">
                     Color Variants
                   </Text>
-                  <Text color="fg.default">Default foreground text</Text>
-                  <Text color="fg.subtle">Subtle foreground text</Text>
-                  <Text color="fg.muted">Muted foreground text</Text>
-                  <Text color="fg.destructive">Destructive text</Text>
-                  <Text color="fg.success">Success text</Text>
-                  <Text color="fg.warning">Warning text</Text>
-                  <Text color="fg.accent">Accent text</Text>
+                  <Text color="text.default">Default foreground text</Text>
+                  <Text color="text.muted">Subtle foreground text</Text>
+                  <Text color="text.subtle">Muted foreground text</Text>
+                  <Text color="status.danger.content">Destructive text</Text>
+                  <Text color="status.success.content">Success text</Text>
+                  <Text color="status.warning.content">Warning text</Text>
+                  <Text color="accent.text">Accent text</Text>
                 </VStack>
               </VStack>
             </Box>
@@ -328,7 +328,7 @@ export default function Page() {
               {/* Post Card */}
               <Box
                 flex="1"
-                bg="bg.default"
+                bg="background.surface"
                 borderRadius="lg"
                 p="6"
                 boxShadow="surface"
@@ -336,12 +336,17 @@ export default function Page() {
                 <VStack gap="4" alignItems="start">
                   <HStack justify="space-between" w="full">
                     <HStack gap="3">
-                      <Box w="10" h="10" bg="bg.muted" borderRadius="full" />
+                      <Box
+                        w="10"
+                        h="10"
+                        bg="background.inset"
+                        borderRadius="full"
+                      />
                       <VStack gap="1" alignItems="start">
                         <Text size="sm" fontWeight="semibold">
                           John Doe
                         </Text>
-                        <Text size="xs" color="fg.muted">
+                        <Text size="xs" color="text.subtle">
                           2 hours ago
                         </Text>
                       </VStack>
@@ -355,7 +360,7 @@ export default function Page() {
                     <Text size="lg" fontWeight="semibold">
                       Sample Forum Post Title
                     </Text>
-                    <Text color="fg.subtle">
+                    <Text color="text.muted">
                       This is a sample forum post content that demonstrates how
                       text appears in cards with proper contrast ratios and
                       semantic color usage.
@@ -375,7 +380,7 @@ export default function Page() {
                     w="full"
                     pt="2"
                     borderTopWidth="thin"
-                    borderTopColor="border.subtle"
+                    borderTopColor="border.muted"
                   >
                     <HStack gap="4">
                       <Button variant="ghost" size="sm">
@@ -401,7 +406,7 @@ export default function Page() {
               {/* Sidebar Widget */}
               <Box
                 flex="1"
-                bg="bg.subtle"
+                bg="background.inset"
                 borderRadius="lg"
                 p="4"
                 boxShadow="surface"
@@ -437,7 +442,7 @@ export default function Page() {
             {/* Form Elements */}
             <Box
               w="full"
-              bg="bg.default"
+              bg="background.surface"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -450,7 +455,7 @@ export default function Page() {
                 <HStack gap="8" w="full" alignItems="start">
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
-                      <Text size="sm" color="fg.subtle">
+                      <Text size="sm" color="text.muted">
                         Input Fields
                       </Text>
                       <Input placeholder="Default input" />
@@ -459,7 +464,7 @@ export default function Page() {
                     </VStack>
 
                     <VStack gap="2" alignItems="start">
-                      <Text size="sm" color="fg.subtle">
+                      <Text size="sm" color="text.muted">
                         Checkboxes
                       </Text>
                       <Checkbox>Unchecked</Checkbox>
@@ -471,7 +476,7 @@ export default function Page() {
 
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
-                      <Text size="sm" color="fg.subtle">
+                      <Text size="sm" color="text.muted">
                         Badge Variants
                       </Text>
                       <HStack gap="2" flexWrap="wrap">
@@ -499,7 +504,7 @@ export default function Page() {
             {/* Background & Surface Testing */}
             <Box
               w="full"
-              bg="bg.muted"
+              bg="background.inset"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -511,10 +516,15 @@ export default function Page() {
 
                 <HStack gap="4" w="full">
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Default Surface
                     </Text>
-                    <Box bg="bg.default" p="4" borderRadius="md" w="full">
+                    <Box
+                      bg="background.surface"
+                      p="4"
+                      borderRadius="md"
+                      w="full"
+                    >
                       <Text>Content on default background</Text>
                       <Button variant="solid" size="sm" mt="2">
                         Action
@@ -523,10 +533,10 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Subtle Surface
                     </Text>
-                    <Box bg="bg.subtle" p="4" borderRadius="md" w="full">
+                    <Box bg="background.inset" p="4" borderRadius="md" w="full">
                       <Text>Content on subtle background</Text>
                       <Button variant="outline" size="sm" mt="2">
                         Action
@@ -535,11 +545,11 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Muted Surface
                     </Text>
                     <Box
-                      bg="bg.muted"
+                      bg="background.inset"
                       p="4"
                       borderRadius="md"
                       w="full"
@@ -559,7 +569,7 @@ export default function Page() {
             {/* State Indicators */}
             <Box
               w="full"
-              bg="bg.default"
+              bg="background.surface"
               borderRadius="lg"
               p="6"
               boxShadow="surface"
@@ -571,57 +581,57 @@ export default function Page() {
 
                 <HStack gap="6" w="full">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Status Messages
                     </Text>
                     <Box
-                      bg="bg.success"
+                      bg="status.success.surface"
                       p="3"
                       borderRadius="md"
                       borderLeftWidth="thick"
-                      borderLeftColor="border.success"
+                      borderLeftColor="status.success.border"
                     >
-                      <Text size="sm" color="fg.success">
+                      <Text size="sm" color="status.success.content">
                         Success: Operation completed
                       </Text>
                     </Box>
                     <Box
-                      bg="bg.warning"
+                      bg="status.warning.surface"
                       p="3"
                       borderRadius="md"
                       borderLeftWidth="thick"
-                      borderLeftColor="border.warning"
+                      borderLeftColor="status.warning.border"
                     >
-                      <Text size="sm" color="fg.warning">
+                      <Text size="sm" color="status.warning.content">
                         Warning: Please review
                       </Text>
                     </Box>
                     <Box
-                      bg="bg.destructive"
+                      bg="status.danger.surface"
                       p="3"
                       borderRadius="md"
                       borderLeftWidth="thick"
-                      borderLeftColor="border.destructive"
+                      borderLeftColor="status.danger.border"
                     >
-                      <Text size="sm" color="fg.destructive">
+                      <Text size="sm" color="status.danger.content">
                         Error: Something went wrong
                       </Text>
                     </Box>
                     <Box
-                      bg="bg.info"
+                      bg="status.info.surface"
                       p="3"
                       borderRadius="md"
                       borderLeftWidth="thick"
-                      borderLeftColor="border.info"
+                      borderLeftColor="status.info.border"
                     >
-                      <Text size="sm" color="fg.info">
+                      <Text size="sm" color="status.info.content">
                         Info: Additional context
                       </Text>
                     </Box>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
+                    <Text size="sm" color="text.muted">
                       Content States
                     </Text>
                     <Box
@@ -682,24 +692,30 @@ export default function Page() {
           top="20"
           bottom="0"
           w="80"
-          bg="bg.opaque"
+          bg="background.overlay"
           backdropBlur="frosted"
           backdropFilter="auto"
           borderLeftWidth="thick"
-          borderLeftColor="border.subtle"
+          borderLeftColor="border.muted"
           p="4"
           display={{ base: "none", xl: "block" }}
           overflowY="auto"
         >
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="fg.subtle">
+              <Text size="sm" fontWeight="semibold" color="text.muted">
                 Recent Activity
               </Text>
               <VStack gap="2" w="full">
                 {[...Array(5)].map((_, i) => (
-                  <Box key={i} p="3" bg="bg.subtle" borderRadius="md" w="full">
-                    <Text size="xs" color="fg.muted">
+                  <Box
+                    key={i}
+                    p="3"
+                    bg="background.inset"
+                    borderRadius="md"
+                    w="full"
+                  >
+                    <Text size="xs" color="text.subtle">
                       {i + 1}h ago
                     </Text>
                     <Text size="sm">User activity {i + 1}</Text>
@@ -709,7 +725,7 @@ export default function Page() {
             </VStack>
 
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="fg.subtle">
+              <Text size="sm" fontWeight="semibold" color="text.muted">
                 Popular Tags
               </Text>
               <HStack gap="1" flexWrap="wrap">

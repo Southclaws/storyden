@@ -174,7 +174,7 @@ export function BannerEditor() {
             maxHeight: "64",
             borderRadius: "md",
             // TODO: Remove black background when empty
-            backgroundColor: "bg.default",
+            backgroundColor: "background.surface",
           })}
           onTransformImageEnd={handleSaveCurrentCrop}
           // defaultPosition={

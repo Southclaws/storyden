@@ -77,7 +77,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   flexDirection="column"
                   alignItems="center"
                   justifyContent="center"
-                  backgroundColor="bg.error"
+                  backgroundColor="status.danger.surface"
                   borderRadius="lg"
                   padding="2"
                   height="min"
@@ -89,7 +89,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                 >
                   <styled.p
                     fontSize="sm"
-                    color="fg.error"
+                    color="status.danger.content"
                     fontWeight="medium"
                     maxW="prose"
                   >
@@ -110,7 +110,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   <LinkButton size="xs" variant="subtle" href={href}>
                     {href}
                   </LinkButton>
-                  <styled.p fontSize="xs" color="fg.muted">
+                  <styled.p fontSize="xs" color="text.subtle">
                     <WarningIcon w="3" display="inline" />
                     &nbsp;<span>Link preview failed to load</span>
                   </styled.p>

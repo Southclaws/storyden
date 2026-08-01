@@ -34,7 +34,7 @@ export function IconEditor(props: Props) {
       borderRadius="xl"
     >
       {showPreviews && (
-        <HStack pl="2" pt="2" color="fg.subtle">
+        <HStack pl="2" pt="2" color="text.muted">
           <AvatarEditor
             image={file}
             style={{

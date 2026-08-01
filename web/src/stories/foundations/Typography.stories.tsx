@@ -83,8 +83,8 @@ export const TypeScale: Story = {
           {fontFamilyTokens.map((font) => (
             <styled.article
               key={font.token}
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="flex"
@@ -95,14 +95,14 @@ export const TypeScale: Story = {
             >
               <TokenCode>{font.token}</TokenCode>
               <styled.span
-                color="content.default"
+                color="text.default"
                 fontSize="2xl"
                 lineHeight="tight"
                 style={{ fontFamily: tokenVar(font.token) }}
               >
                 Storyden
               </styled.span>
-              <styled.span color="content.subtle" fontSize="sm">
+              <styled.span color="text.muted" fontSize="sm">
                 {font.usage}
               </styled.span>
             </styled.article>
@@ -116,8 +116,8 @@ export const TypeScale: Story = {
             <styled.article
               key={size}
               alignItems="baseline"
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -130,7 +130,7 @@ export const TypeScale: Story = {
             >
               <TokenCode>fontSizes.{size}</TokenCode>
               <styled.span
-                color="content.default"
+                color="text.default"
                 lineHeight="tight"
                 minW="0"
                 style={{
@@ -150,8 +150,8 @@ export const TypeScale: Story = {
           {textStyles.map((style) => (
             <styled.article
               key={style.name}
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -164,11 +164,11 @@ export const TypeScale: Story = {
             >
               <styled.div display="flex" flexDirection="column" gap="2">
                 <TokenCode>{style.name}</TokenCode>
-                <styled.span color="content.subtle" fontSize="xs">
+                <styled.span color="text.muted" fontSize="xs">
                   {style.token}
                 </styled.span>
               </styled.div>
-              <Text color="content.default" size={style.name}>
+              <Text color="text.default" size={style.name}>
                 {style.sample}
               </Text>
             </styled.article>
@@ -185,8 +185,8 @@ export const TypeScale: Story = {
           {fontWeights.map((weight) => (
             <styled.article
               key={weight}
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="flex"
@@ -196,7 +196,7 @@ export const TypeScale: Story = {
             >
               <TokenCode>fontWeights.{weight}</TokenCode>
               <styled.span
-                color="content.default"
+                color="text.default"
                 fontSize="lg"
                 fontWeight={weight}
               >

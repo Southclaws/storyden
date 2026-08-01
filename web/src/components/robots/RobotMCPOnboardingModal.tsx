@@ -236,7 +236,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
       <LStack gap="6">
         <LStack gap="2">
           <Heading size="sm">{server.name} connected</Heading>
-          <styled.p color="fg.muted" fontSize="sm">
+          <styled.p color="text.subtle" fontSize="sm">
             {server.tools.length} tools were discovered and added to the Robot
             tool catalogue.
           </styled.p>
@@ -341,7 +341,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
         <Heading size="sm">OAuth advanced settings</Heading>
 
         <styled.div
-          bgColor="bg.subtle"
+          bgColor="background.inset"
           borderWidth="thin"
           borderStyle="solid"
           borderColor="border.default"
@@ -391,7 +391,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
             />
           ) : (
             <LStack gap="3">
-              <styled.p color="fg.muted" fontSize="sm">
+              <styled.p color="text.subtle" fontSize="sm">
                 Bearer token mode skips OAuth. Switch back to OAuth to use CIMD,
                 DCR, or manual client credentials.
               </styled.p>
@@ -449,7 +449,7 @@ function ReadinessRow({
       gap="3"
       borderWidth="thin"
       borderStyle="solid"
-      borderColor={ready ? "border.success" : "border.default"}
+      borderColor={ready ? "status.success.border" : "border.default"}
       borderRadius="md"
       px="3"
       py="2"
@@ -492,7 +492,7 @@ function MCPStatusCard({
       gap="1"
       borderWidth="thin"
       borderStyle="solid"
-      borderColor={ready ? "border.success" : "border.default"}
+      borderColor={ready ? "status.success.border" : "border.default"}
       borderRadius="md"
       p="3"
     >
@@ -506,24 +506,24 @@ function MCPStatusCard({
       {probe && (
         <LStack gap="1">
           <Heading size="xs">{serverName}</Heading>
-          <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+          <styled.p color="text.subtle" fontSize="xs" wordBreak="break-word">
             {endpointURL}
           </styled.p>
 
           {probe.server_card?.description && (
-            <styled.p color="fg.muted" fontSize="sm">
+            <styled.p color="text.subtle" fontSize="sm">
               {probe.server_card.description}
             </styled.p>
           )}
 
           {probe.probe_error && !waitingForAuthorisation && (
-            <styled.p color="fg.warning" fontSize="xs">
+            <styled.p color="status.warning.content" fontSize="xs">
               {probe.probe_error}
             </styled.p>
           )}
 
           {waitingForAuthorisation && (
-            <styled.p color="fg.muted" fontSize="xs">
+            <styled.p color="text.subtle" fontSize="xs">
               Complete authorisation in the new tab, then return here.
             </styled.p>
           )}

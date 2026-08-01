@@ -1,7 +1,7 @@
 import { Unready } from "@/components/site/Unready";
-
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
-import { CardBox, LStack } from "@/styled-system/jsx";
+import { LStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { OAuth } from "./OAuth/OAuth";

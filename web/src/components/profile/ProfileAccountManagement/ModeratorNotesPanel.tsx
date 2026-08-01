@@ -116,7 +116,7 @@ export function ModeratorNotesPanel({
       )}
 
       {createNoteError ? (
-        <styled.p fontSize="sm" color="fg.destructive">
+        <styled.p fontSize="sm" color="status.danger.content">
           {deriveError(createNoteError)}
         </styled.p>
       ) : null}
@@ -124,15 +124,15 @@ export function ModeratorNotesPanel({
       {canViewModerationNotes ? (
         <LStack gap="3" w="full" minW="0">
           {notesError ? (
-            <styled.p fontSize="sm" color="fg.destructive">
+            <styled.p fontSize="sm" color="status.danger.content">
               {deriveError(notesError)}
             </styled.p>
           ) : notesLoading ? (
-            <styled.p fontSize="sm" color="fg.subtle">
+            <styled.p fontSize="sm" color="text.muted">
               Loading moderation notes...
             </styled.p>
           ) : (notesData?.notes?.length ?? 0) === 0 ? (
-            <styled.p fontSize="sm" color="fg.subtle">
+            <styled.p fontSize="sm" color="text.muted">
               No moderation notes yet.
             </styled.p>
           ) : (
@@ -147,7 +147,7 @@ export function ModeratorNotesPanel({
           )}
         </LStack>
       ) : (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <styled.p fontSize="sm" color="text.muted">
           You can add notes, but you do not have permission to view note
           history.
         </styled.p>
@@ -207,7 +207,7 @@ function ModerationNoteCard({
       borderWidth="thin"
       borderRadius="sm"
       p="2"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       w="full"
     >
       <Flex
@@ -224,7 +224,11 @@ function ModerationNoteCard({
         )}
 
         <HStack gap="2" alignItems="center" flexShrink="0">
-          <Timestamp created={note.created_at} color="fg.muted" fontSize="xs" />
+          <Timestamp
+            created={note.created_at}
+            color="text.subtle"
+            fontSize="xs"
+          />
 
           {canManageModerationNotes &&
             (isConfirming ? (
@@ -232,7 +236,7 @@ function ModerationNoteCard({
                 <Button
                   size="xs"
                   variant="subtle"
-                  bgColor="bg.destructive"
+                  bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
                   loading={isMutating}
                 >
@@ -266,7 +270,7 @@ function ModerationNoteCard({
       </styled.p>
 
       {deleteNoteError ? (
-        <styled.p mt="2" fontSize="sm" color="fg.destructive">
+        <styled.p mt="2" fontSize="sm" color="status.danger.content">
           {deriveError(deleteNoteError)}
         </styled.p>
       ) : null}

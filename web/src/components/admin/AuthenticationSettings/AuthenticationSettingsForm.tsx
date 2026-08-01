@@ -7,6 +7,7 @@ import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -22,7 +23,7 @@ import {
   RegistrationModeSchema,
 } from "@/lib/auth/registration-mode";
 import { Settings } from "@/lib/settings/settings";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
+import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 export type Props = {

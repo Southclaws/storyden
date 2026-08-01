@@ -28,7 +28,7 @@ export function SystemBadge({ size = "sm", name = "visible" }: Props) {
         alignItems="center"
         justifyContent="center"
         borderRadius="md"
-        bg="bg.muted"
+        bg="background.inset"
         w={
           size === "xs" ? "4" : size === "sm" ? "6" : size === "md" ? "8" : "10"
         }
@@ -45,7 +45,7 @@ export function SystemBadge({ size = "sm", name = "visible" }: Props) {
       {name === "visible" && (
         <styled.span
           fontSize={sizeMap[size]}
-          color="fg.subtle"
+          color="text.muted"
           fontStyle="italic"
           fontWeight="normal"
         >

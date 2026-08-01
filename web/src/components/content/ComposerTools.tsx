@@ -161,7 +161,7 @@ export function ComposerTools({
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
           cursor="pointer"
-          backgroundColor={isExpanded ? "bg.subtle/80" : "transparent"}
+          backgroundColor={isExpanded ? "background.overlay/80" : "transparent"}
           backdropBlur={isExpanded ? "sm" : undefined}
           backdropFilter={isExpanded ? "auto" : undefined}
           borderRadius="md"
@@ -187,7 +187,7 @@ export function ComposerTools({
                     <styled.span
                       className="composer-tools__working-status-count"
                       fontSize="xs"
-                      color="fg.muted"
+                      color="text.subtle"
                     >
                       {workingCount}
                     </styled.span>

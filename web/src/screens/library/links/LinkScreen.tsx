@@ -76,7 +76,7 @@ export function LinkScreen(props: Props) {
         <LStack>
           <Heading size="lg">{titleLabel}</Heading>
 
-          <styled.p color="fg.muted">{descriptionLabel}</styled.p>
+          <styled.p color="text.subtle">{descriptionLabel}</styled.p>
 
           <HStack>
             <LinkButton w="min" size="xs" variant="subtle" href={link.url}>

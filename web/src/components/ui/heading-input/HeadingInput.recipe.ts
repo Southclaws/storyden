@@ -22,11 +22,11 @@ export const headingInput = defineRecipe({
       _before: {
         content: "attr(placeholder)",
         opacity: 0.3,
-        color: "fg.default",
+        color: "text.default",
       },
     },
     _invalid: {
-      borderBottomColor: "fg.destructive",
+      borderBottomColor: "status.danger.content",
       borderBottomWidth: "1px",
       borderBottomStyle: "solid",
     },

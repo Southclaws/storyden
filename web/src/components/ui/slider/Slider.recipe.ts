@@ -18,7 +18,7 @@ export const slider = defineSlotRecipe({
       alignItems: "center",
     },
     track: {
-      backgroundColor: "bg.muted",
+      backgroundColor: "control.trackBackground",
       borderRadius: "full",
       overflow: "hidden",
       flex: "1",
@@ -27,7 +27,7 @@ export const slider = defineSlotRecipe({
       background: "accent.default",
     },
     thumb: {
-      background: "bg.default",
+      background: "background.overlay",
       borderColor: "accent.default",
       borderRadius: "full",
       borderWidth: "2px",
@@ -48,7 +48,7 @@ export const slider = defineSlotRecipe({
       },
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     markerGroup: {
@@ -60,7 +60,7 @@ export const slider = defineSlotRecipe({
         _osLight: "white",
         _osDark: "black",
       },
-      color: "fg.muted",
+      color: "text.subtle",
       _before: {
         background: "white",
         borderRadius: "full",

@@ -69,10 +69,10 @@ export function AccountPurgeScreen(props: Props) {
           p="3"
           borderRadius="sm"
           borderWidth="thin"
-          borderColor="border.warning"
-          bgColor="bg.warning"
+          borderColor="status.warning.border"
+          bgColor="status.warning.surface"
         >
-          <HStack gap="2" color="fg.warning">
+          <HStack gap="2" color="status.warning.content">
             <WarningIcon w="5" flexShrink="0" />
             <LStack gap="1">
               <styled.p fontWeight="semibold" fontSize="sm">
@@ -93,7 +93,7 @@ export function AccountPurgeScreen(props: Props) {
             name="contentTypes"
             items={CONTENT_TYPES}
           />
-          <styled.p fontSize="xs" color="fg.subtle" mt="1">
+          <styled.p fontSize="xs" color="text.muted" mt="1">
             Select the types of content you want to purge from this account
           </styled.p>
         </FormControl>

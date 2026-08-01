@@ -13,10 +13,12 @@ import { PermissionSummary } from "@/components/role/PermissionList";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import { useAdminOAuthSettings } from "./useAdminOAuthSettings";
 
@@ -78,7 +80,7 @@ function OAuthClientItem({ client }: { client: OAuthClientList[number] }) {
         <WStack gap="2" alignItems="start">
           <LStack gap="1" minW="0">
             <Heading size="sm">{client.name}</Heading>
-            <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <styled.p color="text.subtle" fontSize="xs" wordBreak="break-word">
               {client.client_id}
             </styled.p>
           </LStack>
@@ -123,7 +125,7 @@ function OAuthRefreshTokenListView({
     <LStack gap="3">
       <styled.div display="flex" gap="3" alignItems="baseline" flexWrap="wrap">
         <Heading size="sm">Refresh tokens</Heading>
-        <styled.p color="fg.muted" fontSize="sm">
+        <styled.p color="text.subtle" fontSize="sm">
           {tokens.length} tokens, {activeTokens} active.
         </styled.p>
       </styled.div>
@@ -162,7 +164,7 @@ function OAuthRefreshTokenItem({
               <Button
                 size="xs"
                 variant="subtle"
-                bgColor="bg.destructive"
+                bgColor="status.danger.surface"
                 onClick={handleConfirmAction}
               >
                 Confirm revoke
@@ -175,7 +177,7 @@ function OAuthRefreshTokenItem({
             <Button
               size="xs"
               variant="outline"
-              bgColor="bg.destructive"
+              bgColor="status.danger.surface"
               onClick={handleConfirmAction}
             >
               Revoke
@@ -255,7 +257,7 @@ function Empty({ title, body }: { title: string; body: string }) {
   return (
     <LStack>
       <Heading size="sm">{title}</Heading>
-      <styled.p color="fg.muted" fontStyle="italic">
+      <styled.p color="text.subtle" fontStyle="italic">
         {body}
       </styled.p>
     </LStack>

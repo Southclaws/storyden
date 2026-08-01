@@ -13,9 +13,10 @@ import { CancelAction } from "@/components/site/Action/Cancel";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
-import { CardBox, HStack, WStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 type Props = {
@@ -51,15 +52,19 @@ export function EmailCard({ email }: Props) {
           <Heading size="sm">{email.email_address}</Heading>
           {email.verified ? (
             <Badge
-              borderColor="border.success"
-              backgroundColor="bg.success"
-              color="fg.success"
+              borderColor="status.success.border"
+              backgroundColor="status.success.surface"
+              color="status.success.content"
             >
               Verified
             </Badge>
           ) : (
             <Link href="/auth/verify/email?returnURL=/settings">
-              <Badge borderColor="border.error" backgroundColor="bg.error" color="fg.error">
+              <Badge
+                borderColor="status.danger.border"
+                backgroundColor="status.danger.surface"
+                color="status.danger.content"
+              >
                 Verify this email
               </Badge>
             </Link>

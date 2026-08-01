@@ -212,12 +212,12 @@ export const All: Story = {
           gap="2"
           minW="0"
           borderWidth="thin"
-          borderColor="border.subtle"
+          borderColor="border.muted"
           borderRadius="md"
           p="2"
         >
           <styled.span
-            color="fg.default"
+            color="text.default"
             flexShrink="0"
             display="inline-flex"
             alignItems="center"
@@ -230,7 +230,7 @@ export const All: Story = {
             <Icon width="100%" height="100%" />
           </styled.span>
           <styled.span
-            color="fg.muted"
+            color="text.subtle"
             fontSize="xs"
             overflow="hidden"
             textOverflow="ellipsis"

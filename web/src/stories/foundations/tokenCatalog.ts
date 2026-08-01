@@ -11,74 +11,63 @@ export type StatusTokenExample = {
   border: string;
 };
 
-export const surfaceTokens: TokenExample[] = [
+export type LayerRoleTokenExample = {
+  name: string;
+  usage: string;
+  background: string;
+  elevated?: boolean;
+};
+
+export const layerRoleTokens: LayerRoleTokenExample[] = [
   {
     name: "Canvas",
-    token: "colors.canvas",
-    usage: "Viewport and app background.",
+    usage: "Root application background and quiet page-level content.",
+    background: "colors.background.canvas",
   },
   {
     name: "Surface",
-    token: "colors.surface.default",
-    usage: "Default panels, cards, and controls.",
+    usage: "Independent objects such as posts, cards, panels, and reports.",
+    background: "colors.background.surface",
   },
   {
-    name: "Subtle surface",
-    token: "colors.surface.subtle",
-    usage: "Secondary surface contrast.",
+    name: "Inset",
+    usage: "Embedded or supporting content within the current page context.",
+    background: "colors.background.inset",
   },
   {
-    name: "Muted surface",
-    token: "colors.surface.muted",
-    usage: "Hover, quiet selected areas, and nested surfaces.",
-  },
-  {
-    name: "Elevated surface",
-    token: "colors.surface.elevated",
-    usage: "Raised panels and overlays.",
-  },
-  {
-    name: "Frosted surface",
-    token: "colors.surface.frosted",
-    usage: "Blurred navigation and translucent panels.",
-  },
-  {
-    name: "Selected surface",
-    token: "colors.surface.selected",
-    usage: "Selected rows, active nav, and checked cards.",
-  },
-  {
-    name: "Disabled surface",
-    token: "colors.surface.disabled",
-    usage: "Unavailable component backgrounds.",
+    name: "Overlay",
+    usage:
+      "Temporary content above document flow, including menus and dialogs.",
+    background: "colors.background.overlay",
+    elevated: true,
   },
 ];
 
-export const contentTokens: TokenExample[] = [
+export const textTokens: TokenExample[] = [
   {
-    name: "Default content",
-    token: "colors.content.default",
-    usage: "Primary text and icons.",
+    name: "Default text",
+    token: "colors.text.default",
+    usage: "Primary product copy and labels.",
   },
   {
-    name: "Subtle content",
-    token: "colors.content.subtle",
-    usage: "Secondary labels and metadata.",
+    name: "Muted text",
+    token: "colors.text.muted",
+    usage: "Secondary descriptions and metadata.",
   },
   {
-    name: "Muted content",
-    token: "colors.content.muted",
-    usage: "Low-emphasis hints.",
+    name: "Subtle text",
+    token: "colors.text.subtle",
+    usage: "Low-priority supporting information.",
   },
   {
-    name: "Disabled content",
-    token: "colors.content.disabled",
-    usage: "Unavailable text and icons.",
+    name: "Disabled text",
+    token: "colors.text.disabled",
+    usage: "Unavailable actions and values.",
   },
   {
-    name: "Accent content",
-    token: "colors.content.accent",
-    usage: "Community-owned accent foreground.",
+    name: "Inverse text",
+    token: "colors.text.inverse",
+    usage: "Text placed on a strong filled control.",
   },
 ];
 
@@ -86,27 +75,50 @@ export const borderTokens: TokenExample[] = [
   {
     name: "Default border",
     token: "colors.border.default",
-    usage: "Standard component boundaries.",
-  },
-  {
-    name: "Subtle border",
-    token: "colors.border.subtle",
-    usage: "Low contrast dividers.",
+    usage: "Ordinary separation between adjacent regions.",
   },
   {
     name: "Muted border",
     token: "colors.border.muted",
-    usage: "Secondary frames and separators.",
+    usage: "Lower-emphasis control and supporting-region boundaries.",
   },
   {
-    name: "Accent border",
-    token: "colors.border.accent",
-    usage: "Accent-backed boundaries.",
+    name: "Strong border",
+    token: "colors.border.strong",
+    usage: "Overlays and boundaries that need clearer separation.",
   },
   {
     name: "Disabled border",
     token: "colors.border.disabled",
-    usage: "Inactive component frames.",
+    usage: "Unavailable controls.",
+  },
+];
+
+export const stateBackgroundTokens: TokenExample[] = [
+  {
+    name: "Control",
+    token: "colors.control.background",
+    usage: "Persistent fill for inputs and other controls.",
+  },
+  {
+    name: "Control hover",
+    token: "colors.control.hoverBackground",
+    usage: "Neutral hover feedback for interactive controls and rows.",
+  },
+  {
+    name: "Control subtle",
+    token: "colors.control.subtleBackground",
+    usage: "Low-emphasis filled controls such as subtle buttons.",
+  },
+  {
+    name: "Control track",
+    token: "colors.control.trackBackground",
+    usage: "Tracks for switches, sliders, and progress indicators.",
+  },
+  {
+    name: "Selection",
+    token: "colors.selection.background",
+    usage: "Neutral selected state without semantic accent meaning.",
   },
 ];
 

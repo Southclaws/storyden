@@ -178,7 +178,7 @@ export function RoleEditScreen(props: Props) {
               }))}
             />
           ) : (
-            <styled.p color="fg.muted" fontSize="sm">
+            <styled.p color="text.subtle" fontSize="sm">
               <InfoIcon display="inline" w="4" />
               &nbsp;You cannot change the permissions granted to the default
               Admin role. This role implicitly holds all permissions.

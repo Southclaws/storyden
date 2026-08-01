@@ -85,12 +85,12 @@ export function CategoryScreen(props: ScreenProps) {
           <CategoryMenu category={category} />
         </WStack>
 
-        <styled.p color="fg.muted">{category.description}</styled.p>
+        <styled.p color="text.subtle">{category.description}</styled.p>
       </LStack>
 
       {category.children && category.children.length > 0 && (
         <LStack gap="1">
-          <Heading size="sm" color="fg.muted">
+          <Heading size="sm" color="text.subtle">
             Subcategories
           </Heading>
           <CategoryLayout layout="grid" categories={category.children} />

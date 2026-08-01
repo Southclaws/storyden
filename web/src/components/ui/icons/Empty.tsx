@@ -6,13 +6,13 @@ import { styled } from "@/styled-system/jsx";
 export const EmptyIcon = styled(CubeTransparentIcon, {
   base: {
     width: "4",
-    color: "fg.subtle",
+    color: "text.muted",
   },
 });
 
 export const EmptyThreadsIcon = styled(Origami, {
   base: {
     width: "4",
-    color: "fg.subtle",
+    color: "text.muted",
   },
 });

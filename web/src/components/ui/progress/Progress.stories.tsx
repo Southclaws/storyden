@@ -47,13 +47,13 @@ export const Sizes: Story = {
       rowGap="5"
       w="full"
     >
-      <Text color="fg.muted" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" size="xs">
         Size
       </Text>
-      <Text color="fg.muted" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" size="xs">
         Linear
       </Text>
-      <Text color="fg.muted" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" size="xs">
         Circular
       </Text>
 

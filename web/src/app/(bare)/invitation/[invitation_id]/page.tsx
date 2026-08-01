@@ -44,9 +44,9 @@ export default async function Page({ params }: Props) {
             gap="4"
             borderWidth="thin"
             borderStyle="solid"
-            borderColor="border.warning"
-            bgColor="bg.warning"
-            color="fg.warning"
+            borderColor="status.warning.border"
+            bgColor="status.warning.surface"
+            color="status.warning.content"
             borderRadius="md"
             p="4"
           >

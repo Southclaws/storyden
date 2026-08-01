@@ -4,10 +4,12 @@ import { AccessKey, AccessKeyList } from "@/api/openapi-schema";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CreateAccessKeyModal } from "./CreateAccessKeyModal";
@@ -39,7 +41,7 @@ export function AccessKeysSettings({ keys }: Props) {
         </LStack>
 
         <LStack>
-          <WStack alignItems="center" color="fg.muted">
+          <WStack alignItems="center" color="text.subtle">
             {hasInactive ? (
               <styled.p>
                 {totalKeys} access keys, {totalActiveKeys} active.
@@ -119,7 +121,7 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                   <Button
                     size="xs"
                     variant="subtle"
-                    bgColor="bg.destructive"
+                    bgColor="status.danger.surface"
                     onClick={handleConfirmAction}
                   >
                     Confirm Revoke
@@ -136,7 +138,7 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
                 <Button
                   size="xs"
                   variant="outline"
-                  bgColor="bg.destructive"
+                  bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
                 >
                   Revoke

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { CategoryIcon } from "@/components/ui/icons/Category";
@@ -7,7 +8,7 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { CardRows } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
@@ -56,17 +57,20 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
               <CategoryMenu category={category} />
             </WStack>
 
-            <styled.p color="fg.muted" fontSize="sm">
+            <styled.p color="text.subtle" fontSize="sm">
               {category.description}
             </styled.p>
           </LStack>
 
           <WStack>
-            <HStack gap="1" color="fg.subtle" fontSize="sm">
+            <HStack gap="1" color="text.muted" fontSize="sm">
               <DiscussionIcon w="4" />
-              <styled.p>{category.postCount} {category.postCount === 1 ? "thread" : "threads"}</styled.p>
+              <styled.p>
+                {category.postCount}{" "}
+                {category.postCount === 1 ? "thread" : "threads"}
+              </styled.p>
               {hasSubcategories && (
-                <HStack gap="1" color="fg.subtle" fontSize="sm">
+                <HStack gap="1" color="text.muted" fontSize="sm">
                   <CategoryIcon w="4" />
                   <styled.p>
                     {category.children.length} {plural}
@@ -87,7 +91,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                   key={c.id}
                   position="relative"
                   style={cssProps}
-                  borderColor="bg.subtle"
+                  borderColor="background.inset"
                   borderWidth="hairline"
                   borderStyle="solid"
                   borderLeftColor="colorPalette.border"
@@ -108,7 +112,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                         </Heading>
                       </Link>
                       <BulletIcon />
-                      <styled.p lineClamp={1} color="fg.muted" fontSize="sm">
+                      <styled.p lineClamp={1} color="text.subtle" fontSize="sm">
                         {c.description}
                       </styled.p>
                     </HStack>

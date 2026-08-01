@@ -1,6 +1,5 @@
 import { ProfileReference } from "@/api/openapi-schema";
 import { Timestamp } from "@/components/site/Timestamp";
-
 import { HStack } from "@/styled-system/jsx";
 
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
@@ -22,7 +21,7 @@ export function Byline(props: Props) {
         gap="0"
         minWidth="0"
         fontSize="sm"
-        color="fg.subtle"
+        color="text.muted"
       >
         <MemberBadge profile={props.author} size="sm" name="handle" />
         <DotSeparator />

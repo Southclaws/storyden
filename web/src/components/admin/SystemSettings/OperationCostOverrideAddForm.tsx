@@ -1,12 +1,13 @@
 import { useFilter, useListCollection } from "@ark-ui/react";
 
+import { CardBox } from "@/components/ui/card-box";
 import * as Combobox from "@/components/ui/combobox";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
-import { CardBox, HStack, LStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { formatSeconds } from "./useSystemSettings";
 
@@ -100,11 +101,13 @@ export function OperationCostOverrideAddForm({
           </IconButton>
         </HStack>
 
-        <styled.p fontSize="xs" color="fg.muted">
+        <styled.p fontSize="xs" color="text.subtle">
           Can be performed{" "}
-          <styled.strong color="fg.info">{effectiveLimit}</styled.strong> times
-          every{" "}
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
+            {effectiveLimit}
+          </styled.strong>{" "}
+          times every{" "}
+          <styled.strong color="status.info.content">
             {formatSeconds(rateLimitPeriod)}
           </styled.strong>
         </styled.p>

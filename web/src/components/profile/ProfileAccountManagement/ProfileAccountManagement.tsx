@@ -8,17 +8,11 @@ import { Account, Permission, ProfileReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Badge } from "@/components/ui/badge";
+import { CardBox } from "@/components/ui/card-box";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import * as Tabs from "@/components/ui/tabs";
-import {
-  Box,
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  styled,
-} from "@/styled-system/jsx";
+import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 import { hasPermission } from "@/utils/permissions";
 
@@ -72,7 +66,7 @@ export function ProfileAccountManagement({ accountId }: Props) {
   if (!ready) {
     return (
       <CardBox
-        borderColor="border.warning"
+        borderColor="status.warning.border"
         borderWidth="thin"
         borderStyle="dashed"
         borderRadius="sm"
@@ -80,7 +74,7 @@ export function ProfileAccountManagement({ accountId }: Props) {
       >
         <HStack
           alignItems="center"
-          color="fg.subtle"
+          color="text.muted"
           role="alert"
           aria-atomic="true"
         >
@@ -96,15 +90,21 @@ export function ProfileAccountManagement({ accountId }: Props) {
   return (
     <CardBox
       p="0"
-      borderColor="border.warning"
+      borderColor="status.warning.border"
       borderWidth="thin"
       borderStyle="dashed"
       borderRadius="sm"
     >
-      <Box bgColor="bg.warning" borderTopRadius="sm" pl="3" pr="2" py="1">
+      <Box
+        bgColor="status.warning.surface"
+        borderTopRadius="sm"
+        pl="3"
+        pr="2"
+        py="1"
+      >
         <HStack
           gap="1"
-          color="fg.warning"
+          color="status.warning.content"
           fontSize="xs"
           justifyContent="space-between"
         >
@@ -182,14 +182,14 @@ function ProfileAccountManagementTabs({
         >
           <LStack flex="1" gap="4" flexShrink="1" flexGrow="1" minW="0">
             <LStack gap="1">
-              <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
+              <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
                 Account Status
               </styled.p>
               <Box fontSize="sm">{emailVerifiedStatusBadge.run()}</Box>
             </LStack>
 
             <LStack gap="1">
-              <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
+              <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
                 Joined at
               </styled.p>
               <styled.p fontSize="sm">
@@ -199,10 +199,14 @@ function ProfileAccountManagementTabs({
 
             {account.suspended && (
               <LStack gap="1">
-                <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
+                <styled.p
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="text.subtle"
+                >
                   Suspended
                 </styled.p>
-                <styled.p fontSize="sm" color="fg.destructive">
+                <styled.p fontSize="sm" color="status.danger.content">
                   {formatDate(new Date(account.suspended), "PPPppp")}
                 </styled.p>
               </LStack>
@@ -210,7 +214,11 @@ function ProfileAccountManagementTabs({
 
             {account.invited_by && (
               <LStack gap="1">
-                <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
+                <styled.p
+                  fontSize="xs"
+                  fontWeight="semibold"
+                  color="text.subtle"
+                >
                   Invited By
                 </styled.p>
                 <MemberIdent
@@ -223,7 +231,7 @@ function ProfileAccountManagementTabs({
           </LStack>
 
           <LStack flex="1" gap="2" flexShrink="1" flexGrow="1" minW="0">
-            <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
+            <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
               Email Addresses
             </styled.p>
             {account.email_addresses.length > 0 ? (
@@ -259,7 +267,7 @@ function ProfileAccountManagementTabs({
                 ))}
               </LStack>
             ) : (
-              <styled.p fontSize="sm" color="fg.subtle">
+              <styled.p fontSize="sm" color="text.muted">
                 No email addresses
               </styled.p>
             )}

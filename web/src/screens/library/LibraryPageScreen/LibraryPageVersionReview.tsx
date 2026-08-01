@@ -169,16 +169,16 @@ function VersionReviewPanel({
       <ReviewHeader
         title={
           isDraft ? (
-            <styled.span color="fg.subtle">
+            <styled.span color="text.muted">
               Reviewing draft for{" "}
-              <styled.span color="fg.default" fontWeight="semibold">
+              <styled.span color="text.default" fontWeight="semibold">
                 {node.name}
               </styled.span>
             </styled.span>
           ) : (
-            <styled.span color="fg.subtle">
+            <styled.span color="text.muted">
               Viewing checkpoint for{" "}
-              <styled.span color="fg.default" fontWeight="semibold">
+              <styled.span color="text.default" fontWeight="semibold">
                 {node.name}
               </styled.span>
             </styled.span>
@@ -192,7 +192,7 @@ function VersionReviewPanel({
                 type="button"
                 size="xs"
                 variant="ghost"
-                color="fg.destructive"
+                color="status.danger.content"
                 loading={deleting}
                 onClick={handleDelete}
               >
@@ -273,10 +273,10 @@ function VersionComparisonContext({
     <LStack
       borderWidth="thin"
       borderStyle="solid"
-      borderColor="border.muted"
+      borderColor="border.strong"
       borderRadius="sm"
-      bgColor="bg.default"
-      color="fg.muted"
+      bgColor="background.surface"
+      color="text.subtle"
       fontSize="sm"
       lineHeight="tight"
       p="2"
@@ -343,7 +343,7 @@ function ReviewHeader({
       borderStyle="dashed"
       borderColor="visibility.draft.border"
       borderRadius="sm"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       p="2"
       gap="2"
     >
@@ -351,7 +351,7 @@ function ReviewHeader({
         <LStack gap="0" minW="0">
           <Heading size="sm">{title}</Heading>
           {subtitle && (
-            <styled.span color="fg.muted" fontSize="sm">
+            <styled.span color="text.subtle" fontSize="sm">
               {subtitle}
             </styled.span>
           )}
@@ -490,11 +490,11 @@ function FieldDiffRow({ row }: { row: FieldDiffRow }) {
 
       return (
         <Table.Row key={row.key}>
-          {/* <Table.Cell fontWeight="medium" color="fg.muted">
+          {/* <Table.Cell fontWeight="medium" color="text.subtle">
             {row.kind}
           </Table.Cell> */}
           <Table.Cell>
-            <styled.span fontWeight="medium" color="fg.muted">
+            <styled.span fontWeight="medium" color="text.subtle">
               {row.kind}
             </styled.span>
             <br />
@@ -519,7 +519,7 @@ function FieldDiffRow({ row }: { row: FieldDiffRow }) {
 const diffArrowVerticalStyles = css({
   display: "inline-block",
   fontWeight: "medium",
-  color: "fg.muted",
+  color: "text.subtle",
   textAlign: "center",
   w: "full",
   transform: "rotate(90deg)",
@@ -528,7 +528,7 @@ const diffArrowVerticalStyles = css({
 const diffArrowHorizontalStyles = css({
   display: "inline-block",
   fontWeight: "medium",
-  color: "fg.muted",
+  color: "text.subtle",
   transform: "rotate(0deg)",
   paddingX: "1",
 });

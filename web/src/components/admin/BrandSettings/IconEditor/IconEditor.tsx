@@ -22,7 +22,7 @@ export function IconEditor(props: Props) {
           display="none"
           width="min"
           type="file"
-          bgColor="bg.subtle"
+          bgColor="background.inset"
           borderRadius="md"
           border="none"
           onChange={onFileChange}

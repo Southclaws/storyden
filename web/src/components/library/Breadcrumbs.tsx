@@ -4,7 +4,6 @@ import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
 import { Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-
 import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
@@ -50,7 +49,7 @@ export const Breadcrumbs_ = (
   return (
     <HStack
       w="full"
-      color="fg.subtle"
+      color="text.muted"
       overflowX="scroll"
       pt="scrollGutter"
       mt="-scrollGutter"

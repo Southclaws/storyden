@@ -2,11 +2,11 @@ import {
   TreeView as ArkTreeView,
   createTreeCollection,
 } from "@ark-ui/react/tree-view";
+import { TreeViewExpandedChangeDetails as ExpandedChangeDetails } from "@ark-ui/react/tree-view";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { TreeViewExpandedChangeDetails as ExpandedChangeDetails } from "@ark-ui/react/tree-view";
 import {
   CSSProperties,
   Fragment,
@@ -373,7 +373,7 @@ function TreeNode({
     : "";
 
   const highlightStyles = css({
-    background: isHighlighted ? "bg.selected" : undefined,
+    background: isHighlighted ? "interactive.selected.surface" : undefined,
   });
 
   return (
@@ -531,7 +531,9 @@ function DropIndicator({
           left: 0,
           right: 0,
           height: "3px",
-          background: active ? "var(--colors-bg-muted)" : "transparent",
+          background: active
+            ? "var(--colors-selection-background)"
+            : "transparent",
           opacity: active ? 1 : 0,
           transition: "opacity 0.2s",
           pointerEvents: "none",
@@ -578,7 +580,7 @@ const BulletIcon = () => (
     width="16"
     height="16"
     viewBox="0 0 24 24"
-    fill={token("colors.fg.muted")}
+    fill={token("colors.text.subtle")}
   >
     <circle cx="12.1" cy="12.1" r="2.5" />
   </svg>

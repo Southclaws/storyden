@@ -1,9 +1,10 @@
 import { Robot } from "@/api/openapi-schema";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Badge } from "@/components/ui/badge";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   robot: Robot;
@@ -20,7 +21,7 @@ export function RobotCard({ robot, editHref = `/robots/${robot.id}` }: Props) {
         <WStack alignItems="start">
           <LStack gap="1">
             <Heading size="sm">{robot.name}</Heading>
-            <styled.p fontSize="sm" color="fg.muted">
+            <styled.p fontSize="sm" color="text.subtle">
               {robot.description}
             </styled.p>
           </LStack>
@@ -28,7 +29,7 @@ export function RobotCard({ robot, editHref = `/robots/${robot.id}` }: Props) {
 
         <styled.p
           fontSize="sm"
-          color="fg.subtle"
+          color="text.muted"
           lineClamp={2}
           fontFamily="mono"
         >

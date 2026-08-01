@@ -10,6 +10,7 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -18,16 +19,9 @@ import {
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
 import { css } from "@/styled-system/css";
-import {
-  Box,
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import {
   ALL_EMAIL_STATUSES,
@@ -226,26 +220,26 @@ function EmailItem({
             </Badge>
           </HStack>
 
-          <styled.time fontSize="xs" color="fg.muted">
+          <styled.time fontSize="xs" color="text.subtle">
             {formatDate(email.queued_at, "PPpp")}
           </styled.time>
         </WStack>
 
         <WStack>
-          <styled.p fontSize="sm" color="fg.subtle">
+          <styled.p fontSize="sm" color="text.muted">
             “{email.subject}”
           </styled.p>
 
-          <styled.p fontSize="xs" color="fg.subtle">
+          <styled.p fontSize="xs" color="text.muted">
             {recipient}
           </styled.p>
         </WStack>
 
         <styled.details
           borderWidth="thin"
-          borderColor="border.subtle"
+          borderColor="border.muted"
           borderRadius="md"
-          bg="bg.subtle"
+          bg="background.inset"
           overflow="hidden"
         >
           <styled.summary
@@ -255,7 +249,7 @@ function EmailItem({
             py="2.5"
             fontSize="sm"
             fontWeight="medium"
-            color="fg.default"
+            color="text.default"
             _marker={{ display: "none" }}
             css={{
               "&::-webkit-details-marker": {
@@ -265,7 +259,11 @@ function EmailItem({
           >
             <LStack gap="1">
               <styled.span>{attemptCountLabel}</styled.span>
-              <styled.span fontSize="xs" color="fg.muted" fontWeight="normal">
+              <styled.span
+                fontSize="xs"
+                color="text.subtle"
+                fontWeight="normal"
+              >
                 {error ? error : "Open to review the full delivery history."}
               </styled.span>
             </LStack>
@@ -276,7 +274,7 @@ function EmailItem({
               <Box
                 key={`${attempt.timestamp}-${index}`}
                 borderTopWidth={index === 0 ? "none" : "thin"}
-                borderColor="border.subtle"
+                borderColor="border.muted"
                 pt={index === 0 ? "0" : "2"}
               >
                 <Box
@@ -299,7 +297,7 @@ function EmailItem({
                       {attempt.status}
                     </Badge>
 
-                    <styled.time fontSize="xs" color="fg.muted">
+                    <styled.time fontSize="xs" color="text.subtle">
                       {formatDate(attempt.timestamp, "PPpp")}
                     </styled.time>
                   </WStack>
@@ -309,7 +307,7 @@ function EmailItem({
                     minW="0"
                     fontSize="xs"
                     lineHeight="normal"
-                    color={attempt.error ? "fg.default" : "fg.muted"}
+                    color={attempt.error ? "text.default" : "text.subtle"}
                     whiteSpace="pre-wrap"
                     overflowWrap="anywhere"
                     wordBreak="break-word"

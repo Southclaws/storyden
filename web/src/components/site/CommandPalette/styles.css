@@ -8,14 +8,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--colors-bg-opaque);
+  background-color: var(--colors-scrim-background);
 }
 
 [cmdk-root] {
   max-width: var(--sizes-2xl);
   width: 100%;
   padding: var(--spacing-2);
-  background: var(--colors-bg-default);
+  background: var(--colors-background-overlay);
   border-radius: var(--radii-md);
   overflow: hidden;
   border: var(--border-widths-thin) solid var(--colors-border-default);
@@ -30,24 +30,24 @@
   font-size: var(--font-sizes-md);
   padding: var(--spacing-2);
   outline: none;
-  background: var(--colors-bg-default);
-  color: var(--colors-fg-default);
+  background: var(--colors-control-background);
+  color: var(--colors-text-default);
   border-radius: 0;
 }
 
 [cmdk-input]::placeholder {
-  color: var(--colors-fg-subtle);
+  color: var(--colors-text-muted);
   opacity: 1;
 }
 
 [cmdk-badge] {
   height: var(--spacing-5);
-  background: var(--colors-bg-subtle);
+  background: var(--colors-badge-background);
   display: inline-flex;
   align-items: center;
   padding: 0 var(--spacing-2);
   font-size: var(--font-sizes-xs);
-  color: var(--colors-fg-muted);
+  color: var(--colors-text-subtle);
   border-radius: var(--radii-xs);
   margin: var(--spacing-1) 0 var(--spacing-1) var(--spacing-1);
   user-select: none;
@@ -65,25 +65,25 @@
   align-items: center;
   gap: var(--spacing-2);
   padding: 0 var(--spacing-4);
-  color: var(--colors-fg-default);
+  color: var(--colors-text-default);
   user-select: none;
   will-change: background, color;
   transition: all 150ms ease;
   transition-property: none;
 
   &[data-selected="true"] {
-    background: var(--colors-bg-emphasized);
-    color: var(--colors-fg-emphasized);
+    background: var(--colors-interactive-emphasized-surface);
+    color: var(--colors-interactive-emphasized-content);
   }
 
   &[data-disabled="true"] {
-    color: var(--colors-fg-disabled);
+    color: var(--colors-text-disabled);
     cursor: not-allowed;
   }
 
   &:active {
     transition-property: background;
-    background: var(--colors-bg-muted);
+    background: var(--colors-control-hover-background);
   }
 
   & + [cmdk-item] {
@@ -117,8 +117,8 @@
     padding: var(--spacing-1);
     height: 20px;
     border-radius: var(--radii-xs);
-    color: var(--colors-fg-muted);
-    background: var(--colors-bg-muted);
+    color: var(--colors-text-subtle);
+    background: var(--colors-badge-background);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -129,7 +129,7 @@
 [cmdk-separator] {
   height: 1px;
   width: 100%;
-  background: var(--colors-border-subtle);
+  background: var(--colors-border-muted);
   margin: var(--spacing-1) 0;
 }
 
@@ -140,7 +140,7 @@
 [cmdk-group-heading] {
   user-select: none;
   font-size: var(--font-sizes-xs);
-  color: var(--colors-fg-muted);
+  color: var(--colors-text-subtle);
   padding: 0 var(--spacing-2);
   display: flex;
   align-items: center;
@@ -154,5 +154,5 @@
   justify-content: center;
   height: 48px;
   white-space: pre-wrap;
-  color: var(--colors-fg-muted);
+  color: var(--colors-text-subtle);
 }

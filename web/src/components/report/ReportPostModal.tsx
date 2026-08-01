@@ -66,7 +66,7 @@ export function ReportPostModal({
           {body && (
             <styled.p
               fontSize="sm"
-              color="fg.subtle"
+              color="text.muted"
               whiteSpace="pre-wrap"
               maxW="64"
               wordBreak="break-word"

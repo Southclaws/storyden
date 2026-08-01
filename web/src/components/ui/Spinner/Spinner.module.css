@@ -1,8 +1,8 @@
 .spinner {
   pointer-events: none;
   border: 0.2em solid transparent;
-  border-color: var(--colors-bg-muted);
-  border-top-color: var(--colors-fg-subtle);
+  border-color: var(--colors-control-track-background);
+  border-top-color: var(--colors-text-muted);
   border-radius: 50%;
   animation: loadingspin 1s linear infinite;
 }

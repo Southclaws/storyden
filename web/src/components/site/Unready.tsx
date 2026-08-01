@@ -1,15 +1,9 @@
 import { PropsWithChildren } from "react";
 
+import { CardBox } from "@/components/ui/card-box";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import type { Settings } from "@/lib/settings/settings";
-import {
-  Box,
-  CardBox,
-  Center,
-  HStack,
-  LStack,
-  styled,
-} from "@/styled-system/jsx";
+import { Box, Center, HStack, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 import { WarningIcon } from "../ui/icons/Warning";
@@ -44,7 +38,7 @@ export function Unready({ error }: Props) {
     <HStack
       maxW="xs"
       alignItems="center"
-      color="fg.subtle"
+      color="text.muted"
       role="alert"
       aria-atomic="true"
     >

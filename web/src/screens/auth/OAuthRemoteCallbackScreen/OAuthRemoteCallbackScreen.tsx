@@ -180,7 +180,7 @@ function CallbackMessage({
 
       <VStack gap="2" textAlign="center">
         <Heading size="md">{title}</Heading>
-        <styled.p color="fg.muted">{body}</styled.p>
+        <styled.p color="text.subtle">{body}</styled.p>
       </VStack>
 
       {action}
@@ -203,21 +203,21 @@ function callbackErrorMessage(error: unknown) {
 function toneBackground(tone: CallbackMessageProps["tone"]) {
   switch (tone) {
     case "success":
-      return "bg.success";
+      return "status.success.surface";
     case "error":
-      return "bg.error";
+      return "status.danger.surface";
     default:
-      return "bg.subtle";
+      return "background.inset";
   }
 }
 
 function toneForeground(tone: CallbackMessageProps["tone"]) {
   switch (tone) {
     case "success":
-      return "fg.success";
+      return "status.success.content";
     case "error":
-      return "fg.error";
+      return "status.danger.content";
     default:
-      return "fg.muted";
+      return "text.subtle";
   }
 }

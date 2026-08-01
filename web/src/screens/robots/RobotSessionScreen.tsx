@@ -167,7 +167,7 @@ function StatusText({ session }: { session: RobotSession }) {
   });
 
   return (
-    <HStack color="fg.muted" fontSize="xs" gap="1">
+    <HStack color="text.subtle" fontSize="xs" gap="1">
       <styled.span>chat started by</styled.span>
       <MemberBadge
         profile={session.created_by}

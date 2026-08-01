@@ -38,7 +38,7 @@ function LibraryPageLinkBlockEditing() {
           w="full"
           size="sm"
           variant="ghost"
-          color="fg.muted"
+          color="text.subtle"
           placeholder="External URL..."
           onChange={handlers.handleInputValueChange}
           value={data.inputValue}

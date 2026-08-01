@@ -15,7 +15,7 @@ export function InputPrefix({
     <styled.div
       px="3"
       py="2"
-      bg="bg.muted"
+      bg="control.background"
       borderStyle="solid"
       borderColor="border.default"
       borderWidth="thin"
@@ -24,7 +24,7 @@ export function InputPrefix({
       borderBottomLeftRadius="sm"
       display="flex"
       alignItems="center"
-      color="fg.muted"
+      color="text.subtle"
       fontSize="sm"
       {...(props as any)}
     >

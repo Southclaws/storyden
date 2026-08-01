@@ -26,7 +26,7 @@ export function ColourInput(props: Props) {
       style={styles}
       borderWidth="thin"
       borderStyle="solid"
-      borderColor="border.muted"
+      borderColor="border.strong"
       borderRadius="lg"
       p="4"
     >
@@ -86,7 +86,7 @@ export function ColourInput(props: Props) {
               width: "var(--thumb-size)",
             }}
           >
-            <DragHandleIcon color="fg.muted" />
+            <DragHandleIcon color="text.subtle" />
           </styled.div>
         </styled.output>
       </styled.div>

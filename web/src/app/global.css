@@ -116,16 +116,16 @@
   --navigation-topbar-padding-inline-end: var(--spacing-1);
 
   /* Navigation surfaces */
-  --navigation-surface-background-fallback: var(--colors-bg-site);
+  --navigation-surface-background-fallback: var(--colors-background-canvas);
   --navigation-surface-background: color-mix(
     in srgb,
-    var(--colors-bg-site) 80%,
+    var(--colors-background-canvas) 80%,
     transparent
   );
   --navigation-surface-blur: var(--blurs-frosted);
   --navigation-scrim-background: color-mix(
     in srgb,
-    var(--colors-bg-site) 80%,
+    var(--colors-background-canvas) 80%,
     transparent
   );
   --navigation-scrim-blur: var(--blurs-subtle);
@@ -155,8 +155,8 @@
 
 html,
 body {
-  background-color: var(--colors-bg-site);
-  color: var(--colors-fg-default);
+  background-color: var(--colors-background-canvas);
+  color: var(--colors-text-default);
   font-family: var(--fonts-body);
   font-style: normal;
 }
@@ -272,8 +272,8 @@ body {
   }
 
   blockquote:not([data-no-typography] *) {
-    background: var(--colors-gray-50);
-    border-left: var(--spacing-2) solid var(--colors-gray-200);
+    background: var(--colors-background-inset);
+    border-left: var(--spacing-2) solid var(--colors-border-strong);
     margin: var(--spacing-4) var(--spacing-2);
     padding: var(--spacing-2);
     border-radius: var(--radii-lg);
@@ -288,7 +288,7 @@ body {
     max-width: 100%;
     border-radius: var(--radii-lg);
     padding: var(--spacing-2);
-    background-color: var(--colors-bg-subtle);
+    background-color: var(--colors-background-inset);
   }
 
   /* LEAF ELEMENTS */
@@ -326,7 +326,7 @@ body {
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-  color: var(--colors-fg-subtle);
+  color: var(--colors-text-muted);
   content: attr(data-placeholder);
   float: left;
   height: 0;
@@ -475,6 +475,8 @@ body {
   transition: var(--navigation-drawer-transition);
   transition-delay: var(--navigation-drawer-transition-delay-open);
   visibility: visible;
+  box-shadow: var(--shadows-overlay);
+  border-radius: var(--radii-xl);
 }
 
 .navigation__mobile-commandbar {
@@ -674,9 +676,9 @@ body *::-webkit-scrollbar {
   height: var(--spacing-scroll-gutter);
 }
 body *::-webkit-scrollbar-thumb {
-  background-color: var(--colors-bg-muted);
+  background-color: var(--colors-control-track-background);
   border-radius: var(--radii-lg);
-  border: 0.1rem solid var(--colors-bg-subtle);
+  border: 0.1rem solid var(--colors-background-canvas);
 }
 
 /*

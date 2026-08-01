@@ -1,6 +1,7 @@
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { Box, CardBox } from "@/styled-system/jsx";
+import { CardBox } from "@/components/ui/card-box";
+import { Box } from "@/styled-system/jsx";
 
 import { PaginationControls } from "../PaginationControls/PaginationControls";
 

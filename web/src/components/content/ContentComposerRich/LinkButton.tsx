@@ -103,7 +103,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
         <Popover.Content>
           <HStack gap="1" alignItems="stretch">
             <Input
-              borderColor={isInvalid ? "border.error" : undefined}
+              borderColor={isInvalid ? "status.danger.border" : undefined}
               size="xs"
               value={url}
               onChange={handleChangeURL}

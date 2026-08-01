@@ -50,7 +50,7 @@ export function CollectionScreen({ session, initialCollection }: Props) {
           {collection.description ? (
             <styled.span>{collection.description}</styled.span>
           ) : (
-            <styled.span color="fg.muted" fontStyle="italic">
+            <styled.span color="text.subtle" fontStyle="italic">
               (no description)
             </styled.span>
           )}

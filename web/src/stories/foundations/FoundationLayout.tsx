@@ -18,7 +18,7 @@ export function FoundationPage({
   return (
     <styled.main
       boxSizing="border-box"
-      color="content.default"
+      color="text.default"
       display="flex"
       flexDirection="column"
       gap="8"
@@ -29,14 +29,14 @@ export function FoundationPage({
     >
       <styled.header display="flex" flexDirection="column" gap="2" maxW="3xl">
         <styled.h1
-          color="content.default"
+          color="text.default"
           fontSize="2xl"
           fontWeight="semibold"
           lineHeight="tight"
         >
           {title}
         </styled.h1>
-        <styled.p color="content.subtle" fontSize="md" lineHeight="relaxed">
+        <styled.p color="text.muted" fontSize="md" lineHeight="relaxed">
           {description}
         </styled.p>
       </styled.header>
@@ -60,7 +60,7 @@ export function FoundationSection({
     <styled.section display="flex" flexDirection="column" gap="4" width="full">
       <styled.header display="flex" flexDirection="column" gap="1" maxW="3xl">
         <styled.h2
-          color="content.default"
+          color="text.default"
           fontSize="xl"
           fontWeight="semibold"
           lineHeight="tight"
@@ -68,7 +68,7 @@ export function FoundationSection({
           {title}
         </styled.h2>
         {description ? (
-          <styled.p color="content.subtle" fontSize="sm" lineHeight="relaxed">
+          <styled.p color="text.muted" fontSize="sm" lineHeight="relaxed">
             {description}
           </styled.p>
         ) : null}
@@ -85,11 +85,11 @@ type TokenCodeProps = {
 export function TokenCode({ children }: TokenCodeProps) {
   return (
     <styled.code
-      backgroundColor="surface.subtle"
-      borderColor="border.subtle"
+      backgroundColor="background.inset"
+      borderColor="border.default"
       borderRadius="sm"
       borderWidth="thin"
-      color="content.default"
+      color="text.default"
       fontFamily="mono"
       fontSize="xs"
       maxWidth="full"

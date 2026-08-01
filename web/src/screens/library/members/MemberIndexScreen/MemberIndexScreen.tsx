@@ -40,7 +40,7 @@ export function MemberIndexScreen(props: Props) {
           <LinkButton
             size="md"
             variant="subtle"
-            bg="bg.warning"
+            bg="status.warning.surface"
             href="/m?mode=admin"
           >
             <AdminIcon />

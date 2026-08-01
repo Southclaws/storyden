@@ -46,6 +46,7 @@ import { Unready } from "@/components/site/Unready";
 import * as Alert from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
@@ -58,14 +59,7 @@ import { Input } from "@/components/ui/input";
 import * as Select from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
-import {
-  CardBox,
-  HStack,
-  LStack,
-  VStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { timestamp } from "@/utils/date";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -118,40 +112,40 @@ export function RobotsSettingsScreen() {
           {available ? (
             <Badge
               size="sm"
-              borderColor="border.success"
-              backgroundColor="bg.success"
-              color="fg.success"
+              borderColor="status.success.border"
+              backgroundColor="status.success.surface"
+              color="status.success.content"
             >
               Available
             </Badge>
           ) : enabledProviders.length > 0 ? (
             <Badge
               size="sm"
-              borderColor="border.warning"
-              backgroundColor="bg.warning"
-              color="fg.warning"
+              borderColor="status.warning.border"
+              backgroundColor="status.warning.surface"
+              color="status.warning.content"
             >
               Setup incomplete
             </Badge>
           ) : (
             <Badge
               size="sm"
-              borderColor="border.muted"
-              backgroundColor="bg.muted"
-              color="fg.muted"
+              borderColor="border.strong"
+              backgroundColor="control.disabledBackground"
+              color="text.subtle"
             >
               Disabled
             </Badge>
           )}
         </WStack>
 
-        <Text color="fg.muted" fontSize="sm">
+        <Text color="text.subtle" fontSize="sm">
           Configure model providers for Robots. Robots become available after at
           least one provider is enabled and a default model is selected.
         </Text>
 
         {enabledProviders.length > 0 && !defaultModel && (
-          <Text color="fg.warning" fontSize="xs">
+          <Text color="status.warning.content" fontSize="xs">
             Robots are enabled, but no default model has been selected yet.
           </Text>
         )}
@@ -191,7 +185,7 @@ function RobotMCPServersSettings() {
       <WStack justifyContent="space-between">
         <LStack gap="1">
           <Heading size="md">MCP servers</Heading>
-          <Text color="fg.muted" fontSize="sm">
+          <Text color="text.subtle" fontSize="sm">
             Connect external MCP servers and add their tools to Robots.
           </Text>
         </LStack>
@@ -254,7 +248,7 @@ function RobotWorkspaceTemplatesSection({
       <WStack justifyContent="space-between" alignItems="start">
         <LStack gap="1">
           <Heading size="md">Workspace templates</Heading>
-          <Text color="fg.muted" fontSize="sm">
+          <Text color="text.subtle" fontSize="sm">
             Create reusable workspace templates. Robot sessions create live
             instances from these templates when they mount a workspace.
           </Text>
@@ -351,18 +345,18 @@ function RobotWorkspaceTemplateItem({
               <Heading size="xs">{workspace.name}</Heading>
               <Badge
                 size="sm"
-                borderColor="border.info"
-                backgroundColor="bg.info"
-                color="fg.info"
+                borderColor="status.info.border"
+                backgroundColor="status.info.surface"
+                color="status.info.content"
               >
                 {workspace.provider}
               </Badge>
               {workspace.allow_untrusted_commands ? (
                 <Badge
                   size="sm"
-                  borderColor="border.warning"
-                  backgroundColor="bg.warning"
-                  color="fg.warning"
+                  borderColor="status.warning.border"
+                  backgroundColor="status.warning.surface"
+                  color="status.warning.content"
                 >
                   Shell
                 </Badge>
@@ -370,11 +364,11 @@ function RobotWorkspaceTemplateItem({
             </HStack>
 
             {workspace.description ? (
-              <Text color="fg.muted" fontSize="xs">
+              <Text color="text.subtle" fontSize="xs">
                 {workspace.description}
               </Text>
             ) : (
-              <Text color="fg.muted" fontSize="xs">
+              <Text color="text.subtle" fontSize="xs">
                 No description.
               </Text>
             )}
@@ -427,10 +421,10 @@ function RobotWorkspaceInstancesDrawer({
     <ModalDrawer title={workspace.name} isOpen={isOpen} onClose={onClose}>
       <LStack gap="4">
         <LStack gap="1">
-          <Text color="fg.muted" fontSize="sm">
+          <Text color="text.subtle" fontSize="sm">
             Live workspace instances created from this template.
           </Text>
-          <Text color="fg.muted" fontSize="xs">
+          <Text color="text.subtle" fontSize="xs">
             Template ID: {workspace.id}
           </Text>
         </LStack>
@@ -439,7 +433,7 @@ function RobotWorkspaceInstancesDrawer({
           <Unready error={error} />
         ) : instances.length === 0 ? (
           <CardBox>
-            <Text color="fg.muted" fontSize="sm">
+            <Text color="text.subtle" fontSize="sm">
               No live instances yet.
             </Text>
           </CardBox>
@@ -470,19 +464,19 @@ function RobotWorkspaceInstanceRow({
           <Heading size="xs">{instance.id}</Heading>
           <Badge
             size="sm"
-            borderColor="border.info"
-            backgroundColor="bg.info"
-            color="fg.info"
+            borderColor="status.info.border"
+            backgroundColor="status.info.surface"
+            color="status.info.content"
           >
             {instance.provider}
           </Badge>
         </WStack>
 
         <LStack gap="1">
-          <Text color="fg.muted" fontSize="xs">
+          <Text color="text.subtle" fontSize="xs">
             Created {timestamp(instance.createdAt, false)}
           </Text>
-          <Text color="fg.muted" fontSize="xs">
+          <Text color="text.subtle" fontSize="xs">
             Updated {timestamp(instance.updatedAt, false)}
           </Text>
         </LStack>
@@ -720,7 +714,7 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
                 </Badge>
               )}
             </HStack>
-            <Text color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <Text color="text.subtle" fontSize="xs" wordBreak="break-word">
               {server.endpoint_url}
             </Text>
           </LStack>
@@ -748,12 +742,12 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           </HStack>
         </WStack>
 
-        <Text color="fg.muted" fontSize="xs">
+        <Text color="text.subtle" fontSize="xs">
           {server.tools.length} tools cached.
         </Text>
 
         {server.last_error && (
-          <Text color="fg.error" fontSize="xs">
+          <Text color="status.danger.content" fontSize="xs">
             {server.last_error}
           </Text>
         )}
@@ -805,7 +799,7 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
               <ProviderStatusBadge provider={provider} />
             </HStack>
 
-            <Text color="fg.muted" fontSize="xs">
+            <Text color="text.subtle" fontSize="xs">
               {provider.models.length} models available. Last refresh:{" "}
               {lastRefreshed}.
             </Text>
@@ -834,7 +828,7 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
         </WStack>
 
         {provider.cache.last_error && (
-          <Text color="fg.error" fontSize="xs">
+          <Text color="status.danger.content" fontSize="xs">
             {provider.cache.last_error}
           </Text>
         )}
@@ -855,9 +849,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
     return (
       <Badge
         size="sm"
-        borderColor="border.success"
-        backgroundColor="bg.success"
-        color="fg.success"
+        borderColor="status.success.border"
+        backgroundColor="status.success.surface"
+        color="status.success.content"
       >
         Enabled
       </Badge>
@@ -868,9 +862,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
     return (
       <Badge
         size="sm"
-        borderColor="border.info"
-        backgroundColor="bg.info"
-        color="fg.info"
+        borderColor="status.info.border"
+        backgroundColor="status.info.surface"
+        color="status.info.content"
       >
         Configured
       </Badge>
@@ -880,9 +874,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
   return (
     <Badge
       size="sm"
-      borderColor="border.muted"
-      backgroundColor="bg.muted"
-      color="fg.muted"
+      borderColor="border.strong"
+      backgroundColor="control.disabledBackground"
+      color="text.subtle"
     >
       Disabled
     </Badge>
@@ -1168,7 +1162,7 @@ function GlobalDefaultModelForm({
             disabled={disabled}
           />
           {helperText && (
-            <Text color="fg.warning" fontSize="xs">
+            <Text color="status.warning.content" fontSize="xs">
               {helperText}
             </Text>
           )}

@@ -78,7 +78,7 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
 
   return (
     <form className={lstack({ gap: "4" })} onSubmit={handleSubmit}>
-      <styled.p color="fg.muted">
+      <styled.p color="text.subtle">
         Register an external plugin that connects to Storyden over authenticated
         RPC. Storyden will not manage this plugin process.
       </styled.p>
@@ -111,8 +111,8 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
         borderColor="border.default"
         borderRadius="md"
         p="3"
-        bgColor="bg.default"
-        color="fg.default"
+        bgColor="control.background"
+        color="text.default"
         fontFamily="mono"
         fontSize="xs"
         lineHeight="tight"

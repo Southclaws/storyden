@@ -1,6 +1,4 @@
-import {
-  FileUploadFileChangeDetails,
-} from "@ark-ui/react";
+import { FileUploadFileChangeDetails } from "@ark-ui/react";
 import { FileUploadFileError as FileError } from "@ark-ui/react/file-upload";
 
 import { Button } from "@/components/ui/button";
@@ -47,7 +45,7 @@ export function PluginArchiveUpload({
             <styled.p fontWeight="medium">
               Drop your plugin file here or click to browse
             </styled.p>
-            <styled.p fontSize="sm" color="fg.muted">
+            <styled.p fontSize="sm" color="text.subtle">
               Plugin files only (.zip or .sdx), max 50MB
             </styled.p>
           </VStack>

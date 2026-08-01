@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { Controller, ControllerProps } from "react-hook-form";
 
-import { Anchor } from "@/components/site/Anchor";
-
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
+import { Anchor } from "@/components/site/Anchor";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -13,7 +12,7 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { timestamp } from "@/utils/date";
 
 import { useReplyContext } from "../ReplyContext";
@@ -44,11 +43,11 @@ export function ReplyBox(props: Props) {
       >
         {postedReply && (
           <LStack h="full" justifyContent="center">
-            <styled.p fontSize="sm" color="fg.muted">
+            <styled.p fontSize="sm" color="text.subtle">
               Your reply has been posted on{" "}
               <Link
                 className={css({
-                  color: "fg.emphasized",
+                  color: "interactive.emphasized.content",
                   _hover: { textDecoration: "underline" },
                 })}
                 href={postedReply.permalink}
@@ -63,7 +62,7 @@ export function ReplyBox(props: Props) {
       </Admonition>
 
       <styled.form
-        className={CardBox()}
+        className={cardBox()}
         display="flex"
         flexDirection="column"
         gap="1"
@@ -71,8 +70,8 @@ export function ReplyBox(props: Props) {
         onSubmit={handlers.handleSubmit}
       >
         {replyTo && (
-          <WStack py="1" px="2" borderRadius="md" bgColor="bg.muted">
-            <HStack gap="1" fontSize="sm" color="fg.muted">
+          <WStack py="1" px="2" borderRadius="md" bgColor="background.inset">
+            <HStack gap="1" fontSize="sm" color="text.subtle">
               <styled.span>Replying&nbsp;to</styled.span>
               <MemberIdent
                 profile={replyTo.reply.author}
@@ -162,14 +161,15 @@ function LoginToReply({
       w="full"
       p="8"
       borderRadius="xl"
-      bgColor="border.muted"
+      bgColor="border.strong"
       justifyContent="center"
     >
       <DiscussionIcon width="4" />
 
       <p>
-        Please <Anchor href={canRegister ? "/register" : "/login"}>{action}</Anchor>{" "}
-        to reply
+        Please{" "}
+        <Anchor href={canRegister ? "/register" : "/login"}>{action}</Anchor> to
+        reply
       </p>
     </HStack>
   );

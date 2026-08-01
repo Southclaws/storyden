@@ -12,11 +12,13 @@ import { PermissionSummary } from "@/components/role/PermissionList";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CreateOAuthClientModal } from "./CreateOAuthClientModal";
@@ -44,7 +46,7 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
           </LStack>
 
           <LStack>
-            <WStack alignItems="center" color="fg.muted">
+            <WStack alignItems="center" color="text.subtle">
               <styled.p>{clients.length} clients.</styled.p>
               <Button size="xs" variant="subtle" onClick={createModal.onOpen}>
                 <AddIcon />
@@ -79,7 +81,7 @@ function OAuthClientItemList({ clients }: { clients: OAuthClientList }) {
 
   if (clients.length === 0) {
     return (
-      <styled.p color="fg.muted" fontStyle="italic">
+      <styled.p color="text.subtle" fontStyle="italic">
         No OAuth clients created yet.
       </styled.p>
     );
@@ -118,7 +120,7 @@ function OAuthClientItem({ client, onDelete }: OAuthClientItemProps) {
         <WStack gap="2" alignItems="start">
           <LStack gap="1" minW="0">
             <Heading size="sm">{client.name}</Heading>
-            <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <styled.p color="text.subtle" fontSize="xs" wordBreak="break-word">
               {client.client_id}
             </styled.p>
           </LStack>
@@ -158,7 +160,7 @@ function OAuthTokenItemList({ tokens }: Pick<Props, "tokens">) {
 
   if (tokens.length === 0) {
     return (
-      <styled.p color="fg.muted" fontStyle="italic">
+      <styled.p color="text.subtle" fontStyle="italic">
         No OAuth applications authorised yet.
       </styled.p>
     );
@@ -256,7 +258,7 @@ function ConfirmActions({
         <Button
           size="xs"
           variant="subtle"
-          bgColor="bg.destructive"
+          bgColor="status.danger.surface"
           onClick={onConfirm}
         >
           {confirmLabel}
@@ -272,7 +274,7 @@ function ConfirmActions({
     <Button
       size="xs"
       variant="outline"
-      bgColor="bg.destructive"
+      bgColor="status.danger.surface"
       onClick={onConfirm}
     >
       {idleLabel}

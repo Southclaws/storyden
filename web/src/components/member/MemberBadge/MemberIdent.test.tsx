@@ -46,9 +46,9 @@ describe("MemberIdent decorations", () => {
     const withColourRoot = withColour.container.querySelector(
       ".member-name__show-horizontal",
     ) as HTMLDivElement;
-    expect(withColourRoot.style.getPropertyValue("--colors-color-palette")).toBe(
-      "#123456",
-    );
+    expect(
+      withColourRoot.style.getPropertyValue("--colors-color-palette"),
+    ).toBe("#123456");
 
     const withoutColour = render(
       <MemberName
@@ -68,7 +68,7 @@ describe("MemberIdent decorations", () => {
     ) as HTMLDivElement;
     expect(
       withoutColourRoot.style.getPropertyValue("--colors-color-palette"),
-    ).toBe(token("colors.fg.default"));
+    ).toBe(token("colors.text.default"));
   });
 
   it("uses bold and italic metadata for decoration vars", () => {
@@ -87,7 +87,9 @@ describe("MemberIdent decorations", () => {
     const root = container.querySelector(
       ".member-name__show-handle",
     ) as HTMLDivElement;
-    expect(root.style.getPropertyValue("--decoration-font-style")).toBe("italic");
+    expect(root.style.getPropertyValue("--decoration-font-style")).toBe(
+      "italic",
+    );
     expect(root.style.getPropertyValue("--decoration-font-weight")).toBe(
       token("fontWeights.semibold"),
     );
@@ -118,23 +120,21 @@ describe("MemberIdent decorations", () => {
     const root = container.querySelector(
       ".member-name__show-vertical",
     ) as HTMLDivElement;
-    expect(root.style.getPropertyValue("--colors-color-palette")).toBe("#ff0000");
+    expect(root.style.getPropertyValue("--colors-color-palette")).toBe(
+      "#ff0000",
+    );
   });
 
   it("falls back to subtle default for handle variant when no custom roles", () => {
     const { container } = render(
-      <MemberName
-        profile={profileWithRoles([])}
-        name="handle"
-        size="md"
-      />,
+      <MemberName profile={profileWithRoles([])} name="handle" size="md" />,
     );
 
     const root = container.querySelector(
       ".member-name__show-handle",
     ) as HTMLDivElement;
     expect(root.style.getPropertyValue("--colors-color-palette")).toBe(
-      token("colors.fg.subtle"),
+      token("colors.text.muted"),
     );
   });
 });
@@ -186,7 +186,9 @@ describe("MemberIdent common permutations", () => {
       />,
     );
 
-    expect(queryByAltText(`${profile.handle}'s avatar`)).not.toBeInTheDocument();
+    expect(
+      queryByAltText(`${profile.handle}'s avatar`),
+    ).not.toBeInTheDocument();
     expect(getByText(profile.name)).toBeInTheDocument();
     expect(getByText(`@${profile.handle}`)).toBeInTheDocument();
   });

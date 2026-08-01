@@ -224,7 +224,7 @@ export function OAuthRemoteSetupPanel({
     <LStack gap="2">
       <LStack gap="1">
         <Heading size="sm">OAuth setup</Heading>
-        <styled.p color="fg.muted" fontSize="sm">
+        <styled.p color="text.subtle" fontSize="sm">
           Discover the provider configuration, then prepare an authorisation
           link using authorisation code and PKCE.
         </styled.p>
@@ -282,7 +282,11 @@ export function OAuthRemoteSetupPanel({
                 {discovery.protected_resource_metadata.resource_name ||
                   discovery.authorization_server}
               </Heading>
-              <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+              <styled.p
+                color="text.subtle"
+                fontSize="xs"
+                wordBreak="break-word"
+              >
                 {discovery.authorization_server}
               </styled.p>
             </LStack>
@@ -441,7 +445,7 @@ function ModeBadge({ mode }: { mode: OAuthRemoteMode }) {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <LStack gap="0">
-      <styled.span color="fg.muted" fontSize="xs">
+      <styled.span color="text.subtle" fontSize="xs">
         {label}
       </styled.span>
       <styled.span fontSize="xs" wordBreak="break-word">

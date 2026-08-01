@@ -66,8 +66,8 @@ export function FullPageChatInput() {
             borderRadius="md"
             borderWidth="thin"
             borderColor="border.default"
-            bg="bg.default"
-            color="fg.default"
+            bg="control.background"
+            color="text.default"
             fontSize="sm"
             resize="none"
             _focus={{

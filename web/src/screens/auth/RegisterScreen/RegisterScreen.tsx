@@ -24,7 +24,7 @@ export async function RegisterScreen({
     return (
       <VStack textAlign="center">
         <styled.h1 fontWeight="bold">Registration is invite-only.</styled.h1>
-        <styled.p color="fg.muted" textWrap="balance">
+        <styled.p color="text.subtle" textWrap="balance">
           Ask a community member or administrator for an invitation link to
           join.
         </styled.p>
@@ -39,7 +39,7 @@ export async function RegisterScreen({
         <styled.h1 fontWeight="bold">
           Registration is currently closed.
         </styled.h1>
-        <styled.p color="fg.muted" textWrap="balance">
+        <styled.p color="text.subtle" textWrap="balance">
           This site has closed public registration of accounts.
         </styled.p>
       </VStack>

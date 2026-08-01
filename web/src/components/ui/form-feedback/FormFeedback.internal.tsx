@@ -7,7 +7,7 @@ import { FormErrorText } from "../form-error-text";
 
 const formFeedback = cva({
   base: {
-    color: "fg.muted",
+    color: "text.subtle",
     fontSize: "xs",
   },
 });

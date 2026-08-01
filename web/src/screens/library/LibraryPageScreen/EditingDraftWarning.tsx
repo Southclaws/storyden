@@ -16,12 +16,12 @@ export function EditingDraftWarning() {
       borderStyle="dashed"
       borderColor="visibility.draft.border"
       borderRadius="sm"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       p="2"
       gap="0"
     >
       <Heading size="sm">Editing Draft</Heading>
-      <styled.span color="fg.muted" fontSize="sm">
+      <styled.span color="text.subtle" fontSize="sm">
         {label}
       </styled.span>
     </LStack>

@@ -52,7 +52,7 @@ export function RobotToolCall({ part }: Props) {
       py="1.5"
       bg="transparent"
       borderLeftWidth="medium"
-      borderLeftColor="border.subtle"
+      borderLeftColor="border.muted"
       borderLeftRadius="none"
       fontSize="sm"
       w="full"
@@ -76,14 +76,14 @@ function RobotToolCallTitle({ part, toolName }: Props & { toolName: string }) {
         aria-label={`${toolName} tool call details`}
         cursor="pointer"
         fontSize="xs"
-        color="fg.muted"
-        _groupHover={{ color: "fg.default" }}
+        color="text.subtle"
+        _groupHover={{ color: "text.default" }}
       >
         <styled.span
           display="flex"
           alignItems="center"
           _detailsOpen={{
-            color: "fg.default",
+            color: "text.default",
           }}
         >
           <ToolIcon w="3" h="3" />
@@ -95,7 +95,7 @@ function RobotToolCallTitle({ part, toolName }: Props & { toolName: string }) {
         <styled.pre
           fontSize="xs"
           p="2"
-          bg="bg.subtle"
+          bg="background.inset"
           borderRadius="sm"
           overflow="auto"
           maxH="32"
@@ -301,7 +301,8 @@ export function RobotToolConfirmationBatch({
       !getToolConfirmationResolution(part, messages),
   );
   const hasPending = pendingParts.length > 0;
-  const isPartiallyResolved = hasPending && pendingParts.length !== parts.length;
+  const isPartiallyResolved =
+    hasPending && pendingParts.length !== parts.length;
 
   const resolvePart = (part: ConfirmationPart, approved: boolean) =>
     part.approval?.id
@@ -321,7 +322,9 @@ export function RobotToolConfirmationBatch({
   return (
     <LStack
       role="group"
-      aria-label={isPartiallyResolved ? "Partial approvals" : "Confirmation batch"}
+      aria-label={
+        isPartiallyResolved ? "Partial approvals" : "Confirmation batch"
+      }
       className="group"
       gap="2"
       pl="3"
@@ -329,16 +332,19 @@ export function RobotToolConfirmationBatch({
       py="1.5"
       bg="transparent"
       borderLeftWidth="medium"
-      borderLeftColor="border.subtle"
+      borderLeftColor="border.muted"
       borderLeftRadius="none"
       fontSize="sm"
       w="full"
       alignSelf="flex-start"
     >
-      <styled.div className={wstack()} fontSize="xs" color="fg.muted">
+      <styled.div className={wstack()} fontSize="xs" color="text.subtle">
         <styled.span display="flex" alignItems="center">
           <ToolIcon w="3" h="3" />
-          &nbsp;{hasPending ? `Approve these ${parts.length} actions?` : `${parts.length} actions resolved`}
+          &nbsp;
+          {hasPending
+            ? `Approve these ${parts.length} actions?`
+            : `${parts.length} actions resolved`}
         </styled.span>
         <styled.span>
           {hasPending ? `${pendingParts.length} pending` : "Tool complete"}
@@ -411,7 +417,7 @@ function ConfirmationBatchRow({
       w="full"
       listStyle="none"
     >
-      <HStack gap="1.5" minW="0" color="fg.muted">
+      <HStack gap="1.5" minW="0" color="text.subtle">
         <ToolIcon w="3" h="3" flexShrink="0" />
         <styled.span overflow="hidden" textOverflow="ellipsis">
           {label}
@@ -438,7 +444,10 @@ function ConfirmationBatchRow({
           </Button>
         </HStack>
       ) : (
-        <styled.span fontSize="xs" color={denied ? "fg.muted" : "fg.default"}>
+        <styled.span
+          fontSize="xs"
+          color={denied ? "text.subtle" : "text.default"}
+        >
           {denied ? "Denied" : "Approved"}
         </styled.span>
       )}
@@ -562,17 +571,21 @@ function RobotLibraryPageRequest({ part }: Props) {
   }
 
   if (isLoading) {
-    return <styled.p color="fg.muted">Loading pages...</styled.p>;
+    return <styled.p color="text.subtle">Loading pages...</styled.p>;
   }
 
   if (error) {
-    return <styled.p color="fg.error">Could not load Library pages.</styled.p>;
+    return (
+      <styled.p color="status.danger.content">
+        Could not load Library pages.
+      </styled.p>
+    );
   }
 
   const pages = flattenLibraryPages(data?.nodes ?? []);
 
   if (pages.length === 0) {
-    return <styled.p color="fg.muted">No Library pages found.</styled.p>;
+    return <styled.p color="text.subtle">No Library pages found.</styled.p>;
   }
 
   return (
@@ -620,7 +633,7 @@ function RobotLibraryPageRequest({ part }: Props) {
                 {page.name}
               </styled.span>
               <styled.span
-                color="fg.muted"
+                color="text.subtle"
                 fontSize="xs"
                 maxW="full"
                 overflow="hidden"

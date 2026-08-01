@@ -1,7 +1,8 @@
 import { RadioGroupValueChangeDetails } from "@ark-ui/react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
-import { Box, CardBox } from "@/styled-system/jsx";
+import { CardBox } from "@/components/ui/card-box";
+import { Box } from "@/styled-system/jsx";
 import { hstack, lstack } from "@/styled-system/patterns";
 
 import * as RadioGroup from "./RadioGroup.internal";
@@ -45,7 +46,7 @@ export function FormCardGroupRadio<T extends FieldValues>({
                 <CardBox
                   key={item.value}
                   _hover={{
-                    background: "bg.emphasized",
+                    background: "interactive.emphasized.surface",
                   }}
                 >
                   <RadioGroup.Item

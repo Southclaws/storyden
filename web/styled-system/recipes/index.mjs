@@ -1,6 +1,7 @@
 export * from './badge.mjs';
 export * from './checkbox.mjs';
 export * from './button.mjs';
+export * from './card-box.mjs';
 export * from './group.mjs';
 export * from './input.mjs';
 export * from './multi-select-picker.mjs';

@@ -13,9 +13,12 @@ export const select = defineSlotRecipe({
       width: "full",
     },
     content: {
-      background: "bg.default",
+      background: "background.overlay",
+      borderColor: "border.strong",
       borderRadius: "sm",
+      borderWidth: "thin",
       boxShadow: "overlay",
+      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",
@@ -34,7 +37,7 @@ export const select = defineSlotRecipe({
       _focusVisible: {
         outlineOffset: "2px",
         outline: "2px solid",
-        outlineColor: "border.outline",
+        outlineColor: "border.default",
       },
     },
     item: {
@@ -48,22 +51,22 @@ export const select = defineSlotRecipe({
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
       _hover: {
-        background: "bg.emphasized",
-        color: "fg.default",
+        background: "control.hoverBackground",
+        color: "text.default",
       },
       _highlighted: {
-        background: "bg.selected",
-        color: "fg.default",
+        background: "selection.background",
+        color: "text.default",
       },
       _selected: {
-        color: "fg.default",
+        color: "text.default",
       },
       _disabled: {
-        color: "fg.disabled",
+        color: "text.disabled",
         cursor: "not-allowed",
         _hover: {
           background: "transparent",
-          color: "fg.disabled",
+          color: "text.disabled",
         },
       },
     },
@@ -75,7 +78,7 @@ export const select = defineSlotRecipe({
       color: "colorPalette.default",
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     trigger: {
@@ -84,7 +87,7 @@ export const select = defineSlotRecipe({
       borderColor: "border.default",
       borderRadius: "sm",
       cursor: "pointer",
-      color: "fg.default",
+      color: "text.default",
       display: "inline-flex",
       justifyContent: "space-between",
       outline: 0,
@@ -94,17 +97,17 @@ export const select = defineSlotRecipe({
       transitionTimingFunction: "default",
       width: "full",
       _placeholderShown: {
-        color: "fg.subtle",
+        color: "text.muted",
       },
       _disabled: {
-        color: "fg.disabled",
+        color: "text.disabled",
         cursor: "not-allowed",
         "& :where(svg)": {
-          color: "fg.disabled",
+          color: "text.disabled",
         },
       },
       "& :where(svg)": {
-        color: "fg.subtle",
+        color: "text.muted",
       },
     },
   },

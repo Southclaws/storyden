@@ -48,8 +48,8 @@ export const ResponsiveScale: Story = {
           {breakpointTokens.map((breakpoint) => (
             <styled.article
               key={breakpoint.name}
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -62,12 +62,12 @@ export const ResponsiveScale: Story = {
             >
               <styled.div display="flex" flexDirection="column" gap="1">
                 <TokenCode>{breakpoint.name}</TokenCode>
-                <styled.span color="content.subtle" fontSize="xs">
+                <styled.span color="text.muted" fontSize="xs">
                   {breakpoint.usage}
                 </styled.span>
               </styled.div>
               <styled.div
-                backgroundColor="surface.subtle"
+                backgroundColor="background.inset"
                 borderRadius="pill"
                 height="4"
                 overflow="hidden"
@@ -81,11 +81,7 @@ export const ResponsiveScale: Story = {
                   }}
                 />
               </styled.div>
-              <styled.span
-                color="content.default"
-                fontFamily="mono"
-                fontSize="sm"
-              >
+              <styled.span color="text.default" fontFamily="mono" fontSize="sm">
                 {breakpoint.value}px
               </styled.span>
             </styled.article>
@@ -102,8 +98,8 @@ export const ResponsiveScale: Story = {
             <styled.article
               key={condition.name}
               alignItems="center"
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -115,11 +111,7 @@ export const ResponsiveScale: Story = {
               padding="4"
             >
               <TokenCode>{condition.name}</TokenCode>
-              <styled.span
-                color="content.subtle"
-                fontFamily="mono"
-                fontSize="sm"
-              >
+              <styled.span color="text.muted" fontFamily="mono" fontSize="sm">
                 {condition.value}
               </styled.span>
             </styled.article>

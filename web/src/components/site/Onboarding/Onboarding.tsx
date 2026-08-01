@@ -14,7 +14,7 @@ export function Onboarding() {
     <Box position="relative">
       <Box
         position="absolute"
-        background="bg.default"
+        background="background.surface"
         p="4"
         zIndex="banner"
         boxShadow="overlay"

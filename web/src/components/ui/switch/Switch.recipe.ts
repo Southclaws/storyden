@@ -17,7 +17,7 @@ export const switchRecipe = defineSlotRecipe({
     },
     control: {
       alignItems: "center",
-      background: "bg.muted",
+      background: "control.trackBackground",
       borderRadius: "full",
       boxShadow: "inset 0 0 0 1px token(colors.border.default)",
       cursor: "pointer",
@@ -32,17 +32,17 @@ export const switchRecipe = defineSlotRecipe({
         boxShadow: "inset 0 0 0 1px token(colors.accent.default)",
       },
       _disabled: {
-        background: "bg.disabled",
+        background: "control.disabledBackground",
         boxShadow: "inset 0 0 0 1px token(colors.border.disabled)",
         cursor: "not-allowed",
       },
     },
     label: {
-      color: "fg.default",
+      color: "text.default",
       fontWeight: "medium",
     },
     thumb: {
-      background: "surface.elevated",
+      background: "background.overlay",
       borderRadius: "full",
       boxShadow: "surface",
       transitionDuration: "normal",
@@ -50,10 +50,10 @@ export const switchRecipe = defineSlotRecipe({
       transitionTimingFunction: "default",
       _checked: {
         transform: "translateX(100%)",
-        background: "surface.elevated",
+        background: "background.overlay",
       },
       _disabled: {
-        background: "fg.disabled",
+        background: "text.disabled",
       },
     },
   },

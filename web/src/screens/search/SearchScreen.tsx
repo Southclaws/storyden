@@ -40,7 +40,7 @@ export function SearchScreen(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          background="bg.default"
+          background="control.background"
           placeholder={`Search...`}
           _focus={{
             // NOTE: This disables the default focus behaviour styles for inputs.

@@ -2,9 +2,10 @@ import { useState } from "react";
 
 import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { CardBox, LStack, WStack, styled } from "@/styled-system/jsx";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { EmailCard } from "./EmailCard";
@@ -69,7 +70,7 @@ export function EmailSettings(props: Props) {
         </WStack>
 
         {data.emails.length === 0 ? (
-          <styled.p color="fg.muted">
+          <styled.p color="text.subtle">
             You do not have any email addresses associated with your account.
           </styled.p>
         ) : (

@@ -37,7 +37,7 @@ export const visibility = {
     fg: {
       DEFAULT: {
         value: {
-          _osLight: "{colors.blue.light.11}",
+          _osLight: "{colors.blue.light.12}",
           _osDark: "{colors.blue.dark.11}",
         },
       },
@@ -63,7 +63,7 @@ export const visibility = {
     fg: {
       DEFAULT: {
         value: {
-          _osLight: "{colors.amber.light.11}",
+          _osLight: "{colors.amber.light.12}",
           _osDark: "{colors.amber.dark.11}",
         },
       },
@@ -89,7 +89,7 @@ export const visibility = {
     fg: {
       DEFAULT: {
         value: {
-          _osLight: "{colors.pink.light.11}",
+          _osLight: "{colors.pink.light.12}",
           _osDark: "{colors.pink.dark.11}",
         },
       },

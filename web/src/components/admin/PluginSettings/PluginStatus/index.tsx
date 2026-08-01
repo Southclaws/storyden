@@ -6,9 +6,10 @@ import { usePluginGet } from "@/api/openapi-client/plugins";
 import { Identifier, Plugin, PluginExternalProps } from "@/api/openapi-schema";
 import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import * as Tabs from "@/components/ui/tabs";
-import { CardBox, HStack, WStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { PluginStatusToggle } from "../PluginStatusToggle";

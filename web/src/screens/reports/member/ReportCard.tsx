@@ -9,7 +9,8 @@ import {
 } from "@/components/datagraph/DatagraphItemCard";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Button } from "@/components/ui/button";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { CardBox } from "@/components/ui/card-box";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { ReportCardContent } from "../ReportCardContent";
 import { ReportStatusBadge } from "../ReportStatusBadge";

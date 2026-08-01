@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { match } from "ts-pattern";
 import { useSWRConfig } from "swr";
+import { match } from "ts-pattern";
 
 import { handle } from "@/api/client";
 import { mutateTransaction } from "@/api/mutate";
@@ -16,8 +16,8 @@ import {
 } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
-import { deriveError } from "@/utils/error";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
+import { deriveError } from "@/utils/error";
 
 type Props = {
   pluginID: string;
@@ -86,7 +86,7 @@ export function ConfigurationTab({ pluginID }: Props) {
   if (fields.length === 0) {
     return (
       <Box minH="12">
-        <styled.p fontSize="sm" color="fg.muted">
+        <styled.p fontSize="sm" color="text.subtle">
           This plugin has no configurable fields.
         </styled.p>
       </Box>
@@ -101,7 +101,7 @@ export function ConfigurationTab({ pluginID }: Props) {
       gap="4"
       w="full"
     >
-      <styled.p fontSize="sm" color="fg.muted">
+      <styled.p fontSize="sm" color="text.subtle">
         Configure the plugin&apos;s settings below.
       </styled.p>
 
@@ -163,7 +163,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="bg.default"
+        bgColor="control.background"
       />
     ))
     .with({ type: "number" }, (f) => (
@@ -178,7 +178,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="bg.default"
+        bgColor="control.background"
       />
     ))
     .with({ type: "boolean" }, (f) => (
@@ -202,7 +202,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         {input}
       </WStack>
       {description && (
-        <styled.p fontSize="xs" color="fg.muted">
+        <styled.p fontSize="xs" color="text.subtle">
           {description}
         </styled.p>
       )}

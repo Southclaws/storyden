@@ -64,7 +64,7 @@ export function DatagraphItemPostGenericCard({
       text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge
               profile={ref.author}
               size="sm"
@@ -92,7 +92,7 @@ export function DatagraphItemReplyCard({ item }: { item: DatagraphItemReply }) {
       text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge
               profile={ref.author}
               size="sm"
@@ -121,7 +121,7 @@ export function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
       image={getAssetURL(ref.primary_image?.path)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge profile={ref.owner} size="sm" name="full-horizontal" />
             <Timestamp created={ref.createdAt} />
           </HStack>
@@ -149,7 +149,7 @@ export function DatagraphItemProfileCard({
       text={ref.bio}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge profile={ref} size="sm" name="full-horizontal" />
             <Timestamp created={ref.createdAt} />
           </HStack>

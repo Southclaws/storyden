@@ -134,7 +134,7 @@ export function OAuthConsentScreen() {
     <LStack gap="2">
       <LStack gap="1">
         <Heading size="md">{data.client_name}</Heading>
-        <styled.p color="fg.muted">
+        <styled.p color="text.subtle">
           {data.inherits_user_permissions
             ? "This application will act with your current account permissions."
             : "This application is requesting access to your account."}
@@ -159,7 +159,7 @@ export function OAuthConsentScreen() {
 
       {permissions.length > 0 && (
         <LStack flexShrink="0" gap="2">
-          <Heading size="sm" color="fg.muted">
+          <Heading size="sm" color="text.subtle">
             Permissions requested
           </Heading>
           <styled.ul
@@ -184,7 +184,7 @@ export function OAuthConsentScreen() {
                 <styled.span fontSize="sm" fontWeight="medium">
                   {permission.name}
                 </styled.span>
-                <styled.span color="fg.muted" fontSize="sm">
+                <styled.span color="text.subtle" fontSize="sm">
                   {permission.description}
                 </styled.span>
               </styled.li>
@@ -218,7 +218,7 @@ function ConsentMessage({ icon, title, body }: ConsentMessageProps) {
     <LStack gap="3" textAlign="center" alignItems="center">
       {icon}
       <Heading size="md">{title}</Heading>
-      <styled.p color="fg.muted">{body}</styled.p>
+      <styled.p color="text.subtle">{body}</styled.p>
     </LStack>
   );
 }

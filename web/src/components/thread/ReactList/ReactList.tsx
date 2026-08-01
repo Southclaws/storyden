@@ -142,7 +142,7 @@ function ReactTrigger({ react, disabled, onClick }: ReactionProps) {
       variant="subtle"
       gap="0"
       borderRadius="md"
-      color="fg.subtle"
+      color="text.muted"
       onClick={handleClick}
       fontVariantNumeric="tabular-nums"
       title={buttonLabel}
@@ -200,7 +200,7 @@ function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
           className={reactButtonStyles}
           variant="subtle"
           borderRadius="md"
-          color="fg.muted"
+          color="text.subtle"
           aria-label="Add reaction"
         >
           <ReactionAddIcon />

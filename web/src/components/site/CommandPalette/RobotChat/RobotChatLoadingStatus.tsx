@@ -16,7 +16,7 @@ export function RobotChatLoadingStatus({
     <HStack
       role="status"
       aria-live="polite"
-      color="fg.muted"
+      color="text.subtle"
       fontSize="xs"
       px="1"
       gap="2"

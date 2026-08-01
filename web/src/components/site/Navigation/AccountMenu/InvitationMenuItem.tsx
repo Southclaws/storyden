@@ -107,7 +107,7 @@ function InvitationModalContent({
     return (
       <LStack gap="6">
         <LStack gap="2">
-          <styled.p color="fg.muted">
+          <styled.p color="text.subtle">
             Send this invitation link to someone you would like to welcome into
             the community.
           </styled.p>
@@ -141,10 +141,10 @@ function InvitationModalContent({
     return (
       <LStack gap="6">
         <LStack gap="2">
-          <styled.p color="fg.muted">
+          <styled.p color="text.subtle">
             Something went wrong while creating the invitation.
           </styled.p>
-          <styled.p color="fg.error" fontSize="sm">
+          <styled.p color="status.danger.content" fontSize="sm">
             {invitation.message}
           </styled.p>
         </LStack>
@@ -165,7 +165,7 @@ function InvitationModalContent({
     <Center minH="36">
       <VStack gap="3" textAlign="center">
         <IconButton variant="ghost" loading aria-label="Creating invitation" />
-        <styled.p color="fg.muted">Creating an invitation...</styled.p>
+        <styled.p color="text.subtle">Creating an invitation...</styled.p>
       </VStack>
     </Center>
   );

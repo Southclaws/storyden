@@ -1,15 +1,10 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import {
-  Permission,
-  ThreadReference,
-  Visibility,
-} from "@/api/openapi-schema";
+import { Permission, ThreadReference, Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
-
 import { Card } from "@/components/ui/rich-card";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
@@ -132,7 +127,7 @@ export const ThreadReferenceCard = memo(
               >
                 <styled.span
                   className="thread-byline__reply-status-label"
-                  color="fg.muted"
+                  color="text.subtle"
                   display="flex"
                   gap="0.5"
                   alignItems="center"
@@ -145,7 +140,7 @@ export const ThreadReferenceCard = memo(
                   {replyCount}
                   {newRepliesCount > 0 && (
                     <styled.span
-                      color="fg.muted"
+                      color="text.subtle"
                       fontSize="xs"
                       title={newRepliesLabel}
                     >

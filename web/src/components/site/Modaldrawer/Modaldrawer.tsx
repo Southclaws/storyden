@@ -56,7 +56,7 @@ export function ModalDrawer({
               }}
               borderTopRadius={{ base: "xl", md: "md" }}
               borderBottomRadius={{ base: "none", md: "md" }}
-              bgColor="bg.default"
+              bgColor="background.overlay"
               boxShadow="overlay"
               p={{ base: "4", md: "3" }}
               className={className}

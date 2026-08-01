@@ -12,9 +12,12 @@ export const popover = defineSlotRecipe({
     },
     content: {
       maxHeight: "var(--available-height)",
-      background: "bg.default",
+      background: "background.overlay",
+      borderColor: "border.strong",
       borderRadius: "md",
+      borderWidth: "thin",
       boxShadow: "overlay",
+      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",
@@ -36,17 +39,18 @@ export const popover = defineSlotRecipe({
     },
     description: {
       overflowY: "scroll",
-      color: "fg.muted",
+      color: "text.muted",
       textStyle: "sm",
     },
     closeTrigger: {
-      color: "fg.muted",
+      color: "text.muted",
     },
     arrow: {
       "--arrow-size": "var(--sizes-3)",
-      "--arrow-background": "var(--colors-bg-default)",
+      "--arrow-background": "var(--colors-background-overlay)",
     },
     arrowTip: {
+      borderColor: "border.strong",
       borderTopWidth: "1px",
       borderLeftWidth: "1px",
     },

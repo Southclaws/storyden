@@ -35,8 +35,8 @@ export const ShapeAndDepth: Story = {
             <styled.article
               key={token}
               alignItems="center"
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -61,7 +61,7 @@ export const ShapeAndDepth: Story = {
               >
                 <TokenCode>{token}</TokenCode>
                 <styled.span
-                  color="content.subtle"
+                  color="text.muted"
                   fontFamily="mono"
                   fontSize="xs"
                   style={{ overflowWrap: "anywhere" }}
@@ -80,8 +80,8 @@ export const ShapeAndDepth: Story = {
             <styled.article
               key={token}
               alignItems="center"
-              backgroundColor="surface.subtle"
-              borderColor="border.subtle"
+              backgroundColor="background.inset"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="grid"
@@ -90,8 +90,8 @@ export const ShapeAndDepth: Story = {
               padding="5"
             >
               <styled.div
-                backgroundColor="surface.elevated"
-                borderColor="border.subtle"
+                backgroundColor="background.overlay"
+                borderColor="border.muted"
                 borderRadius="panel"
                 borderWidth="thin"
                 height="16"
@@ -106,7 +106,7 @@ export const ShapeAndDepth: Story = {
               >
                 <TokenCode>{token}</TokenCode>
                 <styled.span
-                  color="content.subtle"
+                  color="text.muted"
                   fontFamily="mono"
                   fontSize="xs"
                   style={{ overflowWrap: "anywhere" }}
@@ -124,8 +124,8 @@ export const ShapeAndDepth: Story = {
           {blurTokens.map((token) => (
             <styled.article
               key={token}
-              backgroundColor="surface.default"
-              borderColor="border.subtle"
+              backgroundColor="background.surface"
+              borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
               display="flex"
@@ -134,14 +134,14 @@ export const ShapeAndDepth: Story = {
               padding="3"
             >
               <styled.div
-                borderColor="border.subtle"
+                borderColor="border.muted"
                 borderRadius="overlay"
                 borderWidth="thin"
                 height="20"
                 overflow="hidden"
                 position="relative"
                 style={{
-                  backgroundImage: `repeating-linear-gradient(90deg, ${tokenVar("colors.bg.success")} 0 0.75rem, ${tokenVar("colors.bg.warning")} 0.75rem 1.5rem, ${tokenVar("colors.bg.destructive")} 1.5rem 2.25rem)`,
+                  backgroundImage: `repeating-linear-gradient(90deg, ${tokenVar("colors.status.success.surface")} 0 0.75rem, ${tokenVar("colors.status.warning.surface")} 0.75rem 1.5rem, ${tokenVar("colors.status.danger.surface")} 1.5rem 2.25rem)`,
                 }}
               >
                 <styled.div
@@ -153,7 +153,7 @@ export const ShapeAndDepth: Story = {
                   style={{
                     backdropFilter: `blur(${tokenVar(token)})`,
                     backgroundColor:
-                      "color-mix(in srgb, var(--colors-surface-default) 20%, transparent)",
+                      "color-mix(in srgb, var(--colors-background-surface) 20%, transparent)",
                     WebkitBackdropFilter: `blur(${tokenVar(token)})`,
                   }}
                   top="0"
@@ -168,7 +168,7 @@ export const ShapeAndDepth: Story = {
               >
                 <TokenCode>{token}</TokenCode>
                 <styled.span
-                  color="content.subtle"
+                  color="text.muted"
                   fontFamily="mono"
                   fontSize="xs"
                   style={{ overflowWrap: "anywhere" }}

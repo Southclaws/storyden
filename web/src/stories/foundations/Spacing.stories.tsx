@@ -33,8 +33,8 @@ function SpacingRow({ name }: { name: string }) {
   return (
     <styled.article
       alignItems="center"
-      backgroundColor="surface.default"
-      borderColor="border.subtle"
+      backgroundColor="background.surface"
+      borderColor="border.muted"
       borderRadius="panel"
       borderWidth="thin"
       display="grid"
@@ -47,20 +47,20 @@ function SpacingRow({ name }: { name: string }) {
     >
       <TokenCode>{token}</TokenCode>
       <styled.div
-        backgroundColor="surface.subtle"
+        backgroundColor="background.inset"
         borderRadius="control"
         height="5"
         overflow="hidden"
         width="full"
       >
         <styled.div
-          backgroundColor="content.default"
+          backgroundColor="text.default"
           height="full"
           minW={name === "0" ? "0" : "0.5"}
           style={{ width: variable }}
         />
       </styled.div>
-      <styled.span color="content.subtle" fontFamily="mono" fontSize="xs">
+      <styled.span color="text.muted" fontFamily="mono" fontSize="xs">
         {tokenValue(token)}
       </styled.span>
     </styled.article>
@@ -72,8 +72,8 @@ function LayoutSizeRow({ name, token, usage }: TokenExample) {
 
   return (
     <styled.article
-      backgroundColor="surface.default"
-      borderColor="border.subtle"
+      backgroundColor="background.surface"
+      borderColor="border.muted"
       borderRadius="panel"
       borderWidth="thin"
       display="flex"
@@ -88,31 +88,27 @@ function LayoutSizeRow({ name, token, usage }: TokenExample) {
         gridTemplateColumns={{ base: "1fr", md: "12rem minmax(0, 1fr) auto" }}
       >
         <styled.div display="flex" flexDirection="column" gap="1">
-          <styled.strong
-            color="content.default"
-            fontSize="sm"
-            fontWeight="medium"
-          >
+          <styled.strong color="text.default" fontSize="sm" fontWeight="medium">
             {name}
           </styled.strong>
           <TokenCode>{token}</TokenCode>
         </styled.div>
-        <styled.p color="content.subtle" fontSize="xs" lineHeight="relaxed">
+        <styled.p color="text.muted" fontSize="xs" lineHeight="relaxed">
           {usage}
         </styled.p>
-        <styled.span color="content.muted" fontFamily="mono" fontSize="xs">
+        <styled.span color="text.subtle" fontFamily="mono" fontSize="xs">
           {tokenValue(token)}
         </styled.span>
       </styled.div>
       <styled.div
-        backgroundColor="surface.subtle"
+        backgroundColor="background.inset"
         borderRadius="control"
         height="6"
         overflow="hidden"
         width="full"
       >
         <styled.div
-          backgroundColor="content.default"
+          backgroundColor="text.default"
           height="full"
           maxW="full"
           style={{ width: variable }}

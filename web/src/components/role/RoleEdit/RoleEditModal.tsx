@@ -53,7 +53,7 @@ export function RoleEditModalTrigger({ role }: Props) {
         width="5"
         height="5"
         padding="0"
-        color="fg.muted"
+        color="text.subtle"
         disabled={cannotEdit}
         title={titleLabel}
         onClick={disclosure.onOpen}

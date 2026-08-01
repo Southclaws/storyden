@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 
 import { Role } from "@/api/openapi-schema";
+import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
-import { CardBox, HStack, WStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 
 import { Badge } from "../ui/badge";
 

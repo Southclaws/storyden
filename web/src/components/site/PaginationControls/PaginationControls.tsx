@@ -98,7 +98,9 @@ export function PaginationControls({
         return (
           <LinkButton
             variant="ghost"
-            backgroundColor={v === currentPage ? "bg.muted" : undefined}
+            backgroundColor={
+              v === currentPage ? "selection.background" : undefined
+            }
             size="xs"
             key={v}
             href={`${path}?${withPage.toString()}`}
@@ -131,7 +133,7 @@ export function PaginationControls({
 
 function Sep() {
   return (
-    <styled.span fontSize="xs" color="fg.disabled">
+    <styled.span fontSize="xs" color="text.disabled">
       •••
     </styled.span>
   );

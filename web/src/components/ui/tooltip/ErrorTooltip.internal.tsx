@@ -23,7 +23,7 @@ export function ErrorTooltip({ error }: ErrorTooltipProps) {
           variant="ghost"
           aria-label="Show error details"
         >
-          <WarningIcon color="fg.error" />
+          <WarningIcon color="status.danger.content" />
         </IconButton>
       </Tooltip.Trigger>
       <Portal>

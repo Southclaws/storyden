@@ -2,6 +2,7 @@
 export * from './badge';
 export * from './checkbox';
 export * from './button';
+export * from './card-box';
 export * from './group';
 export * from './input';
 export * from './multi-select-picker';
