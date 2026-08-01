@@ -4,20 +4,19 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/packages/param"
-	"github.com/openai/openai-go/v3/shared"
+	"github.com/openai/openai-go/v3/responses"
 	"google.golang.org/adk/model"
 	"google.golang.org/genai"
 )
 
-func convertToOpenAIMessages(req *model.LLMRequest) []openai.ChatCompletionMessageParamUnion {
-	var messages []openai.ChatCompletionMessageParamUnion
+func convertToOpenAIInput(req *model.LLMRequest) []responses.ResponseInputItemUnionParam {
+	var input []responses.ResponseInputItemUnionParam
 
 	if req.Config != nil && req.Config.SystemInstruction != nil {
 		text := extractAllText(req.Config.SystemInstruction.Parts)
 		if text != "" {
-			messages = append(messages, openai.SystemMessage(text))
+			input = append(input, responses.ResponseInputItemParamOfMessage(text, responses.EasyInputMessageRoleSystem))
 		}
 	}
 
@@ -29,9 +28,7 @@ func convertToOpenAIMessages(req *model.LLMRequest) []openai.ChatCompletionMessa
 		// Check for function responses first (they can appear in any role)
 		functionResponses := extractFunctionResponses(content.Parts)
 		if len(functionResponses) > 0 {
-			for _, resp := range functionResponses {
-				messages = append(messages, resp)
-			}
+			input = append(input, functionResponses...)
 			continue
 		}
 
@@ -39,36 +36,25 @@ func convertToOpenAIMessages(req *model.LLMRequest) []openai.ChatCompletionMessa
 		case genai.RoleUser:
 			text := extractAllText(content.Parts)
 			if text != "" {
-				messages = append(messages, openai.UserMessage(text))
+				input = append(input, responses.ResponseInputItemParamOfMessage(text, responses.EasyInputMessageRoleUser))
 			}
 
 		case genai.RoleModel:
 			text := extractAllText(content.Parts)
 			toolCalls := extractToolCalls(content.Parts)
 
-			if len(toolCalls) > 0 {
-				msg := openai.ChatCompletionAssistantMessageParam{
-					ToolCalls: toolCalls,
-				}
-				if text != "" {
-					msg.Content = openai.ChatCompletionAssistantMessageParamContentUnion{
-						OfString: param.NewOpt(text),
-					}
-				}
-				messages = append(messages, openai.ChatCompletionMessageParamUnion{
-					OfAssistant: &msg,
-				})
-			} else if text != "" {
-				messages = append(messages, openai.AssistantMessage(text))
+			if text != "" {
+				input = append(input, responses.ResponseInputItemParamOfMessage(text, responses.EasyInputMessageRoleAssistant))
 			}
+			input = append(input, toolCalls...)
 		}
 	}
 
-	return messages
+	return input
 }
 
-func extractFunctionResponses(parts []*genai.Part) []openai.ChatCompletionMessageParamUnion {
-	var responses []openai.ChatCompletionMessageParamUnion
+func extractFunctionResponses(parts []*genai.Part) []responses.ResponseInputItemUnionParam {
+	var output []responses.ResponseInputItemUnionParam
 
 	for _, part := range parts {
 		if part.FunctionResponse != nil {
@@ -86,15 +72,15 @@ func extractFunctionResponses(parts []*genai.Part) []openai.ChatCompletionMessag
 				}
 			}
 			// ToolMessage signature is: ToolMessage(content, toolCallID)
-			responses = append(responses, openai.ToolMessage(resultJSON, id))
+			output = append(output, responses.ResponseInputItemParamOfFunctionCallOutput(id, resultJSON))
 		}
 	}
 
-	return responses
+	return output
 }
 
-func extractToolCalls(parts []*genai.Part) []openai.ChatCompletionMessageToolCallUnionParam {
-	var toolCalls []openai.ChatCompletionMessageToolCallUnionParam
+func extractToolCalls(parts []*genai.Part) []responses.ResponseInputItemUnionParam {
+	var toolCalls []responses.ResponseInputItemUnionParam
 
 	for _, part := range parts {
 		if part.FunctionCall != nil {
@@ -105,27 +91,19 @@ func extractToolCalls(parts []*genai.Part) []openai.ChatCompletionMessageToolCal
 				}
 			}
 
-			toolCalls = append(toolCalls, openai.ChatCompletionMessageToolCallUnionParam{
-				OfFunction: &openai.ChatCompletionMessageFunctionToolCallParam{
-					ID: part.FunctionCall.ID,
-					Function: openai.ChatCompletionMessageFunctionToolCallFunctionParam{
-						Name:      part.FunctionCall.Name,
-						Arguments: argsJSON,
-					},
-				},
-			})
+			toolCalls = append(toolCalls, responses.ResponseInputItemParamOfFunctionCall(argsJSON, part.FunctionCall.ID, part.FunctionCall.Name))
 		}
 	}
 
 	return toolCalls
 }
 
-func convertToOpenAITools(req *model.LLMRequest) []openai.ChatCompletionToolUnionParam {
+func convertToOpenAITools(req *model.LLMRequest) []responses.ToolUnionParam {
 	if req.Config == nil || len(req.Config.Tools) == 0 {
 		return nil
 	}
 
-	var tools []openai.ChatCompletionToolUnionParam
+	var tools []responses.ToolUnionParam
 
 	for _, tool := range req.Config.Tools {
 		if tool.FunctionDeclarations == nil {
@@ -151,82 +129,54 @@ func convertToOpenAITools(req *model.LLMRequest) []openai.ChatCompletionToolUnio
 				}
 			}
 
-			tools = append(tools, openai.ChatCompletionFunctionTool(shared.FunctionDefinitionParam{
+			tools = append(tools, responses.ToolUnionParam{OfFunction: &responses.FunctionToolParam{
 				Name:        fn.Name,
 				Description: param.NewOpt(fn.Description),
-				Parameters:  shared.FunctionParameters(schema),
-			}))
+				Parameters:  schema,
+				Strict:      param.NewOpt(false),
+			}})
 		}
 	}
 
 	return tools
 }
 
-func convertOpenAIMessageToGenaiContent(msg openai.ChatCompletionMessage) *genai.Content {
+func convertOpenAIResponseToGenaiContent(response responses.Response) *genai.Content {
 	content := &genai.Content{
 		Role:  genai.RoleModel,
 		Parts: []*genai.Part{},
 	}
 
-	if msg.Content != "" {
-		content.Parts = append(content.Parts, &genai.Part{Text: msg.Content})
-	}
-
-	for _, tc := range msg.ToolCalls {
-		args := make(map[string]interface{})
-		if tc.Function.Arguments != "" {
-			json.Unmarshal([]byte(tc.Function.Arguments), &args)
+	for _, item := range response.Output {
+		switch item.Type {
+		case "message":
+			for _, part := range item.AsMessage().Content {
+				if part.Type == "output_text" {
+					content.Parts = append(content.Parts, &genai.Part{Text: part.Text})
+				}
+			}
+		case "function_call":
+			toolCall := item.AsFunctionCall()
+			args := make(map[string]interface{})
+			if toolCall.Arguments != "" {
+				json.Unmarshal([]byte(toolCall.Arguments), &args)
+			}
+			content.Parts = append(content.Parts, &genai.Part{FunctionCall: &genai.FunctionCall{
+				ID: toolCall.CallID, Name: toolCall.Name, Args: args,
+			}})
 		}
-
-		content.Parts = append(content.Parts, &genai.Part{
-			FunctionCall: &genai.FunctionCall{
-				ID:   tc.ID,
-				Name: tc.Function.Name,
-				Args: args,
-			},
-		})
 	}
 
 	return content
 }
 
-func buildFinalGenaiContent(text string, toolCalls []openai.ChatCompletionMessageToolCallUnion) *genai.Content {
-	content := &genai.Content{
-		Role:  genai.RoleModel,
-		Parts: []*genai.Part{},
-	}
-
-	if text != "" {
-		content.Parts = append(content.Parts, &genai.Part{Text: text})
-	}
-
-	for _, tc := range toolCalls {
-		args := make(map[string]interface{})
-		if tc.Function.Arguments != "" {
-			json.Unmarshal([]byte(tc.Function.Arguments), &args)
-		}
-
-		content.Parts = append(content.Parts, &genai.Part{
-			FunctionCall: &genai.FunctionCall{
-				ID:   tc.ID,
-				Name: tc.Function.Name,
-				Args: args,
-			},
-		})
-	}
-
-	return content
-}
-
-func convertOpenAIFinishReasonToGenai(reason string) genai.FinishReason {
-	switch reason {
-	case "stop":
+func convertOpenAIResponseStatusToGenai(status string) genai.FinishReason {
+	switch status {
+	case "completed":
 		return genai.FinishReasonStop
-	case "length":
+	case "incomplete":
 		return genai.FinishReasonMaxTokens
-	case "tool_calls":
-		return genai.FinishReasonStop
-	case "content_filter":
+	case "failed":
 		return genai.FinishReasonSafety
 	default:
 		return genai.FinishReasonUnspecified

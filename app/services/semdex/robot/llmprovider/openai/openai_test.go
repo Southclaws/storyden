@@ -1,17 +1,15 @@
 package openai
 
 import (
-	"encoding/json"
 	"testing"
 
-	"github.com/openai/openai-go/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/adk/model"
 	"google.golang.org/genai"
 )
 
-func TestConvertToOpenAIMessagesReplaysEmptyToolArgsAsObject(t *testing.T) {
+func TestConvertToOpenAIInputReplaysEmptyToolArgsAsObject(t *testing.T) {
 	req := &model.LLMRequest{
 		Contents: []*genai.Content{
 			{
@@ -28,17 +26,15 @@ func TestConvertToOpenAIMessagesReplaysEmptyToolArgsAsObject(t *testing.T) {
 		},
 	}
 
-	messages := convertToOpenAIMessages(req)
-	require.Len(t, messages, 1)
-	require.NotNil(t, messages[0].OfAssistant)
-	require.Len(t, messages[0].OfAssistant.ToolCalls, 1)
+	input := convertToOpenAIInput(req)
+	require.Len(t, input, 1)
 
-	toolCall := messages[0].OfAssistant.ToolCalls[0].OfFunction
+	toolCall := input[0].OfFunctionCall
 	require.NotNil(t, toolCall)
-	assert.Equal(t, "{}", toolCall.Function.Arguments)
+	assert.Equal(t, "{}", toolCall.Arguments)
 }
 
-func TestConvertToOpenAIMessagesPassesThroughToolResult(t *testing.T) {
+func TestConvertToOpenAIInputPassesThroughToolResult(t *testing.T) {
 	req := &model.LLMRequest{
 		Contents: []*genai.Content{
 			{
@@ -60,26 +56,10 @@ func TestConvertToOpenAIMessagesPassesThroughToolResult(t *testing.T) {
 		},
 	}
 
-	messages := convertToOpenAIMessages(req)
-	require.Len(t, messages, 1)
-	require.NotNil(t, messages[0].OfTool)
-	assert.Equal(t, "call_123", messages[0].OfTool.ToolCallID)
-
-	content := toolMessageContent(t, messages[0].OfTool.Content)
-	var payload map[string]any
-	require.NoError(t, json.Unmarshal([]byte(content), &payload))
-
-	assert.Equal(t, "Documentation Hub", payload["name"])
-	assert.Equal(t, "documentation-hub", payload["slug"])
-}
-
-func toolMessageContent(t *testing.T, content openai.ChatCompletionToolMessageParamContentUnion) string {
-	t.Helper()
-
-	raw, err := json.Marshal(content)
-	require.NoError(t, err)
-
-	var value string
-	require.NoError(t, json.Unmarshal(raw, &value))
-	return value
+	input := convertToOpenAIInput(req)
+	require.Len(t, input, 1)
+	require.NotNil(t, input[0].OfFunctionCallOutput)
+	assert.Equal(t, "call_123", input[0].OfFunctionCallOutput.CallID)
+	require.True(t, input[0].OfFunctionCallOutput.Output.OfString.Valid())
+	assert.JSONEq(t, `{"id":"d8818ueot5pfij6bvm90","name":"Documentation Hub","slug":"documentation-hub"}`, input[0].OfFunctionCallOutput.Output.OfString.Value)
 }

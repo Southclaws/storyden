@@ -5,8 +5,9 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/openai/openai-go"
-	"github.com/openai/openai-go/option"
+	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/option"
+	"github.com/openai/openai-go/v3/responses"
 	"github.com/philippgille/chromem-go"
 
 	"github.com/Southclaws/storyden/internal/config"
@@ -24,31 +25,31 @@ func newOpenAI(cfg config.Config) (*OpenAI, error) {
 }
 
 func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
-	res, err := o.client.Chat.Completions.New(ctx, openai.ChatCompletionNewParams{
+	res, err := o.client.Responses.New(ctx, responses.ResponseNewParams{
 		Model: openai.ChatModelGPT4_1,
-		Messages: []openai.ChatCompletionMessageParamUnion{
-			openai.UserMessage(input),
+		Input: responses.ResponseNewParamsInputUnion{
+			OfString: openai.String(input),
 		},
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if len(res.Choices) == 0 {
+	if res.OutputText() == "" {
 		return nil, fault.New("result is empty")
 	}
 
 	return &Result{
-		Answer: res.Choices[0].Message.Content,
+		Answer: res.OutputText(),
 	}, nil
 }
 
 func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error) {
 	iter := func(yield func(string, error) bool) {
-		stream := o.client.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
+		stream := o.client.Responses.NewStreaming(ctx, responses.ResponseNewParams{
 			Model: openai.ChatModelGPT4_1,
-			Messages: []openai.ChatCompletionMessageParamUnion{
-				openai.UserMessage(input),
+			Input: responses.ResponseNewParamsInputUnion{
+				OfString: openai.String(input),
 			},
 		})
 
@@ -63,10 +64,10 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield fun
 				break
 			}
 
-			chunk := stream.Current()
+			event := stream.Current()
 
-			if len(chunk.Choices) > 0 {
-				if !yield(chunk.Choices[0].Delta.Content, nil) {
+			if event.Type == "response.output_text.delta" {
+				if !yield(event.Delta, nil) {
 					return
 				}
 			}
