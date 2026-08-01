@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { HStack, LStack } from "@/styled-system/jsx";
 
-import { Badge, badgeColourPalette, badgeColours } from ".";
+import { Badge, badgeColorPalettes, badgeColourPalette, badgeColours } from ".";
 
 const meta = {
   title: "UI/Badge",
@@ -13,6 +13,10 @@ const meta = {
     variant: "subtle",
   },
   argTypes: {
+    colorPalette: {
+      control: "select",
+      options: badgeColorPalettes,
+    },
     size: {
       control: "select",
       options: ["sm", "md", "lg"],
@@ -47,6 +51,26 @@ export const Variants: Story = {
 };
 
 export const ColourPalette: Story = {
+  render: () => (
+    <LStack gap="3" alignItems="start">
+      {(["subtle", "solid", "outline"] as const).map((variant) => (
+        <HStack key={variant} gap="2" flexWrap="wrap">
+          {badgeColorPalettes.map((colorPalette) => (
+            <Badge
+              key={colorPalette}
+              colorPalette={colorPalette}
+              variant={variant}
+            >
+              {colorPalette}
+            </Badge>
+          ))}
+        </HStack>
+      ))}
+    </LStack>
+  ),
+};
+
+export const CustomColour: Story = {
   render: () => (
     <HStack gap="3" flexWrap="wrap">
       <Badge style={badgeColourPalette(badgeColours("#27b981"))}>Open</Badge>

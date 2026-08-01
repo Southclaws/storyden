@@ -1,5 +1,3 @@
-import chroma from "chroma-js";
-
 import {
   DatagraphItem,
   DatagraphItemKind,
@@ -165,38 +163,7 @@ export function DatagraphItemBadge({ kind }: { kind: DatagraphItemKind }) {
   const label = getDatagraphKindLabel(kind);
   const colour = getDatagraphKindColour(kind);
 
-  const cssVars = badgeColourCSS(colour);
-
-  return (
-    <Badge
-      style={cssVars}
-      backgroundColor="var(--colors-color-palette-bg)"
-      borderColor="var(--colors-color-palette-bo)"
-      color="var(--colors-color-palette-fg)"
-    >
-      {label}
-    </Badge>
-  );
-}
-
-export function badgeColourCSS(c: string) {
-  const { bg, bo, fg } = badgeColours(c);
-
-  return {
-    "--colors-color-palette-fg": fg,
-    "--colors-color-palette-bo": bo,
-    "--colors-color-palette-bg": bg,
-  } as React.CSSProperties;
-}
-
-export function badgeColours(c: string) {
-  const colour = chroma(c);
-
-  const bg = colour.luminance(0.8).css();
-  const bo = colour.luminance(0.6).saturate(1.3).css();
-  const fg = colour.darken(1.5).saturate(2).css();
-
-  return { bg, bo, fg };
+  return <Badge colorPalette={colour}>{label}</Badge>;
 }
 
 export function getDatagraphKindLabel(kind: DatagraphItemKind): string {

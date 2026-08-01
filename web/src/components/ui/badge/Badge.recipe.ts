@@ -1,5 +1,18 @@
 import { defineRecipe } from "@pandacss/dev";
 
+export const badgeColorPalettes = [
+  "accent",
+  "gray",
+  "blue",
+  "green",
+  "amber",
+  "orange",
+  "pink",
+  "red",
+  "slate",
+  "tomato",
+] as const;
+
 export const badge = defineRecipe({
   className: "badge",
   jsx: ["Badge"],
@@ -7,7 +20,6 @@ export const badge = defineRecipe({
   base: {
     alignItems: "center",
     borderRadius: "full",
-    colorPalette: "accent",
     display: "inline-flex",
     fontWeight: "medium",
     userSelect: "none",
@@ -24,18 +36,18 @@ export const badge = defineRecipe({
         color: "colorPalette.fg",
       },
       subtle: {
-        background: "badge.background",
-        borderColor: "border.muted",
+        background: "colorPalette.3",
+        borderColor: "colorPalette.6",
         borderWidth: "1px",
-        color: "text.default",
+        color: "colorPalette.12",
         "& svg": {
-          color: "text.muted",
+          color: "colorPalette.12",
         },
       },
       outline: {
-        color: "text.default",
+        color: "colorPalette.12",
         borderWidth: "2px",
-        borderColor: "border.default",
+        borderColor: "colorPalette.7",
       },
     },
     size: {

@@ -5,8 +5,8 @@ import { styled } from "@/styled-system/jsx";
 import { badge } from "@/styled-system/recipes";
 import type { ComponentProps } from "@/styled-system/types";
 
-export type BadgeProps = ComponentProps<typeof Badge>;
-export const Badge = styled(ark.div, badge);
+export const StyledBadge = styled(ark.div, badge);
+export type StyledBadgeProps = ComponentProps<typeof StyledBadge>;
 
 export function badgeColours(hexColour: string) {
   const colour = chroma(hexColour);
@@ -26,9 +26,9 @@ export function badgeColourPalette(colourStyles: {
 }) {
   const cssVars = colourStyles
     ? ({
-        "--colors-color-palette-fg": colourStyles.fg,
-        "--colors-color-palette-border": colourStyles.border,
-        "--colors-color-palette-bg": colourStyles.bg,
+        "--colors-color-palette-3": colourStyles.bg,
+        "--colors-color-palette-6": colourStyles.border,
+        "--colors-color-palette-12": colourStyles.fg,
       } as React.CSSProperties)
     : undefined;
 
