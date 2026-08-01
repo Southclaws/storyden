@@ -33,16 +33,15 @@ export const Playground: Story = {};
 export const Variants: Story = {
   render: () => (
     <LStack gap="4" alignItems="start">
-      <HStack gap="3" flexWrap="wrap">
-        <Badge variant="solid">Solid</Badge>
-        <Badge variant="subtle">Subtle</Badge>
-        <Badge variant="outline">Outline</Badge>
-      </HStack>
-      <HStack gap="3" flexWrap="wrap">
-        <Badge size="sm">Small</Badge>
-        <Badge size="md">Medium</Badge>
-        <Badge size="lg">Large</Badge>
-      </HStack>
+      {(["solid", "subtle", "outline"] as const).map((variant) => (
+        <HStack key={variant} gap="3" flexWrap="wrap">
+          {(["sm", "md", "lg"] as const).map((size) => (
+            <Badge key={size} variant={variant} size={size}>
+              {variant} {size}
+            </Badge>
+          ))}
+        </HStack>
+      ))}
     </LStack>
   ),
 };

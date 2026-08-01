@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Badge } from "../badge";
+import { MoreIcon } from "../icons/More";
 
 import { Card, CardGrid, CardRows } from ".";
 
@@ -28,6 +29,11 @@ const exampleItems = [
 const meta = {
   title: "UI/Rich Card",
   component: Card,
+  args: {
+    id: "example-card",
+    title: "Example card",
+    url: "/d/example-card",
+  },
   parameters: {
     layout: "padded",
   },
@@ -63,4 +69,39 @@ export const Grid: Story = {
     url: "/d/example-grid",
   },
   render: () => <CardGrid items={exampleItems} />,
+};
+
+export const Variants: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: "1rem", maxWidth: "48rem" }}>
+      {(["row", "responsive", "box", "fill"] as const).map((shape) => (
+        <Card
+          key={shape}
+          id={`card-${shape}`}
+          title={`Card shape ${shape}`}
+          url={`/d/card-${shape}`}
+          text="A shared card primitive used for discussions, links, and library previews."
+          image="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=900&q=80"
+          shape={shape}
+          disableAnchors
+        >
+          <Badge>{shape}</Badge>
+        </Card>
+      ))}
+      {(["default", "emphasized", "accent"] as const).map((backgroundColor) => (
+        <Card
+          key={backgroundColor}
+          id={`card-background-${backgroundColor}`}
+          title={`Background ${backgroundColor}`}
+          url={`/d/card-background-${backgroundColor}`}
+          text="Background variants keep the same structure while changing surface emphasis."
+          backgroundColor={backgroundColor}
+          menu={<MoreIcon />}
+          disableAnchors
+        >
+          <Badge>{backgroundColor}</Badge>
+        </Card>
+      ))}
+    </div>
+  ),
 };
