@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-01T12:36:17Z",
+  "title": "Design System: Storyden",
+  "extensions": {
+    "colorMeta": {
+      "bg-site": {
+        "role": "neutral",
+        "displayName": "bg.site",
+        "canonical": "#fcfcfc",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "bg-default": {
+        "role": "neutral",
+        "displayName": "bg.default",
+        "canonical": "#f9f9f9",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "bg-subtle": {
+        "role": "neutral",
+        "displayName": "bg.subtle",
+        "canonical": "#f0f0f0",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "bg-muted": {
+        "role": "neutral",
+        "displayName": "bg.muted",
+        "canonical": "#e8e8e8",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "fg-default": {
+        "role": "neutral",
+        "displayName": "fg.default",
+        "canonical": "#202020",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "fg-subtle": {
+        "role": "neutral",
+        "displayName": "fg.subtle",
+        "canonical": "#646464",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "fg-muted": {
+        "role": "neutral",
+        "displayName": "fg.muted",
+        "canonical": "#838383",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "border-default": {
+        "role": "neutral",
+        "displayName": "border.default",
+        "canonical": "#e0e0e0",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "border-muted": {
+        "role": "neutral",
+        "displayName": "border.muted",
+        "canonical": "#cecece",
+        "tonalRamp": ["#202020", "#646464", "#838383", "#bbbbbb", "#cecece", "#e0e0e0", "#f0f0f0", "#fcfcfc"]
+      },
+      "accent-default": {
+        "role": "primary",
+        "displayName": "accent.default",
+        "canonical": "var(--accent-colour-flat-fill-400)",
+        "tonalRamp": ["var(--accent-colour-flat-fill-900)", "var(--accent-colour-flat-fill-800)", "var(--accent-colour-flat-fill-700)", "var(--accent-colour-flat-fill-600)", "var(--accent-colour-flat-fill-500)", "var(--accent-colour-flat-fill-400)", "var(--accent-colour-flat-fill-300)", "var(--accent-colour-flat-fill-200)", "var(--accent-colour-flat-fill-100)", "var(--accent-colour-flat-fill-50)"]
+      },
+      "accent-subtle": {
+        "role": "primary",
+        "displayName": "accent.subtle",
+        "canonical": "var(--accent-colour-flat-fill-200)",
+        "tonalRamp": ["var(--accent-colour-flat-fill-900)", "var(--accent-colour-flat-fill-800)", "var(--accent-colour-flat-fill-700)", "var(--accent-colour-flat-fill-600)", "var(--accent-colour-flat-fill-500)", "var(--accent-colour-flat-fill-400)", "var(--accent-colour-flat-fill-300)", "var(--accent-colour-flat-fill-200)", "var(--accent-colour-flat-fill-100)", "var(--accent-colour-flat-fill-50)"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Rare page-level statements and high-emphasis onboarding or empty states." },
+      "headline": { "displayName": "Headline", "purpose": "Major page and section introductions." },
+      "title": { "displayName": "Title", "purpose": "Prominent section and panel titles." },
+      "body": { "displayName": "Body", "purpose": "Discussion, descriptions, settings copy, and general reading." },
+      "label": { "displayName": "Label", "purpose": "Buttons, navigation, compact controls, and metadata labels." }
+    },
+    "shadows": [
+      { "name": "subtle-surface", "value": "0 1px 2px rgb(0 0 0 / 2.4%), 0 0 1px rgb(0 0 0 / 6%)", "purpose": "Resting rich cards and quiet contained surfaces." },
+      { "name": "small-float", "value": "0 2px 4px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)", "purpose": "Tooltips and small transient surfaces." },
+      { "name": "large-float", "value": "0 8px 16px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)", "purpose": "Menus, popovers, dialogs, and modal layers." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "150ms cubic-bezier(0.2, 0, 0, 1)", "purpose": "Compact hover and highlight transitions." },
+      { "name": "normal", "value": "200ms cubic-bezier(0.2, 0, 0, 1)", "purpose": "Default control state transitions." },
+      { "name": "drawer", "value": "150ms ease", "purpose": "Mobile navigation opacity and transform, disabled under reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Solid Button",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "The compact primary action using the host community's configured accent.",
+      "html": "<button class=\"ds-button-solid\">Continue</button>",
+      "css": ".ds-button-solid { display:inline-flex; min-width:2.5rem; height:2.5rem; align-items:center; justify-content:center; gap:.5rem; padding:0 1rem; border:0; border-radius:var(--radii-l2, .25rem); background:var(--colors-accent-default, #7c8fd1); color:var(--colors-bg-default, #f9f9f9); font:600 .875rem/1.25 var(--fonts-body, Inter, sans-serif); cursor:pointer; transition:background 200ms cubic-bezier(.2,0,0,1), color 200ms cubic-bezier(.2,0,0,1); } .ds-button-solid:hover { filter:brightness(.94); } .ds-button-solid:focus-visible { outline:2px solid var(--colors-accent-default, #7c8fd1); outline-offset:2px; } .ds-button-solid:active { filter:brightness(.88); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "A neutral secondary action that stays compact and legible in dense groups.",
+      "html": "<button class=\"ds-button-outline\">Secondary</button>",
+      "css": ".ds-button-outline { display:inline-flex; min-width:2.5rem; height:2.5rem; align-items:center; justify-content:center; gap:.5rem; padding:0 1rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:var(--radii-l2, .25rem); background:transparent; color:var(--colors-fg-subtle, #646464); font:600 .875rem/1.25 var(--fonts-body, Inter, sans-serif); cursor:pointer; transition:background 200ms cubic-bezier(.2,0,0,1), color 200ms cubic-bezier(.2,0,0,1); } .ds-button-outline:hover { background:var(--colors-bg-subtle, #f0f0f0); color:var(--colors-fg-default, #202020); } .ds-button-outline:focus-visible { outline:2px solid var(--colors-accent-default, #7c8fd1); outline-offset:2px; }"
+    },
+    {
+      "name": "Outlined Input",
+      "kind": "input",
+      "refersTo": "input-outline",
+      "description": "A transparent, one-line field with a quiet semantic boundary and clear focus state.",
+      "html": "<input class=\"ds-input-outline\" placeholder=\"Community name\" />",
+      "css": ".ds-input-outline { width:100%; height:2.5rem; padding:0 .75rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:var(--radii-l2, .25rem); background:transparent; color:var(--colors-fg-default, #202020); font:400 1rem/1.5 var(--fonts-body, Inter, sans-serif); transition:border-color 200ms cubic-bezier(.2,0,0,1), box-shadow 200ms cubic-bezier(.2,0,0,1); } .ds-input-outline::placeholder { color:var(--colors-fg-subtle, #646464); } .ds-input-outline:hover { border-color:var(--colors-border-muted, #cecece); } .ds-input-outline:focus-visible { border-color:var(--colors-accent-default, #7c8fd1); outline:2px solid color-mix(in srgb, var(--colors-accent-default, #7c8fd1) 35%, transparent); outline-offset:1px; }"
+    },
+    {
+      "name": "Subtle Badge",
+      "kind": "chip",
+      "refersTo": "badge-subtle",
+      "description": "A low-noise metadata or category label built to coexist with dense card content.",
+      "html": "<span class=\"ds-badge-subtle\">General</span>",
+      "css": ".ds-badge-subtle { display:inline-flex; height:1.5rem; align-items:center; padding:0 .625rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:9999px; background:var(--colors-bg-subtle, #f0f0f0); color:var(--colors-fg-default, #202020); font:500 .75rem/1.125rem var(--fonts-body, Inter, sans-serif); white-space:nowrap; }"
+    },
+    {
+      "name": "Rich Card",
+      "kind": "card",
+      "refersTo": "rich-card",
+      "description": "Storyden's signature compact content surface for threads, collections, links, and Library nodes.",
+      "html": "<article class=\"ds-rich-card\"><h3>Community knowledge</h3><p>A structured place for ideas worth keeping.</p><footer><span>3 replies</span><button aria-label=\"More options\">•••</button></footer></article>",
+      "css": ".ds-rich-card { display:grid; gap:.25rem; overflow:hidden; padding:.5rem; border-radius:var(--radii-lg, .5rem); background:var(--colors-bg-default, #f9f9f9); color:var(--colors-fg-default, #202020); box-shadow:0 1px 2px rgb(0 0 0 / 2.4%), 0 0 1px rgb(0 0 0 / 6%); font:400 1rem/1.5 var(--fonts-body, Inter, sans-serif); } .ds-rich-card h3 { margin:0; font-size:1rem; line-height:1.5; font-weight:700; } .ds-rich-card p { margin:0; color:var(--colors-fg-subtle, #646464); } .ds-rich-card footer { display:flex; align-items:center; justify-content:space-between; gap:.5rem; color:var(--colors-fg-muted, #838383); font-size:.75rem; } .ds-rich-card button { border:0; border-radius:var(--radii-l2, .25rem); background:transparent; color:inherit; cursor:pointer; } .ds-rich-card button:hover { background:var(--colors-bg-muted, #e8e8e8); color:var(--colors-fg-default, #202020); } .ds-rich-card button:focus-visible { outline:2px solid var(--colors-accent-default, #7c8fd1); outline-offset:2px; }"
+    },
+    {
+      "name": "Navigation Anchor",
+      "kind": "nav",
+      "description": "A compact ghost action for the persistent sidebar and command bars.",
+      "html": "<a class=\"ds-navigation-anchor\" href=\"#\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 11.5 12 4l9 7.5v8a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"/></svg><span>Home</span></a>",
+      "css": ".ds-navigation-anchor { display:inline-flex; min-width:1.5rem; height:1.5rem; align-items:center; justify-content:center; gap:.5rem; padding:.25rem; border-radius:var(--radii-l2, .25rem); color:var(--colors-fg-subtle, #646464); font:600 .75rem/1.125rem var(--fonts-body, Inter, sans-serif); text-decoration:none; transition:background 200ms cubic-bezier(.2,0,0,1), color 200ms cubic-bezier(.2,0,0,1); } .ds-navigation-anchor svg { width:1.5rem; height:1.5rem; } .ds-navigation-anchor:hover { background:var(--colors-accent-subtle, #eef0ff); color:var(--colors-fg-default, #202020); } .ds-navigation-anchor:focus-visible { outline:2px solid var(--colors-accent-default, #7c8fd1); outline-offset:2px; }"
+    },
+    {
+      "name": "Frosted Navigation Surface",
+      "kind": "nav",
+      "description": "Quiet translucent chrome for persistent command bars and the mobile drawer.",
+      "html": "<nav class=\"ds-navigation-surface\"><strong>Storyden</strong><span>Search · Account</span></nav>",
+      "css": ".ds-navigation-surface { display:flex; min-height:3rem; align-items:center; justify-content:space-between; gap:1rem; padding:.5rem .75rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:var(--radii-xl, .75rem); background:color-mix(in srgb, var(--colors-bg-site, #fcfcfc) 80%, transparent); color:var(--colors-fg-default, #202020); backdrop-filter:blur(8px); font:400 .875rem/1.25 var(--fonts-body, Inter, sans-serif); } .ds-navigation-surface strong { font-weight:700; } .ds-navigation-surface span { color:var(--colors-fg-subtle, #646464); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Campfire",
+    "overview": "Storyden is a calm gathering place built around participation, conversation, and communal memory. Its interface should feel quietly welcoming and carefully made: present enough to guide people, restrained enough to let their community, content, and chosen accent color remain the protagonists.\n\nThe system is refined and modern without becoming corporate or precious. Compact type, modest controls, and close spatial relationships provide useful information density; neutral surfaces, clear hierarchy, and selective depth keep that density readable. The result should feel premium through consistency and craft, not decoration.\n\nReference influences remain Linear's precision and restraint, Luma's selective moments of fresh color, and Discord's community and moderation ergonomics. They are signals to interpret through Storyden's white-label system, not visual templates to reproduce.",
+    "keyCharacteristics": [
+      "Calm, premium, and community-native rather than corporate SaaS.",
+      "Refined, restrained, and compact, with deliberate information density.",
+      "White-label by design: neutral foundations carry administrator-controlled accents and imagery.",
+      "Modern and minimal without losing the warmth or utility of forum culture.",
+      "Accessible, responsive, and respectful of reduced-motion preferences."
+    ],
+    "rules": [
+      { "name": "The Community Owns the Accent Rule", "body": "Use semantic `accent.*` roles rather than a fixed Storyden hue. The neutral system must let the host community's configured color remain the primary brand expression.", "section": "colors" },
+      { "name": "The Quiet Canvas Rule", "body": "Most screen area belongs to `bg.site`, `bg.default`, and neutral foreground roles. Accent is purposeful punctuation, not a wash over the interface.", "section": "colors" },
+      { "name": "The Density Without Crowding Rule", "body": "Prefer compact type and short vertical rhythms, but preserve line height, grouping, and contrast so the interface scans as structured information rather than compressed noise.", "section": "typography" },
+      { "name": "The Quietly Layered Rule", "body": "Establish hierarchy with tone and borders first. Add shadow only when a surface truly sits above another surface or must remain legible while floating over content.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use the existing semantic roles—`bg.*`, `fg.*`, `border.*`, and `accent.*`—so white-label themes remain coherent.",
+      "Do make dense screens legible through alignment, hierarchy, and consistent compact spacing.",
+      "Do keep community content and host branding visually stronger than the application chrome.",
+      "Do preserve keyboard focus, sufficient contrast, reduced-motion behavior, and responsive access to every workflow.",
+      "Do favor restrained motion, precise typography, and carefully resolved interaction states as the source of polish."
+    ],
+    "donts": [
+      "Don't bypass semantic tokens with one-off raw colors or fixed brand hues.",
+      "Don't reproduce legacy PHP forum styling, generic corporate SaaS dashboards, or dense AWS Console-like control surfaces.",
+      "Don't turn every group into a floating card or use shadow where a tonal layer or border is sufficient.",
+      "Don't sacrifice useful information density by inflating controls, type, or whitespace indiscriminately.",
+      "Don't let decorative effects overpower discussion, knowledge, or the identity of the host community."
+    ]
+  }
+}
