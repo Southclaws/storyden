@@ -2,10 +2,10 @@ import { ClipboardIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import * as Clipboard from "@/components/ui/clipboard";
-import { DatePickerInputField } from "@/components/ui/form/DatePickerField";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
+import { FormDatePickerField } from "@/components/ui/date-picker";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
@@ -110,7 +110,7 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Expiry Date (Optional)</FormLabel>
-          <DatePickerInputField<Form>
+          <FormDatePickerField<Form>
             name="expires_at"
             control={form.control}
             // min={now("UTC")}

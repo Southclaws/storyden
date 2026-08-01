@@ -3,8 +3,6 @@
 import { Controller, ControllerProps } from "react-hook-form";
 import { match } from "ts-pattern";
 
-import { Unready } from "@/components/site/Unready";
-
 import { Thread, Visibility } from "@/api/openapi-schema";
 import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
@@ -13,6 +11,7 @@ import { LinkCard } from "@/components/library/links/LinkCard";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
+import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { PostReviewBadge } from "@/components/thread/PostReviewBadge";
@@ -23,7 +22,7 @@ import { Signature } from "@/components/thread/Signature";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { TagListField } from "@/components/thread/ThreadTagList";
-import { FormErrorText } from "@/components/ui/FormErrorText";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
 import {

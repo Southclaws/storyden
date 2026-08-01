@@ -1,7 +1,7 @@
 import { CSSProperties, Ref, forwardRef } from "react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
-import { FormControl } from "@/components/ui/form/FormControl";
+import { FormControl } from "@/components/ui/form-control";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { styled } from "@/styled-system/jsx";
 

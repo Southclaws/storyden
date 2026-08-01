@@ -1,14 +1,13 @@
 "use client";
 
-import { CollectionWithItems } from "@/api/openapi-schema";
-import { Unready } from "@/components/site/Unready";
-
 import { useCollectionGet } from "@/api/openapi-client/collections";
+import { CollectionWithItems } from "@/api/openapi-schema";
 import { Account } from "@/api/openapi-schema";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Unready } from "@/components/site/Unready";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { LStack, VStack, styled } from "@/styled-system/jsx";

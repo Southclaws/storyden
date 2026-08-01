@@ -5,7 +5,7 @@ import { Account, CollectionListOKResponse } from "@/api/openapi-schema";
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { LStack } from "@/styled-system/jsx";

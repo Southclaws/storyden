@@ -4,15 +4,15 @@ import { useRobotModelsList } from "@/api/openapi-client/robots";
 import { TOOL_NAMES } from "@/api/robots";
 import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
-import { FormLabel } from "@/components/ui/FormLabel";
+import { Button } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { Input } from "@/components/ui/input";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/multi-select-picker";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";

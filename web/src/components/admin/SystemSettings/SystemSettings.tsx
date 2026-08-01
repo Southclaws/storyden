@@ -9,13 +9,13 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { SelectField } from "@/components/ui/form/SelectField";
-import { SliderField } from "@/components/ui/form/SliderField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { FormSelectField } from "@/components/ui/select";
+import { FormSliderField } from "@/components/ui/slider";
 import { API_ADDRESS } from "@/config";
 import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -162,7 +162,7 @@ export function SystemSettingsForm(props: Props) {
         <RateLimitTester />
 
         <FormControl>
-          <SliderField
+          <FormSliderField
             control={control}
             name="rate_limit"
             label={`Rate limit: ${rateLimit} request units`}
@@ -184,7 +184,7 @@ export function SystemSettingsForm(props: Props) {
         </FormControl>
 
         <FormControl>
-          <SliderField
+          <FormSliderField
             control={control}
             name="rate_limit_period"
             label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
@@ -207,7 +207,7 @@ export function SystemSettingsForm(props: Props) {
         </FormControl>
 
         <FormControl>
-          <SliderField
+          <FormSliderField
             control={control}
             name="rate_limit_bucket"
             label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
@@ -231,7 +231,7 @@ export function SystemSettingsForm(props: Props) {
         </FormControl>
 
         <FormControl>
-          <SliderField
+          <FormSliderField
             control={control}
             name="rate_limit_guest_cost"
             label="Guest rate limit cost multiplier"
@@ -267,7 +267,10 @@ export function SystemSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Client IP mode</FormLabel>
-          <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+          <FormSelectField<
+            Form,
+            (typeof CLIENT_IP_MODE_COLLECTION.items)[number]
+          >
             control={control}
             name="client_ip_mode"
             collection={CLIENT_IP_MODE_COLLECTION}

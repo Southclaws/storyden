@@ -2,12 +2,12 @@ import { Controller } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { NumberInputField } from "@/components/ui/form/NumberInputField";
-import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
+import { FormNumberInputField } from "@/components/ui/number-input";
+import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { CardBox, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -35,7 +35,7 @@ export function InterfaceSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Default editor</FormLabel>
-          <RadioGroupField
+          <FormRadioGroupField
             control={control}
             name="editorMode"
             items={[
@@ -72,7 +72,7 @@ export function InterfaceSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Signature max height (px)</FormLabel>
-          <NumberInputField
+          <FormNumberInputField
             control={control}
             name="signatureMaxHeight"
             min={32}
@@ -86,7 +86,7 @@ export function InterfaceSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Signature max characters</FormLabel>
-          <NumberInputField
+          <FormNumberInputField
             control={control}
             name="signatureMaxChars"
             min={1}

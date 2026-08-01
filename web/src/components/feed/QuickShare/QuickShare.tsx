@@ -2,12 +2,12 @@ import { match } from "ts-pattern";
 
 import { LinkReference } from "@/api/openapi-schema";
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
-import { Spinner } from "@/components/ui/Spinner";
+import { FormComposeField } from "@/components/content/ContentComposer";
 import { Button } from "@/components/ui/button";
-import { ComposeField } from "@/components/ui/form/ComposeField";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Card } from "@/components/ui/rich-card";
+import { Spinner } from "@/components/ui/spinner";
 import { CardBox, Flex, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
@@ -36,7 +36,7 @@ export function QuickShare(props: Props) {
         onFocus={handlers.handleFocus}
         onSubmit={handlers.handlePost}
       >
-        <ComposeField
+        <FormComposeField
           control={form.control}
           name="body"
           placeholder="Share a thought, a link, something cool..."

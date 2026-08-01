@@ -8,7 +8,7 @@ import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
+} from "@/components/ui/multi-select-picker";
 
 export type Props = {
   editing: boolean;
@@ -17,9 +17,7 @@ export type Props = {
 };
 
 export function ThreadTagList(props: Props) {
-  const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>(
-    [],
-  );
+  const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>([]);
 
   const currentTags: MultiSelectPickerItem[] =
     props.initialTags?.map((t) => ({

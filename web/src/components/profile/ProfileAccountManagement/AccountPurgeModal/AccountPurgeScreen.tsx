@@ -1,8 +1,8 @@
 import { ModerationActionPurgeAccountContentType } from "@/api/openapi-schema";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormLabel } from "@/components/ui/FormLabel";
 import { Button } from "@/components/ui/button";
-import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
+import { FormCardGroupSelect } from "@/components/ui/checkbox";
+import { FormControl } from "@/components/ui/form-control";
+import { FormLabel } from "@/components/ui/form-label";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -88,7 +88,7 @@ export function AccountPurgeScreen(props: Props) {
 
         <FormControl>
           <FormLabel>Content Types to Purge</FormLabel>
-          <CardGroupSelect
+          <FormCardGroupSelect
             control={form.control}
             name="contentTypes"
             items={CONTENT_TYPES}

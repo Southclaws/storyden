@@ -13,12 +13,12 @@ import {
   OAuthRemoteDiscoveryResult,
   OAuthRemoteMode,
 } from "@/api/openapi-schema";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
-import { FormLabel } from "@/components/ui/FormLabel";
 import * as Alert from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonGroup } from "@/components/ui/button";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";

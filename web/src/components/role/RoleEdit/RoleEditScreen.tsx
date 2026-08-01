@@ -2,13 +2,13 @@ import { Controller, useWatch } from "react-hook-form";
 
 import { DeleteWithConfirmationButton } from "@/components/site/DeleteConfirmationButton";
 import { InfoTip } from "@/components/site/InfoTip";
-import { ColourPickerField } from "@/components/ui/ColourPickerField";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
-import { FormLabel } from "@/components/ui/FormLabel";
 import { Button } from "@/components/ui/button";
+import { FormCardGroupSelect } from "@/components/ui/checkbox";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
+import { FormColourPickerField } from "@/components/ui/color-picker";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import { Input } from "@/components/ui/input";
 import {
@@ -83,7 +83,7 @@ export function RoleEditScreen(props: Props) {
 
         <FormControl>
           <FormLabel>Colour</FormLabel>
-          <ColourPickerField control={form.control} name="colour" />
+          <FormColourPickerField control={form.control} name="colour" />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
@@ -168,7 +168,7 @@ export function RoleEditScreen(props: Props) {
         <FormControl>
           <FormLabel>Permissions</FormLabel>
           {canEditPermissions ? (
-            <CardGroupSelect
+            <FormCardGroupSelect
               control={form.control}
               name="permissions"
               items={permissionList.map((p) => ({

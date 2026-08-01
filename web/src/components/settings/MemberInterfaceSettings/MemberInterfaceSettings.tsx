@@ -1,10 +1,10 @@
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
+import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { CardBox, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -40,7 +40,7 @@ export function MemberInterfaceSettings(props: Props) {
 
         <FormControl>
           <FormLabel>Text editor style</FormLabel>
-          <RadioGroupField
+          <FormRadioGroupField
             control={control}
             name="editorMode"
             items={[

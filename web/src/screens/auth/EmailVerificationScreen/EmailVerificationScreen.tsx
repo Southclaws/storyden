@@ -10,11 +10,11 @@ import { handle } from "@/api/client";
 import { authEmailVerify } from "@/api/openapi-client/auth";
 import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { PinInputField } from "@/components/ui/form/PinInputField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { FormPinInputField } from "@/components/ui/pin-input";
 import { vstack } from "@/styled-system/patterns";
 
 export const FormSchema = z.object({
@@ -77,7 +77,7 @@ export function EmailVerificationScreen(props: Props) {
       </FormControl>
 
       <FormControl>
-        <PinInputField control={form.control} name="code" length={6} />
+        <FormPinInputField control={form.control} name="code" length={6} />
         <FormErrorText>{form.formState.errors["code"]?.message}</FormErrorText>
       </FormControl>
 

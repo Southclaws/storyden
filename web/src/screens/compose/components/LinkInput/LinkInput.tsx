@@ -1,5 +1,5 @@
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 
 import { useLinkInput } from "./useLinkInput";

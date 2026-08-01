@@ -1,7 +1,7 @@
 import { Controller } from "react-hook-form";
 
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { HeadingInput } from "@/components/ui/heading-input";
 
 import { useTitleInput } from "./useTitleInput";

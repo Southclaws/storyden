@@ -1,12 +1,11 @@
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { SelectField } from "@/components/ui/form/SelectField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { FormSelectField } from "@/components/ui/select";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 import { CategoryDeleteProps, useCategoryDelete } from "./useCategoryDelete";
@@ -46,7 +45,7 @@ export function CategoryDeleteScreen(props: CategoryDeleteProps) {
 
         <FormControl>
           <FormLabel>Move posts to category</FormLabel>
-          <SelectField
+          <FormSelectField
             name="move_to"
             control={form.control}
             collection={categoryCollection}

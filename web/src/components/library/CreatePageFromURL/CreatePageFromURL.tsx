@@ -4,7 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 
-import { Spinner } from "@/components/ui/Spinner";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
@@ -13,6 +12,7 @@ import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
 import { Item } from "@/components/ui/menu";
 import * as Popover from "@/components/ui/popover";
+import { Spinner } from "@/components/ui/spinner";
 import { useCapability } from "@/lib/settings/capabilities";
 import { HStack, styled } from "@/styled-system/jsx";
 import { UtilityValues } from "@/styled-system/types/prop-type";

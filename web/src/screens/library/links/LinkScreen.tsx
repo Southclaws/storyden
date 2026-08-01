@@ -4,7 +4,7 @@ import { useLinkGet } from "@/api/openapi-client/links";
 import { Link } from "@/api/openapi-schema";
 import { AssetThumbnailList } from "@/components/asset/AssetThumbnailList";
 import { Unready } from "@/components/site/Unready";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Heading } from "@/components/ui/heading";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { LinkButton } from "@/components/ui/link-button";

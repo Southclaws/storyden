@@ -3,7 +3,7 @@ import { useState } from "react";
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
 import { InstanceCapability } from "@/api/openapi-schema";
-import { MultiSelectPickerItem } from "@/components/ui/MultiSelectPicker";
+import { MultiSelectPickerItem } from "@/components/ui/multi-select-picker";
 import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
@@ -20,9 +20,7 @@ export function useLibraryPageTagsBlockEditing() {
 
   const { suggestTags } = useLibraryMutation();
   const [loadingTags, setLoadingTags] = useState(false);
-  const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>(
-    [],
-  );
+  const [queryResults, setQueryResults] = useState<MultiSelectPickerItem[]>([]);
 
   const currentTagItems: MultiSelectPickerItem[] = tags.map((t) => ({
     label: t.name,
