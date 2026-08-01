@@ -6,11 +6,11 @@ import { useEffect, useMemo } from "react";
 import { RequestError } from "@/api/common";
 import { useOAuthRemoteCallback } from "@/api/openapi-client/auth";
 import { useGetSession } from "@/api/openapi-client/misc";
-import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { Spinner } from "@/components/ui/spinner";
 import { LStack, VStack, styled } from "@/styled-system/jsx";
 
 export function OAuthRemoteCallbackScreen() {

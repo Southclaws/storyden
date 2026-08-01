@@ -4,8 +4,8 @@ import Image from "next/image";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { css } from "@/styled-system/css";

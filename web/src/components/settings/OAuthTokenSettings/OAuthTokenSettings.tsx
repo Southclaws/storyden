@@ -11,11 +11,11 @@ import {
 import { PermissionSummary } from "@/components/role/PermissionList";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { useConfirmation } from "@/components/site/useConfirmation";
-import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
+import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";

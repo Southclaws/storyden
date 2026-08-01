@@ -1,9 +1,8 @@
 import { PropsWithChildren } from "react";
 
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-
-import { Slot } from "@/components/ui/Slot";
 import { Button, ButtonProps } from "@/components/ui/button";
+import { Slot } from "@/components/ui/slot";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { EditAvatarScreen } from "./EditAvatarScreen";

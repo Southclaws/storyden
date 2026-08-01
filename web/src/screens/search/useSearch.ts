@@ -18,7 +18,7 @@ import {
   DatagraphSearchOKResponse,
 } from "@/api/openapi-schema";
 import { useSearchQueryState } from "@/components/search/Search/useSearch";
-import { MultiSelectPickerItem } from "@/components/ui/MultiSelectPicker";
+import { MultiSelectPickerItem } from "@/components/ui/multi-select-picker";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
 import { deriveError } from "@/utils/error";
 

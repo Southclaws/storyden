@@ -1,11 +1,10 @@
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
 import { VStack, WStack, styled } from "@/styled-system/jsx";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { Props, useCollectionCreate } from "./useCollectionCreate";
 

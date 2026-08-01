@@ -7,7 +7,7 @@ import { TagListResult } from "@/api/openapi-schema";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Text } from "@/components/ui/text";
 import { LStack } from "@/styled-system/jsx";
 

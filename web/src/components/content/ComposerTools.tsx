@@ -11,7 +11,7 @@ import {
 import { IconButton } from "@/components/ui/icon-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
-import { Spinner } from "../ui/Spinner";
+import { Spinner } from "../ui/spinner";
 
 // NOTE: Should match the MD breakpoint in `panda.config.ts`.
 const MD_BREAKPOINT = 768;

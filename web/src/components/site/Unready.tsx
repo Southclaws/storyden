@@ -1,5 +1,7 @@
 import { PropsWithChildren } from "react";
 
+import { usePublicRegistration } from "@/lib/settings/registration";
+import type { Settings } from "@/lib/settings/settings";
 import {
   Box,
   CardBox,
@@ -8,13 +10,11 @@ import {
   LStack,
   styled,
 } from "@/styled-system/jsx";
-import { usePublicRegistration } from "@/lib/settings/registration";
-import type { Settings } from "@/lib/settings/settings";
 import { deriveError } from "@/utils/error";
 
-import { Spinner } from "../ui/Spinner";
 import { WarningIcon } from "../ui/icons/Warning";
 import { LinkButton } from "../ui/link-button";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   error?: unknown;

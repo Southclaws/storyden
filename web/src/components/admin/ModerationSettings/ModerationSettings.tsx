@@ -4,14 +4,14 @@ import { Controller } from "react-hook-form";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { NumberInputField } from "@/components/ui/form/NumberInputField";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
+import { FormNumberInputField } from "@/components/ui/number-input";
 import {
   CardBox,
   Flex,
@@ -52,7 +52,7 @@ export function ModerationSettingsForm(props: Props) {
         >
           <FormControl>
             <FormLabel>Thread content maximum length</FormLabel>
-            <NumberInputField
+            <FormNumberInputField
               control={control}
               name="threadBodyMaxSize"
               scrubber={true}
@@ -68,7 +68,7 @@ export function ModerationSettingsForm(props: Props) {
 
           <FormControl>
             <FormLabel>Reply content maximum length</FormLabel>
-            <NumberInputField
+            <FormNumberInputField
               control={control}
               name="replyBodyMaxSize"
               scrubber={true}

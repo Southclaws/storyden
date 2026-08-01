@@ -9,7 +9,7 @@ import {
   getAccountGetKey,
 } from "@/api/openapi-client/accounts";
 import { Button } from "@/components/ui/button";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { SaveIcon } from "@/components/ui/icons/Save";
 import { Input } from "@/components/ui/input";

@@ -8,10 +8,10 @@ import { useEffect } from "react";
 
 import { useLinkCreate } from "@/api/openapi-client/links";
 import { LinkCard } from "@/components/library/links/LinkCard";
-import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { LinkButton } from "@/components/ui/link-button";
+import { Spinner } from "@/components/ui/spinner";
 import { css } from "@/styled-system/css";
 import { Center, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";

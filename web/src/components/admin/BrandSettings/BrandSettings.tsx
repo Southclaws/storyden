@@ -1,17 +1,16 @@
 import { createListCollection } from "@ark-ui/react";
 
-import { ColourField } from "@/components/form/ColourInput/ColourInput";
-
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
-import { FormErrorText } from "@/components/ui/FormErrorText";
+import { ColourField } from "@/components/form/ColourInput/ColourInput";
 import { Button } from "@/components/ui/button";
-import { DatePickerInputField } from "@/components/ui/form/DatePickerField";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { SelectField } from "@/components/ui/form/SelectField";
+import { FormDatePickerField } from "@/components/ui/date-picker";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { FormSelectField } from "@/components/ui/select";
 import {
   Box,
   CardBox,
@@ -193,7 +192,7 @@ export function BrandSettingsForm(props: Props) {
         >
           <FormControl>
             <FormLabel>MOTD starts at</FormLabel>
-            <DatePickerInputField<Form> name="motdStartAt" control={control} />
+            <FormDatePickerField<Form> name="motdStartAt" control={control} />
             <FormErrorText>
               {formState.errors.motdStartAt?.message}
             </FormErrorText>
@@ -201,7 +200,7 @@ export function BrandSettingsForm(props: Props) {
 
           <FormControl>
             <FormLabel>MOTD ends at</FormLabel>
-            <DatePickerInputField<Form> name="motdEndAt" control={control} />
+            <FormDatePickerField<Form> name="motdEndAt" control={control} />
             <FormErrorText>{formState.errors.motdEndAt?.message}</FormErrorText>
           </FormControl>
         </Stack>
@@ -216,7 +215,7 @@ export function BrandSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>MOTD alert type</FormLabel>
-          <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
+          <FormSelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
             control={control}
             name="motdType"
             collection={MOTD_TYPE_COLLECTION}

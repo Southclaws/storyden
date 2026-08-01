@@ -5,7 +5,7 @@ import { Tag, TagName } from "@/api/openapi-schema";
 import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { Unready } from "@/components/site/Unready";
 import { TagBadge } from "@/components/tag/TagBadge";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 type Props = {

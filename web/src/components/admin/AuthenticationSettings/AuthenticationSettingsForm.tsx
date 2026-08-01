@@ -6,12 +6,12 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
-import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
-import { CardGroupRadio } from "@/components/ui/form/CardGroupRadio";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormLabel } from "@/components/ui/form/FormLabel";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
+import { FormCardGroupRadio } from "@/components/ui/radio-group";
 import {
   AuthenticationModeDetail,
   AuthenticationModeList,
@@ -107,7 +107,7 @@ export function AuthenticationSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Authentication mode</FormLabel>
-          <CardGroupRadio
+          <FormCardGroupRadio
             control={form.control}
             name="authentication_mode"
             items={availableModes.map((m) => ({
@@ -124,7 +124,7 @@ export function AuthenticationSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Registration mode</FormLabel>
-          <CardGroupRadio
+          <FormCardGroupRadio
             control={form.control}
             name="registration_mode"
             items={RegistrationModeList.map((m) => ({
