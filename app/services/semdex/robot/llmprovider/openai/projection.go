@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/openai/openai-go/v3/packages/param"
 	"github.com/openai/openai-go/v3/responses"
 	"google.golang.org/adk/model"
@@ -172,7 +173,7 @@ func convertToOpenAITools(req *model.LLMRequest) []responses.ToolUnionParam {
 	return tools
 }
 
-func convertOpenAIResponseToGenaiContent(response responses.Response) *genai.Content {
+func convertOpenAIResponseToGenaiContent(response responses.Response) (*genai.Content, error) {
 	content := &genai.Content{
 		Role:  genai.RoleModel,
 		Parts: []*genai.Part{},
@@ -189,7 +190,9 @@ func convertOpenAIResponseToGenaiContent(response responses.Response) *genai.Con
 		case responses.ResponseFunctionToolCall:
 			args := make(map[string]interface{})
 			if output.Arguments != "" {
-				json.Unmarshal([]byte(output.Arguments), &args)
+				if err := json.Unmarshal([]byte(output.Arguments), &args); err != nil {
+					return nil, fault.Wrap(err, fmsg.Withf("failed to parse arguments for function call %q", output.Name))
+				}
 			}
 			content.Parts = append(content.Parts, &genai.Part{FunctionCall: &genai.FunctionCall{
 				ID: output.CallID, Name: output.Name, Args: args,
@@ -201,7 +204,7 @@ func convertOpenAIResponseToGenaiContent(response responses.Response) *genai.Con
 		}
 	}
 
-	return content
+	return content, nil
 }
 
 func convertOpenAIResponseToGenaiFinishReason(response responses.Response) genai.FinishReason {

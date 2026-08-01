@@ -50,8 +50,14 @@ func (o *OpenAI) generateContentSync(ctx context.Context, params responses.Respo
 		return
 	}
 
+	content, err := convertOpenAIResponseToGenaiContent(*res)
+	if err != nil {
+		yield(nil, fault.Wrap(err, fctx.With(ctx)))
+		return
+	}
+
 	yield(&model.LLMResponse{
-		Content:      convertOpenAIResponseToGenaiContent(*res),
+		Content:      content,
 		FinishReason: convertOpenAIResponseToGenaiFinishReason(*res),
 		TurnComplete: true,
 	}, nil)
@@ -89,8 +95,14 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params responses.Res
 		}
 
 		if event.Type == "response.completed" || event.Type == "response.incomplete" {
+			content, err := convertOpenAIResponseToGenaiContent(event.Response)
+			if err != nil {
+				yield(nil, fault.Wrap(err, fctx.With(ctx)))
+				return
+			}
+
 			yield(&model.LLMResponse{
-				Content:      convertOpenAIResponseToGenaiContent(event.Response),
+				Content:      content,
 				FinishReason: convertOpenAIResponseToGenaiFinishReason(event.Response),
 				TurnComplete: true,
 			}, nil)

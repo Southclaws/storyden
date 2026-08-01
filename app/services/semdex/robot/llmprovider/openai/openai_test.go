@@ -76,7 +76,8 @@ func TestConvertOpenAIResponseToGenaiContentPreservesReasoningItems(t *testing.T
 		{"type":"message","id":"msg_123","role":"assistant","status":"completed","content":[{"type":"output_text","text":"Looking it up."}]}
 	]`), &output))
 
-	content := convertOpenAIResponseToGenaiContent(responses.Response{Output: output})
+	content, err := convertOpenAIResponseToGenaiContent(responses.Response{Output: output})
+	require.NoError(t, err)
 	require.Len(t, content.Parts, 3)
 	assert.JSONEq(t, `{"type":"reasoning","id":"rs_123","summary":[],"encrypted_content":"encrypted-reasoning"}`, reasoningMetadata(t, content.Parts[0]))
 	require.NotNil(t, content.Parts[1].FunctionCall)
@@ -92,6 +93,17 @@ func TestConvertOpenAIResponseToGenaiContentPreservesReasoningItems(t *testing.T
 	require.NotNil(t, input[1].OfFunctionCall)
 	assert.Equal(t, "call_123", input[1].OfFunctionCall.CallID)
 	require.NotNil(t, input[2].OfMessage)
+}
+
+func TestConvertOpenAIResponseToGenaiContentRejectsMalformedFunctionArguments(t *testing.T) {
+	var output []responses.ResponseOutputItemUnion
+	require.NoError(t, json.Unmarshal([]byte(`[
+		{"type":"function_call","call_id":"call_123","name":"library_request_page","arguments":"{not valid"}
+	]`), &output))
+
+	_, err := convertOpenAIResponseToGenaiContent(responses.Response{Output: output})
+	require.Error(t, err)
+	assert.ErrorContains(t, err, `failed to parse arguments for function call "library_request_page"`)
 }
 
 func TestConvertToOpenAIToolsUsesObjectSchemaWhenDeclarationHasNone(t *testing.T) {
