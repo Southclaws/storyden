@@ -25,10 +25,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function Example(props: Menu.RootProps) {
+  const triggerSize = props.size === "xs" ? "sm" : props.size;
+
   return (
     <Menu.Root {...props}>
       <Menu.Trigger asChild>
-        <Button variant="outline" size={props.size}>
+        <Button variant="outline" size={triggerSize}>
           Open menu
         </Button>
       </Menu.Trigger>

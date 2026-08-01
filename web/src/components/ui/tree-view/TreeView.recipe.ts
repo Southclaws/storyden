@@ -28,7 +28,7 @@ export const treeView = defineSlotRecipe({
     },
     branchControl: {
       alignItems: "center",
-      borderRadius: "l2",
+      borderRadius: "sm",
       color: "fg.subtle",
       display: "flex",
       fontWeight: "medium",
@@ -72,7 +72,7 @@ export const treeView = defineSlotRecipe({
       },
     },
     item: {
-      borderRadius: "l2",
+      borderRadius: "sm",
       color: "fg.muted",
       cursor: "pointer",
       fontWeight: "medium",

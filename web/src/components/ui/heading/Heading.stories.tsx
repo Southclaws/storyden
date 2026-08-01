@@ -9,12 +9,12 @@ const meta = {
   component: Heading,
   args: {
     children: "Discussion categories",
-    size: "lg",
+    size: "md",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["xs", "sm", "md", "lg", "xl"],
     },
   },
 } satisfies Meta<typeof Heading>;
@@ -28,7 +28,7 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   render: () => (
     <LStack gap="2">
-      {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
+      {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
         <Heading key={size} size={size}>
           Heading {size}
         </Heading>

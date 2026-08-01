@@ -30,14 +30,6 @@ export const group = defineRecipe({
         gap: "0",
       },
     },
-    grow: {
-      true: {
-        display: "flex",
-        "& > *": {
-          flex: 1,
-        },
-      },
-    },
   },
   compoundVariants: [
     {

@@ -96,7 +96,7 @@ export const tabs = defineSlotRecipe({
             _osDark: "bg.subtle",
           },
 
-          boxShadow: "xs",
+          boxShadow: "surface",
           borderRadius: "md",
           "--transition-duration": "200ms!",
           height: "var(--height)",
@@ -149,11 +149,11 @@ export const tabs = defineSlotRecipe({
           borderColor: "transparent",
           borderWidth: "1px",
           _horizontal: {
-            borderTopRadius: "l2",
+            borderTopRadius: "sm",
           },
           _vertical: {
-            borderTopLeftRadius: "l2",
-            borderBottomLeftRadius: "l2",
+            borderTopLeftRadius: "sm",
+            borderBottomLeftRadius: "sm",
           },
           _selected: {
             background: "bg.default",

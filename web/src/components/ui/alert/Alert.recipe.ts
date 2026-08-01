@@ -8,7 +8,7 @@ export const alert = defineSlotRecipe({
       background: "bg.muted",
       borderColor: "border.muted",
       borderWidth: "thin",
-      borderRadius: "l3",
+      borderRadius: "md",
       display: "flex",
       gap: "2",
       p: "2",

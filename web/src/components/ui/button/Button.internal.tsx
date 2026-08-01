@@ -34,13 +34,21 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const trulyDisabled = loading || disabled;
 
     return (
-      <StyledButton disabled={trulyDisabled} ref={ref} {...rest}>
+      <StyledButton
+        aria-busy={loading || undefined}
+        disabled={trulyDisabled}
+        ref={ref}
+        {...rest}
+      >
         {loading ? (
           loadingText ? (
             loadingText
           ) : (
             <>
-              <Spinner />
+              <span className="button__loading-content">{children}</span>
+              <span className="button__loading-indicator" aria-hidden="true">
+                <Spinner />
+              </span>
             </>
           )
         ) : (

@@ -4,9 +4,9 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface PinInputVariant {
   /**
- * @default "md"
+ * @default "sm"
  */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+size: "sm" | "md" | "lg"
 }
 
 type PinInputVariantMap = {

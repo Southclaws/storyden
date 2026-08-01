@@ -129,7 +129,7 @@ export function ContentComposerRich(props: ContentComposerProps) {
             backgroundColor: "bg.subtle/80",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            boxShadow: "md",
+            boxShadow: "floating",
           })}
         >
           <EditorMenu

@@ -31,7 +31,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["sm", "md", "lg"],
     },
   },
 } satisfies Meta<typeof MultiSelectPicker>;

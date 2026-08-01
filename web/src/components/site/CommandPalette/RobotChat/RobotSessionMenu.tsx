@@ -67,13 +67,13 @@ export function RobotSessionMenu() {
     sessions.find((s) => s.id === sessionId)?.name || "Current Session";
 
   return (
-    <Combobox.RootProvider value={combobox} size="xs">
+    <Combobox.RootProvider value={combobox} size="sm">
       <Combobox.Control>
         <Combobox.Input placeholder={currentSessionName} asChild>
-          <Input size="xs" />
+          <Input size="sm" />
         </Combobox.Input>
         <Combobox.Trigger asChild>
-          <IconButton variant="link" aria-label="Select session" size="xs">
+          <IconButton variant="ghost" aria-label="Select session" size="sm">
             <ChevronUpDownIcon />
           </IconButton>
         </Combobox.Trigger>

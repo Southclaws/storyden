@@ -16,14 +16,26 @@ export const colorPicker = defineSlotRecipe({
       textStyle: "sm",
     },
     control: {
+      alignItems: "center",
       display: "flex",
       flexDirection: "row",
       gap: "2",
     },
+    trigger: {
+      flexShrink: "0",
+      overflow: "visible",
+      p: "0.5!",
+      "& [data-scope=color-picker][data-part=swatch]": {
+        borderRadius: "xs",
+        boxShadow: "none",
+        height: "full",
+        width: "full",
+      },
+    },
     content: {
       background: "bg.default",
-      borderRadius: "l3",
-      boxShadow: "lg",
+      borderRadius: "md",
+      boxShadow: "overlay",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",
@@ -41,7 +53,7 @@ export const colorPicker = defineSlotRecipe({
     },
     area: {
       height: "36",
-      borderRadius: "l2",
+      borderRadius: "sm",
       overflow: "hidden",
     },
     areaThumb: {
@@ -55,11 +67,11 @@ export const colorPicker = defineSlotRecipe({
       height: "full",
     },
     channelSlider: {
-      borderRadius: "l2",
+      borderRadius: "sm",
     },
     channelSliderTrack: {
       height: "3",
-      borderRadius: "l2",
+      borderRadius: "sm",
     },
     swatchGroup: {
       display: "grid",
@@ -70,7 +82,7 @@ export const colorPicker = defineSlotRecipe({
     swatch: {
       height: "6",
       width: "6",
-      borderRadius: "l2",
+      borderRadius: "sm",
       boxShadow:
         "0 0 0 1px var(--colors-border-emphasized), 0 0 0 2px var(--colors-bg-default) inset",
     },
@@ -83,7 +95,7 @@ export const colorPicker = defineSlotRecipe({
       outline: "none",
     },
     transparencyGrid: {
-      borderRadius: "l2",
+      borderRadius: "sm",
     },
   },
 });

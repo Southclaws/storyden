@@ -29,7 +29,7 @@ export const Default: Story = {
             Configure notifications, visibility, and moderation options.
           </Popover.Description>
           <Popover.CloseTrigger asChild>
-            <Button size="xs" variant="ghost">
+            <Button size="sm" variant="ghost">
               Close
             </Button>
           </Popover.CloseTrigger>

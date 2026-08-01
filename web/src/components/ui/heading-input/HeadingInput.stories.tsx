@@ -8,7 +8,7 @@ import { HeadingInput } from ".";
 type HeadingInputStoryArgs = {
   defaultValue: string;
   placeholder: string;
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+  size: "md" | "lg";
 };
 
 const meta = {
@@ -16,12 +16,12 @@ const meta = {
   args: {
     defaultValue: "Editable title",
     placeholder: "Untitled",
-    size: "lg",
+    size: "md",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["md", "lg"],
     },
   },
 } satisfies Meta<HeadingInputStoryArgs>;
@@ -37,7 +37,7 @@ export const Playground: Story = {
     return (
       <HeadingInput
         {...args}
-        size={args.size as any}
+        size={args.size}
         value={value}
         onValueChange={setValue}
       />
@@ -48,10 +48,10 @@ export const Playground: Story = {
 export const Sizes: Story = {
   render: () => (
     <LStack gap="3" maxW="2xl">
-      {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
+      {(["md", "lg"] as const).map((size) => (
         <HeadingInput
           key={size}
-          size={size as any}
+          size={size}
           defaultValue={`Editable heading ${size}`}
           onValueChange={() => undefined}
         />

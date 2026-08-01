@@ -13,8 +13,8 @@ export const popover = defineSlotRecipe({
     content: {
       maxHeight: "var(--available-height)",
       background: "bg.default",
-      borderRadius: "l3",
-      boxShadow: "lg",
+      borderRadius: "md",
+      boxShadow: "overlay",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",

@@ -8,7 +8,6 @@ interface GroupVariant {
  */
 orientation: "horizontal" | "vertical"
 attached: boolean
-grow: boolean
 }
 
 type GroupVariantMap = {

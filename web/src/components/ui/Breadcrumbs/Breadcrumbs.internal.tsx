@@ -36,7 +36,7 @@ export function Breadcrumbs({
         mt="-scrollGutter"
       >
         <LinkButton
-          size="xs"
+          size="sm"
           variant="subtle"
           flexShrink="0"
           minW="min"
@@ -65,7 +65,7 @@ export function Breadcrumbs({
 function BreadcrumbButton({ crumb }: { crumb: Breadcrumb }) {
   return (
     <LinkButton
-      size="xs"
+      size="sm"
       variant="subtle"
       flexShrink="0"
       maxW="64"

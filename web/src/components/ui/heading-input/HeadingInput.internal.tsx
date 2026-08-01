@@ -37,7 +37,10 @@ function HeadingInputWithRef(
   ref: ForwardedRef<HTMLSpanElement>,
 ) {
   const { onValueChange, defaultValue, value, ...rest } = props;
-  const [recipeProps, componentProps] = headingInput.splitVariantProps(rest);
+  const [headingProps, headingInputProps] =
+    typographyHeading.splitVariantProps(rest);
+  const [recipeProps, componentProps] =
+    headingInput.splitVariantProps(headingInputProps);
   const internalRef = useRef<HTMLSpanElement>(null);
 
   useImperativeHandle(ref, () => internalRef.current as any);
@@ -55,8 +58,6 @@ function HeadingInputWithRef(
       internalRef.current.textContent = defaultValue.toString();
     }
   }, [defaultValue]);
-
-  const [headingProps] = typographyHeading.splitVariantProps(rest);
 
   const handleInput = useCallback(
     (e: FormEvent<HTMLSpanElement>) => {

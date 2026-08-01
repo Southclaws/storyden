@@ -19,7 +19,7 @@ const items = [
 const collection = createListCollection({ items });
 
 type ComboboxStoryArgs = {
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg";
 };
 
 const meta = {
@@ -27,7 +27,7 @@ const meta = {
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg"],
+      options: ["sm", "md", "lg"],
     },
   },
 } satisfies Meta<ComboboxStoryArgs>;
@@ -71,16 +71,13 @@ function Example(props: ComboboxStoryArgs) {
 }
 
 export const Playground: Story = {
-  args: {
-    size: "md",
-  },
   render: (args) => <Example {...args} />,
 };
 
 export const Sizes: Story = {
   render: () => (
     <LStack gap="4">
-      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+      {(["sm", "md", "lg"] as const).map((size) => (
         <Example key={size} size={size} />
       ))}
     </LStack>

@@ -17,9 +17,6 @@ const meta = {
     attached: {
       control: "boolean",
     },
-    grow: {
-      control: "boolean",
-    },
   },
 } satisfies Meta<typeof Group>;
 
@@ -31,7 +28,6 @@ export const Playground: Story = {
   args: {
     orientation: "horizontal",
     attached: false,
-    grow: false,
   },
   render: (args) => (
     <Group {...args}>

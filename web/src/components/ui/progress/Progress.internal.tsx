@@ -12,7 +12,9 @@ import { type ProgressVariantProps, progress } from "@/styled-system/recipes";
 import type { JsxStyleProps } from "@/styled-system/types";
 
 interface BaseProgressProps
-  extends Assign<JsxStyleProps, ProgressRootProps>, ProgressVariantProps {}
+  extends
+    Assign<JsxStyleProps, ProgressRootProps>,
+    Omit<ProgressVariantProps, "shape"> {}
 
 export interface ProgressCircleProps extends BaseProgressProps {
   showValue?: boolean;
@@ -22,7 +24,7 @@ export const ProgressCircle = (props: ProgressCircleProps) => {
   const [variantProps, progressProps] = progress.splitVariantProps(props);
   const [cssProps, localProps] = splitCssProps(progressProps);
   const { showValue = true, className, ...rootProps } = localProps;
-  const styles = progress(variantProps);
+  const styles = progress({ ...variantProps, shape: "circle" });
 
   return (
     <ArkProgress.Root
@@ -46,7 +48,7 @@ export const ProgressHorizontal = (props: ProgressHorizontalProps) => {
   const [variantProps, progressProps] = progress.splitVariantProps(props);
   const [cssProps, localProps] = splitCssProps(progressProps);
   const { showValue = true, className, ...rootProps } = localProps;
-  const styles = progress(variantProps);
+  const styles = progress({ ...variantProps, shape: "horizontal" });
 
   return (
     <ArkProgress.Root

@@ -104,7 +104,7 @@ export function LinkPasteMenu({ editor }: Props) {
         backgroundColor: "bg.subtle/80",
         backdropBlur: "frosted",
         backdropFilter: "auto",
-        boxShadow: "md",
+        boxShadow: "floating",
         padding: "1",
       })}
     >

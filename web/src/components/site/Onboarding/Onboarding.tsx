@@ -17,7 +17,7 @@ export function Onboarding() {
         background="bg.default"
         p="4"
         zIndex="banner"
-        boxShadow="2xl"
+        boxShadow="overlay"
         borderRadius="2xl"
         w="full"
         maxH="breakpoint-sm"

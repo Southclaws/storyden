@@ -39,7 +39,7 @@ export const richCard = defineSlotRecipe({
       gap: "0",
       overflow: "hidden",
       borderRadius: "var(--card-border-radius)",
-      boxShadow: "subtle",
+      boxShadow: "surface",
       backgroundColor: "bg.default",
     },
 
@@ -51,6 +51,7 @@ export const richCard = defineSlotRecipe({
     menuContainer: {
       display: "flex",
       flexDirection: "column",
+      zIndex: "var(--card-content-index)",
     },
 
     titleContainer: {
@@ -162,6 +163,10 @@ export const richCard = defineSlotRecipe({
           gridRow: "header-start / header-end",
           alignSelf: "start",
           justifySelf: "end",
+          "&[data-header=absent]": {
+            alignSelf: "center",
+            gridRow: "title-start / title-end",
+          },
         },
 
         titleContainer: {
@@ -235,6 +240,10 @@ export const richCard = defineSlotRecipe({
           gridRow: "header-start / header-end",
           alignSelf: "start",
           justifySelf: "end",
+          "&[data-header=absent]": {
+            alignSelf: "center",
+            gridRow: "title-start / title-end",
+          },
         },
 
         titleContainer: {

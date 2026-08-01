@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { HStack, LStack } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
 
 import * as RadioGroup from ".";
 
@@ -14,7 +14,6 @@ const meta = {
   title: "UI/Radio Group",
   component: RadioGroup.Root,
   args: {
-    size: "md",
     defaultValue: "public",
     orientation: "vertical",
   },
@@ -54,13 +53,21 @@ export const Playground: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <LStack gap="4">
+    <LStack gap="6">
       {(["sm", "md", "lg"] as const).map((size) => (
-        <Example key={size} size={size} defaultValue="public" />
+        <LStack key={size} gap="2">
+          <styled.span color="fg.muted" textStyle="xs">
+            {size}
+          </styled.span>
+          <Example size={size} defaultValue="public" />
+        </LStack>
       ))}
-      <HStack gap="6">
+      <LStack gap="2">
+        <styled.span color="fg.muted" textStyle="xs">
+          Horizontal
+        </styled.span>
         <Example size="md" orientation="horizontal" defaultValue="members" />
-      </HStack>
+      </LStack>
     </LStack>
   ),
 };

@@ -5,7 +5,6 @@ export const headingInput = defineRecipe({
   base: {
     display: "inline-block",
     width: "full",
-    fontSize: "3xl",
     overflowWrap: "break-word",
     wordBreak: "break-word",
     fontWeight: "semibold",

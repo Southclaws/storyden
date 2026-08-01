@@ -6,6 +6,7 @@ export const slider = defineSlotRecipe({
   slots: sliderAnatomy.keys(),
   base: {
     root: {
+      colorPalette: "accent",
       display: "flex",
       flexDirection: "column",
       gap: "1",
@@ -17,26 +18,26 @@ export const slider = defineSlotRecipe({
       alignItems: "center",
     },
     track: {
-      backgroundColor: "bg.emphasized",
+      backgroundColor: "bg.muted",
       borderRadius: "full",
       overflow: "hidden",
       flex: "1",
     },
     range: {
-      background: "colorPalette.default",
+      background: "accent.default",
     },
     thumb: {
       background: "bg.default",
-      borderColor: "colorPalette.default",
+      borderColor: "accent.default",
       borderRadius: "full",
       borderWidth: "2px",
-      boxShadow: "sm",
+      boxShadow: "surface",
       outline: "none",
       zIndex: "1",
       transition: "box-shadow 0.2s, transform 0.2s",
       _focusVisible: {
-        boxShadow: "0 0 0 3px token(colors.colorPalette.a4)",
-        outline: "2px solid token(colors.colorPalette.default)",
+        boxShadow: "0 0 0 3px token(colors.accent.4)",
+        outline: "2px solid token(colors.accent.default)",
         outlineOffset: "2px",
       },
       _hover: {

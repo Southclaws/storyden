@@ -444,7 +444,7 @@ function Row({
                   ))
                   .with("fixed:link", () =>
                     child.link ? (
-                      <LinkRefButton link={child.link} variant="link" />
+                      <LinkRefButton link={child.link} />
                     ) : (
                       <>{column.value}</>
                     ),

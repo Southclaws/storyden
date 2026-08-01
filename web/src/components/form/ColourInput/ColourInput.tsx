@@ -40,7 +40,7 @@ export function ColourInput(props: Props) {
           width: "var(--circle-size)",
           height: "var(--circle-size)",
         }}
-        boxShadow="lg"
+        boxShadow="surface"
         _before={
           {
             content: '""',

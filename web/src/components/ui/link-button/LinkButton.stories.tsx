@@ -10,17 +10,17 @@ const meta = {
   args: {
     href: "/",
     children: "Open discussion",
-    size: "md",
-    variant: "solid",
+    size: "sm",
+    variant: "subtle",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["sm", "md", "lg"],
     },
     variant: {
       control: "select",
-      options: ["solid", "outline", "ghost", "link", "subtle"],
+      options: ["solid", "outline", "ghost", "subtle"],
     },
   },
 } satisfies Meta<typeof LinkButton>;
@@ -46,9 +46,6 @@ export const Variants: Story = {
         </LinkButton>
         <LinkButton href="/" variant="ghost">
           Ghost
-        </LinkButton>
-        <LinkButton href="/" variant="link">
-          Link
         </LinkButton>
       </HStack>
       <LinkButton href="https://www.storyden.org" variant="outline">

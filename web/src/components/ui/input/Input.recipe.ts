@@ -7,7 +7,7 @@ export const input = defineRecipe({
     appearance: "none",
     background: "none",
     borderColor: "border.default",
-    borderRadius: "l2",
+    borderRadius: "sm",
     borderWidth: "1px",
     colorPalette: "accent",
     color: "fg.default",
@@ -39,18 +39,14 @@ export const input = defineRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
     variant: "outline",
   },
   variants: {
     size: {
-      "2xs": { px: "1.5", h: "6", minW: "7", fontSize: "xs" },
-      xs: { px: "2", h: "6", minW: "8", fontSize: "xs", borderRadius: "sm" },
-      sm: { px: "2.5", h: "8", minW: "9", fontSize: "sm" },
-      md: { px: "3", h: "10", minW: "10", fontSize: "md" },
-      lg: { px: "3.5", h: "11", minW: "11", fontSize: "md" },
-      xl: { px: "4", h: "12", minW: "12", fontSize: "lg" },
-      "2xl": { px: "4.5", h: "16", minW: "16", textStyle: "3xl" },
+      sm: { h: "6", minW: "8", fontSize: "xs", borderRadius: "sm" },
+      md: { h: "8", minW: "9", fontSize: "sm" },
+      lg: { h: "10", minW: "10", fontSize: "md" },
     },
     variant: {
       outline: {},
@@ -64,4 +60,9 @@ export const input = defineRecipe({
       },
     },
   },
+  compoundVariants: [
+    { size: "sm", variant: "outline", css: { px: "2" } },
+    { size: "md", variant: "outline", css: { px: "2.5" } },
+    { size: "lg", variant: "outline", css: { px: "3" } },
+  ],
 });

@@ -52,18 +52,18 @@ export const checkbox = defineSlotRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
   },
   variants: {
     size: {
       sm: {
         root: {
-          gap: "2",
+          gap: "1.5",
         },
         control: {
           width: "4",
           height: "4",
-          borderRadius: "l1",
+          borderRadius: "xs",
           "& svg": {
             width: "3",
             height: "3",
@@ -75,36 +75,36 @@ export const checkbox = defineSlotRecipe({
       },
       md: {
         root: {
-          gap: "3",
+          gap: "2",
         },
         control: {
           width: "5",
           height: "5",
-          borderRadius: "l1",
+          borderRadius: "xs",
           "& svg": {
             width: "3.5",
             height: "3.5",
           },
         },
         label: {
-          textStyle: "md",
+          textStyle: "sm",
         },
       },
       lg: {
         root: {
-          gap: "4",
+          gap: "2.5",
         },
         control: {
           width: "6",
           height: "6",
-          borderRadius: "l1",
+          borderRadius: "xs",
           "& svg": {
             width: "4",
             height: "4",
           },
         },
         label: {
-          textStyle: "lg",
+          textStyle: "md",
         },
       },
     },

@@ -1,10 +1,27 @@
-import { PropsWithChildren } from "react";
+import type { ComponentProps } from "react";
+
+import { cva } from "@/styled-system/css";
+import { styled } from "@/styled-system/jsx";
 
 import { FormErrorText } from "../form-error-text";
-import { FormHelperText } from "../form-helper-text";
 
-export function FormFeedback(props: PropsWithChildren<{ error?: string }>) {
-  if (props.error) return <FormErrorText>{props.error}</FormErrorText>;
+const formFeedback = cva({
+  base: {
+    color: "fg.muted",
+    fontSize: "xs",
+  },
+});
 
-  return <FormHelperText>{props.children}</FormHelperText>;
+const FormFeedbackText = styled("p", formFeedback);
+
+export type FormFeedbackProps = ComponentProps<typeof FormFeedbackText> & {
+  error?: string;
+};
+
+export function FormFeedback({ error, children, ...props }: FormFeedbackProps) {
+  if (error) {
+    return <FormErrorText {...props}>{error}</FormErrorText>;
+  }
+
+  return <FormFeedbackText {...props}>{children}</FormFeedbackText>;
 }

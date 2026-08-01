@@ -4,7 +4,7 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface RadioGroupVariant {
   /**
- * @default "md"
+ * @default "sm"
  */
 size: "sm" | "md" | "lg"
 }

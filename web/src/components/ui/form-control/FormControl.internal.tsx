@@ -3,6 +3,9 @@ import { styled } from "@/styled-system/jsx";
 
 const formControl = cva({
   base: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1",
     width: "full",
   },
 });

@@ -16,6 +16,7 @@ import { typographyHeading } from "@/components/ui/heading-input/TypographyHeadi
 import { inputGroup } from "@/components/ui/input-group/InputGroup.recipe";
 import { input } from "@/components/ui/input/Input.recipe";
 import { menu } from "@/components/ui/menu/Menu.recipe";
+import { multiSelectPicker } from "@/components/ui/multi-select-picker/MultiSelectPicker.recipe";
 import { numberInput } from "@/components/ui/number-input/NumberInput.recipe";
 import { pinInput } from "@/components/ui/pin-input/PinInput.recipe";
 import { popover } from "@/components/ui/popover/Popover.recipe";
@@ -44,6 +45,37 @@ export default defineConfig({
   include: ["./src/**/*.tsx"],
   jsxFramework: "react",
   exclude: [],
+  staticCss: {
+    recipes: {
+      button: [
+        {
+          size: ["sm", "md", "lg"],
+          variant: ["solid", "outline", "ghost", "subtle"],
+        },
+      ],
+      checkbox: [{ size: ["sm", "md", "lg"] }],
+      combobox: [{ size: ["sm", "md", "lg"] }],
+      input: [{ size: ["sm", "md", "lg"], variant: ["outline", "ghost"] }],
+      inputGroup: [{ size: ["sm", "md", "lg"] }],
+      multiSelectPicker: [{ size: ["sm", "md", "lg"] }],
+      numberInput: [{ size: ["sm", "md", "lg"] }],
+      pinInput: [{ size: ["sm", "md", "lg"] }],
+      progress: [
+        {
+          shape: ["circle", "horizontal"],
+          size: ["sm", "md", "lg"],
+        },
+      ],
+      radioGroup: [{ size: ["sm", "md", "lg"] }],
+      select: [{ size: ["sm", "md", "lg"], variant: ["outline", "ghost"] }],
+      slider: [{ size: ["sm", "md", "lg"] }],
+      switchRecipe: [{ size: ["sm", "md", "lg"] }],
+      typographyHeading: [{ size: ["md", "lg"] }],
+      toggleGroup: [
+        { size: ["sm", "md", "lg"], variant: ["outline", "ghost"] },
+      ],
+    },
+  },
 
   conditions: {
     target: "&:target",
@@ -105,7 +137,7 @@ export default defineConfig({
             backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            boxShadow: "sm",
+            boxShadow: "floating",
           };
         },
       },
@@ -131,7 +163,7 @@ export default defineConfig({
             flexDirection: "column",
             gap: "1",
             width: "full",
-            boxShadow: "subtle",
+            boxShadow: "surface",
             borderRadius: "lg",
             backgroundColor: "bg.default",
             padding,
@@ -187,7 +219,7 @@ export default defineConfig({
         button: button,
         group: group,
         input: input,
-        switchRecipe: switchRecipe,
+        multiSelectPicker: multiSelectPicker,
         text: text,
         admonition: admonition,
         headingInput: headingInput,
@@ -212,6 +244,7 @@ export default defineConfig({
         pinInput: pinInput,
         tabs: tabs,
         radioGroup: radioGroup,
+        switchRecipe: switchRecipe,
         treeView: treeView,
         toggleGroup: toggleGroup,
         tooltip: tooltip,
@@ -234,35 +267,6 @@ export default defineConfig({
         lg: { value: { fontSize: "lg", lineHeight: "1.75rem" } },
         xl: { value: { fontSize: "xl", lineHeight: "1.875rem" } },
         "2xl": { value: { fontSize: "2xl", lineHeight: "2rem" } },
-        "3xl": { value: { fontSize: "3xl", lineHeight: "2.375rem" } },
-        "4xl": {
-          value: {
-            fontSize: "4xl",
-            lineHeight: "2.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "5xl": {
-          value: {
-            fontSize: "5xl",
-            lineHeight: "3.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "6xl": {
-          value: {
-            fontSize: "6xl",
-            lineHeight: "4.5rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "7xl": {
-          value: {
-            fontSize: "7xl",
-            lineHeight: "5.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
       }),
     },
   },

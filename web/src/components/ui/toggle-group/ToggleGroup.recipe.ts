@@ -31,11 +31,12 @@ export const toggleGroup = defineSlotRecipe({
       verticalAlign: "middle",
       whiteSpace: "nowrap",
       _on: {
-        background: "bg.emphasized",
-        color: "fg.emphasized",
+        background: "bg.muted",
+        color: "fg.default",
+        zIndex: 1,
         _hover: {
-          background: "bg.emphasized",
-          color: "fg.emphasized",
+          background: "bg.muted",
+          color: "fg.default",
         },
       },
       _hover: {
@@ -62,7 +63,7 @@ export const toggleGroup = defineSlotRecipe({
       outline: {
         root: {
           borderWidth: "1px",
-          borderRadius: "l2",
+          borderRadius: "sm",
           borderColor: "border.default",
           _horizontal: {
             divideX: "1px",
@@ -86,7 +87,7 @@ export const toggleGroup = defineSlotRecipe({
           gap: "1",
         },
         item: {
-          borderRadius: "l2",
+          borderRadius: "sm",
           _focusVisible: {
             outlineOffset: "2px",
             outline: "2px solid",

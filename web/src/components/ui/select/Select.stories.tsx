@@ -17,20 +17,20 @@ const items = [
 const collection = createListCollection({ items });
 
 type SelectStoryArgs = {
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg";
   variant?: "outline" | "ghost";
 };
 
 const meta = {
   title: "UI/Select",
   args: {
-    size: "md",
+    size: "sm",
     variant: "outline",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg"],
+      options: ["sm", "md", "lg"],
     },
     variant: {
       control: "select",
@@ -82,7 +82,7 @@ export const Playground: Story = {
 export const Variants: Story = {
   render: () => (
     <LStack gap="4">
-      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+      {(["sm", "md", "lg"] as const).map((size) => (
         <Example key={size} size={size} />
       ))}
       <Example variant="ghost" />

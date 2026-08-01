@@ -98,7 +98,13 @@ export default function Page() {
         <Box flex="1" pl={{ base: "0", lg: "64" }} pr={{ base: "0", xl: "80" }}>
           <VStack gap="6" p="6" maxW="4xl" mx="auto">
             {/* Accent Color Palette Tester */}
-            <Box w="full" bg="bg.subtle" borderRadius="lg" p="6" boxShadow="sm">
+            <Box
+              w="full"
+              bg="bg.subtle"
+              borderRadius="lg"
+              p="6"
+              boxShadow="surface"
+            >
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
                   Accent Color Palette
@@ -163,7 +169,7 @@ export default function Page() {
               bg="bg.default"
               borderRadius="lg"
               p="6"
-              boxShadow="sm"
+              boxShadow="surface"
             >
               <VStack gap="6" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
@@ -234,22 +240,6 @@ export default function Page() {
                       Disabled
                     </Button>
                   </VStack>
-
-                  <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="fg.subtle">
-                      Link
-                    </Text>
-                    <Button variant="link" size="sm">
-                      Small Link
-                    </Button>
-                    <Button variant="link">Medium Link</Button>
-                    <Button variant="link" size="lg">
-                      Large Link
-                    </Button>
-                    <Button variant="link" disabled>
-                      Disabled Link
-                    </Button>
-                  </VStack>
                 </HStack>
 
                 <HStack gap="4" flexWrap="wrap">
@@ -285,28 +275,19 @@ export default function Page() {
             </Box>
 
             {/* Typography Showcase */}
-            <Box w="full" bg="bg.subtle" borderRadius="lg" p="6" boxShadow="sm">
+            <Box
+              w="full"
+              bg="bg.subtle"
+              borderRadius="lg"
+              p="6"
+              boxShadow="surface"
+            >
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
                   Typography Scale
                 </Text>
 
                 <VStack gap="3" alignItems="start" w="full">
-                  <Text size="7xl" color="fg.default">
-                    7XL Heading
-                  </Text>
-                  <Text size="6xl" color="fg.default">
-                    6XL Heading
-                  </Text>
-                  <Text size="5xl" color="fg.default">
-                    5XL Heading
-                  </Text>
-                  <Text size="4xl" color="fg.default">
-                    4XL Heading
-                  </Text>
-                  <Text size="3xl" color="fg.default">
-                    3XL Heading
-                  </Text>
                   <Text size="2xl" color="fg.default">
                     2XL Heading
                   </Text>
@@ -350,7 +331,7 @@ export default function Page() {
                 bg="bg.default"
                 borderRadius="lg"
                 p="6"
-                boxShadow="sm"
+                boxShadow="surface"
               >
                 <VStack gap="4" alignItems="start">
                   <HStack justify="space-between" w="full">
@@ -423,7 +404,7 @@ export default function Page() {
                 bg="bg.subtle"
                 borderRadius="lg"
                 p="4"
-                boxShadow="sm"
+                boxShadow="surface"
               >
                 <VStack gap="3" alignItems="start">
                   <Text size="sm" fontWeight="semibold">
@@ -459,7 +440,7 @@ export default function Page() {
               bg="bg.default"
               borderRadius="lg"
               p="6"
-              boxShadow="sm"
+              boxShadow="surface"
             >
               <VStack gap="6" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
@@ -516,7 +497,13 @@ export default function Page() {
             </Box>
 
             {/* Background & Surface Testing */}
-            <Box w="full" bg="bg.muted" borderRadius="lg" p="6" boxShadow="sm">
+            <Box
+              w="full"
+              bg="bg.muted"
+              borderRadius="lg"
+              p="6"
+              boxShadow="surface"
+            >
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">
                   Surface Hierarchy
@@ -575,7 +562,7 @@ export default function Page() {
               bg="bg.default"
               borderRadius="lg"
               p="6"
-              boxShadow="sm"
+              boxShadow="surface"
             >
               <VStack gap="4" alignItems="start">
                 <Text size="lg" fontWeight="semibold">

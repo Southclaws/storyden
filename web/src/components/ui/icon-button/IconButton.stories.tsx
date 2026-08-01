@@ -14,17 +14,17 @@ const meta = {
   args: {
     "aria-label": "Create",
     children: <AddIcon />,
-    size: "md",
-    variant: "solid",
+    size: "sm",
+    variant: "subtle",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl", "2xl"],
+      options: ["sm", "md", "lg"],
     },
     variant: {
       control: "select",
-      options: ["solid", "outline", "ghost", "link", "subtle"],
+      options: ["solid", "outline", "ghost", "subtle"],
     },
   },
 } satisfies Meta<typeof IconButton>;
@@ -53,7 +53,7 @@ export const Variants: Story = {
         </IconButton>
       </HStack>
       <HStack gap="3" flexWrap="wrap">
-        {(["xs", "sm", "md", "lg", "xl", "2xl"] as const).map((size) => (
+        {(["sm", "md", "lg"] as const).map((size) => (
           <IconButton key={size} size={size} aria-label={`Add ${size}`}>
             <AddIcon />
           </IconButton>

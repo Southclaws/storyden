@@ -25,8 +25,9 @@ export const admonition = defineRecipe({
         backgroundColor: "white.a6",
       },
       success: {
-        backgroundColor: "green.100",
-        color: "accent.text.500",
+        backgroundColor: "status.success.surface",
+        borderColor: "status.success.border",
+        color: "status.success.content",
       },
       failure: {
         backgroundColor: "bg.destructive",

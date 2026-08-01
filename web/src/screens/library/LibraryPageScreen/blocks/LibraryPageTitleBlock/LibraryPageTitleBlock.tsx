@@ -44,7 +44,7 @@ function LibraryPageTitleBlockEditing() {
           <HeadingInput
             key={`title:${titleInputKey}`}
             id="name-input"
-            size={"2xl" as any}
+            size="lg"
             fontWeight="bold"
             placeholder="Name..."
             onValueChange={handleChangeAndReset}

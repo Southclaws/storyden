@@ -2,8 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const numberInputDefaultVariants = {
-  "size": "md",
-  "variant": "outline"
+  "size": "sm"
 }
 const numberInputCompoundVariants = []
 
@@ -48,8 +47,7 @@ const numberInputFn = memo((props = {}) => {
 })
 
 const numberInputVariantKeys = [
-  "size",
-  "variant"
+  "size"
 ]
 const getVariantProps = (variants) => ({ ...numberInputDefaultVariants, ...compact(variants) })
 
@@ -63,12 +61,7 @@ export const numberInput = /* @__PURE__ */ Object.assign(numberInputFn, {
   "size": [
     "sm",
     "md",
-    "lg",
-    "xl"
-  ],
-  "variant": [
-    "outline",
-    "ghost"
+    "lg"
   ]
 },
   splitVariantProps(props) {

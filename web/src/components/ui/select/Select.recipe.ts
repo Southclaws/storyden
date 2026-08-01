@@ -14,8 +14,8 @@ export const select = defineSlotRecipe({
     },
     content: {
       background: "bg.default",
-      borderRadius: "l2",
-      boxShadow: "lg",
+      borderRadius: "sm",
+      boxShadow: "overlay",
       display: "flex",
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",
@@ -39,9 +39,10 @@ export const select = defineSlotRecipe({
     },
     item: {
       alignItems: "center",
-      borderRadius: "l1",
+      borderRadius: "xs",
       cursor: "pointer",
       display: "flex",
+      gap: "2",
       justifyContent: "space-between",
       transitionDuration: "fast",
       transitionProperty: "background, color",
@@ -81,7 +82,7 @@ export const select = defineSlotRecipe({
       appearance: "none",
       alignItems: "center",
       borderColor: "border.default",
-      borderRadius: "l2",
+      borderRadius: "sm",
       cursor: "pointer",
       color: "fg.default",
       display: "inline-flex",
@@ -108,7 +109,7 @@ export const select = defineSlotRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
     variant: "outline",
   },
   variants: {
@@ -134,7 +135,7 @@ export const select = defineSlotRecipe({
       },
     },
     size: {
-      xs: {
+      sm: {
         content: { p: "0.5", gap: "1", borderRadius: "sm" },
         item: { textStyle: "xs", px: "2", height: "6", borderRadius: "sm" },
         itemIndicator: {
@@ -161,7 +162,7 @@ export const select = defineSlotRecipe({
           },
         },
       },
-      sm: {
+      md: {
         content: { p: "0.5", gap: "1" },
         item: { textStyle: "sm", px: "2", height: "9" },
         itemIndicator: {
@@ -187,7 +188,7 @@ export const select = defineSlotRecipe({
           },
         },
       },
-      md: {
+      lg: {
         content: { p: "1", gap: "1" },
         item: { textStyle: "md", px: "2", height: "10" },
         itemIndicator: {
@@ -210,32 +211,6 @@ export const select = defineSlotRecipe({
           "& :where(svg)": {
             width: "4",
             height: "4",
-          },
-        },
-      },
-      lg: {
-        content: { p: "1.5", gap: "1" },
-        item: { textStyle: "md", px: "2", height: "11" },
-        itemIndicator: {
-          "& :where(svg)": {
-            width: "5",
-            height: "5",
-          },
-        },
-        itemGroupLabel: {
-          px: "2",
-          py: "1.5",
-        },
-        label: { textStyle: "sm" },
-        trigger: {
-          px: "3.5",
-          h: "11",
-          minW: "11",
-          fontSize: "md",
-          gap: "2",
-          "& :where(svg)": {
-            width: "5",
-            height: "5",
           },
         },
       },

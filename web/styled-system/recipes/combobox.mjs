@@ -2,7 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const comboboxDefaultVariants = {
-  "size": "md"
+  "size": "sm"
 }
 const comboboxCompoundVariants = []
 
@@ -87,7 +87,6 @@ export const combobox = /* @__PURE__ */ Object.assign(comboboxFn, {
   variantKeys: comboboxVariantKeys,
   variantMap: {
   "size": [
-    "xs",
     "sm",
     "md",
     "lg"

@@ -9,7 +9,6 @@ const meta = {
   component: Checkbox,
   args: {
     children: "Email me replies",
-    size: "md",
   },
   argTypes: {
     size: {

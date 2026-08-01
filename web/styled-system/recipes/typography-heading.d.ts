@@ -6,7 +6,7 @@ interface TypographyHeadingVariant {
   /**
  * @default "md"
  */
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+size: "md" | "lg"
 }
 
 type TypographyHeadingVariantMap = {

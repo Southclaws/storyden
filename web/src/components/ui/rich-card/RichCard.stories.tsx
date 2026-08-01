@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Badge } from "../badge";
+import { IconButton } from "../icon-button";
 import { MoreIcon } from "../icons/More";
 
 import { Card, CardGrid, CardRows } from ".";
@@ -96,7 +97,11 @@ export const Variants: Story = {
           url={`/d/card-background-${backgroundColor}`}
           text="Background variants keep the same structure while changing surface emphasis."
           backgroundColor={backgroundColor}
-          menu={<MoreIcon />}
+          menu={
+            <IconButton aria-label="More options" type="button" variant="ghost">
+              <MoreIcon />
+            </IconButton>
+          }
           disableAnchors
         >
           <Badge>{backgroundColor}</Badge>

@@ -2,7 +2,7 @@ import { switchAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const switchRecipe = defineSlotRecipe({
-  className: "switchRecipe",
+  className: "switch",
   jsx: ["Switch", /Switch\.+/],
   slots: switchAnatomy.keys(),
   base: {
@@ -10,19 +10,31 @@ export const switchRecipe = defineSlotRecipe({
       alignItems: "center",
       display: "flex",
       position: "relative",
+      "&:has(input:focus-visible) [data-part=control]": {
+        outline: "2px solid token(colors.accent.default)",
+        outlineOffset: "2px",
+      },
     },
     control: {
       alignItems: "center",
       background: "bg.muted",
       borderRadius: "full",
+      boxShadow: "inset 0 0 0 1px token(colors.border.default)",
       cursor: "pointer",
       display: "inline-flex",
       flexShrink: "0",
+      position: "relative",
       transitionDuration: "normal",
       transitionProperty: "background",
       transitionTimingFunction: "default",
       _checked: {
-        background: "bg.emphasized",
+        background: "accent.default",
+        boxShadow: "inset 0 0 0 1px token(colors.accent.default)",
+      },
+      _disabled: {
+        background: "bg.disabled",
+        boxShadow: "inset 0 0 0 1px token(colors.border.disabled)",
+        cursor: "not-allowed",
       },
     },
     label: {
@@ -30,15 +42,18 @@ export const switchRecipe = defineSlotRecipe({
       fontWeight: "medium",
     },
     thumb: {
-      background: "bg.default",
+      background: "surface.elevated",
       borderRadius: "full",
-      boxShadow: "xs",
+      boxShadow: "surface",
       transitionDuration: "normal",
       transitionProperty: "transform, background",
       transitionTimingFunction: "default",
       _checked: {
         transform: "translateX(100%)",
-        background: "fg.muted",
+        background: "surface.elevated",
+      },
+      _disabled: {
+        background: "fg.disabled",
       },
     },
   },

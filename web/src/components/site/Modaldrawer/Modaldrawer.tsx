@@ -1,11 +1,10 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { Heading } from "@/components/ui/heading";
 import { cx } from "@/styled-system/css";
 import { Box, VStack, WStack } from "@/styled-system/jsx";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { CloseAction } from "../Action/Close";
 
@@ -58,7 +57,7 @@ export function ModalDrawer({
               borderTopRadius={{ base: "xl", md: "md" }}
               borderBottomRadius={{ base: "none", md: "md" }}
               bgColor="bg.default"
-              boxShadow="lg"
+              boxShadow="overlay"
               p={{ base: "4", md: "3" }}
               className={className}
             >

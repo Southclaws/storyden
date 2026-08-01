@@ -58,11 +58,12 @@ export interface NumberInputProps extends RootProps {
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   function NumberInput(props, ref) {
-    const { inputProps, rootRef, scrubber, ...rest } = props;
+    const { inputProps, rootRef, scrubber, size, ...rest } = props;
     return (
-      <Root ref={rootRef} {...rest}>
+      <Root ref={rootRef} size={size} {...rest}>
         <Control />
         <InputGroup
+          size={size ?? "sm"}
           startElement={
             scrubber && (
               <Scrubber pointerEvents="auto">

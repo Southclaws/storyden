@@ -101,7 +101,14 @@ export function Card({
         )}
 
         {header && <div className={styles.headerContainer}>{header}</div>}
-        {menu && <div className={styles.menuContainer}>{menu}</div>}
+        {menu && (
+          <div
+            className={styles.menuContainer}
+            data-header={header ? "present" : "absent"}
+          >
+            {menu}
+          </div>
+        )}
 
         {title && (
           <styled.div className={styles.titleContainer}>

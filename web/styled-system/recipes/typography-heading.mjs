@@ -7,12 +7,8 @@ const typographyHeadingFn = /* @__PURE__ */ createRecipe('typography-heading', {
 
 const typographyHeadingVariantMap = {
   "size": [
-    "xs",
-    "sm",
     "md",
-    "lg",
-    "xl",
-    "2xl"
+    "lg"
   ]
 }
 

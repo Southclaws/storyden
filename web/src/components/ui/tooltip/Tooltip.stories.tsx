@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Button } from "../button";
 
 import * as Tooltip from ".";
+import { ErrorTooltip } from "./ErrorTooltip.internal";
 
 const meta = {
   title: "UI/Tooltip",
@@ -28,5 +29,13 @@ export const Default: Story = {
         </Tooltip.Content>
       </Tooltip.Positioner>
     </Tooltip.Root>
+  ),
+};
+
+export const Error: Story = {
+  render: () => (
+    <ErrorTooltip
+      error={new globalThis.Error("The category list could not be loaded.")}
+    />
   ),
 };

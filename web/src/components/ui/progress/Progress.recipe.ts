@@ -48,9 +48,23 @@ export const progress = defineSlotRecipe({
     },
   },
   defaultVariants: {
+    shape: "horizontal",
     size: "md",
   },
   variants: {
+    shape: {
+      circle: {
+        root: {
+          alignItems: "center",
+          width: "fit",
+        },
+      },
+      horizontal: {
+        root: {
+          width: "full",
+        },
+      },
+    },
     size: {
       sm: {
         root: {

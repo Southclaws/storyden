@@ -18,19 +18,32 @@ export const radioGroup = defineSlotRecipe({
       borderColor: "border.default",
       borderRadius: "full",
       borderWidth: "1px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
       transitionDuration: "normal",
-      transitionProperty: "background",
+      transitionProperty: "background, border-color",
       transitionTimingFunction: "default",
+      _before: {
+        backgroundColor: "accent.default",
+        borderRadius: "full",
+        content: "''",
+        display: "block",
+        transform: "scale(0)",
+        transitionDuration: "fast",
+        transitionProperty: "transform",
+        transitionTimingFunction: "default",
+      },
       _hover: {
         background: "bg.subtle",
       },
       _checked: {
-        background: "colorPalette.default",
-        borderColor: "colorPalette.default",
-        outlineColor: "bg.default",
-        outlineStyle: "solid",
+        borderColor: "accent.default",
         _hover: {
-          background: "colorPalette.default",
+          background: "transparent",
+        },
+        _before: {
+          transform: "scale(1)",
         },
       },
       _disabled: {
@@ -59,33 +72,55 @@ export const radioGroup = defineSlotRecipe({
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
   },
   variants: {
     size: {
       sm: {
         root: {
           gap: {
-            _vertical: "3",
+            _vertical: "2",
             _horizontal: "4",
+          },
+        },
+        item: {
+          gap: "1.5",
+        },
+        itemControl: {
+          width: "4",
+          height: "4",
+          _before: {
+            width: "2",
+            height: "2",
+          },
+        },
+        itemText: {
+          textStyle: "xs",
+        },
+      },
+      md: {
+        root: {
+          gap: {
+            _vertical: "3",
+            _horizontal: "5",
           },
         },
         item: {
           gap: "2",
         },
         itemControl: {
-          width: "4",
-          height: "4",
-          _checked: {
-            outlineWidth: "3px",
-            outlineOffset: "-4px",
+          width: "5",
+          height: "5",
+          _before: {
+            width: "2.5",
+            height: "2.5",
           },
         },
         itemText: {
           textStyle: "sm",
         },
       },
-      md: {
+      lg: {
         root: {
           gap: {
             _vertical: "4",
@@ -93,40 +128,18 @@ export const radioGroup = defineSlotRecipe({
           },
         },
         item: {
-          gap: "3",
-        },
-        itemControl: {
-          width: "5",
-          height: "5",
-          _checked: {
-            outlineWidth: "4px",
-            outlineOffset: "-5px",
-          },
-        },
-        itemText: {
-          textStyle: "md",
-        },
-      },
-      lg: {
-        root: {
-          gap: {
-            _vertical: "5",
-            _horizontal: "8",
-          },
-        },
-        item: {
-          gap: "4",
+          gap: "2.5",
         },
         itemControl: {
           width: "6",
           height: "6",
-          _checked: {
-            outlineWidth: "5px",
-            outlineOffset: "-6px",
+          _before: {
+            width: "3",
+            height: "3",
           },
         },
         itemText: {
-          textStyle: "lg",
+          textStyle: "md",
         },
       },
     },

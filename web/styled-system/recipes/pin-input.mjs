@@ -2,7 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const pinInputDefaultVariants = {
-  "size": "md"
+  "size": "sm"
 }
 const pinInputCompoundVariants = []
 
@@ -43,12 +43,9 @@ export const pinInput = /* @__PURE__ */ Object.assign(pinInputFn, {
   variantKeys: pinInputVariantKeys,
   variantMap: {
   "size": [
-    "xs",
     "sm",
     "md",
-    "lg",
-    "xl",
-    "2xl"
+    "lg"
   ]
 },
   splitVariantProps(props) {

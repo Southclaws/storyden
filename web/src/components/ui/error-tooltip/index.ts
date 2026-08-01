@@ -1,1 +1,1 @@
-export * from "./ErrorTooltip.internal";
+export { ErrorTooltip } from "../tooltip";

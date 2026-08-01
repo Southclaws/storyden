@@ -12,12 +12,12 @@ const meta = {
   title: "UI/Input Group",
   component: InputGroup,
   args: {
-    size: "md",
+    size: "sm",
   },
   argTypes: {
     size: {
       control: "select",
-      options: ["xs", "sm", "md", "lg", "xl"],
+      options: ["sm", "md", "lg"],
     },
   },
 } satisfies Meta<typeof InputGroup>;
@@ -37,13 +37,13 @@ export const Playground: Story = {
 export const Sizes: Story = {
   render: () => (
     <LStack gap="3" maxW="md">
-      {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
+      {(["sm", "md", "lg"] as const).map((size) => (
         <InputGroup key={size} size={size} startElement={<SearchIcon />}>
           <Input size={size} placeholder={`Search ${size}`} />
         </InputGroup>
       ))}
       <InputGroup startElement={<LinkIcon />} endElement=".storyden.org">
-        <Input placeholder="community" />
+        <Input aria-label="Community address" placeholder="community" />
       </InputGroup>
     </LStack>
   ),

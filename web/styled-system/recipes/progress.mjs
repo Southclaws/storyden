@@ -2,6 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const progressDefaultVariants = {
+  "shape": "horizontal",
   "size": "md"
 }
 const progressCompoundVariants = []
@@ -51,6 +52,7 @@ const progressFn = memo((props = {}) => {
 })
 
 const progressVariantKeys = [
+  "shape",
   "size"
 ]
 const getVariantProps = (variants) => ({ ...progressDefaultVariants, ...compact(variants) })
@@ -62,6 +64,10 @@ export const progress = /* @__PURE__ */ Object.assign(progressFn, {
   classNameMap: {},
   variantKeys: progressVariantKeys,
   variantMap: {
+  "shape": [
+    "circle",
+    "horizontal"
+  ],
   "size": [
     "sm",
     "md",

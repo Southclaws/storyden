@@ -99,7 +99,7 @@ export function RobotConfigurationForm(props: Props) {
             borderWidth="thin"
             borderStyle="solid"
             borderColor="border.default"
-            borderRadius="l2"
+            borderRadius="sm"
             resize="vertical"
             _focus={{
               outline: "none",

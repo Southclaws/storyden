@@ -7,59 +7,60 @@ export const inputGroup = defineSlotRecipe({
     root: {
       position: "relative",
       width: "full",
+      "& > input:not(:first-child)": {
+        ps: "var(--input-group-element-width)!",
+      },
+      "& > input:not(:last-child)": {
+        pe: "var(--input-group-element-width)!",
+      },
     },
     element: {
       alignItems: "center",
       color: "fg.muted",
       display: "flex",
+      fontSize: "var(--input-group-element-font-size)",
       height: "full",
       justifyContent: "center",
+      lineHeight: "1",
+      minWidth: "var(--input-group-element-width)",
+      paddingInline: "var(--input-group-element-padding)",
       position: "absolute",
+      whiteSpace: "nowrap",
       zIndex: "2",
       _icon: {
+        boxSize: "var(--input-group-icon-size)",
         color: "fg.subtle",
       },
     },
   },
   defaultVariants: {
-    size: "md",
+    size: "sm",
   },
   variants: {
     size: {
-      xs: {
-        element: { minW: "8", _icon: { boxSize: "4" } },
-        root: {
-          "& > input:not(:first-child)": { ps: "7!" },
-          "& > input:not(:last-child)": { pe: "7!" },
-        },
-      },
       sm: {
         root: {
-          "& > input:not(:first-child)": { ps: "8!" },
-          "& > input:not(:last-child)": { pe: "8!" },
+          "--input-group-element-font-size": "fontSizes.xs",
+          "--input-group-element-padding": "spacing.2",
+          "--input-group-element-width": "sizes.8",
+          "--input-group-icon-size": "sizes.4",
         },
-        element: { minW: "9", _icon: { boxSize: "4.5" } },
       },
       md: {
         root: {
-          "& > input:not(:first-child)": { ps: "9!" },
-          "& > input:not(:last-child)": { pe: "9!" },
+          "--input-group-element-font-size": "fontSizes.sm",
+          "--input-group-element-padding": "spacing.2.5",
+          "--input-group-element-width": "sizes.10",
+          "--input-group-icon-size": "sizes.4.5",
         },
-        element: { minW: "10", _icon: { boxSize: "5" } },
       },
       lg: {
         root: {
-          "& > input:not(:first-child)": { ps: "10!" },
-          "& > input:not(:last-child)": { pe: "10!" },
+          "--input-group-element-font-size": "fontSizes.md",
+          "--input-group-element-padding": "spacing.3",
+          "--input-group-element-width": "sizes.11",
+          "--input-group-icon-size": "sizes.5",
         },
-        element: { minW: "11", _icon: { boxSize: "5" } },
-      },
-      xl: {
-        root: {
-          "& > input:not(:first-child)": { ps: "11!" },
-          "& > input:not(:last-child)": { pe: "11!" },
-        },
-        element: { minW: "11", _icon: { boxSize: "5.5" } },
       },
     },
   },
