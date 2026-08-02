@@ -19,7 +19,7 @@ const meta = {
     },
     variant: {
       control: "select",
-      options: ["outline", "ghost"],
+      options: ["outline", "ghost", "inset"],
     },
   },
 } satisfies Meta<typeof Input>;
@@ -33,7 +33,7 @@ export const Playground: Story = {};
 export const Sizes: Story = {
   render: () => (
     <LStack gap="4" maxW="md">
-      {(["outline", "ghost"] as const).map((variant) => (
+      {(["outline", "ghost", "inset"] as const).map((variant) => (
         <LStack key={variant} gap="3">
           {(["sm", "md", "lg"] as const).map((size) => (
             <Input

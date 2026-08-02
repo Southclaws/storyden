@@ -1,5 +1,6 @@
 import Link from "next/link";
 import {
+  Children,
   DOMAttributes,
   PropsWithChildren,
   ReactNode,
@@ -9,9 +10,14 @@ import {
 } from "react";
 
 import { css } from "@/styled-system/css";
-import { Box, Grid, LStack, styled } from "@/styled-system/jsx";
+import { Box, LStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
-import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
+import {
+  RichCardVariantProps,
+  cardGrid,
+  cardRows,
+  richCard,
+} from "@/styled-system/recipes";
 import { isExternalURL } from "@/utils/url";
 
 import { ContentComposer } from "../../content/ContentComposer/ContentComposer";
@@ -167,39 +173,43 @@ export type CardGroupProps =
     }
   | {
       items?: undefined;
-      children: ReactNode[];
+      children: ReactNode;
     };
 
 export function CardRows(props: CardGroupProps) {
   return (
-    <LStack maxH="min">
-      {props.children
-        ? props.children
-        : props.items.map((i) => <Card key={i.id} shape="row" {...i} />)}
-    </LStack>
+    <div className={cardRows()}>
+      {props.items
+        ? props.items.map((i) => <Card key={i.id} shape="row" {...i} />)
+        : props.children}
+    </div>
   );
 }
 
 export function CardGrid(props: CardGroupProps) {
+  const cardCount = props.items
+    ? props.items.length
+    : Children.toArray(props.children).length;
+
+  const balance =
+    cardCount === 1
+      ? "one"
+      : cardCount % 3 === 1
+        ? "last-four"
+        : cardCount % 3 === 2
+          ? "last-two"
+          : "none";
+
+  const styles = cardGrid();
+
   return (
-    <Box containerType="inline-size" containerName="card-grid" w="full">
-      <Grid
-        w="full"
-        alignItems="start"
-        gridTemplateColumns={{
-          _containerSmall: "1fr",
-          _containerMedium: "1fr 1fr",
-          _containerLarge: "1fr 1fr 1fr",
-          base: "1fr",
-          sm: "1fr 1fr",
-          "2xl": "1fr 1fr 1fr",
-        }}
-      >
-        {props.children
-          ? props.children
-          : props.items.map((i) => <Card key={i.id} shape="box" {...i} />)}
-      </Grid>
-    </Box>
+    <div className={styles.container}>
+      <div className={styles.grid} data-balance={balance}>
+        {props.items
+          ? props.items.map((i) => <Card key={i.id} shape="box" {...i} />)
+          : props.children}
+      </div>
+    </div>
   );
 }
 

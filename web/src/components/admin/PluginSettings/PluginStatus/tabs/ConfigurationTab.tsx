@@ -168,7 +168,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="control.background"
+        bgColor="background.control"
       />
     ))
     .with({ type: "number" }, (f) => (
@@ -183,7 +183,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="control.background"
+        bgColor="background.control"
       />
     ))
     .with({ type: "boolean" }, (f) => (

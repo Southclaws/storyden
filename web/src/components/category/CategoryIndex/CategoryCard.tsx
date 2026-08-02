@@ -4,7 +4,7 @@ import { CardBox } from "@/components/ui/card-box";
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { CategoryIcon } from "@/components/ui/icons/Category";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { CardRows } from "@/components/ui/rich-card";
+import { CardRows } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
@@ -21,6 +21,7 @@ type CategoryCardProps = {
 
 export function CategoryCard({ category, showChildren }: CategoryCardProps) {
   const cssProps = categoryColourCSS(category.colour);
+  const coverImage = getAssetURL(category.cover_image?.path);
 
   const hasSubcategories = category.children.length > 0;
 
@@ -31,22 +32,31 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
     <CardBox
       position="relative"
       style={cssProps}
-      borderColor="colorPalette.border"
-      borderLeftWidth="thick"
-      borderLeftStyle="solid"
+      borderWidth="none"
       display="flex"
+      height="full"
       justifyContent="space-between"
       gap="0"
       p="0"
       overflow="hidden"
     >
-      <img
-        src={getAssetURL(category.cover_image?.path)}
-        alt="" // No alt image, decorative
-        aria-hidden="true"
-      />
+      {coverImage && (
+        <img
+          src={coverImage}
+          alt="" // No alt image, decorative
+          aria-hidden="true"
+        />
+      )}
 
-      <LStack p="1">
+      <LStack
+        flex="1"
+        p="1"
+        borderColor="colorPalette.border"
+        borderWidth="thin"
+        borderTopWidth={coverImage ? "none" : undefined}
+        borderRadius="lg"
+        borderTopRadius={coverImage ? "none" : undefined}
+      >
         <LStack h="full" gap="1" justifyContent="space-between">
           <LStack h="full" gap="1">
             <WStack alignItems="start">
@@ -96,12 +106,11 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                   key={c.id}
                   position="relative"
                   style={cssProps}
-                  borderColor="background.inset"
+                  background="background.inset"
+                  borderColor="border.muted"
                   borderWidth="hairline"
                   borderStyle="solid"
-                  borderLeftColor="colorPalette.border"
-                  borderLeftWidth="thick"
-                  borderLeftStyle="solid"
+                  borderRadius="sm"
                   display="flex"
                   justifyContent="space-between"
                   gap="4"

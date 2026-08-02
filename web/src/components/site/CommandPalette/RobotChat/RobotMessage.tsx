@@ -11,7 +11,7 @@ import { ContentComposerMarkdown } from "@/components/content/ContentComposerMar
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CardBox } from "@/components/ui/card-box";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import {

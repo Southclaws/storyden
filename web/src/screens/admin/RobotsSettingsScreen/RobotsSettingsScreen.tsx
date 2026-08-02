@@ -134,7 +134,7 @@ export function RobotsSettingsScreen() {
             <Badge
               size="sm"
               borderColor="border.strong"
-              backgroundColor="control.disabledBackground"
+              backgroundColor="background.controlDisabled"
               color="text.subtle"
             >
               Disabled
@@ -875,7 +875,7 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
     <Badge
       size="sm"
       borderColor="border.strong"
-      backgroundColor="control.disabledBackground"
+      backgroundColor="background.controlDisabled"
       color="text.subtle"
     >
       Disabled

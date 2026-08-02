@@ -2,7 +2,7 @@ import { defineRecipe } from "@pandacss/dev";
 
 export const inputBase = {
   appearance: "none",
-  background: "control.background",
+  background: "background.control",
   borderColor: "border.default",
   borderRadius: "sm",
   borderWidth: "1px",
@@ -45,6 +45,15 @@ export const inputSizeVariants = {
 export const inputVariantVariants = {
   outline: {},
   ghost: {
+    borderColor: "transparent",
+    px: "0",
+    _focus: {
+      borderColor: "transparent",
+      boxShadow: "0 0 0 0px var(--colors-color-palette-default)",
+    },
+  },
+  inset: {
+    background: "background.controlInset",
     borderColor: "transparent",
     px: "0",
     _focus: {

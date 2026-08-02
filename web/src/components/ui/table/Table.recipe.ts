@@ -67,7 +67,7 @@ export const table = defineSlotRecipe({
       plain: {
         row: {
           _hover: {
-            bg: "control.hoverBackground",
+            bg: "background.controlHover",
           },
           _selected: {
             bg: "selection.background",

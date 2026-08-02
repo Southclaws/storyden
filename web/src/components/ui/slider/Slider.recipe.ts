@@ -18,7 +18,7 @@ export const slider = defineSlotRecipe({
       alignItems: "center",
     },
     track: {
-      backgroundColor: "control.trackBackground",
+      backgroundColor: "background.controlTrack",
       borderRadius: "full",
       overflow: "hidden",
       flex: "1",

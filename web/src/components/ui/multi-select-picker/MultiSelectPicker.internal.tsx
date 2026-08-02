@@ -234,11 +234,11 @@ export function MultiSelectPicker({
                   <HStack
                     position="absolute"
                     right="-0.5"
-                    bg="control.background"
+                    bg="background.control"
                     color="text.default"
                     backdropBlur="frosted"
                     backdropFilter="auto"
-                    mask="linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 0.8) 100%)"
+                    mask="linear-gradient(to right, rgb(from {colors.background.control} r g b / 0) 0%, rgb(from {colors.background.control} r g b / 0.8) 100%)"
                     fontWeight="semibold"
                     pointerEvents="none"
                     height="full"

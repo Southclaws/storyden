@@ -9,7 +9,7 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Unready } from "@/components/site/Unready";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { PageHeading } from "@/components/ui/page-heading";
-import { CardGrid } from "@/components/ui/rich-card";
+import { CardGrid } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { LStack, VStack } from "@/styled-system/jsx";
 

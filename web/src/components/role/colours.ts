@@ -1,5 +1,7 @@
 import chroma from "chroma-js";
 
+import { getReadableTextColour } from "@/utils/colour";
+
 export function badgeColourCSS(c: string) {
   const { bg, bo, fg } = badgeColours(c);
 
@@ -22,7 +24,7 @@ export function badgeColours(c: string) {
 
   const bg = colour.brighten(2).desaturate(3).css();
   const bo = colour.darken(1).desaturate(1).alpha(0.2).css();
-  const fg = colour.darken(1).saturate(2).css();
+  const fg = getReadableTextColour(bg);
 
   return { bg, bo, fg };
 }

@@ -1,4 +1,4 @@
-import { CardGrid, CardRows } from "@/components/ui/rich-card";
+import { CardGrid, CardRows } from "@/components/ui/surface";
 import { CategoryTree } from "@/lib/category/tree";
 
 import { CategoryCard } from "./CategoryCard";

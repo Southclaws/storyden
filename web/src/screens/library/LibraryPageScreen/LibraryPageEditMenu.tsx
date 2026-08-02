@@ -278,7 +278,7 @@ function VersionMenuItem({
       borderRadius="sm"
       px="2"
       py="2"
-      _hover={{ bgColor: "control.hoverBackground" }}
+      _hover={{ bgColor: "background.controlHover" }}
     >
       <WStack alignItems="start">
         <PageVersionStatusBadge status={version.status} />

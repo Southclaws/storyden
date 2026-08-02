@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Badge } from "../badge";
 import { IconButton } from "../icon-button";
 import { MoreIcon } from "../icons/More";
+import { SectionHeading } from "../section-heading";
+import { Text } from "../text";
 
 import { Card, CardGrid, CardRows } from ".";
 
@@ -27,8 +29,30 @@ const exampleItems = [
   },
 ];
 
+const gridLayouts = [
+  "1 full-width card",
+  "2 cards",
+  "3 cards",
+  "2 + 2",
+  "3 + 2",
+  "3 + 3",
+  "3 + 2 + 2",
+  "3 + 3 + 2",
+  "3 + 3 + 3",
+];
+
+function createGridItems(count: number) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `grid-${count}-${index + 1}`,
+    title: `Card ${index + 1}`,
+    url: `/d/grid-${count}-${index + 1}`,
+    text: "A representative content card for checking balanced grid rows.",
+    disableAnchors: true,
+  }));
+}
+
 const meta = {
-  title: "UI/Rich Card",
+  title: "UI/Surface",
   component: Card,
   args: {
     id: "example-card",
@@ -70,6 +94,40 @@ export const Grid: Story = {
     url: "/d/example-grid",
   },
   render: () => <CardGrid items={exampleItems} />,
+};
+
+export const GridCounts: Story = {
+  args: {
+    id: "grid-counts",
+    url: "/d/grid-counts",
+  },
+  render: () => (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+        margin: "0 auto",
+        maxWidth: "80rem",
+      }}
+    >
+      {Array.from({ length: 9 }, (_, index) => {
+        const count = index + 1;
+
+        return (
+          <section key={count}>
+            <SectionHeading>
+              {count} {count === 1 ? "card" : "cards"}
+            </SectionHeading>
+            <Text variant="supporting" marginBottom="2">
+              Balanced as {gridLayouts[index]}.
+            </Text>
+            <CardGrid items={createGridItems(count)} />
+          </section>
+        );
+      })}
+    </div>
+  ),
 };
 
 export const Variants: Story = {

@@ -4,8 +4,7 @@ import { type Account } from "@/api/openapi-schema";
 import { useFeedConfig } from "@/lib/settings/feed-client";
 import { type Settings } from "@/lib/settings/settings";
 
-import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
-
+import { CategoryFeedScreen } from "./CategoryFeedScreen";
 import { LibraryFeedScreen } from "./LibraryFeedScreen/LibraryFeedScreen";
 import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
 import { InitialData } from "./types";
@@ -49,7 +48,7 @@ export function FeedScreenContent({
 
     case "categories":
       return (
-        <CategoryIndexScreen
+        <CategoryFeedScreen
           initialThreadListPage={initialData.initialPage}
           initialThreadList={initialData.initialThreadList}
           initialSession={initialSession}

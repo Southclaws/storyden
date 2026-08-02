@@ -22,7 +22,7 @@ import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
 export type { CategoryCreateProps };
 
 export function CategoryCreateScreen(props: CategoryCreateProps) {
-  const { register, onSubmit, control, handleImageUpload } =
+  const { register, slugInput, onSubmit, control, handleImageUpload } =
     useCategoryCreate(props);
 
   const { data: categoryListResult } = useCategoryList();
@@ -85,7 +85,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
               {hostname}/d/
             </InputPrefix>
             <Input
-              {...register("slug")}
+              {...slugInput}
               type="text"
               flex="1"
               borderTopLeftRadius={{

@@ -15,7 +15,7 @@ import { htmlToMarkdown } from "@/utils/markdown";
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
 import { Timestamp } from "../site/Timestamp";
 import { Badge } from "../ui/badge";
-import { Card } from "../ui/rich-card";
+import { Card } from "../ui/surface";
 
 type Props = {
   item: DatagraphItem;

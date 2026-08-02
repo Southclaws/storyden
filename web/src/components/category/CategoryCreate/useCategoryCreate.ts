@@ -9,11 +9,15 @@ import {
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
 import { Asset } from "@/api/openapi-schema";
+import { slugify } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),
-  slug: z.string().min(1, "Please enter a URL slug for the category."),
+  slug: z
+    .string()
+    .transform(slugify)
+    .pipe(z.string().min(1, "Please enter a URL slug for the category.")),
   description: z.string().min(1, "Please enter a short description."),
   colour: z.string().default("#8577ce"),
   parent: z.string().optional(),
@@ -34,6 +38,15 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     },
   });
 
+  const slugInput = register("slug", {
+    onBlur(event) {
+      setValue("slug", slugify(event.target.value), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+  });
+
   const onSubmit = handleSubmit(async (data) => {
     await handle(async () => {
       await categoryCreate(data);
@@ -49,6 +62,7 @@ export function useCategoryCreate(props: CategoryCreateProps) {
   return {
     onSubmit,
     register,
+    slugInput,
     control,
     handleImageUpload,
   };

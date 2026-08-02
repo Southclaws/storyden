@@ -15,7 +15,7 @@ const itemStyle = {
   transitionTimingFunction: "default",
   color: "text.default",
   _hover: {
-    background: "control.hoverBackground",
+    background: "background.controlHover",
     "& :where(svg)": {
       color: "text.default",
     },
@@ -39,7 +39,7 @@ const itemStyle = {
 export const menu = defineSlotRecipe({
   className: "menu",
   jsx: ["Menu"],
-  staticCss: [{ size: ["xs", "sm", "md"] }],
+  staticCss: [{ size: ["xs", "sm", "md", "lg"] }],
   slots: menuAnatomy.keys(),
   base: {
     itemGroupLabel: {

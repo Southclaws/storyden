@@ -115,10 +115,10 @@ export function LibraryPageDirectoryBlockTable({
                     "data-active": "",
                   })}
                   _hover={{
-                    bg: "control.hoverBackground",
+                    bg: "background.controlHover",
                   }}
                   _active={{
-                    bg: "control.hoverBackground",
+                    bg: "background.controlHover",
                   }}
                   p="0"
                 >
@@ -324,9 +324,9 @@ function Row({
             // class is also used in the page edit level, need to
             // create a second level of hover grouping or something.
             // _groupHover={{
-            //   bg: "control.hoverBackground",
+            //   bg: "background.controlHover",
             // }}
-            _hover={{ bg: "control.hoverBackground" }}
+            _hover={{ bg: "background.controlHover" }}
             position="relative"
           >
             {editing ? (

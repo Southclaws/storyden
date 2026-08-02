@@ -23,10 +23,12 @@ import { pinInput } from "@/components/ui/pin-input/PinInput.recipe";
 import { popover } from "@/components/ui/popover/Popover.recipe";
 import { progress } from "@/components/ui/progress/Progress.recipe";
 import { radioGroup } from "@/components/ui/radio-group/RadioGroup.recipe";
-import { richCard } from "@/components/ui/rich-card/RichCard.recipe";
 import { sectionNavigation } from "@/components/ui/section-navigation/SectionNavigation.recipe";
 import { select } from "@/components/ui/select/Select.recipe";
 import { slider } from "@/components/ui/slider/Slider.recipe";
+import { cardGrid } from "@/components/ui/surface/CardGrid.recipe";
+import { cardRows } from "@/components/ui/surface/CardRows.recipe";
+import { richCard } from "@/components/ui/surface/RichCard.recipe";
 import { switchRecipe } from "@/components/ui/switch/Switch.recipe";
 import { table } from "@/components/ui/table/Table.recipe";
 import { tabs } from "@/components/ui/tabs/Tabs.recipe";
@@ -64,7 +66,12 @@ export default defineConfig({
       ],
       checkbox: [{ size: ["sm", "md", "lg"] }],
       combobox: [{ size: ["sm", "md", "lg"] }],
-      input: [{ size: ["sm", "md", "lg"], variant: ["outline", "ghost"] }],
+      input: [
+        {
+          size: ["sm", "md", "lg"],
+          variant: ["outline", "ghost", "inset"],
+        },
+      ],
       inputGroup: [{ size: ["sm", "md", "lg"] }],
       multiSelectPicker: [{ size: ["sm", "md", "lg"] }],
       numberInput: [{ size: ["sm", "md", "lg"] }],
@@ -185,6 +192,7 @@ export default defineConfig({
         checkbox: checkbox,
         button: button,
         cardBox: cardBox,
+        cardRows: cardRows,
         group: group,
         input: input,
         multiSelectPicker: multiSelectPicker,
@@ -195,6 +203,7 @@ export default defineConfig({
       },
       slotRecipes: {
         alert: alert,
+        cardGrid: cardGrid,
         clipboard: clipboard,
         numberInput: numberInput,
         inputGroup: inputGroup,
@@ -221,6 +230,14 @@ export default defineConfig({
       semanticTokens,
       tokens: tokens,
       keyframes: {
+        fadeIn: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        fadeOut: {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },

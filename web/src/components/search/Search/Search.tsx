@@ -24,7 +24,7 @@ export function Search(props: Props) {
         borderRightRadius="none"
         type="search"
         defaultValue={props.query}
-        background="control.background"
+        background="background.control"
         placeholder={`Search...`}
         _focus={{
           // NOTE: This disables the default focus behaviour styles for inputs.

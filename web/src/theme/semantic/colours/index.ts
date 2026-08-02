@@ -14,7 +14,6 @@ import { accent } from "./accent";
 import { background } from "./background";
 import { border } from "./border";
 import { conicGradient } from "./conic-gradient";
-import { control } from "./control";
 import { interactive } from "./interactive";
 import { scrim } from "./scrim";
 import { selection } from "./selection";
@@ -26,7 +25,6 @@ export const colours = defineSemanticTokens.colors({
   background,
   text,
   border,
-  control,
   scrim,
   selection,
   interactive,
@@ -58,9 +56,9 @@ export const colours = defineSemanticTokens.colors({
   "overflow-fade": {
     value: {
       _osLight:
-        "linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 1) 80%)",
+        "linear-gradient(to right, rgb(from {colors.background.control} r g b / 0) 0%, rgb(from {colors.background.control} r g b / 1) 80%)",
       _osDark:
-        "linear-gradient(to right, rgb(from {colors.control.background} r g b / 0) 0%, rgb(from {colors.control.background} r g b / 1) 80%)",
+        "linear-gradient(to right, rgb(from {colors.background.control} r g b / 0) 0%, rgb(from {colors.background.control} r g b / 1) 80%)",
     },
   },
   "scroll-fade-top": {

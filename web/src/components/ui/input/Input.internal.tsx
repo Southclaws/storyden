@@ -13,9 +13,10 @@ export function InputPrefix({
 }: PropsWithChildren<HstackProps>) {
   return (
     <styled.div
-      px="3"
-      py="2"
-      bg="control.background"
+      boxSizing="border-box"
+      h="6"
+      px="2"
+      bg="background.control"
       borderStyle="solid"
       borderColor="border.default"
       borderWidth="thin"
@@ -25,7 +26,9 @@ export function InputPrefix({
       display="flex"
       alignItems="center"
       color="text.subtle"
-      fontSize="sm"
+      fontSize="xs"
+      lineHeight="1.125rem"
+      whiteSpace="nowrap"
       {...(props as any)}
     >
       {children}

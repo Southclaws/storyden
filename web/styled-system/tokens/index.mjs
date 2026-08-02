@@ -3335,6 +3335,30 @@ const tokens = {
     "value": "var(--colors-background-overlay)",
     "variable": "var(--colors-background-overlay)"
   },
+  "colors.background.control": {
+    "value": "var(--colors-background-control)",
+    "variable": "var(--colors-background-control)"
+  },
+  "colors.background.controlInset": {
+    "value": "var(--colors-background-control-inset)",
+    "variable": "var(--colors-background-control-inset)"
+  },
+  "colors.background.controlHover": {
+    "value": "var(--colors-background-control-hover)",
+    "variable": "var(--colors-background-control-hover)"
+  },
+  "colors.background.controlSubtle": {
+    "value": "var(--colors-background-control-subtle)",
+    "variable": "var(--colors-background-control-subtle)"
+  },
+  "colors.background.controlTrack": {
+    "value": "var(--colors-background-control-track)",
+    "variable": "var(--colors-background-control-track)"
+  },
+  "colors.background.controlDisabled": {
+    "value": "var(--colors-background-control-disabled)",
+    "variable": "var(--colors-background-control-disabled)"
+  },
   "colors.text.default": {
     "value": "var(--colors-text-default)",
     "variable": "var(--colors-text-default)"
@@ -3374,26 +3398,6 @@ const tokens = {
   "colors.border.disabled": {
     "value": "var(--colors-border-disabled)",
     "variable": "var(--colors-border-disabled)"
-  },
-  "colors.control.background": {
-    "value": "var(--colors-control-background)",
-    "variable": "var(--colors-control-background)"
-  },
-  "colors.control.hoverBackground": {
-    "value": "var(--colors-control-hover-background)",
-    "variable": "var(--colors-control-hover-background)"
-  },
-  "colors.control.subtleBackground": {
-    "value": "var(--colors-control-subtle-background)",
-    "variable": "var(--colors-control-subtle-background)"
-  },
-  "colors.control.trackBackground": {
-    "value": "var(--colors-control-track-background)",
-    "variable": "var(--colors-control-track-background)"
-  },
-  "colors.control.disabledBackground": {
-    "value": "var(--colors-control-disabled-background)",
-    "variable": "var(--colors-control-disabled-background)"
   },
   "colors.scrim.background": {
     "value": "var(--colors-scrim-background)",
@@ -5139,6 +5143,30 @@ const tokens = {
     "value": "var(--colors-color-palette-overlay)",
     "variable": "var(--colors-color-palette-overlay)"
   },
+  "colors.colorPalette.control": {
+    "value": "var(--colors-color-palette-control)",
+    "variable": "var(--colors-color-palette-control)"
+  },
+  "colors.colorPalette.controlInset": {
+    "value": "var(--colors-color-palette-control-inset)",
+    "variable": "var(--colors-color-palette-control-inset)"
+  },
+  "colors.colorPalette.controlHover": {
+    "value": "var(--colors-color-palette-control-hover)",
+    "variable": "var(--colors-color-palette-control-hover)"
+  },
+  "colors.colorPalette.controlSubtle": {
+    "value": "var(--colors-color-palette-control-subtle)",
+    "variable": "var(--colors-color-palette-control-subtle)"
+  },
+  "colors.colorPalette.controlTrack": {
+    "value": "var(--colors-color-palette-control-track)",
+    "variable": "var(--colors-color-palette-control-track)"
+  },
+  "colors.colorPalette.controlDisabled": {
+    "value": "var(--colors-color-palette-control-disabled)",
+    "variable": "var(--colors-color-palette-control-disabled)"
+  },
   "colors.colorPalette.default": {
     "value": "var(--colors-color-palette-default)",
     "variable": "var(--colors-color-palette-default)"
@@ -5166,22 +5194,6 @@ const tokens = {
   "colors.colorPalette.background": {
     "value": "var(--colors-color-palette-background)",
     "variable": "var(--colors-color-palette-background)"
-  },
-  "colors.colorPalette.hoverBackground": {
-    "value": "var(--colors-color-palette-hover-background)",
-    "variable": "var(--colors-color-palette-hover-background)"
-  },
-  "colors.colorPalette.subtleBackground": {
-    "value": "var(--colors-color-palette-subtle-background)",
-    "variable": "var(--colors-color-palette-subtle-background)"
-  },
-  "colors.colorPalette.trackBackground": {
-    "value": "var(--colors-color-palette-track-background)",
-    "variable": "var(--colors-color-palette-track-background)"
-  },
-  "colors.colorPalette.disabledBackground": {
-    "value": "var(--colors-color-palette-disabled-background)",
-    "variable": "var(--colors-color-palette-disabled-background)"
   },
   "colors.colorPalette.selected.surface": {
     "value": "var(--colors-color-palette-selected-surface)",
