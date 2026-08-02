@@ -3,6 +3,7 @@ import { defineConfig } from "@pandacss/dev";
 import { admonition } from "@/components/ui/admonition/Admonition.recipe";
 import { alert } from "@/components/ui/alert/Alert.recipe";
 import { badge, badgeColorPalettes } from "@/components/ui/badge/Badge.recipe";
+import { blockEditor } from "@/components/ui/block-editor/BlockEditor.recipe";
 import { button } from "@/components/ui/button/Button.recipe";
 import { cardBox } from "@/components/ui/card-box/CardBox.recipe";
 import { checkbox } from "@/components/ui/checkbox/Checkbox.recipe";
@@ -203,6 +204,7 @@ export default defineConfig({
       },
       slotRecipes: {
         alert: alert,
+        blockEditor: blockEditor,
         cardGrid: cardGrid,
         clipboard: clipboard,
         numberInput: numberInput,
