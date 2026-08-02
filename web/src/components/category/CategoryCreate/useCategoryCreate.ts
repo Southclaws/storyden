@@ -9,7 +9,7 @@ import {
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
 import { Asset } from "@/api/openapi-schema";
-import { slugify } from "@/utils/slugify";
+import { slugify, slugifyDraft } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
@@ -39,8 +39,17 @@ export function useCategoryCreate(props: CategoryCreateProps) {
   });
 
   const slugInput = register("slug", {
+    onChange(event) {
+      const value = slugifyDraft(event.target.value);
+      event.target.value = value;
+      setValue("slug", value, {
+        shouldDirty: true,
+      });
+    },
     onBlur(event) {
-      setValue("slug", slugify(event.target.value), {
+      const value = slugify(event.target.value);
+      event.target.value = value;
+      setValue("slug", value, {
         shouldDirty: true,
         shouldValidate: true,
       });
