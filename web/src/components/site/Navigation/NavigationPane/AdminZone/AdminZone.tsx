@@ -66,14 +66,7 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
   }
 
   return (
-    <Box
-      w="full"
-      pl="3"
-      pr="2"
-      py="1"
-      bgColor="status.warning.surface"
-      borderTopRadius="md"
-    >
+    <Box w="full" pl="3" pr="2" py="1">
       <HStack w="full" fontSize="xs" justify="space-between">
         <HStack gap="1" color="status.warning.content">
           <AdminIcon w="4" />
