@@ -1,13 +1,11 @@
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { Heading } from "@/components/ui/heading";
 import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
 
 import {
   Props,
@@ -31,30 +29,28 @@ export function MemberInterfaceSettings(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()}>
-        <WStack>
-          <Heading size="md">Interface settings</Heading>
-          <Button type="submit" loading={formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
+      <WStack>
+        <Heading size="md">Interface settings</Heading>
+        <Button type="submit" loading={formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
 
-        <FormControl>
-          <FormLabel>Text editor style</FormLabel>
-          <FormRadioGroupField
-            control={control}
-            name="editorMode"
-            items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
-            ]}
-          />
-          <FormHelperText>
-            Choose your preferred editor style for composing threads, replies
-            and pages.
-          </FormHelperText>
-        </FormControl>
-      </CardBox>
+      <FormControl>
+        <FormLabel>Text editor style</FormLabel>
+        <FormRadioGroupField
+          control={control}
+          name="editorMode"
+          items={[
+            { label: "Rich text", value: "richtext" },
+            { label: "Markdown", value: "markdown" },
+          ]}
+        />
+        <FormHelperText>
+          Choose your preferred editor style for composing threads, replies and
+          pages.
+        </FormHelperText>
+      </FormControl>
     </styled.form>
   );
 }

@@ -1,13 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import type { KeyboardEvent, PropsWithChildren } from "react";
+import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
 
 type Props = {
   canRegister?: boolean;
+  desktopSidebar: ReactNode;
+  siteNavigation: ReactNode;
 };
 
 const focusableSelector = [
@@ -23,8 +25,9 @@ const mobileMediaQuery = "(max-width: 767px)";
 
 export function NavigationChrome({
   canRegister,
-  children,
-}: PropsWithChildren<Props>) {
+  desktopSidebar,
+  siteNavigation,
+}: Props) {
   const pathname = usePathname();
   const chromeRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -167,6 +170,16 @@ export function NavigationChrome({
     }
   }
 
+  function handleDrawerClick(event: MouseEvent<HTMLDivElement>) {
+    if (
+      isMobileNavigationModal &&
+      event.target instanceof Element &&
+      event.target.closest("a[href]")
+    ) {
+      closeMobileNavigation();
+    }
+  }
+
   return (
     <div
       ref={chromeRef}
@@ -181,16 +194,19 @@ export function NavigationChrome({
         onClick={closeMobileNavigation}
       />
 
+      <div className="navigation__desktop-sidebar">{desktopSidebar}</div>
+
       <div
         id="navigation__leftbar"
         ref={drawerRef}
         aria-label="Site navigation"
         aria-modal={isMobileNavigationModal ? "true" : undefined}
         className="navigation__leftbar"
+        onClick={handleDrawerClick}
         role={isMobileNavigationModal ? "dialog" : undefined}
         tabIndex={-1}
       >
-        {children}
+        {siteNavigation}
       </div>
 
       <div className="navigation__navpill">

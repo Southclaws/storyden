@@ -7,7 +7,6 @@ import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -97,56 +96,54 @@ export function AuthenticationSettingsForm(props: Props) {
     useAuthenticationSettingsForm(props);
 
   return (
-    <CardBox>
-      <styled.form className={lstack()} onSubmit={handleSubmit}>
-        <WStack>
-          <Heading size="md">Authentication settings</Heading>
-          <Button type="submit" loading={form.formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
+    <styled.form className={lstack()} onSubmit={handleSubmit}>
+      <WStack>
+        <Heading size="md">Authentication settings</Heading>
+        <Button type="submit" loading={form.formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
 
-        <FormControl>
-          <FormLabel>Authentication mode</FormLabel>
-          <FormCardGroupRadio
-            control={form.control}
-            name="authentication_mode"
-            items={availableModes.map((m) => ({
-              value: m.value,
-              label: m.name,
-              description: m.description,
-              disabled: !m.enabled,
-            }))}
-          />
-          <FormErrorText>
-            {form.formState.errors["authentication_mode"]?.message}{" "}
-          </FormErrorText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Authentication mode</FormLabel>
+        <FormCardGroupRadio
+          control={form.control}
+          name="authentication_mode"
+          items={availableModes.map((m) => ({
+            value: m.value,
+            label: m.name,
+            description: m.description,
+            disabled: !m.enabled,
+          }))}
+        />
+        <FormErrorText>
+          {form.formState.errors["authentication_mode"]?.message}{" "}
+        </FormErrorText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Registration mode</FormLabel>
-          <FormCardGroupRadio
-            control={form.control}
-            name="registration_mode"
-            items={RegistrationModeList.map((m) => ({
-              value: m.value,
-              label: m.name,
-              description: m.description,
-            }))}
-          />
-          <FormErrorText>
-            {form.formState.errors["registration_mode"]?.message}{" "}
-          </FormErrorText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Registration mode</FormLabel>
+        <FormCardGroupRadio
+          control={form.control}
+          name="registration_mode"
+          items={RegistrationModeList.map((m) => ({
+            value: m.value,
+            label: m.name,
+            description: m.description,
+          }))}
+        />
+        <FormErrorText>
+          {form.formState.errors["registration_mode"]?.message}{" "}
+        </FormErrorText>
+      </FormControl>
 
-        <FormErrorText>{form.formState.errors["root"]?.message} </FormErrorText>
+      <FormErrorText>{form.formState.errors["root"]?.message} </FormErrorText>
 
-        <WStack justifyContent="end">
-          <Button type="submit" loading={form.formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
-      </styled.form>
-    </CardBox>
+      <WStack justifyContent="end">
+        <Button type="submit" loading={form.formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
+    </styled.form>
   );
 }

@@ -15,7 +15,6 @@ import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
-import { CardBox } from "@/components/ui/card-box";
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Heading } from "@/components/ui/heading";
 import {
@@ -57,7 +56,7 @@ export function AuditLogSettingsScreen() {
   );
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <Heading size="md">Audit Log</Heading>
       <styled.p>
         View all moderation actions and administrative events on this site.
@@ -104,7 +103,7 @@ export function AuditLogSettingsScreen() {
         currentPage={currentPage}
         selectedTypes={selectedTypes}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -132,13 +131,12 @@ function AuditLogEventList({
       </ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/audit-log"
         currentPage={currentPage}
         totalPages={data.total_pages}
         pageSize={data.page_size}
         params={{
           types: selectedTypes.map((v) => v.value).join(","),
-          tab: "audit",
         }}
       />
     </>

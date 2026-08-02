@@ -16,6 +16,7 @@ export * from './number-input.mjs';
 export * from './input-group.mjs';
 export * from './date-picker.mjs';
 export * from './select.mjs';
+export * from './section-navigation.mjs';
 export * from './color-picker.mjs';
 export * from './combobox.mjs';
 export * from './menu.mjs';

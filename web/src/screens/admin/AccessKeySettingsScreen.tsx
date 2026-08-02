@@ -1,3 +1,5 @@
+"use client";
+
 import { useAdminAccessKeyList } from "@/api/openapi-client/admin";
 import { AccessKeySettings } from "@/components/admin/AccessKeySettings/AccessKeySettings";
 import { UnreadyBanner } from "@/components/site/Unready";

@@ -10,7 +10,6 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { DateRangePicker } from "@/components/ui/date-picker";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
@@ -57,7 +56,7 @@ export function EmailLogSettingsScreen() {
   );
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <WStack>
         <Heading size="md">Email Log</Heading>
 
@@ -127,7 +126,7 @@ export function EmailLogSettingsScreen() {
         onRetry={retryEmail}
         retryingEmailId={retryingEmailId}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -176,7 +175,7 @@ function EmailLogList({
       </ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/email"
         currentPage={currentPage}
         totalPages={data.total_pages}
         pageSize={data.page_size}
@@ -354,6 +353,5 @@ function buildEmailLogPaginationParams(
     ...(selectedStatuses.length > 0
       ? { statuses: selectedStatuses.map((status) => status.value).join(",") }
       : {}),
-    tab: "email",
   };
 }

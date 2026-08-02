@@ -17,6 +17,7 @@ export * from './number-input';
 export * from './input-group';
 export * from './date-picker';
 export * from './select';
+export * from './section-navigation';
 export * from './color-picker';
 export * from './combobox';
 export * from './menu';

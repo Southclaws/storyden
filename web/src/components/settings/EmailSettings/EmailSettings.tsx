@@ -2,11 +2,9 @@ import { useState } from "react";
 
 import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
 
 import { EmailCard } from "./EmailCard";
 import { EmailCreateForm } from "./EmailCreateForm";
@@ -47,7 +45,7 @@ export function EmailSettings(props: Props) {
   const { data, handlers } = useEmailSettings(props);
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <LStack>
         <Heading size="md">Email settings</Heading>
         <p>
@@ -84,6 +82,6 @@ export function EmailSettings(props: Props) {
           />
         )}
       </LStack>
-    </CardBox>
+    </LStack>
   );
 }

@@ -1,8 +1,6 @@
 import { PluginActiveState, PluginList } from "@/api/openapi-schema";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
-import { WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { PluginAddTrigger } from "./PluginAddModal/PluginAddModal";
 import { PluginItemList } from "./PluginItemList";
@@ -20,7 +18,7 @@ export function PluginSettingsIndex({ plugins }: Props) {
   const hasInactive = totalPlugins !== activePlugins;
 
   return (
-    <CardBox className={lstack()}>
+    <LStack>
       <WStack justifyContent="space-between">
         <Heading size="md">Plugins</Heading>
 
@@ -38,6 +36,6 @@ export function PluginSettingsIndex({ plugins }: Props) {
       </styled.p>
 
       <PluginItemList plugins={plugins} />
-    </CardBox>
+    </LStack>
   );
 }

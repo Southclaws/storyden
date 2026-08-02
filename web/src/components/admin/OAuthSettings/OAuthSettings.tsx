@@ -14,7 +14,6 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
@@ -45,7 +44,7 @@ export function OAuthSettings({
   const activeTokens = tokens.filter((token) => !token.revoked_at).length;
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <LStack gap="2">
         <Heading size="md">OAuth</Heading>
         <p>OAuth clients, device authorisations, and refresh tokens.</p>
@@ -60,7 +59,7 @@ export function OAuthSettings({
       <OAuthDeviceAuthorisationListView
         deviceAuthorisations={deviceAuthorisations}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -157,11 +156,10 @@ function OAuthRefreshTokenListView({
       </styled.ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/oauth"
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         pageSize={page.pageSize}
-        params={{ tab: "oauth" }}
       />
     </LStack>
   );

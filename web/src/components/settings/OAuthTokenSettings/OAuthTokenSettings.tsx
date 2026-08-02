@@ -13,7 +13,6 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
@@ -44,7 +43,7 @@ export function OAuthTokenSettings({ tokens, clients, tokenPage }: Props) {
   return (
     <>
       <LStack gap="8">
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack w="full">
             <Heading size="md">OAuth clients</Heading>
             <p>
@@ -56,7 +55,7 @@ export function OAuthTokenSettings({ tokens, clients, tokenPage }: Props) {
           <LStack>
             <WStack alignItems="center" color="text.subtle">
               <styled.p>{clients.length} clients.</styled.p>
-              <Button size="xs" variant="subtle" onClick={createModal.onOpen}>
+              <Button onClick={createModal.onOpen}>
                 <AddIcon />
                 New
               </Button>
@@ -64,16 +63,16 @@ export function OAuthTokenSettings({ tokens, clients, tokenPage }: Props) {
 
             <OAuthClientItemList clients={clients} />
           </LStack>
-        </CardBox>
+        </LStack>
 
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack>
             <Heading size="md">Authorised applications</Heading>
             <p>Applications you have authorised to access this site.</p>
           </LStack>
 
           <OAuthTokenItemList tokens={tokens} page={tokenPage} />
-        </CardBox>
+        </LStack>
       </LStack>
 
       <CreateOAuthClientModal
@@ -192,11 +191,10 @@ function OAuthTokenItemList({
       </styled.ul>
 
       <PaginationControls
-        path="/settings"
+        path="/settings/oauth"
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         pageSize={page.pageSize}
-        params={{ tab: "oauth" }}
       />
     </LStack>
   );
@@ -278,15 +276,10 @@ function ConfirmActions({
   if (confirming) {
     return (
       <HStack gap="2">
-        <Button
-          size="xs"
-          variant="subtle"
-          bgColor="status.danger.surface"
-          onClick={onConfirm}
-        >
+        <Button bgColor="status.danger.surface" onClick={onConfirm}>
           {confirmLabel}
         </Button>
-        <Button size="xs" variant="outline" onClick={onCancel}>
+        <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
       </HStack>
@@ -295,7 +288,6 @@ function ConfirmActions({
 
   return (
     <Button
-      size="xs"
       variant="outline"
       bgColor="status.danger.surface"
       onClick={onConfirm}

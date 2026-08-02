@@ -1,6 +1,5 @@
 "use client";
 
-import { ButtonGroup } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
 import RobotListScreen from "@/screens/robots/RobotListScreen";
@@ -14,15 +13,7 @@ export default function Page() {
           <Heading size="md">Robots</Heading>
         </HStack>
 
-        <ButtonGroup attached>
-          <LinkButton variant="subtle" size="xs" href="/robots/chats">
-            Chats
-          </LinkButton>
-
-          <LinkButton href="/robots/new" variant="subtle" size="xs">
-            New
-          </LinkButton>
-        </ButtonGroup>
+        <LinkButton href="/robots/new">New</LinkButton>
       </WStack>
 
       <RobotListScreen />

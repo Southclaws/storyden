@@ -10,7 +10,6 @@ import { PermissionBadge } from "@/components/role/PermissionBadge";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { PermissionDetails } from "@/lib/permission/permission";
@@ -29,10 +28,10 @@ export function AccessKeySettings({ keys }: Props) {
 
   if (keys.length === 0) {
     return (
-      <CardBox className={lstack()}>
+      <LStack>
         <Heading size="md">Access keys</Heading>
         <p>No access keys have been created yet.</p>
-      </CardBox>
+      </LStack>
     );
   }
 
@@ -41,7 +40,7 @@ export function AccessKeySettings({ keys }: Props) {
   const hasInactive = totalKeys != totalActiveKeys;
 
   return (
-    <CardBox className={lstack()}>
+    <LStack>
       <Heading size="md">Access keys</Heading>
       <p>All access keys created by members of this site.</p>
       <div>
@@ -73,7 +72,7 @@ export function AccessKeySettings({ keys }: Props) {
           />
         ))}
       </ul>
-    </CardBox>
+    </LStack>
   );
 }
 

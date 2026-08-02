@@ -34,7 +34,7 @@ export const tabs = defineSlotRecipe({
     },
     trigger: {
       alignItems: "center",
-      color: "text.subtle",
+      color: "text.muted",
       cursor: "pointer",
       display: "inline-flex",
       flexShrink: "0",
@@ -54,7 +54,7 @@ export const tabs = defineSlotRecipe({
         },
       },
       _hover: {
-        color: "text.subtle",
+        color: "text.default",
       },
       _selected: {
         color: "text.default",

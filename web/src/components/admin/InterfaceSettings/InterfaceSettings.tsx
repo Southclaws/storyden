@@ -1,7 +1,6 @@
 import { Controller } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
@@ -10,7 +9,6 @@ import { Heading } from "@/components/ui/heading";
 import { FormNumberInputField } from "@/components/ui/number-input";
 import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
 
 import { Props, useInterfaceSettings } from "./useInterfaceSettings";
 
@@ -26,79 +24,77 @@ export function InterfaceSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()}>
-        <WStack>
-          <Heading size="md">Interface settings</Heading>
-          <Button type="submit" loading={formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
+      <WStack>
+        <Heading size="md">Interface settings</Heading>
+        <Button type="submit" loading={formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
 
-        <FormControl>
-          <FormLabel>Default editor</FormLabel>
-          <FormRadioGroupField
-            control={control}
-            name="editorMode"
-            items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
-            ]}
-          />
-          <FormHelperText>
-            Choose the default editor for composing threads, replies and pages.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Default editor</FormLabel>
+        <FormRadioGroupField
+          control={control}
+          name="editorMode"
+          items={[
+            { label: "Rich text", value: "richtext" },
+            { label: "Markdown", value: "markdown" },
+          ]}
+        />
+        <FormHelperText>
+          Choose the default editor for composing threads, replies and pages.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Signatures</FormLabel>
-          <Controller
-            control={control}
-            name="signaturesEnabled"
-            render={({ field }) => (
-              <Checkbox
-                size="sm"
-                checked={!!field.value}
-                onCheckedChange={({ checked }) => {
-                  field.onChange(checked === true);
-                }}
-              >
-                Enable member signatures
-              </Checkbox>
-            )}
-          />
-          <FormHelperText>
-            When disabled, signatures are hidden under posts and on profiles.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Signatures</FormLabel>
+        <Controller
+          control={control}
+          name="signaturesEnabled"
+          render={({ field }) => (
+            <Checkbox
+              size="sm"
+              checked={!!field.value}
+              onCheckedChange={({ checked }) => {
+                field.onChange(checked === true);
+              }}
+            >
+              Enable member signatures
+            </Checkbox>
+          )}
+        />
+        <FormHelperText>
+          When disabled, signatures are hidden under posts and on profiles.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Signature max height (px)</FormLabel>
-          <FormNumberInputField
-            control={control}
-            name="signatureMaxHeight"
-            min={32}
-            max={2000}
-            disabled={!signaturesEnabled}
-          />
-          <FormHelperText>
-            Limits how tall member signatures can appear below posts.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Signature max height (px)</FormLabel>
+        <FormNumberInputField
+          control={control}
+          name="signatureMaxHeight"
+          min={32}
+          max={2000}
+          disabled={!signaturesEnabled}
+        />
+        <FormHelperText>
+          Limits how tall member signatures can appear below posts.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Signature max characters</FormLabel>
-          <FormNumberInputField
-            control={control}
-            name="signatureMaxChars"
-            min={1}
-            max={10000}
-            disabled={!signaturesEnabled}
-          />
-          <FormHelperText>
-            Visible characters, not including HTML tags.
-          </FormHelperText>
-        </FormControl>
-      </CardBox>
+      <FormControl>
+        <FormLabel>Signature max characters</FormLabel>
+        <FormNumberInputField
+          control={control}
+          name="signatureMaxChars"
+          min={1}
+          max={10000}
+          disabled={!signaturesEnabled}
+        />
+        <FormHelperText>
+          Visible characters, not including HTML tags.
+        </FormHelperText>
+      </FormControl>
     </styled.form>
   );
 }

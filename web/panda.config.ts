@@ -24,6 +24,7 @@ import { popover } from "@/components/ui/popover/Popover.recipe";
 import { progress } from "@/components/ui/progress/Progress.recipe";
 import { radioGroup } from "@/components/ui/radio-group/RadioGroup.recipe";
 import { richCard } from "@/components/ui/rich-card/RichCard.recipe";
+import { sectionNavigation } from "@/components/ui/section-navigation/SectionNavigation.recipe";
 import { select } from "@/components/ui/select/Select.recipe";
 import { slider } from "@/components/ui/slider/Slider.recipe";
 import { switchRecipe } from "@/components/ui/switch/Switch.recipe";
@@ -200,6 +201,7 @@ export default defineConfig({
         inputGroup: inputGroup,
         datePicker: datePicker,
         select: select,
+        sectionNavigation: sectionNavigation,
         colorPicker: colorPicker,
         combobox: combobox,
         menu: menu,

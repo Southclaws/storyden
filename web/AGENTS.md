@@ -47,6 +47,25 @@ prefer at least TypeScript and Storybook build before handing back.
 `src/components/ui` is intentionally flat: one component folder per public UI
 component or primitive group.
 
+## Component Reuse
+
+Always prefer an existing component, recipe, or established composition before
+creating a new component. Search `src/components/ui`, its Storybook stories, and
+representative product call sites before writing route-local UI from raw
+elements and bespoke CSS.
+
+Do not create a new visual component, including a feature-local or route-local
+component, without first confirming the decision with the user. Present the
+closest existing components, explain why they cannot satisfy the requirement,
+and agree where the new component belongs. A component that owns new layout,
+spacing, sizing, states, or responsive presentation is a new visual component
+even when it is small, uses BEM classes, or is only consumed once.
+
+Feature-specific compositions are allowed without introducing a new primitive
+when they only arrange existing canonical components and do not establish their
+own visual language. Prefer extending an existing recipe or extracting a shared
+composition when multiple features need the same pattern.
+
 Component folders generally follow this shape:
 
 - `index.ts` re-exports the public API so consumer import paths stay stable.

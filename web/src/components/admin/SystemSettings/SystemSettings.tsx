@@ -19,7 +19,6 @@ import { FormSelectField } from "@/components/ui/select";
 import { FormSliderField } from "@/components/ui/slider";
 import { API_ADDRESS } from "@/config";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
 import { OperationCostOverrides } from "./OperationCostOverrides";
@@ -100,228 +99,222 @@ export function SystemSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()} gap="4">
-        <WStack>
-          <Heading size="md">System settings</Heading>
-          <Button type="submit" loading={formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
+      <WStack>
+        <Heading size="md">System settings</Heading>
+        <Button type="submit" loading={formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
 
-        {hasErrors && showError && (
-          <Admonition
-            value={true}
-            kind="failure"
-            title="Form validation error"
-            onChange={() => setShowError(false)}
-          >
-            {errorMessages}
-          </Admonition>
-        )}
+      {hasErrors && showError && (
+        <Admonition
+          value={true}
+          kind="failure"
+          title="Form validation error"
+          onChange={() => setShowError(false)}
+        >
+          {errorMessages}
+        </Admonition>
+      )}
 
-        <Heading>Rate limits</Heading>
+      <Heading>Rate limits</Heading>
 
-        <p>
-          Rate limits help protect your installation from spam, DDoS attacks and
-          content scraping. This is achieved by limiting the number of{" "}
-          <strong>Operations</strong>{" "}
-          <InfoTip title="What is an operation?">
-            An "Operation" is a request to Storyden's backend. Loading a screen
-            such as Home, a Thread or a Library Page usually involves 10-30
-            request operations.
-          </InfoTip>{" "}
-          in a time period.
-        </p>
+      <p>
+        Rate limits help protect your installation from spam, DDoS attacks and
+        content scraping. This is achieved by limiting the number of{" "}
+        <strong>Operations</strong>{" "}
+        <InfoTip title="What is an operation?">
+          An "Operation" is a request to Storyden's backend. Loading a screen
+          such as Home, a Thread or a Library Page usually involves 10-30
+          request operations.
+        </InfoTip>{" "}
+        in a time period.
+      </p>
 
-        <p>
-          Members:{" "}
-          <styled.strong color="status.info.content">{rateLimit}</styled.strong>{" "}
-          operations every{" "}
-          <styled.strong color="status.info.content">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
-          </styled.strong>{" "}
-          (~
-          <styled.strong color="status.info.content">
-            {memberRequestsPerMinute}
-          </styled.strong>{" "}
-          requests per minute).
-        </p>
+      <p>
+        Members:{" "}
+        <styled.strong color="status.info.content">{rateLimit}</styled.strong>{" "}
+        operations every{" "}
+        <styled.strong color="status.info.content">
+          {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+        </styled.strong>{" "}
+        (~
+        <styled.strong color="status.info.content">
+          {memberRequestsPerMinute}
+        </styled.strong>{" "}
+        requests per minute).
+      </p>
 
-        <p>
-          Guests:{" "}
-          <styled.strong color="status.info.content">
-            {guestRateLimit}
-          </styled.strong>{" "}
-          operations every{" "}
-          <styled.strong color="status.info.content">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
-          </styled.strong>{" "}
-          (~
-          <styled.strong color="status.info.content">
-            {guestRequestsPerMinute}
-          </styled.strong>{" "}
-          requests per minute).
-        </p>
+      <p>
+        Guests:{" "}
+        <styled.strong color="status.info.content">
+          {guestRateLimit}
+        </styled.strong>{" "}
+        operations every{" "}
+        <styled.strong color="status.info.content">
+          {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+        </styled.strong>{" "}
+        (~
+        <styled.strong color="status.info.content">
+          {guestRequestsPerMinute}
+        </styled.strong>{" "}
+        requests per minute).
+      </p>
 
-        <RateLimitTester />
+      <RateLimitTester />
 
-        <FormControl>
-          <FormSliderField
-            control={control}
-            name="rate_limit"
-            label={`Rate limit: ${rateLimit} request units`}
-            min={10}
-            max={20000}
-            step={10}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The amount of requests that a user can make within the
-            `rate_limit_period`.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormSliderField
-            control={control}
-            name="rate_limit_period"
-            label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
-            min={60}
-            max={86400}
-            step={60}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_PERIOD}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT_PERIOD,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The period of time in which the `rate_limit` is applied. This is a
-            sliding window, so the `rate_limit` is applied to the last
-            `rate_limit_period` of requests.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormSliderField
-            control={control}
-            name="rate_limit_bucket"
-            label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
-            min={0}
-            max={1200}
-            step={60}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_BUCKET}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT_BUCKET,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The granularity of rate limit counter buckets. Lower values use more
-            memory but provide more accurate rate limiting. Higher values use
-            less memory but may allow short bursts of traffic above the rate
-            limit.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormSliderField
-            control={control}
-            name="rate_limit_guest_cost"
-            label="Guest rate limit cost multiplier"
-            min={1}
-            max={10}
-            step={1}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_GUEST_COST}
-          />
-          <FormHelperText>
-            The cost multiplier applied to unauthenticated guest visitors. For
-            example, a value of 5 means each operation consumes 5 units from the
-            guest&apos;s rate limit instead of 1, applying stricter limits to
-            non-authenticated traffic.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Operation cost overrides</FormLabel>
-          <FormHelperText>
-            Configure custom cost multipliers for specific API operations.
-            Higher costs reduce the number of requests allowed within the rate
-            limit period.
-          </FormHelperText>
-          <OperationCostOverrides
-            control={control}
-            name="cost_overrides"
-            rateLimit={rateLimit ?? DEFAULT_RATE_LIMIT}
-            rateLimitPeriod={rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD}
-          />
-        </FormControl>
-
-        <Heading>Client IP strategy</Heading>
-
-        <FormControl>
-          <FormLabel>Client IP mode</FormLabel>
-          <FormSelectField<
-            Form,
-            (typeof CLIENT_IP_MODE_COLLECTION.items)[number]
-          >
-            control={control}
-            name="client_ip_mode"
-            collection={CLIENT_IP_MODE_COLLECTION}
-            placeholder="Select client IP mode"
-          />
-          <FormHelperText>
-            Choose how Storyden resolves client addresses for request context.
-            The default uses only RemoteAddr and does not trust forwarded
-            headers. Header-based modes should only be used when your edge
-            proxy/CDN strips or overwrites client-provided forwarding headers.
-          </FormHelperText>
-        </FormControl>
-
-        {clientIPMode === "single_header" && (
-          <FormControl>
-            <FormLabel>Client IP header</FormLabel>
-            <Input {...register("client_ip_header")} />
-            <FormHelperText>
-              Header to trust for the canonical client IP (for example
-              CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
-              unless this header is guaranteed to be injected by trusted
-              infrastructure.
-            </FormHelperText>
-          </FormControl>
-        )}
-
-        {clientIPMode === "xff_trusted_proxies" && (
-          <FormControl>
-            <FormLabel>Trusted proxy CIDRs</FormLabel>
-            <Input
-              {...register("trusted_proxy_cidrs")}
-              placeholder="10.0.0.0/8, 172.16.0.0/12"
-            />
-            <FormHelperText>
-              Comma-separated CIDR ranges that are allowed to append XFF hops.
-              Storyden will only trust XFF when RemoteAddr is in these ranges.
-              Include every proxy hop in your chain to avoid collapsing users to
-              a shared proxy IP.
-            </FormHelperText>
-          </FormControl>
-        )}
-
-        <ClientIPTester
-          canRun={!formState.isDirty && !formState.isSubmitting}
-          initialHeaders={props.settings.headers}
+      <FormControl>
+        <FormSliderField
+          control={control}
+          name="rate_limit"
+          label={`Rate limit: ${rateLimit} request units`}
+          min={10}
+          max={20000}
+          step={10}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT,
+              label: "Default",
+            },
+          ]}
         />
-      </CardBox>
+        <FormHelperText>
+          The amount of requests that a user can make within the
+          `rate_limit_period`.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormSliderField
+          control={control}
+          name="rate_limit_period"
+          label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
+          min={60}
+          max={86400}
+          step={60}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_PERIOD}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT_PERIOD,
+              label: "Default",
+            },
+          ]}
+        />
+        <FormHelperText>
+          The period of time in which the `rate_limit` is applied. This is a
+          sliding window, so the `rate_limit` is applied to the last
+          `rate_limit_period` of requests.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormSliderField
+          control={control}
+          name="rate_limit_bucket"
+          label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
+          min={0}
+          max={1200}
+          step={60}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_BUCKET}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT_BUCKET,
+              label: "Default",
+            },
+          ]}
+        />
+        <FormHelperText>
+          The granularity of rate limit counter buckets. Lower values use more
+          memory but provide more accurate rate limiting. Higher values use less
+          memory but may allow short bursts of traffic above the rate limit.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormSliderField
+          control={control}
+          name="rate_limit_guest_cost"
+          label="Guest rate limit cost multiplier"
+          min={1}
+          max={10}
+          step={1}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_GUEST_COST}
+        />
+        <FormHelperText>
+          The cost multiplier applied to unauthenticated guest visitors. For
+          example, a value of 5 means each operation consumes 5 units from the
+          guest&apos;s rate limit instead of 1, applying stricter limits to
+          non-authenticated traffic.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormLabel>Operation cost overrides</FormLabel>
+        <FormHelperText>
+          Configure custom cost multipliers for specific API operations. Higher
+          costs reduce the number of requests allowed within the rate limit
+          period.
+        </FormHelperText>
+        <OperationCostOverrides
+          control={control}
+          name="cost_overrides"
+          rateLimit={rateLimit ?? DEFAULT_RATE_LIMIT}
+          rateLimitPeriod={rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD}
+        />
+      </FormControl>
+
+      <Heading>Client IP strategy</Heading>
+
+      <FormControl>
+        <FormLabel>Client IP mode</FormLabel>
+        <FormSelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+          control={control}
+          name="client_ip_mode"
+          collection={CLIENT_IP_MODE_COLLECTION}
+          placeholder="Select client IP mode"
+        />
+        <FormHelperText>
+          Choose how Storyden resolves client addresses for request context. The
+          default uses only RemoteAddr and does not trust forwarded headers.
+          Header-based modes should only be used when your edge proxy/CDN strips
+          or overwrites client-provided forwarding headers.
+        </FormHelperText>
+      </FormControl>
+
+      {clientIPMode === "single_header" && (
+        <FormControl>
+          <FormLabel>Client IP header</FormLabel>
+          <Input {...register("client_ip_header")} />
+          <FormHelperText>
+            Header to trust for the canonical client IP (for example
+            CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
+            unless this header is guaranteed to be injected by trusted
+            infrastructure.
+          </FormHelperText>
+        </FormControl>
+      )}
+
+      {clientIPMode === "xff_trusted_proxies" && (
+        <FormControl>
+          <FormLabel>Trusted proxy CIDRs</FormLabel>
+          <Input
+            {...register("trusted_proxy_cidrs")}
+            placeholder="10.0.0.0/8, 172.16.0.0/12"
+          />
+          <FormHelperText>
+            Comma-separated CIDR ranges that are allowed to append XFF hops.
+            Storyden will only trust XFF when RemoteAddr is in these ranges.
+            Include every proxy hop in your chain to avoid collapsing users to a
+            shared proxy IP.
+          </FormHelperText>
+        </FormControl>
+      )}
+
+      <ClientIPTester
+        canRun={!formState.isDirty && !formState.isSubmitting}
+        initialHeaders={props.settings.headers}
+      />
     </styled.form>
   );
 }

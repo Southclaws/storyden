@@ -1,8 +1,8 @@
+"use client";
+
 import { Unready } from "@/components/site/Unready";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { LStack } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
 
 import { OAuth } from "./OAuth/OAuth";
 import { Password } from "./Password/Password";
@@ -17,7 +17,7 @@ export function AuthMethodSettings() {
   const { active, available } = data;
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <LStack>
         <Heading size="md">Authentication methods</Heading>
         <p>
@@ -35,6 +35,6 @@ export function AuthMethodSettings() {
       {(available.oauth.length > 0 || active.methods.length > 0) && (
         <OAuth active={active.methods} available={available.oauth} />
       )}
-    </CardBox>
+    </LStack>
   );
 }

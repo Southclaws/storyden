@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import { InstanceCapability } from "@/api/openapi-schema";
 import { hasCapability } from "@/lib/settings/capabilities";
 import { getSettings } from "@/lib/settings/settings-server";
+import { RobotsTabs } from "@/screens/robots/RobotsTabs";
 
 export default async function Layout({ children }: PropsWithChildren) {
   const { capabilities } = await getSettings();
@@ -12,5 +13,5 @@ export default async function Layout({ children }: PropsWithChildren) {
     notFound();
   }
 
-  return <>{children}</>;
+  return <RobotsTabs>{children}</RobotsTabs>;
 }
