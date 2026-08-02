@@ -5,7 +5,7 @@ export const PageHeading = styled(
   {
     base: {
       color: "text.default",
-      fontSize: "lg",
+      fontSize: "xl",
       fontWeight: "semibold",
       lineHeight: "normal",
     },
