@@ -10,7 +10,7 @@ export const headingInput = defineRecipe({
     overflowWrap: "break-word",
     wordBreak: "break-word",
     fontWeight: "semibold",
-    lineHeight: "1.875rem",
+    lineHeight: "normal",
     cursor: "text",
     borderBottomColor: "border.default",
     borderBottomWidth: "1px",
