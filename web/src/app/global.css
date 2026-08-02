@@ -515,6 +515,25 @@ body {
   padding-inline: var(--navigation-pane-content-padding);
 }
 
+.navigation__scroll-viewport {
+  --navigation-scroll-overflow-gradient-size: var(--spacing-8);
+}
+
+.navigation__scroll-viewport[data-overflow-block-end="true"] {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - var(--navigation-scroll-overflow-gradient-size)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - var(--navigation-scroll-overflow-gradient-size)),
+    transparent 100%
+  );
+}
+
 .sidebar-navigation {
   display: flex;
   width: 100%;

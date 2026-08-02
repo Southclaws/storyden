@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { type MouseEventHandler, type ReactNode } from "react";
+
+import { useOverflowGradient } from "@/utils/useOverflowGradient";
 
 type PaneProps = {
   label: string;
@@ -14,13 +18,20 @@ export function SidebarNavigationPane({
   children,
   footer,
 }: PaneProps) {
+  const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
+
   return (
     <header className="sidebar-navigation-pane navigation__surface">
       <nav className="sidebar-navigation" aria-label={label}>
         <div className="sidebar-navigation__header">
           <h2 className="sidebar-navigation__title">{title}</h2>
         </div>
-        <div className="sidebar-navigation__body">{children}</div>
+        <div
+          ref={scrollViewportRef}
+          className="sidebar-navigation__body navigation__scroll-viewport"
+        >
+          {children}
+        </div>
         {footer && <div className="sidebar-navigation__footer">{footer}</div>}
       </nav>
     </header>

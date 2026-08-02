@@ -3,6 +3,7 @@
 import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { LStack, styled } from "@/styled-system/jsx";
+import { useOverflowGradient } from "@/utils/useOverflowGradient";
 
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { LinksAnchor } from "../Anchors/Link";
@@ -18,6 +19,7 @@ type Props = {
 
 export function ContentNavigationList(props: Props) {
   const { nodeSlug } = useNavigation();
+  const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
 
   return (
     <styled.nav
@@ -32,6 +34,8 @@ export function ContentNavigationList(props: Props) {
       justifyContent="space-between"
     >
       <LStack
+        ref={scrollViewportRef}
+        className="navigation__scroll-viewport"
         gap="1"
         overflowY="scroll"
         style={{
