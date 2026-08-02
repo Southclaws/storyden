@@ -20,7 +20,6 @@ type CategoryCardProps = {
 };
 
 export function CategoryCard({ category, showChildren }: CategoryCardProps) {
-  const cssProps = categoryColourCSS(category.colour);
   const coverImage = getAssetURL(category.cover_image?.path);
 
   const hasSubcategories = category.children.length > 0;
@@ -31,7 +30,6 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
   return (
     <CardBox
       position="relative"
-      style={cssProps}
       borderWidth="none"
       display="flex"
       height="full"
@@ -51,7 +49,6 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
       <LStack
         flex="1"
         p="1"
-        borderColor="colorPalette.border"
         borderWidth="thin"
         borderTopWidth={coverImage ? "none" : undefined}
         borderRadius="lg"
