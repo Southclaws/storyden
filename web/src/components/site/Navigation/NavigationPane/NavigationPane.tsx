@@ -9,17 +9,15 @@ import { type Settings } from "@/lib/settings/settings";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 
-import { AdminZone } from "./AdminZone/AdminZone";
-
-type ServerProps = {
+type NavigationPaneProps = {
   initialSession?: Account;
-  initialSettings: Settings;
+  initialSettings?: Settings;
 };
 
 export async function NavigationPane({
   initialSession,
   initialSettings,
-}: ServerProps) {
+}: NavigationPaneProps) {
   try {
     const [{ data: initialNodeList }, { data: initialCategoryList }] =
       await Promise.all([
@@ -49,26 +47,24 @@ export async function NavigationPane({
 }
 
 type Props = {
-  initialNodeList?: NodeListResult;
-  initialCategoryList?: CategoryListOKResponse;
   initialSession?: Account;
   initialSettings?: Settings;
+  initialNodeList?: NodeListResult;
+  initialCategoryList?: CategoryListOKResponse;
 };
 
 function NavigationPaneContent({
-  initialNodeList,
-  initialCategoryList,
   initialSession,
   initialSettings,
+  initialNodeList,
+  initialCategoryList,
 }: Props) {
   return (
     <header className="navigation-pane navigation__surface">
-      <AdminZone
-        initialSession={initialSession}
-        initialSettings={initialSettings}
-      />
       <div id="desktop-nav-box" className="navigation-pane__content">
         <ContentNavigationList
+          initialSession={initialSession}
+          initialSettings={initialSettings}
           initialNodeList={initialNodeList}
           initialCategoryList={initialCategoryList}
         />

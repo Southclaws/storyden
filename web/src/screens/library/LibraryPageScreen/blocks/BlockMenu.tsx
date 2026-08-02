@@ -2,7 +2,6 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { keyBy } from "lodash";
 import { PropsWithChildren } from "react";
 
-import { ButtonProps } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import * as Menu from "@/components/ui/menu";
 import { allBlockTypes } from "@/lib/library/blockTypes";
@@ -18,14 +17,17 @@ import { LibraryPageDirectoryBlockMenuItems } from "./LibraryPageDirectoryBlock/
 import { LibraryPageTitleBlockMenuItems } from "./LibraryPageTitleBlock/LibraryPageTitleBlockMenuItems";
 
 type Props = {
-  open?: boolean;
   block: LibraryPageBlock;
   index: number;
+  open?: boolean;
 };
 
-type AllProps = PropsWithChildren<Props & ButtonProps>;
-
-export function BlockMenu({ children, open, block, index }: AllProps) {
+export function BlockMenu({
+  children,
+  block,
+  index,
+  open,
+}: PropsWithChildren<Props>) {
   const emit = useEmitLibraryBlockEvent();
 
   const currentMetadata = useWatch((s) => s.draft.meta);
@@ -48,8 +50,8 @@ export function BlockMenu({ children, open, block, index }: AllProps) {
 
   return (
     <Menu.Root
-      open={open}
       lazyMount
+      open={open}
       onSelect={handleSelect}
       positioning={{
         placement: "right-start",

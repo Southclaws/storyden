@@ -11,6 +11,7 @@ import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { EditorSettingsSchema } from "./editor";
 import { DefaultFeedConfig, FeedConfigSchema } from "./feed";
+import { DefaultNavigationConfig, NavigationConfigSchema } from "./navigation";
 
 export const DefaultEditorSettings = {
   mode: "richtext" as const,
@@ -32,6 +33,7 @@ export type MotdMetadata = z.infer<typeof MotdMetadataSchema>;
 
 export const DefaultFrontendConfig = {
   feed: DefaultFeedConfig,
+  navigation: DefaultNavigationConfig,
   editor: DefaultEditorSettings,
   signatures: {
     enabled: true,
@@ -58,6 +60,7 @@ export const DefaultSettings = {
 export const FrontendConfigurationSchema = z
   .object({
     feed: FeedConfigSchema,
+    navigation: NavigationConfigSchema,
     editor: EditorSettingsSchema.default(DefaultEditorSettings),
     signatures: z
       .object({

@@ -1,5 +1,3 @@
-import { Portal } from "@ark-ui/react";
-import { useDndContext } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
@@ -8,15 +6,15 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
-import * as Tooltip from "@/components/ui/tooltip";
-import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
+import { DragItemLibraryBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
-import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
+import { Box } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -34,7 +32,7 @@ import { LibraryPageTagsBlock } from "./LibraryPageTagsBlock/LibraryPageTagsBloc
 import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleBlock";
 
 export function LibraryPageBlocks() {
-  const { store } = useLibraryPageContext();
+  const { initialNode, store } = useLibraryPageContext();
   const { moveBlock, addBlock, removeBlock } = store.getState();
   const { isDirectEditing } = useEditState();
 
@@ -78,7 +76,9 @@ export function LibraryPageBlocks() {
 
   const blocks = meta.layout?.blocks ?? [];
 
-  const blockIds = blocks.map((block) => block.type);
+  const blockIds = blocks.map((block) =>
+    getLibraryBlockSortableID(initialNode.id, block.type),
+  );
 
   if (isDirectEditing) {
     const editStateBlocks = meta.layout?.blocks ?? [];
@@ -156,37 +156,29 @@ function LibraryPageBlockEditable({
   const {
     attributes,
     listeners,
+    setActivatorNodeRef,
     setNodeRef,
     transform,
     transition,
     isDragging,
   } = useSortable({
-    id: block.type,
+    id: getLibraryBlockSortableID(initialNode.id, block.type),
     data: {
-      type: "block",
+      type: "library-block",
       node: initialNode, // TODO: Change this to only pass the node ID.
       block: block.type,
-    } as DragItemNodeBlock,
+    } as DragItemLibraryBlock,
   });
-
-  // Manage the menu state manually due to the complexity of the menu trigger
-  // also being a drag handle for the block.
   const [isOpen, setOpen] = useState(false);
-  function handleMenuToggle() {
-    setOpen((prev) => !prev);
-  }
+  const handleRef = useRef<HTMLDivElement>(null);
 
-  // Manually handle click-away behaviour - the default menu behaviour has been
-  // overridden by making it a controlled component in order to allow for the
-  // drag handle to be used as a menu open trigger.
-  const elementRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
 
     function handleClickAway(event: MouseEvent) {
       if (
-        elementRef.current &&
-        !elementRef.current.contains(event.target as Node)
+        handleRef.current &&
+        !handleRef.current.contains(event.target as Node)
       ) {
         setOpen(false);
       }
@@ -196,10 +188,6 @@ function LibraryPageBlockEditable({
     return () => document.removeEventListener("click", handleClickAway);
   }, [isOpen]);
 
-  // Check if we're dragging anything at all, to hide the tooltip.
-  const { active } = useDndContext();
-  const isDraggingAnything = active !== null;
-
   const dragStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -207,115 +195,45 @@ function LibraryPageBlockEditable({
     flexShrink: 0,
   };
 
-  const dragHandleStyle = {
-    cursor: isDragging ? "grabbing" : "grab",
-  };
-
   return (
-    <HStack
+    <BlockEditor.Root
+      ref={setNodeRef}
       id={`block-${block.type}_container`}
       className="group"
       style={dragStyle}
-      w="full"
-      gap="0"
-      position="relative"
     >
-      <VStack
-        id={`block-${block.type}_gutter-container`}
-        ref={setNodeRef}
-        w="6"
-        left={{ base: "0", md: "-7" }}
-        top={{ base: "-7", md: "0" }}
-        alignItems="start"
-        height="full"
-        position="absolute"
-        p="0"
-      >
-        <VStack
-          id={`block-${block.type}_gutter-drag-handle`}
-          {...listeners}
-          {...attributes}
-          ref={elementRef}
-          w="full"
-          h={{ base: "6", md: "full" }}
-          bgColor="selection.background/50"
-          color="text.muted"
-          borderRadius="sm"
-          visibility="hidden"
-          _groupHover={{
-            visibility: "visible",
-          }}
-          // Hide on mobile: Not happy with the mobile experience of this yet.
-          display={{ base: "none", md: "flex" }}
-        >
-          <Tooltip.Root
-            openDelay={0}
-            closeDelay={0}
-            disabled={isDraggingAnything}
-            positioning={{
-              slide: true,
-              gutter: 4,
-              placement: "bottom-start",
-            }}
+      <BlockEditor.Gutter id={`block-${block.type}_gutter-container`}>
+        <BlockEditor.Handle ref={handleRef}>
+          <IconButton
+            {...attributes}
+            {...listeners}
+            ref={setActivatorNodeRef}
+            aria-label="Move or configure block"
+            id={`block-${block.type}_gutter-drag-handle`}
+            style={{ cursor: isDragging ? "grabbing" : "grab" }}
+            variant="subtle"
+            onClick={() => setOpen((open) => !open)}
           >
-            <Tooltip.Trigger asChild>
-              <Box position="relative">
-                <Box style={dragHandleStyle}>
-                  <IconButton
-                    style={dragHandleStyle}
-                    id={`block-${block.type}_gutter-drag-handle-button`}
-                    variant={{
-                      base: "subtle",
-                      md: "ghost",
-                    }}
-                    minWidth="5"
-                    width="5"
-                    height="5"
-                    padding="0"
-                    color="text.subtle"
-                    onClick={handleMenuToggle}
-                  >
-                    <DragHandleIcon width="4" />
-                  </IconButton>
-                </Box>
-              </Box>
-            </Tooltip.Trigger>
-            <Portal>
-              <Tooltip.Positioner>
-                <Tooltip.Arrow>
-                  <Tooltip.ArrowTip />
-                </Tooltip.Arrow>
+            <DragHandleIcon />
+          </IconButton>
 
-                <Tooltip.Content p="1" borderRadius="sm">
-                  <p>
-                    <styled.span fontWeight="semibold">Click</styled.span>&nbsp;
-                    <styled.span fontWeight="normal">to open menu</styled.span>
-                  </p>
-                  <p>
-                    <styled.span fontWeight="semibold">Drag</styled.span>&nbsp;
-                    <styled.span fontWeight="normal">to move</styled.span>
-                  </p>
-                </Tooltip.Content>
-              </Tooltip.Positioner>
-            </Portal>
-          </Tooltip.Root>
-
-          <Box
-            position="absolute"
-            top="0"
-            width="6"
-            height="6"
-            pointerEvents="none"
-          >
-            <BlockMenu block={block} open={isOpen} index={index}>
-              <Box position="absolute" width="6" height="6" />
+          <Box position="absolute" inset="0" pointerEvents="none">
+            <BlockMenu block={block} index={index} open={isOpen}>
+              <Box width="full" height="full" />
             </BlockMenu>
           </Box>
-        </VStack>
-      </VStack>
-      <Box id={`block-${block.type}_content`} w="full" minW="0">
+        </BlockEditor.Handle>
+      </BlockEditor.Gutter>
+      <BlockEditor.Content id={`block-${block.type}_content`}>
         <LibraryPageBlockRender block={block} />
-      </Box>
-    </HStack>
+      </BlockEditor.Content>
+    </BlockEditor.Root>
   );
+}
+
+function getLibraryBlockSortableID(
+  nodeID: string,
+  blockType: LibraryPageBlockType,
+) {
+  return `library-block:${nodeID}:${blockType}`;
 }

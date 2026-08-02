@@ -20,11 +20,17 @@ type Props = {
 export function MemberActions({ session, canRegister }: Props) {
   const account = useSession(session);
   return (
-    <HStack w="full" gap="2" alignItems="center" justify="end" pr="1">
+    <HStack
+      className="navigation-pane__member-actions"
+      w="full"
+      gap="2"
+      alignItems="center"
+      justify="space-between"
+    >
       {account ? (
         <>
+          <AccountMenu account={account} name="handle" size="sm" />
           <NotificationsMenu status="unread" />
-          <AccountMenu account={account} />
         </>
       ) : (
         <>

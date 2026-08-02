@@ -2,46 +2,44 @@
 
 import { handle } from "@/api/client";
 
-import { DefaultFeedConfig, type FeedConfig } from "./feed";
 import { useSettingsMutation } from "./mutation";
+import { DefaultNavigationConfig, type NavigationConfig } from "./navigation";
 import { type Settings } from "./settings";
 import { useSettings } from "./settings-client";
 
-export function useFeedConfig(
+export function useNavigationConfig(
   initialSettings?: Settings,
   revalidateOnMount = false,
-): FeedConfig {
+): NavigationConfig {
   const { settings } = useSettings(initialSettings, revalidateOnMount);
 
   return (
-    settings?.metadata.feed ??
-    initialSettings?.metadata.feed ??
-    DefaultFeedConfig
+    settings?.metadata.navigation ??
+    initialSettings?.metadata.navigation ??
+    DefaultNavigationConfig
   );
 }
 
-export function useFeedMutation() {
+export function useNavigationMutation() {
   const { updateSettings } = useSettingsMutation();
 
-  const updateFeed = async (feed: FeedConfig) => {
+  async function updateNavigation(navigation: NavigationConfig) {
     await handle(
       async () => {
         await updateSettings({
           metadata: {
-            feed,
+            navigation,
           },
         });
       },
       {
         promiseToast: {
-          loading: "Updating feed configuration...",
-          success: "Updated!",
+          loading: "Updating navigation...",
+          success: "Navigation updated",
         },
       },
     );
-  };
+  }
 
-  return {
-    updateFeed,
-  };
+  return { updateNavigation };
 }

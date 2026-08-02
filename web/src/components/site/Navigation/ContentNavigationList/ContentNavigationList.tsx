@@ -1,18 +1,23 @@
 "use client";
 
-import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
-import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { LStack, styled } from "@/styled-system/jsx";
+import {
+  type Account,
+  type CategoryListOKResponse,
+  type NodeListResult,
+} from "@/api/openapi-schema";
+import { useNavigationConfig } from "@/lib/settings/navigation-client";
+import { type Settings } from "@/lib/settings/settings";
+import { useSiteEditorState } from "@/lib/settings/site-editor-client";
+import { styled } from "@/styled-system/jsx";
 import { useOverflowGradient } from "@/utils/useOverflowGradient";
 
-import { CollectionsAnchor } from "../Anchors/Collections";
-import { LinksAnchor } from "../Anchors/Link";
-import { MembersAnchor } from "../Anchors/Members";
-import { RolesAnchor } from "../Anchors/Roles";
-import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 
+import { NavigationItems } from "./NavigationItems";
+
 type Props = {
+  initialSession?: Account;
+  initialSettings?: Settings;
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
 };
@@ -20,42 +25,35 @@ type Props = {
 export function ContentNavigationList(props: Props) {
   const { nodeSlug } = useNavigation();
   const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
+  const navigation = useNavigationConfig(props.initialSettings, false);
+  const { isEditing } = useSiteEditorState({
+    initialSession: props.initialSession,
+    initialSettings: props.initialSettings,
+  });
 
   return (
     <styled.nav
       aria-label="Site navigation"
       display="flex"
       flexDir="column"
-      gap="4"
       height="full"
       width="full"
       minH="0"
       alignItems="start"
-      justifyContent="space-between"
     >
-      <LStack
+      <div
         ref={scrollViewportRef}
-        className="navigation__scroll-viewport"
-        gap="1"
-        overflowY="scroll"
-        style={{
-          scrollbarWidth: "none",
-        }}
+        className="navigation__scroll-viewport navigation-editor__viewport"
+        style={{ scrollbarWidth: "none" }}
       >
-        <CategoryList initialCategoryList={props.initialCategoryList} />
-        <LibraryNavigationTree
-          initialNodeList={props.initialNodeList}
+        <NavigationItems
+          navigation={navigation}
           currentNode={nodeSlug}
-          visibility={["draft", "review", "unlisted", "published"]}
+          initialCategoryList={props.initialCategoryList}
+          initialNodeList={props.initialNodeList}
+          isEditing={isEditing}
         />
-      </LStack>
-
-      <LStack gap="1">
-        <CollectionsAnchor />
-        <LinksAnchor />
-        <MembersAnchor />
-        <RolesAnchor />
-      </LStack>
+      </div>
     </styled.nav>
   );
 }
