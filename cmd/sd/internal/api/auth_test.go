@@ -15,10 +15,43 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/cmd/sd/internal/config"
 )
 
 func TestNewAuthenticatedClient(t *testing.T) {
+	t.Run("does not impose a whole request timeout", func(t *testing.T) {
+		r := require.New(t)
+
+		server := httptest.NewServer(http.NotFoundHandler())
+		defer server.Close()
+
+		store := config.NewFileStoreAt(filepath.Join(t.TempDir(), "storyden", "config.yaml"))
+		cfg := config.New()
+		cfg.UpsertContext("local", config.Context{
+			APIURL:   server.URL,
+			AuthType: config.AuthStorageFile,
+			Auth: &config.Auth{
+				Method:      config.AuthMethodAccessKey,
+				AccessToken: "sdak_test_access_key",
+				TokenType:   "Bearer",
+			},
+		})
+		cfg.SetCurrentContext("local")
+		r.NoError(store.Save(cfg))
+
+		client, err := NewAuthenticatedClient(context.Background(), store)
+		r.NoError(err)
+
+		generated, ok := client.OpenAPI.ClientInterface.(*openapi.Client)
+		r.True(ok)
+		authenticated, ok := generated.Client.(authenticatedDoer)
+		r.True(ok)
+		httpClient, ok := authenticated.base.(*http.Client)
+		r.True(ok)
+		r.Zero(httpClient.Timeout)
+	})
+
 	t.Run("returns human readable rate limit errors", func(t *testing.T) {
 		r := require.New(t)
 

@@ -24,7 +24,7 @@ func New(store *config.Store) LogsCommand {
 		Short: "Stream supervised plugin logs",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			client, err := api.NewAuthenticatedClient(cmd.Context(), store, api.WithRequestTimeout(0))
+			client, err := api.NewAuthenticatedClient(cmd.Context(), store)
 			if err != nil {
 				return err
 			}
