@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { type ReactNode } from "react";
+import { type MouseEventHandler, type ReactNode } from "react";
 
 type PaneProps = {
   label: string;
@@ -47,6 +47,7 @@ type LinkProps = {
   icon: ReactNode;
   active?: boolean;
   description?: string;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
 
 export function SidebarNavigationLink({
@@ -55,12 +56,14 @@ export function SidebarNavigationLink({
   icon,
   active,
   description,
+  onClick,
 }: LinkProps) {
   return (
     <Link
       className="sidebar-navigation__link"
       href={href}
       aria-current={active ? "page" : undefined}
+      onClick={onClick}
     >
       <span className="sidebar-navigation__icon" aria-hidden="true">
         {icon}

@@ -5,6 +5,7 @@ import { type PropsWithChildren, useEffect } from "react";
 
 import { useAccountGet } from "@/api/openapi-client/accounts";
 import { Permission } from "@/api/openapi-schema";
+import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { SectionNavigation } from "@/components/ui/section-navigation";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -51,11 +52,14 @@ export default function Layout({ children }: PropsWithChildren) {
 
   return (
     <div className="section-navigation-layout">
-      <SectionNavigation
-        className="section-navigation-layout__navigation"
-        groups={groups}
-        label="Admin sections"
-      />
+      <div className="section-navigation-layout__mobile-navigation">
+        <BackAction flexShrink="0" />
+        <SectionNavigation
+          className="section-navigation-layout__navigation"
+          groups={groups}
+          label="Admin sections"
+        />
+      </div>
       <div className="section-navigation-layout__content">{children}</div>
     </div>
   );

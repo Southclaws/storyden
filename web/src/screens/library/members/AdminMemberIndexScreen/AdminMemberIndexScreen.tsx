@@ -11,6 +11,7 @@ import { RoleFilter } from "@/components/library/members/MemberFilters/RoleFilte
 import { SortMenu } from "@/components/library/members/MemberFilters/SortMenu";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
+import { BackAction } from "@/components/site/Action/Back";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Timestamp } from "@/components/site/Timestamp";
@@ -23,6 +24,7 @@ import { CheckIcon } from "@/components/ui/icons/Check";
 import { MembersIcon } from "@/components/ui/icons/Members";
 import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
+import { PageHeader } from "@/components/ui/page-header";
 import { Text } from "@/components/ui/text";
 import {
   Box,
@@ -67,6 +69,7 @@ export function AdminMemberIndexScreen(props: Props) {
 
   return (
     <VStack alignItems="stretch" gap="4" w="full">
+      <PageHeader title="Member administration" back={<BackAction />} />
       <Group>
         <SearchInput
           index="/m"

@@ -22,6 +22,7 @@ import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SystemIcon } from "@/components/ui/icons/System";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { useSmartBack } from "@/lib/navigation/smart-back";
 import { useSettings } from "@/lib/settings/settings-client";
 import { hasPermission } from "@/utils/permissions";
 
@@ -45,6 +46,7 @@ export function AdminNavigationPane() {
   const pathname = usePathname();
   const account = useAccountGet();
   const settings = useSettings();
+  const goBack = useSmartBack();
   const authorised = hasPermission(
     account.data,
     Permission.ADMINISTRATOR,
@@ -66,6 +68,10 @@ export function AdminNavigationPane() {
           href="/"
           label="Back to community"
           icon={<HomeIcon />}
+          onClick={(event) => {
+            event.preventDefault();
+            goBack();
+          }}
         />
       }
     >

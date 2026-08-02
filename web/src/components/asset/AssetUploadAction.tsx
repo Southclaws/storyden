@@ -32,6 +32,7 @@ export function AssetUploadAction({
   ...props
 }: PropsWithChildren<Props>) {
   const [buttonVariantProps, fileUploadProps] = button.splitVariantProps(props);
+  const label = operation === "add" ? "Add cover" : "Replace cover";
 
   const acceptedMIMEs = getMIMEs(props.accept);
 
@@ -103,7 +104,13 @@ export function AssetUploadAction({
     >
       <FileUpload.Trigger asChild>
         {children || (
-          <Button type="button" variant="outline" {...buttonVariantProps}>
+          <Button
+            type="button"
+            variant="outline"
+            aria-label={hideLabel ? label : undefined}
+            title={hideLabel ? label : undefined}
+            {...buttonVariantProps}
+          >
             {operation === "add" ? (
               <>
                 <MediaAddIcon />

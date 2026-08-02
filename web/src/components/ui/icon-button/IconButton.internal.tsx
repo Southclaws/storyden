@@ -28,13 +28,26 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       () => ({ ...propsContext, ...props }),
       [propsContext, props],
     );
-    const { loading, disabled, loadingText, children, ...rest } =
-      iconButtonProps;
+    const {
+      loading,
+      disabled,
+      loadingText,
+      children,
+      "aria-label": ariaLabel,
+      title = ariaLabel,
+      ...rest
+    } = iconButtonProps;
 
     const trulyDisabled = loading || disabled;
 
     return (
-      <StyledIconButton disabled={trulyDisabled} ref={ref} {...rest}>
+      <StyledIconButton
+        aria-label={ariaLabel}
+        disabled={trulyDisabled}
+        ref={ref}
+        title={title}
+        {...rest}
+      >
         {loading && !loadingText ? (
           <>
             <Spinner />

@@ -8,11 +8,13 @@ import { JoinedDateFilter } from "@/components/library/members/MemberFilters/Joi
 import { RoleFilter } from "@/components/library/members/MemberFilters/RoleFilter";
 import { SortMenu } from "@/components/library/members/MemberFilters/SortMenu";
 import { MemberList } from "@/components/library/members/MemberList";
+import { BackAction } from "@/components/site/Action/Back";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
 import { Group } from "@/components/ui/group";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeader } from "@/components/ui/page-header";
 import { Flex, VStack } from "@/styled-system/jsx";
 
 import { SearchInput } from "../SearchInput";
@@ -33,7 +35,8 @@ export function MemberIndexScreen(props: Props) {
   }
 
   return (
-    <VStack>
+    <VStack gap="4">
+      <PageHeader title="Members" back={<BackAction />} />
       <Group w="full">
         <SearchInput index="/m" initialQuery={props.query} />
         {props.adminModeAvailable && (

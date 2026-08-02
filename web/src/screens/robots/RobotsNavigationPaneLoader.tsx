@@ -1,19 +1,20 @@
-import { robotSessionsList, robotsList } from "@/api/openapi-server/robots";
+"use client";
+
+import {
+  useRobotSessionsList,
+  useRobotsList,
+} from "@/api/openapi-client/robots";
 
 import { RobotsNavigationPane } from "./RobotsNavigationPane";
 
-export async function RobotsNavigationPaneLoader() {
-  const [robotsResult, sessionsResult] = await Promise.allSettled([
-    robotsList(),
-    robotSessionsList(),
-  ]);
+export function RobotsNavigationPaneLoader() {
+  const robots = useRobotsList();
+  const sessions = useRobotSessionsList();
 
-  const robots =
-    robotsResult.status === "fulfilled" ? robotsResult.value.data.robots : [];
-  const sessions =
-    sessionsResult.status === "fulfilled"
-      ? sessionsResult.value.data.sessions
-      : [];
-
-  return <RobotsNavigationPane robots={robots} sessions={sessions} />;
+  return (
+    <RobotsNavigationPane
+      robots={robots.data?.robots ?? []}
+      sessions={sessions.data?.sessions ?? []}
+    />
+  );
 }

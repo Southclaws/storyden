@@ -38,6 +38,7 @@ export function Anchor({
       variant="ghost"
       className={cx("navigation-anchor", `navigation-anchor--${id}`, className)}
       data-navigation-anchor={id}
+      aria-label={hideLabel ? label : undefined}
       {...props}
     >
       <span className="navigation-anchor__icon" aria-hidden="true">
@@ -65,6 +66,8 @@ export function MenuItem({
       className={cx("navigation-menu-anchor", `navigation-menu-anchor--${id}`)}
       data-navigation-anchor={id}
       href={href}
+      aria-label={hideLabel ? label : undefined}
+      title={hideLabel ? label : undefined}
     >
       <Item value={id}>
         <span className="navigation-menu-anchor__icon" aria-hidden="true">

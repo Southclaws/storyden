@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { type PropsWithChildren, useEffect } from "react";
 
 import { useAccountGet } from "@/api/openapi-client/accounts";
+import { BackAction } from "@/components/site/Action/Back";
 import { SectionNavigation } from "@/components/ui/section-navigation";
 import { useSettings } from "@/lib/settings/settings-client";
 import {
@@ -32,11 +33,14 @@ export default function Layout({ children }: PropsWithChildren) {
   return (
     <div className="section-navigation-layout">
       {ready && (
-        <SectionNavigation
-          className="section-navigation-layout__navigation"
-          groups={[{ items: sections }]}
-          label="Settings sections"
-        />
+        <div className="section-navigation-layout__mobile-navigation">
+          <BackAction flexShrink="0" />
+          <SectionNavigation
+            className="section-navigation-layout__navigation"
+            groups={[{ items: sections }]}
+            label="Settings sections"
+          />
+        </div>
       )}
       <div className="section-navigation-layout__content">{children}</div>
     </div>
