@@ -12,7 +12,6 @@ import { PermissionSummary } from "@/components/role/PermissionList";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
@@ -36,7 +35,7 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
   return (
     <>
       <LStack gap="8">
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack w="full">
             <Heading size="md">OAuth clients</Heading>
             <p>
@@ -56,16 +55,16 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
 
             <OAuthClientItemList clients={clients} />
           </LStack>
-        </CardBox>
+        </LStack>
 
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack>
             <Heading size="md">Authorised applications</Heading>
             <p>Applications you have authorised to access this site.</p>
           </LStack>
 
           <OAuthTokenItemList tokens={tokens} />
-        </CardBox>
+        </LStack>
       </LStack>
 
       <CreateOAuthClientModal

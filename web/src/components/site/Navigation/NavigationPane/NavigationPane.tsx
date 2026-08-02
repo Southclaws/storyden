@@ -13,7 +13,7 @@ import { AdminZone } from "./AdminZone/AdminZone";
 
 type ServerProps = {
   initialSession?: Account;
-  initialSettings?: Settings;
+  initialSettings: Settings;
 };
 
 export async function NavigationPane({
@@ -21,11 +21,14 @@ export async function NavigationPane({
   initialSettings,
 }: ServerProps) {
   try {
-    const { data: initialNodeList } = await nodeListCached({
-      // NOTE: This doesn't work due to a bug in Orval.
-      // visibility: ["draft", "review", "unlisted", "published"],
-    });
-    const { data: initialCategoryList } = await categoryListCached();
+    const [{ data: initialNodeList }, { data: initialCategoryList }] =
+      await Promise.all([
+        nodeListCached({
+          // NOTE: This doesn't work due to a bug in Orval.
+          // visibility: ["draft", "review", "unlisted", "published"],
+        }),
+        categoryListCached(),
+      ]);
 
     return (
       <NavigationPaneContent
@@ -35,7 +38,7 @@ export async function NavigationPane({
         initialSettings={initialSettings}
       />
     );
-  } catch (e) {
+  } catch {
     return (
       <NavigationPaneContent
         initialSession={initialSession}

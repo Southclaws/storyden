@@ -10,7 +10,6 @@ import { CalendarIcon } from "@/components/ui/icons/Calendar";
 import { MembersIcon } from "@/components/ui/icons/Members";
 import { ParticipatingIcon } from "@/components/ui/icons/Participating";
 import { SlugIcon } from "@/components/ui/icons/Slug";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import * as Table from "@/components/ui/table";
 import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
@@ -111,10 +110,6 @@ export function ThreadScreenContextPane(props: Props) {
           ))}
         </Table.Body>
       </Table.Root>
-
-      <p>
-        <ScrollToTop />
-      </p>
     </LStack>
   );
 }

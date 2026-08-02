@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 
 import { getServerSession } from "@/auth/server-session";
 import { allowsPublicRegistration } from "@/lib/settings/registration";
@@ -12,7 +12,11 @@ import { DesktopCommandBar } from "./DesktopCommandBar";
 import { NavigationChrome } from "./NavigationChrome";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
 
-export async function Navigation({ children }: PropsWithChildren) {
+type Props = PropsWithChildren<{
+  sidebar: ReactNode;
+}>;
+
+export async function Navigation({ children, sidebar }: Props) {
   const globalSettings = await getSettings();
   const canRegister = allowsPublicRegistration(
     globalSettings.registration_mode,
@@ -37,12 +41,16 @@ export async function Navigation({ children }: PropsWithChildren) {
       <div id="navigation__fixed" className="navigation__fixed">
         <DesktopCommandBar />
 
-        <NavigationChrome canRegister={canRegister}>
-          <NavigationPane
-            initialSession={sessionAccount}
-            initialSettings={globalSettings}
-          />
-        </NavigationChrome>
+        <NavigationChrome
+          canRegister={canRegister}
+          desktopSidebar={sidebar}
+          siteNavigation={
+            <NavigationPane
+              initialSession={sessionAccount ?? undefined}
+              initialSettings={globalSettings}
+            />
+          }
+        />
       </div>
 
       <CommandPalette />

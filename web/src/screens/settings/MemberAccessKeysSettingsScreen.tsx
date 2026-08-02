@@ -1,3 +1,5 @@
+"use client";
+
 import { useAccessKeyList } from "@/api/openapi-client/auth";
 import { AccessKeysSettings } from "@/components/settings/AccessKeysSettings/AccessKeysSettings";
 import { Unready } from "@/components/site/Unready";

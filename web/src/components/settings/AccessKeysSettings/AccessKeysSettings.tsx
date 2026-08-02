@@ -4,7 +4,6 @@ import { AccessKey, AccessKeyList } from "@/api/openapi-schema";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CardBox } from "@/components/ui/card-box";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
@@ -28,7 +27,7 @@ export function AccessKeysSettings({ keys }: Props) {
 
   return (
     <>
-      <CardBox className={lstack()} gap="8">
+      <LStack gap="8">
         <LStack>
           <Heading size="md">Access keys</Heading>
 
@@ -57,7 +56,7 @@ export function AccessKeysSettings({ keys }: Props) {
 
           <AccessKeyItemList keys={keys} />
         </LStack>
-      </CardBox>
+      </LStack>
 
       <CreateAccessKeyModal
         isOpen={createModal.isOpen}

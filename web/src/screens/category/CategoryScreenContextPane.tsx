@@ -4,7 +4,6 @@ import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Unready } from "@/components/site/Unready";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { SlugIcon } from "@/components/ui/icons/Slug";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
 import * as Table from "@/components/ui/table";
 import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
@@ -77,10 +76,6 @@ export function CategoryScreenContextPane(props: Props) {
           ))}
         </Table.Body>
       </Table.Root>
-
-      <p>
-        <ScrollToTop />
-      </p>
     </LStack>
   );
 }

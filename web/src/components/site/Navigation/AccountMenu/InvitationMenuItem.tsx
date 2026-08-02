@@ -67,7 +67,7 @@ export function InvitationMenuItem() {
   return (
     <Item value={InvitationID}>
       <InvitationIcon />
-      &nbsp;<span>{InvitationLabel}</span>
+      <span>{InvitationLabel}</span>
     </Item>
   );
 }

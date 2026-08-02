@@ -1,3 +1,5 @@
+"use client";
+
 import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
@@ -105,7 +107,7 @@ export function RobotsSettingsScreen() {
 
   return (
     <LStack gap="4">
-      <CardBox className={lstack()} gap="4">
+      <LStack gap="4">
         <WStack justifyContent="space-between">
           <Heading size="md">Robot settings</Heading>
 
@@ -167,7 +169,7 @@ export function RobotsSettingsScreen() {
             ))}
           </LStack>
         )}
-      </CardBox>
+      </LStack>
 
       <RobotMCPServersSettings />
     </LStack>
@@ -181,7 +183,7 @@ function RobotMCPServersSettings() {
   const servers = serversQuery.data?.servers ?? [];
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <WStack justifyContent="space-between">
         <LStack gap="1">
           <Heading size="md">MCP servers</Heading>
@@ -228,7 +230,7 @@ function RobotMCPServersSettings() {
         onOpen={disclosure.onOpen}
         onOpenChange={disclosure.onOpenChange}
       />
-    </CardBox>
+    </LStack>
   );
 }
 

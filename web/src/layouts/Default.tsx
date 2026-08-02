@@ -3,19 +3,13 @@ import { PropsWithChildren, ReactNode } from "react";
 import { MotdBanner } from "@/components/site/MotdBanner/MotdBanner";
 import { Navigation } from "@/components/site/Navigation/Navigation";
 import { getSettings } from "@/lib/settings/settings-server";
-import { Box, Flex, styled } from "@/styled-system/jsx";
+import { Flex, styled } from "@/styled-system/jsx";
 
 type Props = {
-  contextpane: ReactNode;
+  sidebar: ReactNode;
 };
 
-export async function Default({
-  contextpane,
-  children,
-}: PropsWithChildren<Props>) {
-  // Keep accepting the parallel route slot while the context pane is out of the layout.
-  void contextpane;
-
+export async function Default({ sidebar, children }: PropsWithChildren<Props>) {
   const settings = await getSettings();
 
   return (
@@ -26,7 +20,7 @@ export async function Default({
       backgroundColor="background.canvas"
       vaul-drawer-wrapper=""
     >
-      <Navigation>
+      <Navigation sidebar={sidebar}>
         <styled.main
           containerType="inline-size"
           width="full"
