@@ -1,4 +1,5 @@
 import { Asset, Link } from "@/api/openapi-schema";
+import { Text } from "@/components/ui/text";
 import { Box, LinkOverlay, VStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
@@ -42,7 +43,9 @@ export function LinkView({ link, asset }: Props) {
           </LinkOverlay>
         </styled.h2>
         <Box lineClamp={1} overflow="hidden">
-          <styled.p lineClamp={2}>{link.description}</styled.p>
+          <Text variant="supporting" lineClamp={2}>
+            {link.description}
+          </Text>
           <br />
         </Box>
       </VStack>

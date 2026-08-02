@@ -3,11 +3,14 @@ import { defineRecipe } from "@pandacss/dev";
 export const headingInput = defineRecipe({
   className: "headingInput",
   base: {
+    color: "text.default",
     display: "inline-block",
+    fontSize: "xl",
     width: "full",
     overflowWrap: "break-word",
     wordBreak: "break-word",
     fontWeight: "semibold",
+    lineHeight: "1.875rem",
     cursor: "text",
     borderBottomColor: "border.default",
     borderBottomWidth: "1px",

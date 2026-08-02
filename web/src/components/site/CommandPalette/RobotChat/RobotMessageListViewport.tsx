@@ -198,7 +198,6 @@ export function RobotMessageListViewport({ surface }: Props) {
           <Box display="flex" justifyContent="center" my="1">
             <Button
               type="button"
-              size="xs"
               variant="ghost"
               loading={isLoadingOlderMessages}
               onClick={() => void handleLoadOlder()}
@@ -317,7 +316,6 @@ function NewMessagesButton({
     >
       <Button
         type="button"
-        size="xs"
         variant="subtle"
         pointerEvents="auto"
         onClick={onClick}

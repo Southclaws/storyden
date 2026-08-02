@@ -54,13 +54,7 @@ export const Breadcrumbs_ = (
       pt="scrollGutter"
       mt="-scrollGutter"
     >
-      <LinkButton
-        size="xs"
-        variant="subtle"
-        flexShrink="0"
-        minW="min"
-        href="/l"
-      >
+      <LinkButton variant="subtle" flexShrink="0" minW="min" href="/l">
         Library
       </LinkButton>
       {paths.map((p) => {
@@ -72,7 +66,6 @@ export const Breadcrumbs_ = (
               <BreadcrumbIcon />
             </Box>
             <LinkButton
-              size="xs"
               variant="subtle"
               flexShrink="0"
               minW="min"
@@ -126,9 +119,6 @@ export const Breadcrumbs_ = (
             ref={ref}
             w="full"
             minW="32"
-            size="xs"
-            height="6" // TODO: Make this default for size="xs"
-            borderRadius="sm"
             placeholder="URL slug"
             defaultValue={defaultValue}
             value={value}

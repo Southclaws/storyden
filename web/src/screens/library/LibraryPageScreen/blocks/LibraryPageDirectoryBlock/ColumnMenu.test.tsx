@@ -57,7 +57,10 @@ describe("ColumnMenu", () => {
     expect(actions.setChildPropertyName).toHaveBeenCalledWith("p1", "Urgency");
 
     await user.click(screen.getByRole("menuitem", { name: /Hide column/ }));
-    expect(actions.setChildPropertyHiddenState).toHaveBeenCalledWith("p1", true);
+    expect(actions.setChildPropertyHiddenState).toHaveBeenCalledWith(
+      "p1",
+      true,
+    );
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
     await user.click(screen.getByRole("menuitem", { name: /Delete/ }));
@@ -85,7 +88,9 @@ describe("ColumnMenu", () => {
 
     expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByRole("menuitem", { name: /Delete/ })).toBeNull();
-    expect(screen.getByRole("menuitem", { name: /Hide column/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: /Hide column/ }),
+    ).toBeInTheDocument();
   });
 
   it("stays closed when edit mode is disabled", async () => {
@@ -109,7 +114,9 @@ describe("ColumnMenu", () => {
     await user.click(screen.getByRole("button", { name: "Open menu" }));
 
     await waitFor(() => {
-      expect(screen.queryByRole("menuitem", { name: "Hide column" })).toBeNull();
+      expect(
+        screen.queryByRole("menuitem", { name: "Hide column" }),
+      ).toBeNull();
     });
   });
 });

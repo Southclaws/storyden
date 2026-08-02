@@ -3,8 +3,9 @@ import { NotificationStatus } from "@/api/openapi-schema";
 import { ArchiveIcon } from "@/components/ui/icons/Archive";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { Card, CardRows } from "@/components/ui/rich-card";
+import { Text } from "@/components/ui/text";
 import { getCommonProperties } from "@/lib/datagraph/item";
-import { Center, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Center, HStack, LStack, WStack } from "@/styled-system/jsx";
 import { timestamp } from "@/utils/date";
 
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
@@ -22,7 +23,7 @@ export function NotificationCardList({ notifications, onMove }: Props) {
   if (notifications.length === 0) {
     return (
       <Center h="96" w="full" display="flex" flexDirection="column" gap="1">
-        <styled.p color="text.subtle">no notifications.</styled.p>
+        <Text variant="supporting">no notifications.</Text>
       </Center>
     );
   }
@@ -67,7 +68,9 @@ function NotificationSource(props: NotificationItem) {
   return (
     <HStack>
       <LStack gap="0">
-        <styled.span color="text.muted">system message</styled.span>
+        <Text as="span" variant="metadata">
+          system message
+        </Text>
       </LStack>
     </HStack>
   );
@@ -90,7 +93,6 @@ function StatusControl({
   return notification.isRead ? (
     <IconButton
       variant="ghost"
-      size="xs"
       title="Mark as unread"
       onClick={handleChangeStatus}
     >
@@ -99,7 +101,6 @@ function StatusControl({
   ) : (
     <IconButton
       variant="ghost"
-      size="xs"
       title="Mark as read"
       onClick={handleChangeStatus}
     >

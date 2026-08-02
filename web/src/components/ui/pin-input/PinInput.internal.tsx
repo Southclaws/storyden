@@ -26,6 +26,10 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(
     const [cssProps, localProps] = splitCssProps(pinInputProps);
     const { children, className, length = 4, ...rootProps } = localProps;
     const styles = pinInput(variantProps);
+    const inputSize =
+      variantProps.size === "md" || variantProps.size === "lg"
+        ? variantProps.size
+        : "sm";
 
     return (
       <ArkPinInput.Root
@@ -46,7 +50,7 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(
               index={index}
               asChild
             >
-              <Input size={variantProps.size} />
+              <Input size={inputSize} />
             </ArkPinInput.Input>
           ))}
         </ArkPinInput.Control>

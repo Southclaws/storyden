@@ -1,13 +1,12 @@
 "use client";
 
+import { Account } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { NotificationsMenu } from "@/components/notifications/NotificationsMenu";
 import {
   LoginAnchor,
   RegisterAnchor,
 } from "@/components/site/Navigation/Anchors/Login";
-
-import { Account } from "@/api/openapi-schema";
-import { NotificationsMenu } from "@/components/notifications/NotificationsMenu";
 import { HStack } from "@/styled-system/jsx";
 
 import { AccountMenu } from "./AccountMenu/AccountMenu";

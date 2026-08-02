@@ -12,6 +12,7 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CardBox } from "@/components/ui/card-box";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { Card } from "@/components/ui/rich-card";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import {
   Box,
@@ -279,11 +280,11 @@ function RobotProfileCard({ data }: { data: RobotRenderCardData }) {
         <WStack>
           <MemberBadge profile={profile} size="md" name="full-vertical" />
 
-          <styled.span color="text.subtle" fontSize="sm">
+          <Text as="span" variant="supporting">
             {"joined "}
             <Timestamp created={profile.createdAt} />
             {" ago"}
-          </styled.span>
+          </Text>
         </WStack>
       </CardBox>
     </Box>
@@ -356,7 +357,7 @@ function RobotReplyCard({ data }: { data: RobotRenderCardData }) {
           >
             <HStack gap="1" alignItems="center">
               <ReplyIcon width="4" height="4" aria-hidden />
-              <styled.span>Reply in this thread</styled.span>
+              <span>Reply in this thread</span>
             </HStack>
           </Link>
           <Box>
@@ -421,9 +422,9 @@ function RobotThreadReferenceCard({
           <Timestamp created={thread.createdAt} />
         </HStack>
 
-        <styled.span color="text.subtle" fontSize="sm">
+        <Text as="span" variant="supporting">
           {replyLabel}
-        </styled.span>
+        </Text>
       </WStack>
     </Card>
   );
@@ -461,19 +462,11 @@ function RobotFallbackLinkCard({
 }
 
 function RobotLoadingCard({ label }: { label: string }) {
-  return (
-    <styled.p color="text.subtle" fontSize="sm">
-      Loading {label.toLowerCase()}...
-    </styled.p>
-  );
+  return <Text variant="supporting">Loading {label.toLowerCase()}...</Text>;
 }
 
 function RobotUnavailableCard({ label }: { label: string }) {
-  return (
-    <styled.p color="text.subtle" fontSize="sm">
-      {label} unavailable.
-    </styled.p>
-  );
+  return <Text variant="supporting">{label} unavailable.</Text>;
 }
 
 function partKey(part: StorydenUIMessage["parts"][number], idx: number) {

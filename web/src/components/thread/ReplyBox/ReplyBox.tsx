@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -43,7 +44,7 @@ export function ReplyBox(props: Props) {
       >
         {postedReply && (
           <LStack h="full" justifyContent="center">
-            <styled.p fontSize="sm" color="text.subtle">
+            <Text variant="supporting">
               Your reply has been posted on{" "}
               <Link
                 className={css({
@@ -56,7 +57,7 @@ export function ReplyBox(props: Props) {
                 page {postedReply.pageNumber}
               </Link>
               .
-            </styled.p>
+            </Text>
           </LStack>
         )}
       </Admonition>
@@ -72,7 +73,7 @@ export function ReplyBox(props: Props) {
         {replyTo && (
           <WStack py="1" px="2" borderRadius="md" bgColor="background.inset">
             <HStack gap="1" fontSize="sm" color="text.subtle">
-              <styled.span>Replying&nbsp;to</styled.span>
+              <span>Replying&nbsp;to</span>
               <MemberIdent
                 profile={replyTo.reply.author}
                 name="handle"
@@ -85,7 +86,6 @@ export function ReplyBox(props: Props) {
 
             <IconButton
               type="button"
-              size="xs"
               variant="ghost"
               aria-label="Clear reply-to"
               onClick={clearReplyTo}
@@ -105,7 +105,7 @@ export function ReplyBox(props: Props) {
             />
           </HStack>
 
-          <Button type="submit" size="xs" disabled={isLoading || isEmpty}>
+          <Button type="submit" disabled={isLoading || isEmpty}>
             Post
           </Button>
         </HStack>

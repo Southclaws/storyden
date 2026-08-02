@@ -23,13 +23,13 @@ import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { TagListField } from "@/components/thread/ThreadTagList";
 import { FormErrorText } from "@/components/ui/form-error-text";
-import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
 } from "@/components/ui/icons/Discussion";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
+import { PageHeading } from "@/components/ui/page-heading";
 import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -129,9 +129,7 @@ export function ThreadScreen(props: Props) {
           {isEditing ? (
             <TitleInput name="title" control={form.control} />
           ) : (
-            <Heading fontSize="heading.variable.1" fontWeight="bold">
-              {thread.title}
-            </Heading>
+            <PageHeading>{thread.title}</PageHeading>
           )}
 
           {isEditing ? (

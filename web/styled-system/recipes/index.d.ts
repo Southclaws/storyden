@@ -9,7 +9,6 @@ export * from './multi-select-picker';
 export * from './text';
 export * from './admonition';
 export * from './heading-input';
-export * from './typography-heading';
 export * from './rich-card';
 export * from './alert';
 export * from './clipboard';

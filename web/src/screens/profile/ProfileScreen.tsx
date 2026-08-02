@@ -18,6 +18,7 @@ import { Unready } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -109,14 +110,14 @@ export function ProfileScreen(props: Props) {
           </Flex>
 
           <HStack gap="1">
-            <styled.p color="text.subtle" wordBreak="keep-all">
+            <Text variant="supporting" wordBreak="keep-all">
               Joined{" "}
               <styled.time textWrap="nowrap">
                 {formatDistanceToNow(new Date(profile.createdAt), {
                   addSuffix: true,
                 })}
               </styled.time>
-            </styled.p>
+            </Text>
             <DotSeparator />
             <HStack
               gap="1"
@@ -132,9 +133,9 @@ export function ProfileScreen(props: Props) {
           </HStack>
 
           {isEmpty && !isEditing ? (
-            <styled.p color="text.muted" fontStyle="italic">
+            <Text variant="supporting" fontStyle="italic">
               This profile has no bio yet...
-            </styled.p>
+            </Text>
           ) : (
             <ContentFormField<Form>
               control={form.control}
@@ -147,9 +148,9 @@ export function ProfileScreen(props: Props) {
 
           {signaturesEnabled &&
             (isSignatureEmpty && !isEditing ? (
-              <styled.p color="text.muted" fontStyle="italic">
+              <Text variant="supporting" fontStyle="italic">
                 This profile has no signature yet...
-              </styled.p>
+              </Text>
             ) : (
               <ContentFormField<Form>
                 control={form.control}

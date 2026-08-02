@@ -22,7 +22,8 @@ export const alert = defineSlotRecipe({
     },
     description: {
       color: "text.muted",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     icon: {
       color: "status.warning.content",
@@ -34,7 +35,8 @@ export const alert = defineSlotRecipe({
     title: {
       color: "status.warning.content",
       fontWeight: "semibold",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
   },
 });

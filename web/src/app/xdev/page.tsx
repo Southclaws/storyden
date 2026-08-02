@@ -55,7 +55,11 @@ export default function Page() {
         >
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="text.muted">
+              <Text
+                variant="supporting"
+                fontWeight="semibold"
+                color="text.muted"
+              >
                 Navigation
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
@@ -73,7 +77,11 @@ export default function Page() {
             </VStack>
 
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="text.muted">
+              <Text
+                variant="supporting"
+                fontWeight="semibold"
+                color="text.muted"
+              >
                 Categories
               </Text>
               <Button variant="ghost" size="sm" justifyContent="start" w="full">
@@ -106,7 +114,7 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="4" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   Accent Color Palette
                 </Text>
 
@@ -117,7 +125,7 @@ export default function Page() {
                     borderRadius="md"
                     style={{ backgroundColor: `var(${v})` }}
                   >
-                    <Text size="sm" fontWeight="medium">
+                    <Text variant="supporting" fontWeight="medium">
                       {v}: {colours[v]}
                     </Text>
                   </styled.div>
@@ -135,7 +143,7 @@ export default function Page() {
                           color: `var(${flatText[i]})`,
                         }}
                       >
-                        <Text size="sm" fontWeight="medium">
+                        <Text variant="supporting" fontWeight="medium">
                           {v}
                         </Text>
                       </styled.div>
@@ -153,7 +161,7 @@ export default function Page() {
                           color: `var(${darkText[i]})`,
                         }}
                       >
-                        <Text size="sm" fontWeight="medium">
+                        <Text variant="supporting" fontWeight="medium">
                           {v}
                         </Text>
                       </styled.div>
@@ -172,13 +180,13 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="6" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   Button Variants
                 </Text>
 
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Solid
                     </Text>
                     <Button variant="solid" size="sm">
@@ -194,7 +202,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Outline
                     </Text>
                     <Button variant="outline" size="sm">
@@ -210,7 +218,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Ghost
                     </Text>
                     <Button variant="ghost" size="sm">
@@ -226,7 +234,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Subtle
                     </Text>
                     <Button variant="subtle" size="sm">
@@ -244,7 +252,7 @@ export default function Page() {
 
                 <HStack gap="4" flexWrap="wrap">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Color Palettes
                     </Text>
                     <Button>Default</Button>
@@ -254,7 +262,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       With Icons
                     </Text>
                     <Button>
@@ -283,33 +291,33 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="4" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   Typography Scale
                 </Text>
 
                 <VStack gap="3" alignItems="start" w="full">
-                  <Text size="2xl" color="text.default">
+                  <Text fontSize="2xl" lineHeight="tight" color="text.default">
                     2XL Heading
                   </Text>
-                  <Text size="xl" color="text.default">
+                  <Text fontSize="xl" lineHeight="normal" color="text.default">
                     XL Heading
                   </Text>
-                  <Text size="lg" color="text.default">
+                  <Text fontSize="lg" lineHeight="normal" color="text.default">
                     Large Text
                   </Text>
-                  <Text size="md" color="text.default">
+                  <Text variant="body" color="text.default">
                     Medium Text (Body)
                   </Text>
-                  <Text size="sm" color="text.muted">
+                  <Text variant="supporting" color="text.muted">
                     Small Text (Secondary)
                   </Text>
-                  <Text size="xs" color="text.subtle">
+                  <Text variant="metadata" color="text.subtle">
                     Extra Small Text (Captions)
                   </Text>
                 </VStack>
 
                 <VStack gap="2" alignItems="start" w="full" mt="4">
-                  <Text size="sm" color="text.muted">
+                  <Text variant="supporting" color="text.muted">
                     Color Variants
                   </Text>
                   <Text color="text.default">Default foreground text</Text>
@@ -343,10 +351,10 @@ export default function Page() {
                         borderRadius="full"
                       />
                       <VStack gap="1" alignItems="start">
-                        <Text size="sm" fontWeight="semibold">
+                        <Text variant="supporting" fontWeight="semibold">
                           John Doe
                         </Text>
-                        <Text size="xs" color="text.subtle">
+                        <Text variant="metadata" color="text.subtle">
                           2 hours ago
                         </Text>
                       </VStack>
@@ -357,7 +365,11 @@ export default function Page() {
                   </HStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="lg" fontWeight="semibold">
+                    <Text
+                      fontSize="lg"
+                      lineHeight="normal"
+                      fontWeight="semibold"
+                    >
                       Sample Forum Post Title
                     </Text>
                     <Text color="text.muted">
@@ -412,7 +424,7 @@ export default function Page() {
                 boxShadow="surface"
               >
                 <VStack gap="3" alignItems="start">
-                  <Text size="sm" fontWeight="semibold">
+                  <Text variant="supporting" fontWeight="semibold">
                     Quick Actions
                   </Text>
                   <VStack gap="2" w="full">
@@ -448,14 +460,14 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="6" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   Form Elements
                 </Text>
 
                 <HStack gap="8" w="full" alignItems="start">
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
-                      <Text size="sm" color="text.muted">
+                      <Text variant="supporting" color="text.muted">
                         Input Fields
                       </Text>
                       <Input placeholder="Default input" />
@@ -464,7 +476,7 @@ export default function Page() {
                     </VStack>
 
                     <VStack gap="2" alignItems="start">
-                      <Text size="sm" color="text.muted">
+                      <Text variant="supporting" color="text.muted">
                         Checkboxes
                       </Text>
                       <Checkbox>Unchecked</Checkbox>
@@ -476,7 +488,7 @@ export default function Page() {
 
                   <VStack gap="4" alignItems="start" flex="1">
                     <VStack gap="2" alignItems="start" w="full">
-                      <Text size="sm" color="text.muted">
+                      <Text variant="supporting" color="text.muted">
                         Badge Variants
                       </Text>
                       <HStack gap="2" flexWrap="wrap">
@@ -510,13 +522,13 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="4" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   Surface Hierarchy
                 </Text>
 
                 <HStack gap="4" w="full">
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Default Surface
                     </Text>
                     <Box
@@ -533,7 +545,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Subtle Surface
                     </Text>
                     <Box bg="background.inset" p="4" borderRadius="md" w="full">
@@ -545,7 +557,7 @@ export default function Page() {
                   </VStack>
 
                   <VStack gap="2" alignItems="start" flex="1">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Muted Surface
                     </Text>
                     <Box
@@ -575,13 +587,13 @@ export default function Page() {
               boxShadow="surface"
             >
               <VStack gap="4" alignItems="start">
-                <Text size="lg" fontWeight="semibold">
+                <Text fontSize="lg" lineHeight="normal" fontWeight="semibold">
                   State Indicators
                 </Text>
 
                 <HStack gap="6" w="full">
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Status Messages
                     </Text>
                     <Box
@@ -591,7 +603,7 @@ export default function Page() {
                       borderLeftWidth="thick"
                       borderLeftColor="status.success.border"
                     >
-                      <Text size="sm" color="status.success.content">
+                      <Text variant="supporting" color="status.success.content">
                         Success: Operation completed
                       </Text>
                     </Box>
@@ -602,7 +614,7 @@ export default function Page() {
                       borderLeftWidth="thick"
                       borderLeftColor="status.warning.border"
                     >
-                      <Text size="sm" color="status.warning.content">
+                      <Text variant="supporting" color="status.warning.content">
                         Warning: Please review
                       </Text>
                     </Box>
@@ -613,7 +625,7 @@ export default function Page() {
                       borderLeftWidth="thick"
                       borderLeftColor="status.danger.border"
                     >
-                      <Text size="sm" color="status.danger.content">
+                      <Text variant="supporting" color="status.danger.content">
                         Error: Something went wrong
                       </Text>
                     </Box>
@@ -624,14 +636,14 @@ export default function Page() {
                       borderLeftWidth="thick"
                       borderLeftColor="status.info.border"
                     >
-                      <Text size="sm" color="status.info.content">
+                      <Text variant="supporting" color="status.info.content">
                         Info: Additional context
                       </Text>
                     </Box>
                   </VStack>
 
                   <VStack gap="2" alignItems="start">
-                    <Text size="sm" color="text.muted">
+                    <Text variant="supporting" color="text.muted">
                       Content States
                     </Text>
                     <Box
@@ -641,7 +653,10 @@ export default function Page() {
                       borderWidth="thin"
                       borderColor="visibility.published.border"
                     >
-                      <Text size="sm" color="visibility.published.fg">
+                      <Text
+                        variant="supporting"
+                        color="visibility.published.fg"
+                      >
                         Published Content
                       </Text>
                     </Box>
@@ -652,7 +667,7 @@ export default function Page() {
                       borderWidth="thin"
                       borderColor="visibility.draft.border"
                     >
-                      <Text size="sm" color="visibility.draft.fg">
+                      <Text variant="supporting" color="visibility.draft.fg">
                         Draft Content
                       </Text>
                     </Box>
@@ -663,7 +678,7 @@ export default function Page() {
                       borderWidth="thin"
                       borderColor="visibility.review.border"
                     >
-                      <Text size="sm" color="visibility.review.fg">
+                      <Text variant="supporting" color="visibility.review.fg">
                         Under Review
                       </Text>
                     </Box>
@@ -674,7 +689,7 @@ export default function Page() {
                       borderWidth="thin"
                       borderColor="visibility.unlisted.border"
                     >
-                      <Text size="sm" color="visibility.unlisted.fg">
+                      <Text variant="supporting" color="visibility.unlisted.fg">
                         Unlisted Content
                       </Text>
                     </Box>
@@ -703,7 +718,11 @@ export default function Page() {
         >
           <VStack gap="6" alignItems="start">
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="text.muted">
+              <Text
+                variant="supporting"
+                fontWeight="semibold"
+                color="text.muted"
+              >
                 Recent Activity
               </Text>
               <VStack gap="2" w="full">
@@ -715,17 +734,21 @@ export default function Page() {
                     borderRadius="md"
                     w="full"
                   >
-                    <Text size="xs" color="text.subtle">
+                    <Text variant="metadata" color="text.subtle">
                       {i + 1}h ago
                     </Text>
-                    <Text size="sm">User activity {i + 1}</Text>
+                    <Text variant="supporting">User activity {i + 1}</Text>
                   </Box>
                 ))}
               </VStack>
             </VStack>
 
             <VStack gap="2" alignItems="start" w="full">
-              <Text size="sm" fontWeight="semibold" color="text.muted">
+              <Text
+                variant="supporting"
+                fontWeight="semibold"
+                color="text.muted"
+              >
                 Popular Tags
               </Text>
               <HStack gap="1" flexWrap="wrap">

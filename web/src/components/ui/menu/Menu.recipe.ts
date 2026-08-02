@@ -8,7 +8,8 @@ const itemStyle = {
   display: "flex",
   fontWeight: "medium",
   gap: "2",
-  textStyle: "sm",
+  fontSize: "sm",
+  lineHeight: "1.25rem",
   transitionDuration: "fast",
   transitionProperty: "background, color",
   transitionTimingFunction: "default",
@@ -43,7 +44,8 @@ export const menu = defineSlotRecipe({
   base: {
     itemGroupLabel: {
       fontWeight: "semibold",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     content: {
       maxHeight: "var(--available-height)",
@@ -98,7 +100,8 @@ export const menu = defineSlotRecipe({
           py: "1",
           px: "1",
           mx: "1",
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
         content: {
           py: "1",
@@ -108,7 +111,8 @@ export const menu = defineSlotRecipe({
           h: "6",
           px: "1",
           mx: "1",
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
           "& :where(svg)": {
             width: "4",
             height: "4",
@@ -127,7 +131,8 @@ export const menu = defineSlotRecipe({
           h: "6",
           px: "1",
           mx: "1",
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
           "& :where(svg)": {
             width: "4",
             height: "4",

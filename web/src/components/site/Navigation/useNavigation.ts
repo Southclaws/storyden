@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 
 import { useSession } from "@/auth";
-
 import { useSettings } from "@/lib/settings/settings-client";
 
 // NOTE: Everything that involves data fetching here has a suitable fallback.

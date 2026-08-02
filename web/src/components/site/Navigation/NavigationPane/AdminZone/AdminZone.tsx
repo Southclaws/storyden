@@ -12,7 +12,6 @@ import { type Account, type Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
 import { InfoTip } from "@/components/site/InfoTip";
 import * as Checkbox from "@/components/ui/checkbox";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { CategoryIcon } from "@/components/ui/icons/Category";
@@ -24,7 +23,8 @@ import { LayoutListIcon } from "@/components/ui/icons/LayoutList";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
-import { type FeedConfig } from "@/lib/settings/feed";
+import { Text } from "@/components/ui/text";
+import type { FeedConfig as FeedConfigData } from "@/lib/settings/feed";
 import {
   useFeedConfig,
   useFeedEditorState,
@@ -50,7 +50,7 @@ type Props = {
   initialSettings?: Settings;
 };
 
-type UpdateFeed = (feed: FeedConfig) => Promise<void>;
+type UpdateFeed = (feed: FeedConfigData) => Promise<void>;
 
 export function AdminZone({ initialSession, initialSettings }: Props) {
   const feed = useFeedConfig(initialSettings, false);
@@ -93,7 +93,6 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
         <HStack gap="1">
           {isRouteEditable && (
             <IconButton
-              size="xs"
               variant="ghost"
               onClick={handleToggleEditing}
               type="button"
@@ -132,7 +131,7 @@ function RouteConfig({
   updateFeed,
 }: {
   route?: Route;
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   switch (route?.name) {
@@ -179,7 +178,7 @@ export function FeedConfig({
   feed,
   updateFeed,
 }: {
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   const sourceCollection = createListCollection({ items: sources });
@@ -240,7 +239,6 @@ export function FeedConfig({
   return (
     <LStack>
       <Select.Root
-        size="xs"
         collection={sourceCollection}
         defaultValue={[feed.source.type]}
         positioning={{ sameWidth: false }}
@@ -269,7 +267,7 @@ export function FeedConfig({
                 <Select.ItemText mr="2">
                   <HStack gap="1">
                     <styled.span w="4">{item.icon}</styled.span>
-                    <styled.span>{item.label}</styled.span>
+                    <span>{item.label}</span>
                   </HStack>
                 </Select.ItemText>
                 <Select.ItemIndicator>
@@ -283,7 +281,6 @@ export function FeedConfig({
 
       {canUpdateLayout && (
         <Select.Root
-          size="xs"
           collection={layoutCollection}
           defaultValue={[feed.layout.type]}
           positioning={{ sameWidth: false }}
@@ -309,7 +306,7 @@ export function FeedConfig({
                   <Select.ItemText mr="2">
                     <HStack gap="1">
                       <styled.span w="4">{item.icon}</styled.span>
-                      <styled.span>{item.label}</styled.span>
+                      <span>{item.label}</span>
                     </HStack>
                   </Select.ItemText>
                   <Select.ItemIndicator>
@@ -331,7 +328,7 @@ function SourceConfig({
   feed,
   updateFeed,
 }: {
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   switch (feed.source.type) {
@@ -350,7 +347,7 @@ function SourceThreadsConfig({
   feed,
   updateFeed,
 }: {
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   if (feed.source.type !== "threads") {
@@ -372,9 +369,9 @@ function SourceThreadsConfig({
   return (
     <LStack gap="1">
       <WStack alignItems="center">
-        <Heading fontWeight="medium" size="xs">
+        <Text variant="supporting" color="text.default" fontWeight="medium">
           Quick Share
-        </Heading>
+        </Text>
 
         <InfoTip title="Show quick share box">
           Display a quick share box at the top of the thread list to allow users
@@ -403,7 +400,7 @@ function SourceLibraryConfig({
   feed,
   updateFeed,
 }: {
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   if (feed.source.type !== "library") {
@@ -423,9 +420,9 @@ function SourceLibraryConfig({
   return (
     <LStack gap="1">
       <WStack alignItems="center">
-        <Heading fontWeight="medium" size="xs">
+        <Text variant="supporting" color="text.default" fontWeight="medium">
           Use a Page (optional)
-        </Heading>
+        </Text>
 
         <InfoTip title="Use a Page as the home screen">
           This allows you to pick a page from the library to use as the home
@@ -462,7 +459,7 @@ function SourceCategoriesConfig({
   feed,
   updateFeed,
 }: {
-  feed: FeedConfig;
+  feed: FeedConfigData;
   updateFeed: UpdateFeed;
 }) {
   const { mutate } = useSWRConfig();
@@ -519,9 +516,9 @@ function SourceCategoriesConfig({
   return (
     <LStack gap="1">
       <WStack alignItems="center">
-        <Heading fontWeight="medium" size="xs">
+        <Text variant="supporting" color="text.default" fontWeight="medium">
           Thread list display
-        </Heading>
+        </Text>
 
         <InfoTip title="Choose what threads to show">
           Control which threads are displayed below the categories. Select
@@ -532,7 +529,6 @@ function SourceCategoriesConfig({
       </WStack>
 
       <Select.Root
-        size="xs"
         collection={threadListModeCollection}
         defaultValue={[feed.source.threadListMode]}
         positioning={{ sameWidth: false }}
@@ -559,9 +555,9 @@ function SourceCategoriesConfig({
       </Select.Root>
 
       <WStack alignItems="center">
-        <Heading fontWeight="medium" size="xs">
+        <Text variant="supporting" color="text.default" fontWeight="medium">
           Quick Share
-        </Heading>
+        </Text>
 
         <InfoTip title="Show quick share box">
           Display a quick share box at the top of the thread list to allow users

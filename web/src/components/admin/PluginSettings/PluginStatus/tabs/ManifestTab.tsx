@@ -10,6 +10,7 @@ import {
 } from "@/api/openapi-client/plugins";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -82,9 +83,9 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
 
   return (
     <LStack gap="2" w="full">
-      <styled.p fontSize="sm" color="text.subtle">
+      <Text variant="supporting">
         Defines plugin metadata and which features the plugin has access to.
-      </styled.p>
+      </Text>
 
       <Box
         w="full"
@@ -114,9 +115,9 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
 
       {editable && (
         <WStack justifyContent="space-between">
-          <styled.p fontSize="xs" color="text.subtle">
+          <Text variant="metadata">
             Updating the manifest will force the plugin to disconnect.
-          </styled.p>
+          </Text>
           <Button
             size="sm"
             variant="subtle"
@@ -138,7 +139,9 @@ export function ManifestTab({ pluginID, manifest, editable }: Props) {
         {error && (
           <LStack>
             {error.overview && (
-              <styled.p fontSize="sm">{error.overview}</styled.p>
+              <Text variant="supporting" color="text.default">
+                {error.overview}
+              </Text>
             )}
 
             <styled.pre fontSize="xs" mt="1" whiteSpace="pre-wrap">

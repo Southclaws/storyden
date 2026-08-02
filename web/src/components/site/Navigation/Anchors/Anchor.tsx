@@ -33,7 +33,7 @@ export function Anchor({
   return (
     <LinkButton
       href={href}
-      size="xs"
+      fontWeight="medium"
       p="1"
       variant="ghost"
       className={cx("navigation-anchor", `navigation-anchor--${id}`, className)}

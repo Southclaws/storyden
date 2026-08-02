@@ -19,9 +19,10 @@ import { Button, ButtonGroup } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 type Props = {
   resourceUrl: string;
@@ -223,11 +224,11 @@ export function OAuthRemoteSetupPanel({
   return (
     <LStack gap="2">
       <LStack gap="1">
-        <Heading size="sm">OAuth setup</Heading>
-        <styled.p color="text.subtle" fontSize="sm">
+        <SectionHeading>OAuth setup</SectionHeading>
+        <Text variant="supporting">
           Discover the provider configuration, then prepare an authorisation
           link using authorisation code and PKCE.
-        </styled.p>
+        </Text>
       </LStack>
 
       {showResourceUrl && (
@@ -278,22 +279,22 @@ export function OAuthRemoteSetupPanel({
         >
           <WStack alignItems="start">
             <LStack gap="1">
-              <Heading size="xs">
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
                 {discovery.protected_resource_metadata.resource_name ||
                   discovery.authorization_server}
-              </Heading>
-              <styled.p
-                color="text.subtle"
-                fontSize="xs"
-                wordBreak="break-word"
-              >
+              </Text>
+              <Text variant="metadata" wordBreak="break-word">
                 {discovery.authorization_server}
-              </styled.p>
+              </Text>
             </LStack>
             <ModeBadge mode={selectedMode} />
           </WStack>
 
-          <ButtonGroup attached size="xs" variant="outline">
+          <ButtonGroup attached variant="outline">
             <Button
               type="button"
               variant={
@@ -445,12 +446,12 @@ function ModeBadge({ mode }: { mode: OAuthRemoteMode }) {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <LStack gap="0">
-      <styled.span color="text.subtle" fontSize="xs">
+      <Text as="span" variant="metadata">
         {label}
-      </styled.span>
-      <styled.span fontSize="xs" wordBreak="break-word">
+      </Text>
+      <Text as="span" variant="metadata" wordBreak="break-word">
         {value}
-      </styled.span>
+      </Text>
     </LStack>
   );
 }

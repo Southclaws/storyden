@@ -10,6 +10,7 @@ import {
 import { ProfileReference } from "@/api/openapi-schema";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 import { useDisclosure } from "@/utils/useDisclosure";
 
@@ -64,9 +65,9 @@ export function MemberWarningTrigger({
         title={`Issue warning to ${profile.name}`}
       >
         <VStack alignItems="start" gap="3">
-          <styled.p fontSize="sm" color="text.muted">
+          <Text variant="supporting">
             Warnings are recorded for internal moderation history.
-          </styled.p>
+          </Text>
           <styled.textarea
             rows={5}
             value={reason}

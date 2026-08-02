@@ -24,7 +24,8 @@ import { EditIcon } from "@/components/ui/icons/Edit";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import { VersionsIcon } from "@/components/ui/icons/Versions";
 import * as Menu from "@/components/ui/menu";
-import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Box, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPath } from "../useLibraryPath";
 
@@ -222,9 +223,9 @@ export function LibraryPageEditMenu({ node }: Props) {
             )}
 
             {versions.length === 0 ? (
-              <styled.p px="1" py="1" color="text.subtle" fontSize="xs">
+              <Text variant="metadata" px="1" py="1">
                 No versions or drafts yet.
-              </styled.p>
+              </Text>
             ) : (
               <Menu.ItemGroup id="versions" gap="1">
                 {menuVersions.map((version) => (
@@ -284,7 +285,6 @@ function VersionMenuItem({
         <Button
           type="button"
           variant="subtle"
-          size="xs"
           onClick={() => onOpenVersion(version.id)}
         >
           {buttonLabel}
@@ -298,9 +298,9 @@ function VersionMenuItem({
           name="handle"
           avatar="visible"
         />
-        <styled.span color="text.subtle" fontSize="xs">
+        <Text as="span" variant="metadata">
           <Timestamp created={version.updated_at} /> ago
-        </styled.span>
+        </Text>
       </WStack>
     </LStack>
   );

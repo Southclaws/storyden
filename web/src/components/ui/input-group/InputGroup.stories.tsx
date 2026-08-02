@@ -27,11 +27,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  render: (args) => (
-    <InputGroup {...args} startElement={<SearchIcon />} maxW="md">
-      <Input size={args.size} placeholder="Search..." />
-    </InputGroup>
-  ),
+  render: (args) => {
+    const size = args.size === "md" || args.size === "lg" ? args.size : "sm";
+
+    return (
+      <InputGroup {...args} startElement={<SearchIcon />} maxW="md">
+        <Input size={size} placeholder="Search..." />
+      </InputGroup>
+    );
+  },
 };
 
 export const Sizes: Story = {

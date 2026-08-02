@@ -43,11 +43,7 @@ test("hasPermission grants all when account has ADMINISTRATOR", () => {
 
 test("hasPermissionOr returns true from fallback when no permission", () => {
   const account = accountWithPermissions(Permission.READ_PROFILE);
-  const result = hasPermissionOr(
-    account,
-    () => true,
-    Permission.MANAGE_POSTS,
-  );
+  const result = hasPermissionOr(account, () => true, Permission.MANAGE_POSTS);
   assert.ok(result);
 });
 

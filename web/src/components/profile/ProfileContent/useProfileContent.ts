@@ -1,7 +1,6 @@
 import { useCollectionList } from "@/api/openapi-client/collections";
-import { Account, PublicProfile } from "@/api/openapi-schema";
-
 import { useThreadList } from "@/api/openapi-client/threads";
+import { Account, PublicProfile } from "@/api/openapi-schema";
 
 export type Props = {
   session?: Account;

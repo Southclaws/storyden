@@ -5,7 +5,6 @@ import { cx } from "styled-system/css";
 import * as Menu from "@/components/ui/menu";
 import { Box, HStack, WStack } from "@/styled-system/jsx";
 import {
-  ButtonVariantProps,
   InputVariantProps,
   MenuVariantProps,
   input,
@@ -19,6 +18,8 @@ import { Badge, badgeColourPalette, badgeColours } from "../badge";
 import { ButtonProps } from "../button";
 import { Input } from "../input";
 import { Text } from "../text";
+
+type ControlSize = "sm" | "md" | "lg";
 
 export type MultiSelectPickerItem = {
   label: string;
@@ -38,7 +39,7 @@ type Props = {
   queryError?: string | null;
 
   // styling
-  size?: ButtonVariantProps["size"] & MenuVariantProps["size"];
+  size?: ControlSize;
   triggerProps?: ButtonProps;
   menuVariantProps?: MenuVariantProps;
   inputVariantProps?: InputVariantProps;
@@ -263,7 +264,7 @@ export function MultiSelectPicker({
               )}
             </>
           ) : (
-            <Text size="sm" color="text.subtle">
+            <Text variant="supporting" color="text.subtle">
               {inputPlaceholder || "Select items..."}
             </Text>
           )}
@@ -352,7 +353,7 @@ export function MultiSelectPicker({
                   !filteredQueryResults?.length &&
                   !showCreateNew && (
                     <Menu.ItemGroup p="2">
-                      <Text size="sm" color="text.muted">
+                      <Text variant="supporting" color="text.muted">
                         No results found
                       </Text>
                     </Menu.ItemGroup>

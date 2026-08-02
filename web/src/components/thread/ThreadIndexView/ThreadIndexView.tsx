@@ -1,7 +1,6 @@
+import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
-
-import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";

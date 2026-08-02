@@ -149,19 +149,14 @@ export function BannerEditor() {
           onFileReject={handleFileReject}
         >
           <FileUpload.Trigger w="min" asChild>
-            <Button type="button" size="xs" variant="outline">
+            <Button type="button" variant="outline">
               <MediaAddIcon /> Upload banner
             </Button>
           </FileUpload.Trigger>
           <FileUpload.HiddenInput data-testid="input" />
         </FileUpload.Root>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="solid"
-          onClick={handleSaveCurrentCrop}
-        >
+        <Button type="button" variant="solid" onClick={handleSaveCurrentCrop}>
           <SaveIcon /> Save banner
         </Button>
       </HStack>

@@ -87,7 +87,8 @@ export const combobox = defineSlotRecipe({
     },
     itemGroupLabel: {
       fontWeight: "semibold",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     itemIndicator: {
       color: "colorPalette.default",
@@ -100,7 +101,13 @@ export const combobox = defineSlotRecipe({
     size: {
       sm: {
         content: { p: "0.5", gap: "1", borderRadius: "sm" },
-        item: { textStyle: "xs", px: "2", height: "6", borderRadius: "xs" },
+        item: {
+          fontSize: "xs",
+          lineHeight: "1.125rem",
+          px: "2",
+          height: "6",
+          borderRadius: "xs",
+        },
         itemIndicator: {
           "& :where(svg)": {
             width: "3.5",
@@ -111,7 +118,7 @@ export const combobox = defineSlotRecipe({
           px: "2",
           py: "1.5",
         },
-        label: { textStyle: "xs" },
+        label: { fontSize: "xs", lineHeight: "1.125rem" },
         input: { paddingRight: "6!" },
         trigger: {
           height: "full!",
@@ -124,7 +131,7 @@ export const combobox = defineSlotRecipe({
       },
       md: {
         content: { p: "0.5", gap: "1" },
-        item: { textStyle: "sm", px: "2", height: "8" },
+        item: { fontSize: "sm", lineHeight: "1.25rem", px: "2", height: "8" },
         itemIndicator: {
           "& :where(svg)": {
             width: "4",
@@ -135,7 +142,7 @@ export const combobox = defineSlotRecipe({
           px: "2",
           py: "1.5",
         },
-        label: { textStyle: "sm" },
+        label: { fontSize: "sm", lineHeight: "1.25rem" },
         input: { paddingRight: "8!" },
         trigger: {
           height: "full!",
@@ -148,7 +155,7 @@ export const combobox = defineSlotRecipe({
       },
       lg: {
         content: { p: "1", gap: "1" },
-        item: { textStyle: "md", px: "2", height: "10" },
+        item: { fontSize: "md", lineHeight: "1.5rem", px: "2", height: "10" },
         itemIndicator: {
           "& :where(svg)": {
             width: "5",
@@ -159,7 +166,7 @@ export const combobox = defineSlotRecipe({
           px: "2",
           py: "1.5",
         },
-        label: { textStyle: "md" },
+        label: { fontSize: "md", lineHeight: "1.5rem" },
         input: { paddingRight: "10!" },
         trigger: {
           height: "full!",

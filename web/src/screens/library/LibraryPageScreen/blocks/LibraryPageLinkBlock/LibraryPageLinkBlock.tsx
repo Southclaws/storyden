@@ -51,7 +51,6 @@ function LibraryPageLinkBlockEditing() {
           </InfoTip>
           <Button
             type="button"
-            size="xs"
             variant="subtle"
             disabled={!data.resolvedLink}
             loading={data.isImporting}

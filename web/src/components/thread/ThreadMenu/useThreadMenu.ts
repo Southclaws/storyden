@@ -3,9 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
-import { Permission, ThreadReference } from "@/api/openapi-schema";
-
 import { handle } from "@/api/client";
+import { Permission, ThreadReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";

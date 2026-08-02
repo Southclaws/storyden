@@ -15,6 +15,7 @@ import {
 } from "@/api/robots-types";
 import { Button } from "@/components/ui/button";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
 import { wstack } from "@/styled-system/patterns";
 
@@ -237,7 +238,7 @@ function RobotToolCallStatus({ part }: Props) {
     .with("output-denied", () => "Denied")
     .otherwise(() => "Tool complete");
 
-  return <styled.span>{label}</styled.span>;
+  return <span>{label}</span>;
 }
 
 function RobotToolConfirmation({ part }: Props) {
@@ -259,7 +260,6 @@ function RobotToolConfirmation({ part }: Props) {
     <HStack gap="2" justifyContent="flex-start">
       <Button
         aria-label="Approve"
-        size="xs"
         variant="solid"
         onClick={() =>
           resolveToolConfirmation({
@@ -273,7 +273,6 @@ function RobotToolConfirmation({ part }: Props) {
       </Button>
       <Button
         aria-label="Deny"
-        size="xs"
         variant="outline"
         onClick={() =>
           resolveToolConfirmation({
@@ -346,9 +345,9 @@ export function RobotToolConfirmationBatch({
             ? `Approve these ${parts.length} actions?`
             : `${parts.length} actions resolved`}
         </styled.span>
-        <styled.span>
+        <span>
           {hasPending ? `${pendingParts.length} pending` : "Tool complete"}
-        </styled.span>
+        </span>
       </styled.div>
 
       <LStack as="ul" gap="2" alignItems="stretch" w="full">
@@ -368,7 +367,6 @@ export function RobotToolConfirmationBatch({
         <HStack gap="2" justifyContent="flex-start" pt="1">
           <Button
             aria-label="Approve all confirmations"
-            size="xs"
             variant="solid"
             onClick={() => resolveAll(true)}
           >
@@ -376,7 +374,6 @@ export function RobotToolConfirmationBatch({
           </Button>
           <Button
             aria-label="Deny all confirmations"
-            size="xs"
             variant="outline"
             onClick={() => resolveAll(false)}
           >
@@ -428,7 +425,6 @@ function ConfirmationBatchRow({
         <HStack gap="1.5" flexShrink="0">
           <Button
             aria-label={`Approve ${label}`}
-            size="xs"
             variant="solid"
             onClick={onApprove}
           >
@@ -436,7 +432,6 @@ function ConfirmationBatchRow({
           </Button>
           <Button
             aria-label={`Deny ${label}`}
-            size="xs"
             variant="outline"
             onClick={onDeny}
           >
@@ -444,12 +439,13 @@ function ConfirmationBatchRow({
           </Button>
         </HStack>
       ) : (
-        <styled.span
-          fontSize="xs"
+        <Text
+          as="span"
+          variant="metadata"
           color={denied ? "text.subtle" : "text.default"}
         >
           {denied ? "Denied" : "Approved"}
-        </styled.span>
+        </Text>
       )}
     </HStack>
   );
@@ -571,21 +567,21 @@ function RobotLibraryPageRequest({ part }: Props) {
   }
 
   if (isLoading) {
-    return <styled.p color="text.subtle">Loading pages...</styled.p>;
+    return <Text variant="supporting">Loading pages...</Text>;
   }
 
   if (error) {
     return (
-      <styled.p color="status.danger.content">
+      <Text variant="supporting" color="status.danger.content">
         Could not load Library pages.
-      </styled.p>
+      </Text>
     );
   }
 
   const pages = flattenLibraryPages(data?.nodes ?? []);
 
   if (pages.length === 0) {
-    return <styled.p color="text.subtle">No Library pages found.</styled.p>;
+    return <Text variant="supporting">No Library pages found.</Text>;
   }
 
   return (
@@ -610,7 +606,6 @@ function RobotLibraryPageRequest({ part }: Props) {
           <Button
             key={page.id}
             aria-label={`Select Library page ${page.name}`}
-            size="xs"
             variant="outline"
             justifyContent="flex-start"
             h="auto"
@@ -632,15 +627,15 @@ function RobotLibraryPageRequest({ part }: Props) {
               >
                 {page.name}
               </styled.span>
-              <styled.span
-                color="text.subtle"
-                fontSize="xs"
+              <Text
+                as="span"
+                variant="metadata"
                 maxW="full"
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
                 /{page.slug}
-              </styled.span>
+              </Text>
             </LStack>
           </Button>
         );

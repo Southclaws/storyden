@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { PropsWithChildren } from "react";
 
-import { getColourAsHex } from "@/utils/colour";
-
 import { inter, interDisplay } from "@/app/fonts";
 import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
+import { getColourAsHex } from "@/utils/colour";
 import { getIconURL } from "@/utils/icon";
 
 import "./global.css";

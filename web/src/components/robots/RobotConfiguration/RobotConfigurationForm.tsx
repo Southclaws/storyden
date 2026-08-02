@@ -13,6 +13,7 @@ import {
   MultiSelectPicker,
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -123,11 +124,11 @@ export function RobotConfigurationForm(props: Props) {
           {modelError ? (
             <FormErrorText>Failed to load robot models.</FormErrorText>
           ) : (
-            <styled.p color="text.subtle" fontSize="sm">
+            <Text variant="supporting">
               {isCreating
                 ? "Leave unset to use the configured default model."
                 : "Choose one of the enabled provider models."}
-            </styled.p>
+            </Text>
           )}
           <FormErrorText>{form.formState.errors.model?.message}</FormErrorText>
         </FormControl>
@@ -199,13 +200,13 @@ function RobotDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
       >
         <LStack gap="6">
           <LStack gap="2">
-            <styled.p fontSize="sm">
+            <Text variant="supporting" color="text.default">
               This will permanently delete this robot.
-            </styled.p>
-            <styled.p fontSize="sm" color="text.subtle">
+            </Text>
+            <Text variant="supporting">
               Existing robot chat sessions will remain, but this robot will no
               longer be available.
-            </styled.p>
+            </Text>
           </LStack>
 
           <HStack justifyContent="end" gap="3">

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 import { Role } from "@/api/openapi-schema";
 import { CardBox } from "@/components/ui/card-box";
-import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
 import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
 import { HStack, WStack } from "@/styled-system/jsx";
@@ -39,7 +39,9 @@ export function RoleCard({ role, editable, dragHandle }: Props) {
       }}
     >
       <WStack alignItems="flex-start">
-        <Heading>{role.name}</Heading>
+        <Text variant="supporting" color="text.default" fontWeight="semibold">
+          {role.name}
+        </Text>
 
         <HStack>
           {isDefault && (

@@ -3,10 +3,9 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { Category, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { MoreAction } from "@/components/site/Action/More";
-import { Heading } from "@/components/ui/heading";
 import * as Menu from "@/components/ui/menu";
+import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
-import { styled } from "@/styled-system/jsx";
 import { useShare } from "@/utils/client";
 import { hasPermission } from "@/utils/permissions";
 import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
@@ -81,7 +80,7 @@ export function CategoryMenu(props: Props) {
   return (
     <Menu.Root onSelect={handlers.handleSelect}>
       <Menu.Trigger asChild>
-        <MoreAction size="xs" />
+        <MoreAction />
       </Menu.Trigger>
 
       <Portal>
@@ -89,10 +88,16 @@ export function CategoryMenu(props: Props) {
           <Menu.Content minW="48" userSelect="none">
             <Menu.ItemGroup id="account">
               <Menu.ItemGroupLabel>
-                <Heading size="sm">{category.name}</Heading>
-                <styled.span color="text.muted">
+                <Text
+                  variant="supporting"
+                  color="text.default"
+                  fontWeight="semibold"
+                >
+                  {category.name}
+                </Text>
+                <Text as="span" variant="metadata">
                   discussion category
-                </styled.span>
+                </Text>
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />

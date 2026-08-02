@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
 
-import { VStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/styled-system/jsx";
 
 import { EmptyIcon } from "../ui/icons/Empty";
 
@@ -9,9 +10,9 @@ export function Empty({ children }: PropsWithChildren) {
   return (
     <VStack alignItems="center" color="text.subtle">
       <EmptyIcon />
-      <styled.p fontStyle="italic" textWrap="nowrap">
+      <Text variant="supporting" fontStyle="italic" textWrap="nowrap">
         {children}
-      </styled.p>
+      </Text>
     </VStack>
   );
 }

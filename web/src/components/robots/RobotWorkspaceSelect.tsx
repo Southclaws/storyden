@@ -8,18 +8,18 @@ import { useRobotChat } from "@/components/site/CommandPalette/RobotChat/RobotCh
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
-import { styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
 
 const NO_WORKSPACE_VALUE = "__none";
 
 type Props = {
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: ComponentProps<typeof Select.Root>["size"];
   variant?: "outline" | "ghost";
   minW?: ComponentProps<typeof Select.Root>["minW"];
 };
 
 export function RobotWorkspaceSelect({
-  size = "xs",
+  size = "sm",
   variant = "ghost",
   minW = "44",
 }: Props) {
@@ -84,9 +84,9 @@ export function RobotWorkspaceSelect({
               <Select.ItemText>
                 {item.label}
                 {"description" in item && item.description ? (
-                  <styled.span color="text.subtle" ml="1">
+                  <Text as="span" variant="metadata" ml="1">
                     {item.description}
-                  </styled.span>
+                  </Text>
                 ) : null}
               </Select.ItemText>
               <Select.ItemIndicator>

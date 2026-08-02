@@ -6,7 +6,7 @@ import { nodeUpdateChildrenPropertySchema } from "@/api/openapi-client/nodes";
 import { PropertyType } from "@/api/openapi-schema";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
-import { styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
 import { useClickAway } from "@/utils/useClickAway";
 
 import { useLibraryPageContext } from "../../../Context";
@@ -136,9 +136,9 @@ export function AddPropertyMenu({
 
               {unavailable && (
                 <Menu.ItemGroup>
-                  <styled.p fontSize="xs" color="text.subtle">
+                  <Text variant="metadata">
                     Properties require at least one sub-page.
-                  </styled.p>
+                  </Text>
                 </Menu.ItemGroup>
               )}
             </Menu.ItemGroup>

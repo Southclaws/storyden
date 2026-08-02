@@ -1,4 +1,4 @@
-import { defineConfig, defineTextStyles } from "@pandacss/dev";
+import { defineConfig } from "@pandacss/dev";
 
 import { admonition } from "@/components/ui/admonition/Admonition.recipe";
 import { alert } from "@/components/ui/alert/Alert.recipe";
@@ -13,7 +13,6 @@ import { datePicker } from "@/components/ui/date-picker/DatePicker.recipe";
 import { fileUpload } from "@/components/ui/file-upload/FileUpload.recipe";
 import { group } from "@/components/ui/group/Group.recipe";
 import { headingInput } from "@/components/ui/heading-input/HeadingInput.recipe";
-import { typographyHeading } from "@/components/ui/heading-input/TypographyHeading.recipe";
 import { inputGroup } from "@/components/ui/input-group/InputGroup.recipe";
 import { input } from "@/components/ui/input/Input.recipe";
 import { menu } from "@/components/ui/menu/Menu.recipe";
@@ -35,7 +34,7 @@ import { toggleGroup } from "@/components/ui/toggle-group/ToggleGroup.recipe";
 import { tooltip } from "@/components/ui/tooltip/Tooltip.recipe";
 import { treeView } from "@/components/ui/tree-view/TreeView.recipe";
 import { tokens } from "@/theme/base";
-import { semanticTokens } from "@/theme/semantic";
+import { semanticTokens, textStyles } from "@/theme/semantic";
 
 export default defineConfig({
   presets: ["@pandacss/preset-base"],
@@ -79,7 +78,7 @@ export default defineConfig({
       select: [{ size: ["sm", "md", "lg"], variant: ["outline", "ghost"] }],
       slider: [{ size: ["sm", "md", "lg"] }],
       switchRecipe: [{ size: ["sm", "md", "lg"] }],
-      typographyHeading: [{ size: ["md", "lg"] }],
+      text: [{ variant: ["body", "supporting", "metadata"] }],
       toggleGroup: [
         { size: ["sm", "md", "lg"], variant: ["outline", "ghost"] },
       ],
@@ -191,7 +190,6 @@ export default defineConfig({
         text: text,
         admonition: admonition,
         headingInput: headingInput,
-        typographyHeading: typographyHeading,
         richCard: richCard,
       },
       slotRecipes: {
@@ -231,14 +229,7 @@ export default defineConfig({
           },
         },
       },
-      textStyles: defineTextStyles({
-        xs: { value: { fontSize: "xs", lineHeight: "1.125rem" } },
-        sm: { value: { fontSize: "sm", lineHeight: "1.25rem" } },
-        md: { value: { fontSize: "md", lineHeight: "1.5rem" } },
-        lg: { value: { fontSize: "lg", lineHeight: "1.75rem" } },
-        xl: { value: { fontSize: "xl", lineHeight: "1.875rem" } },
-        "2xl": { value: { fontSize: "2xl", lineHeight: "2rem" } },
-      }),
+      textStyles,
     },
   },
 

@@ -102,7 +102,8 @@ export const toggleGroup = defineSlotRecipe({
           px: "1",
           h: "6",
           minW: "6",
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
           gap: "1",
           "& svg": {
             width: "4",
@@ -115,7 +116,8 @@ export const toggleGroup = defineSlotRecipe({
           px: "2",
           h: "8",
           minW: "8",
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
           gap: "2",
           "& svg": {
             width: "4",
@@ -128,7 +130,8 @@ export const toggleGroup = defineSlotRecipe({
           px: "2",
           h: "10",
           minW: "10",
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
           gap: "2",
           "& svg": {
             width: "5",
@@ -141,7 +144,8 @@ export const toggleGroup = defineSlotRecipe({
           px: "2",
           h: "11",
           minW: "11",
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
           gap: "2",
           "& svg": {
             width: "5",

@@ -142,7 +142,6 @@ export function CreatePageFromURLAction({
       <Popover.Trigger asChild>
         <IconButton
           type="button"
-          size="xs"
           variant="subtle"
           px={hideLabel ? "0" : "1"}
           {...props}
@@ -161,13 +160,11 @@ export function CreatePageFromURLAction({
             <HStack gap="2" transition="all">
               <Input
                 w="64"
-                size="xs"
                 placeholder="Enter URL to import..."
                 value={url.value}
                 onChange={handleInputChange}
               />
               <Button
-                size="xs"
                 onClick={handleImport}
                 disabled={!url.valid || isImporting}
                 loading={isImporting}

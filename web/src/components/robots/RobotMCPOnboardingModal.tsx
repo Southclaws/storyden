@@ -24,8 +24,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button, ButtonGroup } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
@@ -235,11 +236,11 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
     return (
       <LStack gap="6">
         <LStack gap="2">
-          <Heading size="sm">{server.name} connected</Heading>
-          <styled.p color="text.subtle" fontSize="sm">
+          <SectionHeading>{server.name} connected</SectionHeading>
+          <Text variant="supporting">
             {server.tools.length} tools were discovered and added to the Robot
             tool catalogue.
-          </styled.p>
+          </Text>
         </LStack>
 
         <Button alignSelf="end" onClick={onClose}>
@@ -338,7 +339,7 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
       </LStack>
 
       <LStack gap="2">
-        <Heading size="sm">OAuth advanced settings</Heading>
+        <SectionHeading>OAuth advanced settings</SectionHeading>
 
         <styled.div
           bgColor="background.inset"
@@ -391,10 +392,10 @@ function RobotMCPOnboardingScreen({ onClose }: { onClose?: () => void }) {
             />
           ) : (
             <LStack gap="3">
-              <styled.p color="text.subtle" fontSize="sm">
+              <Text variant="supporting">
                 Bearer token mode skips OAuth. Switch back to OAuth to use CIMD,
                 DCR, or manual client credentials.
-              </styled.p>
+              </Text>
             </LStack>
           )}
         </styled.div>
@@ -454,9 +455,14 @@ function ReadinessRow({
       px="3"
       py="2"
     >
-      <styled.span fontSize="sm" fontWeight="medium">
+      <Text
+        as="span"
+        variant="supporting"
+        color="text.default"
+        fontWeight="medium"
+      >
         {label}
-      </styled.span>
+      </Text>
       <Badge size="sm">{status}</Badge>
     </WStack>
   );
@@ -497,35 +503,40 @@ function MCPStatusCard({
       p="3"
     >
       <WStack gap="1">
-        <styled.span fontSize="sm" fontWeight="medium">
+        <Text
+          as="span"
+          variant="supporting"
+          color="text.default"
+          fontWeight="medium"
+        >
           MCP Endpoint
-        </styled.span>
+        </Text>
         <Badge size="sm">{status}</Badge>
       </WStack>
 
       {probe && (
         <LStack gap="1">
-          <Heading size="xs">{serverName}</Heading>
-          <styled.p color="text.subtle" fontSize="xs" wordBreak="break-word">
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {serverName}
+          </Text>
+          <Text variant="metadata" wordBreak="break-word">
             {endpointURL}
-          </styled.p>
+          </Text>
 
           {probe.server_card?.description && (
-            <styled.p color="text.subtle" fontSize="sm">
-              {probe.server_card.description}
-            </styled.p>
+            <Text variant="supporting">{probe.server_card.description}</Text>
           )}
 
           {probe.probe_error && !waitingForAuthorisation && (
-            <styled.p color="status.warning.content" fontSize="xs">
+            <Text variant="metadata" color="status.warning.content">
               {probe.probe_error}
-            </styled.p>
+            </Text>
           )}
 
           {waitingForAuthorisation && (
-            <styled.p color="text.subtle" fontSize="xs">
+            <Text variant="metadata">
               Complete authorisation in the new tab, then return here.
-            </styled.p>
+            </Text>
           )}
         </LStack>
       )}

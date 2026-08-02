@@ -39,7 +39,7 @@ export const Sizes: Story = {
       rowGap="3"
       w="full"
     >
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         SM
       </Text>
       <NumberInput
@@ -48,7 +48,7 @@ export const Sizes: Story = {
         inputProps={{ "aria-label": "Number input sm" }}
       />
 
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         MD
       </Text>
       <NumberInput
@@ -57,7 +57,7 @@ export const Sizes: Story = {
         inputProps={{ "aria-label": "Number input md" }}
       />
 
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         LG
       </Text>
       <NumberInput

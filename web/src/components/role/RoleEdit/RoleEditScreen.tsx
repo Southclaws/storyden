@@ -11,6 +11,7 @@ import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import {
   PermissionList,
   buildPermissionList,
@@ -178,11 +179,11 @@ export function RoleEditScreen(props: Props) {
               }))}
             />
           ) : (
-            <styled.p color="text.subtle" fontSize="sm">
+            <Text variant="supporting">
               <InfoIcon display="inline" w="4" />
               &nbsp;You cannot change the permissions granted to the default
               Admin role. This role implicitly holds all permissions.
-            </styled.p>
+            </Text>
           )}
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
@@ -253,11 +254,11 @@ function RoleNamePreview({
       backgroundColor={backgroundColor}
       borderRadius="md"
     >
-      <styled.p fontSize="xs" color={labelColour} textTransform="uppercase">
+      <Text variant="metadata" color={labelColour} textTransform="uppercase">
         {mode}
-      </styled.p>
+      </Text>
 
-      <styled.p lineHeight="tight" fontSize="md">
+      <Text lineHeight="tight">
         <styled.span
           color={
             !roleColour || !roleMeta.coloured ? defaultNameColour : undefined
@@ -276,7 +277,7 @@ function RoleNamePreview({
         >
           @sample
         </styled.span>
-      </styled.p>
+      </Text>
     </WStack>
   );
 }

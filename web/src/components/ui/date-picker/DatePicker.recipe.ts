@@ -42,13 +42,15 @@ export const datePicker = defineSlotRecipe({
     label: {
       color: "text.default",
       fontWeight: "medium",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     tableHeader: {
       color: "text.muted",
       fontWeight: "semibold",
       height: "10",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     viewControl: {
       display: "flex",

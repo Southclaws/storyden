@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
 import { FormNumberInputField } from "@/components/ui/number-input";
+import { PageHeading } from "@/components/ui/page-heading";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Props, useModerationSettings } from "./useModerationSettings";
@@ -28,7 +28,7 @@ export function ModerationSettingsForm(props: Props) {
       onSubmit={onSubmit}
     >
       <WStack>
-        <Heading size="md">Moderation settings</Heading>
+        <PageHeading>Moderation settings</PageHeading>
         <Button type="submit" loading={formState.isSubmitting}>
           Save
         </Button>
@@ -116,7 +116,6 @@ export function ModerationSettingsForm(props: Props) {
                         {word}
                         <IconButton
                           type="button"
-                          size="xs"
                           variant="ghost"
                           onClick={() => handleRemoveWord(word)}
                         >
@@ -185,7 +184,6 @@ export function ModerationSettingsForm(props: Props) {
                         {word}
                         <IconButton
                           type="button"
-                          size="xs"
                           variant="ghost"
                           onClick={() => handleRemoveWord(word)}
                         >

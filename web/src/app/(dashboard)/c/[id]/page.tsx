@@ -1,8 +1,7 @@
-import { UnreadyBanner } from "@/components/site/Unready";
-import { CollectionScreen } from "@/screens/collection/CollectionScreen";
-
 import { collectionGet } from "@/api/openapi-server/collections";
 import { getServerSession } from "@/auth/server-session";
+import { UnreadyBanner } from "@/components/site/Unready";
+import { CollectionScreen } from "@/screens/collection/CollectionScreen";
 
 type Props = {
   params: Promise<{

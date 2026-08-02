@@ -12,8 +12,9 @@ import { CopyIcon } from "@/components/ui/icons/Copy";
 import { InvitationIcon } from "@/components/ui/icons/Invitation";
 import { Input } from "@/components/ui/input";
 import { Item } from "@/components/ui/menu";
+import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
-import { Center, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
+import { Center, LStack, VStack, WStack } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 type InvitationState =
@@ -107,10 +108,10 @@ function InvitationModalContent({
     return (
       <LStack gap="6">
         <LStack gap="2">
-          <styled.p color="text.subtle">
+          <Text variant="supporting">
             Send this invitation link to someone you would like to welcome into
             the community.
-          </styled.p>
+          </Text>
         </LStack>
 
         <Clipboard.Root w="full" value={invitation.link}>
@@ -141,12 +142,12 @@ function InvitationModalContent({
     return (
       <LStack gap="6">
         <LStack gap="2">
-          <styled.p color="text.subtle">
+          <Text variant="supporting">
             Something went wrong while creating the invitation.
-          </styled.p>
-          <styled.p color="status.danger.content" fontSize="sm">
+          </Text>
+          <Text variant="metadata" color="status.danger.content">
             {invitation.message}
-          </styled.p>
+          </Text>
         </LStack>
 
         <WStack>
@@ -165,7 +166,7 @@ function InvitationModalContent({
     <Center minH="36">
       <VStack gap="3" textAlign="center">
         <IconButton variant="ghost" loading aria-label="Creating invitation" />
-        <styled.p color="text.subtle">Creating an invitation...</styled.p>
+        <Text variant="supporting">Creating an invitation...</Text>
       </VStack>
     </Center>
   );

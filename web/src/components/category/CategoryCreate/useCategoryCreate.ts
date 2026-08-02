@@ -3,14 +3,13 @@ import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
 
+import { handle } from "@/api/client";
 import {
   categoryCreate,
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
 import { Asset } from "@/api/openapi-schema";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
-
-import { handle } from "@/api/client";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),

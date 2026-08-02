@@ -10,6 +10,7 @@ import { Timestamp } from "@/components/site/Timestamp";
 import { SystemBadge } from "@/components/system/SystemBadge";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { ReportCardContent } from "../ReportCardContent";
@@ -98,9 +99,9 @@ export function ReportCard({ report }: Props) {
 
         <WStack gap="1">
           <HStack gap="2" alignItems="center" minW="0" maxW="1/2">
-            <styled.span fontSize="sm" color="text.muted" fontWeight="medium">
+            <Text as="span" variant="supporting" fontWeight="medium">
               Reporter:
-            </styled.span>
+            </Text>
             {report.reported_by ? (
               <MemberBadge
                 profile={report.reported_by}
@@ -114,9 +115,9 @@ export function ReportCard({ report }: Props) {
           </HStack>
 
           <HStack gap="2" alignItems="center" minW="0" maxW="1/2">
-            <styled.span fontSize="sm" color="text.muted" fontWeight="medium">
+            <Text as="span" variant="supporting" fontWeight="medium">
               Handler:
-            </styled.span>
+            </Text>
             {report.handled_by ? (
               <MemberBadge
                 profile={report.handled_by}
@@ -125,9 +126,9 @@ export function ReportCard({ report }: Props) {
                 as="link"
               />
             ) : (
-              <styled.span color="text.muted" fontStyle="italic">
+              <Text as="span" variant="metadata" fontStyle="italic">
                 Unassigned
-              </styled.span>
+              </Text>
             )}
           </HStack>
         </WStack>

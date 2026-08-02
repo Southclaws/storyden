@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
 import { FormCardGroupRadio } from "@/components/ui/radio-group";
 import {
   AuthenticationModeDetail,
@@ -98,7 +98,7 @@ export function AuthenticationSettingsForm(props: Props) {
   return (
     <styled.form className={lstack()} onSubmit={handleSubmit}>
       <WStack>
-        <Heading size="md">Authentication settings</Heading>
+        <PageHeading>Authentication settings</PageHeading>
         <Button type="submit" loading={form.formState.isSubmitting}>
           Save
         </Button>

@@ -2,7 +2,6 @@ import { Portal } from "@ark-ui/react";
 import { KeyboardEvent, useState } from "react";
 
 import { BookmarkAction } from "@/components/site/Action/Bookmark";
-
 import { Unready } from "@/components/site/Unready";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AddIcon } from "@/components/ui/icons/Add";
@@ -55,7 +54,6 @@ export function CollectionMenu(props: Props) {
         <Menu.Trigger asChild>
           <BookmarkAction
             variant="subtle"
-            size="xs"
             bookmarked={props.thread.collections.has_collected}
           />
         </Menu.Trigger>

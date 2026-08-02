@@ -11,11 +11,13 @@ import * as Clipboard from "@/components/ui/clipboard";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
 import * as RadioGroup from "@/components/ui/radio-group";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { PermissionList } from "@/lib/permission/permission";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
@@ -51,7 +53,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
       <LStack h="full" gap="8" justifyContent="space-between">
         <LStack gap="5">
           <LStack>
-            <Heading>OAuth Client Created</Heading>
+            <PageHeading>OAuth Client Created</PageHeading>
             <p>
               <strong>
                 This is the only time you&apos;ll see this secret.
@@ -86,10 +88,10 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
     <styled.form onSubmit={handleSubmit}>
       <LStack gap="5">
         <LStack gap="1">
-          <Heading size="sm">Create OAuth Client</Heading>
-          <styled.p color="text.subtle" fontSize="sm">
+          <SectionHeading>Create OAuth Client</SectionHeading>
+          <Text variant="supporting">
             Configure your OAuth client for different integration types.
-          </styled.p>
+          </Text>
         </LStack>
 
         <FormControl>
@@ -115,14 +117,19 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                     <RadioGroup.ItemControl />
                     <RadioGroup.ItemText>
                       <LStack gap="0">
-                        <styled.span fontWeight="medium">
+                        <Text
+                          as="span"
+                          variant="supporting"
+                          color="text.default"
+                          fontWeight="medium"
+                        >
                           App Integration
-                        </styled.span>
-                        <styled.span color="text.subtle" fontSize="xs">
+                        </Text>
+                        <Text as="span" variant="metadata">
                           For third-party apps like MCP clients
                           (authorization_code + refresh_token, confidential,
                           PKCE required)
-                        </styled.span>
+                        </Text>
                       </LStack>
                     </RadioGroup.ItemText>
                   </RadioGroup.Item>
@@ -131,13 +138,18 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                     <RadioGroup.ItemControl />
                     <RadioGroup.ItemText>
                       <LStack gap="0">
-                        <styled.span fontWeight="medium">
+                        <Text
+                          as="span"
+                          variant="supporting"
+                          color="text.default"
+                          fontWeight="medium"
+                        >
                           Public App
-                        </styled.span>
-                        <styled.span color="text.subtle" fontSize="xs">
+                        </Text>
+                        <Text as="span" variant="metadata">
                           For browser/mobile apps (authorization_code +
                           refresh_token, public, PKCE required)
-                        </styled.span>
+                        </Text>
                       </LStack>
                     </RadioGroup.ItemText>
                   </RadioGroup.Item>
@@ -146,13 +158,18 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                     <RadioGroup.ItemControl />
                     <RadioGroup.ItemText>
                       <LStack gap="0">
-                        <styled.span fontWeight="medium">
+                        <Text
+                          as="span"
+                          variant="supporting"
+                          color="text.default"
+                          fontWeight="medium"
+                        >
                           Machine Client
-                        </styled.span>
-                        <styled.span color="text.subtle" fontSize="xs">
+                        </Text>
+                        <Text as="span" variant="metadata">
                           For server-to-server (client_credentials,
                           confidential, no redirect URIs)
-                        </styled.span>
+                        </Text>
                       </LStack>
                     </RadioGroup.ItemText>
                   </RadioGroup.Item>
@@ -233,12 +250,17 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
                       }}
                     >
                       <LStack gap="0">
-                        <styled.span fontWeight="medium">
+                        <Text
+                          as="span"
+                          variant="supporting"
+                          color="text.default"
+                          fontWeight="medium"
+                        >
                           {permission.name}
-                        </styled.span>
-                        <styled.span color="text.subtle" fontSize="xs">
+                        </Text>
+                        <Text as="span" variant="metadata">
                           {permission.description}
-                        </styled.span>
+                        </Text>
                       </LStack>
                     </Checkbox>
                   );
@@ -276,9 +298,9 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 function SecretField({ label, value }: { label: string; value: string }) {
   return (
     <LStack gap="2">
-      <Heading size="sm" color="text.subtle">
+      <Text variant="supporting" fontWeight="semibold">
         {label}
-      </Heading>
+      </Text>
       <Clipboard.Root w="full" value={value}>
         <Clipboard.Control>
           <Clipboard.Input asChild>

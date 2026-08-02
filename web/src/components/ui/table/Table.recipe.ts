@@ -78,7 +78,8 @@ export const table = defineSlotRecipe({
     size: {
       sm: {
         root: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
         caption: {
           mt: "1",
@@ -94,7 +95,8 @@ export const table = defineSlotRecipe({
       },
       md: {
         root: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
         caption: {
           mt: "4",

@@ -2,7 +2,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { useAccountGet } from "@/api/openapi-client/accounts";
-
 import { usePublicRegistration } from "@/lib/settings/registration";
 
 const PRIVATE_PAGES = ["/settings", "/new", "/admin"];

@@ -1,10 +1,9 @@
 import { PropsWithChildren } from "react";
 
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { Button } from "@/components/ui/button";
 import { CreateFolderIcon } from "@/components/ui/icons/CreateFolder";
 import { ButtonVariantProps } from "@/styled-system/recipes";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CollectionCreateModal } from "./CollectionCreateModal";
 import { Props } from "./useCollectionCreate";

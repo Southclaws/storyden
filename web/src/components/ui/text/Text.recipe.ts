@@ -2,21 +2,24 @@ import { defineRecipe } from "@pandacss/dev";
 
 export const text = defineRecipe({
   className: "text",
-  jsx: ["Heading", "Text"],
+  jsx: ["Text"],
   variants: {
     variant: {
-      heading: {
+      body: {
         color: "text.default",
-        fontWeight: "semibold",
+        textStyle: "body",
+      },
+      supporting: {
+        color: "text.muted",
+        textStyle: "supporting",
+      },
+      metadata: {
+        color: "text.muted",
+        textStyle: "metadata",
       },
     },
-    size: {
-      xs: { textStyle: "xs", lineHeight: "1.125rem" },
-      sm: { textStyle: "sm", lineHeight: "1.25rem" },
-      md: { textStyle: "md", lineHeight: "1.5rem" },
-      lg: { textStyle: "lg", lineHeight: "1.75rem" },
-      xl: { textStyle: "xl", lineHeight: "1.875rem" },
-      "2xl": { textStyle: "2xl", lineHeight: "2rem" },
-    },
+  },
+  defaultVariants: {
+    variant: "body",
   },
 });

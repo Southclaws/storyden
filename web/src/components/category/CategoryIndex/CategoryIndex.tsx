@@ -2,11 +2,13 @@ import { match } from "ts-pattern";
 
 import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { CategoryTree } from "@/lib/category/tree";
 import { Settings } from "@/lib/settings/settings";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { CategoryBadge } from "../CategoryBadge";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
@@ -43,7 +45,7 @@ export function CategoryIndex({
     <LStack gap="8">
       <LStack>
         <WStack>
-          <Heading>Discussion categories</Heading>
+          <PageHeading>Discussion categories</PageHeading>
 
           <CategoryCreateTrigger />
         </WStack>
@@ -53,25 +55,23 @@ export function CategoryIndex({
             .when(
               (c) => c === 0,
               () => (
-                <styled.p color="text.subtle">
-                  No categories yet. Create one?
-                </styled.p>
+                <Text variant="supporting">No categories yet. Create one?</Text>
               ),
             )
             .when(
               (c) => c === 1,
               () => (
-                <styled.p color="text.subtle">
+                <Text variant="supporting">
                   There is {categoryCount} category available to start a
                   discussion.
-                </styled.p>
+                </Text>
               ),
             )
             .otherwise(() => (
-              <styled.p color="text.subtle">
+              <Text variant="supporting">
                 There are {categoryCount} categories available to start
                 discussions.
-              </styled.p>
+              </Text>
             ))}
 
           <HStack>
@@ -130,7 +130,7 @@ function ThreadListSection({
     <LStack>
       {!showQuickShare && (
         <WStack>
-          <Heading>{heading}</Heading>
+          <SectionHeading>{heading}</SectionHeading>
 
           <ComposeAnchor />
         </WStack>

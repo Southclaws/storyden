@@ -46,7 +46,6 @@ export function CreatePageAction({
   return (
     <IconButton
       type="button"
-      size="xs"
       variant="subtle"
       px={hideLabel ? "0" : "1"}
       onClick={handleCreate}

@@ -5,7 +5,6 @@ import {
   PropertySchemaList,
   PropertyType,
 } from "@/api/openapi-schema";
-
 import { CoverImageSchema, NodeMetadataSchema } from "@/lib/library/metadata";
 
 const CoverImageFormSchema = z.union([

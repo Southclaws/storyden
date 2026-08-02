@@ -42,7 +42,12 @@ function groupReactions(
   );
 }
 
-export function useReactionList({ initialSession, thread, reply, currentPage }: Props) {
+export function useReactionList({
+  initialSession,
+  thread,
+  reply,
+  currentPage,
+}: Props) {
   const session = useSession(initialSession);
   const { reactionAdd, reactionRemove, revalidate } = useThreadMutations(
     thread,

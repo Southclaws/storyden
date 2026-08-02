@@ -1,6 +1,5 @@
 import { Node } from "@/api/openapi-schema";
 import { Timestamp } from "@/components/site/Timestamp";
-
 import { Card } from "@/components/ui/rich-card";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { HStack, WStack } from "@/styled-system/jsx";

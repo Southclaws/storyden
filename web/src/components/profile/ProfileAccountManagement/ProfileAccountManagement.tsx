@@ -12,6 +12,7 @@ import { CardBox } from "@/components/ui/card-box";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import * as Tabs from "@/components/ui/tabs";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 import { hasPermission } from "@/utils/permissions";
@@ -182,45 +183,37 @@ function ProfileAccountManagementTabs({
         >
           <LStack flex="1" gap="4" flexShrink="1" flexGrow="1" minW="0">
             <LStack gap="1">
-              <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
+              <Text variant="metadata" fontWeight="semibold">
                 Account Status
-              </styled.p>
+              </Text>
               <Box fontSize="sm">{emailVerifiedStatusBadge.run()}</Box>
             </LStack>
 
             <LStack gap="1">
-              <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
+              <Text variant="metadata" fontWeight="semibold">
                 Joined at
-              </styled.p>
-              <styled.p fontSize="sm">
+              </Text>
+              <Text variant="supporting" color="text.default">
                 {formatDate(new Date(account.joined), "PPPppp")}
-              </styled.p>
+              </Text>
             </LStack>
 
             {account.suspended && (
               <LStack gap="1">
-                <styled.p
-                  fontSize="xs"
-                  fontWeight="semibold"
-                  color="text.subtle"
-                >
+                <Text variant="metadata" fontWeight="semibold">
                   Suspended
-                </styled.p>
-                <styled.p fontSize="sm" color="status.danger.content">
+                </Text>
+                <Text variant="metadata" color="status.danger.content">
                   {formatDate(new Date(account.suspended), "PPPppp")}
-                </styled.p>
+                </Text>
               </LStack>
             )}
 
             {account.invited_by && (
               <LStack gap="1">
-                <styled.p
-                  fontSize="xs"
-                  fontWeight="semibold"
-                  color="text.subtle"
-                >
+                <Text variant="metadata" fontWeight="semibold">
                   Invited By
-                </styled.p>
+                </Text>
                 <MemberIdent
                   size="sm"
                   name="full-vertical"
@@ -231,9 +224,9 @@ function ProfileAccountManagementTabs({
           </LStack>
 
           <LStack flex="1" gap="2" flexShrink="1" flexGrow="1" minW="0">
-            <styled.p fontSize="xs" fontWeight="semibold" color="text.subtle">
+            <Text variant="metadata" fontWeight="semibold">
               Email Addresses
-            </styled.p>
+            </Text>
             {account.email_addresses.length > 0 ? (
               <LStack gap="2" minW="0">
                 {account.email_addresses.map((email) => (
@@ -267,9 +260,7 @@ function ProfileAccountManagementTabs({
                 ))}
               </LStack>
             ) : (
-              <styled.p fontSize="sm" color="text.muted">
-                No email addresses
-              </styled.p>
+              <Text variant="supporting">No email addresses</Text>
             )}
           </LStack>
         </Flex>

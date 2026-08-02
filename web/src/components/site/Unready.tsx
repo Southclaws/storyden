@@ -1,6 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import type { Settings } from "@/lib/settings/settings";
 import { Box, Center, HStack, LStack, styled } from "@/styled-system/jsx";
@@ -84,9 +85,9 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
             </styled.h1>
           </HStack>
 
-          <styled.p id="error__message">
+          <Text id="error__message">
             <span>{message}</span>
-          </styled.p>
+          </Text>
 
           <LStack>{children}</LStack>
         </LStack>
@@ -106,11 +107,11 @@ export function UnauthenticatedBanner({
     <UnreadyBanner error="Please log in to see this page.">
       <HStack w="full">
         {canRegister && (
-          <LinkButton w="full" size="xs" href="/register">
+          <LinkButton w="full" href="/register">
             Register
           </LinkButton>
         )}
-        <LinkButton w="full" size="xs" variant="outline" href="/login">
+        <LinkButton w="full" variant="outline" href="/login">
           Login
         </LinkButton>
       </HStack>

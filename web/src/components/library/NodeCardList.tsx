@@ -1,5 +1,4 @@
 import { Node } from "@/api/openapi-schema";
-
 import { CardGrid, CardRows } from "@/components/ui/rich-card";
 import { RichCardVariantProps } from "@/styled-system/recipes";
 

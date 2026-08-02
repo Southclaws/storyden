@@ -12,6 +12,7 @@ import { ProfileIcon } from "@/components/ui/icons/Profile";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import { Switch } from "@/components/ui/switch";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { markdownURLTransform, remarkLooseLists } from "@/utils/markdown";
@@ -102,9 +103,9 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
               dangerouslySetInnerHTML={{ __html: previewHTML }}
             />
           ) : (
-            <styled.p height="14" color="text.subtle" fontStyle="italic">
+            <Text variant="supporting" height="14" fontStyle="italic">
               empty...
-            </styled.p>
+            </Text>
           )}
         </>
       ) : (

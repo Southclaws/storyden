@@ -90,7 +90,6 @@ export function LinkButton({ editor }: LinkButtonProps) {
       <Popover.Trigger asChild>
         <Button
           type="button"
-          size="xs"
           variant={isActive ? "subtle" : "ghost"}
           title={isActive ? "Edit link" : "Add link"}
           onClick={handleOpen}
@@ -104,7 +103,6 @@ export function LinkButton({ editor }: LinkButtonProps) {
           <HStack gap="1" alignItems="stretch">
             <Input
               borderColor={isInvalid ? "status.danger.border" : undefined}
-              size="xs"
               value={url}
               onChange={handleChangeURL}
               placeholder="Enter or paste URL"
@@ -124,7 +122,6 @@ export function LinkButton({ editor }: LinkButtonProps) {
               {isActive && (
                 <Button
                   type="button"
-                  size="xs"
                   variant="ghost"
                   onClick={handleRemoveLink}
                   title="Remove link"
@@ -132,7 +129,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
                   <DeleteIcon />
                 </Button>
               )}
-              <Button type="button" size="xs" onClick={handleSetLink}>
+              <Button type="button" onClick={handleSetLink}>
                 {isActive ? "Update" : "Add"}
               </Button>
             </HStack>

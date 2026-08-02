@@ -1,5 +1,6 @@
 import { DatagraphItemKind, ProfileReference } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { Text } from "@/components/ui/text";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { ReportModal, ReportModalProps } from "./ReportModal";
@@ -64,15 +65,14 @@ export function ReportPostModal({
             </styled.span>
           )}
           {body && (
-            <styled.p
-              fontSize="sm"
-              color="text.muted"
+            <Text
+              variant="supporting"
               whiteSpace="pre-wrap"
               maxW="64"
               wordBreak="break-word"
             >
               {body}
-            </styled.p>
+            </Text>
           )}
         </VStack>
       }

@@ -11,12 +11,13 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-picker";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
 } from "@/components/ui/multi-select-picker";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -58,11 +59,10 @@ export function EmailLogSettingsScreen() {
   return (
     <LStack gap="4">
       <WStack>
-        <Heading size="md">Email Log</Heading>
+        <PageHeading>Email Log</PageHeading>
 
         <Button
           type="button"
-          size="xs"
           variant="subtle"
           loading={refreshing}
           onClick={refreshEmailLog}
@@ -70,9 +70,9 @@ export function EmailLogSettingsScreen() {
           Refresh
         </Button>
       </WStack>
-      <styled.p>
+      <Text variant="supporting">
         View queued emails and delivery attempts, including failure reasons.
-      </styled.p>
+      </Text>
 
       <Flex
         w="full"
@@ -225,13 +225,9 @@ function EmailItem({
         </WStack>
 
         <WStack>
-          <styled.p fontSize="sm" color="text.muted">
-            “{email.subject}”
-          </styled.p>
+          <Text variant="supporting">“{email.subject}”</Text>
 
-          <styled.p fontSize="xs" color="text.muted">
-            {recipient}
-          </styled.p>
+          <Text variant="metadata">{recipient}</Text>
         </WStack>
 
         <styled.details
@@ -257,14 +253,10 @@ function EmailItem({
             }}
           >
             <LStack gap="1">
-              <styled.span>{attemptCountLabel}</styled.span>
-              <styled.span
-                fontSize="xs"
-                color="text.subtle"
-                fontWeight="normal"
-              >
+              <span>{attemptCountLabel}</span>
+              <Text as="span" variant="metadata" fontWeight="normal">
                 {error ? error : "Open to review the full delivery history."}
-              </styled.span>
+              </Text>
             </LStack>
           </styled.summary>
 
@@ -325,7 +317,6 @@ function EmailItem({
           {email.status === "failed" && (
             <Button
               type="button"
-              size="xs"
               variant="subtle"
               loading={retrying}
               loadingText="Retrying..."

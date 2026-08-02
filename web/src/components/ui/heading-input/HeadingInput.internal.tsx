@@ -13,13 +13,10 @@ import {
 } from "react";
 import {
   type HeadingInputVariantProps,
-  type TypographyHeadingVariantProps,
   headingInput,
 } from "styled-system/recipes";
 
-import { cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
-import { typographyHeading } from "@/styled-system/recipes";
 import { JsxStyleProps } from "@/styled-system/types";
 
 type CustomProps = {
@@ -28,7 +25,6 @@ type CustomProps = {
 
 export type HeadingInputProps = JsxStyleProps &
   HeadingInputVariantProps &
-  TypographyHeadingVariantProps &
   ComponentPropsWithoutRef<typeof ark.input> &
   CustomProps;
 
@@ -37,10 +33,7 @@ function HeadingInputWithRef(
   ref: ForwardedRef<HTMLSpanElement>,
 ) {
   const { onValueChange, defaultValue, value, ...rest } = props;
-  const [headingProps, headingInputProps] =
-    typographyHeading.splitVariantProps(rest);
-  const [recipeProps, componentProps] =
-    headingInput.splitVariantProps(headingInputProps);
+  const [recipeProps, componentProps] = headingInput.splitVariantProps(rest);
   const internalRef = useRef<HTMLSpanElement>(null);
 
   useImperativeHandle(ref, () => internalRef.current as any);
@@ -88,10 +81,7 @@ function HeadingInputWithRef(
     <styled.span
       {...(componentProps as any)}
       ref={internalRef}
-      className={cx(
-        headingInput({ ...recipeProps }),
-        typographyHeading({ ...headingProps }),
-      )}
+      className={headingInput({ ...recipeProps })}
       //
       // NOTE: We're doing a bit of a hack here in order to make this
       // field look nice and behave like the Substack title editor.

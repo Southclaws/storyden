@@ -7,6 +7,7 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { formatSeconds } from "./useSystemSettings";
@@ -101,7 +102,7 @@ export function OperationCostOverrideAddForm({
           </IconButton>
         </HStack>
 
-        <styled.p fontSize="xs" color="text.subtle">
+        <Text variant="metadata">
           Can be performed{" "}
           <styled.strong color="status.info.content">
             {effectiveLimit}
@@ -110,7 +111,7 @@ export function OperationCostOverrideAddForm({
           <styled.strong color="status.info.content">
             {formatSeconds(rateLimitPeriod)}
           </styled.strong>
-        </styled.p>
+        </Text>
       </LStack>
     </CardBox>
   );

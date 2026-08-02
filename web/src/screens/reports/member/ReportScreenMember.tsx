@@ -3,8 +3,8 @@ import { ReportListResult } from "@/api/openapi-schema";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
-import { Center, LStack, styled } from "@/styled-system/jsx";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Center, LStack } from "@/styled-system/jsx";
 
 import { useReportsScreenFilters } from "../manager/useReportsScreenFilters";
 
@@ -51,7 +51,7 @@ export function ReportScreenMember(props: Props) {
   const { reports, results, current_page, total_pages, page_size } = data;
   return (
     <LStack gap="4">
-      <Heading>Reports</Heading>
+      <PageHeading>Reports</PageHeading>
 
       {reports.length > 0 ? (
         <>

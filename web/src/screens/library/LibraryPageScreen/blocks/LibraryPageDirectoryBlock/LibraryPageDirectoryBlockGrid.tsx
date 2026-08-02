@@ -289,7 +289,6 @@ function GridCard({
                 <IconButton
                   style={dragHandleStyle}
                   variant="subtle"
-                  size="xs"
                   minWidth="5"
                   width="5"
                   height="5"

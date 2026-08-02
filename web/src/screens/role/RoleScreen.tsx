@@ -34,9 +34,9 @@ import { RoleCard } from "@/components/role/RoleCard";
 import { RoleCreateModalTrigger } from "@/components/role/RoleEdit/RoleEditModal";
 import { InfoTip } from "@/components/site/InfoTip";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
+import { PageHeading } from "@/components/ui/page-heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { isDefaultRole } from "@/lib/role/defaults";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
@@ -60,7 +60,7 @@ export function RoleScreen(props: Props) {
   return (
     <LStack>
       <WStack>
-        <Heading>Roles</Heading>
+        <PageHeading>Roles</PageHeading>
 
         {canEdit && <RoleCreateModalTrigger />}
       </WStack>
@@ -226,7 +226,6 @@ function SortableRoleCard({
           draggable ? (
             <IconButton
               variant={{ base: "subtle", md: "ghost" }}
-              size="xs"
               minWidth="5"
               width="5"
               height="5"

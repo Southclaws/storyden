@@ -70,7 +70,10 @@ export const richCard = defineSlotRecipe({
 
     title: {
       lineClamp: "1",
-      fontWeight: "bold",
+      color: "text.default",
+      fontSize: "sm",
+      fontWeight: "semibold",
+      lineHeight: "1.25rem",
     },
 
     contentContainer: {

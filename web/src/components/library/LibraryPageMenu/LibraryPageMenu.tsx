@@ -1,10 +1,9 @@
 import { MenuOpenChangeDetails, Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "@/components/site/Action/More";
-
 import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
+import { MoreAction } from "@/components/site/Action/More";
 import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
@@ -77,7 +76,7 @@ export function LibraryPageMenu({
       onInteractOutside={onInteractOutside}
     >
       <Menu.Trigger asChild>
-        {children ?? <MoreAction variant="subtle" size="xs" {...props} />}
+        {children ?? <MoreAction variant="subtle" {...props} />}
       </Menu.Trigger>
 
       <Portal>
@@ -89,9 +88,9 @@ export function LibraryPageMenu({
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>
+                <span>
                   {`Created by ${node.owner.name}`} {statusText}
-                </styled.span>
+                </span>
 
                 <styled.time fontWeight="normal">
                   {format(new Date(node.createdAt), "yyyy-mm-dd")}

@@ -53,11 +53,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
 import * as Select from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
@@ -109,7 +110,7 @@ export function RobotsSettingsScreen() {
     <LStack gap="4">
       <LStack gap="4">
         <WStack justifyContent="space-between">
-          <Heading size="md">Robot settings</Heading>
+          <PageHeading>Robot settings</PageHeading>
 
           {available ? (
             <Badge
@@ -186,18 +187,13 @@ function RobotMCPServersSettings() {
     <LStack gap="4">
       <WStack justifyContent="space-between">
         <LStack gap="1">
-          <Heading size="md">MCP servers</Heading>
+          <SectionHeading>MCP servers</SectionHeading>
           <Text color="text.subtle" fontSize="sm">
             Connect external MCP servers and add their tools to Robots.
           </Text>
         </LStack>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={disclosure.onOpen}
-        >
+        <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
           Connect
         </Button>
       </WStack>
@@ -249,19 +245,14 @@ function RobotWorkspaceTemplatesSection({
     <LStack gap="3" pt="3">
       <WStack justifyContent="space-between" alignItems="start">
         <LStack gap="1">
-          <Heading size="md">Workspace templates</Heading>
+          <SectionHeading>Workspace templates</SectionHeading>
           <Text color="text.subtle" fontSize="sm">
             Create reusable workspace templates. Robot sessions create live
             instances from these templates when they mount a workspace.
           </Text>
         </LStack>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={disclosure.onOpen}
-        >
+        <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
           Create
         </Button>
       </WStack>
@@ -344,7 +335,13 @@ function RobotWorkspaceTemplateItem({
         <WStack justifyContent="space-between" alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{workspace.name}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {workspace.name}
+              </Text>
               <Badge
                 size="sm"
                 borderColor="status.info.border"
@@ -380,7 +377,6 @@ function RobotWorkspaceTemplateItem({
             type="button"
             variant="ghost"
             colorPalette="red"
-            size="xs"
             onClick={handleDelete}
           >
             Delete
@@ -463,7 +459,9 @@ function RobotWorkspaceInstanceRow({
     <CardBox>
       <LStack gap="2">
         <WStack justifyContent="space-between">
-          <Heading size="xs">{instance.id}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {instance.id}
+          </Text>
           <Badge
             size="sm"
             borderColor="status.info.border"
@@ -707,7 +705,13 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
         <WStack alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{server.name}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {server.name}
+              </Text>
               <Badge size="sm">{server.enabled ? "Enabled" : "Disabled"}</Badge>
               {server.has_bearer_token && <Badge size="sm">Bearer</Badge>}
               {server.oauth_remote_connection_id && (
@@ -724,7 +728,6 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           <HStack gap="2">
             <Button
               type="button"
-              size="xs"
               variant="outline"
               loading={isRefreshing}
               onClick={refresh}
@@ -733,7 +736,6 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
             </Button>
             <Button
               type="button"
-              size="xs"
               variant="ghost"
               colorPalette="red"
               loading={isDeleting}
@@ -797,7 +799,13 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
         <WStack justifyContent="space-between" alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{provider.provider}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {provider.provider}
+              </Text>
               <ProviderStatusBadge provider={provider} />
             </HStack>
 
@@ -809,21 +817,11 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
 
           <HStack gap="2">
             {provider.settings.has_api_key && (
-              <Button
-                type="button"
-                size="xs"
-                variant="outline"
-                onClick={refreshModels}
-              >
+              <Button type="button" variant="outline" onClick={refreshModels}>
                 Refresh
               </Button>
             )}
-            <Button
-              type="button"
-              variant="subtle"
-              size="xs"
-              onClick={disclosure.onOpen}
-            >
+            <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
               Configure
             </Button>
           </HStack>

@@ -1,7 +1,7 @@
 "use client";
 
-import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeading } from "@/components/ui/page-heading";
 import RobotListScreen from "@/screens/robots/RobotListScreen";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
@@ -10,7 +10,7 @@ export default function Page() {
     <LStack>
       <WStack>
         <HStack gap="2">
-          <Heading size="md">Robots</Heading>
+          <PageHeading>Robots</PageHeading>
         </HStack>
 
         <LinkButton href="/robots/new">New</LinkButton>

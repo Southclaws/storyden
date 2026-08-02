@@ -54,7 +54,15 @@ export interface ToolContentSearchInput {
   /**
    * Filter by content types.
    */
-  kind?: ("post" | "thread" | "reply" | "node" | "collection" | "profile" | "event")[];
+  kind?: (
+    | "post"
+    | "thread"
+    | "reply"
+    | "node"
+    | "collection"
+    | "profile"
+    | "event"
+  )[];
   /**
    * Filter by author handles (usernames). Do not use '@' prefix.
    */
@@ -1428,7 +1436,14 @@ export interface DatagraphItemRef {
   /**
    * Type of datagraph item (thread, node, profile, collection, etc.)
    */
-  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
+  kind:
+    | "post"
+    | "thread"
+    | "reply"
+    | "node"
+    | "collection"
+    | "profile"
+    | "event";
 }
 export interface RobotChatContext {
   datagraph_item?: DatagraphItemRef1;
@@ -1452,190 +1467,256 @@ export interface DatagraphItemRef1 {
   /**
    * Type of datagraph item (thread, node, profile, collection, etc.)
    */
-  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
+  kind:
+    | "post"
+    | "thread"
+    | "reply"
+    | "node"
+    | "collection"
+    | "profile"
+    | "event";
 }
 
-export type ToolName = "content_search" | "robot_switch" | "system_robot_tool_catalog" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "library_page_list" | "library_request_page" | "get_library_page" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "thread_create" | "thread_list" | "thread_get" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
+export type ToolName =
+  | "content_search"
+  | "robot_switch"
+  | "system_robot_tool_catalog"
+  | "robot_create"
+  | "robot_list"
+  | "robot_get"
+  | "robot_update"
+  | "robot_delete"
+  | "library_page_list"
+  | "library_request_page"
+  | "get_library_page"
+  | "create_library_page"
+  | "update_library_page"
+  | "library_search_pages"
+  | "library_page_property_schema_get"
+  | "library_page_property_schema_update"
+  | "library_page_properties_update"
+  | "tag_list"
+  | "link_create"
+  | "thread_create"
+  | "thread_list"
+  | "thread_get"
+  | "thread_update"
+  | "thread_reply"
+  | "category_list"
+  | "thread_search"
+  | "reply_search"
+  | "post_search"
+  | "member_search";
 
-export const TOOL_NAMES = ["content_search", "robot_switch", "system_robot_tool_catalog", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "library_page_list", "library_request_page", "get_library_page", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "thread_create", "thread_list", "thread_get", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
+export const TOOL_NAMES = [
+  "content_search",
+  "robot_switch",
+  "system_robot_tool_catalog",
+  "robot_create",
+  "robot_list",
+  "robot_get",
+  "robot_update",
+  "robot_delete",
+  "library_page_list",
+  "library_request_page",
+  "get_library_page",
+  "create_library_page",
+  "update_library_page",
+  "library_search_pages",
+  "library_page_property_schema_get",
+  "library_page_property_schema_update",
+  "library_page_properties_update",
+  "tag_list",
+  "link_create",
+  "thread_create",
+  "thread_list",
+  "thread_get",
+  "thread_update",
+  "thread_reply",
+  "category_list",
+  "thread_search",
+  "reply_search",
+  "post_search",
+  "member_search",
+] as const;
 
 export type ToolInputMap = {
-  "content_search": ToolContentSearchInput;
-  "robot_switch": ToolRobotSwitchInput;
-  "system_robot_tool_catalog": ToolSystemRobotToolCatalogInput;
-  "robot_create": ToolRobotCreateInput;
-  "robot_list": ToolRobotListInput;
-  "robot_get": ToolRobotGetInput;
-  "robot_update": ToolRobotUpdateInput;
-  "robot_delete": ToolRobotDeleteInput;
-  "library_page_list": ToolLibraryPageTreeInput;
-  "library_request_page": ToolLibraryRequestPageInput;
-  "get_library_page": ToolLibraryPageGetInput;
-  "create_library_page": ToolLibraryPageCreateInput;
-  "update_library_page": ToolLibraryPageUpdateInput;
-  "library_search_pages": ToolLibrarySearchPagesInput;
-  "library_page_property_schema_get": ToolLibraryPagePropertySchemaGetInput;
-  "library_page_property_schema_update": ToolLibraryPagePropertySchemaUpdateInput;
-  "library_page_properties_update": ToolLibraryPagePropertiesUpdateInput;
-  "tag_list": ToolTagListInput;
-  "link_create": ToolLinkCreateInput;
-  "thread_create": ToolThreadCreateInput;
-  "thread_list": ToolThreadListInput;
-  "thread_get": ToolThreadGetInput;
-  "thread_update": ToolThreadUpdateInput;
-  "thread_reply": ToolThreadReplyInput;
-  "category_list": ToolCategoryListInput;
-  "thread_search": ToolThreadSearchInput;
-  "reply_search": ToolReplySearchInput;
-  "post_search": ToolPostSearchInput;
-  "member_search": ToolMemberSearchInput;
+  content_search: ToolContentSearchInput;
+  robot_switch: ToolRobotSwitchInput;
+  system_robot_tool_catalog: ToolSystemRobotToolCatalogInput;
+  robot_create: ToolRobotCreateInput;
+  robot_list: ToolRobotListInput;
+  robot_get: ToolRobotGetInput;
+  robot_update: ToolRobotUpdateInput;
+  robot_delete: ToolRobotDeleteInput;
+  library_page_list: ToolLibraryPageTreeInput;
+  library_request_page: ToolLibraryRequestPageInput;
+  get_library_page: ToolLibraryPageGetInput;
+  create_library_page: ToolLibraryPageCreateInput;
+  update_library_page: ToolLibraryPageUpdateInput;
+  library_search_pages: ToolLibrarySearchPagesInput;
+  library_page_property_schema_get: ToolLibraryPagePropertySchemaGetInput;
+  library_page_property_schema_update: ToolLibraryPagePropertySchemaUpdateInput;
+  library_page_properties_update: ToolLibraryPagePropertiesUpdateInput;
+  tag_list: ToolTagListInput;
+  link_create: ToolLinkCreateInput;
+  thread_create: ToolThreadCreateInput;
+  thread_list: ToolThreadListInput;
+  thread_get: ToolThreadGetInput;
+  thread_update: ToolThreadUpdateInput;
+  thread_reply: ToolThreadReplyInput;
+  category_list: ToolCategoryListInput;
+  thread_search: ToolThreadSearchInput;
+  reply_search: ToolReplySearchInput;
+  post_search: ToolPostSearchInput;
+  member_search: ToolMemberSearchInput;
 };
 
 export type ToolOutputMap = {
-  "content_search": ToolContentSearchOutput;
-  "robot_switch": ToolRobotSwitchOutput;
-  "system_robot_tool_catalog": ToolSystemRobotToolCatalogOutput;
-  "robot_create": ToolRobotCreateOutput;
-  "robot_list": ToolRobotListOutput;
-  "robot_get": ToolRobotGetOutput;
-  "robot_update": ToolRobotUpdateOutput;
-  "robot_delete": ToolRobotDeleteOutput;
-  "library_page_list": ToolLibraryPageTreeOutput;
-  "library_request_page": ToolLibraryRequestPageOutput;
-  "get_library_page": ToolLibraryPageGetOutput;
-  "create_library_page": ToolLibraryPageCreateOutput;
-  "update_library_page": ToolLibraryPageUpdateOutput;
-  "library_search_pages": ToolLibrarySearchPagesOutput;
-  "library_page_property_schema_get": ToolLibraryPagePropertySchemaGetOutput;
-  "library_page_property_schema_update": ToolLibraryPagePropertySchemaUpdateOutput;
-  "library_page_properties_update": ToolLibraryPagePropertiesUpdateOutput;
-  "tag_list": ToolTagListOutput;
-  "link_create": ToolLinkCreateOutput;
-  "thread_create": ToolThreadCreateOutput;
-  "thread_list": ToolThreadListOutput;
-  "thread_get": ToolThreadGetOutput;
-  "thread_update": ToolThreadUpdateOutput;
-  "thread_reply": ToolThreadReplyOutput;
-  "category_list": ToolCategoryListOutput;
-  "thread_search": ToolThreadSearchOutput;
-  "reply_search": ToolReplySearchOutput;
-  "post_search": ToolPostSearchOutput;
-  "member_search": ToolMemberSearchOutput;
+  content_search: ToolContentSearchOutput;
+  robot_switch: ToolRobotSwitchOutput;
+  system_robot_tool_catalog: ToolSystemRobotToolCatalogOutput;
+  robot_create: ToolRobotCreateOutput;
+  robot_list: ToolRobotListOutput;
+  robot_get: ToolRobotGetOutput;
+  robot_update: ToolRobotUpdateOutput;
+  robot_delete: ToolRobotDeleteOutput;
+  library_page_list: ToolLibraryPageTreeOutput;
+  library_request_page: ToolLibraryRequestPageOutput;
+  get_library_page: ToolLibraryPageGetOutput;
+  create_library_page: ToolLibraryPageCreateOutput;
+  update_library_page: ToolLibraryPageUpdateOutput;
+  library_search_pages: ToolLibrarySearchPagesOutput;
+  library_page_property_schema_get: ToolLibraryPagePropertySchemaGetOutput;
+  library_page_property_schema_update: ToolLibraryPagePropertySchemaUpdateOutput;
+  library_page_properties_update: ToolLibraryPagePropertiesUpdateOutput;
+  tag_list: ToolTagListOutput;
+  link_create: ToolLinkCreateOutput;
+  thread_create: ToolThreadCreateOutput;
+  thread_list: ToolThreadListOutput;
+  thread_get: ToolThreadGetOutput;
+  thread_update: ToolThreadUpdateOutput;
+  thread_reply: ToolThreadReplyOutput;
+  category_list: ToolCategoryListOutput;
+  thread_search: ToolThreadSearchOutput;
+  reply_search: ToolReplySearchOutput;
+  post_search: ToolPostSearchOutput;
+  member_search: ToolMemberSearchOutput;
 };
 export type StorydenTools = {
-  "content_search": {
+  content_search: {
     input: ToolContentSearchInput;
     output: ToolContentSearchOutput;
   };
-  "robot_switch": {
+  robot_switch: {
     input: ToolRobotSwitchInput;
     output: ToolRobotSwitchOutput;
   };
-  "system_robot_tool_catalog": {
+  system_robot_tool_catalog: {
     input: ToolSystemRobotToolCatalogInput;
     output: ToolSystemRobotToolCatalogOutput;
   };
-  "robot_create": {
+  robot_create: {
     input: ToolRobotCreateInput;
     output: ToolRobotCreateOutput;
   };
-  "robot_list": {
+  robot_list: {
     input: ToolRobotListInput;
     output: ToolRobotListOutput;
   };
-  "robot_get": {
+  robot_get: {
     input: ToolRobotGetInput;
     output: ToolRobotGetOutput;
   };
-  "robot_update": {
+  robot_update: {
     input: ToolRobotUpdateInput;
     output: ToolRobotUpdateOutput;
   };
-  "robot_delete": {
+  robot_delete: {
     input: ToolRobotDeleteInput;
     output: ToolRobotDeleteOutput;
   };
-  "library_page_list": {
+  library_page_list: {
     input: ToolLibraryPageTreeInput;
     output: ToolLibraryPageTreeOutput;
   };
-  "library_request_page": {
+  library_request_page: {
     input: ToolLibraryRequestPageInput;
     output: ToolLibraryRequestPageOutput;
   };
-  "get_library_page": {
+  get_library_page: {
     input: ToolLibraryPageGetInput;
     output: ToolLibraryPageGetOutput;
   };
-  "create_library_page": {
+  create_library_page: {
     input: ToolLibraryPageCreateInput;
     output: ToolLibraryPageCreateOutput;
   };
-  "update_library_page": {
+  update_library_page: {
     input: ToolLibraryPageUpdateInput;
     output: ToolLibraryPageUpdateOutput;
   };
-  "library_search_pages": {
+  library_search_pages: {
     input: ToolLibrarySearchPagesInput;
     output: ToolLibrarySearchPagesOutput;
   };
-  "library_page_property_schema_get": {
+  library_page_property_schema_get: {
     input: ToolLibraryPagePropertySchemaGetInput;
     output: ToolLibraryPagePropertySchemaGetOutput;
   };
-  "library_page_property_schema_update": {
+  library_page_property_schema_update: {
     input: ToolLibraryPagePropertySchemaUpdateInput;
     output: ToolLibraryPagePropertySchemaUpdateOutput;
   };
-  "library_page_properties_update": {
+  library_page_properties_update: {
     input: ToolLibraryPagePropertiesUpdateInput;
     output: ToolLibraryPagePropertiesUpdateOutput;
   };
-  "tag_list": {
+  tag_list: {
     input: ToolTagListInput;
     output: ToolTagListOutput;
   };
-  "link_create": {
+  link_create: {
     input: ToolLinkCreateInput;
     output: ToolLinkCreateOutput;
   };
-  "thread_create": {
+  thread_create: {
     input: ToolThreadCreateInput;
     output: ToolThreadCreateOutput;
   };
-  "thread_list": {
+  thread_list: {
     input: ToolThreadListInput;
     output: ToolThreadListOutput;
   };
-  "thread_get": {
+  thread_get: {
     input: ToolThreadGetInput;
     output: ToolThreadGetOutput;
   };
-  "thread_update": {
+  thread_update: {
     input: ToolThreadUpdateInput;
     output: ToolThreadUpdateOutput;
   };
-  "thread_reply": {
+  thread_reply: {
     input: ToolThreadReplyInput;
     output: ToolThreadReplyOutput;
   };
-  "category_list": {
+  category_list: {
     input: ToolCategoryListInput;
     output: ToolCategoryListOutput;
   };
-  "thread_search": {
+  thread_search: {
     input: ToolThreadSearchInput;
     output: ToolThreadSearchOutput;
   };
-  "reply_search": {
+  reply_search: {
     input: ToolReplySearchInput;
     output: ToolReplySearchOutput;
   };
-  "post_search": {
+  post_search: {
     input: ToolPostSearchInput;
     output: ToolPostSearchOutput;
   };
-  "member_search": {
+  member_search: {
     input: ToolMemberSearchInput;
     output: ToolMemberSearchOutput;
   };

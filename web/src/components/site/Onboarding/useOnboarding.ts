@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 import { OnboardingStatus } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-
 import { useSettings } from "@/lib/settings/settings-client";
 
 export function useOnboarding() {

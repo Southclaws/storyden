@@ -146,7 +146,6 @@ export function PluginStatusToggle({ plugin }: Props) {
       <Button
         borderLeftRadius="none"
         borderRightRadius="full"
-        size="xs"
         minWidth="var(--btn-min-width)"
         onClick={handleToggleActive}
         disabled={isTransitioning}

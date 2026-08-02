@@ -1,20 +1,7 @@
-import type { ComponentProps } from "react";
-
-import { cva } from "@/styled-system/css";
-import { styled } from "@/styled-system/jsx";
-
 import { FormErrorText } from "../form-error-text";
+import { Text, type TextProps } from "../text";
 
-const formFeedback = cva({
-  base: {
-    color: "text.subtle",
-    fontSize: "xs",
-  },
-});
-
-const FormFeedbackText = styled("p", formFeedback);
-
-export type FormFeedbackProps = ComponentProps<typeof FormFeedbackText> & {
+export type FormFeedbackProps = Omit<TextProps<"p">, "variant"> & {
   error?: string;
 };
 
@@ -23,5 +10,9 @@ export function FormFeedback({ error, children, ...props }: FormFeedbackProps) {
     return <FormErrorText {...props}>{error}</FormErrorText>;
   }
 
-  return <FormFeedbackText {...props}>{children}</FormFeedbackText>;
+  return (
+    <Text variant="metadata" color="text.subtle" {...props}>
+      {children}
+    </Text>
+  );
 }

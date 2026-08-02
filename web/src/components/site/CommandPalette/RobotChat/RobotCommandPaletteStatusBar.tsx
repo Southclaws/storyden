@@ -20,10 +20,9 @@ export function RobotCommandPaletteStatusBar() {
       <RobotSessionMenu />
 
       <HStack gap="0">
-        <RobotListMenu size="xs" variant="ghost" borderRightRadius="none" />
-        <RobotWorkspaceSelect size="xs" variant="ghost" minW="40" />
+        <RobotListMenu variant="ghost" borderRightRadius="none" />
+        <RobotWorkspaceSelect variant="ghost" minW="40" />
         <IconButton
-          size="xs"
           variant="ghost"
           borderLeftRadius="none"
           onClick={handleReset}

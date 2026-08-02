@@ -1,7 +1,7 @@
 import { Link as LinkSchema, ThreadReference } from "@/api/openapi-schema";
 import { Anchor } from "@/components/site/Anchor";
 import { Empty } from "@/components/site/Empty";
-import { Heading } from "@/components/ui/heading";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { cardBox } from "@/styled-system/recipes";
 import { getAssetURL } from "@/utils/asset";
@@ -45,15 +45,21 @@ export function LinkPost(props: Props) {
           p="2"
         >
           <Flex width="full" justifyContent="space-between">
-            <Heading size="sm" lineClamp={1}>
+            <styled.h1
+              color="text.default"
+              fontWeight="semibold"
+              fontSize="sm"
+              lineHeight="normal"
+              lineClamp={1}
+            >
               <Anchor href={permalink}>{props.thread.title}</Anchor>
-            </Heading>
+            </styled.h1>
           </Flex>
 
           <Box>
-            <styled.p lineClamp={1} wordBreak="break-all">
+            <Text variant="supporting" lineClamp={1} wordBreak="break-all">
               <Anchor href={link.url}>{link.url}</Anchor>
-            </styled.p>
+            </Text>
           </Box>
         </VStack>
       </Box>

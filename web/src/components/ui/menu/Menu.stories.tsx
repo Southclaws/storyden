@@ -25,7 +25,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 function Example(props: Menu.RootProps) {
-  const triggerSize = props.size === "xs" ? "sm" : props.size;
+  const triggerSize =
+    props.size === "md" || props.size === "lg" ? props.size : "sm";
 
   return (
     <Menu.Root {...props}>

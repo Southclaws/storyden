@@ -2,6 +2,7 @@ import { CardBox } from "@/components/ui/card-box";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { NumberInput } from "@/components/ui/number-input";
+import { Text } from "@/components/ui/text";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -61,7 +62,7 @@ export function OperationCostOverrideItem({
           </IconButton>
         </HStack>
       </WStack>
-      <styled.p fontSize="xs" color="text.subtle" lineHeight="tight">
+      <Text variant="metadata">
         Can be performed{" "}
         <styled.strong color="status.info.content">
           {effectiveLimit}
@@ -70,7 +71,7 @@ export function OperationCostOverrideItem({
         <styled.strong color="status.info.content">
           {formatSeconds(rateLimitPeriod)}
         </styled.strong>
-      </styled.p>
+      </Text>
     </CardBox>
   );
 }

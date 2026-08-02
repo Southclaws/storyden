@@ -1,5 +1,4 @@
 import { ThreadReference } from "@/api/openapi-schema";
-
 import { styled } from "@/styled-system/jsx";
 
 import { ThreadReferenceCard } from "./ThreadCard";

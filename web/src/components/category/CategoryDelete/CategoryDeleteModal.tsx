@@ -1,6 +1,9 @@
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 
-import { CategoryDeleteProps, CategoryDeleteScreen } from "./CategoryDeleteScreen";
+import {
+  CategoryDeleteProps,
+  CategoryDeleteScreen,
+} from "./CategoryDeleteScreen";
 
 export function CategoryDeleteModal(props: CategoryDeleteProps) {
   return (

@@ -6,6 +6,7 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { handle } from "@/api/client";
 import { useProfileGet } from "@/api/openapi-client/profiles";
 import {
   Account,
@@ -13,8 +14,6 @@ import {
   ProfileGetOKResponse,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-
-import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import type { SignatureConfig } from "@/lib/settings/settings";
 import { hasPermissionOr } from "@/utils/permissions";

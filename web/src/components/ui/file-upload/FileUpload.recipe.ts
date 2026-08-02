@@ -13,7 +13,8 @@ export const fileUpload = defineSlotRecipe({
     },
     label: {
       fontWeight: "medium",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     dropzone: {
       alignItems: "center",
@@ -55,12 +56,14 @@ export const fileUpload = defineSlotRecipe({
       color: "text.default",
       fontWeight: "medium",
       gridArea: "name",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     itemSizeText: {
       color: "text.muted",
       gridArea: "size",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     itemDeleteTrigger: {
       alignSelf: "flex-start",

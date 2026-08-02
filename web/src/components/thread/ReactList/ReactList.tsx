@@ -138,7 +138,6 @@ function ReactTrigger({ react, disabled, onClick }: ReactionProps) {
   return (
     <Button
       className={reactButtonStyles}
-      size="xs"
       variant="subtle"
       gap="0"
       borderRadius="md"
@@ -196,7 +195,6 @@ function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
         asChild
       >
         <IconButton
-          size="xs"
           className={reactButtonStyles}
           variant="subtle"
           borderRadius="md"

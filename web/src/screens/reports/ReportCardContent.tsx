@@ -14,6 +14,7 @@ import {
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Badge } from "@/components/ui/badge";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 function getItemPath(
@@ -46,9 +47,9 @@ export function ReportCardContent({ report }: Props) {
   if (!item) {
     return (
       <Box p="3" borderRadius="md" bg="background.inset">
-        <styled.p color="text.subtle" fontStyle="italic">
+        <Text variant="supporting" fontStyle="italic">
           Content no longer available
-        </styled.p>
+        </Text>
       </Box>
     );
   }
@@ -65,7 +66,7 @@ export function ReportCardContent({ report }: Props) {
     default:
       return (
         <Box p="3" borderRadius="md" bg="background.inset">
-          <styled.p color="text.subtle">Unknown content type</styled.p>
+          <Text variant="supporting">Unknown content type</Text>
         </Box>
       );
   }
@@ -137,9 +138,9 @@ function NodeContent({ reportID, item }: NodeContentProps) {
 
         <LStack>
           <div>
-            <styled.p fontSize="sm" color="text.muted" lineClamp={3}>
+            <Text variant="supporting" lineClamp={3}>
               {ref.description}
-            </styled.p>
+            </Text>
           </div>
 
           <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">

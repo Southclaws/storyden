@@ -25,11 +25,11 @@ import { Timestamp } from "@/components/site/Timestamp";
 import { Unready } from "@/components/site/Unready";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import { SaveIcon } from "@/components/ui/icons/Save";
 import * as Table from "@/components/ui/table";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
@@ -169,19 +169,29 @@ function VersionReviewPanel({
       <ReviewHeader
         title={
           isDraft ? (
-            <styled.span color="text.muted">
+            <Text as="span" variant="supporting">
               Reviewing draft for{" "}
-              <styled.span color="text.default" fontWeight="semibold">
+              <Text
+                as="span"
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
                 {node.name}
-              </styled.span>
-            </styled.span>
+              </Text>
+            </Text>
           ) : (
-            <styled.span color="text.muted">
+            <Text as="span" variant="supporting">
               Viewing checkpoint for{" "}
-              <styled.span color="text.default" fontWeight="semibold">
+              <Text
+                as="span"
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
                 {node.name}
-              </styled.span>
-            </styled.span>
+              </Text>
+            </Text>
           )
         }
         onClose={onClose}
@@ -190,7 +200,6 @@ function VersionReviewPanel({
             {canDelete && (
               <Button
                 type="button"
-                size="xs"
                 variant="ghost"
                 color="status.danger.content"
                 loading={deleting}
@@ -204,7 +213,6 @@ function VersionReviewPanel({
             {canApply && (
               <Button
                 type="button"
-                size="xs"
                 variant="subtle"
                 loading={applying}
                 onClick={handleApply}
@@ -349,17 +357,19 @@ function ReviewHeader({
     >
       <WStack alignItems="start">
         <LStack gap="0" minW="0">
-          <Heading size="sm">{title}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {title}
+          </Text>
           {subtitle && (
-            <styled.span color="text.subtle" fontSize="sm">
+            <Text as="span" variant="supporting">
               {subtitle}
-            </styled.span>
+            </Text>
           )}
         </LStack>
 
         <HStack gap="1">
           {controls}
-          <Button type="button" size="xs" variant="ghost" onClick={onClose}>
+          <Button type="button" variant="ghost" onClick={onClose}>
             Close
           </Button>
         </HStack>
@@ -451,7 +461,9 @@ function FieldDiffRow({ row }: { row: FieldDiffRow }) {
       return (
         <Table.Row key={row.key}>
           <Table.Cell className={diffAfterLabelStyles}>
-            <styled.span fontWeight="medium">{row.kind}</styled.span>
+            <Text as="span" variant="metadata" fontWeight="medium">
+              {row.kind}
+            </Text>
             <br />
             <span className={diffAfterStyles}>{row.after.name}</span>
           </Table.Cell>
@@ -463,7 +475,9 @@ function FieldDiffRow({ row }: { row: FieldDiffRow }) {
       return (
         <Table.Row key={row.key}>
           <Table.Cell className={diffBeforeLabelStyles}>
-            <styled.span fontWeight="medium">{row.kind}</styled.span>
+            <Text as="span" variant="metadata" fontWeight="medium">
+              {row.kind}
+            </Text>
             <br />
             <span className={diffBeforeStyles}>{row.before.name}</span>
           </Table.Cell>
@@ -494,9 +508,9 @@ function FieldDiffRow({ row }: { row: FieldDiffRow }) {
             {row.kind}
           </Table.Cell> */}
           <Table.Cell>
-            <styled.span fontWeight="medium" color="text.subtle">
+            <Text as="span" variant="metadata" color="text.subtle">
               {row.kind}
-            </styled.span>
+            </Text>
             <br />
             {nameChanged ? (
               <WrappedDiff t1={beforeName} t2={afterName} />

@@ -10,10 +10,11 @@ import { PermissionBadge } from "@/components/role/PermissionBadge";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { PermissionDetails } from "@/lib/permission/permission";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { cardBox } from "@/styled-system/recipes";
 
@@ -29,7 +30,7 @@ export function AccessKeySettings({ keys }: Props) {
   if (keys.length === 0) {
     return (
       <LStack>
-        <Heading size="md">Access keys</Heading>
+        <PageHeading>Access keys</PageHeading>
         <p>No access keys have been created yet.</p>
       </LStack>
     );
@@ -41,7 +42,7 @@ export function AccessKeySettings({ keys }: Props) {
 
   return (
     <LStack>
-      <Heading size="md">Access keys</Heading>
+      <PageHeading>Access keys</PageHeading>
       <p>All access keys created by members of this site.</p>
       <div>
         <span>
@@ -55,11 +56,11 @@ export function AccessKeySettings({ keys }: Props) {
 
       <WStack alignItems="center" color="text.subtle">
         {hasInactive ? (
-          <styled.p>
+          <Text variant="metadata">
             {totalKeys} access keys, {totalActiveKeys} active.
-          </styled.p>
+          </Text>
         ) : (
-          <styled.p>{keys.length} access keys.</styled.p>
+          <Text variant="metadata">{keys.length} access keys.</Text>
         )}
       </WStack>
 
@@ -97,31 +98,27 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
     <li className={cardBox()}>
       <LStack>
         <WStack>
-          <Heading size="sm">{accessKey.name}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {accessKey.name}
+          </Text>
 
           {inactiveStatus === undefined ? (
             <HStack>
               {isConfirming ? (
                 <>
                   <Button
-                    size="xs"
                     variant="subtle"
                     bgColor="status.danger.surface"
                     onClick={handleConfirmAction}
                   >
                     Confirm Revoke
                   </Button>
-                  <Button
-                    size="xs"
-                    variant="outline"
-                    onClick={handleCancelAction}
-                  >
+                  <Button variant="outline" onClick={handleCancelAction}>
                     Cancel
                   </Button>
                 </>
               ) : (
                 <Button
-                  size="xs"
                   variant="outline"
                   bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
@@ -136,9 +133,9 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
         </WStack>
 
         <WStack flexWrap="wrap">
-          <styled.p fontSize="xs">
+          <Text variant="metadata">
             Created: <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
-          </styled.p>
+          </Text>
 
           {accessKey.expires_at && (
             <Badge gap="1">

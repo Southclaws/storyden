@@ -52,7 +52,8 @@ export const badge = defineRecipe({
     },
     size: {
       sm: {
-        textStyle: "xs",
+        fontSize: "xs",
+        lineHeight: "1.125rem",
         px: "2",
         h: "5",
         gap: "1",
@@ -62,7 +63,8 @@ export const badge = defineRecipe({
         },
       },
       md: {
-        textStyle: "xs",
+        fontSize: "xs",
+        lineHeight: "1.125rem",
         px: "2.5",
         h: "6",
         gap: "1.5",
@@ -72,7 +74,8 @@ export const badge = defineRecipe({
         },
       },
       lg: {
-        textStyle: "sm",
+        fontSize: "sm",
+        lineHeight: "1.25rem",
         px: "3",
         h: "7",
         gap: "1.5",

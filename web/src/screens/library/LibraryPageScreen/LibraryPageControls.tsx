@@ -72,7 +72,7 @@ export function LibraryPageControls() {
       />
 
       <HStack>
-        <ButtonGroup variant="subtle" size="xs" attached>
+        <ButtonGroup variant="subtle" attached>
           <EditMenuControls />
           <LibraryPageMenu node={draft} />
         </ButtonGroup>

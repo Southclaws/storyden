@@ -6,7 +6,8 @@ import * as FileUpload from "@/components/ui/file-upload";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DeleteSmallIcon } from "@/components/ui/icons/Delete";
-import { VStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/styled-system/jsx";
 
 type Props = {
   disabled?: boolean;
@@ -42,12 +43,12 @@ export function PluginArchiveUpload({
       <FileUpload.Dropzone minHeight="44">
         <VStack>
           <VStack gap="1" textAlign="center">
-            <styled.p fontWeight="medium">
+            <Text fontWeight="medium">
               Drop your plugin file here or click to browse
-            </styled.p>
-            <styled.p fontSize="sm" color="text.subtle">
+            </Text>
+            <Text variant="supporting">
               Plugin files only (.zip or .sdx), max 50MB
-            </styled.p>
+            </Text>
           </VStack>
           <FileUpload.Trigger asChild>
             <Button variant="outline" disabled={disabled}>
@@ -66,7 +67,7 @@ export function PluginArchiveUpload({
                 <FileUpload.ItemName />
                 <FileUpload.ItemSizeText />
                 <FileUpload.ItemDeleteTrigger asChild>
-                  <IconButton size="xs" variant="ghost">
+                  <IconButton variant="ghost">
                     <DeleteSmallIcon h="4" />
                   </IconButton>
                 </FileUpload.ItemDeleteTrigger>

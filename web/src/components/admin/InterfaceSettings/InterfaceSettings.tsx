@@ -5,8 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { FormNumberInputField } from "@/components/ui/number-input";
+import { PageHeading } from "@/components/ui/page-heading";
 import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
 
@@ -25,7 +25,7 @@ export function InterfaceSettingsForm(props: Props) {
       onSubmit={onSubmit}
     >
       <WStack>
-        <Heading size="md">Interface settings</Heading>
+        <PageHeading>Interface settings</PageHeading>
         <Button type="submit" loading={formState.isSubmitting}>
           Save
         </Button>

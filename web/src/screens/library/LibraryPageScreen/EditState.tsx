@@ -13,12 +13,12 @@ import { nodeVersionCreate } from "@/api/openapi-client/nodes";
 import { NodeVersion } from "@/api/openapi-schema";
 
 import { useLibraryPageContext } from "./Context";
+import { LibraryPageEditMode, normaliseLibraryPageEditMode } from "./editMode";
 import {
   directEditorSourceKey,
   liveEditorSourceKey,
   versionEditorSourceKey,
 } from "./editorSource";
-import { LibraryPageEditMode, normaliseLibraryPageEditMode } from "./editMode";
 import { useLibraryPagePermissions } from "./permissions";
 import { overlayNodeVersion } from "./versionedEdit";
 

@@ -10,7 +10,9 @@ import { useSession } from "@/auth";
 import { CategoryLayout } from "@/components/category/CategoryIndex/CategoryCardLayout";
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { hasPermission } from "@/utils/permissions";
@@ -80,19 +82,17 @@ export function CategoryScreen(props: ScreenProps) {
 
       <LStack gap="1">
         <WStack alignItems="start">
-          <Heading>{category.name}</Heading>
+          <PageHeading>{category.name}</PageHeading>
 
           <CategoryMenu category={category} />
         </WStack>
 
-        <styled.p color="text.subtle">{category.description}</styled.p>
+        <Text variant="supporting">{category.description}</Text>
       </LStack>
 
       {category.children && category.children.length > 0 && (
         <LStack gap="1">
-          <Heading size="sm" color="text.subtle">
-            Subcategories
-          </Heading>
+          <SectionHeading>Subcategories</SectionHeading>
           <CategoryLayout layout="grid" categories={category.children} />
         </LStack>
       )}

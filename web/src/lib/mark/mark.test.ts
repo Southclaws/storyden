@@ -4,10 +4,7 @@ import * as assert from "uvu/assert";
 import { isSlugReady, processMarkInput } from "./mark";
 
 test("processMarkInput normalizes spaces, disallowed chars, and casing", () => {
-  assert.is(
-    processMarkInput("  My /Page?# Name  "),
-    "-my-page-name-",
-  );
+  assert.is(processMarkInput("  My /Page?# Name  "), "-my-page-name-");
 });
 
 test("processMarkInput collapses repeated hyphens", () => {

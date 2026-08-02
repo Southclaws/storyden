@@ -23,6 +23,7 @@ import { Unready } from "@/components/site/Unready";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type WarningsPanelProps = {
@@ -45,9 +46,9 @@ export function WarningsPanel({
     <LStack gap="3">
       {data.total === 0 || data.warnings.length === 0 ? (
         <Box borderWidth="thin" borderRadius="sm" p="2">
-          <styled.p fontSize="sm" color="text.muted">
+          <Text variant="supporting">
             No warning history for this account yet.
-          </styled.p>
+          </Text>
         </Box>
       ) : (
         <LStack gap="2">
@@ -65,7 +66,7 @@ export function WarningsPanel({
       {canManageWarnings && (
         <WStack justifyContent="flex-end">
           <MemberWarningTrigger profile={profile}>
-            <Button size="xs" colorPalette="orange" variant="subtle">
+            <Button colorPalette="orange" variant="subtle">
               Issue warning
             </Button>
           </MemberWarningTrigger>
@@ -227,7 +228,6 @@ function WarningRecordCard({
               {isEditing ? (
                 <>
                   <Button
-                    size="xs"
                     variant="subtle"
                     onClick={handleSave}
                     loading={isUpdating}
@@ -235,7 +235,6 @@ function WarningRecordCard({
                     Save
                   </Button>
                   <Button
-                    size="xs"
                     variant="ghost"
                     onClick={cancelEditing}
                     disabled={isUpdating}
@@ -244,11 +243,7 @@ function WarningRecordCard({
                   </Button>
                 </>
               ) : (
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => setIsEditing(true)}
-                >
+                <Button variant="ghost" onClick={() => setIsEditing(true)}>
                   Edit
                 </Button>
               )}
@@ -256,7 +251,6 @@ function WarningRecordCard({
               {isConfirming ? (
                 <HStack gap="1">
                   <Button
-                    size="xs"
                     variant="subtle"
                     bgColor="status.danger.surface"
                     onClick={handleConfirmAction}
@@ -265,7 +259,6 @@ function WarningRecordCard({
                     Confirm delete
                   </Button>
                   <Button
-                    size="xs"
                     variant="ghost"
                     onClick={handleCancelAction}
                     disabled={isDeleting}
@@ -275,7 +268,6 @@ function WarningRecordCard({
                 </HStack>
               ) : (
                 <Button
-                  size="xs"
                   variant="ghost"
                   aria-label="Delete warning"
                   title="Delete warning"
@@ -302,9 +294,9 @@ function WarningRecordCard({
           w="full"
         />
       ) : (
-        <styled.p fontSize="sm" whiteSpace="pre-wrap">
+        <Text variant="supporting" color="text.default" whiteSpace="pre-wrap">
           {warning.reason?.trim() || "No reason recorded."}
-        </styled.p>
+        </Text>
       )}
     </Box>
   );
