@@ -7,7 +7,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { Asset, Category } from "@/api/openapi-schema";
 import { useCategoryMutations } from "@/lib/category/mutation";
-import { slugify } from "@/utils/slugify";
+import { slugify, slugifyDraft } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export type Props = {
@@ -38,8 +38,17 @@ export function useCategoryEdit(props: Props) {
   const router = useRouter();
 
   const slugInput = form.register("slug", {
+    onChange(event) {
+      const value = slugifyDraft(event.target.value);
+      event.target.value = value;
+      form.setValue("slug", value, {
+        shouldDirty: true,
+      });
+    },
     onBlur(event) {
-      form.setValue("slug", slugify(event.target.value), {
+      const value = slugify(event.target.value);
+      event.target.value = value;
+      form.setValue("slug", value, {
         shouldDirty: true,
         shouldValidate: true,
       });

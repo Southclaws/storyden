@@ -1,7 +1,7 @@
 import { test } from "uvu";
 import * as assert from "uvu/assert";
 
-import { slugify } from "./slugify";
+import { slugify, slugifyDraft } from "./slugify";
 
 test("cyrillic", () => {
   assert.is(slugify("Документация"), "документация");
@@ -265,6 +265,23 @@ test("arabic numerals in arabic", () => {
 
 test("devanagari numerals", () => {
   assert.is(slugify("परीक्षण १२३"), "परीक्षण-१२३");
+});
+
+test("draft slug is normalised while typing", () => {
+  assert.is(
+    slugifyDraft("General!!!!!dnwHDAUIDHAODH3r3u18 2"),
+    "general-dnwhdauidhaodh3r3u18-2",
+  );
+});
+
+test("draft slug preserves one pending word separator", () => {
+  assert.is(slugifyDraft("日本語   "), "日本語-");
+  assert.is(slugifyDraft("hello___"), "hello_");
+});
+
+test("draft slug removes leading separators", () => {
+  assert.is(slugifyDraft("---hello"), "hello");
+  assert.is(slugifyDraft("---"), "");
 });
 
 test.run();
