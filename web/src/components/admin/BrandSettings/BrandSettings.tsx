@@ -9,8 +9,9 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { FormSelectField } from "@/components/ui/select";
 import { Box, HStack, Stack, WStack, styled } from "@/styled-system/jsx";
 
@@ -51,7 +52,7 @@ export function BrandSettingsForm(props: Props) {
       onSubmit={onSubmit}
     >
       <WStack>
-        <Heading size="md">Brand settings</Heading>
+        <PageHeading>Brand settings</PageHeading>
         <Button type="submit">Save</Button>
       </WStack>
 
@@ -141,7 +142,7 @@ export function BrandSettingsForm(props: Props) {
       </FormControl>
 
       <WStack mt="2">
-        <Heading size="sm">Message of the Day</Heading>
+        <SectionHeading>Message of the Day</SectionHeading>
         <Button type="submit" size="sm">
           Save
         </Button>
@@ -150,12 +151,7 @@ export function BrandSettingsForm(props: Props) {
       <FormControl>
         <WStack alignItems="center">
           <FormLabel>MOTD content</FormLabel>
-          <Button
-            type="button"
-            size="xs"
-            variant="outline"
-            onClick={onClearMotd}
-          >
+          <Button type="button" variant="outline" onClick={onClearMotd}>
             Clear MOTD
           </Button>
         </WStack>
@@ -192,12 +188,7 @@ export function BrandSettingsForm(props: Props) {
           <FormErrorText>{formState.errors.motdEndAt?.message}</FormErrorText>
         </FormControl>
       </Stack>
-      <Button
-        type="button"
-        size="xs"
-        variant="outline"
-        onClick={onClearMotdDates}
-      >
+      <Button type="button" variant="outline" onClick={onClearMotdDates}>
         Clear dates
       </Button>
 

@@ -16,6 +16,7 @@ import {
 } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
@@ -86,9 +87,9 @@ export function ConfigurationTab({ pluginID }: Props) {
   if (fields.length === 0) {
     return (
       <Box minH="12">
-        <styled.p fontSize="sm" color="text.subtle">
+        <Text variant="supporting">
           This plugin has no configurable fields.
-        </styled.p>
+        </Text>
       </Box>
     );
   }
@@ -101,9 +102,9 @@ export function ConfigurationTab({ pluginID }: Props) {
       gap="4"
       w="full"
     >
-      <styled.p fontSize="sm" color="text.subtle">
+      <Text variant="supporting">
         Configure the plugin&apos;s settings below.
-      </styled.p>
+      </Text>
 
       <LStack gap="3">
         {fields.map((field) => (
@@ -134,7 +135,11 @@ export function ConfigurationTab({ pluginID }: Props) {
         title="Configuration Error"
         onChange={() => setError(null)}
       >
-        {error && <styled.p fontSize="sm">{error}</styled.p>}
+        {error && (
+          <Text variant="supporting" color="text.default">
+            {error}
+          </Text>
+        )}
       </Admonition>
     </styled.form>
   );
@@ -201,11 +206,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         </styled.label>
         {input}
       </WStack>
-      {description && (
-        <styled.p fontSize="xs" color="text.subtle">
-          {description}
-        </styled.p>
-      )}
+      {description && <Text variant="metadata">{description}</Text>}
     </LStack>
   );
 }

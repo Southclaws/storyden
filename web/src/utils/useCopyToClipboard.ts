@@ -6,7 +6,8 @@ export function useCopyToClipboard(): [
   boolean,
 ] {
   const [copiedText, setCopiedText] = useState<string | null>(null);
-  const isClipboardAvailable = typeof window !== 'undefined' && !!navigator?.clipboard;
+  const isClipboardAvailable =
+    typeof window !== "undefined" && !!navigator?.clipboard;
 
   const copyToClipboard = useCallback(async (text: string) => {
     if (!navigator?.clipboard) {

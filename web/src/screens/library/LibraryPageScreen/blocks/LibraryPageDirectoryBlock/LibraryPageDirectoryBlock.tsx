@@ -73,7 +73,6 @@ export function LibraryPageDirectoryBlockContents() {
           <Input
             variant="ghost"
             placeholder="Search..."
-            size="xs"
             onChange={handleSearchChange}
             minW="20"
             maxW="min"
@@ -83,17 +82,13 @@ export function LibraryPageDirectoryBlockContents() {
           {isDirectEditing && (
             <HStack gap="1">
               <AddPropertyMenu unavailable={!hasChildren}>
-                <IconButton
-                  size="xs"
-                  variant="ghost"
-                  title="Add a new property."
-                >
+                <IconButton variant="ghost" title="Add a new property.">
                   <AddIcon />
                 </IconButton>
               </AddPropertyMenu>
 
               <PropertyListMenu>
-                <IconButton size="xs" variant="ghost">
+                <IconButton variant="ghost">
                   <MenuIcon />
                 </IconButton>
               </PropertyListMenu>

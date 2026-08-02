@@ -1,5 +1,5 @@
-import { Heading } from "@/components/ui/heading";
-import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPagePermissions } from "./permissions";
 
@@ -20,10 +20,12 @@ export function EditingDraftWarning() {
       p="2"
       gap="0"
     >
-      <Heading size="sm">Editing Draft</Heading>
-      <styled.span color="text.subtle" fontSize="sm">
+      <Text variant="supporting" color="text.default" fontWeight="semibold">
+        Editing Draft
+      </Text>
+      <Text as="span" variant="supporting">
         {label}
-      </styled.span>
+      </Text>
     </LStack>
   );
 }

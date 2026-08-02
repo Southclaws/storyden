@@ -155,9 +155,9 @@ export const ShapeAndDepth: Story = {
                     backgroundColor:
                       "color-mix(in srgb, var(--colors-background-surface) 20%, transparent)",
                     WebkitBackdropFilter: `blur(${tokenVar(token)})`,
+                    width: "60%",
                   }}
                   top="0"
-                  width="60%"
                 />
               </styled.div>
               <styled.div

@@ -32,7 +32,8 @@ export const pinInput = defineSlotRecipe({
           gap: "1.5",
         },
         label: {
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
         input: {
           minWidth: "6!",
@@ -44,7 +45,8 @@ export const pinInput = defineSlotRecipe({
           gap: "2",
         },
         label: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
         input: {
           minWidth: "8!",
@@ -56,7 +58,8 @@ export const pinInput = defineSlotRecipe({
           gap: "2.5",
         },
         label: {
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
         },
         input: {
           minWidth: "10!",

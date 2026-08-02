@@ -1,14 +1,13 @@
 "use client";
 
+import { handle } from "@/api/client";
 import { Reply, Thread } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { useShare } from "@/utils/client";
-
-import { handle } from "@/api/client";
 import { useReportContext } from "@/lib/report/useReportContext";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
+import { useShare } from "@/utils/client";
 import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 import { getPermalinkForPost } from "../utils";

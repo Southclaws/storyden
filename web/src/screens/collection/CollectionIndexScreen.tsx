@@ -9,7 +9,6 @@ import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/C
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { LStack } from "@/styled-system/jsx";
 
@@ -41,11 +40,7 @@ export function CollectionIndexScreen(props: Props) {
         crumbs={[]}
       >
         {props.session && (
-          <CollectionCreateTrigger
-            session={props.session}
-            size="xs"
-            label="Create"
-          />
+          <CollectionCreateTrigger session={props.session} label="Create" />
         )}
       </Breadcrumbs>
 

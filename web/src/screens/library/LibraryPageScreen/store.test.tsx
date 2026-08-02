@@ -38,10 +38,7 @@ describe("LibraryPageScreen store", () => {
     expect(state.draft.name).toBe("Renamed");
     expect(state.draft.slug).toBe("renamed");
     expect(state.draft.content).toBe("<p>updated</p>");
-    expect(state.draft.tags.map((tag) => tag.name)).toEqual([
-      "alpha",
-      "beta",
-    ]);
+    expect(state.draft.tags.map((tag) => tag.name)).toEqual(["alpha", "beta"]);
     expect(state.draft.link).toBeUndefined();
 
     expect(state.original.name).toBe("Node root");
@@ -257,9 +254,9 @@ describe("LibraryPageScreen store", () => {
     });
 
     expect(
-      store.getState().draft.meta.layout?.blocks.find(
-        (block) => block.type === "assets",
-      ),
+      store
+        .getState()
+        .draft.meta.layout?.blocks.find((block) => block.type === "assets"),
     ).toEqual({
       type: "assets",
       config: {

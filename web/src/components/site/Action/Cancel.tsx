@@ -10,12 +10,7 @@ export function CancelAction({
   const hasLabel = React.Children.count(children) > 0;
 
   return (
-    <Button
-      variant="ghost"
-      size="xs"
-      px={hasLabel ? undefined : "0"}
-      {...props}
-    >
+    <Button variant="ghost" px={hasLabel ? undefined : "0"} {...props}>
       <CancelIcon /> {children}
     </Button>
   );

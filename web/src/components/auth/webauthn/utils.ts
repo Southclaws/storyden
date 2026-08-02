@@ -10,7 +10,6 @@ import {
   webAuthnMakeCredential,
   webAuthnRequestCredential,
 } from "@/api/openapi-client/auth";
-
 import {
   WebAuthnMakeAssertionBody,
   WebAuthnMakeCredentialBody,

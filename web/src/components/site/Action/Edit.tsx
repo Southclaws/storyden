@@ -8,7 +8,7 @@ export function EditAction({
   ...props
 }: PropsWithChildren<ButtonProps>) {
   return (
-    <Button variant="ghost" size="xs" {...props}>
+    <Button variant="ghost" {...props}>
       <EditIcon width="4" height="4" />
       {children}
     </Button>

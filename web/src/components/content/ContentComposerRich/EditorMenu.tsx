@@ -42,12 +42,7 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
         positioning={{ gutter: 0 }}
       >
         <Menu.Trigger asChild>
-          <Button
-            type="button"
-            size="xs"
-            variant="ghost"
-            title="Change the kind of text"
-          >
+          <Button type="button" variant="ghost" title="Change the kind of text">
             {match(format.text.active)
               .with("p", () => <TextIcon />)
               .with("h1", () => <Heading1Icon />)
@@ -105,7 +100,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
       </Menu.Root>
       <Button
         type="button"
-        size="xs"
         variant={format.bold.isActive ? "subtle" : "ghost"}
         title="Toggle bold text"
         onClick={format.bold.toggle}
@@ -114,7 +108,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
       </Button>
       <Button
         type="button"
-        size="xs"
         variant={format.italic.isActive ? "subtle" : "ghost"}
         title="Toggle italic text"
         onClick={format.italic.toggle}
@@ -123,7 +116,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
       </Button>
       <Button
         type="button"
-        size="xs"
         variant={format.strike.isActive ? "subtle" : "ghost"}
         title="Toggle strikeout text"
         onClick={format.strike.toggle}
@@ -132,7 +124,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
       </Button>
       <Button
         type="button"
-        size="xs"
         variant={format.code.isActive ? "subtle" : "ghost"}
         title="Toggle inline code snippet"
         onClick={format.code.toggle}
@@ -144,7 +135,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
 
       <Button
         type="button"
-        size="xs"
         variant={format.blockquote.isActive ? "subtle" : "ghost"}
         title="Toggle quote"
         onClick={format.blockquote.toggle}
@@ -154,7 +144,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
 
       <Button
         type="button"
-        size="xs"
         variant={format.pre.isActive ? "subtle" : "ghost"}
         title="Toggle code block"
         onClick={format.pre.toggle}
@@ -164,7 +153,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
 
       <Button
         type="button"
-        size="xs"
         variant={format.bulletList.isActive ? "subtle" : "ghost"}
         title="Toggle bullet points"
         onClick={format.bulletList.toggle}
@@ -174,7 +162,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
 
       <Button
         type="button"
-        size="xs"
         variant={format.orderedList.isActive ? "subtle" : "ghost"}
         title="Toggle numbered list"
         onClick={format.orderedList.toggle}
@@ -184,7 +171,6 @@ export function EditorMenu({ editor, uniqueID, format, handlers }: Props) {
 
       <label
         className={button({
-          size: "xs",
           variant: "ghost",
         })}
         htmlFor={`filepicker-${uniqueID}`}

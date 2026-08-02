@@ -129,7 +129,6 @@ function LibraryPagePropertiesBlockEditable() {
       <Button
         type="button"
         w="full"
-        size="xs"
         variant="subtle"
         onClick={handleAddProperty}
       >

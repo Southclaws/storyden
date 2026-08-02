@@ -3,11 +3,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { handle } from "@/api/client";
 import { categoryGet } from "@/api/openapi-client/categories";
 import { useCategoryMutations } from "@/lib/category/mutation";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 const FormSchema = z.object({
   move_to: z.string().min(1, "Please select a category to move posts to."),

@@ -66,7 +66,7 @@ export function FormSelectField<
                         {item.icon && (
                           <styled.span w="4">{item.icon}</styled.span>
                         )}
-                        <styled.span>{item.label}</styled.span>
+                        <span>{item.label}</span>
                       </HStack>
                     </Select.ItemText>
                     <Select.ItemIndicator>

@@ -4,6 +4,7 @@ import { FormCardGroupSelect } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormLabel } from "@/components/ui/form-label";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -75,13 +76,17 @@ export function AccountPurgeScreen(props: Props) {
           <HStack gap="2" color="status.warning.content">
             <WarningIcon w="5" flexShrink="0" />
             <LStack gap="1">
-              <styled.p fontWeight="semibold" fontSize="sm">
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
                 Destructive Action
-              </styled.p>
-              <styled.p fontSize="xs">
+              </Text>
+              <Text variant="metadata">
                 This will permanently delete the selected content types from
                 this account. This action cannot be undone.
-              </styled.p>
+              </Text>
             </LStack>
           </HStack>
         </Box>
@@ -93,9 +98,9 @@ export function AccountPurgeScreen(props: Props) {
             name="contentTypes"
             items={CONTENT_TYPES}
           />
-          <styled.p fontSize="xs" color="text.muted" mt="1">
+          <Text variant="metadata" mt="1">
             Select the types of content you want to purge from this account
-          </styled.p>
+          </Text>
         </FormControl>
       </LStack>
 

@@ -21,42 +21,27 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
-type TextSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+type TextVariant = "body" | "supporting" | "metadata";
 
 const textStyles: Array<{
-  name: TextSize;
+  name: TextVariant;
   token: string;
   sample: string;
 }> = [
   {
-    name: "xs",
-    token: "textStyle xs",
-    sample: "@southclaws • 18d • 0 replies",
-  },
-  {
-    name: "sm",
-    token: "textStyle sm",
-    sample: "Discussion categories",
-  },
-  {
-    name: "md",
-    token: "textStyle md",
+    name: "body",
+    token: "textStyles.body",
     sample: "There are 4 categories available to start discussions.",
   },
   {
-    name: "lg",
-    token: "textStyle lg",
-    sample: "Check out the new Storyden command line interface!",
+    name: "supporting",
+    token: "textStyles.supporting",
+    sample: "Connect external MCP servers and add their tools to Robots.",
   },
   {
-    name: "xl",
-    token: "textStyle xl",
-    sample: "Related discussions",
-  },
-  {
-    name: "2xl",
-    token: "textStyle 2xl",
-    sample: "Create discussion",
+    name: "metadata",
+    token: "textStyles.metadata",
+    sample: "@southclaws · 18d · 0 replies",
   },
 ];
 
@@ -72,7 +57,7 @@ export const TypeScale: Story = {
   render: () => (
     <FoundationPage
       title="Typography tokens"
-      description="Typography foundations separate primitive font tokens from product text styles. Components should usually consume text styles."
+      description="Typography foundations separate primitive font tokens from semantic UI prose. Text owns these three prose roles; headings and controls own their own metrics."
     >
       <FoundationSection title="Font families">
         <styled.div
@@ -168,9 +153,7 @@ export const TypeScale: Story = {
                   {style.token}
                 </styled.span>
               </styled.div>
-              <Text color="text.default" size={style.name}>
-                {style.sample}
-              </Text>
+              <Text variant={style.name}>{style.sample}</Text>
             </styled.article>
           ))}
         </styled.div>

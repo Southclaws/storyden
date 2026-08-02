@@ -35,8 +35,14 @@ describe("OAuthAuthoriseConsentScreen", () => {
   it("asks for the full application link when the request id is missing", () => {
     render(<OAuthAuthoriseConsentScreen />);
 
-    expect(screen.getByRole("heading", { name: "Missing request" })).toBeVisible();
-    expect(screen.getByText("Open the full link from the application and try again.")).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Missing request" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        "Open the full link from the application and try again.",
+      ),
+    ).toBeVisible();
   });
 
   it("shows access denied when the OAuth API returns access_denied", () => {
@@ -79,7 +85,9 @@ describe("OAuthAuthoriseConsentScreen", () => {
 
     render(<OAuthAuthoriseConsentScreen />);
 
-    expect(screen.getByRole("heading", { name: "Analytics Bot" })).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Analytics Bot" }),
+    ).toBeVisible();
     expect(screen.getByText("https://client.example/callback")).toBeVisible();
     expect(screen.getByText("Create post")).toBeVisible();
     expect(screen.getByText("Members can create posts.")).toBeVisible();

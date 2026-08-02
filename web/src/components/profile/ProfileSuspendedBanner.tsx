@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 
 import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, styled } from "@/styled-system/jsx";
 
 import { BanIcon } from "../ui/icons/BanIcon";
@@ -36,14 +37,18 @@ export function ProfileSuspendedBanner({ date }: Props) {
         direction={{ base: "column", md: "row" }}
         alignItems="start"
       >
-        <styled.p color="status.danger.content" wordBreak="keep-all">
+        <Text
+          variant="supporting"
+          color="status.danger.content"
+          wordBreak="keep-all"
+        >
           This member was suspended&nbsp;
           <styled.time textWrap="nowrap">
             {formatDistanceToNow(date, {
               addSuffix: true,
             })}
           </styled.time>
-        </styled.p>
+        </Text>
       </Flex>
     </CardBox>
   );

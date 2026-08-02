@@ -33,7 +33,9 @@ describe("LinkButton", () => {
     await user.click(screen.getByTitle("Add link"));
     await user.type(screen.getByLabelText("Link URL"), "example.com{enter}");
 
-    expect(chain.setLink).toHaveBeenCalledWith({ href: "https://example.com/" });
+    expect(chain.setLink).toHaveBeenCalledWith({
+      href: "https://example.com/",
+    });
     expect(chain.extendMarkRange).not.toHaveBeenCalled();
     expect(chain.run).toHaveBeenCalled();
   });

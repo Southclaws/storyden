@@ -1,7 +1,6 @@
 import { Category } from "@/api/openapi-schema";
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { Item } from "@/components/ui/menu";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 

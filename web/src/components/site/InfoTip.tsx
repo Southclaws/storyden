@@ -1,6 +1,6 @@
+import { Portal } from "@ark-ui/react";
 import { PropsWithChildren } from "react";
 
-import { Portal } from "@ark-ui/react";
 import { IconButton } from "@/components/ui/icon-button";
 import { InfoIcon } from "@/components/ui/icons/Info";
 import * as Popover from "@/components/ui/popover";
@@ -14,7 +14,7 @@ export function InfoTip({ title, children }: PropsWithChildren<Props>) {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <IconButton size="xs" variant="ghost" borderRadius="full">
+        <IconButton variant="ghost" borderRadius="full">
           <InfoIcon />
         </IconButton>
       </Popover.Trigger>

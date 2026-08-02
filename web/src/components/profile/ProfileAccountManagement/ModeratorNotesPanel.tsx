@@ -19,6 +19,7 @@ import { Timestamp } from "@/components/site/Timestamp";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
@@ -102,7 +103,6 @@ export function ModeratorNotesPanel({
           />
           <WStack justifyContent="end">
             <Button
-              size="xs"
               variant="subtle"
               onClick={submitNote}
               loading={isMutating}
@@ -116,25 +116,21 @@ export function ModeratorNotesPanel({
       )}
 
       {createNoteError ? (
-        <styled.p fontSize="sm" color="status.danger.content">
+        <Text variant="metadata" color="status.danger.content">
           {deriveError(createNoteError)}
-        </styled.p>
+        </Text>
       ) : null}
 
       {canViewModerationNotes ? (
         <LStack gap="3" w="full" minW="0">
           {notesError ? (
-            <styled.p fontSize="sm" color="status.danger.content">
+            <Text variant="metadata" color="status.danger.content">
               {deriveError(notesError)}
-            </styled.p>
+            </Text>
           ) : notesLoading ? (
-            <styled.p fontSize="sm" color="text.muted">
-              Loading moderation notes...
-            </styled.p>
+            <Text variant="supporting">Loading moderation notes...</Text>
           ) : (notesData?.notes?.length ?? 0) === 0 ? (
-            <styled.p fontSize="sm" color="text.muted">
-              No moderation notes yet.
-            </styled.p>
+            <Text variant="supporting">No moderation notes yet.</Text>
           ) : (
             (notesData?.notes ?? []).map((note) => (
               <ModerationNoteCard
@@ -147,10 +143,10 @@ export function ModeratorNotesPanel({
           )}
         </LStack>
       ) : (
-        <styled.p fontSize="sm" color="text.muted">
+        <Text variant="supporting">
           You can add notes, but you do not have permission to view note
           history.
-        </styled.p>
+        </Text>
       )}
     </LStack>
   );
@@ -234,7 +230,6 @@ function ModerationNoteCard({
             (isConfirming ? (
               <HStack gap="1">
                 <Button
-                  size="xs"
                   variant="subtle"
                   bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
@@ -243,7 +238,6 @@ function ModerationNoteCard({
                   Confirm delete
                 </Button>
                 <Button
-                  size="xs"
                   variant="subtle"
                   onClick={handleCancelAction}
                   disabled={isMutating}
@@ -253,7 +247,6 @@ function ModerationNoteCard({
               </HStack>
             ) : (
               <Button
-                size="xs"
                 variant="ghost"
                 aria-label="Delete moderation note"
                 title="Delete note"
@@ -265,14 +258,14 @@ function ModerationNoteCard({
         </HStack>
       </Flex>
 
-      <styled.p fontSize="sm" whiteSpace="pre-wrap">
+      <Text variant="supporting" color="text.default" whiteSpace="pre-wrap">
         {note.content}
-      </styled.p>
+      </Text>
 
       {deleteNoteError ? (
-        <styled.p mt="2" fontSize="sm" color="status.danger.content">
+        <Text variant="metadata" mt="2" color="status.danger.content">
           {deriveError(deleteNoteError)}
-        </styled.p>
+        </Text>
       ) : null}
     </Box>
   );

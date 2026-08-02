@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
 import { FormRadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
 
@@ -30,7 +30,7 @@ export function MemberInterfaceSettings(props: Props) {
       onSubmit={onSubmit}
     >
       <WStack>
-        <Heading size="md">Interface settings</Heading>
+        <PageHeading>Interface settings</PageHeading>
         <Button type="submit" loading={formState.isSubmitting}>
           Save
         </Button>

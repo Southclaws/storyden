@@ -75,7 +75,8 @@ export const switchRecipe = defineSlotRecipe({
           height: "3",
         },
         label: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
       },
       md: {
@@ -91,7 +92,8 @@ export const switchRecipe = defineSlotRecipe({
           height: "4",
         },
         label: {
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
         },
       },
       lg: {
@@ -107,7 +109,8 @@ export const switchRecipe = defineSlotRecipe({
           height: "5",
         },
         label: {
-          textStyle: "lg",
+          fontSize: "lg",
+          lineHeight: "1.75rem",
         },
       },
     },

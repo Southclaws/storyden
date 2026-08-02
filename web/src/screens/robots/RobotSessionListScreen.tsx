@@ -14,10 +14,11 @@ import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -52,14 +53,14 @@ export function RobotSessionListScreen(props: Props) {
       <WStack>
         <HStack gap="2">
           <Link href="/robots">
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost">
               <ArrowLeftIcon />
             </IconButton>
           </Link>
-          <Heading size="md">Robot Chat Sessions</Heading>
+          <PageHeading>Robot Chat Sessions</PageHeading>
         </HStack>
 
-        <LinkButton href="/robots/chats/new" variant="subtle" size="xs">
+        <LinkButton href="/robots/chats/new" variant="subtle">
           New
         </LinkButton>
       </WStack>
@@ -123,9 +124,7 @@ function RobotSessionCard({ session }: RobotSessionCardProps) {
       <Link href={`/robots/chats/${session.id}`}>
         <LStack gap="2">
           <WStack alignItems="center">
-            <styled.p fontSize="sm" color="text.muted">
-              {session.name}
-            </styled.p>
+            <Text variant="supporting">{session.name}</Text>
             <styled.time fontSize="xs" color="text.subtle">
               {timeAgo}
             </styled.time>

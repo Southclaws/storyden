@@ -29,12 +29,14 @@ export function parseRoleMetadata(meta: Metadata | undefined): RoleMetadata {
   }
 
   return {
-    bold: parsed.success ? parsed.data.bold ?? DefaultRoleMetadata.bold : false,
+    bold: parsed.success
+      ? (parsed.data.bold ?? DefaultRoleMetadata.bold)
+      : false,
     italic: parsed.success
-      ? parsed.data.italic ?? DefaultRoleMetadata.italic
+      ? (parsed.data.italic ?? DefaultRoleMetadata.italic)
       : false,
     coloured: parsed.success
-      ? parsed.data.coloured ?? DefaultRoleMetadata.coloured
+      ? (parsed.data.coloured ?? DefaultRoleMetadata.coloured)
       : false,
   };
 }

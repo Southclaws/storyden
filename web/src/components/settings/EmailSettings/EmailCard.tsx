@@ -14,8 +14,8 @@ import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
-import { Heading } from "@/components/ui/heading";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { Text } from "@/components/ui/text";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -49,7 +49,9 @@ export function EmailCard({ email }: Props) {
     <CardBox key={email.email_address} className={lstack()} gap="4">
       <WStack alignItems="center">
         <HStack>
-          <Heading size="sm">{email.email_address}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {email.email_address}
+          </Text>
           {email.verified ? (
             <Badge
               borderColor="status.success.border"
@@ -77,7 +79,6 @@ export function EmailCard({ email }: Props) {
               borderBottomRightRadius: isConfirming ? "0" : undefined,
               borderTopRightRadius: isConfirming ? "0" : undefined,
             }}
-            size="xs"
             variant="subtle"
             onClick={handleConfirmAction}
           >

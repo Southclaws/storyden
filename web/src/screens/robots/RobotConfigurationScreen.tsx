@@ -15,10 +15,10 @@ import {
 import { RobotsListOKResponse } from "@/api/openapi-schema";
 import { RobotConfigurationForm } from "@/components/robots/RobotConfiguration/RobotConfigurationForm";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeading } from "@/components/ui/page-heading";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 type Props = {
@@ -76,17 +76,15 @@ export function RobotConfigurationScreen({ robotId }: Props) {
       <WStack>
         <HStack gap="2">
           <Link href="/robots">
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost">
               <ArrowLeftIcon />
             </IconButton>
           </Link>
 
-          <Heading size="md" lineClamp="1">
-            {data.name}
-          </Heading>
+          <PageHeading lineClamp="1">{data.name}</PageHeading>
         </HStack>
 
-        <LinkButton variant="subtle" size="xs" href="/robots/chats">
+        <LinkButton variant="subtle" href="/robots/chats">
           Chats
         </LinkButton>
       </WStack>

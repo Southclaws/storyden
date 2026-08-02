@@ -13,7 +13,8 @@ export const colorPicker = defineSlotRecipe({
     label: {
       color: "text.default",
       fontWeight: "medium",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     control: {
       alignItems: "center",

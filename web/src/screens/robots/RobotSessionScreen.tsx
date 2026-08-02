@@ -18,9 +18,9 @@ import {
   useRobotChat,
 } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
+import { PageHeading } from "@/components/ui/page-heading";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -128,7 +128,7 @@ function ChatPageContent({
       <WStack mt="1">
         <HStack>
           <RobotListMenu />
-          <RobotWorkspaceSelect size="xs" variant="outline" />
+          <RobotWorkspaceSelect variant="outline" />
         </HStack>
         {session && <StatusText session={session} />}
       </WStack>
@@ -150,11 +150,11 @@ function ChatPageHeader({
       <WStack alignItems="center" flexShrink="0">
         <HStack gap="2">
           <Link href="/robots/chats">
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost">
               <ArrowLeftIcon />
             </IconButton>
           </Link>
-          <Heading size="md">{title}</Heading>
+          <PageHeading>{title}</PageHeading>
         </HStack>
       </WStack>
     </LStack>
@@ -168,7 +168,7 @@ function StatusText({ session }: { session: RobotSession }) {
 
   return (
     <HStack color="text.subtle" fontSize="xs" gap="1">
-      <styled.span>chat started by</styled.span>
+      <span>chat started by</span>
       <MemberBadge
         profile={session.created_by}
         avatar="hidden"

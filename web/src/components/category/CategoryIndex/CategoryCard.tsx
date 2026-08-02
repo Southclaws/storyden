@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 import { CardBox } from "@/components/ui/card-box";
-import { Heading } from "@/components/ui/heading";
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { CategoryIcon } from "@/components/ui/icons/Category";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { CardRows } from "@/components/ui/rich-card";
+import { Text } from "@/components/ui/text";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
@@ -51,30 +51,35 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
           <LStack h="full" gap="1">
             <WStack alignItems="start">
               <Link className={linkOverlay()} href={`/d/${category.slug}`}>
-                <Heading>{category.name}</Heading>
+                <styled.h2
+                  color="text.default"
+                  fontWeight="semibold"
+                  fontSize="sm"
+                  lineHeight="normal"
+                >
+                  {category.name}
+                </styled.h2>
               </Link>
 
               <CategoryMenu category={category} />
             </WStack>
 
-            <styled.p color="text.subtle" fontSize="sm">
-              {category.description}
-            </styled.p>
+            <Text variant="supporting">{category.description}</Text>
           </LStack>
 
           <WStack>
             <HStack gap="1" color="text.muted" fontSize="sm">
               <DiscussionIcon w="4" />
-              <styled.p>
+              <Text as="span" variant="metadata">
                 {category.postCount}{" "}
                 {category.postCount === 1 ? "thread" : "threads"}
-              </styled.p>
+              </Text>
               {hasSubcategories && (
                 <HStack gap="1" color="text.muted" fontSize="sm">
                   <CategoryIcon w="4" />
-                  <styled.p>
+                  <Text as="span" variant="metadata">
                     {category.children.length} {plural}
-                  </styled.p>
+                  </Text>
                 </HStack>
               )}
             </HStack>
@@ -107,14 +112,20 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
                   <WStack alignItems="start">
                     <HStack gap="1">
                       <Link className={linkOverlay()} href={`/d/${c.slug}`}>
-                        <Heading textWrap="nowrap" fontSize="sm">
+                        <styled.h3
+                          color="text.default"
+                          fontWeight="semibold"
+                          fontSize="sm"
+                          lineHeight="normal"
+                          textWrap="nowrap"
+                        >
                           {c.name}
-                        </Heading>
+                        </styled.h3>
                       </Link>
                       <BulletIcon />
-                      <styled.p lineClamp={1} color="text.subtle" fontSize="sm">
+                      <Text variant="supporting" lineClamp={1}>
                         {c.description}
-                      </styled.p>
+                      </Text>
                     </HStack>
                     <CategoryMenu category={c} />
                   </WStack>

@@ -95,7 +95,8 @@ export const radioGroup = defineSlotRecipe({
           },
         },
         itemText: {
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
       },
       md: {
@@ -117,7 +118,8 @@ export const radioGroup = defineSlotRecipe({
           },
         },
         itemText: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
       },
       lg: {
@@ -139,7 +141,8 @@ export const radioGroup = defineSlotRecipe({
           },
         },
         itemText: {
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
         },
       },
     },

@@ -3,11 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { oAuthProviderCallback } from "@/api/openapi-client/auth";
-import { Unready } from "@/components/site/Unready";
-
 import { handle } from "@/api/client";
+import { oAuthProviderCallback } from "@/api/openapi-client/auth";
 import { OAuthCallback } from "@/api/openapi-schema";
+import { Unready } from "@/components/site/Unready";
 import { deriveError } from "@/utils/error";
 
 export type Props = {

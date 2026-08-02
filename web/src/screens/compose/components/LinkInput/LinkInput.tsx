@@ -10,7 +10,6 @@ export function LinkInput() {
   return (
     <FormControl>
       <Input
-        size="xs"
         placeholder="Share a link with your post..."
         type="url"
         {...register("url")}

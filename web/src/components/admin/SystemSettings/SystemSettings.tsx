@@ -13,10 +13,12 @@ import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { FormSelectField } from "@/components/ui/select";
 import { FormSliderField } from "@/components/ui/slider";
+import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
@@ -100,7 +102,7 @@ export function SystemSettingsForm(props: Props) {
       onSubmit={onSubmit}
     >
       <WStack>
-        <Heading size="md">System settings</Heading>
+        <PageHeading>System settings</PageHeading>
         <Button type="submit" loading={formState.isSubmitting}>
           Save
         </Button>
@@ -117,7 +119,7 @@ export function SystemSettingsForm(props: Props) {
         </Admonition>
       )}
 
-      <Heading>Rate limits</Heading>
+      <SectionHeading>Rate limits</SectionHeading>
 
       <p>
         Rate limits help protect your installation from spam, DDoS attacks and
@@ -264,7 +266,7 @@ export function SystemSettingsForm(props: Props) {
         />
       </FormControl>
 
-      <Heading>Client IP strategy</Heading>
+      <SectionHeading>Client IP strategy</SectionHeading>
 
       <FormControl>
         <FormLabel>Client IP mode</FormLabel>
@@ -448,12 +450,16 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
 
   return (
     <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
-      <styled.p>
+      <Text variant="supporting">
         This client IP test runs automatically and compares what Storyden sees
         from an SSR-origin call and a browser-origin call.
-      </styled.p>
+      </Text>
 
-      {error && <styled.p color="status.danger.content">{error}</styled.p>}
+      {error && (
+        <Text variant="metadata" color="status.danger.content">
+          {error}
+        </Text>
+      )}
 
       {warnings.length > 0 && (
         <Alert.Root>
@@ -500,7 +506,6 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
         <Button
           type="button"
           variant="subtle"
-          size="xs"
           onClick={() => {
             if (!canRun) {
               setError("Save settings before refreshing the client IP test.");
@@ -637,10 +642,10 @@ function RateLimitTester() {
 
   return (
     <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
-      <styled.p>
+      <Text variant="supporting">
         This is your current rate limit status. Click the &quot;Test&quot;
         button to consume one request.
-      </styled.p>
+      </Text>
 
       <styled.pre textWrap="wrap">
         x-rate-limit-limit = '{rateLimitLimit}'<br />
@@ -657,20 +662,10 @@ function RateLimitTester() {
       </styled.pre>
 
       <HStack justify="end">
-        <Button
-          type="button"
-          variant="subtle"
-          size="xs"
-          onClick={() => run(true)}
-        >
+        <Button type="button" variant="subtle" onClick={() => run(true)}>
           Test as Member
         </Button>
-        <Button
-          type="button"
-          variant="subtle"
-          size="xs"
-          onClick={() => run(false)}
-        >
+        <Button type="button" variant="subtle" onClick={() => run(false)}>
           Test as Guest
         </Button>
       </HStack>

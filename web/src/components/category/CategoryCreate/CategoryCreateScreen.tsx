@@ -9,6 +9,7 @@ import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { Input, InputPrefix } from "@/components/ui/input";
 import { FormSelectField } from "@/components/ui/select";
+import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
@@ -41,12 +42,12 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
   return (
     <VStack alignItems="start" gap="4">
-      <styled.p>
+      <Text variant="supporting">
         Use categories to organise posts. A post can only have one category,
         unlike tags. So it&apos;s best to keep categories high-level and
         different enough so that it&apos;s not easy to get confused between
         them.
-      </styled.p>
+      </Text>
       <styled.form
         display="flex"
         flexDir="column"

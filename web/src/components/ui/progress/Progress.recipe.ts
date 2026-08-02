@@ -75,10 +75,12 @@ export const progress = defineSlotRecipe({
           height: "1",
         },
         label: {
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
         valueText: {
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
         circle: {
           width: "9",
@@ -105,10 +107,12 @@ export const progress = defineSlotRecipe({
           height: "2",
         },
         label: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
         valueText: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
           // optical alignment because of % character
           paddingLeft: "0.5",
         },
@@ -137,10 +141,12 @@ export const progress = defineSlotRecipe({
           height: "3",
         },
         label: {
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
         },
         valueText: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
           // optical alignment because of % character
           paddingLeft: "2",
         },

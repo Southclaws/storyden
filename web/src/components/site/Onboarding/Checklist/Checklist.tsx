@@ -2,10 +2,11 @@
 
 import { OnboardingStatus } from "@/api/openapi-schema";
 import { CategoryCreateModal } from "@/components/category/CategoryCreate/CategoryCreateModal";
-
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { ChecklistItem } from "./ChecklistItem";
@@ -21,12 +22,12 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
 
   return (
     <VStack width="full" height="full" justify="start" pt="4" pb="16">
-      <Heading size="lg">Welcome to Storyden!</Heading>
-      <styled.p p="2" textAlign="center">
+      <PageHeading>Welcome to Storyden!</PageHeading>
+      <Text variant="supporting" p="2" textAlign="center">
         Get your community set up
         <br />
         with the following steps:
-      </styled.p>
+      </Text>
       <styled.ol
         display="flex"
         flexDir="column"
@@ -40,10 +41,10 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Create an account"
           url="/register"
         >
-          <styled.p>
+          <Text variant="supporting">
             Start by creating an account. The first registration is
             automatically given administrator rights!
-          </styled.p>
+          </Text>
         </ChecklistItem>
 
         <ChecklistItem
@@ -52,10 +53,10 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Create a category"
           onClick={onOpen}
         >
-          <styled.p>
+          <Text variant="supporting">
             Posts need to live somewhere! So create your first category, give it
             a name and set it up just how you like!
-          </styled.p>
+          </Text>
           <CategoryCreateModal onClose={onClose} isOpen={isOpen} />
         </ChecklistItem>
 
@@ -65,28 +66,27 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           title="Write your first post"
           url="/new"
         >
-          <styled.p>
+          <Text variant="supporting">
             An intro, a thesis, a manifesto, a set of rules or just a hi! Get
             started on your first post in your new category!
-          </styled.p>
+          </Text>
         </ChecklistItem>
 
         <VStack textAlign="center" px="2">
-          <Heading size="md">Invite your people</Heading>
-          <styled.p>
+          <SectionHeading>Invite your people</SectionHeading>
+          <Text variant="supporting">
             And you&apos;re ready to go! Spread the word and let the posts flow.
-          </styled.p>
+          </Text>
 
-          <styled.p>
+          <Text variant="supporting">
             <LinkButton
-              size="xs"
               colorPalette="accent"
               href="https://www.storyden.org/docs"
             >
               Visit the docs
             </LinkButton>{" "}
             for more info if you get stuck.
-          </styled.p>
+          </Text>
 
           {isLoggedIn && (
             <Button onClick={onFinish}>
@@ -99,7 +99,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
       <hr />
 
       <VStack>
-        <Heading size="sm">Not an admin?</Heading>
+        <SectionHeading>Not an admin?</SectionHeading>
 
         <p>
           This site is not quite ready to use but you can still browse around!

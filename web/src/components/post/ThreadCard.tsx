@@ -6,6 +6,7 @@ import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
 import { Card } from "@/components/ui/rich-card";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { timestamp } from "@/utils/date";
@@ -139,13 +140,9 @@ export const ThreadReferenceCard = memo(
                   )}
                   {replyCount}
                   {newRepliesCount > 0 && (
-                    <styled.span
-                      color="text.subtle"
-                      fontSize="xs"
-                      title={newRepliesLabel}
-                    >
+                    <Text as="span" variant="metadata" title={newRepliesLabel}>
                       +{newRepliesCount}
-                    </styled.span>
+                    </Text>
                   )}
                 </styled.span>
               </Link>

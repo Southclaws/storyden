@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { Drawer } from "vaul";
 
-import { Heading } from "@/components/ui/heading";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { cx } from "@/styled-system/css";
 import { Box, VStack, WStack } from "@/styled-system/jsx";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
@@ -63,7 +63,7 @@ export function ModalDrawer({
             >
               <WStack alignItems="start">
                 <Drawer.Title asChild>
-                  <Heading size="md">{props.title}</Heading>
+                  <SectionHeading>{props.title}</SectionHeading>
                 </Drawer.Title>
                 <CloseAction onClick={props.onClose} />
               </WStack>

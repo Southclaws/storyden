@@ -21,7 +21,10 @@ vi.mock("src/utils/client", () => ({
 }));
 
 vi.mock("@/api/client", () => ({
-  handle: async (fn: () => Promise<void>, opts?: { cleanup?: () => Promise<void> }) => {
+  handle: async (
+    fn: () => Promise<void>,
+    opts?: { cleanup?: () => Promise<void> },
+  ) => {
     await fn();
     await opts?.cleanup?.();
   },

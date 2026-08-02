@@ -19,7 +19,6 @@ export function ReplyToButton(props: Props) {
   return (
     <IconButton
       type="button"
-      size="xs"
       variant="ghost"
       aria-label="Reply to this"
       onClick={handleClick}

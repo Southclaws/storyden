@@ -20,7 +20,6 @@ export function BackAction({
 
   return (
     <Button
-      size="xs"
       variant="ghost"
       px={hasLabel ? undefined : "0"}
       onClick={handleBack}

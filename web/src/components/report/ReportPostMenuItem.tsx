@@ -1,7 +1,6 @@
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { ProfileReference } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { ReportIcon } from "../ui/icons/Report";
 

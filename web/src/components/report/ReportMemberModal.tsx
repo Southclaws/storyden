@@ -3,11 +3,24 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 
 import { ReportModal, ReportModalProps } from "./ReportModal";
 
-export type ReportMemberModalProps = Omit<ReportModalProps, "title" | "description" | "subject" | "targetId" | "targetKind" | "submitLabel" | "successMessage" | "loadingMessage"> & {
+export type ReportMemberModalProps = Omit<
+  ReportModalProps,
+  | "title"
+  | "description"
+  | "subject"
+  | "targetId"
+  | "targetKind"
+  | "submitLabel"
+  | "successMessage"
+  | "loadingMessage"
+> & {
   profile: ProfileReference;
 };
 
-export function ReportMemberModal({ profile, ...disclosure }: ReportMemberModalProps) {
+export function ReportMemberModal({
+  profile,
+  ...disclosure
+}: ReportMemberModalProps) {
   return (
     <ReportModal
       title={`Report ${profile.name}`}

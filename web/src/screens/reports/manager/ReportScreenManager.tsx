@@ -9,8 +9,8 @@ import {
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
-import { Center, LStack, styled } from "@/styled-system/jsx";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Center, LStack } from "@/styled-system/jsx";
 
 import { ReportFilters } from "./ReportFilters";
 import { ReportResultList } from "./ReportResultList";
@@ -80,7 +80,7 @@ export function ReportScreenManager(props: Props) {
 
   return (
     <LStack gap="4">
-      <Heading>Reports</Heading>
+      <PageHeading>Reports</PageHeading>
 
       <ReportFilters />
 

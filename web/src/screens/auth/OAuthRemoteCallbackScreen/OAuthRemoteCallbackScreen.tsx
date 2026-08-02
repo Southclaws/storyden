@@ -7,10 +7,11 @@ import { RequestError } from "@/api/common";
 import { useOAuthRemoteCallback } from "@/api/openapi-client/auth";
 import { useGetSession } from "@/api/openapi-client/misc";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { PageHeading } from "@/components/ui/page-heading";
 import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { LStack, VStack, styled } from "@/styled-system/jsx";
 
 export function OAuthRemoteCallbackScreen() {
@@ -179,8 +180,8 @@ function CallbackMessage({
       )}
 
       <VStack gap="2" textAlign="center">
-        <Heading size="md">{title}</Heading>
-        <styled.p color="text.subtle">{body}</styled.p>
+        <PageHeading>{title}</PageHeading>
+        <Text variant="supporting">{body}</Text>
       </VStack>
 
       {action}

@@ -75,8 +75,8 @@ function CommandPaletteStatusBar() {
     default:
       return (
         <>
-          <styled.p>Storyden</styled.p>
-          <styled.p>{mode}</styled.p>
+          <p>Storyden</p>
+          <p>{mode}</p>
         </>
       );
   }

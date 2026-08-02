@@ -1,10 +1,10 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 
-import { select } from "../select/Select.recipe";
-
-const selectBase = select.base;
-const selectLarge = select.variants?.size?.lg;
-const selectGhost = select.variants?.variant?.ghost;
+import {
+  selectBaseStyles,
+  selectGhostStyles,
+  selectLargeStyles,
+} from "../select/Select.recipe";
 
 export const sectionNavigation = defineSlotRecipe({
   className: "section-navigation",
@@ -28,9 +28,9 @@ export const sectionNavigation = defineSlotRecipe({
       width: "full",
     },
     trigger: {
-      ...selectBase?.trigger,
-      ...selectLarge?.trigger,
-      ...selectGhost?.trigger,
+      ...selectBaseStyles.trigger,
+      ...selectLargeStyles.trigger,
+      ...selectGhostStyles.trigger,
       textAlign: "start",
     },
     triggerLabel: {
@@ -49,8 +49,8 @@ export const sectionNavigation = defineSlotRecipe({
       zIndex: "popover",
     },
     content: {
-      ...selectBase?.content,
-      ...selectLarge?.content,
+      ...selectBaseStyles.content,
+      ...selectLargeStyles.content,
       width: "full",
     },
     navigation: {
@@ -66,8 +66,8 @@ export const sectionNavigation = defineSlotRecipe({
       gap: "1",
     },
     sectionLabel: {
-      ...selectBase?.itemGroupLabel,
-      ...selectLarge?.itemGroupLabel,
+      ...selectBaseStyles.itemGroupLabel,
+      ...selectLargeStyles.itemGroupLabel,
       color: "text.subtle",
     },
     items: {
@@ -83,8 +83,8 @@ export const sectionNavigation = defineSlotRecipe({
       minWidth: "0",
     },
     link: {
-      ...selectBase?.item,
-      ...selectLarge?.item,
+      ...selectBaseStyles.item,
+      ...selectLargeStyles.item,
       color: "text.muted",
       textDecoration: "none",
       _focusVisible: {

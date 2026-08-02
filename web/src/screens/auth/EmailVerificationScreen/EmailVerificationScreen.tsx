@@ -12,8 +12,8 @@ import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
 import { FormPinInputField } from "@/components/ui/pin-input";
 import { vstack } from "@/styled-system/patterns";
 
@@ -64,7 +64,7 @@ export function EmailVerificationScreen(props: Props) {
 
   return (
     <form className={vstack()} onSubmit={handleSubmit}>
-      <Heading>Verify your email address.</Heading>
+      <PageHeading>Verify your email address.</PageHeading>
       <p>Check your email for a 6 digit code.</p>
 
       <FormControl>

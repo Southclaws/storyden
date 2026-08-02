@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { handle } from "@/api/client";
 import { threadCreate, threadUpdate } from "@/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "@/api/openapi-schema";
-
-import { handle } from "@/api/client";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 
 export type Props = { editing?: string; initialDraft?: Thread };

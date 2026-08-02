@@ -8,7 +8,6 @@ export * from './multi-select-picker.mjs';
 export * from './text.mjs';
 export * from './admonition.mjs';
 export * from './heading-input.mjs';
-export * from './typography-heading.mjs';
 export * from './rich-card.mjs';
 export * from './alert.mjs';
 export * from './clipboard.mjs';

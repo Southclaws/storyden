@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { UnreadyBanner } from "@/components/site/Unready";
-
 import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {

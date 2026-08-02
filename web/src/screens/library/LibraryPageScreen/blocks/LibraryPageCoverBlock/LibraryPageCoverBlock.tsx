@@ -86,10 +86,9 @@ function LibraryPageCoverBlockEditing() {
         onFinish={handleUploadCoverImage}
         accept={["image/png", "image/jpeg", "image/gif"]}
         w="full"
-        size="xs"
         variant="subtle"
       >
-        <Button type="button" w="full" size="xs" variant="subtle">
+        <Button type="button" w="full" variant="subtle">
           Upload cover image
         </Button>
       </AssetUploadAction>

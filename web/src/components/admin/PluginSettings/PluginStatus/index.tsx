@@ -7,7 +7,7 @@ import { Identifier, Plugin, PluginExternalProps } from "@/api/openapi-schema";
 import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
 import * as Tabs from "@/components/ui/tabs";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -56,9 +56,7 @@ export function PluginStatus({ plugin }: Props) {
       <WStack justifyContent="space-between">
         <HStack>
           <BackAction />
-          <Heading size="md" lineClamp="1">
-            {data.name}
-          </Heading>
+          <PageHeading lineClamp="1">{data.name}</PageHeading>
         </HStack>
 
         <PluginStatusToggle plugin={data} />

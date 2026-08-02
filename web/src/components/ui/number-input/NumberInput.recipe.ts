@@ -1,7 +1,11 @@
 import { numberInputAnatomy } from "@ark-ui/react/anatomy";
 import { defineSlotRecipe } from "@pandacss/dev";
 
-import { input } from "../input/Input.recipe";
+import {
+  inputBase,
+  inputSizeVariants,
+  inputVariantVariants,
+} from "../input/Input.recipe";
 
 const trigger = {
   alignItems: "center",
@@ -53,7 +57,7 @@ export const numberInput = defineSlotRecipe({
       zIndex: "1",
     },
     input: {
-      ...input?.base,
+      ...inputBase,
       verticalAlign: "top",
     },
     label: {
@@ -71,8 +75,17 @@ export const numberInput = defineSlotRecipe({
   },
   defaultVariants: {
     size: "sm",
+    variant: "outline",
   },
   variants: {
+    variant: {
+      outline: {
+        input: inputVariantVariants.outline,
+      },
+      ghost: {
+        input: inputVariantVariants.ghost,
+      },
+    },
     size: {
       sm: {
         root: {
@@ -91,7 +104,7 @@ export const numberInput = defineSlotRecipe({
           },
         },
         input: {
-          ...input?.variants?.["size"]?.["sm"],
+          ...inputSizeVariants.sm,
           px: "2",
           pe: "calc(var(--stepper-width) + 0.5rem)!",
         },
@@ -113,7 +126,7 @@ export const numberInput = defineSlotRecipe({
           },
         },
         input: {
-          ...input?.variants?.["size"]?.["md"],
+          ...inputSizeVariants.md,
           px: "2.5",
           pe: "calc(var(--stepper-width) + 0.5rem)!",
         },
@@ -135,7 +148,7 @@ export const numberInput = defineSlotRecipe({
           },
         },
         input: {
-          ...input?.variants?.["size"]?.["lg"],
+          ...inputSizeVariants.lg,
           px: "3",
           pe: "calc(var(--stepper-width) + 0.5rem)!",
         },

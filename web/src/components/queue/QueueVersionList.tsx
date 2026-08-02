@@ -1,5 +1,8 @@
 import { NodeDraft } from "@/api/openapi-schema";
-import { LibraryPageBadge, LibraryBadge } from "@/components/library/LibraryBadge";
+import {
+  LibraryBadge,
+  LibraryPageBadge,
+} from "@/components/library/LibraryBadge";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { DraftIcon } from "@/components/ui/icons/Draft";
@@ -51,11 +54,7 @@ function QueueVersionListItem({ draft }: { draft: NodeDraft }) {
             )}
           </HStack>
 
-          <LinkButton
-            href={`${url}?version=${draft.id}`}
-            size="xs"
-            variant="subtle"
-          >
+          <LinkButton href={`${url}?version=${draft.id}`} variant="subtle">
             Review
           </LinkButton>
         </WStack>

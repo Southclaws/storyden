@@ -56,7 +56,6 @@ export function ReportCard({ report }: Props) {
             <Button
               type="button"
               variant="subtle"
-              size="xs"
               disabled={report.status === "resolved"}
               onClick={handleCancel}
             >

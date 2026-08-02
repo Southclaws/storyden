@@ -5,6 +5,7 @@ import { Plugin, PluginStatusError } from "@/api/openapi-schema";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -35,11 +36,7 @@ export function OverviewTab({ plugin }: Props) {
               <Alert.Title>Plugin error</Alert.Title>
               {canViewLogs && (
                 <HStack>
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    onClick={() => setTab("logs")}
-                  >
+                  <Button variant="subtle" onClick={() => setTab("logs")}>
                     View logs
                   </Button>
                 </HStack>
@@ -67,9 +64,9 @@ export function OverviewTab({ plugin }: Props) {
         </Alert.Root>
       )}
 
-      <styled.p fontSize="sm" color="text.default">
+      <Text variant="supporting" color="text.default">
         {plugin.description || "No description provided."}
-      </styled.p>
+      </Text>
 
       <LStack gap="2">
         <OverviewField label="Plugin ID" value={manifestID || "-"} monospace />
@@ -87,38 +84,38 @@ export function OverviewTab({ plugin }: Props) {
 
         <SubsectionTitle>Events consumed</SubsectionTitle>
         {events.length === 0 ? (
-          <styled.p fontSize="sm" color="text.subtle">
+          <Text variant="supporting">
             This plugin does not consume any events.
-          </styled.p>
+          </Text>
         ) : (
           <LStack gap="1" maxH="64" overflowY="auto">
             {events.map((eventName) => (
-              <styled.p
+              <Text
+                variant="metadata"
                 key={eventName}
-                fontSize="xs"
                 fontFamily="mono"
                 p="2"
                 bgColor="background.inset"
                 borderRadius="sm"
               >
                 {eventName}
-              </styled.p>
+              </Text>
             ))}
           </LStack>
         )}
       </LStack>
 
       <WStack>
-        <styled.p fontSize="xs" color="text.muted">
+        <Text variant="metadata">
           installed:&nbsp;
           <styled.code color="text.subtle">
             {formatDate(plugin.added_at, "PPp")}
           </styled.code>
-        </styled.p>
+        </Text>
 
-        <styled.p fontSize="xs" color="text.muted">
+        <Text variant="metadata">
           id:&nbsp;<styled.code color="text.subtle">{plugin.id}</styled.code>
-        </styled.p>
+        </Text>
       </WStack>
     </LStack>
   );
@@ -135,17 +132,16 @@ function OverviewField({
 }) {
   return (
     <WStack justifyContent="space-between" alignItems="start" gap="4">
-      <styled.p fontSize="xs" color="text.subtle">
-        {label}
-      </styled.p>
-      <styled.p
-        fontSize="sm"
+      <Text variant="metadata">{label}</Text>
+      <Text
+        variant="supporting"
+        color="text.default"
         fontFamily={monospace ? "mono" : undefined}
         textAlign="right"
         wordBreak="break-word"
       >
         {value}
-      </styled.p>
+      </Text>
     </WStack>
   );
 }
@@ -176,10 +172,10 @@ function CommandLine({ command, args }: { command: string; args: string }) {
       overflow="hidden"
     >
       <WStack gap="0" alignItems="stretch">
-        <styled.p
+        <Text
+          variant="metadata"
           px="3"
           py="2"
-          fontSize="xs"
           fontFamily="mono"
           fontWeight="semibold"
           bgColor="background.surface"
@@ -188,17 +184,17 @@ function CommandLine({ command, args }: { command: string; args: string }) {
           whiteSpace="nowrap"
         >
           {command}
-        </styled.p>
-        <styled.p
+        </Text>
+        <Text
+          variant="metadata"
           px="3"
           py="2"
-          fontSize="xs"
           fontFamily="mono"
           color={args === "-" ? "text.subtle" : "text.default"}
           wordBreak="break-word"
         >
           {args}
-        </styled.p>
+        </Text>
       </WStack>
     </Box>
   );

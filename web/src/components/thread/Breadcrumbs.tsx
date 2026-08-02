@@ -59,7 +59,6 @@ export function Breadcrumbs({ thread }: Props) {
       mt="-scrollGutter"
     >
       <LinkButton
-        size="xs"
         variant="subtle"
         flexShrink="0"
         minW="min"
@@ -88,7 +87,6 @@ function BreadcrumbButton({ breadcrumb }: { breadcrumb: Breadcrumb }) {
       // TODO: Explore using the CategoryBadge component with subtle colour.
       return (
         <LinkButton
-          size="xs"
           variant="subtle"
           flexShrink="0"
           maxW="64"
@@ -102,7 +100,6 @@ function BreadcrumbButton({ breadcrumb }: { breadcrumb: Breadcrumb }) {
     case "thread":
       return (
         <LinkButton
-          size="xs"
           variant="subtle"
           flexShrink="0"
           maxW="64"

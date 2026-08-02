@@ -1,7 +1,6 @@
-import { timestamp } from "@/utils/date";
-
 import { styled } from "@/styled-system/jsx";
 import { JsxStyleProps } from "@/styled-system/types";
+import { timestamp } from "@/utils/date";
 
 import { Anchor } from "./Anchor";
 

@@ -1,14 +1,13 @@
 import { Portal } from "@ark-ui/react";
 
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { ButtonProps } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
 import { hasPermission } from "@/utils/permissions";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 
@@ -28,6 +27,7 @@ export function CategoryCreateTrigger({
 }: Props) {
   const session = useSession();
   const useDisclosureProps = useDisclosure();
+  const Trigger = hideLabel ? IconButton : Button;
 
   if (!hasPermission(session, Permission.MANAGE_CATEGORIES)) {
     return null;
@@ -35,11 +35,10 @@ export function CategoryCreateTrigger({
 
   return (
     <>
-      <IconButton
+      <Trigger
         type="button"
-        size="xs"
         variant="ghost"
-        px={hideLabel ? "0" : "1"}
+        aria-label={hideLabel ? CreateCategoryLabel : undefined}
         onClick={useDisclosureProps.onOpen}
         {...props}
       >
@@ -49,7 +48,7 @@ export function CategoryCreateTrigger({
             <span>{CreateCategoryLabel}</span>
           </>
         )}
-      </IconButton>
+      </Trigger>
 
       <CategoryCreateModal {...useDisclosureProps} defaultParent={parentSlug} />
     </>

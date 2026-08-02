@@ -12,7 +12,7 @@ import * as Menu from "@/components/ui/menu";
 type Props = ComponentProps<typeof Button>;
 
 export function RobotListMenu({
-  size = "xs",
+  size = "sm",
   variant = "ghost",
   ...buttonProps
 }: Props) {

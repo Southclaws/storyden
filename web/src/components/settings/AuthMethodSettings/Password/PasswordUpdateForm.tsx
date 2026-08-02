@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
@@ -14,7 +14,7 @@ export function PasswordUpdateForm() {
 
   return (
     <styled.form className={lstack()} gap="2" onSubmit={handlePasswordChange}>
-      <Heading>Password</Heading>
+      <SectionHeading>Password</SectionHeading>
 
       <FormControl>
         <Input

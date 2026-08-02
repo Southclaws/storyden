@@ -44,16 +44,14 @@ export const Text: PolymorphicComponent = React.forwardRef<any, TextProps<any>>(
   ) => {
     const [variantProps, textProps] = text.splitVariantProps(props);
     const [cssProps, localProps] = splitCssProps(textProps);
-    const { className, ...otherProps } = localProps;
+    const { as, className, ...otherProps } = localProps;
     const styles = text(variantProps);
-    const Component = props.as || "p";
+    const Component = (as || "p") as React.ElementType;
 
-    return (
-      <Component
-        ref={ref}
-        className={cx(styles, css(cssProps), className)}
-        {...otherProps}
-      />
-    );
+    return React.createElement(Component, {
+      ref,
+      className: cx(styles, css(cssProps), className),
+      ...otherProps,
+    });
   },
 );

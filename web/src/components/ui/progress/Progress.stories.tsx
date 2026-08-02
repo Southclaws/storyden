@@ -47,29 +47,29 @@ export const Sizes: Story = {
       rowGap="5"
       w="full"
     >
-      <Text color="text.subtle" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
         Size
       </Text>
-      <Text color="text.subtle" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
         Linear
       </Text>
-      <Text color="text.subtle" fontWeight="semibold" size="xs">
+      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
         Circular
       </Text>
 
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         SM
       </Text>
       <ProgressHorizontal size="sm" value={64} />
       <ProgressCircle size="sm" value={64} />
 
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         MD
       </Text>
       <ProgressHorizontal size="md" value={64} />
       <ProgressCircle size="md" value={64} />
 
-      <Text fontWeight="semibold" size="sm">
+      <Text fontWeight="semibold" variant="supporting">
         LG
       </Text>
       <ProgressHorizontal size="lg" value={64} />

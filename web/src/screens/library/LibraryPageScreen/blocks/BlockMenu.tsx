@@ -8,7 +8,6 @@ import * as Menu from "@/components/ui/menu";
 import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
-import { styled } from "@/styled-system/jsx";
 
 import { useWatch } from "../store";
 
@@ -71,7 +70,7 @@ export function BlockMenu({ children, open, block, index }: AllProps) {
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>{LibraryPageBlockName[block.type]}</styled.span>
+                <span>{LibraryPageBlockName[block.type]}</span>
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />

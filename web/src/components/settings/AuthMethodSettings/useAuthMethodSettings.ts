@@ -1,7 +1,6 @@
 import { find } from "lodash";
 
 import { useAccountAuthProviderList } from "@/api/openapi-client/accounts";
-
 import { groupAuthMethods, groupAuthProviders } from "@/lib/auth/utils";
 
 export function useAuthMethodSettings() {

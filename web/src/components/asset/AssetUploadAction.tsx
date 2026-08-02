@@ -103,12 +103,7 @@ export function AssetUploadAction({
     >
       <FileUpload.Trigger asChild>
         {children || (
-          <Button
-            type="button"
-            size="xs"
-            variant="outline"
-            {...buttonVariantProps}
-          >
+          <Button type="button" variant="outline" {...buttonVariantProps}>
             {operation === "add" ? (
               <>
                 <MediaAddIcon />

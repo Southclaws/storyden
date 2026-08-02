@@ -9,7 +9,8 @@ import {
 } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
-import { Box, HStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Box, HStack } from "@/styled-system/jsx";
 
 import { Spinner } from "../ui/spinner";
 
@@ -184,13 +185,13 @@ export function ComposerTools({
                 <HStack gap="1" className="composer-tools__working-status">
                   <Spinner size="sm" />
                   {workingCount > 1 && (
-                    <styled.span
+                    <Text
+                      as="span"
+                      variant="metadata"
                       className="composer-tools__working-status-count"
-                      fontSize="xs"
-                      color="text.subtle"
                     >
                       {workingCount}
-                    </styled.span>
+                    </Text>
                   )}
                 </HStack>
               )}
@@ -212,7 +213,6 @@ export function ComposerTools({
               className="composer-tools__expand-button"
               type="button"
               variant="ghost"
-              size="xs"
               onClick={handleClick}
               aria-label="Show editor tools"
               aria-expanded={isExpanded}

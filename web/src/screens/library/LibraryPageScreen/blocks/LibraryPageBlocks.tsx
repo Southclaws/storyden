@@ -102,7 +102,7 @@ export function LibraryPageBlocks() {
 
         <CreateBlockMenu
           trigger={
-            <Button variant="outline" size="xs" w="full">
+            <Button variant="outline" w="full">
               <AddIcon />
               &nbsp;Add Block
             </Button>
@@ -268,7 +268,6 @@ function LibraryPageBlockEditable({
                       base: "subtle",
                       md: "ghost",
                     }}
-                    size="xs"
                     minWidth="5"
                     width="5"
                     height="5"

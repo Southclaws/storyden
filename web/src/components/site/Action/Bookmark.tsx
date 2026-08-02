@@ -10,7 +10,7 @@ type Props = ButtonProps & { bookmarked: boolean };
 export function BookmarkAction(props: Props) {
   const { bookmarked, ...rest } = props;
   return (
-    <IconButton variant="subtle" size="xs" {...rest}>
+    <IconButton variant="subtle" {...rest}>
       {bookmarked ? <BookmarkSavedIcon /> : <BookmarkIcon />}
     </IconButton>
   );

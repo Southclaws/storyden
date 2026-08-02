@@ -1,13 +1,7 @@
-import { type RecipeVariantProps, cva } from "@/styled-system/css";
-import { styled } from "@/styled-system/jsx";
+import { Text, type TextProps } from "../text";
 
-const formErrorText = cva({
-  base: {
-    color: "status.danger.content",
-    fontSize: "xs",
-  },
-});
+export type FormErrorTextProps = Omit<TextProps<"p">, "variant">;
 
-export type FormErrorTextVariants = RecipeVariantProps<typeof formErrorText>;
-
-export const FormErrorText = styled("p", formErrorText);
+export function FormErrorText(props: FormErrorTextProps) {
+  return <Text variant="metadata" color="status.danger.content" {...props} />;
+}

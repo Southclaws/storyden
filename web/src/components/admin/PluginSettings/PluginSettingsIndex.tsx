@@ -1,6 +1,7 @@
 import { PluginActiveState, PluginList } from "@/api/openapi-schema";
-import { Heading } from "@/components/ui/heading";
-import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack } from "@/styled-system/jsx";
 
 import { PluginAddTrigger } from "./PluginAddModal/PluginAddModal";
 import { PluginItemList } from "./PluginItemList";
@@ -20,12 +21,12 @@ export function PluginSettingsIndex({ plugins }: Props) {
   return (
     <LStack>
       <WStack justifyContent="space-between">
-        <Heading size="md">Plugins</Heading>
+        <PageHeading>Plugins</PageHeading>
 
         <PluginAddTrigger />
       </WStack>
 
-      <styled.p color="text.subtle">
+      <Text variant="supporting">
         {hasInactive ? (
           <span>
             {totalPlugins} plugins, {activePlugins} active.
@@ -33,7 +34,7 @@ export function PluginSettingsIndex({ plugins }: Props) {
         ) : (
           <span>{plugins.length} plugins.</span>
         )}
-      </styled.p>
+      </Text>
 
       <PluginItemList plugins={plugins} />
     </LStack>

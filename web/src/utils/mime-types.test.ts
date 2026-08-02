@@ -30,10 +30,10 @@ test("getExtensionsForMimeTypes deduplicates across explicit and wildcard", () =
 });
 
 test("getExtensionsForMimeTypes supports mixed specific mime types", () => {
-  assert.equal(
-    getExtensionsForMimeTypes(["application/pdf", "text/plain"]),
-    ["pdf", "txt"],
-  );
+  assert.equal(getExtensionsForMimeTypes(["application/pdf", "text/plain"]), [
+    "pdf",
+    "txt",
+  ]);
 });
 
 test("getExtensionsForMimeTypes returns empty for unknown wildcard groups", () => {

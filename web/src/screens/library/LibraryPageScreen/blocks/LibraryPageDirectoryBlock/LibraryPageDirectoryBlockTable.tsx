@@ -142,7 +142,6 @@ export function LibraryPageDirectoryBlockTable({
                     <IconButton
                       type="button"
                       variant="ghost"
-                      size="xs"
                       onClick={handleClickSortAction}
                     >
                       <SortIndicator order={sortState} />
@@ -186,14 +185,12 @@ export function LibraryPageDirectoryBlockTable({
                 <HStack gap="2">
                   <CreatePageAction
                     variant="ghost"
-                    size="xs"
                     parentSlug={nodeID}
                     disableRedirect
                     onComplete={handleCreatePageComplete}
                   />
                   <CreatePageFromURLAction
                     variant="ghost"
-                    size="xs"
                     parentSlug={nodeID}
                     onComplete={handleCreatePageComplete}
                   />
@@ -360,7 +357,6 @@ function Row({
                                 base: "subtle",
                                 md: "ghost",
                               }}
-                              size="xs"
                               minWidth="5"
                               width="5"
                               height="5"

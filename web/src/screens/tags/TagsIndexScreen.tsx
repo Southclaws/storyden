@@ -41,7 +41,7 @@ export function TagsIndexScreen(props: Props) {
           crumbs={[]}
         />
 
-        <Text textStyle="sm">
+        <Text fontSize="sm" lineHeight="normal">
           Threads and library pages can be tagged with related topics.
         </Text>
       </LStack>

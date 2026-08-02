@@ -3,7 +3,8 @@ import { parseAsInteger, useQueryState } from "nuqs";
 import { MouseEvent, useState } from "react";
 
 import { LinkButton } from "@/components/ui/link-button";
-import { HStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { HStack } from "@/styled-system/jsx";
 
 const MAX_PAGES_SHOWN = 5;
 const MID_POINT = MAX_PAGES_SHOWN / 2;
@@ -75,7 +76,6 @@ export function PaginationControls({
         <>
           <LinkButton
             variant="ghost"
-            size="xs"
             href={`${path}?${new URLSearchParams({
               ...params,
               page: "1",
@@ -101,7 +101,6 @@ export function PaginationControls({
             backgroundColor={
               v === currentPage ? "selection.background" : undefined
             }
-            size="xs"
             key={v}
             href={`${path}?${withPage.toString()}`}
             onClick={clickHandler(v)}
@@ -116,7 +115,6 @@ export function PaginationControls({
           <Sep />
           <LinkButton
             variant="ghost"
-            size="xs"
             href={`${path}?${new URLSearchParams({
               ...params,
               page: lastPage.toString(),
@@ -133,8 +131,8 @@ export function PaginationControls({
 
 function Sep() {
   return (
-    <styled.span fontSize="xs" color="text.disabled">
+    <Text as="span" variant="metadata" color="text.disabled">
       •••
-    </styled.span>
+    </Text>
   );
 }

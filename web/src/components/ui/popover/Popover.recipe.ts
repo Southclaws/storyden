@@ -35,12 +35,14 @@ export const popover = defineSlotRecipe({
     },
     title: {
       fontWeight: "medium",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     description: {
       overflowY: "scroll",
       color: "text.muted",
-      textStyle: "sm",
+      fontSize: "sm",
+      lineHeight: "1.25rem",
     },
     closeTrigger: {
       color: "text.muted",

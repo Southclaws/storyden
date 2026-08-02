@@ -10,9 +10,8 @@ import { Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 
-import { Asset } from "@/api/openapi-schema";
-
 import { handle } from "@/api/client";
+import { Asset } from "@/api/openapi-schema";
 import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 

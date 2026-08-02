@@ -23,6 +23,7 @@ import { CheckIcon } from "@/components/ui/icons/Check";
 import { MembersIcon } from "@/components/ui/icons/Members";
 import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
+import { Text } from "@/components/ui/text";
 import {
   Box,
   Flex,
@@ -223,9 +224,9 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Emails">
                         <VStack alignItems="stretch" gap="1.5">
                           {account.email_addresses.length === 0 ? (
-                            <styled.span color="text.subtle" fontSize="sm">
+                            <Text as="span" variant="supporting">
                               No email addresses
-                            </styled.span>
+                            </Text>
                           ) : (
                             account.email_addresses.map((email) => (
                               <HStack
@@ -234,9 +235,14 @@ export function AdminMemberIndexScreen(props: Props) {
                                 gap="2"
                                 flexWrap="wrap"
                               >
-                                <styled.span fontFamily="mono" fontSize="sm">
+                                <Text
+                                  as="span"
+                                  variant="supporting"
+                                  color="text.default"
+                                  fontFamily="mono"
+                                >
                                   {email.email_address}
-                                </styled.span>
+                                </Text>
                                 <Badge variant="outline">
                                   {email.verified ? "verified" : "unverified"}
                                 </Badge>
@@ -249,9 +255,9 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Roles">
                         <HStack gap="2" flexWrap="wrap">
                           {account.roles.length === 0 ? (
-                            <styled.span color="text.subtle" fontSize="sm">
+                            <Text as="span" variant="supporting">
                               No roles
-                            </styled.span>
+                            </Text>
                           ) : (
                             account.roles.map((role) => (
                               <Badge key={role.id} variant="subtle">
@@ -267,9 +273,9 @@ export function AdminMemberIndexScreen(props: Props) {
                       <InfoBlock label="Auth services">
                         <HStack gap="2" flexWrap="wrap">
                           {authServices.length === 0 ? (
-                            <styled.span color="text.subtle" fontSize="sm">
+                            <Text as="span" variant="supporting">
                               None
-                            </styled.span>
+                            </Text>
                           ) : (
                             <>
                               {authServices.slice(0, 5).map((service) => (
@@ -296,9 +302,9 @@ export function AdminMemberIndexScreen(props: Props) {
                             avatar="hidden"
                           />
                         ) : (
-                          <styled.span color="text.muted" fontStyle="italic">
+                          <Text as="span" variant="metadata" fontStyle="italic">
                             n/a
-                          </styled.span>
+                          </Text>
                         )}
                       </InfoBlock>
                     </VStack>
@@ -359,9 +365,9 @@ function BooleanFilterMenu(props: {
 function InfoBlock(props: React.PropsWithChildren<{ label: string }>) {
   return (
     <LStack gap="2" alignItems="stretch">
-      <styled.span fontSize="sm" color="text.muted" fontWeight="medium">
+      <Text as="span" variant="supporting" fontWeight="medium">
         {props.label}
-      </styled.span>
+      </Text>
       {props.children}
     </LStack>
   );

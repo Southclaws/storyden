@@ -1,10 +1,6 @@
 import { WEB_ADDRESS } from "@/config";
 
-export function getPermalinkForPost(
-  slug: string,
-  post: string,
-  page?: number,
-) {
+export function getPermalinkForPost(slug: string, post: string, page?: number) {
   const url = new URL(`/t/${slug}`, WEB_ADDRESS);
 
   if (page && page > 1) {

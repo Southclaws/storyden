@@ -1,6 +1,5 @@
 import { DatagraphSearchResult } from "@/api/openapi-schema";
 import { EmptyState } from "@/components/site/EmptyState";
-
 import { styled } from "@/styled-system/jsx";
 
 import { DatagraphItemCard } from "../datagraph/DatagraphItemCard";

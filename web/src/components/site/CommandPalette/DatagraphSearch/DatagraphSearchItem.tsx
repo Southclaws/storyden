@@ -7,6 +7,7 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ProfileIcon } from "@/components/ui/icons/Profile";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import {
@@ -42,9 +43,14 @@ export function DatagraphSearchItem({ result, handleNavigate }: Props) {
               {result.name}
             </styled.h1>
             {result.description && (
-              <styled.span lineClamp={1} fontSize="xs" fontWeight="normal">
+              <Text
+                as="span"
+                variant="metadata"
+                lineClamp={1}
+                fontWeight="normal"
+              >
                 {result.description}
-              </styled.span>
+              </Text>
             )}
           </LStack>
         </HStack>

@@ -10,7 +10,7 @@ export function PluginAddTrigger() {
 
   return (
     <>
-      <Button type="button" size="xs" variant="ghost" onClick={onOpen}>
+      <Button type="button" variant="ghost" onClick={onOpen}>
         <AddIcon />
         <span>Add plugin</span>
       </Button>

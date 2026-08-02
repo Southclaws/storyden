@@ -1,7 +1,7 @@
 "use client";
 
 import { Unready } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
 import { LStack } from "@/styled-system/jsx";
 
 import { OAuth } from "./OAuth/OAuth";
@@ -19,7 +19,7 @@ export function AuthMethodSettings() {
   return (
     <LStack gap="4">
       <LStack>
-        <Heading size="md">Authentication methods</Heading>
+        <PageHeading>Authentication methods</PageHeading>
         <p>
           We recommend you add more than one method of authentication to your
           account. This will help you recover your account if you lose access to

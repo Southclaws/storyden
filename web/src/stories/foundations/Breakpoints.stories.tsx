@@ -20,7 +20,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const maxBreakpoint = breakpointTokens[breakpointTokens.length - 1].value;
+const maxBreakpoint = breakpointTokens.at(-1)!.value;
 
 const containerConditions = [
   {

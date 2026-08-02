@@ -4,6 +4,10 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface NumberInputVariant {
   /**
+ * @default "outline"
+ */
+variant: "outline" | "ghost"
+/**
  * @default "sm"
  */
 size: "sm" | "md" | "lg"

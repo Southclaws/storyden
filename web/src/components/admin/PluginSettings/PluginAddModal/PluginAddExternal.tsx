@@ -12,6 +12,7 @@ import {
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { Text } from "@/components/ui/text";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
@@ -78,10 +79,10 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
 
   return (
     <form className={lstack({ gap: "4" })} onSubmit={handleSubmit}>
-      <styled.p color="text.subtle">
+      <Text variant="supporting">
         Register an external plugin that connects to Storyden over authenticated
         RPC. Storyden will not manage this plugin process.
-      </styled.p>
+      </Text>
 
       <Alert.Root>
         <Alert.Icon asChild>

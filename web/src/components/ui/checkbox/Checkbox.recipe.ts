@@ -70,7 +70,8 @@ export const checkbox = defineSlotRecipe({
           },
         },
         label: {
-          textStyle: "xs",
+          fontSize: "xs",
+          lineHeight: "1.125rem",
         },
       },
       md: {
@@ -87,7 +88,8 @@ export const checkbox = defineSlotRecipe({
           },
         },
         label: {
-          textStyle: "sm",
+          fontSize: "sm",
+          lineHeight: "1.25rem",
         },
       },
       lg: {
@@ -104,7 +106,8 @@ export const checkbox = defineSlotRecipe({
           },
         },
         label: {
-          textStyle: "md",
+          fontSize: "md",
+          lineHeight: "1.5rem",
         },
       },
     },

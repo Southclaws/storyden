@@ -1,8 +1,7 @@
 import { z } from "zod";
 
-import { ThreadIndexScreen } from "@/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
-
 import { threadList } from "@/api/openapi-server/threads";
+import { ThreadIndexScreen } from "@/screens/thread/ThreadIndexScreen/ThreadIndexScreen";
 
 type Props = {
   searchParams: Promise<Query>;

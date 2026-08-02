@@ -1,11 +1,10 @@
+import { handle } from "@/api/client";
 import {
   accountAuthMethodDelete,
   useAccountAuthProviderList,
 } from "@/api/openapi-client/accounts";
 import { APIError } from "@/api/openapi-schema";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
-
-import { handle } from "@/api/client";
 
 export type Props = {
   id: string;

@@ -1,4 +1,4 @@
-import { defineSemanticTokens } from "@pandacss/dev";
+import { defineSemanticTokens, defineTextStyles } from "@pandacss/dev";
 
 import { colours } from "./colours";
 
@@ -126,5 +126,29 @@ export const semanticTokens = defineSemanticTokens({
     safeBottom: { value: "env(safe-area-inset-bottom)" },
     safeTop: { value: "calc(env(keyboard-inset-height) + 4px)" },
     scrollGutter: { value: "var(--spacing-2)" },
+  },
+});
+
+export const textStyles = defineTextStyles({
+  body: {
+    value: {
+      fontSize: "md",
+      fontWeight: "normal",
+      lineHeight: "normal",
+    },
+  },
+  supporting: {
+    value: {
+      fontSize: "sm",
+      fontWeight: "normal",
+      lineHeight: "tight",
+    },
+  },
+  metadata: {
+    value: {
+      fontSize: "xs",
+      fontWeight: "medium",
+      lineHeight: "tight",
+    },
   },
 });
