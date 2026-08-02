@@ -17,7 +17,7 @@ export const switchRecipe = defineSlotRecipe({
     },
     control: {
       alignItems: "center",
-      background: "control.trackBackground",
+      background: "background.controlTrack",
       borderRadius: "full",
       boxShadow: "inset 0 0 0 1px token(colors.border.default)",
       cursor: "pointer",
@@ -32,7 +32,7 @@ export const switchRecipe = defineSlotRecipe({
         boxShadow: "inset 0 0 0 1px token(colors.accent.default)",
       },
       _disabled: {
-        background: "control.disabledBackground",
+        background: "background.controlDisabled",
         boxShadow: "inset 0 0 0 1px token(colors.border.disabled)",
         cursor: "not-allowed",
       },

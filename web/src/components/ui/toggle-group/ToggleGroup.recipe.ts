@@ -40,7 +40,7 @@ export const toggleGroup = defineSlotRecipe({
         },
       },
       _hover: {
-        background: "control.hoverBackground",
+        background: "background.controlHover",
       },
       _disabled: {
         borderColor: "border.disabled",

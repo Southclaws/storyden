@@ -5,7 +5,7 @@ import { Permission, ThreadReference, Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";

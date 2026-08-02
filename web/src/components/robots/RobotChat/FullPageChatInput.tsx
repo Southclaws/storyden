@@ -66,7 +66,7 @@ export function FullPageChatInput() {
             borderRadius="md"
             borderWidth="thin"
             borderColor="border.default"
-            bg="control.background"
+            bg="background.control"
             color="text.default"
             fontSize="sm"
             resize="none"

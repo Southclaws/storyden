@@ -10,7 +10,7 @@ size: "sm" | "md" | "lg"
 /**
  * @default "outline"
  */
-variant: "outline" | "ghost"
+variant: "outline" | "ghost" | "inset"
 }
 
 type InputVariantMap = {

@@ -1,6 +1,6 @@
 import { defineRecipe } from "@pandacss/dev";
 
-import { richCardShell } from "../rich-card/RichCard.recipe";
+import { richCardShell } from "../surface/RichCard.recipe";
 
 export const cardBox = defineRecipe({
   className: "card-box",

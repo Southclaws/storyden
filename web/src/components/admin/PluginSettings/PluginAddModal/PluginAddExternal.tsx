@@ -112,7 +112,7 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
         borderColor="border.default"
         borderRadius="md"
         p="3"
-        bgColor="control.background"
+        bgColor="background.control"
         color="text.default"
         fontFamily="mono"
         fontSize="xs"

@@ -41,7 +41,7 @@ export const selectBaseStyles = {
     transitionProperty: "background, color",
     transitionTimingFunction: "default",
     _hover: {
-      background: "control.hoverBackground",
+      background: "background.controlHover",
       color: "text.default",
     },
     _highlighted: {

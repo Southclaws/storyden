@@ -178,7 +178,7 @@ function SDRInlineReference({
         fontSize: "xs",
         whiteSpace: "nowrap",
         _hover: {
-          backgroundColor: "control.hoverBackground",
+          backgroundColor: "background.controlHover",
           textDecoration: "none",
         },
       })}

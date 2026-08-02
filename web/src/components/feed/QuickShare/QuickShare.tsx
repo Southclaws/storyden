@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { CreateIcon } from "@/components/ui/icons/Create";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import { Spinner } from "@/components/ui/spinner";
 import { Flex, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -28,7 +28,7 @@ export function QuickShare(props: Props) {
   }
 
   return (
-    <CardBox bgColor="background.surface">
+    <CardBox bgColor="background.control" borderRadius="md">
       <form
         className={lstack({
           gap: "2",

@@ -58,11 +58,11 @@ export const button = defineRecipe({
         },
         _disabled: {
           color: "text.disabled",
-          background: "control.disabledBackground",
+          background: "background.controlDisabled",
           cursor: "not-allowed",
           _hover: {
             color: "text.disabled",
-            background: "control.disabledBackground",
+            background: "background.controlDisabled",
           },
         },
       },
@@ -126,7 +126,7 @@ export const button = defineRecipe({
       },
       subtle: {
         colorPalette: "accent",
-        background: "control.subtleBackground/80",
+        background: "background.controlSubtle/80",
         color: "text.muted",
         backdropBlur: "sm",
         backdropFilter: "auto",
@@ -140,11 +140,11 @@ export const button = defineRecipe({
           outlineOffset: "2px",
         },
         _disabled: {
-          background: "control.disabledBackground",
+          background: "background.controlDisabled",
           color: "text.disabled",
           cursor: "not-allowed",
           _hover: {
-            background: "control.disabledBackground",
+            background: "background.controlDisabled",
             color: "text.disabled",
           },
         },

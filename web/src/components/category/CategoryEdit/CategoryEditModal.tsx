@@ -16,7 +16,7 @@ import { HStack, VStack, styled } from "@/styled-system/jsx";
 import { Props, useCategoryEdit } from "./useCategoryEdit";
 
 export function CategoryEditModal(props: Props) {
-  const { form, handlers } = useCategoryEdit(props);
+  const { form, slugInput, handlers } = useCategoryEdit(props);
 
   const hostname = new URL(WEB_ADDRESS).host;
 
@@ -71,7 +71,7 @@ export function CategoryEditModal(props: Props) {
                   {hostname}/d/
                 </InputPrefix>
                 <Input
-                  {...form.register("slug")}
+                  {...slugInput}
                   type="text"
                   flex="1"
                   borderTopLeftRadius={{

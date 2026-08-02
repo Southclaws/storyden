@@ -6,7 +6,7 @@ import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { CardGrid } from "@/components/ui/rich-card";
+import { CardGrid } from "@/components/ui/surface";
 import { LStack } from "@/styled-system/jsx";
 
 export type Props = {

@@ -22,7 +22,7 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
         <Badge
           size="sm"
           borderColor="border.strong"
-          backgroundColor="control.disabledBackground"
+          backgroundColor="background.controlDisabled"
           color="text.subtle"
         >
           Inactive

@@ -68,7 +68,7 @@ export const combobox = defineSlotRecipe({
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
       _hover: {
-        background: "control.hoverBackground",
+        background: "background.controlHover",
       },
       _highlighted: {
         background: "selection.background",

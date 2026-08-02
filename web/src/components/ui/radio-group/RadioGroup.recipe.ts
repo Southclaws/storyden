@@ -35,7 +35,7 @@ export const radioGroup = defineSlotRecipe({
         transitionTimingFunction: "default",
       },
       _hover: {
-        background: "control.hoverBackground",
+        background: "background.controlHover",
       },
       _checked: {
         borderColor: "accent.default",

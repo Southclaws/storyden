@@ -336,7 +336,7 @@ export const Layering: Story = {
               <div className={compactMenu.itemGroup}>
                 <strong className={compactMenu.itemGroupLabel}>Actions</strong>
                 <styled.div
-                  backgroundColor="control.hoverBackground"
+                  backgroundColor="background.controlHover"
                   className={compactMenu.item}
                 >
                   Edit details

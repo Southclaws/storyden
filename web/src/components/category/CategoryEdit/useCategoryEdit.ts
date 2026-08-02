@@ -7,6 +7,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { Asset, Category } from "@/api/openapi-schema";
 import { useCategoryMutations } from "@/lib/category/mutation";
+import { slugify } from "@/utils/slugify";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export type Props = {
@@ -15,7 +16,7 @@ export type Props = {
 
 export const FormSchema = z.object({
   name: z.string().min(1),
-  slug: z.string().min(1),
+  slug: z.string().transform(slugify).pipe(z.string().min(1)),
   description: z.string().min(1),
   colour: z.string().default("#fff"),
   cover_image: z.custom<Asset>().nullable().optional(),
@@ -35,6 +36,15 @@ export function useCategoryEdit(props: Props) {
   });
   const pathname = usePathname();
   const router = useRouter();
+
+  const slugInput = form.register("slug", {
+    onBlur(event) {
+      form.setValue("slug", slugify(event.target.value), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    },
+  });
 
   const { revalidateList, updateCategory } = useCategoryMutations();
 
@@ -80,6 +90,7 @@ export function useCategoryEdit(props: Props) {
 
   return {
     form,
+    slugInput,
     handlers: {
       handleSubmit,
       handleCancel,

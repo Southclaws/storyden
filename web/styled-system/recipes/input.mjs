@@ -36,7 +36,8 @@ const inputVariantMap = {
   ],
   "variant": [
     "outline",
-    "ghost"
+    "ghost",
+    "inset"
   ]
 }
 

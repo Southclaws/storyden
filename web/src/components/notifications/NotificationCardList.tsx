@@ -2,7 +2,7 @@ import { handle } from "@/api/client";
 import { NotificationStatus } from "@/api/openapi-schema";
 import { ArchiveIcon } from "@/components/ui/icons/Archive";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
-import { Card, CardRows } from "@/components/ui/rich-card";
+import { Card, CardRows } from "@/components/ui/surface";
 import { Text } from "@/components/ui/text";
 import { getCommonProperties } from "@/lib/datagraph/item";
 import { Center, HStack, LStack, WStack } from "@/styled-system/jsx";

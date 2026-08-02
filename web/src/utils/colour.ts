@@ -33,7 +33,7 @@ export function getColourVariants(colour: string): Record<string, string> {
 
   const rgb = c.hex();
 
-  const textColour = readableColorWithFallback(rgb);
+  const textColour = getReadableTextColour(rgb);
 
   const flatRamp = ramp.reduceRight((o, r, i) => {
     const [minL, maxL] = flatClampL;
@@ -44,7 +44,7 @@ export function getColourVariants(colour: string): Record<string, string> {
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
-    const text = readableColorWithFallback(parseColourWithFallback(fill).hex());
+    const text = getReadableTextColour(parseColourWithFallback(fill).hex());
 
     return {
       [`--accent-colour-flat-fill-${r}`]: fill,
@@ -62,7 +62,7 @@ export function getColourVariants(colour: string): Record<string, string> {
 
     const fill = `oklch(${L}% ${C}% ${hue}deg)`;
 
-    const text = readableColorWithFallback(parseColourWithFallback(fill).hex());
+    const text = getReadableTextColour(parseColourWithFallback(fill).hex());
 
     return {
       [`--accent-colour-dark-fill-${r}`]: fill,
@@ -104,11 +104,11 @@ function getHue(c) {
   return hue;
 }
 
-function readableColorWithFallback(rgb: string): string {
+export function getReadableTextColour(rgb: string): string {
   try {
-    return readableColor(rgb, "#303030", "#E8ECEA", false);
+    return readableColor(rgb, "#303030", "#E8ECEA", true);
   } catch (e) {
-    return "black";
+    return "#303030";
   }
 }
 

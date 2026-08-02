@@ -1,21 +1,14 @@
-import { match } from "ts-pattern";
-
 import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
-import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Text } from "@/components/ui/text";
 import { CategoryTree } from "@/lib/category/tree";
 import { Settings } from "@/lib/settings/settings";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
-import { HStack, LStack, WStack } from "@/styled-system/jsx";
-
-import { CategoryBadge } from "../CategoryBadge";
-import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
+import { LStack, WStack } from "@/styled-system/jsx";
 
 import { CategoryLayout } from "./CategoryCardLayout";
 
-export type Props = {
+export type CategoryIndexContentProps = {
   initialSession?: Account;
   initialSettings?: Settings;
   initialThreadList?: ThreadListResult;
@@ -28,7 +21,7 @@ export type Props = {
   paginationBasePath: string;
 };
 
-export function CategoryIndex({
+export function CategoryIndexContent({
   initialSession,
   initialSettings,
   initialThreadList,
@@ -38,51 +31,10 @@ export function CategoryIndex({
   showQuickShare,
   categories,
   paginationBasePath,
-}: Props) {
-  const categoryCount = categories.length;
-
+}: CategoryIndexContentProps) {
   return (
     <LStack gap="8">
-      <LStack>
-        <WStack>
-          <PageHeading>Discussion categories</PageHeading>
-
-          <CategoryCreateTrigger />
-        </WStack>
-
-        <LStack>
-          {match(categoryCount)
-            .when(
-              (c) => c === 0,
-              () => (
-                <Text variant="supporting">No categories yet. Create one?</Text>
-              ),
-            )
-            .when(
-              (c) => c === 1,
-              () => (
-                <Text variant="supporting">
-                  There is {categoryCount} category available to start a
-                  discussion.
-                </Text>
-              ),
-            )
-            .otherwise(() => (
-              <Text variant="supporting">
-                There are {categoryCount} categories available to start
-                discussions.
-              </Text>
-            ))}
-
-          <HStack>
-            {categories.map((c) => (
-              <CategoryBadge key={c.id} category={c} />
-            ))}
-          </HStack>
-        </LStack>
-
-        <CategoryLayout layout={layout} categories={categories} />
-      </LStack>
+      <CategoryLayout layout={layout} categories={categories} />
 
       <ThreadListSection
         initialThreadListPage={initialThreadListPage}

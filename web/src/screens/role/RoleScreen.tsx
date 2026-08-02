@@ -37,7 +37,7 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { PageHeading } from "@/components/ui/page-heading";
-import { CardGrid } from "@/components/ui/rich-card";
+import { CardGrid } from "@/components/ui/surface";
 import { isDefaultRole } from "@/lib/role/defaults";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";

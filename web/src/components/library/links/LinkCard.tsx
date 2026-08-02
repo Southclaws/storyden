@@ -1,6 +1,6 @@
 import { LinkReference } from "@/api/openapi-schema";
 import { LinkButton } from "@/components/ui/link-button";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import {
   ButtonVariantProps,
   RichCardVariantProps,

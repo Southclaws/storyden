@@ -25,7 +25,7 @@ export const checkbox = defineSlotRecipe({
       transitionProperty: "border-color, background",
       transitionTimingFunction: "default",
       _hover: {
-        background: "control.hoverBackground",
+        background: "background.controlHover",
       },
       _checked: {
         background: "colorPalette.default",

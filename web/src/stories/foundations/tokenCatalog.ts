@@ -97,22 +97,22 @@ export const borderTokens: TokenExample[] = [
 export const stateBackgroundTokens: TokenExample[] = [
   {
     name: "Control",
-    token: "colors.control.background",
+    token: "colors.background.control",
     usage: "Persistent fill for inputs and other controls.",
   },
   {
     name: "Control hover",
-    token: "colors.control.hoverBackground",
+    token: "colors.background.controlHover",
     usage: "Neutral hover feedback for interactive controls and rows.",
   },
   {
     name: "Control subtle",
-    token: "colors.control.subtleBackground",
+    token: "colors.background.controlSubtle",
     usage: "Low-emphasis filled controls such as subtle buttons.",
   },
   {
     name: "Control track",
-    token: "colors.control.trackBackground",
+    token: "colors.background.controlTrack",
     usage: "Tracks for switches, sliders, and progress indicators.",
   },
   {

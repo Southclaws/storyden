@@ -1,7 +1,7 @@
 import { Collection } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import { HStack, WStack } from "@/styled-system/jsx";
 
 import { CollectionIcon } from "../ui/icons/Collection";

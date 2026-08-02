@@ -6,7 +6,7 @@ import {
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
-import { Card, CardRows } from "@/components/ui/rich-card";
+import { Card, CardRows } from "@/components/ui/surface";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 

@@ -34,7 +34,7 @@ export function LibraryPagePropertiesBlock() {
               color="text.subtle"
               _hover={{
                 color: "text.default",
-                background: "control.hoverBackground",
+                background: "background.controlHover",
                 cursor: "pointer",
               }}
             >
@@ -47,7 +47,7 @@ export function LibraryPagePropertiesBlock() {
               borderRadius="sm"
               _hover={{
                 color: "text.default",
-                background: "control.hoverBackground",
+                background: "background.controlHover",
                 cursor: "pointer",
               }}
             >
