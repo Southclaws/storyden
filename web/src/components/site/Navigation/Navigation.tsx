@@ -1,7 +1,6 @@
 import React, { PropsWithChildren, ReactNode } from "react";
 
 import { getServerSession } from "@/auth/server-session";
-import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 
 import { CommandPalette } from "../CommandPalette/CommandPalette";
@@ -18,9 +17,6 @@ type Props = PropsWithChildren<{
 
 export async function Navigation({ children, sidebar }: Props) {
   const globalSettings = await getSettings();
-  const canRegister = allowsPublicRegistration(
-    globalSettings.registration_mode,
-  );
   const sessionAccount = await getServerSession();
 
   return (
@@ -42,7 +38,6 @@ export async function Navigation({ children, sidebar }: Props) {
         <DesktopCommandBar />
 
         <NavigationChrome
-          canRegister={canRegister}
           desktopSidebar={sidebar}
           siteNavigation={
             <NavigationPane

@@ -185,6 +185,7 @@ export function CardGrid(props: CardGroupProps) {
     <Box containerType="inline-size" containerName="card-grid" w="full">
       <Grid
         w="full"
+        alignItems="start"
         gridTemplateColumns={{
           _containerSmall: "1fr",
           _containerMedium: "1fr 1fr",

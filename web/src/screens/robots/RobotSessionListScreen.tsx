@@ -2,61 +2,40 @@
 
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { useRobotSessionsList } from "@/api/openapi-client/robots";
-import {
-  Account,
-  RobotSessionRef,
-  RobotSessionsListResult,
-} from "@/api/openapi-schema";
-import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { RobotSessionRef, RobotSessionsListResult } from "@/api/openapi-schema";
+import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
+import { BackAction } from "@/components/site/Action/Back";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { CardBox } from "@/components/ui/card-box";
-import { IconButton } from "@/components/ui/icon-button";
-import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/ui/page-heading";
 import { Text } from "@/components/ui/text";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
-type Props = {
-  initialSession: Account;
-  initialChatSessionList: RobotSessionsListResult;
-  initialChatPage?: string;
-};
-
-export function RobotSessionListScreen(props: Props) {
-  const { data, error } = useRobotSessionsList(
-    {
-      page: props.initialChatPage,
-    },
-    {
-      swr: {
-        fallbackData: props.initialChatSessionList,
-      },
-    },
-  );
+export function RobotSessionListScreen() {
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") ?? undefined;
+  const { data, error } = useRobotSessionsList({
+    page,
+  });
 
   if (!data) {
     return <UnreadyBanner error={error} />;
   }
 
-  const currentPage = props.initialChatPage
-    ? parseInt(props.initialChatPage, 10)
-    : 1;
+  const currentPage = page ? parseInt(page, 10) : 1;
 
   return (
     <LStack className={lstack()} gap="4" w="full">
       <WStack>
         <HStack gap="2">
-          <Link href="/robots">
-            <IconButton variant="ghost">
-              <ArrowLeftIcon />
-            </IconButton>
-          </Link>
+          <BackAction fallbackHref="/robots" />
           <PageHeading>Robot Chat Sessions</PageHeading>
         </HStack>
 
@@ -131,7 +110,7 @@ function RobotSessionCard({ session }: RobotSessionCardProps) {
           </WStack>
 
           <WStack>
-            <MemberBadge profile={session.created_by} size="sm" name="handle" />
+            <MemberIdent profile={session.created_by} size="sm" name="handle" />
           </WStack>
         </LStack>
       </Link>

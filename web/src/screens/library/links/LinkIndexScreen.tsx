@@ -3,7 +3,10 @@
 import { useLinkList } from "@/api/openapi-client/links";
 import { LinkListResult } from "@/api/openapi-schema";
 import { LinkIndexView } from "@/components/library/links/LinkIndexView/LinkIndexView";
+import { BackAction } from "@/components/site/Action/Back";
 import { Unready } from "@/components/site/Unready";
+import { PageHeader } from "@/components/ui/page-header";
+import { LStack } from "@/styled-system/jsx";
 
 export type Props = {
   query?: string;
@@ -29,11 +32,14 @@ export function LinkIndexScreen(props: Props) {
   }
 
   return (
-    <LinkIndexView
-      links={data}
-      mutate={mutate}
-      query={props.query}
-      page={props.page}
-    />
+    <LStack gap="4">
+      <PageHeader title="Links" back={<BackAction />} />
+      <LinkIndexView
+        links={data}
+        mutate={mutate}
+        query={props.query}
+        page={props.page}
+      />
+    </LStack>
   );
 }

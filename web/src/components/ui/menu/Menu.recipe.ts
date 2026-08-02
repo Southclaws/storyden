@@ -62,7 +62,7 @@ export const menu = defineSlotRecipe({
       display: "flex",
       flexDirection: "column",
       outline: "none",
-      width: "calc(100% + 2rem)",
+      width: "full",
       zIndex: "popover",
       _hidden: {
         display: "none",

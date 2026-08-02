@@ -59,7 +59,11 @@ export function CreateCategoryMenuItem({ hideLabel }: Props) {
   const useDisclosureProps = useDisclosure();
 
   return (
-    <Item value={CreateCategoryID} onClick={useDisclosureProps.onOpen}>
+    <Item
+      value={CreateCategoryID}
+      aria-label={hideLabel ? CreateCategoryLabel : undefined}
+      onClick={useDisclosureProps.onOpen}
+    >
       {CreateCategoryIcon}
       {!hideLabel && (
         <>

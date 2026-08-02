@@ -1,13 +1,11 @@
+"use client";
+
+import { useParams } from "next/navigation";
+
 import { RobotConfigurationScreen } from "@/screens/robots/RobotConfigurationScreen";
 
-type Props = {
-  params: Promise<{
-    robot: string;
-  }>;
-};
-
-export default async function Page(props: Props) {
-  const { robot } = await props.params;
+export default function Page() {
+  const { robot } = useParams<{ robot: string }>();
 
   return <RobotConfigurationScreen robotId={robot} />;
 }

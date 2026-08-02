@@ -13,6 +13,7 @@ import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
 import { MultiSelectPicker } from "@/components/ui/multi-select-picker";
+import { PageHeading } from "@/components/ui/page-heading";
 import { FormDatagraphKindFilterField } from "@/components/ui/toggle-group";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
@@ -33,6 +34,7 @@ export function SearchScreen(props: Props) {
       onSubmit={handlers.handleSearch}
       action="/search"
     >
+      <PageHeading srOnly>Search</PageHeading>
       <WStack gap="0">
         <Input
           w="full"

@@ -3,99 +3,62 @@
 import { useSession } from "@/auth";
 import type { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { CloseIcon } from "@/components/ui/icons/Close";
 import { MenuIcon } from "@/components/ui/icons/Menu";
-import { SiteIcon } from "@/components/ui/icons/Site";
 
-import { Search } from "../../../search/Search/Search";
-import { CloseAction } from "../../Action/Close";
 import { AccountMenu } from "../AccountMenu/AccountMenu";
-import { ComposeAnchor } from "../Anchors/Compose";
 import { HomeAnchor } from "../Anchors/Home";
-import { LibraryAnchor } from "../Anchors/Library";
 import { LoginAnchor } from "../Anchors/Login";
 
 type Props = {
-  canRegister?: boolean;
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
 };
 
-export function MobileCommandBar({
-  canRegister,
-  isOpen,
-  onClose,
-  onOpen,
-}: Props) {
+export function MobileCommandBar({ isOpen, onClose, onOpen }: Props) {
   const account = useSession();
 
   return (
     <div
-      aria-label="Quick navigation"
-      className="navigation__mobile-commandbar"
+      aria-label="Primary navigation"
+      className="navigation__mobile-commandbar navigation__surface"
       role="toolbar"
     >
-      <div className="navigation__mobile-commandbar-inner">
-        <div className="navigation__mobile-commandbar-items">
-          {isOpen ? (
-            <>
-              {account ? (
-                <AccountMenu account={account} size="sm" />
-              ) : (
-                <span className="navigation__mobile-site-icon">
-                  <SiteIcon />
-                </span>
-              )}
-              <Search />
-              <CloseAction
-                aria-label="Close navigation menu"
-                onClick={onClose}
-                size="sm"
-                title="Close navigation menu"
-                type="button"
-              />
-            </>
-          ) : (
-            <>
-              {account ? (
-                <AccountMenu account={account} size="sm" />
-              ) : (
-                <span className="navigation__mobile-site-icon">
-                  <SiteIcon />
-                </span>
-              )}
-              <HomeAnchor hideLabel size="sm" />
-              {account ? (
-                <ComposeAnchor hideLabel size="sm" />
-              ) : (
-                canRegister && <LoginAnchor />
-              )}
-              <LibraryAnchor hideLabel size="sm" />
-              <ExpandTrigger isOpen={isOpen} onClick={onOpen} />
-            </>
-          )}
-        </div>
+      <NavigationDrawerTrigger
+        isOpen={isOpen}
+        onClick={isOpen ? onClose : onOpen}
+      />
+
+      <div className="navigation__mobile-commandbar-end">
+        <HomeAnchor hideLabel size="sm" />
+        {account ? (
+          <AccountMenu account={account} size="sm" />
+        ) : (
+          <LoginAnchor />
+        )}
       </div>
     </div>
   );
 }
 
-function ExpandTrigger({
+function NavigationDrawerTrigger({
   isOpen,
   ...props
 }: ButtonProps & { isOpen: boolean }) {
+  const label = isOpen ? "Close navigation menu" : "Open navigation menu";
+
   return (
     <IconButton
       aria-controls="navigation__leftbar"
       aria-expanded={isOpen}
-      aria-label="Open navigation menu"
-      title="Open navigation menu"
+      aria-label={label}
       type="button"
       variant="ghost"
       size="sm"
       {...props}
     >
-      <MenuIcon />
+      {isOpen ? <CloseIcon /> : <MenuIcon />}
     </IconButton>
   );
 }

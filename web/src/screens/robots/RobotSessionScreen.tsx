@@ -1,32 +1,29 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { useRobotSessionGet } from "@/api/openapi-client/robots";
-import { Account, RobotSession } from "@/api/openapi-schema";
+import { RobotSession } from "@/api/openapi-schema";
 import { toStorydenUIMessages } from "@/api/robots-types";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { FullPageChatInput } from "@/components/robots/RobotChat/FullPageChatInput";
 import { FullPageMessageList } from "@/components/robots/RobotChat/FullPageMessageList";
 import { RobotListMenu } from "@/components/robots/RobotListMenu";
 import { RobotWorkspaceSelect } from "@/components/robots/RobotWorkspaceSelect";
+import { BackAction } from "@/components/site/Action/Back";
 import {
   RobotChatContext,
   useRobotChat,
 } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { IconButton } from "@/components/ui/icon-button";
-import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { PageHeading } from "@/components/ui/page-heading";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
-  initialSession: Account;
-  initialChatSession: RobotSession | null;
+  sessionId?: string;
   initialChatBefore?: string;
   initialChatLimit?: string;
   initialSelectedRobotID?: string;
@@ -41,21 +38,15 @@ const containerStyles = css({
 });
 
 export function RobotSessionScreen(props: Props) {
-  const isNewSession = props.initialChatSession === null;
+  const isNewSession = props.sessionId === undefined;
 
-  // Only fetch if we have an existing session
   const { data, error } = useRobotSessionGet(
-    props.initialChatSession?.id ?? "",
+    props.sessionId ?? "",
     {
       before: props.initialChatBefore,
       limit: props.initialChatLimit,
     },
-    {
-      swr: {
-        fallbackData: props.initialChatSession ?? undefined,
-        isPaused: () => isNewSession,
-      },
-    },
+    { swr: { enabled: !isNewSession } },
   );
 
   if (!isNewSession && !data) {
@@ -149,11 +140,7 @@ function ChatPageHeader({
     <LStack flexShrink="0">
       <WStack alignItems="center" flexShrink="0">
         <HStack gap="2">
-          <Link href="/robots/chats">
-            <IconButton variant="ghost">
-              <ArrowLeftIcon />
-            </IconButton>
-          </Link>
+          <BackAction fallbackHref="/robots/chats" />
           <PageHeading>{title}</PageHeading>
         </HStack>
       </WStack>

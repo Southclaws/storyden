@@ -18,6 +18,7 @@ import { input } from "@/components/ui/input/Input.recipe";
 import { menu } from "@/components/ui/menu/Menu.recipe";
 import { multiSelectPicker } from "@/components/ui/multi-select-picker/MultiSelectPicker.recipe";
 import { numberInput } from "@/components/ui/number-input/NumberInput.recipe";
+import { pageHeader } from "@/components/ui/page-header/PageHeader.recipe";
 import { pinInput } from "@/components/ui/pin-input/PinInput.recipe";
 import { popover } from "@/components/ui/popover/Popover.recipe";
 import { progress } from "@/components/ui/progress/Progress.recipe";
@@ -206,6 +207,7 @@ export default defineConfig({
         fileUpload: fileUpload,
         popover: popover,
         progress: progress,
+        pageHeader: pageHeader,
         table: table,
         slider: slider,
         pinInput: pinInput,

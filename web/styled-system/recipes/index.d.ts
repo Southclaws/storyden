@@ -23,6 +23,7 @@ export * from './menu';
 export * from './file-upload';
 export * from './popover';
 export * from './progress';
+export * from './page-header';
 export * from './table';
 export * from './slider';
 export * from './pin-input';

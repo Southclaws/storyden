@@ -144,6 +144,7 @@ export function CreatePageFromURLAction({
           type="button"
           variant="subtle"
           px={hideLabel ? "0" : "1"}
+          aria-label={hideLabel ? CreatePageFromURLLabel : undefined}
           {...props}
         >
           {CreatePageFromURLIcon}
@@ -216,7 +217,10 @@ export function CreatePageFromURLAction({
 
 export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
   return (
-    <Item value={CreatePageFromURLID}>
+    <Item
+      value={CreatePageFromURLID}
+      aria-label={hideLabel ? CreatePageFromURLLabel : undefined}
+    >
       {CreatePageFromURLIcon}
       {!hideLabel && (
         <>

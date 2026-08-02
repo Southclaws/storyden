@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSWRConfig } from "swr";
 
@@ -14,9 +13,8 @@ import {
 } from "@/api/openapi-client/robots";
 import { RobotsListOKResponse } from "@/api/openapi-schema";
 import { RobotConfigurationForm } from "@/components/robots/RobotConfiguration/RobotConfigurationForm";
+import { BackAction } from "@/components/site/Action/Back";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { IconButton } from "@/components/ui/icon-button";
-import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
 import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/ui/page-heading";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
@@ -75,11 +73,7 @@ export function RobotConfigurationScreen({ robotId }: Props) {
     <LStack gap="4" w="full">
       <WStack>
         <HStack gap="2">
-          <Link href="/robots">
-            <IconButton variant="ghost">
-              <ArrowLeftIcon />
-            </IconButton>
-          </Link>
+          <BackAction fallbackHref="/robots" />
 
           <PageHeading lineClamp="1">{data.name}</PageHeading>
         </HStack>

@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
 
 type Props = {
-  canRegister?: boolean;
   desktopSidebar: ReactNode;
   siteNavigation: ReactNode;
 };
@@ -23,11 +22,7 @@ const focusableSelector = [
 
 const mobileMediaQuery = "(max-width: 767px)";
 
-export function NavigationChrome({
-  canRegister,
-  desktopSidebar,
-  siteNavigation,
-}: Props) {
+export function NavigationChrome({ desktopSidebar, siteNavigation }: Props) {
   const pathname = usePathname();
   const chromeRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -209,9 +204,8 @@ export function NavigationChrome({
         {siteNavigation}
       </div>
 
-      <div className="navigation__navpill">
+      <div className="navigation__mobile-topbar">
         <MobileCommandBar
-          canRegister={canRegister}
           isOpen={isMobileNavigationOpen}
           onClose={closeMobileNavigation}
           onOpen={openMobileNavigation}

@@ -9,8 +9,14 @@ type Props = ButtonProps & { bookmarked: boolean };
 
 export function BookmarkAction(props: Props) {
   const { bookmarked, ...rest } = props;
+  const label = bookmarked ? "Remove bookmark" : "Bookmark";
+
   return (
-    <IconButton variant="subtle" {...rest}>
+    <IconButton
+      variant="subtle"
+      aria-label={rest["aria-label"] ?? label}
+      {...rest}
+    >
       {bookmarked ? <BookmarkSavedIcon /> : <BookmarkIcon />}
     </IconButton>
   );

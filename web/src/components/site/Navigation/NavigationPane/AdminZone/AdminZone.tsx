@@ -98,7 +98,6 @@ export function AdminZone({ initialSession, initialSettings }: Props) {
               type="button"
               aria-label={isEditing ? "Close feed editor" : "Open feed editor"}
               aria-pressed={isEditing}
-              title={isEditing ? "Close feed editor" : "Open feed editor"}
             >
               <EditIcon w="4" />
             </IconButton>

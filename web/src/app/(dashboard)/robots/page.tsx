@@ -1,5 +1,6 @@
 "use client";
 
+import { BackAction } from "@/components/site/Action/Back";
 import { LinkButton } from "@/components/ui/link-button";
 import { PageHeading } from "@/components/ui/page-heading";
 import RobotListScreen from "@/screens/robots/RobotListScreen";
@@ -10,6 +11,7 @@ export default function Page() {
     <LStack>
       <WStack>
         <HStack gap="2">
+          <BackAction className="robots-tabs__back" />
           <PageHeading>Robots</PageHeading>
         </HStack>
 

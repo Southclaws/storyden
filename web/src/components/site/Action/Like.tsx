@@ -11,7 +11,6 @@ export function LikeAction(props: Props) {
       variant="subtle"
       aria-pressed={liked}
       aria-label={liked ? "Unlike" : "Like"}
-      title={liked ? "Unlike" : "Like"}
       {...rest}
     >
       {liked ? <LikeSavedIcon /> : <LikeIcon />}
