@@ -1,14 +1,16 @@
 import React, { PropsWithChildren, ReactNode } from "react";
 
 import { getServerSession } from "@/auth/server-session";
+import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 
 import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
-import { DesktopCommandBar } from "./DesktopCommandBar";
+import { MemberActions } from "./MemberActions";
 import { NavigationChrome } from "./NavigationChrome";
+import { AdminZone } from "./NavigationPane/AdminZone/AdminZone";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
 
 type Props = PropsWithChildren<{
@@ -18,6 +20,9 @@ type Props = PropsWithChildren<{
 export async function Navigation({ children, sidebar }: Props) {
   const globalSettings = await getSettings();
   const sessionAccount = await getServerSession();
+  const canRegister = allowsPublicRegistration(
+    globalSettings.registration_mode,
+  );
 
   return (
     <div id="navigation__container" className="navigation__container">
@@ -35,14 +40,24 @@ export async function Navigation({ children, sidebar }: Props) {
       </div>
 
       <div id="navigation__fixed" className="navigation__fixed">
-        <DesktopCommandBar />
-
         <NavigationChrome
           desktopSidebar={sidebar}
           siteNavigation={
             <NavigationPane
               initialSession={sessionAccount ?? undefined}
               initialSettings={globalSettings}
+            />
+          }
+          adminZone={
+            <AdminZone
+              initialSession={sessionAccount ?? undefined}
+              initialSettings={globalSettings}
+            />
+          }
+          sidebarBottom={
+            <MemberActions
+              session={sessionAccount ?? undefined}
+              canRegister={canRegister}
             />
           }
         />

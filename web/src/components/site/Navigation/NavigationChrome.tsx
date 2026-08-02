@@ -4,11 +4,17 @@ import { usePathname } from "next/navigation";
 import type { KeyboardEvent, MouseEvent, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import * as Tooltip from "@/components/ui/tooltip";
+
+import { HomeAnchor } from "./Anchors/Home";
+import { SearchAnchor } from "./Anchors/Search";
 import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
 
 type Props = {
   desktopSidebar: ReactNode;
   siteNavigation: ReactNode;
+  adminZone: ReactNode;
+  sidebarBottom: ReactNode;
 };
 
 const focusableSelector = [
@@ -22,7 +28,12 @@ const focusableSelector = [
 
 const mobileMediaQuery = "(max-width: 767px)";
 
-export function NavigationChrome({ desktopSidebar, siteNavigation }: Props) {
+export function NavigationChrome({
+  desktopSidebar,
+  siteNavigation,
+  adminZone,
+  sidebarBottom,
+}: Props) {
   const pathname = usePathname();
   const chromeRef = useRef<HTMLDivElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -189,19 +200,52 @@ export function NavigationChrome({ desktopSidebar, siteNavigation }: Props) {
         onClick={closeMobileNavigation}
       />
 
-      <div className="navigation__desktop-sidebar">{desktopSidebar}</div>
-
       <div
         id="navigation__leftbar"
         ref={drawerRef}
-        aria-label="Site navigation"
+        aria-label={isMobileNavigationModal ? "Site navigation" : undefined}
         aria-modal={isMobileNavigationModal ? "true" : undefined}
         className="navigation__leftbar"
         onClick={handleDrawerClick}
         role={isMobileNavigationModal ? "dialog" : undefined}
         tabIndex={-1}
       >
-        {siteNavigation}
+        <div className="navigation__sidebar-top">
+          <div
+            aria-label="Primary navigation"
+            className="navigation-pane__top-actions"
+            role="toolbar"
+          >
+            <div className="navigation-pane__top-actions-start">
+              <Tooltip.Root openDelay={300}>
+                <Tooltip.Trigger asChild>
+                  <span className="navigation-pane__tooltip-anchor">
+                    <HomeAnchor hideLabel size="sm" />
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner>
+                  <Tooltip.Content>Home</Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+
+              <Tooltip.Root openDelay={300}>
+                <Tooltip.Trigger asChild>
+                  <span className="navigation-pane__tooltip-anchor">
+                    <SearchAnchor hideLabel size="sm" />
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner>
+                  <Tooltip.Content>Search</Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+            </div>
+
+            {adminZone}
+          </div>
+        </div>
+        <div className="navigation__desktop-sidebar">{desktopSidebar}</div>
+        <div className="navigation__site-sidebar">{siteNavigation}</div>
+        <div className="navigation__sidebar-bottom">{sidebarBottom}</div>
       </div>
 
       <div className="navigation__mobile-topbar">

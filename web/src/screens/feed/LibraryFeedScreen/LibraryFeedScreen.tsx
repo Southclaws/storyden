@@ -8,34 +8,28 @@ import {
 import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Unready } from "@/components/site/Unready";
-import { type FeedConfig } from "@/lib/settings/feed";
+import { type FeedBlock } from "@/lib/settings/feed";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 
 export type Props = {
   initialNodeList?: NodeListResult;
   initialNode?: NodeGetOKResponse;
-  feed: FeedConfig;
+  block: Extract<FeedBlock, { type: "library" }>;
 };
 
 export function LibraryFeedScreen({
   initialNodeList,
   initialNode,
-  feed,
+  block,
 }: Props) {
-  if (feed.source.type !== "library") {
-    return null;
-  }
-
-  if (feed.source.node) {
-    return (
-      <LibraryFeedNode initialNode={initialNode} nodeID={feed.source.node} />
-    );
+  if (block.node) {
+    return <LibraryFeedNode initialNode={initialNode} nodeID={block.node} />;
   }
 
   return (
     <LibraryFeedRoot
       initialNodeList={initialNodeList}
-      layoutType={feed.layout.type}
+      layoutType={block.layout}
     />
   );
 }
@@ -60,6 +54,7 @@ function LibraryFeedNode({
 
   return (
     <LibraryPageScreen
+      embedded
       node={data}
       //childNodes={[]} // TODO: Replicate LibraryPageScreen behavior
     />
@@ -71,7 +66,7 @@ function LibraryFeedRoot({
   layoutType,
 }: {
   initialNodeList?: NodeListResult;
-  layoutType: FeedConfig["layout"]["type"];
+  layoutType: "grid" | "list";
 }) {
   const { data, error } = useNodeList(
     {

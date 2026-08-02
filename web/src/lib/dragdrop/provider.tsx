@@ -1,16 +1,21 @@
 "use client";
 
 import {
+  type CollisionDetection,
   DndContext,
-  DragEndEvent,
+  type DragEndEvent,
   DragOverlay,
+  type DragStartEvent,
+  type Modifier,
   MouseSensor,
   TouchSensor,
   pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import { SortableData } from "@dnd-kit/sortable";
+import { getEventCoordinates } from "@dnd-kit/utilities";
 import { useState } from "react";
 
 import { handle } from "@/api/client";
@@ -22,14 +27,27 @@ import { Box } from "@/styled-system/jsx";
 import { treeView } from "@/styled-system/recipes";
 
 import { useEmitCategoryEvent } from "../category/events";
+import { useEmitFeedBlockEvent } from "../feed/events";
 import { useEmitLibraryBlockEvent } from "../library/events";
 import { useLibraryMutation } from "../library/library";
 import { LibraryPageBlockType } from "../library/metadata";
+import { useEmitNavigationItemEvent } from "../navigation/events";
 
-export type DragItemNodeBlock = {
-  type: "block";
+export type DragItemLibraryBlock = {
+  type: "library-block";
   node: NodeWithChildren; // TODO: Change this to only rely on the node ID.
   block: LibraryPageBlockType;
+};
+
+export type DragItemFeedBlock = {
+  type: "feed-block";
+  block: import("@/lib/settings/feed").FeedBlockType;
+};
+
+export type DragItemNavigationItem = {
+  type: "navigation-item";
+  itemKey: string;
+  label: string;
 };
 
 export type DragItemNode = {
@@ -64,13 +82,77 @@ export type DragItemDivider = {
 export type DragItemData =
   | DragItemNode
   | DragItemDivider
-  | DragItemNodeBlock
+  | DragItemLibraryBlock
+  | DragItemFeedBlock
+  | DragItemNavigationItem
   | DragItemCategory
   | DragItemCategoryDivider;
+
+// The preview is smaller than its source, so preserve sensor movement while
+// centering the measured preview on the pointer instead of the source box.
+const centerDragOverlayOnPointer: Modifier = ({
+  activatorEvent,
+  activeNodeRect,
+  overlayNodeRect,
+  transform,
+}) => {
+  if (!activatorEvent || !activeNodeRect) {
+    return transform;
+  }
+
+  const activatorCoordinates = getEventCoordinates(activatorEvent);
+  if (!activatorCoordinates) {
+    return transform;
+  }
+
+  return {
+    ...transform,
+    x:
+      activatorCoordinates.x +
+      transform.x -
+      activeNodeRect.left -
+      (overlayNodeRect?.width ?? activeNodeRect.width) / 2,
+    y:
+      activatorCoordinates.y +
+      transform.y -
+      activeNodeRect.top -
+      (overlayNodeRect?.height ?? activeNodeRect.height) / 2,
+  };
+};
+
+const navigationDragOverlayModifiers = [centerDragOverlayOnPointer];
+
+const collisionDetectionStrategy: CollisionDetection = (args) => {
+  const activeData = args.active.data.current as DragItemData | undefined;
+
+  if (
+    activeData?.type === "feed-block" ||
+    activeData?.type === "library-block" ||
+    activeData?.type === "navigation-item"
+  ) {
+    const matchingContainers = args.droppableContainers.filter(
+      (container) =>
+        (container.data.current as DragItemData | undefined)?.type ===
+        activeData.type,
+    );
+    const filteredArgs = {
+      ...args,
+      droppableContainers: matchingContainers,
+    };
+    const pointerCollisions = pointerWithin(filteredArgs);
+    return pointerCollisions.length > 0
+      ? pointerCollisions
+      : rectIntersection(filteredArgs);
+  }
+
+  return pointerWithin(args);
+};
 
 export function DndProvider({ children }: { children: React.ReactNode }) {
   const { moveNode, revalidate } = useLibraryMutation();
   const emitLibraryBlockEvent = useEmitLibraryBlockEvent();
+  const emitFeedBlockEvent = useEmitFeedBlockEvent();
+  const emitNavigationItemEvent = useEmitNavigationItemEvent();
   const emitCategoryEvent = useEmitCategoryEvent();
   const [activeItem, setActiveItem] = useState<DragItemData | null>(null);
 
@@ -88,7 +170,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
     }),
   );
 
-  const onDragStart = (event: DragEndEvent) => {
+  const onDragStart = (event: DragStartEvent) => {
     const activeData = event.active.data.current as DragItemData;
     setActiveItem(activeData);
   };
@@ -101,6 +183,8 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
   // };
 
   const onDragEnd = async (event: DragEndEvent) => {
+    setActiveItem(null);
+
     if (event.over == null) {
       return;
     }
@@ -217,18 +301,44 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
       );
     }
 
-    if (activeData.type === "block") {
-      const active = activeData as DragItemNodeBlock;
+    if (activeData.type === "library-block") {
+      const active = activeData as DragItemLibraryBlock;
 
-      if (targetData.type !== "block") {
+      if (targetData.type !== "library-block") {
         return;
       }
 
-      const target = targetData as DragItemNodeBlock;
+      const target = targetData as DragItemLibraryBlock;
 
       emitLibraryBlockEvent("library:reorder-block", {
         activeId: active.block,
         overId: target.block,
+      });
+    }
+
+    if (activeData.type === "feed-block") {
+      const active = activeData as DragItemFeedBlock;
+
+      if (targetData.type !== "feed-block") {
+        return;
+      }
+
+      const target = targetData as DragItemFeedBlock;
+
+      emitFeedBlockEvent("feed:reorder-block", {
+        activeId: active.block,
+        overId: target.block,
+      });
+    }
+
+    if (activeData.type === "navigation-item") {
+      if (targetData.type !== "navigation-item") {
+        return;
+      }
+
+      emitNavigationItemEvent("navigation:reorder-item", {
+        activeKey: activeData.itemKey,
+        overKey: targetData.itemKey,
       });
     }
 
@@ -266,15 +376,34 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
     <DndContext
       id="sd-dnd"
       sensors={sensors}
-      collisionDetection={pointerWithin}
+      collisionDetection={collisionDetectionStrategy}
       // onDragOver={onDragOver}
+      onDragCancel={() => setActiveItem(null)}
       onDragEnd={onDragEnd}
       onDragStart={onDragStart}
     >
       {children}
 
-      <DragOverlay>
-        {activeItem && <DragOverlaySwitch activeItem={activeItem} />}
+      <DragOverlay
+        adjustScale={false}
+        dropAnimation={null}
+        className={
+          activeItem?.type === "navigation-item"
+            ? "navigation-editor__drag-preview-container"
+            : undefined
+        }
+        modifiers={
+          activeItem?.type === "navigation-item"
+            ? navigationDragOverlayModifiers
+            : undefined
+        }
+      >
+        {activeItem &&
+          (activeItem.type === "node" ||
+            activeItem.type === "category" ||
+            activeItem.type === "navigation-item") && (
+            <DragOverlaySwitch activeItem={activeItem} />
+          )}
       </DragOverlay>
     </DndContext>
   );
@@ -292,9 +421,24 @@ function DragOverlaySwitch({ activeItem }: DragOverlaySwitchProps) {
     case "category":
       return <DragOverlayNavigationCategory activeItem={activeItem} />;
 
+    case "navigation-item":
+      return <DragOverlayNavigationItem activeItem={activeItem} />;
+
     default:
       return null;
   }
+}
+
+function DragOverlayNavigationItem({
+  activeItem,
+}: {
+  activeItem: DragItemNavigationItem;
+}) {
+  return (
+    <div aria-hidden="true" className="navigation-editor__drag-preview">
+      {activeItem.label}
+    </div>
+  );
 }
 
 function DragOverlayNavigationCategory({

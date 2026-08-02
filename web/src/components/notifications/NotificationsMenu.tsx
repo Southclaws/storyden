@@ -22,7 +22,7 @@ export function NotificationsMenu(props: Props) {
     return (
       <NotificationsTrigger
         hideLabel
-        size="md"
+        size="sm"
         variant="ghost"
         disabled
         title={deriveError(error)}
@@ -39,7 +39,7 @@ export function NotificationsMenu(props: Props) {
       <Menu.Trigger cursor="pointer" position="relative" asChild>
         <NotificationsTrigger
           hideLabel
-          size="md"
+          size="sm"
           variant="ghost"
           unread={!isEmpty}
         />
