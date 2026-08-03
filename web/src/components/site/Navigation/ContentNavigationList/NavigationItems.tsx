@@ -49,6 +49,7 @@ import { Anchor } from "../Anchors/Anchor";
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
+import { RobotsAnchor } from "../Anchors/Robots";
 import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 
@@ -58,6 +59,7 @@ type Props = {
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
   isEditing: boolean;
+  robotsEnabled: boolean;
 };
 
 const animateNavigationLayoutChanges: AnimateLayoutChanges = ({ isSorting }) =>
@@ -69,7 +71,10 @@ export function NavigationItems(props: Props) {
     null,
   );
   const [isCreatingCustomLink, setCreatingCustomLink] = useState(false);
-  const itemKeys = props.navigation.items.map(getNavigationItemKey);
+  const visibleItems = props.navigation.items.filter(
+    (item) => item.type !== "robots" || props.robotsEnabled,
+  );
+  const itemKeys = visibleItems.map(getNavigationItemKey);
 
   const moveItem = useCallback(
     (activeKey: string, overKey: string) => {
@@ -123,7 +128,7 @@ export function NavigationItems(props: Props) {
     }
   }
 
-  const renderedItems = props.navigation.items.map((item) => {
+  const renderedItems = visibleItems.map((item) => {
     const content = (
       <NavigationItemContent
         item={item}
@@ -169,6 +174,7 @@ export function NavigationItems(props: Props) {
         {props.isEditing && (
           <CreateNavigationItemMenu
             navigation={props.navigation}
+            robotsEnabled={props.robotsEnabled}
             onAddBuiltIn={addBuiltIn}
             onAddCustomLink={() => setCreatingCustomLink(true)}
           />
@@ -323,6 +329,8 @@ function NavigationItemContent({
           visibility={["draft", "review", "unlisted", "published"]}
         />
       );
+    case "robots":
+      return <RobotsAnchor />;
     case "collections":
       return <CollectionsAnchor />;
     case "links":
@@ -345,16 +353,18 @@ function NavigationItemContent({
 
 function CreateNavigationItemMenu({
   navigation,
+  robotsEnabled,
   onAddBuiltIn,
   onAddCustomLink,
 }: {
   navigation: NavigationConfig;
+  robotsEnabled: boolean;
   onAddBuiltIn: (type: string) => void;
   onAddCustomLink: () => void;
 }) {
   const existing = new Set(navigation.items.map((item) => item.type));
   const availableBuiltIns = BuiltInNavigationItemTypeSchema.options.filter(
-    (type) => !existing.has(type),
+    (type) => !existing.has(type) && (type !== "robots" || robotsEnabled),
   );
 
   function handleSelect({ value }: MenuSelectionDetails) {

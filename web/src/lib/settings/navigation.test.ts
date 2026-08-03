@@ -21,6 +21,17 @@ test("missing navigation configuration uses the current sidebar", () => {
   );
 });
 
+test("robots is available as a built-in navigation item", () => {
+  assert.ok(
+    DefaultNavigationConfig.items.some((item) => item.type === "robots"),
+  );
+
+  const navigation = NavigationConfigSchema.parse({ items: [] });
+  assert.equal(addBuiltInNavigationItem(navigation, "robots").items, [
+    { type: "robots" },
+  ]);
+});
+
 test("built-in items may only appear once", () => {
   const result = NavigationConfigSchema.safeParse({
     items: [{ type: "categories" }, { type: "categories" }],
