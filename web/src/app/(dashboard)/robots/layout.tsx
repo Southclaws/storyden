@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 
 import { InstanceCapability } from "@/api/openapi-schema";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { PageLayout } from "@/components/ui/page-layout";
 import { hasCapability } from "@/lib/settings/capabilities";
 import { useSettings } from "@/lib/settings/settings-client";
 import { RobotsTabs } from "@/screens/robots/RobotsTabs";
@@ -13,7 +14,11 @@ export default function Layout({ children }: PropsWithChildren) {
   const settings = useSettings();
 
   if (!settings.ready) {
-    return <UnreadyBanner error={settings.error} />;
+    return (
+      <PageLayout width="wide">
+        <UnreadyBanner error={settings.error} />
+      </PageLayout>
+    );
   }
 
   if (
@@ -22,5 +27,9 @@ export default function Layout({ children }: PropsWithChildren) {
     notFound();
   }
 
-  return <RobotsTabs>{children}</RobotsTabs>;
+  return (
+    <PageLayout width="wide">
+      <RobotsTabs>{children}</RobotsTabs>
+    </PageLayout>
+  );
 }

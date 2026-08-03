@@ -59,7 +59,12 @@
 
   /* Navigation shell */
   --navigation-layer: var(--z-index-docked, 10);
-  --navigation-content-width-max: var(--sizes-breakpoint-lg);
+  --navigation-content-width-default: var(--sizes-breakpoint-lg);
+  --navigation-content-width-wide: var(--sizes-layout-content-wide);
+  --navigation-content-width-full: 100vw;
+  --navigation-content-width-max: var(--navigation-content-width-default);
+  --navigation-shell-resize-duration: var(--durations-normal);
+  --navigation-shell-resize-easing: var(--easings-default);
   --navigation-shell-viewport-padding: var(--spacing-2);
   --navigation-shell-viewport-padding-desktop: var(--spacing-4);
   --navigation-shell-viewport-padding-wide: var(--spacing-6);
@@ -72,11 +77,6 @@
   --navigation-content-offset-block: var(--spacing-2);
   --navigation-topbar-height: 3rem;
   --navigation-topbar-title-width-max: 50vw;
-  --navigation-shell-width: calc(
-    var(--navigation-content-width-max) + var(--navigation-sidebar-width) +
-      var(--navigation-content-column-gap)
-  );
-
   /* Navigation mobile grid */
   --navigation-mobile-grid-inline-edge: var(
     --navigation-shell-viewport-padding
@@ -860,6 +860,18 @@ body {
 }
 
 @media screen and (min-width: 768px) {
+  .navigation__container:has(
+    .navigation__main > main > .page-layout[data-page-width="wide"]
+  ) {
+    --navigation-content-width-max: var(--navigation-content-width-wide);
+  }
+
+  .navigation__container:has(
+    .navigation__main > main > .page-layout[data-page-width="full"]
+  ) {
+    --navigation-content-width-max: var(--navigation-content-width-full);
+  }
+
   .navigation__grid {
     display: grid;
     width: min(
@@ -870,6 +882,9 @@ body {
       var(--navigation-shell-width)
     );
     margin-inline: auto;
+    transition-duration: var(--navigation-shell-resize-duration);
+    transition-property: width;
+    transition-timing-function: var(--navigation-shell-resize-easing);
 
     --navigation-shell-viewport-padding: var(
       --navigation-shell-viewport-padding-desktop
@@ -877,6 +892,10 @@ body {
     --navigation-sidebar-width: var(--navigation-sidebar-width-desktop);
     --navigation-content-column-gap: var(
       --navigation-content-column-gap-desktop
+    );
+    --navigation-shell-width: calc(
+      var(--navigation-content-width-max) + var(--navigation-sidebar-width) +
+        var(--navigation-content-column-gap)
     );
 
     grid-template-rows:
@@ -1016,6 +1035,12 @@ body {
     );
     --navigation-sidebar-width: var(--navigation-sidebar-width-wide);
     --navigation-content-column-gap: var(--navigation-content-column-gap-wide);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation__grid {
+    transition-duration: 0ms;
   }
 }
 
