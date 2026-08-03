@@ -3,10 +3,13 @@
 import {
   type Account,
   type CategoryListOKResponse,
+  InstanceCapability,
   type NodeListResult,
 } from "@/api/openapi-schema";
+import { hasCapability } from "@/lib/settings/capabilities";
 import { useNavigationConfig } from "@/lib/settings/navigation-client";
 import { type Settings } from "@/lib/settings/settings";
+import { useSettings } from "@/lib/settings/settings-client";
 import { useSiteEditorState } from "@/lib/settings/site-editor-client";
 import { styled } from "@/styled-system/jsx";
 import { useOverflowGradient } from "@/utils/useOverflowGradient";
@@ -26,6 +29,10 @@ export function ContentNavigationList(props: Props) {
   const { nodeSlug } = useNavigation();
   const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
   const navigation = useNavigationConfig(props.initialSettings, false);
+  const settings = useSettings(props.initialSettings, false);
+  const robotsEnabled =
+    settings.ready &&
+    hasCapability(InstanceCapability.robots, settings.settings.capabilities);
   const { isEditing } = useSiteEditorState({
     initialSession: props.initialSession,
     initialSettings: props.initialSettings,
@@ -52,6 +59,7 @@ export function ContentNavigationList(props: Props) {
           initialCategoryList={props.initialCategoryList}
           initialNodeList={props.initialNodeList}
           isEditing={isEditing}
+          robotsEnabled={robotsEnabled}
         />
       </div>
     </styled.nav>

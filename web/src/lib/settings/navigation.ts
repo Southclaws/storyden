@@ -3,6 +3,7 @@ import { z } from "zod";
 export const BuiltInNavigationItemTypeSchema = z.enum([
   "categories",
   "library",
+  "robots",
   "collections",
   "links",
   "members",
@@ -63,6 +64,7 @@ export const DefaultNavigationConfig = {
   items: [
     { type: "categories" },
     { type: "library" },
+    { type: "robots" },
     { type: "collections" },
     { type: "links" },
     { type: "members" },
@@ -80,6 +82,7 @@ export const BuiltInNavigationItemName: Record<
 > = {
   categories: "Discussion",
   library: "Library",
+  robots: "Robots",
   collections: "Collections",
   links: "Links",
   members: "Members",
