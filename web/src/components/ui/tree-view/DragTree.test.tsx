@@ -120,9 +120,14 @@ describe("DragTree", () => {
       "href",
       "/docs/root",
     );
-    expect(
-      screen.getByRole("link", { name: "Getting started" }),
-    ).toHaveAttribute("href", "/docs/start");
+    const selectedLink = screen.getByRole("link", {
+      name: "Getting started",
+    });
+    expect(selectedLink).toHaveAttribute("href", "/docs/start");
+    expect(selectedLink).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "About" })).not.toHaveAttribute(
+      "aria-current",
+    );
     expect(
       screen.getByRole("button", { name: "Manage Getting started" }),
     ).toBeVisible();
@@ -131,11 +136,10 @@ describe("DragTree", () => {
         .getByRole("link", { name: "Documentation" })
         .closest('[role="treeitem"]'),
     ).toHaveAttribute("aria-expanded", "true");
-    expect(
-      screen
-        .getByRole("link", { name: "Getting started" })
-        .closest('[role="treeitem"]'),
-    ).toHaveAttribute("aria-selected", "true");
+    expect(selectedLink.closest('[role="treeitem"]')).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
     expect(container.querySelector('[data-part="drop-indicator"]')).toBeNull();
 
     fireEvent.click(

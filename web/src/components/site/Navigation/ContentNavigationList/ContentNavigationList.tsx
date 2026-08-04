@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function ContentNavigationList(props: Props) {
-  const { nodeSlug } = useNavigation();
+  const { currentPath } = useNavigation();
   const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
   const navigation = useNavigationConfig(props.initialSettings, false);
   const settings = useSettings(props.initialSettings, false);
@@ -55,7 +55,7 @@ export function ContentNavigationList(props: Props) {
       >
         <NavigationItems
           navigation={navigation}
-          currentNode={nodeSlug}
+          currentPath={currentPath}
           initialCategoryList={props.initialCategoryList}
           initialNodeList={props.initialNodeList}
           isEditing={isEditing}

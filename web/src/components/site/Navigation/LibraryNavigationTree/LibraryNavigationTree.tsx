@@ -17,7 +17,7 @@ export function LibraryNavigationTree(props: Props) {
     return null;
   }
 
-  const { currentNode } = props;
+  const { currentPath } = props;
 
   return (
     <LStack gap="1">
@@ -34,7 +34,7 @@ export function LibraryNavigationTree(props: Props) {
       </NavigationHeader>
 
       <LibraryPageTree
-        currentNode={currentNode}
+        currentPath={currentPath}
         nodes={data.nodes}
         canManageLibrary={canManageLibrary}
       />

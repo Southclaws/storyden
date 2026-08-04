@@ -15,7 +15,7 @@ import { LibraryPageMenu } from "../LibraryPageMenu/LibraryPageMenu";
 
 export interface LibraryPageTreeProps {
   nodes: NodeWithChildren[];
-  currentNode: string | undefined;
+  currentPath?: string;
   canManageLibrary: boolean;
 }
 
@@ -47,7 +47,7 @@ const getNodeChildren = (node: NodeWithChildren) => node.children;
 
 export function LibraryPageTree({
   nodes,
-  currentNode,
+  currentPath,
   canManageLibrary,
 }: LibraryPageTreeProps) {
   const sortedNodes = useMemo(
@@ -59,8 +59,12 @@ export function LibraryPageTree({
     [nodes],
   );
   const expandedIds = useMemo(
-    () => getExpandedNodeIds(sortedNodes, currentNode),
-    [currentNode, sortedNodes],
+    () =>
+      getExpandedNodeIds(
+        sortedNodes,
+        (node) => getNodeHref(node) === currentPath,
+      ),
+    [currentPath, sortedNodes],
   );
 
   return (
@@ -73,7 +77,7 @@ export function LibraryPageTree({
       getHref={getNodeHref}
       getChildren={getNodeChildren}
       defaultExpandedIds={expandedIds}
-      isSelected={(node) => node.slug === currentNode}
+      isSelected={(node) => getNodeHref(node) === currentPath}
       drag={{
         enabled: canManageLibrary,
         getNodeData: ({ node, parent }) =>
@@ -146,14 +150,10 @@ function getVisibilityClassName(node: NodeWithChildren) {
 
 function getExpandedNodeIds(
   nodes: NodeWithChildren[],
-  currentSlug: string | undefined,
+  isSelected: (node: NodeWithChildren) => boolean,
 ) {
-  if (!currentSlug) {
-    return [];
-  }
-
   const visit = (node: NodeWithChildren): string[] | null => {
-    if (node.slug === currentSlug) {
+    if (isSelected(node)) {
       return [node.id];
     }
 

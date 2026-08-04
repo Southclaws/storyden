@@ -55,7 +55,7 @@ import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigatio
 
 type Props = {
   navigation: NavigationConfig;
-  currentNode?: string;
+  currentPath: string;
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
   isEditing: boolean;
@@ -132,7 +132,7 @@ export function NavigationItems(props: Props) {
     const content = (
       <NavigationItemContent
         item={item}
-        currentNode={props.currentNode}
+        currentPath={props.currentPath}
         initialCategoryList={props.initialCategoryList}
         initialNodeList={props.initialNodeList}
       />
@@ -309,23 +309,28 @@ function SortableNavigationItem({
 
 function NavigationItemContent({
   item,
-  currentNode,
+  currentPath,
   initialNodeList,
   initialCategoryList,
 }: {
   item: NavigationItem;
-  currentNode?: string;
+  currentPath: string;
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
 }) {
   switch (item.type) {
     case "categories":
-      return <CategoryList initialCategoryList={initialCategoryList} />;
+      return (
+        <CategoryList
+          initialCategoryList={initialCategoryList}
+          currentPath={currentPath}
+        />
+      );
     case "library":
       return (
         <LibraryNavigationTree
           initialNodeList={initialNodeList}
-          currentNode={currentNode}
+          currentPath={currentPath}
           visibility={["draft", "review", "unlisted", "published"]}
         />
       );
