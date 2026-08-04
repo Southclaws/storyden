@@ -24,7 +24,7 @@ const meta = {
     },
     variant: {
       control: "select",
-      options: ["solid", "outline", "ghost", "subtle"],
+      options: ["solid", "outline", "ghost", "subtle", "plain"],
     },
   },
 } satisfies Meta<typeof IconButton>;
@@ -49,6 +49,9 @@ export const Variants: Story = {
           <DeleteIcon />
         </IconButton>
         <IconButton aria-label="Edit ghost" variant="ghost">
+          <EditIcon />
+        </IconButton>
+        <IconButton aria-label="Edit plain" variant="plain">
           <EditIcon />
         </IconButton>
       </HStack>

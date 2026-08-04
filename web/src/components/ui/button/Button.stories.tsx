@@ -19,7 +19,7 @@ const meta = {
     },
     variant: {
       control: "select",
-      options: ["solid", "outline", "ghost", "subtle"],
+      options: ["solid", "outline", "ghost", "subtle", "plain"],
     },
   },
 } satisfies Meta<typeof Button>;
@@ -33,15 +33,17 @@ export const Playground: Story = {};
 export const Variants: Story = {
   render: () => (
     <LStack gap="4" alignItems="start">
-      {(["solid", "subtle", "outline", "ghost"] as const).map((variant) => (
-        <HStack key={variant} gap="3" flexWrap="wrap">
-          {(["sm", "md", "lg"] as const).map((size) => (
-            <Button key={size} variant={variant} size={size}>
-              {variant} {size}
-            </Button>
-          ))}
-        </HStack>
-      ))}
+      {(["solid", "subtle", "outline", "ghost", "plain"] as const).map(
+        (variant) => (
+          <HStack key={variant} gap="3" flexWrap="wrap">
+            {(["sm", "md", "lg"] as const).map((size) => (
+              <Button key={size} variant={variant} size={size}>
+                {variant} {size}
+              </Button>
+            ))}
+          </HStack>
+        ),
+      )}
     </LStack>
   ),
 };

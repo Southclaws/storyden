@@ -552,7 +552,7 @@ body {
   display: flex;
 }
 
-.navigation-admin-zone__trigger {
+.navigation-layout-edit-mode__trigger {
   display: flex;
   justify-self: end;
   grid-column: 2;

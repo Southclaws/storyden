@@ -13,7 +13,7 @@ import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
 type Props = {
   desktopSidebar: ReactNode;
   siteNavigation: ReactNode;
-  adminZone: ReactNode;
+  layoutEditMode: ReactNode;
   sidebarBottom: ReactNode;
 };
 
@@ -31,7 +31,7 @@ const mobileMediaQuery = "(max-width: 767px)";
 export function NavigationChrome({
   desktopSidebar,
   siteNavigation,
-  adminZone,
+  layoutEditMode,
   sidebarBottom,
 }: Props) {
   const pathname = usePathname();
@@ -240,7 +240,7 @@ export function NavigationChrome({
               </Tooltip.Root>
             </div>
 
-            {adminZone}
+            {layoutEditMode}
           </div>
         </div>
         <div className="navigation__desktop-sidebar">{desktopSidebar}</div>

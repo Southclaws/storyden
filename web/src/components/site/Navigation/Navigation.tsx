@@ -8,9 +8,9 @@ import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
+import { LayoutEditModeButton } from "./LayoutEditMode/LayoutEditModeButton";
 import { MemberActions } from "./MemberActions";
 import { NavigationChrome } from "./NavigationChrome";
-import { AdminZone } from "./NavigationPane/AdminZone/AdminZone";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
 
 type Props = PropsWithChildren<{
@@ -48,8 +48,9 @@ export async function Navigation({ children, sidebar }: Props) {
               initialSettings={globalSettings}
             />
           }
-          adminZone={
-            <AdminZone
+          layoutEditMode={
+            <LayoutEditModeButton
+              key="layout-edit-mode"
               initialSession={sessionAccount ?? undefined}
               initialSettings={globalSettings}
             />
