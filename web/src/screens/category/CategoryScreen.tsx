@@ -9,11 +9,16 @@ import {
 import { useSession } from "@/auth";
 import { CategoryLayout } from "@/components/category/CategoryIndex/CategoryCardLayout";
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
+import {
+  DiscussionLabel,
+  DiscussionRoute,
+} from "@/components/site/Navigation/Anchors/Discussion";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
-import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Box, LStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 import { hasPermission } from "@/utils/permissions";
 
@@ -65,6 +70,18 @@ export function CategoryScreen(props: ScreenProps) {
 
   return (
     <LStack>
+      <Breadcrumbs
+        index={{ label: DiscussionLabel, href: DiscussionRoute }}
+        crumbs={[
+          {
+            label: category.name,
+            href: `${DiscussionRoute}/${category.slug}`,
+          },
+        ]}
+      >
+        <CategoryMenu category={category} />
+      </Breadcrumbs>
+
       {coverImageURL && (
         <Box height="auto" width="full">
           <styled.img
@@ -81,11 +98,7 @@ export function CategoryScreen(props: ScreenProps) {
       )}
 
       <LStack gap="1">
-        <WStack alignItems="start">
-          <PageHeading>{category.name}</PageHeading>
-
-          <CategoryMenu category={category} />
-        </WStack>
+        <PageHeading>{category.name}</PageHeading>
 
         <Text variant="supporting">{category.description}</Text>
       </LStack>
