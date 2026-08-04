@@ -17,6 +17,7 @@ export * from './clipboard.mjs';
 export * from './number-input.mjs';
 export * from './input-group.mjs';
 export * from './date-picker.mjs';
+export * from './drag-tree.mjs';
 export * from './select.mjs';
 export * from './section-navigation.mjs';
 export * from './color-picker.mjs';

@@ -18,6 +18,7 @@ export * from './clipboard';
 export * from './number-input';
 export * from './input-group';
 export * from './date-picker';
+export * from './drag-tree';
 export * from './select';
 export * from './section-navigation';
 export * from './color-picker';

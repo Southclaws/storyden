@@ -3,6 +3,7 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { Category, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { MoreAction } from "@/components/site/Action/More";
+import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
@@ -16,6 +17,7 @@ import { CategoryEditMenuItem } from "../CategoryEdit/CategoryEdit";
 
 type Props = {
   category: Category;
+  triggerProps?: ButtonProps;
 };
 
 export function useCategoryMenu({ category }: Props) {
@@ -75,12 +77,12 @@ export function CategoryMenu(props: Props) {
   const { isSharingEnabled, isEditingEnabled, handlers } =
     useCategoryMenu(props);
 
-  const { category } = props;
+  const { category, triggerProps } = props;
 
   return (
     <Menu.Root onSelect={handlers.handleSelect}>
       <Menu.Trigger asChild>
-        <MoreAction />
+        <MoreAction {...triggerProps} />
       </Menu.Trigger>
 
       <Portal>

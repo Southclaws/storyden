@@ -7,16 +7,17 @@ const buttonFn = /* @__PURE__ */ createRecipe('button', {
 }, [])
 
 const buttonVariantMap = {
-  "variant": [
-    "solid",
-    "outline",
-    "ghost",
-    "subtle"
-  ],
   "size": [
     "sm",
     "md",
     "lg"
+  ],
+  "variant": [
+    "solid",
+    "outline",
+    "ghost",
+    "subtle",
+    "plain"
   ]
 }
 

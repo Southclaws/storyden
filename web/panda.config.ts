@@ -36,6 +36,7 @@ import { tabs } from "@/components/ui/tabs/Tabs.recipe";
 import { text } from "@/components/ui/text/Text.recipe";
 import { toggleGroup } from "@/components/ui/toggle-group/ToggleGroup.recipe";
 import { tooltip } from "@/components/ui/tooltip/Tooltip.recipe";
+import { dragTree } from "@/components/ui/tree-view/DragTree.recipe";
 import { treeView } from "@/components/ui/tree-view/TreeView.recipe";
 import { tokens } from "@/theme/base";
 import { semanticTokens, textStyles } from "@/theme/semantic";
@@ -62,7 +63,7 @@ export default defineConfig({
       button: [
         {
           size: ["sm", "md", "lg"],
-          variant: ["solid", "outline", "ghost", "subtle"],
+          variant: ["solid", "outline", "ghost", "subtle", "plain"],
         },
       ],
       checkbox: [{ size: ["sm", "md", "lg"] }],
@@ -210,6 +211,7 @@ export default defineConfig({
         numberInput: numberInput,
         inputGroup: inputGroup,
         datePicker: datePicker,
+        dragTree: dragTree,
         select: select,
         sectionNavigation: sectionNavigation,
         colorPicker: colorPicker,
