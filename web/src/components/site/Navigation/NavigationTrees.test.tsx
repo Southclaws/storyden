@@ -123,7 +123,7 @@ describe("sidebar navigation trees", () => {
     render(
       <CategoryListTree
         categories={categories}
-        currentCategorySlug="frontend"
+        currentPath="/d/frontend"
         mutate={vi.fn() as never}
       />,
     );
@@ -135,6 +135,10 @@ describe("sidebar navigation trees", () => {
     expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "href",
       "/d/frontend",
+    );
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
+      "aria-current",
+      "page",
     );
     expect(
       screen.getByRole("button", { name: "Create category" }),
@@ -184,7 +188,11 @@ describe("sidebar navigation trees", () => {
     ];
 
     render(
-      <LibraryPageTree nodes={nodes} currentNode="frontend" canManageLibrary />,
+      <LibraryPageTree
+        nodes={nodes}
+        currentPath="/l/frontend"
+        canManageLibrary
+      />,
     );
 
     expect(screen.getByRole("link", { name: "Handbook" })).toHaveAttribute(
@@ -194,6 +202,10 @@ describe("sidebar navigation trees", () => {
     expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
       "href",
       "/l/frontend",
+    );
+    expect(screen.getByRole("link", { name: "Frontend" })).toHaveAttribute(
+      "aria-current",
+      "page",
     );
     expect(
       screen.getByRole("button", { name: "Create page under handbook" }),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { useSession } from "@/auth";
 import { useSettings } from "@/lib/settings/settings-client";
@@ -12,15 +12,13 @@ import { useSettings } from "@/lib/settings/settings-client";
 export function useNavigation() {
   const { settings } = useSettings();
   const session = useSession();
-  const { slug } = useParams();
-
-  const nodeSlug = slug?.[0];
+  const currentPath = usePathname();
 
   const title = settings?.title ?? "Storyden";
 
   return {
     isAdmin: session?.admin ?? false,
     title,
-    nodeSlug,
+    currentPath,
   };
 }

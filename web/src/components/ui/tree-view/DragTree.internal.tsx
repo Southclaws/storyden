@@ -416,6 +416,7 @@ function DragTreeNode<TNode>({
             className={cx(styles.branchText, getLabelClassName?.(context))}
           >
             <Link
+              aria-current={selected ? "page" : undefined}
               className={styles.link}
               href={getHref(node)}
               onClick={preventNavigationWhileDragging}

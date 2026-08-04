@@ -32,7 +32,7 @@ import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
 export type Props = {
   initialCategoryList?: CategoryListOKResponse;
-  currentCategorySlug?: string;
+  currentPath?: string;
 };
 
 const getCategoryId = (category: CategoryTree) => category.id;
@@ -40,10 +40,7 @@ const getCategoryLabel = (category: CategoryTree) => category.name;
 const getCategoryHref = (category: CategoryTree) => `/d/${category.slug}`;
 const getCategoryChildren = (category: CategoryTree) => category.children;
 
-export function CategoryList({
-  initialCategoryList,
-  currentCategorySlug,
-}: Props) {
+export function CategoryList({ initialCategoryList, currentPath }: Props) {
   const { data, error, mutate } = useGetCategoryList({
     swr: { fallbackData: initialCategoryList },
   });
@@ -55,7 +52,7 @@ export function CategoryList({
   return (
     <CategoryListTree
       categories={data.categories}
-      currentCategorySlug={currentCategorySlug}
+      currentPath={currentPath}
       mutate={mutate}
     />
   );
@@ -63,11 +60,11 @@ export function CategoryList({
 
 export function CategoryListTree({
   categories,
-  currentCategorySlug,
+  currentPath,
   mutate,
 }: {
   categories: Category[];
-  currentCategorySlug?: string;
+  currentPath?: string;
   mutate: KeyedMutator<CategoryListOKResponse>;
 }) {
   const session = useSession();
@@ -116,7 +113,7 @@ export function CategoryListTree({
         getHref={getCategoryHref}
         getChildren={getCategoryChildren}
         defaultExpandedIds={tree.map(getCategoryId)}
-        isSelected={(category) => category.slug === currentCategorySlug}
+        isSelected={(category) => getCategoryHref(category) === currentPath}
         drag={{
           enabled: canManageCategories,
           getNodeData: ({ node }) =>
