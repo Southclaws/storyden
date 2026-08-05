@@ -1,6 +1,6 @@
 import { Portal } from "@ark-ui/react";
 
-import { Permission } from "@/api/openapi-schema";
+import { type Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -12,6 +12,7 @@ import { useDisclosure } from "@/utils/useDisclosure";
 import { CategoryCreateModal } from "./CategoryCreateModal";
 
 type Props = ButtonProps & {
+  initialSession?: Account;
   parentSlug?: string;
   hideLabel?: boolean;
 };
@@ -21,11 +22,12 @@ export const CreateCategoryLabel = "Create";
 export const CreateCategoryIcon = <CreateIcon />;
 
 export function CategoryCreateTrigger({
+  initialSession,
   parentSlug,
   hideLabel,
   ...props
 }: Props) {
-  const session = useSession();
+  const session = useSession(initialSession);
   const useDisclosureProps = useDisclosure();
   const Trigger = hideLabel ? IconButton : Button;
 
