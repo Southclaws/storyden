@@ -23,7 +23,7 @@ export const dragTree = defineSlotRecipe({
     row: {
       alignItems: "center",
       borderRadius: "sm",
-      color: "text.default",
+      color: "text.muted",
       display: "flex",
       fontWeight: "medium",
       gap: "1",
