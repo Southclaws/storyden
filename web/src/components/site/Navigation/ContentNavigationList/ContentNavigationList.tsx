@@ -5,6 +5,7 @@ import {
   type CategoryListOKResponse,
   InstanceCapability,
   type NodeListResult,
+  Permission,
 } from "@/api/openapi-schema";
 import { hasCapability } from "@/lib/settings/capabilities";
 import { useNavigationConfig } from "@/lib/settings/navigation-client";
@@ -12,6 +13,7 @@ import { type Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
 import { useSiteEditorState } from "@/lib/settings/site-editor-client";
 import { styled } from "@/styled-system/jsx";
+import { hasPermission } from "@/utils/permissions";
 import { useOverflowGradient } from "@/utils/useOverflowGradient";
 
 import { useNavigation } from "../useNavigation";
@@ -30,13 +32,14 @@ export function ContentNavigationList(props: Props) {
   const scrollViewportRef = useOverflowGradient<HTMLDivElement>();
   const navigation = useNavigationConfig(props.initialSettings, false);
   const settings = useSettings(props.initialSettings, false);
-  const robotsEnabled =
-    settings.ready &&
-    hasCapability(InstanceCapability.robots, settings.settings.capabilities);
-  const { isEditing } = useSiteEditorState({
+  const { isEditing, session } = useSiteEditorState({
     initialSession: props.initialSession,
     initialSettings: props.initialSettings,
   });
+  const robotsEnabled =
+    settings.ready &&
+    hasCapability(InstanceCapability.robots, settings.settings.capabilities) &&
+    hasPermission(session, Permission.USE_ROBOTS, Permission.MANAGE_ROBOTS);
 
   return (
     <styled.nav
