@@ -8,6 +8,7 @@ import { nodeListCached } from "@/lib/library/server-node-list";
 import { type Settings } from "@/lib/settings/settings";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
+import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
 type NavigationPaneProps = {
   initialSession?: Account;
@@ -21,10 +22,11 @@ export async function NavigationPane({
   try {
     const [{ data: initialNodeList }, { data: initialCategoryList }] =
       await Promise.all([
-        nodeListCached({
-          // NOTE: This doesn't work due to a bug in Orval.
-          // visibility: ["draft", "review", "unlisted", "published"],
-        }),
+        nodeListCached(
+          initialSession
+            ? { visibility: libraryNavigationVisibility }
+            : undefined,
+        ),
         categoryListCached(),
       ]);
 

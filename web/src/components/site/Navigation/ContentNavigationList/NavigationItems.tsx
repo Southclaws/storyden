@@ -9,6 +9,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { FormEvent, useCallback, useState } from "react";
 
 import {
+  type Account,
   type CategoryListOKResponse,
   type NodeListResult,
 } from "@/api/openapi-schema";
@@ -52,12 +53,14 @@ import { MembersAnchor } from "../Anchors/Members";
 import { RobotsAnchor } from "../Anchors/Robots";
 import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
+import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
 type Props = {
   navigation: NavigationConfig;
   currentPath: string;
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
+  session?: Account;
   isEditing: boolean;
   robotsEnabled: boolean;
 };
@@ -133,6 +136,7 @@ export function NavigationItems(props: Props) {
       <NavigationItemContent
         item={item}
         currentPath={props.currentPath}
+        session={props.session}
         initialCategoryList={props.initialCategoryList}
         initialNodeList={props.initialNodeList}
       />
@@ -310,11 +314,13 @@ function SortableNavigationItem({
 function NavigationItemContent({
   item,
   currentPath,
+  session,
   initialNodeList,
   initialCategoryList,
 }: {
   item: NavigationItem;
   currentPath: string;
+  session?: Account;
   initialNodeList?: NodeListResult;
   initialCategoryList?: CategoryListOKResponse;
 }) {
@@ -323,6 +329,7 @@ function NavigationItemContent({
       return (
         <CategoryList
           initialCategoryList={initialCategoryList}
+          initialSession={session}
           currentPath={currentPath}
         />
       );
@@ -330,8 +337,9 @@ function NavigationItemContent({
       return (
         <LibraryNavigationTree
           initialNodeList={initialNodeList}
+          initialSession={session}
           currentPath={currentPath}
-          visibility={["draft", "review", "unlisted", "published"]}
+          visibility={libraryNavigationVisibility}
         />
       );
     case "robots":

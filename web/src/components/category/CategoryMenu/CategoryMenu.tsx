@@ -1,6 +1,6 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 
-import { Category, Permission } from "@/api/openapi-schema";
+import { type Account, Category, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { MoreAction } from "@/components/site/Action/More";
 import { ButtonProps } from "@/components/ui/button";
@@ -17,11 +17,12 @@ import { CategoryEditMenuItem } from "../CategoryEdit/CategoryEdit";
 
 type Props = {
   category: Category;
+  initialSession?: Account;
   triggerProps?: ButtonProps;
 };
 
-export function useCategoryMenu({ category }: Props) {
-  const account = useSession();
+export function useCategoryMenu({ category, initialSession }: Props) {
+  const account = useSession(initialSession);
   const [, copyToClipboard] = useCopyToClipboard();
 
   const isEditingEnabled = hasPermission(account, Permission.MANAGE_CATEGORIES);

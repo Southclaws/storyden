@@ -2,17 +2,29 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
 import type {
+  Account,
   Category,
   CategoryListOKResponse,
+  NodeListResult,
   NodeWithChildren,
 } from "@/api/openapi-schema";
 import { Visibility } from "@/api/openapi-schema";
 import { CategoryListTree } from "@/components/category/CategoryList/CategoryList";
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
+import { LibraryNavigationTree } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree";
+import { libraryNavigationVisibility } from "@/components/site/Navigation/LibraryNavigationTree/LibraryNavigationTree.constants";
 
 const dnd = vi.hoisted(() => ({
   draggables: [] as Array<Record<string, unknown>>,
   droppables: [] as Array<Record<string, unknown>>,
+}));
+
+const api = vi.hoisted(() => ({
+  useNodeList: vi.fn(),
+}));
+
+vi.mock("@/api/openapi-client/nodes", () => ({
+  useNodeList: api.useNodeList,
 }));
 
 vi.mock("@dnd-kit/core", () => ({
@@ -37,11 +49,7 @@ vi.mock("@dnd-kit/core", () => ({
 }));
 
 vi.mock("@/auth", () => ({
-  useSession: () => ({ authenticated: true }),
-}));
-
-vi.mock("@/utils/permissions", () => ({
-  hasPermission: () => true,
+  useSession: (initialSession?: Account) => initialSession,
 }));
 
 vi.mock("@/lib/category/events", () => ({
@@ -97,19 +105,27 @@ function page(
   id: string,
   name: string,
   children: NodeWithChildren[] = [],
+  visibility: Visibility = Visibility.published,
 ): NodeWithChildren {
   return {
     id,
     name,
     slug: id,
-    visibility: Visibility.published,
+    visibility,
     children,
   } as NodeWithChildren;
 }
 
+const categoryManager = {
+  roles: [{ permissions: ["MANAGE_CATEGORIES"] }],
+} as Account;
+
 beforeEach(() => {
   dnd.draggables.length = 0;
   dnd.droppables.length = 0;
+  api.useNodeList.mockImplementation((_params, options) => ({
+    data: options?.swr?.fallbackData,
+  }));
 });
 
 describe("sidebar navigation trees", () => {
@@ -124,6 +140,7 @@ describe("sidebar navigation trees", () => {
       <CategoryListTree
         categories={categories}
         currentPath="/d/frontend"
+        initialSession={categoryManager}
         mutate={vi.fn() as never}
       />,
     );
@@ -245,6 +262,32 @@ describe("sidebar navigation trees", () => {
           }),
         }),
       ]),
+    );
+  });
+
+  test("library navigation renders authenticated draft sections from server fallback data", () => {
+    const initialNodeList = {
+      nodes: [
+        page("handbook", "Handbook"),
+        page("work-in-progress", "Work in progress", [], Visibility.draft),
+      ],
+    } as NodeListResult;
+
+    render(
+      <LibraryNavigationTree
+        initialNodeList={initialNodeList}
+        initialSession={categoryManager}
+        visibility={libraryNavigationVisibility}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Drafts" })).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Work in progress" }),
+    ).toHaveAttribute("href", "/l/work-in-progress");
+    expect(api.useNodeList).toHaveBeenCalledWith(
+      { visibility: libraryNavigationVisibility },
+      { swr: { fallbackData: initialNodeList } },
     );
   });
 });

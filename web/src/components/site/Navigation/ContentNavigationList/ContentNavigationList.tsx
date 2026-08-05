@@ -59,6 +59,7 @@ export function ContentNavigationList(props: Props) {
         <NavigationItems
           navigation={navigation}
           currentPath={currentPath}
+          session={session}
           initialCategoryList={props.initialCategoryList}
           initialNodeList={props.initialNodeList}
           isEditing={isEditing}

@@ -1,11 +1,12 @@
 "use client";
 
 import { useNodeList } from "@/api/openapi-client/nodes";
-import { NodeListResult, Visibility } from "@/api/openapi-schema";
+import { type Account, NodeListResult, Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
+  initialSession?: Account;
   initialNodeList?: NodeListResult;
   currentPath?: string;
   visibility: Visibility[];
@@ -13,9 +14,10 @@ export type Props = {
 
 export function useLibraryNavigationTree({
   visibility,
+  initialSession,
   initialNodeList,
 }: Props) {
-  const session = useSession();
+  const session = useSession(initialSession);
   const { data, error } = useNodeList(
     {
       visibility,

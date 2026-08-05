@@ -8,6 +8,7 @@ import {
   useCategoryList as useGetCategoryList,
 } from "@/api/openapi-client/categories";
 import {
+  Account,
   Category,
   CategoryListOKResponse,
   CategoryUpdatePositionBody,
@@ -31,6 +32,7 @@ import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
 export type Props = {
+  initialSession?: Account;
   initialCategoryList?: CategoryListOKResponse;
   currentPath?: string;
 };
@@ -40,7 +42,11 @@ const getCategoryLabel = (category: CategoryTree) => category.name;
 const getCategoryHref = (category: CategoryTree) => `/d/${category.slug}`;
 const getCategoryChildren = (category: CategoryTree) => category.children;
 
-export function CategoryList({ initialCategoryList, currentPath }: Props) {
+export function CategoryList({
+  initialSession,
+  initialCategoryList,
+  currentPath,
+}: Props) {
   const { data, error, mutate } = useGetCategoryList({
     swr: { fallbackData: initialCategoryList },
   });
@@ -53,6 +59,7 @@ export function CategoryList({ initialCategoryList, currentPath }: Props) {
     <CategoryListTree
       categories={data.categories}
       currentPath={currentPath}
+      initialSession={initialSession}
       mutate={mutate}
     />
   );
@@ -61,13 +68,15 @@ export function CategoryList({ initialCategoryList, currentPath }: Props) {
 export function CategoryListTree({
   categories,
   currentPath,
+  initialSession,
   mutate,
 }: {
   categories: Category[];
   currentPath?: string;
+  initialSession?: Account;
   mutate: KeyedMutator<CategoryListOKResponse>;
 }) {
-  const session = useSession();
+  const session = useSession(initialSession);
   const canManageCategories = hasPermission(session, "MANAGE_CATEGORIES");
   const tree = buildCategoryTree(categories);
 
@@ -96,7 +105,11 @@ export function CategoryListTree({
     <LStack gap="0">
       <NavigationHeader
         href={DiscussionRoute}
-        controls={canManageCategories && <CategoryCreateTrigger hideLabel />}
+        controls={
+          canManageCategories && (
+            <CategoryCreateTrigger hideLabel initialSession={initialSession} />
+          )
+        }
       >
         <HStack gap="1">
           <DiscussionIcon />
@@ -133,7 +146,11 @@ export function CategoryListTree({
         }}
         renderActions={({ node }) =>
           canManageCategories ? (
-            <CategoryMenu category={node} triggerProps={{ variant: "plain" }} />
+            <CategoryMenu
+              category={node}
+              initialSession={initialSession}
+              triggerProps={{ variant: "plain" }}
+            />
           ) : null
         }
       />
