@@ -8,6 +8,10 @@ import { useDisclosure } from "@/utils/useDisclosure";
 import { EditAvatarScreen } from "./EditAvatarScreen";
 import { Props } from "./useEditAvatar";
 
+function EditAvatarButton(props: ButtonProps) {
+  return <Button {...props}>Edit</Button>;
+}
+
 export function EditAvatarModal(props: Props) {
   return (
     <ModalDrawer
@@ -26,10 +30,7 @@ export function EditAvatarTrigger({
   ...props
 }: PropsWithChildren<Props & { asChild?: boolean }>) {
   const { onOpen, isOpen, onClose } = useDisclosure();
-
-  const Trigger = asChild
-    ? Slot
-    : (bp: ButtonProps) => <Button {...bp}>Edit</Button>;
+  const Trigger = asChild ? Slot : EditAvatarButton;
 
   return (
     <>
