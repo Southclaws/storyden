@@ -3395,6 +3395,10 @@ const tokens = {
     "value": "var(--colors-border-strong)",
     "variable": "var(--colors-border-strong)"
   },
+  "colors.border.control": {
+    "value": "var(--colors-border-control)",
+    "variable": "var(--colors-border-control)"
+  },
   "colors.border.disabled": {
     "value": "var(--colors-border-disabled)",
     "variable": "var(--colors-border-disabled)"

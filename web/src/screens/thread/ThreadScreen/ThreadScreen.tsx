@@ -1,12 +1,11 @@
 "use client";
 
-import { Controller, ControllerProps } from "react-hook-form";
 import { match } from "ts-pattern";
 
 import { Thread, Visibility } from "@/api/openapi-schema";
 import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
-import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { LinkCard } from "@/components/library/links/LinkCard";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
@@ -21,9 +20,9 @@ import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
 import { Signature } from "@/components/thread/Signature";
 import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
-import { TagListField } from "@/components/thread/ThreadTagList";
+import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
 import { FormErrorText } from "@/components/ui/form-error-text";
-import { HeadingInput } from "@/components/ui/heading-input";
+import { HeadingInputField } from "@/components/ui/heading-input";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
@@ -127,13 +126,23 @@ export function ThreadScreen(props: Props) {
           <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 
           {isEditing ? (
-            <TitleInput name="title" control={form.control} />
+            <>
+              <HeadingInputField
+                id="title-input"
+                placeholder="Thread title..."
+                name="title"
+                control={form.control}
+              />
+              <FormErrorText>
+                {form.formState.errors.title?.message}
+              </FormErrorText>
+            </>
           ) : (
             <PageHeading>{thread.title}</PageHeading>
           )}
 
           {isEditing ? (
-            <TagListField
+            <ThreadTagListField
               name="tags"
               control={form.control}
               initialTags={thread.tags}
@@ -144,13 +153,13 @@ export function ThreadScreen(props: Props) {
 
           {thread.link && <LinkCard link={thread.link} />}
 
-          <ThreadBodyInput
+          <ContentComposerField
             control={form.control}
             name="body"
             initialValue={thread.body}
             resetKey={resetKey}
             disabled={!isEditing}
-            handleEmptyStateChange={handlers.handleEmptyStateChange}
+            onEmptyStateChange={handlers.handleEmptyStateChange}
           />
 
           {signatureConfig.enabled && (
@@ -197,69 +206,6 @@ export function ThreadScreen(props: Props) {
         />
       </LStack>
     </ReplyProvider>
-  );
-}
-
-type TitleInputProps = Omit<ControllerProps<Form>, "render">;
-
-export function TitleInput({ control }: TitleInputProps) {
-  return (
-    <Controller<Form>
-      render={({ field: { onChange, ...field }, formState, fieldState }) => {
-        return (
-          <>
-            <HeadingInput
-              id="title-input"
-              placeholder="Thread title..."
-              onValueChange={onChange}
-              defaultValue={formState.defaultValues?.["title"]}
-              {...field}
-            />
-
-            <FormErrorText>{fieldState.error?.message}</FormErrorText>
-          </>
-        );
-      }}
-      control={control}
-      name="title"
-    />
-  );
-}
-
-type ThreadBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
-  initialValue: string;
-  resetKey: string;
-  handleEmptyStateChange: (isEmpty: boolean) => void;
-};
-
-function ThreadBodyInput({
-  control,
-  name,
-  initialValue,
-  resetKey,
-  disabled,
-  handleEmptyStateChange,
-}: ThreadBodyInputProps) {
-  return (
-    <Controller<Form>
-      render={({ field: { onChange } }) => {
-        function handleChange(value: string, isEmpty: boolean) {
-          handleEmptyStateChange(isEmpty);
-          onChange(value);
-        }
-
-        return (
-          <ContentComposer
-            initialValue={initialValue}
-            onChange={handleChange}
-            resetKey={resetKey}
-            disabled={disabled}
-          />
-        );
-      }}
-      control={control}
-      name={name}
-    />
   );
 }
 

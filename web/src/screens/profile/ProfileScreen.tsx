@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { MemberOptionsMenu } from "@/components/member/MemberOptions/MemberOptionsMenu";
@@ -137,7 +137,7 @@ export function ProfileScreen(props: Props) {
               This profile has no bio yet...
             </Text>
           ) : (
-            <ContentFormField<Form>
+            <ContentComposerField<Form>
               control={form.control}
               name="bio"
               initialValue={profile.bio}
@@ -152,7 +152,7 @@ export function ProfileScreen(props: Props) {
                 This profile has no signature yet...
               </Text>
             ) : (
-              <ContentFormField<Form>
+              <ContentComposerField<Form>
                 control={form.control}
                 name="signature"
                 initialValue={profile.signature ?? ""}

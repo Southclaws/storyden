@@ -60,21 +60,7 @@ export function AdminNavigationPane() {
   const groups = getAdminSectionGroups(settings.settings, account.data);
 
   return (
-    <SidebarNavigationPane
-      label="Admin navigation"
-      title="Admin"
-      footer={
-        <SidebarNavigationLink
-          href="/"
-          label="Back to community"
-          icon={<HomeIcon />}
-          onClick={(event) => {
-            event.preventDefault();
-            goBack();
-          }}
-        />
-      }
-    >
+    <SidebarNavigationPane label="Admin navigation" title="Admin">
       {groups.map((group) => (
         <SidebarNavigationSection key={group.label} label={group.label}>
           {group.items.map((section) => (

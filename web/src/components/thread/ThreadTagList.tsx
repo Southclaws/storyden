@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
@@ -12,6 +11,7 @@ import {
 
 export type Props = {
   editing: boolean;
+  disabled?: boolean;
   initialTags?: TagReferenceList;
   onChange: (tags: TagNameList) => Promise<void>;
 };
@@ -56,6 +56,7 @@ export function ThreadTagList(props: Props) {
         inputPlaceholder="Add tags..."
         autoColour={true}
         size="sm"
+        triggerProps={{ disabled: props.disabled }}
       />
     );
   }
@@ -65,40 +66,4 @@ export function ThreadTagList(props: Props) {
   }
 
   return <TagBadgeList tags={props.initialTags ?? []} />;
-}
-
-type TagListFieldProps<T extends FieldValues> = Omit<
-  ControllerProps<T>,
-  "render"
-> & {
-  initialTags?: TagReferenceList;
-};
-
-export function TagListField<T extends FieldValues>({
-  control,
-  name,
-  initialTags,
-}: TagListFieldProps<T>) {
-  return (
-    <Controller<T>
-      render={({ field }) => {
-        async function handleChange(tags: string[]) {
-          field.onChange(tags);
-        }
-
-        const fieldTags =
-          field.value?.map((name: string) => ({ name })) || initialTags || [];
-
-        return (
-          <ThreadTagList
-            editing={true}
-            initialTags={fieldTags}
-            onChange={handleChange}
-          />
-        );
-      }}
-      control={control}
-      name={name}
-    />
-  );
 }

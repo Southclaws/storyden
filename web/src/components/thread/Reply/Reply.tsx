@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { Controller, ControllerProps } from "react-hook-form";
 
 import { Reply as ReplyType, Thread } from "@/api/openapi-schema";
-import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
@@ -14,7 +13,7 @@ import { hstack } from "@/styled-system/patterns";
 
 import { Byline } from "../../content/Byline";
 import { PostReviewBadge } from "../PostReviewBadge";
-import { ReactList } from "../ReactList/ReactList";
+import { ThreadReactList } from "../ReactList/ThreadReactList";
 import { ReplyMenu } from "../ReplyMenu/ReplyMenu";
 import { Signature } from "../Signature";
 
@@ -101,13 +100,13 @@ export function Reply(props: Props) {
 
         {reply.reply_to && <InReplyTo to={reply.reply_to} thread={thread} />}
 
-        <ReplyBodyInput
+        <ContentComposerField
           control={form.control}
           name="body"
           initialValue={reply.body}
           resetKey={resetKey}
           disabled={!isEditing}
-          handleEmptyStateChange={handlers.handleEmptyStateChange}
+          onEmptyStateChange={handlers.handleEmptyStateChange}
         />
 
         {initialSignatureConfig.enabled && (
@@ -119,7 +118,7 @@ export function Reply(props: Props) {
       </styled.form>
 
       <WStack>
-        <ReactList
+        <ThreadReactList
           initialSession={initialSession}
           thread={thread}
           reply={reply}
@@ -139,43 +138,6 @@ export function Reply(props: Props) {
         )}
       </WStack>
     </CardBox>
-  );
-}
-
-type ReplyBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
-  initialValue: string;
-  resetKey: string;
-  handleEmptyStateChange: (isEmpty: boolean) => void;
-};
-
-function ReplyBodyInput({
-  control,
-  name,
-  initialValue,
-  resetKey,
-  disabled,
-  handleEmptyStateChange,
-}: ReplyBodyInputProps) {
-  return (
-    <Controller<Form>
-      render={({ field: { onChange } }) => {
-        function handleChange(value: string, isEmpty: boolean) {
-          handleEmptyStateChange(isEmpty);
-          onChange(value);
-        }
-
-        return (
-          <ContentComposer
-            initialValue={initialValue}
-            onChange={handleChange}
-            resetKey={resetKey}
-            disabled={disabled}
-          />
-        );
-      }}
-      control={control}
-      name={name}
-    />
   );
 }
 

@@ -32,6 +32,7 @@ export * from './slider.mjs';
 export * from './pin-input.mjs';
 export * from './tabs.mjs';
 export * from './radio-group.mjs';
+export * from './react-list.mjs';
 export * from './switch-recipe.mjs';
 export * from './tree-view.mjs';
 export * from './toggle-group.mjs';

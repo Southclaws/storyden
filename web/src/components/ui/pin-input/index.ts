@@ -1,2 +1,2 @@
 export * from "./PinInput.internal";
-export * from "./PinInput.form";
+export * from "./PinInput.field";

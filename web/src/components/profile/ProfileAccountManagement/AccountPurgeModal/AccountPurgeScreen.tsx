@@ -1,6 +1,6 @@
 import { ModerationActionPurgeAccountContentType } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { FormCardGroupSelect } from "@/components/ui/checkbox";
+import { CheckboxCardGroupField } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormLabel } from "@/components/ui/form-label";
 import { WarningIcon } from "@/components/ui/icons/Warning";
@@ -93,7 +93,7 @@ export function AccountPurgeScreen(props: Props) {
 
         <FormControl>
           <FormLabel>Content Types to Purge</FormLabel>
-          <FormCardGroupSelect
+          <CheckboxCardGroupField
             control={form.control}
             name="contentTypes"
             items={CONTENT_TYPES}

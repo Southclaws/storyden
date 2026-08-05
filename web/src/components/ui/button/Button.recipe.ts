@@ -86,11 +86,11 @@ export const button = defineRecipe({
     variant: {
       solid: {
         background: "colorPalette.default",
-        color: "text.inverse",
+        color: "colorPalette.fg",
         colorPalette: "accent",
         _hover: {
           background: "colorPalette.default/80",
-          color: "text.inverse",
+          color: "colorPalette.fg",
         },
         _focusVisible: {
           outline: "2px solid",
@@ -134,7 +134,7 @@ export const button = defineRecipe({
         _selected: {
           background: "accent.default",
           borderColor: "accent.default",
-          color: "text.inverse",
+          color: "accent.fg",
           _hover: {
             background: "accent.default/80",
             borderColor: "accent.default/80",

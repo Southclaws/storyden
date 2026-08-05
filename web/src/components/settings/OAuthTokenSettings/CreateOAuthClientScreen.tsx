@@ -1,12 +1,11 @@
 "use client";
 
 import { ClipboardIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { Controller, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 
-import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckboxGroupField } from "@/components/ui/checkbox";
 import * as Clipboard from "@/components/ui/clipboard";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
@@ -15,7 +14,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
-import * as RadioGroup from "@/components/ui/radio-group";
+import { RadioGroupField } from "@/components/ui/radio-group";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { Text } from "@/components/ui/text";
 import { PermissionList } from "@/lib/permission/permission";
@@ -24,7 +23,6 @@ import { hasPermission } from "@/utils/permissions";
 
 import {
   Form,
-  OAuthClientPreset,
   Props,
   useCreateOAuthClientScreen,
 } from "./useCreateOAuthClientScreen";
@@ -102,80 +100,68 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Client Type</FormLabel>
-          <Controller
+          <RadioGroupField
             control={form.control}
             name="preset"
-            render={({ field }) => (
-              <RadioGroup.Root
-                value={field.value}
-                onValueChange={(details) =>
-                  field.onChange(details.value as OAuthClientPreset)
-                }
-              >
-                <LStack gap="2">
-                  <RadioGroup.Item value="app_integration">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <Text
-                          as="span"
-                          variant="supporting"
-                          color="text.default"
-                          fontWeight="medium"
-                        >
-                          App Integration
-                        </Text>
-                        <Text as="span" variant="metadata">
-                          For third-party apps like MCP clients
-                          (authorization_code + refresh_token, confidential,
-                          PKCE required)
-                        </Text>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-
-                  <RadioGroup.Item value="public_app">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <Text
-                          as="span"
-                          variant="supporting"
-                          color="text.default"
-                          fontWeight="medium"
-                        >
-                          Public App
-                        </Text>
-                        <Text as="span" variant="metadata">
-                          For browser/mobile apps (authorization_code +
-                          refresh_token, public, PKCE required)
-                        </Text>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-
-                  <RadioGroup.Item value="machine">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <Text
-                          as="span"
-                          variant="supporting"
-                          color="text.default"
-                          fontWeight="medium"
-                        >
-                          Machine Client
-                        </Text>
-                        <Text as="span" variant="metadata">
-                          For server-to-server (client_credentials,
-                          confidential, no redirect URIs)
-                        </Text>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-                </LStack>
-              </RadioGroup.Root>
-            )}
+            items={[
+              {
+                value: "app_integration",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      App Integration
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For third-party apps like MCP clients (authorization_code
+                      + refresh_token, confidential, PKCE required)
+                    </Text>
+                  </LStack>
+                ),
+              },
+              {
+                value: "public_app",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      Public App
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For browser/mobile apps (authorization_code +
+                      refresh_token, public, PKCE required)
+                    </Text>
+                  </LStack>
+                ),
+              },
+              {
+                value: "machine",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      Machine Client
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For server-to-server (client_credentials, confidential, no
+                      redirect URIs)
+                    </Text>
+                  </LStack>
+                ),
+              },
+            ]}
           />
           <FormErrorText>{form.formState.errors.preset?.message}</FormErrorText>
         </FormControl>
@@ -224,49 +210,27 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Permissions</FormLabel>
-          <Controller
+          <CheckboxGroupField
             control={form.control}
             name="permissions"
-            render={({ field }) => (
-              <LStack gap="2">
-                {selectablePermissions.map((permission) => {
-                  const checked = field.value.includes(permission.value);
-
-                  return (
-                    <Checkbox
-                      key={permission.value}
-                      size="sm"
-                      checked={checked}
-                      onCheckedChange={({ checked }) => {
-                        const next = checked
-                          ? Array.from(
-                              new Set([...field.value, permission.value]),
-                            )
-                          : field.value.filter(
-                              (value: Permission) => value !== permission.value,
-                            );
-
-                        field.onChange(next);
-                      }}
-                    >
-                      <LStack gap="0">
-                        <Text
-                          as="span"
-                          variant="supporting"
-                          color="text.default"
-                          fontWeight="medium"
-                        >
-                          {permission.name}
-                        </Text>
-                        <Text as="span" variant="metadata">
-                          {permission.description}
-                        </Text>
-                      </LStack>
-                    </Checkbox>
-                  );
-                })}
-              </LStack>
-            )}
+            items={selectablePermissions.map((permission) => ({
+              value: permission.value,
+              label: (
+                <LStack gap="0">
+                  <Text
+                    as="span"
+                    variant="supporting"
+                    color="text.default"
+                    fontWeight="medium"
+                  >
+                    {permission.name}
+                  </Text>
+                  <Text as="span" variant="metadata">
+                    {permission.description}
+                  </Text>
+                </LStack>
+              ),
+            }))}
           />
           <FormErrorText>
             {form.formState.errors.permissions?.message}

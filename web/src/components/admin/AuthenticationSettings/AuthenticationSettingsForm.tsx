@@ -11,7 +11,7 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { PageHeading } from "@/components/ui/page-heading";
-import { FormCardGroupRadio } from "@/components/ui/radio-group";
+import { RadioGroupCardField } from "@/components/ui/radio-group";
 import {
   AuthenticationModeDetail,
   AuthenticationModeList,
@@ -106,7 +106,8 @@ export function AuthenticationSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Authentication mode</FormLabel>
-        <FormCardGroupRadio
+        <RadioGroupCardField
+          ariaLabel="Authentication mode"
           control={form.control}
           name="authentication_mode"
           items={availableModes.map((m) => ({
@@ -123,7 +124,8 @@ export function AuthenticationSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Registration mode</FormLabel>
-        <FormCardGroupRadio
+        <RadioGroupCardField
+          ariaLabel="Registration mode"
           control={form.control}
           name="registration_mode"
           items={RegistrationModeList.map((m) => ({

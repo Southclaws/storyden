@@ -33,6 +33,7 @@ export * from './slider';
 export * from './pin-input';
 export * from './tabs';
 export * from './radio-group';
+export * from './react-list';
 export * from './switch-recipe';
 export * from './tree-view';
 export * from './toggle-group';

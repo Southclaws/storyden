@@ -1,72 +1,13 @@
-import { uniq } from "lodash/fp";
-import { ChangeEvent, useState } from "react";
-import { Controller, type ControllerRenderProps } from "react-hook-form";
-
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { IconButton } from "@/components/ui/icon-button";
-import { CancelIcon } from "@/components/ui/icons/Cancel";
-import { Input } from "@/components/ui/input";
-import { FormNumberInputField } from "@/components/ui/number-input";
+import { NumberInputField } from "@/components/ui/number-input";
 import { PageHeading } from "@/components/ui/page-heading";
-import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Flex, WStack, styled } from "@/styled-system/jsx";
 
+import { ModerationWordListEditorField } from "./ModerationWordListEditor.field";
 import { Form, Props, useModerationSettings } from "./useModerationSettings";
-
-type WordListField = ControllerRenderProps<
-  Form,
-  "wordBlockList" | "wordReportList"
->;
-
-function ModerationWordListEditor({ field }: { field: WordListField }) {
-  const [newWord, setNewWord] = useState("");
-
-  function handleNewWordChange(v: ChangeEvent<HTMLInputElement>) {
-    setNewWord(v.target.value);
-  }
-
-  function handleNewWordSubmit() {
-    const trimmed = newWord.trim();
-    if (trimmed === "") return;
-    const newList = uniq([...(field.value ?? []), trimmed]);
-    field.onChange(newList);
-    setNewWord("");
-  }
-
-  function handleRemoveWord(wordToRemove: string) {
-    const newList = field.value?.filter((word) => word !== wordToRemove) ?? [];
-    field.onChange(newList);
-  }
-
-  return (
-    <LStack>
-      <Flex flexWrap="wrap">
-        {field.value?.map((word) => (
-          <Badge key={word} pr="0">
-            {word}
-            <IconButton
-              type="button"
-              variant="ghost"
-              onClick={() => handleRemoveWord(word)}
-            >
-              <CancelIcon />
-            </IconButton>
-          </Badge>
-        ))}
-      </Flex>
-
-      <HStack>
-        <Input size="sm" value={newWord} onChange={handleNewWordChange} />
-        <Button type="button" size="sm" onClick={handleNewWordSubmit}>
-          Add
-        </Button>
-      </HStack>
-    </LStack>
-  );
-}
 
 export function ModerationSettingsForm(props: Props) {
   const { control, formState, onSubmit } = useModerationSettings(props);
@@ -95,9 +36,10 @@ export function ModerationSettingsForm(props: Props) {
       >
         <FormControl>
           <FormLabel>Thread content maximum length</FormLabel>
-          <FormNumberInputField
+          <NumberInputField
             control={control}
             name="threadBodyMaxSize"
+            ariaLabel="Thread content maximum length"
             scrubber={true}
             min={1}
             max={1_000_000}
@@ -111,9 +53,10 @@ export function ModerationSettingsForm(props: Props) {
 
         <FormControl>
           <FormLabel>Reply content maximum length</FormLabel>
-          <FormNumberInputField
+          <NumberInputField
             control={control}
             name="replyBodyMaxSize"
+            ariaLabel="Reply content maximum length"
             scrubber={true}
             min={1}
             max={1_000_000}
@@ -136,10 +79,9 @@ export function ModerationSettingsForm(props: Props) {
         <FormControl>
           <FormLabel>Word report list</FormLabel>
 
-          <Controller
+          <ModerationWordListEditorField
             control={control}
             name="wordReportList"
-            render={({ field }) => <ModerationWordListEditor field={field} />}
           />
 
           <FormHelperText>
@@ -150,10 +92,9 @@ export function ModerationSettingsForm(props: Props) {
         <FormControl>
           <FormLabel>Word block list</FormLabel>
 
-          <Controller
+          <ModerationWordListEditorField
             control={control}
             name="wordBlockList"
-            render={({ field }) => <ModerationWordListEditor field={field} />}
           />
 
           <FormHelperText>

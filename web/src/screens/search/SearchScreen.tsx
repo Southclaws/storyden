@@ -14,7 +14,7 @@ import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
 import { MultiSelectPicker } from "@/components/ui/multi-select-picker";
 import { PageHeading } from "@/components/ui/page-heading";
-import { FormDatagraphKindFilterField } from "@/components/ui/toggle-group";
+import { ToggleGroupField } from "@/components/ui/toggle-group";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
@@ -81,7 +81,7 @@ export function SearchScreen(props: Props) {
       </WStack>
 
       <LStack w="full" gap="2">
-        <FormDatagraphKindFilterField
+        <ToggleGroupField
           control={form.control}
           name="kind"
           items={[

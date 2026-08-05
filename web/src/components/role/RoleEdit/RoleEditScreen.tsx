@@ -1,11 +1,11 @@
-import { Controller, useWatch } from "react-hook-form";
+import { useWatch } from "react-hook-form";
 
 import { DeleteWithConfirmationButton } from "@/components/site/DeleteConfirmationButton";
 import { InfoTip } from "@/components/site/InfoTip";
 import { Button } from "@/components/ui/button";
-import { FormCardGroupSelect } from "@/components/ui/checkbox";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FormColourPickerField } from "@/components/ui/color-picker";
+import { CheckboxCardGroupField } from "@/components/ui/checkbox";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -84,7 +84,11 @@ export function RoleEditScreen(props: Props) {
 
         <FormControl>
           <FormLabel>Colour</FormLabel>
-          <FormColourPickerField control={form.control} name="colour" />
+          <ColorPickerField
+            control={form.control}
+            name="colour"
+            ariaLabel="Role colour"
+          />
           <FormErrorText>{form.formState.errors.name?.message}</FormErrorText>
         </FormControl>
 
@@ -92,58 +96,26 @@ export function RoleEditScreen(props: Props) {
           <FormLabel>Name Decorations</FormLabel>
 
           <LStack gap="1">
-            <Controller
-              control={form.control}
-              name="meta.bold"
-              render={({ field }) => (
-                <Checkbox
-                  size="sm"
-                  checked={!!field.value}
-                  onCheckedChange={({ checked }) => {
-                    field.onChange(checked === true);
-                  }}
-                >
-                  Bold name
-                </Checkbox>
-              )}
-            />
+            <CheckboxField control={form.control} name="meta.bold" size="sm">
+              Bold name
+            </CheckboxField>
 
-            <Controller
-              control={form.control}
-              name="meta.italic"
-              render={({ field }) => (
-                <Checkbox
-                  size="sm"
-                  checked={!!field.value}
-                  onCheckedChange={({ checked }) => {
-                    field.onChange(checked === true);
-                  }}
-                >
-                  Italic name
-                </Checkbox>
-              )}
-            />
+            <CheckboxField control={form.control} name="meta.italic" size="sm">
+              Italic name
+            </CheckboxField>
 
-            <Controller
+            <CheckboxField
               control={form.control}
               name="meta.coloured"
-              render={({ field }) => (
-                <Checkbox
-                  size="sm"
-                  checked={!!field.value}
-                  onCheckedChange={({ checked }) => {
-                    field.onChange(checked === true);
-                  }}
-                >
-                  Coloured name{" "}
-                  <InfoTip title="Name colour">
-                    Roles are ordered by priority, and the highest priority role
-                    with coloured name enabled will determine the colour of the
-                    member's name.
-                  </InfoTip>
-                </Checkbox>
-              )}
-            />
+              size="sm"
+            >
+              Coloured name{" "}
+              <InfoTip title="Name colour">
+                Roles are ordered by priority, and the highest priority role
+                with coloured name enabled will determine the colour of the
+                member's name.
+              </InfoTip>
+            </CheckboxField>
           </LStack>
         </FormControl>
 
@@ -169,7 +141,7 @@ export function RoleEditScreen(props: Props) {
         <FormControl>
           <FormLabel>Permissions</FormLabel>
           {canEditPermissions ? (
-            <FormCardGroupSelect
+            <CheckboxCardGroupField
               control={form.control}
               name="permissions"
               items={permissionList.map((p) => ({

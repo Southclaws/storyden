@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
-import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
@@ -79,7 +79,7 @@ export function SiteContextPane(props: Props) {
 
       {isEditingSettings ? (
         <FormControl>
-          <ContentFormField<Form>
+          <ContentComposerField<Form>
             control={form.control}
             name="content"
             initialValue={settings.content}

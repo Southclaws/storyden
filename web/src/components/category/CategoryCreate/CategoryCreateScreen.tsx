@@ -3,12 +3,12 @@ import { createListCollection } from "@ark-ui/react";
 import { useCategoryList } from "@/api/openapi-client/categories";
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { Button } from "@/components/ui/button";
-import { FormColourPickerField } from "@/components/ui/color-picker";
+import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { Input, InputPrefix } from "@/components/ui/input";
-import { FormSelectField } from "@/components/ui/select";
+import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
 import {
@@ -114,7 +114,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
         <FormControl>
           <FormLabel>Parent Category</FormLabel>
-          <FormSelectField
+          <SelectField
             name="parent"
             control={control}
             collection={categoryCollection}
@@ -128,7 +128,11 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
         <FormControl>
           <FormLabel>Colour</FormLabel>
-          <FormColourPickerField control={control} name="colour" />
+          <ColorPickerField
+            control={control}
+            name="colour"
+            ariaLabel="Category colour"
+          />
           <FormHelperText>The colour for the category</FormHelperText>
         </FormControl>
 

@@ -1,3 +1,2 @@
 export * from "./ContentComposer";
-export * from "./ContentComposer.form";
-export * from "./ContentField";
+export * from "./ContentComposer.field";

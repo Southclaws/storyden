@@ -4,7 +4,7 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { PageHeading } from "@/components/ui/page-heading";
-import { FormRadioGroupField } from "@/components/ui/radio-group";
+import { RadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
 
 import {
@@ -38,7 +38,7 @@ export function MemberInterfaceSettings(props: Props) {
 
       <FormControl>
         <FormLabel>Text editor style</FormLabel>
-        <FormRadioGroupField
+        <RadioGroupField
           control={control}
           name="editorMode"
           items={[

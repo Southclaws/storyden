@@ -24,6 +24,7 @@ import { pinInput } from "@/components/ui/pin-input/PinInput.recipe";
 import { popover } from "@/components/ui/popover/Popover.recipe";
 import { progress } from "@/components/ui/progress/Progress.recipe";
 import { radioGroup } from "@/components/ui/radio-group/RadioGroup.recipe";
+import { reactList } from "@/components/ui/react-list/ReactList.recipe";
 import { sectionNavigation } from "@/components/ui/section-navigation/SectionNavigation.recipe";
 import { select } from "@/components/ui/select/Select.recipe";
 import { slider } from "@/components/ui/slider/Slider.recipe";
@@ -226,6 +227,7 @@ export default defineConfig({
         pinInput: pinInput,
         tabs: tabs,
         radioGroup: radioGroup,
+        reactList: reactList,
         switchRecipe: switchRecipe,
         treeView: treeView,
         toggleGroup: toggleGroup,

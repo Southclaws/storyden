@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { LStack } from "@/styled-system/jsx";
+import { Box, LStack } from "@/styled-system/jsx";
 
 import { DatePicker, DateRangePicker } from ".";
 
@@ -23,5 +23,13 @@ export const DateRange: Story = {
       <DateRangePicker />
       <DateRangePicker triggerLabel="Filter by date range" hideInputs />
     </LStack>
+  ),
+};
+
+export const AtViewportEdge: Story = {
+  render: () => (
+    <Box display="flex" justifyContent="end" minH="md" width="full">
+      <DateRangePicker triggerLabel="Filter by date range" hideInputs />
+    </Box>
   ),
 };

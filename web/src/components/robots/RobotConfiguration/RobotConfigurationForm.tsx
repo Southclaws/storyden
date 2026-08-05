@@ -2,9 +2,9 @@ import { useState } from "react";
 
 import { useRobotModelsList } from "@/api/openapi-client/robots";
 import { TOOL_NAMES } from "@/api/robots";
-import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
+import { ComboboxField } from "@/components/ui/combobox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
@@ -114,11 +114,15 @@ export function RobotConfigurationForm(props: Props) {
 
         <FormControl>
           <FormLabel>Model</FormLabel>
-          <RobotModelComboboxField
+          <ComboboxField
             control={form.control}
             name="model"
-            models={models}
+            items={models.map((model) => ({
+              label: model.ref,
+              value: model.ref,
+            }))}
             placeholder={isCreating ? "Use default model" : "Select a model"}
+            ariaLabel="Select model"
             disabled={!modelData || models.length === 0}
           />
           {modelError ? (
