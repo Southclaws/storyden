@@ -15,7 +15,7 @@ export const radioGroup = defineSlotRecipe({
     },
     itemControl: {
       background: "transparent",
-      borderColor: "border.default",
+      borderColor: "border.control",
       borderRadius: "full",
       borderWidth: "1px",
       display: "flex",
@@ -25,7 +25,7 @@ export const radioGroup = defineSlotRecipe({
       transitionProperty: "background, border-color",
       transitionTimingFunction: "default",
       _before: {
-        backgroundColor: "accent.default",
+        backgroundColor: "accent.text",
         borderRadius: "full",
         content: "''",
         display: "block",
@@ -38,7 +38,7 @@ export const radioGroup = defineSlotRecipe({
         background: "background.controlHover",
       },
       _checked: {
-        borderColor: "accent.default",
+        borderColor: "accent.text",
         _hover: {
           background: "transparent",
         },
@@ -47,7 +47,7 @@ export const radioGroup = defineSlotRecipe({
         },
       },
       _disabled: {
-        borderColor: "border.disabled",
+        borderColor: "border.default",
         color: "text.disabled",
         _hover: {
           bg: "initial",
@@ -60,6 +60,7 @@ export const radioGroup = defineSlotRecipe({
       cursor: "pointer",
       display: "flex",
       _disabled: {
+        color: "text.disabled",
         cursor: "not-allowed",
       },
     },

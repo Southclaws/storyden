@@ -110,6 +110,7 @@ export function EmailLogSettingsScreen() {
             })}
           />
           <CancelAction
+            aria-label="Clear date filter"
             variant="subtle"
             size="sm"
             borderLeftRadius="none"

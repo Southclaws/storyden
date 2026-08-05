@@ -71,3 +71,20 @@ export const Sizes: Story = {
     </LStack>
   ),
 };
+
+export const Disabled: Story = {
+  render: () => (
+    <RadioGroup.Root defaultValue="public">
+      <RadioGroup.Item value="public">
+        <RadioGroup.ItemControl />
+        <RadioGroup.ItemText>Available option</RadioGroup.ItemText>
+        <RadioGroup.ItemHiddenInput />
+      </RadioGroup.Item>
+      <RadioGroup.Item value="phone" disabled>
+        <RadioGroup.ItemControl />
+        <RadioGroup.ItemText>Unavailable option</RadioGroup.ItemText>
+        <RadioGroup.ItemHiddenInput />
+      </RadioGroup.Item>
+    </RadioGroup.Root>
+  ),
+};

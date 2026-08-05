@@ -14,7 +14,7 @@ import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
-import { FormPinInputField } from "@/components/ui/pin-input";
+import { PinInputField } from "@/components/ui/pin-input";
 import { vstack } from "@/styled-system/patterns";
 
 export const FormSchema = z.object({
@@ -77,7 +77,7 @@ export function EmailVerificationScreen(props: Props) {
       </FormControl>
 
       <FormControl>
-        <FormPinInputField control={form.control} name="code" length={6} />
+        <PinInputField control={form.control} name="code" length={6} />
         <FormErrorText>{form.formState.errors["code"]?.message}</FormErrorText>
       </FormControl>
 

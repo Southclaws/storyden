@@ -157,6 +157,12 @@ export function useThreadMutations(
     const session = sessionRef.current;
     if (!session) return;
 
+    const optimisticReaction = {
+      id: uniqueId("optimistic_reply_update_"),
+      emoji,
+      author: session,
+    } satisfies React;
+
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
       if (!data) return;
 
@@ -169,17 +175,9 @@ export function useThreadMutations(
               return reply;
             }
 
-            const newReact = {
-              id: uniqueId("optimistic_reply_update_"),
-              emoji,
-              author: session,
-            } satisfies React;
-
-            const reacts = [...reply.reacts, newReact];
-
             return {
               ...reply,
-              reacts,
+              reacts: [...reply.reacts, optimisticReaction],
             };
           }),
         },
@@ -192,14 +190,75 @@ export function useThreadMutations(
       revalidate: false,
     });
 
-    await postReactAdd(replyID, { emoji });
+    try {
+      const reaction = await postReactAdd(replyID, { emoji });
 
-    await mutate(key);
+      await mutate(
+        key,
+        (data?: ThreadGetResponse) => {
+          if (!data) return;
+
+          return {
+            ...data,
+            replies: {
+              ...data.replies,
+              replies: data.replies.replies.map((reply) =>
+                reply.id === replyID
+                  ? {
+                      ...reply,
+                      reacts: reply.reacts.map((item) =>
+                        item.id === optimisticReaction.id ? reaction : item,
+                      ),
+                    }
+                  : reply,
+              ),
+            },
+          };
+        },
+        { revalidate: false },
+      );
+
+      return reaction;
+    } catch (error) {
+      await mutate(
+        key,
+        (data?: ThreadGetResponse) => {
+          if (!data) return;
+
+          return {
+            ...data,
+            replies: {
+              ...data.replies,
+              replies: data.replies.replies.map((reply) =>
+                reply.id === replyID
+                  ? {
+                      ...reply,
+                      reacts: reply.reacts.filter(
+                        (item) => item.id !== optimisticReaction.id,
+                      ),
+                    }
+                  : reply,
+              ),
+            },
+          };
+        },
+        { revalidate: false },
+      );
+
+      throw error;
+    }
   };
 
   const reactionRemove = async (replyID: Identifier, reactID: Identifier) => {
+    if (reactID.startsWith("optimistic")) {
+      return;
+    }
+
     const session = sessionRef.current;
     if (!session) return;
+
+    let removedReaction: React | undefined;
+    let removedIndex = -1;
 
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
       if (!data) return;
@@ -213,11 +272,21 @@ export function useThreadMutations(
               return reply;
             }
 
-            const reacts = reply.reacts.filter((react) => react.id !== reactID);
+            const index = reply.reacts.findIndex(
+              (reaction) => reaction.id === reactID,
+            );
+            if (index === -1) {
+              return reply;
+            }
+
+            removedReaction = reply.reacts[index]!;
+            removedIndex = index;
 
             return {
               ...reply,
-              reacts,
+              reacts: reply.reacts.filter(
+                (reaction) => reaction.id !== reactID,
+              ),
             };
           }),
         },
@@ -230,7 +299,45 @@ export function useThreadMutations(
       revalidate: false,
     });
 
-    await postReactRemove(replyID, reactID);
+    try {
+      await postReactRemove(replyID, reactID);
+    } catch (error) {
+      const reaction = removedReaction;
+      if (reaction) {
+        await mutate(
+          key,
+          (data?: ThreadGetResponse) => {
+            if (!data) return;
+
+            return {
+              ...data,
+              replies: {
+                ...data.replies,
+                replies: data.replies.replies.map((reply) => {
+                  if (
+                    reply.id !== replyID ||
+                    reply.reacts.some((item) => item.id === reaction.id)
+                  ) {
+                    return reply;
+                  }
+
+                  const reacts = [...reply.reacts];
+                  const index = Math.max(
+                    0,
+                    Math.min(removedIndex, reacts.length),
+                  );
+                  reacts.splice(index, 0, reaction);
+
+                  return { ...reply, reacts };
+                }),
+              },
+            };
+          },
+          { revalidate: false },
+        );
+      }
+      throw error;
+    }
   };
 
   const updateCategory = async (categoryID: Identifier) => {

@@ -61,6 +61,20 @@ export const States: Story = {
   ),
 };
 
+export const DisabledVariants: Story = {
+  render: () => (
+    <HStack gap="3" flexWrap="wrap">
+      {(["solid", "subtle", "outline", "ghost", "plain"] as const).map(
+        (variant) => (
+          <Button key={variant} variant={variant} disabled>
+            {variant}
+          </Button>
+        ),
+      )}
+    </HStack>
+  ),
+};
+
 export const Grouped: Story = {
   render: () => (
     <ButtonGroup variant="outline" size="md">

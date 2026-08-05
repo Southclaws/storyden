@@ -1,18 +1,18 @@
 import { createListCollection } from "@ark-ui/react";
 
-import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
-import { ColourField } from "@/components/form/ColourInput/ColourInput";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
-import { FormDatePickerField } from "@/components/ui/date-picker";
+import { DatePickerField } from "@/components/ui/date-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
+import { HueSelectorField } from "@/components/ui/hue-selector";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { FormSelectField } from "@/components/ui/select";
+import { SelectField } from "@/components/ui/select";
 import { Box, HStack, Stack, WStack, styled } from "@/styled-system/jsx";
 
 import { BannerEditor } from "./BannerEditor/BannerEditor";
@@ -106,7 +106,7 @@ export function BrandSettingsForm(props: Props) {
       <FormControl>
         <FormLabel>About</FormLabel>
         <CardBox>
-          <ContentFormField
+          <ContentComposerField
             control={control}
             name="content"
             // NOTE: Does not update if sidebar is changed. Doesn't matter...
@@ -125,7 +125,7 @@ export function BrandSettingsForm(props: Props) {
         <FormLabel>Colour</FormLabel>
         <HStack>
           <Box>
-            <ColourField
+            <HueSelectorField
               name="accentColour"
               defaultValue={props.settings.accent_colour}
               control={control}
@@ -156,7 +156,7 @@ export function BrandSettingsForm(props: Props) {
           </Button>
         </WStack>
         <CardBox>
-          <ContentFormField
+          <ContentComposerField
             control={control}
             name="motdContent"
             initialValue={motdContentInitialValue}
@@ -178,13 +178,13 @@ export function BrandSettingsForm(props: Props) {
       >
         <FormControl>
           <FormLabel>MOTD starts at</FormLabel>
-          <FormDatePickerField<Form> name="motdStartAt" control={control} />
+          <DatePickerField<Form> name="motdStartAt" control={control} />
           <FormErrorText>{formState.errors.motdStartAt?.message}</FormErrorText>
         </FormControl>
 
         <FormControl>
           <FormLabel>MOTD ends at</FormLabel>
-          <FormDatePickerField<Form> name="motdEndAt" control={control} />
+          <DatePickerField<Form> name="motdEndAt" control={control} />
           <FormErrorText>{formState.errors.motdEndAt?.message}</FormErrorText>
         </FormControl>
       </Stack>
@@ -194,7 +194,7 @@ export function BrandSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>MOTD alert type</FormLabel>
-        <FormSelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
+        <SelectField<Form, (typeof MOTD_TYPE_COLLECTION.items)[number]>
           control={control}
           name="motdType"
           collection={MOTD_TYPE_COLLECTION}

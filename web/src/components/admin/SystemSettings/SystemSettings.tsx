@@ -16,14 +16,14 @@ import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { FormSelectField } from "@/components/ui/select";
-import { FormSliderField } from "@/components/ui/slider";
+import { SelectField } from "@/components/ui/select";
+import { SliderField } from "@/components/ui/slider";
 import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
-import { OperationCostOverrides } from "./OperationCostOverrides";
+import { OperationCostOverridesField } from "./OperationCostOverrides.field";
 import {
   DEFAULT_RATE_LIMIT,
   DEFAULT_RATE_LIMIT_BUCKET,
@@ -166,7 +166,7 @@ export function SystemSettingsForm(props: Props) {
       <RateLimitTester />
 
       <FormControl>
-        <FormSliderField
+        <SliderField
           control={control}
           name="rate_limit"
           label={`Rate limit: ${rateLimit} request units`}
@@ -188,7 +188,7 @@ export function SystemSettingsForm(props: Props) {
       </FormControl>
 
       <FormControl>
-        <FormSliderField
+        <SliderField
           control={control}
           name="rate_limit_period"
           label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
@@ -211,7 +211,7 @@ export function SystemSettingsForm(props: Props) {
       </FormControl>
 
       <FormControl>
-        <FormSliderField
+        <SliderField
           control={control}
           name="rate_limit_bucket"
           label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
@@ -234,7 +234,7 @@ export function SystemSettingsForm(props: Props) {
       </FormControl>
 
       <FormControl>
-        <FormSliderField
+        <SliderField
           control={control}
           name="rate_limit_guest_cost"
           label="Guest rate limit cost multiplier"
@@ -258,7 +258,7 @@ export function SystemSettingsForm(props: Props) {
           costs reduce the number of requests allowed within the rate limit
           period.
         </FormHelperText>
-        <OperationCostOverrides
+        <OperationCostOverridesField
           control={control}
           name="cost_overrides"
           rateLimit={rateLimit ?? DEFAULT_RATE_LIMIT}
@@ -270,7 +270,7 @@ export function SystemSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Client IP mode</FormLabel>
-        <FormSelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+        <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
           control={control}
           name="client_ip_mode"
           collection={CLIENT_IP_MODE_COLLECTION}

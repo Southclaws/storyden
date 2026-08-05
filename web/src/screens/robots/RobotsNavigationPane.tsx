@@ -24,21 +24,7 @@ export function RobotsNavigationPane({ robots, sessions }: Props) {
   const goBack = useSmartBack();
 
   return (
-    <SidebarNavigationPane
-      label="Robots navigation"
-      title="Robots"
-      footer={
-        <SidebarNavigationLink
-          href="/"
-          label="Back to community"
-          icon={<HomeIcon />}
-          onClick={(event) => {
-            event.preventDefault();
-            goBack();
-          }}
-        />
-      }
-    >
+    <SidebarNavigationPane label="Robots navigation" title="Robots">
       <SidebarNavigationSection>
         <SidebarNavigationLink
           href="/robots"

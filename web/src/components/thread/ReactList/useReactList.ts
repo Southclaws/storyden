@@ -1,12 +1,11 @@
-import { groupBy, toPairs } from "lodash";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
-import { Account, React, ReactList, Reply, Thread } from "@/api/openapi-schema";
+import { Account, Reply, Thread } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useThreadMutations } from "@/lib/thread/mutation";
 
-export const REACTION_THROTTLE = 180;
+import { groupReactions } from "./ReactList.model";
 
 export type Props = {
   initialSession?: Account;
@@ -15,33 +14,6 @@ export type Props = {
   currentPage?: number;
 };
 
-export type ReactCount = {
-  emoji: string;
-  count: number;
-  hasReacted: boolean;
-  reactions: React[];
-};
-
-function groupReactions(
-  session: Account | undefined,
-  reacts: ReactList,
-): ReactCount[] {
-  const grouped = groupBy<React>(reacts, "emoji");
-  const pairs = toPairs<React[]>(grouped);
-
-  return pairs.map(
-    ([key, value]) =>
-      ({
-        emoji: key,
-        count: value.length,
-        hasReacted: Boolean(
-          value.find((react) => react.author?.id === session?.id),
-        ),
-        reactions: value,
-      }) satisfies ReactCount,
-  );
-}
-
 export function useReactionList({
   initialSession,
   thread,
@@ -49,79 +21,86 @@ export function useReactionList({
   currentPage,
 }: Props) {
   const session = useSession(initialSession);
-  const { reactionAdd, reactionRemove, revalidate } = useThreadMutations(
+  const { reactionAdd, reactionRemove } = useThreadMutations(
     thread,
     currentPage,
   );
-
-  const isLoggedIn = Boolean(session);
-
+  const pendingRef = useRef(new Set<string>());
+  const [pendingEmojis, setPendingEmojis] = useState<ReadonlySet<string>>(
+    () => new Set(),
+  );
   const postReactions = useRef(reply.reacts);
+
   useEffect(() => {
     postReactions.current = reply.reacts;
   }, [reply.reacts]);
 
-  const reacts = groupReactions(session, reply.reacts);
+  async function runReaction(emoji: string, operation: () => Promise<unknown>) {
+    if (pendingRef.current.has(emoji)) {
+      return;
+    }
 
-  const handleAdd = async (emoji: string) => {
+    pendingRef.current.add(emoji);
+    setPendingEmojis(new Set(pendingRef.current));
+
+    return operation().finally(() => {
+      pendingRef.current.delete(emoji);
+      setPendingEmojis(new Set(pendingRef.current));
+    });
+  }
+
+  async function handleAdd(emoji: string) {
     await handle(async () => {
       await reactionAdd(reply.id, emoji);
     });
-  };
+  }
 
-  const handleRemove = async (id: string) => {
+  async function handleRemove(id: string) {
     await handle(async () => {
       await reactionRemove(reply.id, id);
     });
-  };
+  }
 
-  const handleReactExisting = (emoji: string, retry?: boolean) => {
-    const currentReactions = postReactions.current;
-    const grouped = groupBy<React>(currentReactions, "emoji");
-    const reactions = grouped[emoji];
-
-    const existing = reactions?.find(
-      (r) => r.author?.id === session?.id && r.emoji === emoji,
-    );
-
-    if (existing) {
-      if (existing.id.startsWith("optimistic") && !retry) {
-        // If the selected reaction is not yet hydrated from the server, set a
-        // timeout to re-try the deletion, ensuring that it's post-revalidation.
-        setTimeout(
-          () => handleReactExisting(emoji, true),
-          REACTION_THROTTLE * 2,
-        );
-      } else {
-        handleRemove(existing.id);
-      }
-    } else {
-      handleAdd(emoji);
+  async function handleReactExisting(emoji: string) {
+    if (!session || pendingRef.current.has(emoji)) {
+      return;
     }
-  };
 
-  // Only difference for the picker: if the user has already reacted with the
-  // same emoji, don't do anything instead of removing it. Same as Discord.
-  const handleReactPicker = (emoji: string) => {
-    const currentReactions = postReactions.current;
-    const grouped = groupBy<React>(currentReactions, "emoji");
-    const reactions = grouped[emoji];
-
-    const existing = reactions?.find(
-      (r) => r.author?.id === session?.id && r.emoji === emoji,
+    const existing = postReactions.current.find(
+      (reaction) =>
+        reaction.emoji === emoji && reaction.author?.id === session.id,
     );
 
+    if (existing?.id.startsWith("optimistic")) {
+      return;
+    }
+
+    await runReaction(emoji, () =>
+      existing ? handleRemove(existing.id) : handleAdd(emoji),
+    );
+  }
+
+  async function handleReactPicker(emoji: string) {
+    if (!session || pendingRef.current.has(emoji)) {
+      return;
+    }
+
+    const existing = postReactions.current.some(
+      (reaction) =>
+        reaction.emoji === emoji && reaction.author?.id === session.id,
+    );
     if (existing) {
       return;
     }
 
-    handleAdd(emoji);
-  };
+    await runReaction(emoji, () => handleAdd(emoji));
+  }
 
   return {
     data: {
-      isLoggedIn,
-      reacts,
+      isLoggedIn: Boolean(session),
+      pendingEmojis,
+      reactions: groupReactions(session?.id, reply.reacts),
     },
     handlers: {
       handleReactExisting,

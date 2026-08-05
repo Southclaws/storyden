@@ -1,13 +1,11 @@
-import { Controller } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { FormNumberInputField } from "@/components/ui/number-input";
+import { NumberInputField } from "@/components/ui/number-input";
 import { PageHeading } from "@/components/ui/page-heading";
-import { FormRadioGroupField } from "@/components/ui/radio-group";
+import { RadioGroupField } from "@/components/ui/radio-group";
 import { WStack, styled } from "@/styled-system/jsx";
 
 import { Props, useInterfaceSettings } from "./useInterfaceSettings";
@@ -33,7 +31,7 @@ export function InterfaceSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Default editor</FormLabel>
-        <FormRadioGroupField
+        <RadioGroupField
           control={control}
           name="editorMode"
           items={[
@@ -48,21 +46,9 @@ export function InterfaceSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Signatures</FormLabel>
-        <Controller
-          control={control}
-          name="signaturesEnabled"
-          render={({ field }) => (
-            <Checkbox
-              size="sm"
-              checked={!!field.value}
-              onCheckedChange={({ checked }) => {
-                field.onChange(checked === true);
-              }}
-            >
-              Enable member signatures
-            </Checkbox>
-          )}
-        />
+        <CheckboxField control={control} name="signaturesEnabled" size="sm">
+          Enable member signatures
+        </CheckboxField>
         <FormHelperText>
           When disabled, signatures are hidden under posts and on profiles.
         </FormHelperText>
@@ -70,9 +56,10 @@ export function InterfaceSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Signature max height (px)</FormLabel>
-        <FormNumberInputField
+        <NumberInputField
           control={control}
           name="signatureMaxHeight"
+          ariaLabel="Signature max height in pixels"
           min={32}
           max={2000}
           disabled={!signaturesEnabled}
@@ -84,9 +71,10 @@ export function InterfaceSettingsForm(props: Props) {
 
       <FormControl>
         <FormLabel>Signature max characters</FormLabel>
-        <FormNumberInputField
+        <NumberInputField
           control={control}
           name="signatureMaxChars"
+          ariaLabel="Signature max characters"
           min={1}
           max={10000}
           disabled={!signaturesEnabled}

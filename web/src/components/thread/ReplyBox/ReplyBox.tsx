@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { Controller, ControllerProps } from "react-hook-form";
 
-import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Anchor } from "@/components/site/Anchor";
 import { Admonition } from "@/components/ui/admonition";
@@ -110,41 +109,14 @@ export function ReplyBox(props: Props) {
           </Button>
         </HStack>
 
-        <ReplyBodyInput
+        <ContentComposerField
           name="body"
           control={form.control}
-          handleEmptyStateChange={handlers.handleEmptyStateChange}
+          onEmptyStateChange={handlers.handleEmptyStateChange}
           resetKey={resetKey}
         />
       </styled.form>
     </VStack>
-  );
-}
-
-type ReplyBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
-  handleEmptyStateChange: (isEmpty: boolean) => void;
-  resetKey: string;
-};
-
-function ReplyBodyInput({
-  control,
-  name,
-  handleEmptyStateChange,
-  resetKey,
-}: ReplyBodyInputProps) {
-  return (
-    <Controller<Form>
-      render={({ field: { onChange } }) => {
-        function handleChange(value: string, isEmpty: boolean) {
-          handleEmptyStateChange(isEmpty);
-          onChange(value);
-        }
-
-        return <ContentComposer onChange={handleChange} resetKey={resetKey} />;
-      }}
-      control={control}
-      name={name}
-    />
   );
 }
 

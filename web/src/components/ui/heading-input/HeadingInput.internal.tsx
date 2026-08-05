@@ -32,7 +32,13 @@ function HeadingInputWithRef(
   props: HeadingInputProps,
   ref: ForwardedRef<HTMLSpanElement>,
 ) {
-  const { onValueChange, defaultValue, value, ...rest } = props;
+  const {
+    onValueChange,
+    defaultValue,
+    value,
+    contentEditable = true,
+    ...rest
+  } = props;
   const [recipeProps, componentProps] = headingInput.splitVariantProps(rest);
   const internalRef = useRef<HTMLSpanElement>(null);
 
@@ -90,7 +96,7 @@ function HeadingInputWithRef(
       //
       // https://medium.com/programming-essentials/good-to-know-about-the-state-management-of-a-contenteditable-element-in-react-adb4f933df12
       //
-      contentEditable
+      contentEditable={contentEditable}
       suppressContentEditableWarning
       suppressHydrationWarning
       spellCheck={false}

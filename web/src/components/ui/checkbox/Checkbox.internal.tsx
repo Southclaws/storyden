@@ -2,7 +2,7 @@
 
 import type { Assign } from "@ark-ui/react";
 import { Checkbox as ArkCheckbox } from "@ark-ui/react/checkbox";
-import { forwardRef } from "react";
+import { type Ref, forwardRef } from "react";
 
 import { type CheckboxVariantProps, checkbox } from "@/styled-system/recipes";
 import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
@@ -56,9 +56,13 @@ export {
   CheckboxHiddenInput as HiddenInput,
 } from "@ark-ui/react/checkbox";
 
-export const Checkbox = forwardRef<HTMLLabelElement, RootProps>(
+export type CheckboxProps = RootProps & {
+  inputRef?: Ref<HTMLInputElement>;
+};
+
+export const Checkbox = forwardRef<HTMLLabelElement, CheckboxProps>(
   (props, ref) => {
-    const { children, ...rootProps } = props;
+    const { children, inputRef, ...rootProps } = props;
 
     return (
       <Root ref={ref} {...rootProps}>
@@ -71,7 +75,7 @@ export const Checkbox = forwardRef<HTMLLabelElement, RootProps>(
           </Indicator>
         </Control>
         {children && <Label>{children}</Label>}
-        <ArkCheckbox.HiddenInput />
+        <ArkCheckbox.HiddenInput ref={inputRef} />
       </Root>
     );
   },

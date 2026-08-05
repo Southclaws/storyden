@@ -1,2 +1,2 @@
 export * from "./DatePicker.internal";
-export * from "./DatePicker.form";
+export * from "./DatePicker.field";

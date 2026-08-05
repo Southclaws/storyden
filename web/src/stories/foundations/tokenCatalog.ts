@@ -88,6 +88,11 @@ export const borderTokens: TokenExample[] = [
     usage: "Overlays and boundaries that need clearer separation.",
   },
   {
+    name: "Control border",
+    token: "colors.border.control",
+    usage: "Interactive control outlines that require non-text contrast.",
+  },
+  {
     name: "Disabled border",
     token: "colors.border.disabled",
     usage: "Unavailable controls.",

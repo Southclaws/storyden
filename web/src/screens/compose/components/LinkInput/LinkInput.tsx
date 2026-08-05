@@ -1,20 +1,22 @@
+import { useFormContext } from "react-hook-form";
+
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 
-import { useLinkInput } from "./useLinkInput";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 export function LinkInput() {
-  const { register, fieldError } = useLinkInput();
+  const form = useFormContext<FormShape>();
 
   return (
     <FormControl>
       <Input
         placeholder="Share a link with your post..."
         type="url"
-        {...register("url")}
+        {...form.register("url")}
       />
-      <FormErrorText>{fieldError?.message}</FormErrorText>
+      <FormErrorText>{form.formState.errors.url?.message}</FormErrorText>
     </FormControl>
   );
 }

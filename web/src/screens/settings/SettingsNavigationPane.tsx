@@ -41,21 +41,7 @@ export function SettingsNavigationPane() {
     : [];
 
   return (
-    <SidebarNavigationPane
-      label="Settings navigation"
-      title="Settings"
-      footer={
-        <SidebarNavigationLink
-          href="/"
-          label="Back to community"
-          icon={<HomeIcon />}
-          onClick={(event) => {
-            event.preventDefault();
-            goBack();
-          }}
-        />
-      }
-    >
+    <SidebarNavigationPane label="Settings navigation" title="Settings">
       <SidebarNavigationSection>
         {sections.map((section) => (
           <SidebarNavigationLink

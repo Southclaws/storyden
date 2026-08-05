@@ -1,3 +1,2 @@
 export * from "./RadioGroup.internal";
-export * from "./RadioGroup.form";
-export * from "./RadioGroupCard.form";
+export * from "./RadioGroup.field";

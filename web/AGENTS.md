@@ -73,7 +73,8 @@ Component folders generally follow this shape:
   one.
 - `<ComponentName>.internal.tsx` contains the lower-level implementation.
 - `<ComponentName>.tsx` may contain a closed/simple variant when useful.
-- `<ComponentName>.form.tsx` contains React Hook Form wrappers for form variants.
+- `<ComponentName>.field.tsx` contains type-safe React Hook Form adapters for
+  field variants.
 - `<ComponentName>.stories.tsx` documents the component in Storybook.
 - `<ComponentName>.test.tsx` covers complex behavior when needed.
 

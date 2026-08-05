@@ -1,7 +1,7 @@
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
-import { FormColourPickerField } from "@/components/ui/color-picker";
+import { ColorPickerField } from "@/components/ui/color-picker";
 import { FormControl } from "@/components/ui/form-control";
 import { FormFeedback } from "@/components/ui/form-feedback";
 import { FormLabel } from "@/components/ui/form-label";
@@ -100,7 +100,11 @@ export function CategoryEditModal(props: Props) {
 
           <FormControl>
             <FormLabel>Colour</FormLabel>
-            <FormColourPickerField control={form.control} name="colour" />
+            <ColorPickerField
+              control={form.control}
+              name="colour"
+              ariaLabel="Category colour"
+            />
             <FormFeedback error={form.formState.errors["colour"]?.message}>
               The colour for the category.
             </FormFeedback>

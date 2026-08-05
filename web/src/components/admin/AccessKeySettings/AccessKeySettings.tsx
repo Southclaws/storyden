@@ -8,6 +8,7 @@ import {
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { PermissionBadge } from "@/components/role/PermissionBadge";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import * as Alert from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
@@ -44,15 +45,19 @@ export function AccessKeySettings({ keys }: Props) {
     <LStack>
       <PageHeading>Access keys</PageHeading>
       <p>All access keys created by members of this site.</p>
-      <div>
-        <span>
-          <WarningIcon display="inline" width="4" /> <strong>Note:</strong> if
-          you revoke the ability to use access keys from a role or member (by
-          removing the{" "}
-          {<PermissionBadge permission={Permission.USE_PERSONAL_ACCESS_KEYS} />}{" "}
-          permission), this will not revoke their existing access keys.
-        </span>
-      </div>
+      <Alert.Root>
+        <Alert.Icon asChild>
+          <WarningIcon />
+        </Alert.Icon>
+        <Alert.Content>
+          <Alert.Title>Existing access keys remain active</Alert.Title>
+          <Alert.Description>
+            Revoking access-key permission from a role or member by removing the{" "}
+            <PermissionBadge permission={Permission.USE_PERSONAL_ACCESS_KEYS} />{" "}
+            permission does not revoke access keys they have already created.
+          </Alert.Description>
+        </Alert.Content>
+      </Alert.Root>
 
       <WStack alignItems="center" color="text.subtle">
         {hasInactive ? (

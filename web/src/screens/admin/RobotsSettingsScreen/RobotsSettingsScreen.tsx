@@ -3,7 +3,7 @@
 import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import { z } from "zod";
 
@@ -40,7 +40,6 @@ import {
   RobotWorkspaceProvider,
 } from "@/api/openapi-schema";
 import { RobotMCPOnboardingModal } from "@/components/robots/RobotMCPOnboardingModal";
-import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
 import { EmptyState } from "@/components/site/EmptyState";
 import { InfoTip } from "@/components/site/InfoTip";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
@@ -49,17 +48,16 @@ import * as Alert from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { ComboboxField } from "@/components/ui/combobox";
 import { FormControl } from "@/components/ui/form-control";
 import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
-import { CheckIcon } from "@/components/ui/icons/Check";
-import { SelectIcon } from "@/components/ui/icons/Select";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
-import * as Select from "@/components/ui/select";
+import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
@@ -588,55 +586,25 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
 
       <FormControl>
         <FormLabel>Provider</FormLabel>
-        <Controller
+        <SelectField
           control={form.control}
           name="provider"
-          render={({ field }) => (
-            <Select.Root
-              collection={providerCollection}
-              value={field.value ? [field.value] : []}
-              onValueChange={({ value }) => field.onChange(value[0] ?? "")}
-              positioning={{ sameWidth: true }}
-              disabled={providers.length === 0}
-            >
-              <Select.Control>
-                <Select.Trigger w="full">
-                  <Select.ValueText placeholder="Select a provider" />
-                  <SelectIcon />
-                </Select.Trigger>
-              </Select.Control>
-              <Select.Positioner>
-                <Select.Content>
-                  {providerCollection.items.map((item) => (
-                    <Select.Item key={item.value} item={item}>
-                      <Select.ItemText>{item.label}</Select.ItemText>
-                      <Select.ItemIndicator>
-                        <CheckIcon />
-                      </Select.ItemIndicator>
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Positioner>
-            </Select.Root>
-          )}
+          collection={providerCollection}
+          placeholder="Select a provider"
+          positioning={{ sameWidth: true }}
+          disabled={providers.length === 0}
         />
         {providersQuery.error ? <Unready error={providersQuery.error} /> : null}
         <FormErrorText>{form.formState.errors.provider?.message}</FormErrorText>
       </FormControl>
 
-      <Controller
+      <CheckboxField
         control={form.control}
         name="allow_untrusted_commands"
-        render={({ field }) => (
-          <Checkbox
-            size="sm"
-            checked={!!field.value}
-            onCheckedChange={({ checked }) => field.onChange(checked === true)}
-          >
-            Allow untrusted commands
-          </Checkbox>
-        )}
-      />
+        size="sm"
+      >
+        Allow untrusted commands
+      </CheckboxField>
 
       <WStack justifyContent="end">
         <Button type="button" variant="ghost" onClick={onClose}>
@@ -1035,19 +1003,9 @@ function RobotProviderConfigurationForm({
         </Alert.Root>
       )}
 
-      <Controller
-        control={form.control}
-        name="enabled"
-        render={({ field }) => (
-          <Checkbox
-            size="sm"
-            checked={!!field.value}
-            onCheckedChange={({ checked }) => field.onChange(checked === true)}
-          >
-            Enable provider
-          </Checkbox>
-        )}
-      />
+      <CheckboxField control={form.control} name="enabled" size="sm">
+        Enable provider
+      </CheckboxField>
 
       <FormControl>
         <FormLabel>API key</FormLabel>
@@ -1143,43 +1101,50 @@ function GlobalDefaultModelForm({
 
   return (
     <styled.form w="full" onSubmit={onSubmit}>
-      <WStack justifyContent="space-between" alignItems="end">
-        <FormControl>
-          <HStack gap="1">
-            <FormLabel mb="0">Default model</FormLabel>
-            <InfoTip title="Default Robot model">
-              The model used by the Robot Builder. Other Robots can have their
-              own models configured.
-            </InfoTip>
-          </HStack>
-          <RobotModelComboboxField
+      <FormControl>
+        <HStack gap="1">
+          <FormLabel mb="0">Default model</FormLabel>
+          <InfoTip title="Default Robot model">
+            The model used by the Robot Builder. Other Robots can have their own
+            models configured.
+          </InfoTip>
+        </HStack>
+
+        <WStack alignItems="center">
+          <ComboboxField
             control={form.control}
             name="default_model"
-            models={models}
+            items={models.map((model) => ({
+              label: model.ref,
+              value: model.ref,
+            }))}
             placeholder={
               disabled ? "Configure a provider first" : "Select default model"
             }
+            ariaLabel="Select default model"
             disabled={disabled}
           />
-          {helperText && (
-            <Text color="status.warning.content" fontSize="xs">
-              {helperText}
-            </Text>
-          )}
-          <FormErrorText>
-            {form.formState.errors.default_model?.message}
-          </FormErrorText>
-        </FormControl>
 
-        <Button
-          type="submit"
-          size="sm"
-          loading={form.formState.isSubmitting}
-          disabled={disabled || !form.formState.isDirty}
-        >
-          Save
-        </Button>
-      </WStack>
+          <Button
+            type="submit"
+            size="sm"
+            flexShrink="0"
+            loading={form.formState.isSubmitting}
+            disabled={disabled || !form.formState.isDirty}
+          >
+            Save
+          </Button>
+        </WStack>
+
+        {helperText && (
+          <Text color="status.warning.content" fontSize="xs">
+            {helperText}
+          </Text>
+        )}
+        <FormErrorText>
+          {form.formState.errors.default_model?.message}
+        </FormErrorText>
+      </FormControl>
     </styled.form>
   );
 }

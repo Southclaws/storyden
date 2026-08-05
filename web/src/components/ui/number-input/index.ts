@@ -1,2 +1,2 @@
 export * from "./NumberInput.internal";
-export * from "./NumberInput.form";
+export * from "./NumberInput.field";
