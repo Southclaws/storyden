@@ -113,6 +113,8 @@
   --navigation-pane-content-padding: var(--spacing-2);
   --navigation-pane-footer-gap: var(--spacing-4);
   --navigation-pane-padding-block-end: var(--spacing-4);
+  --navigation-notification-indicator-inset: var(--spacing-0\.5);
+  --navigation-notification-indicator-size: var(--sizes-1\.5);
   --navigation-editor-overlay-background: color-mix(
     in srgb,
     var(--colors-background-inset) 30%,
@@ -561,6 +563,17 @@ body {
 
 .navigation-pane__member-actions {
   min-width: 0;
+}
+
+.notifications-trigger__unread-indicator {
+  position: absolute;
+  inset-block-start: var(--navigation-notification-indicator-inset);
+  inset-inline-end: var(--navigation-notification-indicator-inset);
+  width: var(--navigation-notification-indicator-size);
+  height: var(--navigation-notification-indicator-size);
+  border-radius: var(--radii-full);
+  background: var(--colors-status-danger-content);
+  pointer-events: none;
 }
 
 .navigation__scroll-viewport {
