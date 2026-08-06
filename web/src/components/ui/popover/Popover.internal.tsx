@@ -2,6 +2,7 @@
 
 import type { Assign } from "@ark-ui/react";
 import { Popover } from "@ark-ui/react/popover";
+import type { ComponentProps } from "react";
 
 import { type PopoverVariantProps, popover } from "@/styled-system/recipes";
 import type { JsxStyleProps } from "@/styled-system/types";
@@ -9,13 +10,36 @@ import { createStyleContext } from "@/utils/create-style-context";
 
 const { withRootProvider, withContext } = createStyleContext(popover);
 
+const popoverPositioning = {
+  fitViewport: true,
+  flip: true,
+  gutter: 8,
+  overflowPadding: 8,
+  slide: true,
+} satisfies NonNullable<Popover.RootProps["positioning"]>;
+
 export interface RootProps extends Popover.RootProps, PopoverVariantProps {}
 export interface RootProviderProps
   extends Popover.RootProviderProps, PopoverVariantProps {}
 
-export const Root = withRootProvider<RootProps>(Popover.Root);
+const RootBase = withRootProvider<RootProps>(Popover.Root);
 
-export const RootProvider = withRootProvider<RootProviderProps>(Popover.Root);
+export function Root({ positioning, ...props }: RootProps) {
+  return (
+    <RootBase
+      {...props}
+      positioning={{ ...popoverPositioning, ...positioning }}
+    />
+  );
+}
+
+const RootProviderBase = withRootProvider<RootProviderProps>(
+  Popover.RootProvider,
+);
+
+export function RootProvider(props: RootProviderProps) {
+  return <RootProviderBase {...props} />;
+}
 
 export const Anchor = withContext<
   HTMLDivElement,
@@ -41,6 +65,7 @@ export const Content = withContext<
   HTMLDivElement,
   Assign<JsxStyleProps, Popover.ContentProps>
 >(Popover.Content, "content");
+export type ContentProps = ComponentProps<typeof Content>;
 
 export const Description = withContext<
   HTMLParagraphElement,
@@ -56,6 +81,7 @@ export const Positioner = withContext<
   HTMLDivElement,
   Assign<JsxStyleProps, Popover.PositionerProps>
 >(Popover.Positioner, "positioner");
+export type PositionerProps = ComponentProps<typeof Positioner>;
 
 export const Title = withContext<
   HTMLDivElement,

@@ -1,10 +1,8 @@
-import { Portal } from "@ark-ui/react";
-
 import { IconButton } from "@/components/ui/icon-button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { deriveError } from "@/utils/error";
 
-import * as Tooltip from "./Tooltip.internal";
+import { Tooltip } from "./Tooltip";
 
 type ErrorTooltipProps = {
   error?: unknown;
@@ -16,26 +14,10 @@ export function ErrorTooltip({ error }: ErrorTooltipProps) {
   }
 
   return (
-    <Tooltip.Root openDelay={100}>
-      <Tooltip.Trigger asChild>
-        <IconButton
-          type="button"
-          variant="ghost"
-          aria-label="Show error details"
-        >
-          <WarningIcon color="status.danger.content" />
-        </IconButton>
-      </Tooltip.Trigger>
-      <Portal>
-        <Tooltip.Positioner>
-          <Tooltip.Content>
-            <Tooltip.Arrow>
-              <Tooltip.ArrowTip />
-            </Tooltip.Arrow>
-            {deriveError(error)}
-          </Tooltip.Content>
-        </Tooltip.Positioner>
-      </Portal>
-    </Tooltip.Root>
+    <Tooltip content={deriveError(error)} openDelay={100}>
+      <IconButton type="button" variant="ghost" aria-label="Show error details">
+        <WarningIcon color="status.danger.content" />
+      </IconButton>
+    </Tooltip>
   );
 }

@@ -9,15 +9,30 @@ import { createStyleContext } from "@/utils/create-style-context";
 
 const { withRootProvider, withContext } = createStyleContext(menu);
 
+const menuPositioning = {
+  fitViewport: true,
+  flip: true,
+  gutter: 4,
+  overflowPadding: 8,
+  slide: true,
+} satisfies NonNullable<Menu.RootProps["positioning"]>;
+
 export type RootProviderProps = ComponentProps<typeof RootProvider>;
 export const RootProvider = withRootProvider<
   Assign<Menu.RootProviderProps, MenuVariantProps>
 >(Menu.RootProvider);
 
-export type RootProps = ComponentProps<typeof Root>;
-export const Root = withRootProvider<Assign<Menu.RootProps, MenuVariantProps>>(
+const RootBase = withRootProvider<Assign<Menu.RootProps, MenuVariantProps>>(
   Menu.Root,
 );
+
+export type RootProps = ComponentProps<typeof RootBase>;
+
+export function Root({ positioning, ...props }: RootProps) {
+  return (
+    <RootBase {...props} positioning={{ ...menuPositioning, ...positioning }} />
+  );
+}
 
 export const Arrow = withContext<
   HTMLDivElement,
@@ -38,6 +53,7 @@ export const Content = withContext<
   HTMLDivElement,
   Assign<HTMLStyledProps<"div">, Menu.ContentBaseProps>
 >(Menu.Content, "content");
+export type ContentProps = ComponentProps<typeof Content>;
 
 export const ContextTrigger = withContext<
   HTMLButtonElement,
@@ -78,6 +94,7 @@ export const Positioner = withContext<
   HTMLDivElement,
   Assign<HTMLStyledProps<"div">, Menu.PositionerBaseProps>
 >(Menu.Positioner, "positioner");
+export type PositionerProps = ComponentProps<typeof Positioner>;
 
 export const RadioItemGroup = withContext<
   HTMLDivElement,
