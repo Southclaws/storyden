@@ -9,15 +9,33 @@ import { createStyleContext } from "@/utils/create-style-context";
 
 const { withRootProvider, withContext } = createStyleContext(tooltip);
 
+const tooltipPositioning = {
+  fitViewport: true,
+  flip: true,
+  gutter: 6,
+  overflowPadding: 8,
+  slide: true,
+} satisfies NonNullable<Tooltip.RootProps["positioning"]>;
+
 export type RootProviderProps = ComponentProps<typeof RootProvider>;
 export const RootProvider = withRootProvider<
   Assign<Tooltip.RootProviderProps, TooltipVariantProps>
 >(Tooltip.RootProvider);
 
-export type RootProps = ComponentProps<typeof Root>;
-export const Root = withRootProvider<
+const RootBase = withRootProvider<
   Assign<Tooltip.RootProps, TooltipVariantProps>
 >(Tooltip.Root);
+
+export type RootProps = ComponentProps<typeof RootBase>;
+
+export function Root({ positioning, ...props }: RootProps) {
+  return (
+    <RootBase
+      {...props}
+      positioning={{ ...tooltipPositioning, ...positioning }}
+    />
+  );
+}
 
 export const Arrow = withContext<
   HTMLDivElement,
@@ -33,11 +51,13 @@ export const Content = withContext<
   HTMLDivElement,
   Assign<HTMLStyledProps<"div">, Tooltip.ContentBaseProps>
 >(Tooltip.Content, "content");
+export type ContentProps = ComponentProps<typeof Content>;
 
 export const Positioner = withContext<
   HTMLDivElement,
   Assign<HTMLStyledProps<"div">, Tooltip.PositionerBaseProps>
 >(Tooltip.Positioner, "positioner");
+export type PositionerProps = ComponentProps<typeof Positioner>;
 
 export const Trigger = withContext<
   HTMLButtonElement,

@@ -9,6 +9,16 @@ import { createStyleContext } from "@/utils/create-style-context";
 
 const { withProvider, withContext } = createStyleContext(select);
 
+const selectPositioning = {
+  fitViewport: true,
+  flip: true,
+  gutter: 4,
+  overflowPadding: 8,
+  slide: true,
+} satisfies NonNullable<
+  Select.RootBaseProps<Select.CollectionItem>["positioning"]
+>;
+
 export type RootProviderProps = ComponentProps<typeof RootProvider>;
 export const RootProvider = withProvider<
   HTMLDivElement,
@@ -21,14 +31,24 @@ export const RootProvider = withProvider<
   >
 >(Select.RootProvider, "root");
 
-export type RootProps = ComponentProps<typeof Root>;
-export const Root = withProvider<
+const RootBase = withProvider<
   HTMLDivElement,
   Assign<
     Assign<HTMLStyledProps<"div">, Select.RootBaseProps<Select.CollectionItem>>,
     SelectVariantProps
   >
 >(Select.Root, "root");
+
+export type RootProps = ComponentProps<typeof RootBase>;
+
+export function Root({ positioning, ...props }: RootProps) {
+  return (
+    <RootBase
+      {...props}
+      positioning={{ ...selectPositioning, ...positioning }}
+    />
+  );
+}
 
 export const ClearTrigger = withContext<
   HTMLButtonElement,

@@ -9,6 +9,16 @@ import { createStyleContext } from "@/utils/create-style-context";
 
 const { withProvider, withContext } = createStyleContext(combobox);
 
+const comboboxPositioning = {
+  fitViewport: true,
+  flip: true,
+  gutter: 4,
+  overflowPadding: 8,
+  slide: true,
+} satisfies NonNullable<
+  Combobox.RootBaseProps<Combobox.CollectionItem>["positioning"]
+>;
+
 export type RootProviderProps = ComponentProps<typeof RootProvider>;
 export const RootProvider = withProvider<
   HTMLDivElement,
@@ -21,8 +31,7 @@ export const RootProvider = withProvider<
   >
 >(Combobox.RootProvider, "root");
 
-export type RootProps = ComponentProps<typeof Root>;
-export const Root = withProvider<
+const RootBase = withProvider<
   HTMLDivElement,
   Assign<
     Assign<
@@ -32,6 +41,17 @@ export const Root = withProvider<
     ComboboxVariantProps
   >
 >(Combobox.Root, "root");
+
+export type RootProps = ComponentProps<typeof RootBase>;
+
+export function Root({ positioning, ...props }: RootProps) {
+  return (
+    <RootBase
+      {...props}
+      positioning={{ ...comboboxPositioning, ...positioning }}
+    />
+  );
+}
 
 export const ClearTrigger = withContext<
   HTMLButtonElement,
