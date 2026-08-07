@@ -281,6 +281,12 @@ func mount(
 		return c.JSON(http.StatusOK, doc)
 	})
 
+	router.GET("/.well-known/integrations.json", func(c echo.Context) error {
+		c.Response().Header().Set("Cache-Control", "public, max-age=3600")
+
+		return c.JSON(http.StatusOK, buildIntegrationsDocument(cfg, oauthBinding))
+	})
+
 	// RFC 6750 §3 / RFC 9728 §5.1: bearer-protected OAuth resources must answer
 	// 401s with a WWW-Authenticate challenge pointing clients at the protected
 	// resource metadata document for discovery.
