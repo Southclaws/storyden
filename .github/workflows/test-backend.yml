@@ -76,3 +76,41 @@ jobs:
           cache-dependency-path: "**/go.sum"
       - run: go run ./cmd/migrate
       - run: go test -p 4 ./...
+
+  backend-test-turso:
+    runs-on: ubuntu-latest
+    env:
+      DB_NAME: storyden-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      TURSO_API_TOKEN: ${{ secrets.TURSO_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: "1.25"
+          cache: true
+          cache-dependency-path: "**/go.sum"
+
+      - name: Install Turso CLI
+        run: |
+          curl -sSL https://github.com/tursodatabase/homebrew-tap/releases/latest/download/homebrew-tap_Linux_x86_64.tar.gz -o turso.tar.gz
+          tar -xzf turso.tar.gz turso
+          sudo mv turso /usr/local/bin/
+          rm turso.tar.gz
+          turso --version
+
+      - name: Create Turso test database
+        run: |
+          turso db create $DB_NAME --group testing --wait
+          DB_URL=$(turso db show $DB_NAME --url)
+          echo "DATABASE_URL=${DB_URL}?authToken=${TURSO_API_TOKEN}" >> $GITHUB_ENV
+
+      - name: Run migrations
+        run: go run ./cmd/migrate
+
+      - name: Run tests
+        run: go test -p 4 ./...
+
+      - name: Cleanup Turso database
+        if: always()
+        run: turso db destroy $DB_NAME --yes
