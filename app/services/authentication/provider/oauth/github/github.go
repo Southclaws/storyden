@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	service   = authentication.ServiceOAuthGitHub
+	service   = authentication.AuthServiceOAuthGitHub
 	tokenType = authentication.TokenTypeOAuth
 )
 
