@@ -112,7 +112,7 @@ func (p *Provider) oauthConfig(redirect string) *oauth2.Config {
 
 // Link returns the URL to redirect a user to Keycloak for authentication.
 func (p *Provider) Link(redirectPath string) (string, error) {
-	state, err := p.ed.Encrypt(map[string]any{"redirect": redirectPath}, time.Minute*10)
+	state, err := p.ed.Encrypt(endec.PurposeOAuthState, map[string]any{"redirect": redirectPath}, time.Minute*10)
 	if err != nil {
 		return "", fault.Wrap(err)
 	}
@@ -122,7 +122,7 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 
 // Login completes the OAuth2 flow: exchanges code, verifies ID token, and returns the Account.
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
-	c, err := p.ed.Decrypt(state)
+	c, err := p.ed.Decrypt(endec.PurposeOAuthState, state)
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
@@ -130,7 +130,15 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	redirect := c["redirect"].(string)
+	redirect, ok := c["redirect"].(string)
+	if !ok {
+		return nil, fault.New("state value has no redirect",
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("malformed state value", "This link is not valid, please try again from the start."),
+		)
+	}
+
 	oac := p.oauthConfig(redirect)
 	tok, err := oac.Exchange(ctx, code)
 	if err != nil {

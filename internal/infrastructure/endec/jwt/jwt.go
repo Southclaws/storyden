@@ -13,6 +13,8 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
 
+const purposeClaim = "sdp"
+
 type jwtEncrypterDecrypter struct {
 	key []byte
 }
@@ -35,9 +37,13 @@ func New(cfg config.Config) (endec.EncrypterDecrypter, error) {
 	return &jwtEncrypterDecrypter{key: cfg.JWTSecret}, nil
 }
 
-func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duration) (string, error) {
+func (e *jwtEncrypterDecrypter) Encrypt(purpose endec.Purpose, data endec.Claims, lifespan time.Duration) (string, error) {
 	if len(e.key) == 0 {
 		return "", fault.New("no JWT secret provided")
+	}
+
+	if purpose == "" {
+		return "", fault.New("no token purpose provided")
 	}
 
 	var nonce [24]byte
@@ -56,6 +62,8 @@ func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duratio
 		claims[k] = v
 	}
 
+	claims[purposeClaim] = string(purpose)
+
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	s, err := t.SignedString(e.key)
@@ -66,7 +74,7 @@ func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duratio
 	return s, nil
 }
 
-func (e *jwtEncrypterDecrypter) Decrypt(message string) (endec.Claims, error) {
+func (e *jwtEncrypterDecrypter) Decrypt(purpose endec.Purpose, message string) (endec.Claims, error) {
 	t, err := jwt.Parse(message, e.keyfunc)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -79,6 +87,11 @@ func (e *jwtEncrypterDecrypter) Decrypt(message string) (endec.Claims, error) {
 	claims, ok := t.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fault.New("invalid token")
+	}
+
+	got, ok := claims[purposeClaim].(string)
+	if !ok || got != string(purpose) {
+		return nil, fault.Newf("token was not issued for %s", purpose)
 	}
 
 	return endec.Claims(claims), nil

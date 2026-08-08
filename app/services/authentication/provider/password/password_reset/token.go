@@ -35,7 +35,7 @@ func (r *TokenProvider) GetResetToken(ctx context.Context, accountID account.Acc
 		accountIDKey: accountID.String(),
 	}
 
-	token, err := r.endec.Encrypt(claims, resetTokenLifespan)
+	token, err := r.endec.Encrypt(endec.PurposePasswordReset, claims, resetTokenLifespan)
 	if err != nil {
 		return "", fault.Wrap(err, fctx.With(ctx))
 	}
@@ -44,7 +44,7 @@ func (r *TokenProvider) GetResetToken(ctx context.Context, accountID account.Acc
 }
 
 func (r *TokenProvider) Validate(ctx context.Context, tokenString string) (account.AccountID, error) {
-	token, err := r.endec.Decrypt(tokenString)
+	token, err := r.endec.Decrypt(endec.PurposePasswordReset, tokenString)
 	if err != nil {
 		return account.AccountID{}, fault.Wrap(err,
 			fctx.With(ctx),
