@@ -42,12 +42,19 @@ func TestHandleValidation(t *testing.T) {
 				tests.Status(t, err, trailingHyphen, http.StatusBadRequest)
 			})
 
-			t.Run("fails_uppercase_handle", func(t *testing.T) {
-				uppercaseHandle, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{
-					Identifier: "Hello123",
-					Token:      "password",
-				})
-				tests.Status(t, err, uppercaseHandle, http.StatusBadRequest)
+			t.Run("normalises_uppercase_handle", func(t *testing.T) {
+				uppercaseHandle := tests.AssertRequest(
+					cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{
+						Identifier: "Hello123",
+						Token:      "password",
+					}),
+				)(t, http.StatusOK)
+				accountID := account.AccountID(utils.Must(xid.FromString(uppercaseHandle.JSON200.Id)))
+				session := sh.WithSession(e2e.WithAccountID(root, accountID))
+				profile := tests.AssertRequest(
+					cl.AccountGetWithResponse(root, session),
+				)(t, http.StatusOK)
+				assert.Equal(t, "hello123", profile.JSON200.Handle)
 			})
 
 			t.Run("fails_long_handle", func(t *testing.T) {

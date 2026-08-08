@@ -2,6 +2,7 @@ package password
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,6 +18,8 @@ import (
 )
 
 func (p *Provider) RegisterWithHandle(ctx context.Context, handle string, password string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+	handle = strings.ToLower(handle)
+
 	if err := provider.CheckMode(ctx, p.logger, p.settings, authentication.ModeHandle); err != nil {
 		return nil, err
 	}
@@ -53,6 +56,8 @@ func (p *Provider) RegisterWithHandle(ctx context.Context, handle string, passwo
 }
 
 func (b *Provider) LoginWithHandle(ctx context.Context, handle string, password string) (*account.Account, error) {
+	handle = strings.ToLower(handle)
+
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),

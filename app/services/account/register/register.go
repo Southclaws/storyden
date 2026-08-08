@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -205,7 +206,7 @@ func (s *Registrar) ensureOAuthRegistrationAllowed(ctx context.Context) error {
 
 func (s *Registrar) create(ctx context.Context, handle opt.Optional[string], opts ...account_writer.Option) (*account.Account, error) {
 	// If no handle was given, generate one using adjective-animal.
-	handleOrGenerated := handle.Or(petname.Generate(2, "-"))
+	handleOrGenerated := strings.ToLower(handle.Or(petname.Generate(2, "-")))
 
 	if err := account.ValidateHandle(ctx, handleOrGenerated); err != nil {
 		return nil, err
@@ -401,6 +402,8 @@ func (s *Registrar) GetOrCreateViaHandle(
 	handle string,
 	name string,
 ) (*account.Account, error) {
+	handle = mark.Slugify(handle)
+
 	// A session will be present if the user is attempting to link an account
 	// to their Storyden account, rather than registering or logging in.
 	session := session.GetOptAccount(ctx)
