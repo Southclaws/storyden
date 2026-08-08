@@ -56,12 +56,15 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
+	if err := invalidateNodes(ctx, w.cache, node); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchema, schemas, node)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := invalidateNodes(ctx, w.cache, node); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -96,23 +99,22 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		},
 	}
 
-	if err := w.cache.Invalidate(ctx, parent.Slug); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	for _, node := range children {
-		if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
 		events = append(events, rpc.EventNodeUpdated{
 			ID:   library.NodeID(node.ID),
 			Slug: node.Slug,
 		})
 	}
+	affected := append([]*ent.Node{parent}, children...)
+	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	schema, err := w.updateNodes(ctx, schemas, children...)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -149,28 +151,47 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 		},
 	}
 
-	if err := w.cache.Invalidate(ctx, current.Slug); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	for _, node := range siblings {
-		if err := w.cache.Invalidate(ctx, node.Slug); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
 		events = append(events, rpc.EventNodeUpdated{
 			ID:   library.NodeID(node.ID),
 			Slug: node.Slug,
 		})
+	}
+	affected := append([]*ent.Node{current}, siblings...)
+	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	schema, err := w.updateNodes(ctx, schemas, siblings...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if err := invalidateNodes(ctx, w.cache, affected...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	w.bus.PublishMany(ctx, events)
 
 	return schema, nil
+}
+
+func invalidateNodes(ctx context.Context, cache *node_cache.Cache, nodes ...*ent.Node) error {
+	seen := make(map[xid.ID]struct{}, len(nodes))
+	for _, node := range nodes {
+		if node == nil {
+			continue
+		}
+		if _, ok := seen[node.ID]; ok {
+			continue
+		}
+		seen[node.ID] = struct{}{}
+
+		if err := cache.Invalidate(ctx, node.ID, node.Slug); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {

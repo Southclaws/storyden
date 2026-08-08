@@ -65,11 +65,8 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		}
 	}
 
-	if err := s.cache.Invalidate(ctx, n.GetSlug()); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	oldVisibility := n.Visibility
+	previousSlug := n.GetSlug()
 
 	pre, err := s.preMutation(ctx, p, opt.NewPtr(n))
 	if err != nil {
@@ -84,18 +81,35 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		}
 	}
 
+	nextSlug := previousSlug
+	if slug, ok := p.Slug.Get(); ok {
+		nextSlug = slug.String()
+	}
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), nextSlug, previousSlug); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	n, err = s.nodeWriter.Update(ctx, qk, pre.opts...)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if props, ok := p.Properties.Get(); ok {
 		updatedProperties, err := s.applyPropertyMutations(ctx, n, props)
 		if err != nil {
+			_ = s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug)
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n.Properties = opt.New(*updatedProperties)
+
+		if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	// Emit update event

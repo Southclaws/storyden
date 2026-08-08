@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/mileusna/useragent"
 
@@ -29,18 +28,10 @@ func WithRequestInfo(ctx context.Context, r *http.Request, opid string, clientAd
 
 	ifNoneMatch := opt.NewIf(r.Header.Get("If-None-Match"), notEmpty)
 
-	ifModifiedSince, err := opt.MapErr(
-		opt.NewIf(r.Header.Get("If-Modified-Since"), notEmpty),
-		parseConditionalRequestTime,
-	)
-	if err != nil {
-		ifModifiedSince = opt.NewEmpty[time.Time]()
-	}
-
 	info := Info{
 		OperationID:   opid,
 		UserAgent:     ua,
-		CacheQuery:    cachecontrol.NewQuery(ifNoneMatch, ifModifiedSince),
+		CacheQuery:    cachecontrol.NewQuery(ifNoneMatch),
 		ClientAddr:    clientAddr,
 		ClientAddrSSR: clientAddrSSR,
 	}
@@ -87,8 +78,4 @@ func getInfo(ctx context.Context) Info {
 
 func notEmpty(s string) bool {
 	return s != ""
-}
-
-func parseConditionalRequestTime(in string) (time.Time, error) {
-	return http.ParseTime(in)
 }

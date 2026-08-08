@@ -85,9 +85,25 @@ func (c *Cache) storeTimestamp(ctx context.Context, slug string, ts time.Time) e
 }
 
 func (c *Cache) Invalidate(ctx context.Context, slug string) error {
-	now := c.clock().UTC()
+	return c.InvalidateMany(ctx, slug)
+}
 
-	return c.storeTimestamp(ctx, slug, now)
+func (c *Cache) InvalidateMany(ctx context.Context, slugs ...string) error {
+	now := c.clock().UTC()
+	value := now.Format(storeTimeFmt)
+	values := make(map[string]string, len(slugs))
+
+	for _, slug := range slugs {
+		if slug == "" {
+			continue
+		}
+		values[c.cacheKey(slug)] = value
+	}
+	if len(values) == 0 {
+		return nil
+	}
+
+	return c.store.SetMany(ctx, values, cacheTTL)
 }
 
 func (c *Cache) delete(ctx context.Context, slug string) error {

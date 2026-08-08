@@ -92,6 +92,10 @@ func (s *Mutator) Update(ctx context.Context, replyID post.ID, partial Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.RootPostID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	s.bus.Publish(ctx, &rpc.EventThreadReplyUpdated{
 		ThreadID: p.RootPostID,
 		ReplyID:  p.ID,

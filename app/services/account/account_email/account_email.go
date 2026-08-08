@@ -34,12 +34,16 @@ func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
-	if err != nil {
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	ae, err := m.verifier.BeginEmailVerification(ctx, accountID, address, otp)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -57,12 +61,16 @@ func (m *Manager) AddUnverified(ctx context.Context, accountID account.AccountID
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
-	if err != nil {
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	ae, err := m.emailRepo.Add(ctx, accountID, address, code)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -84,12 +92,16 @@ func (m *Manager) LookupAccount(ctx context.Context, address mail.Address) (*acc
 }
 
 func (m *Manager) Remove(ctx context.Context, accountID account.AccountID, id xid.ID) error {
-	err := m.profileCache.Invalidate(ctx, xid.ID(accountID))
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err := m.emailRepo.Remove(ctx, accountID, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = m.emailRepo.Remove(ctx, accountID, id)
+	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -102,12 +114,16 @@ func (m *Manager) Remove(ctx context.Context, accountID account.AccountID, id xi
 }
 
 func (m *Manager) SetVerifiedStatus(ctx context.Context, accountID account.AccountID, id xid.ID, verified bool) (*account.EmailAddress, error) {
-	err := m.profileCache.Invalidate(ctx, xid.ID(accountID))
-	if err != nil {
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	ae, err := m.emailRepo.SetVerifiedStatus(ctx, accountID, id, verified)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = m.profileCache.Invalidate(ctx, xid.ID(accountID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

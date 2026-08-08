@@ -225,6 +225,16 @@ func (s *failingCacheStore) Set(ctx context.Context, key string, object string, 
 	return s.base.Set(ctx, key, object, ttl)
 }
 
+func (s *failingCacheStore) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	for key := range values {
+		if hasPrefix(key, s.failSetPrefixes) {
+			return errors.New("forced cache set failure")
+		}
+	}
+
+	return s.base.SetMany(ctx, values, ttl)
+}
+
 func (s *failingCacheStore) Delete(ctx context.Context, key string) error {
 	if hasPrefix(key, s.failDeletePrefixes) {
 		return errors.New("forced cache delete failure")

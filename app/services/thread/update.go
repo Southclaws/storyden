@@ -115,6 +115,10 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(threadID)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	// Always emit a general update event
 	s.bus.Publish(ctx, &rpc.EventThreadUpdated{
 		ID: thr.ID,

@@ -46,7 +46,6 @@ security:
 x-types:
   cache_response_headers: &cache_response_headers
     Cache-Control: { $ref: "#/components/headers/Cache-Control" }
-    Last-Modified: { $ref: "#/components/headers/Last-Modified" }
     ETag: { $ref: "#/components/headers/ETag" }
 
 tags:
@@ -6634,10 +6633,6 @@ components:
     Cache-Control:
       schema:
         type: string
-    Last-Modified:
-      schema:
-        type: string
-        format: RFC1123
     ETag:
       schema:
         type: string

@@ -63,6 +63,23 @@ func TestLocalCache(t *testing.T) {
 		r.NoError(err)
 		a.Equal(map[string]string{field: "2"}, m)
 	})
+
+	t.Run("set_many", func(t *testing.T) {
+		r := require.New(t)
+		ctx := context.Background()
+
+		c, err := local.New()
+		r.NoError(err)
+
+		values := map[string]string{"first": "one", "second": "two", "third": "three"}
+		r.NoError(c.SetMany(ctx, values, time.Minute))
+
+		for key, want := range values {
+			got, err := c.Get(ctx, key)
+			r.NoError(err)
+			r.Equal(want, got)
+		}
+	})
 }
 
 func BenchmarkLocalCache(b *testing.B) {

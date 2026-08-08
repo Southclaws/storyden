@@ -85,7 +85,6 @@ func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGet
 		return openapi.CategoryGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: categoryGetCacheControl,
-				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		}, nil
@@ -106,7 +105,6 @@ func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGet
 			Body: serialiseCategory(cat),
 			Headers: openapi.CategoryGetOKResponseHeaders{
 				CacheControl: categoryGetCacheControl,
-				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		},

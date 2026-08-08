@@ -4,9 +4,11 @@ import (
 	"context"
 	"time"
 
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -84,12 +86,71 @@ func (c *Cache) storeTimestamp(ctx context.Context, key string, ts time.Time) er
 	return c.store.Set(ctx, c.cacheKey(key), ts.UTC().Format(storeTimeFmt), cacheTTL)
 }
 
-func (c *Cache) Invalidate(ctx context.Context, key string) error {
-	now := c.clock().UTC()
+// CanonicalKey collapses ID and ID-slug query forms onto the stable node ID.
+// Slug-only lookups remain keyed by slug because resolving their ID would
+// require reading the node before checking its conditional request cache.
+func CanonicalKey(key mark.Queryable) string {
+	if id, ok := key.ID().Get(); ok {
+		return id.String()
+	}
 
-	return c.storeTimestamp(ctx, key, now)
+	return key.String()
+}
+
+// Invalidate refreshes the stable ID and current slug validators, then removes
+// any retired slug aliases. Supplying the previous slug is required when a
+// mutation renames or deletes a node.
+func (c *Cache) Invalidate(ctx context.Context, id xid.ID, currentSlug string, retiredSlugs ...string) error {
+	keys := []string{id.String(), currentSlug}
+	seen := make(map[string]struct{}, len(keys)+len(retiredSlugs))
+	now := c.clock().UTC()
+	value := now.Format(storeTimeFmt)
+	values := make(map[string]string, len(keys))
+
+	for _, key := range keys {
+		if key == "" {
+			continue
+		}
+		if _, ok := seen[key]; ok {
+			continue
+		}
+		seen[key] = struct{}{}
+		cacheKey := c.cacheKey(key)
+		values[cacheKey] = value
+	}
+
+	if err := c.store.SetMany(ctx, values, cacheTTL); err != nil {
+		return err
+	}
+
+	for _, slug := range retiredSlugs {
+		if slug == "" {
+			continue
+		}
+		if _, ok := seen[slug]; ok {
+			continue
+		}
+		seen[slug] = struct{}{}
+		if err := c.delete(ctx, slug); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c *Cache) delete(ctx context.Context, key string) error {
 	return c.store.Delete(ctx, c.cacheKey(key))
+}
+
+func (c *Cache) deleteNode(ctx context.Context, id xid.ID, slug string) error {
+	if err := c.delete(ctx, id.String()); err != nil {
+		return err
+	}
+
+	if slug == "" {
+		return nil
+	}
+
+	return c.delete(ctx, slug)
 }

@@ -38,6 +38,10 @@ func (m *Manager) UpdateRoles(ctx context.Context, accountID account_ref.ID, rol
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	m.bus.Publish(ctx, &rpc.EventAccountUpdated{ID: accountID})
 
 	return nil
@@ -49,6 +53,10 @@ func (m *Manager) SetBadge(ctx context.Context, accountID account_ref.ID, roleID
 	}
 
 	if err := m.assign.SetBadge(ctx, accountID, roleID, badge); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

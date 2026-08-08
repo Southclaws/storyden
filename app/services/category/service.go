@@ -120,17 +120,15 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 }
 
 func (s *service) Update(ctx context.Context, slug string, partial Partial) (*category.Category, error) {
-	if err := s.cache.Invalidate(ctx, slug); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	opts := []category.Option{}
+	cacheKeys := []string{slug}
 
 	if v, ok := partial.Name.Get(); ok {
 		opts = append(opts, category.WithName(v))
 	}
 	if v, ok := partial.Slug.Get(); ok {
 		opts = append(opts, category.WithSlug(v))
+		cacheKeys = append(cacheKeys, v)
 	}
 	if v, ok := partial.Description.Get(); ok {
 		opts = append(opts, category.WithDescription(v))
@@ -148,8 +146,16 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 		opts = append(opts, category.WithMeta(v))
 	}
 
+	if err := s.invalidate(ctx, cacheKeys...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	cat, err := s.category_repo.UpdateCategory(ctx, slug, opts...)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.invalidate(ctx, slug, cat.Slug); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -159,7 +165,11 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 }
 
 func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category.Category, error) {
-	if err := s.cache.Invalidate(ctx, slug); err != nil {
+	before, err := s.category_repo.GetCategories(ctx, false)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := s.invalidateCategories(ctx, before...); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -197,9 +207,34 @@ func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.invalidateCategories(ctx, cats...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: slug})
 
 	return cats, nil
+}
+
+func (s *service) invalidate(ctx context.Context, slugs ...string) error {
+	return s.cache.InvalidateMany(ctx, slugs...)
+}
+
+func (s *service) invalidateCategories(ctx context.Context, categories ...*category.Category) error {
+	slugs := make([]string, 0, len(categories))
+	var collect func(...*category.Category)
+	collect = func(categories ...*category.Category) {
+		for _, cat := range categories {
+			if cat == nil {
+				continue
+			}
+			slugs = append(slugs, cat.Slug)
+			collect(cat.Children...)
+		}
+	}
+	collect(categories...)
+
+	return s.invalidate(ctx, slugs...)
 }
 
 func (s *service) Delete(ctx context.Context, slug string, moveToID category.CategoryID) (*category.Category, error) {

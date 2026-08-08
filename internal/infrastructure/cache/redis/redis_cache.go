@@ -52,6 +52,26 @@ func (c *RedisCache) Set(ctx context.Context, key string, value string, ttl time
 	return nil
 }
 
+func (c *RedisCache) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	commands := make(rueidis.Commands, 0, len(values))
+	for key, value := range values {
+		commands = append(commands, c.client.B().
+			Set().
+			Key(key).
+			Value(value).
+			Ex(ttl).
+			Build())
+	}
+
+	for _, result := range c.client.DoMulti(ctx, commands...) {
+		if err := result.Error(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c *RedisCache) Delete(ctx context.Context, key string) error {
 	cmd := c.client.B().
 		Del().

@@ -66,6 +66,10 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	s.bus.Publish(ctx, &rpc.EventPostReacted{
 		PostID:     postID,
 		RootPostID: pref.Root,
@@ -115,6 +119,10 @@ func (s *Reactor) Remove(ctx context.Context, reactID reaction.ReactID) error {
 
 	err = s.reactWriter.Remove(ctx, accountID, reactID)
 	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, xid.ID(pref.Root)); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

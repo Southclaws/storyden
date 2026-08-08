@@ -50,6 +50,10 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 		return err
 	}
 
+	if err := l.cache.Invalidate(ctx, xid.ID(postRef.Root)); err != nil {
+		return err
+	}
+
 	l.bus.Publish(ctx, &rpc.EventPostLiked{
 		PostID:     postID,
 		RootPostID: postRef.Root,
@@ -70,6 +74,10 @@ func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.Accoun
 
 	err = l.likeWriter.RemovePostLike(ctx, accountID, postID)
 	if err != nil {
+		return err
+	}
+
+	if err := l.cache.Invalidate(ctx, xid.ID(postRef.Root)); err != nil {
 		return err
 	}
 
