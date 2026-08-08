@@ -2,7 +2,15 @@ import { defineSlotRecipe } from "@pandacss/dev";
 
 export const blockEditor = defineSlotRecipe({
   className: "block-editor",
-  slots: ["root", "gutter", "handle", "content"],
+  slots: [
+    "root",
+    "gutter",
+    "handle",
+    "menuTrigger",
+    "menuAnchor",
+    "menuContent",
+    "content",
+  ],
   base: {
     root: {
       position: "relative",
@@ -34,6 +42,33 @@ export const blockEditor = defineSlotRecipe({
       color: "text.muted",
       cursor: "grab",
       opacity: "full",
+    },
+    menuTrigger: {
+      width: "6",
+      minWidth: "6",
+      height: "6",
+      padding: "0",
+      color: "text.muted",
+      cursor: "grab",
+      _hover: {
+        color: "text.default",
+      },
+      _expanded: {
+        color: "text.default",
+      },
+      "&[data-dragging]": {
+        cursor: "grabbing",
+      },
+    },
+    menuAnchor: {
+      position: "absolute",
+      inset: "0",
+      width: "full",
+      height: "full",
+      pointerEvents: "none",
+    },
+    menuContent: {
+      minWidth: "40",
     },
     content: {
       width: "full",

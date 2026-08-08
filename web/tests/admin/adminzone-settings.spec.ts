@@ -175,5 +175,8 @@ test.describe("Feed Editor Settings", () => {
         return (categoryAfterDrag?.y ?? 0) > (threadAfterDrag?.y ?? 0);
       })
       .toBe(true);
+    await expect(
+      page.getByRole("menuitem", { name: "Layout", exact: true }),
+    ).toBeHidden();
   });
 });

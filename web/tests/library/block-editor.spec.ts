@@ -126,5 +126,8 @@ test.describe("Library page block editor", () => {
         return (titleAfterDrag?.y ?? 0) > (contentAfterDrag?.y ?? 0);
       })
       .toBe(true);
+    await expect(
+      page.getByRole("menuitem", { name: "Update URL slug", exact: true }),
+    ).toBeHidden();
   });
 });
