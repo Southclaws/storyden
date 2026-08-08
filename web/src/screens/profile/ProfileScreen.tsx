@@ -2,8 +2,6 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { Unready } from "@/components/site/Unready";
-
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
@@ -16,6 +14,7 @@ import { EditAction } from "@/components/site/Action/Edit";
 import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
+import { Unready } from "@/components/site/Unready";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,7 +26,6 @@ import {
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
-import { slugify } from "@/utils/slugify";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
 
@@ -37,8 +35,6 @@ export function ProfileScreen(props: Props) {
   if (!ready) {
     return <Unready error={error} />;
   }
-
-  const { onChange: onHandleChange, ...handleProps } = form.register("handle");
 
   const { session, profile } = data;
   const { isSelf, isEditing, canViewAccount, signaturesEnabled } = state;
@@ -84,11 +80,7 @@ export function ProfileScreen(props: Props) {
                       px="2"
                       borderTop="none"
                       borderTopRadius="none"
-                      {...handleProps}
-                      onChange={(e) => {
-                        e.target.value = slugify(e.target.value);
-                        onHandleChange(e);
-                      }}
+                      {...form.register("handle")}
                     />
                   </LStack>
                   <RoleBadgeList roles={profile.roles} />

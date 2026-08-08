@@ -17,9 +17,6 @@ export function LoginHandleForm() {
     },
   } = useLoginHandleForm();
 
-  const { onChange: onIdentifierChange, ...identifierProps } =
-    register("identifier");
-
   return (
     <styled.form
       w="full"
@@ -38,11 +35,7 @@ export function LoginHandleForm() {
         textAlign="center"
         placeholder="username"
         required
-        {...identifierProps}
-        onChange={(e) => {
-          e.target.value = e.target.value.toLowerCase();
-          onIdentifierChange(e);
-        }}
+        {...register("identifier")}
       />
       <styled.p color="fg.error" fontSize="sm">
         {errors.identifier?.message}

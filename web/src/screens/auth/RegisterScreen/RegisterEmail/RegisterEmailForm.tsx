@@ -6,7 +6,6 @@ import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { Input } from "@/components/ui/input";
 import { styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
-import { slugify } from "@/utils/slugify";
 
 import { useRegisterEmailForm } from "./useRegisterEmailForm";
 
@@ -16,8 +15,6 @@ type Props = {
 
 export function RegisterEmailForm(props: Props) {
   const { form, handlers } = useRegisterEmailForm(props);
-
-  const { onChange: onHandleChange, ...handleProps } = form.register("handle");
 
   return (
     <styled.form
@@ -54,11 +51,7 @@ export function RegisterEmailForm(props: Props) {
           textAlign="center"
           placeholder="username"
           required
-          {...handleProps}
-          onChange={(e) => {
-            e.target.value = slugify(e.target.value);
-            onHandleChange(e);
-          }}
+          {...form.register("handle")}
         />
         <FormErrorText>
           {form.formState.errors["handle"]?.message}

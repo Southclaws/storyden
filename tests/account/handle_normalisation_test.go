@@ -71,6 +71,26 @@ func TestHandleNormalisation(t *testing.T) {
 				tests.Status(t, err, second, http.StatusConflict)
 			})
 
+			t.Run("mixed_case_handle_can_sign_in", func(t *testing.T) {
+				suffix := xid.New().String()
+				handle := "login-" + suffix
+
+				tests.AssertRequest(
+					cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{
+						Identifier: handle,
+						Token:      "password1",
+					}),
+				)(t, http.StatusOK)
+
+				login := tests.AssertRequest(
+					cl.AuthPasswordSigninWithResponse(root, openapi.AuthPair{
+						Identifier: "Login-" + suffix,
+						Token:      "password1",
+					}),
+				)(t, http.StatusOK)
+				require.NotNil(t, login.JSON200)
+			})
+
 			t.Run("invalid_handle_characters_rejected_not_silently_mangled", func(t *testing.T) {
 				for _, bad := range []string{"-leading", "trailing-", "has space", "!!!"} {
 					resp, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{

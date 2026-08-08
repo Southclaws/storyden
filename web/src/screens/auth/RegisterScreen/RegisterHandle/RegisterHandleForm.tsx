@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
-import { slugify } from "@/utils/slugify";
 
 import { Props, useRegisterHandleForm } from "./useRegisterHandleForm";
 
@@ -18,9 +17,6 @@ export function RegisterHandleForm(props: Props) {
       errors,
     },
   } = useRegisterHandleForm(props);
-
-  const { onChange: onIdentifierChange, ...identifierProps } =
-    register("identifier");
 
   return (
     <styled.form
@@ -40,11 +36,7 @@ export function RegisterHandleForm(props: Props) {
         textAlign="center"
         placeholder="username"
         required
-        {...identifierProps}
-        onChange={(e) => {
-          e.target.value = slugify(e.target.value);
-          onIdentifierChange(e);
-        }}
+        {...register("identifier")}
       />
       <styled.p color="fg.error" fontSize="sm">
         {errors.identifier?.message}
