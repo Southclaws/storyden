@@ -80,7 +80,7 @@ func (p *Provider) oauthConfig(redirect string) *oauth2.Config {
 }
 
 func (p *Provider) Link(redirectPath string) (string, error) {
-	state, err := p.ed.Encrypt(map[string]any{
+	state, err := p.ed.Encrypt(endec.PurposeOAuthState, map[string]any{
 		"redirect": redirectPath,
 	}, time.Minute*10)
 	if err != nil {
@@ -93,7 +93,7 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 }
 
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
-	c, err := p.ed.Decrypt(state)
+	c, err := p.ed.Decrypt(endec.PurposeOAuthState, state)
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
@@ -101,7 +101,16 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	oac := p.oauthConfig(c["redirect"].(string))
+	redirect, ok := c["redirect"].(string)
+	if !ok {
+		return nil, fault.New("state value has no redirect",
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("malformed state value", "This link is not valid, please try again from the start."),
+		)
+	}
+
+	oac := p.oauthConfig(redirect)
 
 	token, err := oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
 	if err != nil {
