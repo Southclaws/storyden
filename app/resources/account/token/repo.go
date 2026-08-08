@@ -51,6 +51,10 @@ func (r *cachedRepo) Revoke(ctx context.Context, token Token) error {
 		return err
 	}
 
+	if err := r.delete(ctx, token); err != nil {
+		return err
+	}
+
 	return nil
 }
 
