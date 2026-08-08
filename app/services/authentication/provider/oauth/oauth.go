@@ -11,6 +11,7 @@ type Configuration struct {
 	Enabled      bool
 	ClientID     string
 	ClientSecret string
+	DisplayName  string
 }
 
 func Redirect(publicWebURL url.URL, svc authentication.Service) url.URL {

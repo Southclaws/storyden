@@ -7,17 +7,22 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/openai/openai-go/v3"
+	"github.com/openai/openai-go/v3/packages/param"
+	"github.com/openai/openai-go/v3/responses"
 	"google.golang.org/adk/model"
 	"google.golang.org/genai"
 )
 
 func (o *OpenAI) GenerateContent(ctx context.Context, req *model.LLMRequest, stream bool) iter.Seq2[*model.LLMResponse, error] {
-	messages := convertToOpenAIMessages(req)
+	input := convertToOpenAIInput(req)
 	tools := convertToOpenAITools(req)
 
-	params := openai.ChatCompletionNewParams{
-		Model:    openai.ChatModel(o.modelName),
-		Messages: messages,
+	params := responses.ResponseNewParams{
+		Model: openai.ChatModel(o.modelName),
+		Store: param.NewOpt(false),
+		Input: responses.ResponseNewParamsInputUnion{
+			OfInputItemList: input,
+		},
 	}
 
 	if len(tools) > 0 {
@@ -33,34 +38,35 @@ func (o *OpenAI) GenerateContent(ctx context.Context, req *model.LLMRequest, str
 	}
 }
 
-func (o *OpenAI) generateContentSync(ctx context.Context, params openai.ChatCompletionNewParams, yield func(*model.LLMResponse, error) bool) {
-	res, err := o.client.Chat.Completions.New(ctx, params)
+func (o *OpenAI) generateContentSync(ctx context.Context, params responses.ResponseNewParams, yield func(*model.LLMResponse, error) bool) {
+	res, err := o.client.Responses.New(ctx, params)
 	if err != nil {
 		yield(nil, fault.Wrap(mapError(err), fctx.With(ctx)))
 		return
 	}
 
-	if len(res.Choices) == 0 {
-		yield(nil, fault.New("no choices in response"))
+	if res.Status == responses.ResponseStatusFailed {
+		yield(nil, fault.Wrap(openAIResponseError(*res), fctx.With(ctx)))
 		return
 	}
 
-	choice := res.Choices[0]
-	content := convertOpenAIMessageToGenaiContent(choice.Message)
-	finishReason := convertOpenAIFinishReasonToGenai(string(choice.FinishReason))
+	content, err := convertOpenAIResponseToGenaiContent(*res)
+	if err != nil {
+		yield(nil, fault.Wrap(err, fctx.With(ctx)))
+		return
+	}
 
 	yield(&model.LLMResponse{
 		Content:      content,
-		FinishReason: finishReason,
+		FinishReason: convertOpenAIResponseToGenaiFinishReason(*res),
 		TurnComplete: true,
 	}, nil)
 }
 
-func (o *OpenAI) generateContentStream(ctx context.Context, params openai.ChatCompletionNewParams, yield func(*model.LLMResponse, error) bool) {
-	streamReader := o.client.Chat.Completions.NewStreaming(ctx, params)
+func (o *OpenAI) generateContentStream(ctx context.Context, params responses.ResponseNewParams, yield func(*model.LLMResponse, error) bool) {
+	streamReader := o.client.Responses.NewStreaming(ctx, params)
 
 	var fullContent string
-	var collectedToolCalls []openai.ChatCompletionMessageToolCallUnion
 
 	for {
 		select {
@@ -73,20 +79,14 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params openai.ChatCo
 			break
 		}
 
-		chunk := streamReader.Current()
-		if len(chunk.Choices) == 0 {
-			continue
-		}
+		event := streamReader.Current()
 
-		choice := chunk.Choices[0]
-		delta := choice.Delta
-
-		if delta.Content != "" {
-			fullContent += delta.Content
+		if event.Type == "response.output_text.delta" && event.Delta != "" {
+			fullContent += event.Delta
 			if !yield(&model.LLMResponse{
 				Content: &genai.Content{
 					Role:  genai.RoleModel,
-					Parts: []*genai.Part{{Text: delta.Content}},
+					Parts: []*genai.Part{{Text: event.Delta}},
 				},
 				Partial: true,
 			}, nil) {
@@ -94,33 +94,28 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params openai.ChatCo
 			}
 		}
 
-		if len(delta.ToolCalls) > 0 {
-			for _, tc := range delta.ToolCalls {
-				idx := int(tc.Index)
-				for len(collectedToolCalls) <= idx {
-					collectedToolCalls = append(collectedToolCalls, openai.ChatCompletionMessageToolCallUnion{})
-				}
-				if tc.ID != "" {
-					collectedToolCalls[idx].ID = tc.ID
-				}
-				if tc.Function.Name != "" {
-					collectedToolCalls[idx].Function.Name = tc.Function.Name
-				}
-				if tc.Function.Arguments != "" {
-					collectedToolCalls[idx].Function.Arguments += tc.Function.Arguments
-				}
+		if event.Type == "response.completed" || event.Type == "response.incomplete" {
+			content, err := convertOpenAIResponseToGenaiContent(event.Response)
+			if err != nil {
+				yield(nil, fault.Wrap(err, fctx.With(ctx)))
+				return
 			}
-		}
-
-		if choice.FinishReason != "" {
-			content := buildFinalGenaiContent(fullContent, collectedToolCalls)
-			finishReason := convertOpenAIFinishReasonToGenai(string(choice.FinishReason))
 
 			yield(&model.LLMResponse{
 				Content:      content,
-				FinishReason: finishReason,
+				FinishReason: convertOpenAIResponseToGenaiFinishReason(event.Response),
 				TurnComplete: true,
 			}, nil)
+			return
+		}
+
+		if event.Type == "response.failed" {
+			yield(nil, fault.Wrap(openAIResponseError(event.Response), fctx.With(ctx)))
+			return
+		}
+
+		if event.Type == "error" {
+			yield(nil, fault.Wrap(fault.New("openai response error: "+event.Message), fctx.With(ctx)))
 			return
 		}
 	}
@@ -130,11 +125,11 @@ func (o *OpenAI) generateContentStream(ctx context.Context, params openai.ChatCo
 		return
 	}
 
-	if fullContent != "" || len(collectedToolCalls) > 0 {
-		content := buildFinalGenaiContent(fullContent, collectedToolCalls)
+	if fullContent != "" {
+		content := &genai.Content{Role: genai.RoleModel, Parts: []*genai.Part{{Text: fullContent}}}
 		yield(&model.LLMResponse{
 			Content:      content,
-			FinishReason: genai.FinishReasonStop,
+			FinishReason: genai.FinishReasonUnspecified,
 			TurnComplete: true,
 		}, nil)
 	}

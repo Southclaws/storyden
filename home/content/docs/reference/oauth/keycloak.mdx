@@ -15,6 +15,7 @@ OAUTH_KEYCLOAK_ENABLED=true
 OAUTH_KEYCLOAK_CLIENT_ID=your-client-id
 OAUTH_KEYCLOAK_CLIENT_SECRET=your-client-secret
 OAUTH_KEYCLOAK_ISSUER_URL=https://auth.example.com/realms/YourRealm
+OAUTH_KEYCLOAK_DISPLAY_NAME=Keycloak # optional, defaults to "Keycloak"
 ```
 
 ## Setting Up Keycloak
@@ -32,7 +33,7 @@ Storyden uses OIDC discovery to automatically configure endpoints from `{issuer}
 
 ## Using with Other OIDC Providers
 
-Since Storyden uses standard OIDC discovery, you can use this integration with other identity providers that support OIDC:
+Since Storyden uses standard OIDC discovery, you can use this integration with other identity providers that support OIDC. Set `OAUTH_KEYCLOAK_DISPLAY_NAME` to match the actual provider you're using (e.g. `Authentik`, `Auth0`, `Okta`, `Microsoft Entra ID`) so the login button doesn't say "Keycloak":
 
 ### Authentik
 

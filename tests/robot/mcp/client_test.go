@@ -41,6 +41,7 @@ func TestRobotMCPServerCreateDiscoversBearerProtectedTools(t *testing.T) {
 	integration.Test(t,
 		&config.Config{},
 		e2e.Setup(),
+		withLoopbackMCPClient(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -105,6 +106,7 @@ func TestRobotMCPRefreshRecordsBearerFailure(t *testing.T) {
 	integration.Test(t,
 		&config.Config{},
 		e2e.Setup(),
+		withLoopbackMCPClient(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -144,6 +146,7 @@ func TestRobotMCPProbeFallsBackToCommonMCPPath(t *testing.T) {
 	integration.Test(t,
 		&config.Config{},
 		e2e.Setup(),
+		withLoopbackMCPClient(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -253,6 +256,7 @@ func TestRobotMCPOAuthRefreshesTokenForRefreshAndToolCall(t *testing.T) {
 	integration.Test(t,
 		&config.Config{},
 		e2e.Setup(),
+		withLoopbackMCPClient(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
 			root context.Context,
@@ -345,6 +349,10 @@ func newBearerMCPServer(t *testing.T, token string) string {
 	t.Cleanup(httpServer.Close)
 
 	return httpServer.URL
+}
+
+func withLoopbackMCPClient() fx.Option {
+	return fx.Replace(mcpclient.HTTPClient{Client: http.DefaultClient})
 }
 
 func newRefreshTokenEndpoint(t *testing.T, accessToken string) (string, func() int) {

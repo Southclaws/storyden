@@ -50,10 +50,13 @@ sd plugin dev download d8cg... --no-unzip
 				return err
 			}
 
-			data, err := plugindev.DownloadPackage(cmd.Context(), client.OpenAPI, args[0])
+			progress := newDownloadProgress(cmd.ErrOrStderr())
+			data, err := plugindev.DownloadPackage(cmd.Context(), client.OpenAPI, args[0], progress.Update)
 			if err != nil {
+				progress.Clear()
 				return err
 			}
+			progress.Finish(int64(len(data)))
 
 			if noUnzip {
 				filename := plugindev.PackageFilename(cmd.Context(), data, args[0])

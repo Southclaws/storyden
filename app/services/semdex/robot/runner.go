@@ -47,7 +47,7 @@ func Build() fx.Option {
 		workspaceprovider.Build(),
 		robotbuilder.Build(),
 		pluginbuilder.Build(),
-		fx.Provide(agent_registry.New, NewSessionStorage, New, NewSessionNamer, NewWorkspaceManager, mcpclient.New),
+		fx.Provide(agent_registry.New, NewSessionStorage, New, NewSessionNamer, NewWorkspaceManager, mcpclient.NewHTTPClient, mcpclient.New),
 	)
 }
 

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -23,6 +24,32 @@ type statusResponse interface {
 	Status() string
 	StatusCode() int
 }
+
+type DownloadProgress func(downloaded, total int64)
+
+type downloadProgressReader struct {
+	reader     io.Reader
+	downloaded int64
+	total      int64
+	progress   DownloadProgress
+}
+
+func (r *downloadProgressReader) Read(buffer []byte) (int, error) {
+	read, err := r.reader.Read(buffer)
+	if read > 0 {
+		r.downloaded += int64(read)
+		r.progress(r.downloaded, r.total)
+	}
+	return read, err
+}
+
+type httpStatusResponse struct {
+	response *http.Response
+}
+
+func (r httpStatusResponse) Status() string { return r.response.Status }
+
+func (r httpStatusResponse) StatusCode() int { return r.response.StatusCode }
 
 func EnsureExternalPlugin(ctx context.Context, client *openapi.ClientWithResponses, manifest rpc.Manifest, requestedID string, noUpdate bool) (*ExternalPlugin, error) {
 	if requestedID != "" {
@@ -149,15 +176,36 @@ func GetPlugin(ctx context.Context, client *openapi.ClientWithResponses, id stri
 	return (*openapi.Plugin)(response.JSON200), nil
 }
 
-func DownloadPackage(ctx context.Context, client *openapi.ClientWithResponses, id string) ([]byte, error) {
-	response, err := client.PluginDownloadPackageWithResponse(ctx, openapi.PluginIDParam(id))
+func DownloadPackage(ctx context.Context, client *openapi.ClientWithResponses, id string, progress DownloadProgress) ([]byte, error) {
+	response, err := client.PluginDownloadPackage(ctx, openapi.PluginIDParam(id))
 	if err != nil {
 		return nil, err
 	}
-	if response.StatusCode() != http.StatusOK {
-		return nil, requestError("plugin package download request", response, response.Body)
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		body, readErr := io.ReadAll(response.Body)
+		if readErr != nil {
+			return nil, fmt.Errorf("read plugin package download error: %w", readErr)
+		}
+		return nil, requestError("plugin package download request", httpStatusResponse{response}, body)
 	}
-	return response.Body, nil
+
+	var reader io.Reader = response.Body
+	if progress != nil {
+		progress(0, response.ContentLength)
+		reader = &downloadProgressReader{
+			reader:   response.Body,
+			total:    response.ContentLength,
+			progress: progress,
+		}
+	}
+
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("read plugin package download: %w", err)
+	}
+	return data, nil
 }
 
 func DeletePlugin(ctx context.Context, client *openapi.ClientWithResponses, id string) error {

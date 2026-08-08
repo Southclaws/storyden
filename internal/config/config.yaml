@@ -429,6 +429,13 @@
       description: |-
         The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
 
+    - env: OAUTH_KEYCLOAK_DISPLAY_NAME
+      name: KeycloakDisplayName
+      type: string
+      default: Keycloak
+      description: |-
+        The display name shown for the Keycloak login button.
+
     - env: OAUTH_ENABLED
       name: OAuthEnabled
       type: bool
