@@ -39,45 +39,77 @@ async function createCategoryAndThreads(
   return { categoryThreadTitle, uncategorisedThreadTitle };
 }
 
-async function openFeedEditorFromSidebar(page: Page) {
+async function openFeedEditor(page: Page) {
   await expect(page.locator("#navigation__leftbar")).toBeVisible();
 
-  const editButton = page.getByRole("button", { name: "Open feed editor" });
+  const editButton = page
+    .getByRole("toolbar", { name: "Primary navigation" })
+    .getByRole("button", { name: "Edit site" });
   await expect(editButton).toBeVisible();
   await editButton.click();
 
-  await expect(page).toHaveURL(/editing=feed/);
-  await expect(page.getByText("Editing Home")).toBeVisible();
+  await expect(page).toHaveURL(/editing=site/);
+  await expect(
+    page
+      .getByRole("toolbar", { name: "Primary navigation" })
+      .getByRole("button", { name: "Exit edit mode" }),
+  ).toHaveAttribute("aria-pressed", "true");
 }
 
-async function chooseSelectOption(
+async function chooseBlockMenuItem(page: Page, item: string, value: string) {
+  const menuItem = page.getByRole("menuitem", { name: item, exact: true });
+  await expect(menuItem).toBeVisible();
+  await menuItem.click();
+
+  const valueItem = page.getByRole("menuitem", { name: value, exact: true });
+  await expect(valueItem).toBeVisible();
+  await valueItem.click();
+}
+
+async function clickOutsideOpenMenu(page: Page) {
+  const viewport = page.viewportSize();
+  if (!viewport) {
+    throw new Error("Playwright viewport is unavailable");
+  }
+
+  await page.mouse.click(viewport.width - 2, viewport.height - 2);
+}
+
+async function dragBlockBelow(
   page: Page,
-  select: Locator,
-  optionValue: string,
+  sourceBlock: Locator,
+  targetBlock: Locator,
 ) {
-  await expect(select).toBeVisible();
-  const contentId = await select.getAttribute("aria-controls");
-  if (!contentId) {
-    throw new Error("select trigger did not expose aria-controls");
-  }
-  const content = page.locator(`[id="${contentId}"]`);
-  await select.focus();
-  await select.press("ArrowDown");
-  if ((await content.getAttribute("data-state")) !== "open") {
-    await select.click({ force: true });
-  }
-  await expect(content).toHaveAttribute("data-state", "open");
+  const source = sourceBlock.getByRole("button", {
+    name: "Move or configure block",
+  });
+  const sourceBox = await source.boundingBox();
+  const targetBox = await targetBlock.boundingBox();
 
-  const option = content.locator(
-    `[data-scope='select'][data-part='item'][data-value='${optionValue}']`,
+  if (!sourceBox || !targetBox) {
+    throw new Error("Block drag geometry is unavailable");
+  }
+
+  await page.mouse.move(
+    sourceBox.x + sourceBox.width / 2,
+    sourceBox.y + sourceBox.height / 2,
   );
-  await expect(option).toBeVisible();
-  await option.click();
-  await expect(content).toHaveAttribute("data-state", "closed");
+  await page.mouse.down();
+  await page.mouse.move(
+    sourceBox.x + sourceBox.width / 2,
+    sourceBox.y + sourceBox.height / 2 + 4,
+    { steps: 2 },
+  );
+  await page.mouse.move(
+    targetBox.x + targetBox.width / 2,
+    targetBox.y + targetBox.height - 2,
+    { steps: 12 },
+  );
+  await page.mouse.up();
 }
 
-test.describe("AdminZone Feed Settings", () => {
-  test("switches source to categories and back to threads with dependent UI updates", async ({
+test.describe("Feed Editor Settings", () => {
+  test("configures category layout and thread source from block menus", async ({
     page,
   }) => {
     const seed = Date.now().toString();
@@ -88,33 +120,40 @@ test.describe("AdminZone Feed Settings", () => {
     await createAdmin(page.context(), adminHandle, PASSWORD);
     await login(page, adminHandle, PASSWORD);
     await page.goto("/");
-    await openFeedEditorFromSidebar(page);
+    await openFeedEditor(page);
 
-    const sourceSelect = page.getByRole("combobox", { name: "Source" });
-    await expect(sourceSelect).toContainText("Threads");
+    const categoryBlock = page.locator(
+      '.block-editor__root[data-block-type="categories"]:visible',
+    );
+    await categoryBlock
+      .getByRole("button", { name: "Move or configure block" })
+      .click();
 
-    await chooseSelectOption(page, sourceSelect, "categories");
-    await expect(sourceSelect).toContainText("Categories");
-
-    const layoutSelect = page.getByRole("combobox", { name: "Layout" });
-    await expect(layoutSelect).toBeVisible();
+    const categoryMenuLabel = page
+      .locator('[data-scope="menu"][data-part="item-group-label"]')
+      .getByText("Discussion categories", { exact: true });
+    await categoryMenuLabel.click();
     await expect(
-      page.getByText("Thread list display", { exact: true }),
+      page.getByRole("menuitem", { name: "Layout", exact: true }),
     ).toBeVisible();
+
+    await clickOutsideOpenMenu(page);
     await expect(
-      page.getByRole("heading", { name: "Discussion categories" }),
-    ).toBeVisible();
+      page.getByRole("menuitem", { name: "Layout", exact: true }),
+    ).toBeHidden();
 
-    await chooseSelectOption(page, layoutSelect, "grid");
-    await expect(layoutSelect).toContainText("Grid");
+    await categoryBlock
+      .getByRole("button", { name: "Move or configure block" })
+      .click();
+    await chooseBlockMenuItem(page, "Layout", "Grid");
 
-    const listDisplaySelect = page
-      .locator("[data-scope='select'][data-part='trigger'][role='combobox']")
-      .filter({ hasText: /Uncategorised only|All threads|None/ })
-      .first();
-
-    await chooseSelectOption(page, listDisplaySelect, "all");
-    await expect(listDisplaySelect).toContainText("All threads");
+    const threadBlock = page.locator(
+      '.block-editor__root[data-block-type="threads"]:visible',
+    );
+    await threadBlock
+      .getByRole("button", { name: "Move or configure block" })
+      .click();
+    await chooseBlockMenuItem(page, "Source", "All threads");
 
     await expect(
       page.getByRole("link", { name: categoryThreadTitle, exact: true }),
@@ -123,17 +162,18 @@ test.describe("AdminZone Feed Settings", () => {
       page.getByRole("link", { name: uncategorisedThreadTitle, exact: true }),
     ).toBeVisible();
 
-    await chooseSelectOption(page, sourceSelect, "threads");
+    const categoryBeforeDrag = await categoryBlock.boundingBox();
+    const threadBeforeDrag = await threadBlock.boundingBox();
+    expect(categoryBeforeDrag?.y).toBeLessThan(threadBeforeDrag?.y ?? 0);
 
-    await expect(page.getByRole("combobox", { name: "Layout" })).toHaveCount(0);
-    await expect(
-      page.getByText("Thread list display", { exact: true }),
-    ).toHaveCount(0);
+    await dragBlockBelow(page, categoryBlock, threadBlock);
 
-    const listDisplayComboboxes = page
-      .locator("[data-scope='select'][data-part='trigger'][role='combobox']")
-      .filter({ hasText: /Uncategorised only|All threads|None/ });
-    await expect(listDisplayComboboxes).toHaveCount(0);
-    await expect(sourceSelect).toContainText("Threads");
+    await expect
+      .poll(async () => {
+        const categoryAfterDrag = await categoryBlock.boundingBox();
+        const threadAfterDrag = await threadBlock.boundingBox();
+        return (categoryAfterDrag?.y ?? 0) > (threadAfterDrag?.y ?? 0);
+      })
+      .toBe(true);
   });
 });

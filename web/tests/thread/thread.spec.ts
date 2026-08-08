@@ -2,7 +2,17 @@ import { Page, expect, test } from "@playwright/test";
 
 const PASSWORD = "TestPassword123!";
 
-async function registerUser(page: Page, username: string) {
+function uniqueUsername(prefix: string) {
+  const suffix = `${Date.now().toString(36)}${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+
+  return `${prefix.replaceAll(/[^a-z0-9]/gi, "").slice(0, 8)}-${suffix}`;
+}
+
+async function registerUser(page: Page, prefix: string) {
+  const username = uniqueUsername(prefix);
+
   await page.goto("/register");
   await page.getByRole("textbox", { name: "username" }).fill(username);
   await page.getByRole("textbox", { name: "password" }).fill(PASSWORD);
@@ -11,6 +21,8 @@ async function registerUser(page: Page, username: string) {
   await expect(
     page.getByRole("button", { name: "Account menu" }),
   ).toBeVisible();
+
+  return username;
 }
 
 async function logout(page: Page) {
@@ -35,7 +47,7 @@ async function createThread(
   title: string,
   body: string,
 ): Promise<string> {
-  await page.getByRole("link", { name: "Post", exact: true }).click();
+  await page.goto("/new");
   await expect(page).toHaveURL("/new", { timeout: 5000 });
 
   await page.locator("#title-input").fill(title);
@@ -186,7 +198,7 @@ test.describe("Thread Notifications", () => {
   test("should show notification when someone replies to your thread", async ({
     page,
   }) => {
-    await registerUser(page, "notification-author-01");
+    const author = await registerUser(page, "notification-author");
     const threadUrl = await createThread(
       page,
       "Thread for Notification Test",
@@ -194,20 +206,20 @@ test.describe("Thread Notifications", () => {
     );
 
     await logout(page);
-    await registerUser(page, "notification-replier-01");
+    const replier = await registerUser(page, "notification-replier");
 
     await navigateToThread(page, threadUrl);
     await postReply(page, "A reply that should trigger a notification.");
 
     await logout(page);
-    await login(page, "notification-author-01");
+    await login(page, author);
 
     await expect(
       page.getByRole("button", { name: "Notifications" }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Notifications" }).click();
 
-    await expect(page.getByText("notification-replier-01")).toBeVisible({
+    await expect(page.getByText(replier)).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByText("replied to")).toBeVisible();
