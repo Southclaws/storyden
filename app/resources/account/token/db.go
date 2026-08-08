@@ -30,11 +30,15 @@ func New(
 	}
 }
 
-func (r *persistedRepository) Issue(ctx context.Context, accountID account.AccountID) (*Session, error) {
-	token := Token{xid.New()}
+func (r *persistedRepository) Issue(ctx context.Context, accountID account.AccountID) (*Issued, error) {
+	token, err := Generate()
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	create := r.db.Session.Create().
-		SetID(token.ID).
+		SetID(xid.New()).
+		SetTokenHash(token.Hash()).
 		SetAccountID(xid.ID(accountID)).
 		SetExpiresAt(time.Now().Add(Expiry))
 
@@ -43,11 +47,11 @@ func (r *persistedRepository) Issue(ctx context.Context, accountID account.Accou
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(result), nil
+	return &Issued{Token: token, Session: *Map(result)}, nil
 }
 
-func (r *persistedRepository) Revoke(ctx context.Context, id Token) error {
-	update := r.db.Session.Update().Where(session.ID(id.ID))
+func (r *persistedRepository) Revoke(ctx context.Context, t Token) error {
+	update := r.db.Session.Update().Where(session.TokenHash(t.Hash()))
 
 	update.SetRevokedAt(time.Now())
 
@@ -60,7 +64,7 @@ func (r *persistedRepository) Revoke(ctx context.Context, id Token) error {
 }
 
 func (r *persistedRepository) Validate(ctx context.Context, t Token) (*Validated, error) {
-	query := r.db.Session.Query().Where(session.ID(t.ID))
+	query := r.db.Session.Query().Where(session.TokenHash(t.Hash()))
 
 	result, err := query.Only(ctx)
 	if err != nil {
@@ -77,7 +81,7 @@ func (r *persistedRepository) Validate(ctx context.Context, t Token) (*Validated
 
 func Map(s *ent.Session) *Session {
 	return &Session{
-		Token:     Token{s.ID},
+		TokenHash: s.TokenHash,
 		AccountID: account.AccountID(s.AccountID),
 		ExpiresAt: s.ExpiresAt,
 		RevokedAt: opt.NewPtr(s.RevokedAt),

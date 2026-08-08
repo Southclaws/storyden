@@ -14,7 +14,7 @@ import (
 const cachePrefix = "account:session:"
 
 type Repository interface {
-	Issue(context.Context, account.AccountID) (*Session, error)
+	Issue(context.Context, account.AccountID) (*Issued, error)
 	Revoke(context.Context, Token) error
 	Validate(context.Context, Token) (*Validated, error)
 }
@@ -31,17 +31,17 @@ func NewCachedRepository(repo Repository, store cache.Store) Repository {
 	}
 }
 
-func (r *cachedRepo) Issue(ctx context.Context, accountID account.AccountID) (*Session, error) {
-	s, err := r.repo.Issue(ctx, accountID)
+func (r *cachedRepo) Issue(ctx context.Context, accountID account.AccountID) (*Issued, error) {
+	issued, err := r.repo.Issue(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.cache(ctx, *s); err != nil {
+	if err := r.cache(ctx, issued.Session); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return s, nil
+	return issued, nil
 }
 
 func (r *cachedRepo) Revoke(ctx context.Context, token Token) error {
@@ -118,7 +118,7 @@ func (r *cachedRepo) cache(ctx context.Context, s Session) error {
 		return nil
 	}
 
-	err = r.store.Set(ctx, cacheKey(s.Token), string(payload), ttl)
+	err = r.store.Set(ctx, cachePrefix+s.TokenHash, string(payload), ttl)
 	if err != nil {
 		return err
 	}
@@ -136,5 +136,5 @@ func (r *cachedRepo) delete(ctx context.Context, token Token) error {
 }
 
 func cacheKey(t Token) string {
-	return cachePrefix + t.String()
+	return cachePrefix + t.Hash()
 }

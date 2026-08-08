@@ -21,10 +21,10 @@ func NewIssuer(tokenRepo token.Repository) *Issuer {
 }
 
 func (s *Issuer) Issue(ctx context.Context, accountID account.AccountID) (*token.Token, error) {
-	t, err := s.tokenRepo.Issue(ctx, accountID)
+	issued, err := s.tokenRepo.Issue(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return &t.Token, nil
+	return &issued.Token, nil
 }
