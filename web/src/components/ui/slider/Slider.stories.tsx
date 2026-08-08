@@ -5,7 +5,7 @@ import { LStack } from "@/styled-system/jsx";
 import { Slider } from ".";
 
 const meta = {
-  title: "UI/Slider",
+  title: "Components/Forms/Slider",
   component: Slider,
   args: {
     children: "Confidence",

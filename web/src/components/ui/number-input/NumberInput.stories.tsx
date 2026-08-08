@@ -6,7 +6,7 @@ import { Grid } from "@/styled-system/jsx";
 import { NumberInput } from ".";
 
 const meta = {
-  title: "UI/Number Input",
+  title: "Components/Forms/Number Input",
   component: NumberInput,
   args: {
     defaultValue: "12",

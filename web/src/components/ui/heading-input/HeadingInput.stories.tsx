@@ -11,7 +11,7 @@ type HeadingInputStoryArgs = {
 };
 
 const meta = {
-  title: "UI/Typography/Heading Input",
+  title: "Components/Forms/Heading Input",
   args: {
     defaultValue: "Editable title",
     placeholder: "Untitled",

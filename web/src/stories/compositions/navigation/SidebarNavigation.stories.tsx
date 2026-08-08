@@ -8,7 +8,6 @@ import {
 } from "@/components/site/Navigation/SidebarNavigation";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { HomeIcon } from "@/components/ui/icons/Home";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
@@ -93,9 +92,9 @@ export const SettingsNavigation: Story = {
         title="Settings"
         footer={
           <SidebarNavigationLink
-            href="/"
-            icon={<HomeIcon />}
-            label="Back to community"
+            href="/l"
+            icon={<LibraryIcon />}
+            label="Settings documentation"
           />
         }
       >
@@ -134,17 +133,7 @@ export const SettingsNavigation: Story = {
 export const RobotsNavigation: Story = {
   render: () => (
     <SidebarPreview>
-      <SidebarNavigationPane
-        label="Robots navigation"
-        title="Robots"
-        footer={
-          <SidebarNavigationLink
-            href="/"
-            icon={<HomeIcon />}
-            label="Back to community"
-          />
-        }
-      >
+      <SidebarNavigationPane label="Robots navigation" title="Robots">
         <SidebarNavigationSection>
           <SidebarNavigationLink
             active

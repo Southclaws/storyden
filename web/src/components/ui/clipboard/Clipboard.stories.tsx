@@ -6,7 +6,7 @@ import { Input } from "../input";
 import * as Clipboard from ".";
 
 const meta = {
-  title: "UI/Clipboard",
+  title: "Components/Actions/Clipboard",
   component: Clipboard.Root,
 } satisfies Meta<typeof Clipboard.Root>;
 

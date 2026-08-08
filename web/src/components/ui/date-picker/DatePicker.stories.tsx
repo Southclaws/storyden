@@ -5,7 +5,7 @@ import { Box, LStack } from "@/styled-system/jsx";
 import { DatePicker, DateRangePicker } from ".";
 
 const meta = {
-  title: "UI/Date Picker",
+  title: "Components/Forms/Date Picker",
   component: DatePicker,
 } satisfies Meta<typeof DatePicker>;
 

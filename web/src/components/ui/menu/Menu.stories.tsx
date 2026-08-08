@@ -11,7 +11,7 @@ import * as Menu from ".";
 import { Menu as ClosedMenu } from "./Menu";
 
 const meta = {
-  title: "UI/Menu",
+  title: "Components/Overlays/Menu",
   component: ClosedMenu,
   args: {
     trigger: <Button variant="outline">Open menu</Button>,

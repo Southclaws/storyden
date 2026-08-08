@@ -190,7 +190,7 @@ const iconPreviewClassName = css({
 });
 
 const meta = {
-  title: "UI/Icons",
+  title: "Foundations/Icons/Library",
 } satisfies Meta;
 
 export default meta;

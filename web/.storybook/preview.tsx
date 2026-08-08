@@ -68,6 +68,32 @@ const preview: Preview = {
     a11y: {
       test: "todo",
     },
+    options: {
+      storySort: {
+        method: "alphabetical",
+        locales: "en-US",
+        order: [
+          "Foundations",
+          ["Tokens", "Icons", "Layout", "*"],
+          "Components",
+          [
+            "Actions",
+            "Forms",
+            "Navigation",
+            "Feedback",
+            "Overlays",
+            "Data Display",
+            "Layout",
+            "Typography",
+            "*",
+          ],
+          "Compositions",
+          ["Forms", "Navigation", "Library", "Page Layout", "*"],
+          "Screens",
+          "*",
+        ],
+      },
+    },
   },
 };
 

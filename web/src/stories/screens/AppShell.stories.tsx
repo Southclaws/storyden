@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { CardBox } from "@/components/ui/card-box";
 import { FormControl } from "@/components/ui/form-control";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { HomeIcon } from "@/components/ui/icons/Home";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
@@ -121,9 +120,9 @@ export const Settings: Story = {
           title="Settings"
           footer={
             <SidebarNavigationLink
-              href="/"
-              icon={<HomeIcon />}
-              label="Back to community"
+              href="/l"
+              icon={<LibraryIcon />}
+              label="Settings documentation"
             />
           }
         >

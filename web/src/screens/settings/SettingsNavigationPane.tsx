@@ -9,13 +9,11 @@ import {
   SidebarNavigationPane,
   SidebarNavigationSection,
 } from "@/components/site/Navigation/SidebarNavigation";
-import { HomeIcon } from "@/components/ui/icons/Home";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { ToolIcon } from "@/components/ui/icons/Tool";
-import { useSmartBack } from "@/lib/navigation/smart-back";
 import { useSettings } from "@/lib/settings/settings-client";
 
 import {
@@ -35,7 +33,6 @@ export function SettingsNavigationPane() {
   const pathname = usePathname();
   const account = useAccountGet();
   const settings = useSettings();
-  const goBack = useSmartBack();
   const sections = settings.ready
     ? getSettingsSections(settings.settings, account.data)
     : [];

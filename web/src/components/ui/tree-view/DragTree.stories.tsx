@@ -71,7 +71,7 @@ function DragTreeStoryContext({ children }: { children: ReactNode }) {
 }
 
 const meta = {
-  title: "UI/Drag Tree",
+  title: "Components/Navigation/Drag Tree",
   parameters: {
     layout: "centered",
   },

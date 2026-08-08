@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { MetaGrid, MetaItem } from ".";
 
 const meta = {
-  title: "UI/Meta Grid",
+  title: "Components/Data Display/Meta Grid",
   component: MetaGrid,
   args: {
     children: null,

@@ -6,7 +6,7 @@ import { DeleteIcon } from "../icons/Delete";
 import * as FileUpload from ".";
 
 const meta = {
-  title: "UI/File Upload",
+  title: "Components/Forms/File Upload",
   component: FileUpload.Root,
 } satisfies Meta<typeof FileUpload.Root>;
 

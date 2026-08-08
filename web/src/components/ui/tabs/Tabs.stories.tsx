@@ -5,7 +5,7 @@ import { LStack } from "@/styled-system/jsx";
 import * as Tabs from ".";
 
 const meta = {
-  title: "UI/Tabs",
+  title: "Components/Navigation/Tabs",
   component: Tabs.Root,
   args: {
     defaultValue: "overview",

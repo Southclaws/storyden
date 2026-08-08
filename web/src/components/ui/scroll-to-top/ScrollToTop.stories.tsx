@@ -5,7 +5,7 @@ import { styled } from "@/styled-system/jsx";
 import { ScrollToTop } from ".";
 
 const meta = {
-  title: "UI/Scroll To Top",
+  title: "Components/Navigation/Scroll To Top",
   component: ScrollToTop,
 } satisfies Meta<typeof ScrollToTop>;
 

@@ -5,7 +5,7 @@ import { WarningIcon } from "../icons/Warning";
 import * as Alert from ".";
 
 const meta = {
-  title: "UI/Alert",
+  title: "Components/Feedback/Alert",
   component: Alert.Root,
 } satisfies Meta<typeof Alert.Root>;
 

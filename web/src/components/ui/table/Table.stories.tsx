@@ -11,7 +11,7 @@ const rows = [
 ];
 
 const meta = {
-  title: "UI/Table",
+  title: "Components/Data Display/Table",
   component: Table.Root,
   args: {
     size: "md",

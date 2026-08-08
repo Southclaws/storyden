@@ -14,7 +14,7 @@ const directoryRows = [
 ];
 
 const meta = {
-  title: "Compositions/Library Page Blocks",
+  title: "Compositions/Library/Page Blocks",
   parameters: {
     layout: "padded",
   },
@@ -27,13 +27,11 @@ type Story = StoryObj<typeof meta>;
 type DirectoryPreviewProps = {
   candidate?: string;
   inputBackground?: CSSProperties["backgroundColor"];
-  variant?: "ghost" | "inset";
 };
 
 function DirectoryPreview({
   candidate,
-  inputBackground,
-  variant = "ghost",
+  inputBackground = "var(--colors-background-inset)",
 }: DirectoryPreviewProps) {
   return (
     <LStack data-candidate={candidate} gap="2" width="full">
@@ -47,9 +45,10 @@ function DirectoryPreview({
           flexShrink="1"
           maxW="40"
           minW="20"
+          px="2"
           placeholder="Search..."
           style={{ backgroundColor: inputBackground }}
-          variant={variant}
+          variant="inset"
         />
       </WStack>
 
@@ -80,7 +79,7 @@ function DirectoryPreview({
 export const DirectoryTable: Story = {
   render: () => (
     <styled.main maxW="3xl" width="full">
-      <DirectoryPreview variant="inset" />
+      <DirectoryPreview />
     </styled.main>
   ),
 };

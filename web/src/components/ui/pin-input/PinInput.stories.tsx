@@ -5,7 +5,7 @@ import { LStack } from "@/styled-system/jsx";
 import { PinInput } from ".";
 
 const meta = {
-  title: "UI/Pin Input",
+  title: "Components/Forms/Pin Input",
   component: PinInput,
   args: {
     children: "Verification code",

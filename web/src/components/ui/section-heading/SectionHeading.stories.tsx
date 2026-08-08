@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SectionHeading } from ".";
 
 const meta = {
-  title: "UI/Typography/Section Heading",
+  title: "Components/Typography/Section Heading",
   component: SectionHeading,
   args: {
     children: "Client IP strategy",

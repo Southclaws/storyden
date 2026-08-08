@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ReactList } from ".";
 
 const meta = {
-  title: "UI/React List",
+  title: "Components/Data Display/React List",
   component: ReactList,
   args: {
     isLoggedIn: true,

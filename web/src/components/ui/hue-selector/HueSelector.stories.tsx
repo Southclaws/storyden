@@ -4,7 +4,7 @@ import { useState } from "react";
 import { HueSelector } from ".";
 
 const meta = {
-  title: "UI/Hue Selector",
+  title: "Components/Forms/Hue Selector",
   component: HueSelector,
   args: {
     value: "#31a89f",

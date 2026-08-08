@@ -5,7 +5,7 @@ import { HStack, LStack } from "@/styled-system/jsx";
 import { LinkButton } from ".";
 
 const meta = {
-  title: "UI/Link Button",
+  title: "Components/Actions/Link Button",
   component: LinkButton,
   args: {
     href: "/",

@@ -9,7 +9,7 @@ import { EditIcon } from "../icons/Edit";
 import { IconButton } from ".";
 
 const meta = {
-  title: "UI/Icon Button",
+  title: "Components/Actions/Icon Button",
   component: IconButton,
   args: {
     "aria-label": "Create",

@@ -5,7 +5,7 @@ import { HStack, LStack } from "@/styled-system/jsx";
 import { Checkbox } from ".";
 
 const meta = {
-  title: "UI/Checkbox",
+  title: "Components/Forms/Checkbox",
   component: Checkbox,
   args: {
     children: "Email me replies",

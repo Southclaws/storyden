@@ -1,14 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { BackAction } from "@/components/site/Action/Back";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { LinkButton } from "@/components/ui/link-button";
-import { LStack } from "@/styled-system/jsx";
 
 import { PageHeader } from ".";
 
 const meta = {
-  title: "Compositions/Page headers",
+  title: "Compositions/Page Layout/Page Header",
   component: PageHeader,
   parameters: {
     layout: "padded",
@@ -46,21 +45,19 @@ export const BreadcrumbNavigation: Story = {
     title: "",
   },
   render: () => (
-    <LStack gap="2">
-      <PageHeader
-        title="API reference"
-        navigation={
-          <>
-            <LinkButton href="/l" variant="ghost">
-              Library
-            </LinkButton>
-            <LinkButton href="/l/documentation" variant="ghost">
-              Documentation
-            </LinkButton>
-          </>
-        }
-        actions={<Button>Edit</Button>}
-      />
-    </LStack>
+    <PageHeader
+      title="Web Development"
+      navigation={
+        <Breadcrumbs
+          index={{ label: "Discussion", href: "/d" }}
+          crumbs={[
+            {
+              label: "Web Development",
+              href: "/d/web-development",
+            },
+          ]}
+        />
+      }
+    />
   ),
 };

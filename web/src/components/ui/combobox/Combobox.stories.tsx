@@ -23,7 +23,7 @@ type ComboboxStoryArgs = {
 };
 
 const meta = {
-  title: "UI/Combobox",
+  title: "Components/Forms/Combobox",
   argTypes: {
     size: {
       control: "select",

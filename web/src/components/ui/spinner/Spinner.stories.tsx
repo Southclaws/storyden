@@ -5,7 +5,7 @@ import { HStack } from "@/styled-system/jsx";
 import { Spinner } from ".";
 
 const meta = {
-  title: "UI/Spinner",
+  title: "Components/Feedback/Spinner",
   component: Spinner,
   args: {
     size: "md",

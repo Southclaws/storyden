@@ -15,14 +15,12 @@ import { BanIcon } from "@/components/ui/icons/BanIcon";
 import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { CollectionIcon } from "@/components/ui/icons/Collection";
 import { ColourPipetteIcon } from "@/components/ui/icons/Colour";
-import { HomeIcon } from "@/components/ui/icons/Home";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SystemIcon } from "@/components/ui/icons/System";
 import { ToolIcon } from "@/components/ui/icons/Tool";
-import { useSmartBack } from "@/lib/navigation/smart-back";
 import { useSettings } from "@/lib/settings/settings-client";
 import { hasPermission } from "@/utils/permissions";
 
@@ -46,7 +44,6 @@ export function AdminNavigationPane() {
   const pathname = usePathname();
   const account = useAccountGet();
   const settings = useSettings();
-  const goBack = useSmartBack();
   const authorised = hasPermission(
     account.data,
     Permission.ADMINISTRATOR,

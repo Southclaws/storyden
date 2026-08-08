@@ -5,7 +5,7 @@ import { Box } from "@/styled-system/jsx";
 import { SectionNavigation } from ".";
 
 const meta = {
-  title: "UI/Section Navigation",
+  title: "Components/Navigation/Section Navigation",
   component: SectionNavigation,
   parameters: {
     layout: "padded",

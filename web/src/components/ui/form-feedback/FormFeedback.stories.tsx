@@ -6,7 +6,7 @@ import { styled } from "@/styled-system/jsx";
 import { FormFeedback } from ".";
 
 const meta = {
-  title: "UI/Form Feedback",
+  title: "Components/Forms/Form Feedback",
   component: FormFeedback,
   args: {
     children: "Use a clear, memorable name.",

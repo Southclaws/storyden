@@ -4,7 +4,7 @@ import { cx } from "@/styled-system/css";
 import { treeView } from "@/styled-system/recipes";
 
 const meta = {
-  title: "UI/Tree View",
+  title: "Components/Navigation/Tree View",
   argTypes: {
     variant: {
       control: "select",

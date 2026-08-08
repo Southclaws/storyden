@@ -16,7 +16,7 @@ const queryResults = [
 ];
 
 const meta = {
-  title: "UI/Multi Select Picker",
+  title: "Components/Forms/Multi Select Picker",
   component: MultiSelectPicker,
   args: {
     value: selectedItems,
