@@ -11,6 +11,8 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 )
 
+const cachePrefix = "account:session:"
+
 type Repository interface {
 	Issue(context.Context, account.AccountID) (*Session, error)
 	Revoke(context.Context, Token) error
@@ -89,7 +91,7 @@ func (r *cachedRepo) Validate(ctx context.Context, t Token) (*Validated, error) 
 }
 
 func (r *cachedRepo) get(ctx context.Context, t Token) (*Session, bool, error) {
-	raw, err := r.store.Get(ctx, t.ID.String())
+	raw, err := r.store.Get(ctx, cacheKey(t))
 	if err != nil {
 		// Cache miss, found=false
 		// TODO: Expose a "cache miss" error/return value and distinguish
@@ -116,7 +118,7 @@ func (r *cachedRepo) cache(ctx context.Context, s Session) error {
 		return nil
 	}
 
-	err = r.store.Set(ctx, s.Token.String(), string(payload), ttl)
+	err = r.store.Set(ctx, cacheKey(s.Token), string(payload), ttl)
 	if err != nil {
 		return err
 	}
@@ -125,10 +127,14 @@ func (r *cachedRepo) cache(ctx context.Context, s Session) error {
 }
 
 func (r *cachedRepo) delete(ctx context.Context, token Token) error {
-	err := r.store.Delete(ctx, token.ID.String())
+	err := r.store.Delete(ctx, cacheKey(token))
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func cacheKey(t Token) string {
+	return cachePrefix + t.String()
 }

@@ -22,7 +22,7 @@ type fakeRepo struct {
 }
 
 func (f *fakeRepo) Issue(context.Context, account.AccountID) (*Session, error) { return f.session, nil }
-func (f *fakeRepo) Revoke(context.Context, Token) error                       { return nil }
+func (f *fakeRepo) Revoke(context.Context, Token) error                        { return nil }
 
 func (f *fakeRepo) Validate(context.Context, Token) (*Validated, error) {
 	f.calls++
@@ -45,7 +45,7 @@ func seed(t *testing.T, store *cachetest.Store, s Session) {
 
 	payload, err := s.Serialise()
 	require.NoError(t, err)
-	require.NoError(t, store.Set(context.Background(), s.Token.String(), string(payload), time.Hour))
+	require.NoError(t, store.Set(context.Background(), cacheKey(s.Token), string(payload), time.Hour))
 }
 
 func TestCachedValidateRejectsRevokedCachedSession(t *testing.T) {
@@ -97,7 +97,7 @@ func TestCachedValidateFallsBackWhenEntryIsUnreadable(t *testing.T) {
 	inner := &fakeRepo{session: &stored}
 	repo := NewCachedRepository(inner, store)
 
-	require.NoError(t, store.Set(context.Background(), tok.String(), "not json", time.Hour))
+	require.NoError(t, store.Set(context.Background(), cacheKey(tok), "not json", time.Hour))
 
 	v, err := repo.Validate(context.Background(), tok)
 
