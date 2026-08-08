@@ -17,7 +17,7 @@ import {
 
 export async function passkeyLogin(handle: string) {
   const { publicKey } = await webAuthnGetAssertion(handle);
-  const credential = await startAuthentication(publicKey);
+  const credential = await startAuthentication({ optionsJSON: publicKey });
 
   // HACK:
   // 1. https://github.com/MasterKale/SimpleWebAuthn/issues/330
@@ -30,9 +30,7 @@ export async function passkeyLogin(handle: string) {
 export async function passkeyRegister(handle: string) {
   const { publicKey } = await webAuthnRequestCredential(handle);
 
-  const credential = await startRegistration({
-    ...publicKey,
-  });
+  const credential = await startRegistration({ optionsJSON: publicKey });
 
   await webAuthnMakeCredential(credential as WebAuthnMakeCredentialBody);
 }

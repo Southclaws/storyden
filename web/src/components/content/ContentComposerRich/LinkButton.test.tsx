@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Editor } from "@tiptap/react";
 import { describe, expect, it, vi } from "vitest";
@@ -31,7 +31,10 @@ describe("LinkButton", () => {
     render(<LinkButton editor={editor} />);
 
     await user.click(screen.getByTitle("Add link"));
-    await user.type(screen.getByLabelText("Link URL"), "example.com{enter}");
+    fireEvent.change(screen.getByLabelText("Link URL"), {
+      target: { value: "example.com" },
+    });
+    await user.click(screen.getByRole("button", { name: "Add" }));
 
     expect(chain.setLink).toHaveBeenCalledWith({
       href: "https://example.com/",

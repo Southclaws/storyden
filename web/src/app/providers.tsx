@@ -1,6 +1,7 @@
 "use client";
 
 import { PropsWithChildren } from "react";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import { SWRConfig } from "swr";
 
@@ -12,21 +13,23 @@ export function Providers({ children }: PropsWithChildren) {
   const provider = useCacheProvider();
 
   return (
-    <AuthProvider>
-      <SWRConfig
-        value={{
-          keepPreviousData: true,
-          // provider: provider,
-        }}
-      >
-        <DndProvider>
-          <Toaster />
+    <NuqsAdapter>
+      <AuthProvider>
+        <SWRConfig
+          value={{
+            keepPreviousData: true,
+            // provider: provider,
+          }}
+        >
+          <DndProvider>
+            <Toaster />
 
-          {/* -- */}
-          {children}
-          {/* -- */}
-        </DndProvider>
-      </SWRConfig>
-    </AuthProvider>
+            {/* -- */}
+            {children}
+            {/* -- */}
+          </DndProvider>
+        </SWRConfig>
+      </AuthProvider>
+    </NuqsAdapter>
   );
 }

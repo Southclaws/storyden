@@ -13,38 +13,38 @@ export const FeedBlockTypeSchema = z.enum([
 export type FeedBlockType = z.infer<typeof FeedBlockTypeSchema>;
 
 const FeedTitleBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.title),
+  type: z.literal(FeedBlockTypeSchema.enum.title),
 });
 
 const FeedSubtitleBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.subtitle),
+  type: z.literal(FeedBlockTypeSchema.enum.subtitle),
 });
 
 const FeedContentBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.content),
+  type: z.literal(FeedBlockTypeSchema.enum.content),
 });
 
 const FeedCoverBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.cover),
+  type: z.literal(FeedBlockTypeSchema.enum.cover),
 });
 
 const FeedCategoriesBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.categories),
+  type: z.literal(FeedBlockTypeSchema.enum.categories),
   layout: z.enum(["list", "grid"]).default("list"),
 });
 
 const FeedThreadsBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.threads),
+  type: z.literal(FeedBlockTypeSchema.enum.threads),
   source: z.enum(["all", "uncategorised"]).default("uncategorised"),
 });
 
 const FeedQuickShareBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum["quick-share"]),
+  type: z.literal(FeedBlockTypeSchema.enum["quick-share"]),
   showCategorySelect: z.boolean().default(true),
 });
 
 const FeedLibraryBlockSchema = z.object({
-  type: z.literal(FeedBlockTypeSchema.Enum.library),
+  type: z.literal(FeedBlockTypeSchema.enum.library),
   node: z.string().optional(),
   layout: z.enum(["list", "grid"]).default("list"),
 });

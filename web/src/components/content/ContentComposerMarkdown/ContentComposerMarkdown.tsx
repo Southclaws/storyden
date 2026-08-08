@@ -64,13 +64,12 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
   if (props.disabled) {
     return (
       <LStack
-        className="markdown-editor-readonly"
+        className="markdown-editor-readonly typography"
         position="relative"
         minHeight="8"
         maxHeight="fit"
       >
         <Markdown
-          className="typography"
           components={markdownComponents}
           remarkPlugins={[remarkLooseLists]}
           urlTransform={markdownURLTransform}

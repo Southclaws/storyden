@@ -1,14 +1,14 @@
 "use client";
 
 import { Editor } from "@tiptap/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { LinkIcon } from "@/components/ui/icons/Typography";
 import { Input } from "@/components/ui/input";
 import * as Popover from "@/components/ui/popover";
-import { isValidLinkLike, normalizeLink } from "@/lib/link/validation";
+import { normalizeLink } from "@/lib/link/validation";
 import { HStack } from "@/styled-system/jsx";
 
 type LinkButtonProps = {
@@ -16,43 +16,38 @@ type LinkButtonProps = {
 };
 
 export function LinkButton({ editor }: LinkButtonProps) {
-  const [url, setUrl] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [defaultUrl, setDefaultUrl] = useState("");
   const [open, setOpen] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
 
   const isActive = editor.isActive("link");
   const currentUrl = editor.getAttributes("link")["href"] || "";
 
+  useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.value = defaultUrl;
+    }
+  }, [defaultUrl, open]);
+
   const handleOpen = () => {
     if (isActive) {
-      setUrl(currentUrl);
+      setDefaultUrl(currentUrl);
     } else {
-      setUrl("");
+      setDefaultUrl("");
     }
     setOpen(true);
   };
 
-  const handleChangeURL = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    if (value === "") {
-      setIsInvalid(false);
-    } else {
-      setIsInvalid(isValidLinkLike(value) === false);
-    }
-
-    setUrl(value);
-  };
-
   const handleSetLink = () => {
-    const trimmedUrl = url.trim();
+    const trimmedUrl = inputRef.current?.value.trim() ?? "";
 
     if (!trimmedUrl) {
       if (isActive) {
         editor.chain().focus().extendMarkRange("link").unsetLink().run();
       }
       setOpen(false);
-      setUrl("");
+      setDefaultUrl("");
       return;
     }
 
@@ -76,13 +71,13 @@ export function LinkButton({ editor }: LinkButtonProps) {
     }
 
     setOpen(false);
-    setUrl("");
+    setDefaultUrl("");
   };
 
   const handleRemoveLink = () => {
     editor.chain().focus().extendMarkRange("link").unsetLink().run();
     setOpen(false);
-    setUrl("");
+    setDefaultUrl("");
   };
 
   return (
@@ -102,9 +97,10 @@ export function LinkButton({ editor }: LinkButtonProps) {
         <Popover.Content>
           <HStack gap="1" alignItems="stretch">
             <Input
+              key={defaultUrl}
+              ref={inputRef}
               borderColor={isInvalid ? "status.danger.border" : undefined}
-              value={url}
-              onChange={handleChangeURL}
+              defaultValue={defaultUrl}
               placeholder="Enter or paste URL"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
