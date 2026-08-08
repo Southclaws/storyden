@@ -11,13 +11,7 @@ import (
 var errNotFound = fmt.Errorf("not found")
 
 type RedisCache struct {
-	client  rueidis.Client
-	options Options
-}
-
-type Options struct {
-	Expiration                time.Duration
-	ClientSideCacheExpiration time.Duration
+	client rueidis.Client
 }
 
 func New(client rueidis.Client) *RedisCache {
@@ -25,8 +19,8 @@ func New(client rueidis.Client) *RedisCache {
 }
 
 func (c *RedisCache) Get(ctx context.Context, key string) (string, error) {
-	cmd := c.client.B().Get().Key(key).Cache()
-	res := c.client.DoCache(ctx, cmd, c.options.ClientSideCacheExpiration)
+	cmd := c.client.B().Get().Key(key).Build()
+	res := c.client.Do(ctx, cmd)
 
 	str, err := res.ToString()
 	if rueidis.IsRedisNil(err) {
