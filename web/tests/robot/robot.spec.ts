@@ -5,7 +5,6 @@ import { withAdminAccessKey } from "../access_key_admin_assignment";
 
 import {
   DEFAULT_ROBOT_MODEL,
-  dismissOnboarding,
   goToNewChat,
   sendMessage,
   setupRobotProviderWithScript,
@@ -37,7 +36,6 @@ async function openLatestRobotSession(page: Page) {
   const sessionID = await getLatestRobotSessionID(page);
 
   await page.goto(`/robots/chats/${sessionID}`);
-  await dismissOnboarding(page);
 }
 
 // The mock LLM uses ../tests/robot/scripts/e2e-default.yaml, selected through
@@ -133,7 +131,6 @@ test.describe("Robot Chat — mock LLM stream", () => {
       });
 
       await page.goto("/robots/chats/new");
-      await dismissOnboarding(page);
 
       await switchToRobot(page, customRobotName);
 
@@ -145,7 +142,6 @@ test.describe("Robot Chat — mock LLM stream", () => {
       const sessionID = await getLatestRobotSessionID(page);
 
       await page.goto(`/robots/chats/${sessionID}?robot=${customRobotID}`);
-      await dismissOnboarding(page);
 
       await expect(
         page.getByRole("button", { name: customRobotName }),
@@ -162,7 +158,6 @@ test.describe("Robot Chat — mock LLM stream", () => {
       );
 
       await page.reload();
-      await dismissOnboarding(page);
       await expect(
         page.getByRole("button", { name: "Storyden Robot Builder" }),
       ).toBeVisible({ timeout: 15000 });
@@ -223,7 +218,6 @@ test.describe("Robot Chat — mock LLM stream", () => {
       });
 
       await page.goto("/robots/chats/new");
-      await dismissOnboarding(page);
 
       await switchToRobot(page, cancellableRobotName);
 
@@ -323,7 +317,6 @@ test.describe("Robot Chat — mock LLM stream", () => {
       });
 
       await page.goto("/robots/chats/new");
-      await dismissOnboarding(page);
 
       await switchToRobot(page, switcherRobotName);
 

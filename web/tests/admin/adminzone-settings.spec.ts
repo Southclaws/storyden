@@ -39,13 +39,6 @@ async function createCategoryAndThreads(
   return { categoryThreadTitle, uncategorisedThreadTitle };
 }
 
-async function dismissOnboarding(page: Page) {
-  const skipButton = page.getByRole("button", { name: "Skip" });
-  if (await skipButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await skipButton.click();
-  }
-}
-
 async function openFeedEditorFromSidebar(page: Page) {
   await expect(page.locator("#navigation__leftbar")).toBeVisible();
 
@@ -94,7 +87,6 @@ test.describe("AdminZone Feed Settings", () => {
 
     await createAdmin(page.context(), adminHandle, PASSWORD);
     await login(page, adminHandle, PASSWORD);
-    await dismissOnboarding(page);
     await page.goto("/");
     await openFeedEditorFromSidebar(page);
 
