@@ -12,6 +12,8 @@ type DndContextProps = {
 const mocks = vi.hoisted(() => ({
   contextProps: null as DndContextProps | null,
   emitCategory: vi.fn(),
+  emitFeedBlock: vi.fn(),
+  emitLibraryBlock: vi.fn(),
   moveNode: vi.fn(),
   revalidate: vi.fn(),
 }));
@@ -53,11 +55,11 @@ vi.mock("@/lib/category/events", () => ({
 }));
 
 vi.mock("@/lib/feed/events", () => ({
-  useEmitFeedBlockEvent: () => vi.fn(),
+  useEmitFeedBlockEvent: () => mocks.emitFeedBlock,
 }));
 
 vi.mock("@/lib/library/events", () => ({
-  useEmitLibraryBlockEvent: () => vi.fn(),
+  useEmitLibraryBlockEvent: () => mocks.emitLibraryBlock,
 }));
 
 vi.mock("@/lib/navigation/events", () => ({
@@ -86,6 +88,7 @@ function getDragEnd() {
 }
 
 beforeEach(() => {
+  vi.clearAllMocks();
   mocks.contextProps = null;
 });
 
@@ -230,5 +233,72 @@ describe("sidebar tree drop behavior", () => {
       "documentation",
       undefined,
     );
+  });
+
+  test("dropping a library block emits a library block reorder", async () => {
+    render(<DndProvider>library blocks</DndProvider>);
+
+    await act(() =>
+      getDragEnd()({
+        active: {
+          data: {
+            current: {
+              type: "library-block",
+              node: page("handbook"),
+              block: "title",
+            },
+          },
+        },
+        over: {
+          data: {
+            current: {
+              type: "library-block",
+              node: page("handbook"),
+              block: "content",
+            },
+          },
+        },
+      }),
+    );
+
+    expect(mocks.emitLibraryBlock).toHaveBeenCalledWith(
+      "library:reorder-block",
+      {
+        activeId: "title",
+        overId: "content",
+      },
+    );
+    expect(mocks.emitFeedBlock).not.toHaveBeenCalled();
+  });
+
+  test("dropping a feed block emits a feed block reorder", async () => {
+    render(<DndProvider>feed blocks</DndProvider>);
+
+    await act(() =>
+      getDragEnd()({
+        active: {
+          data: {
+            current: {
+              type: "feed-block",
+              block: "categories",
+            },
+          },
+        },
+        over: {
+          data: {
+            current: {
+              type: "feed-block",
+              block: "threads",
+            },
+          },
+        },
+      }),
+    );
+
+    expect(mocks.emitFeedBlock).toHaveBeenCalledWith("feed:reorder-block", {
+      activeId: "categories",
+      overId: "threads",
+    });
+    expect(mocks.emitLibraryBlock).not.toHaveBeenCalled();
   });
 });

@@ -17,10 +17,17 @@ type Props = {
   block: FeedBlock;
   children: React.ReactNode;
   index: number;
+  onOpenChange?: (open: boolean) => void;
   open?: boolean;
 };
 
-export function BlockMenu({ block, children, index, open }: Props) {
+export function BlockMenu({
+  block,
+  children,
+  index,
+  onOpenChange,
+  open,
+}: Props) {
   const { feed, removeBlock } = useFeedBlockEditor();
   const canAdd = feed.blocks.length < 8;
 
@@ -34,6 +41,7 @@ export function BlockMenu({ block, children, index, open }: Props) {
     <Menu.Root
       lazyMount
       open={open}
+      onOpenChange={(details) => onOpenChange?.(details.open)}
       onSelect={handleSelect}
       positioning={{ placement: "right-start", gutter: 0 }}
     >
@@ -46,7 +54,10 @@ export function BlockMenu({ block, children, index, open }: Props) {
                 {FeedBlockName[block.type]}
               </Menu.ItemGroupLabel>
               <Menu.Separator />
-              <BlockConfigMenu block={block} />
+              <BlockConfigMenu
+                block={block}
+                onConfigured={() => onOpenChange?.(false)}
+              />
               <Menu.Item value="delete">
                 <DeleteIcon />
                 Delete
@@ -60,16 +71,24 @@ export function BlockMenu({ block, children, index, open }: Props) {
   );
 }
 
-function BlockConfigMenu({ block }: { block: FeedBlock }) {
+function BlockConfigMenu({
+  block,
+  onConfigured,
+}: {
+  block: FeedBlock;
+  onConfigured: () => void;
+}) {
   switch (block.type) {
     case "categories":
-      return <CategoryLayoutMenu block={block} />;
+      return <CategoryLayoutMenu block={block} onConfigured={onConfigured} />;
     case "threads":
-      return <ThreadSourceMenu block={block} />;
+      return <ThreadSourceMenu block={block} onConfigured={onConfigured} />;
     case "quick-share":
-      return <QuickShareCategoryMenu block={block} />;
+      return (
+        <QuickShareCategoryMenu block={block} onConfigured={onConfigured} />
+      );
     case "library":
-      return <LibraryConfigMenu block={block} />;
+      return <LibraryConfigMenu block={block} onConfigured={onConfigured} />;
     default:
       return null;
   }
@@ -77,8 +96,10 @@ function BlockConfigMenu({ block }: { block: FeedBlock }) {
 
 function CategoryLayoutMenu({
   block,
+  onConfigured,
 }: {
   block: Extract<FeedBlock, { type: "categories" }>;
+  onConfigured: () => void;
 }) {
   const { overwriteBlock } = useFeedBlockEditor();
 
@@ -87,6 +108,7 @@ function CategoryLayoutMenu({
       ...block,
       layout: value as "grid" | "list",
     });
+    onConfigured();
   }
 
   return (
@@ -117,8 +139,10 @@ function CategoryLayoutMenu({
 
 function ThreadSourceMenu({
   block,
+  onConfigured,
 }: {
   block: Extract<FeedBlock, { type: "threads" }>;
+  onConfigured: () => void;
 }) {
   const { overwriteBlock } = useFeedBlockEditor();
 
@@ -127,6 +151,7 @@ function ThreadSourceMenu({
       ...block,
       source: value as "all" | "uncategorised",
     });
+    onConfigured();
   }
 
   return (
@@ -151,8 +176,10 @@ function ThreadSourceMenu({
 
 function QuickShareCategoryMenu({
   block,
+  onConfigured,
 }: {
   block: Extract<FeedBlock, { type: "quick-share" }>;
+  onConfigured: () => void;
 }) {
   const { overwriteBlock } = useFeedBlockEditor();
 
@@ -161,6 +188,7 @@ function QuickShareCategoryMenu({
       ...block,
       showCategorySelect: value === "show",
     });
+    onConfigured();
   }
 
   return (
@@ -185,8 +213,10 @@ function QuickShareCategoryMenu({
 
 function LibraryConfigMenu({
   block,
+  onConfigured,
 }: {
   block: Extract<FeedBlock, { type: "library" }>;
+  onConfigured: () => void;
 }) {
   const { overwriteBlock } = useFeedBlockEditor();
 
@@ -207,7 +237,9 @@ function LibraryConfigMenu({
                   value={block.node}
                   defaultValue={block.node}
                   onChange={(node) =>
-                    void overwriteBlock({ ...block, node: node?.id })
+                    void overwriteBlock({ ...block, node: node?.id }).then(
+                      onConfigured,
+                    )
                   }
                 />
               </Box>
@@ -215,15 +247,19 @@ function LibraryConfigMenu({
           </Menu.Positioner>
         </Portal>
       </Menu.Root>
-      {!block.node && <LibraryLayoutMenu block={block} />}
+      {!block.node && (
+        <LibraryLayoutMenu block={block} onConfigured={onConfigured} />
+      )}
     </>
   );
 }
 
 function LibraryLayoutMenu({
   block,
+  onConfigured,
 }: {
   block: Extract<FeedBlock, { type: "library" }>;
+  onConfigured: () => void;
 }) {
   const { overwriteBlock } = useFeedBlockEditor();
 
@@ -232,6 +268,7 @@ function LibraryLayoutMenu({
       ...block,
       layout: value as "grid" | "list",
     });
+    onConfigured();
   }
 
   return (

@@ -19,6 +19,7 @@ import { LibraryPageTitleBlockMenuItems } from "./LibraryPageTitleBlock/LibraryP
 type Props = {
   block: LibraryPageBlock;
   index: number;
+  onOpenChange?: (open: boolean) => void;
   open?: boolean;
 };
 
@@ -26,6 +27,7 @@ export function BlockMenu({
   children,
   block,
   index,
+  onOpenChange,
   open,
 }: PropsWithChildren<Props>) {
   const emit = useEmitLibraryBlockEvent();
@@ -52,6 +54,7 @@ export function BlockMenu({
     <Menu.Root
       lazyMount
       open={open}
+      onOpenChange={(details) => onOpenChange?.(details.open)}
       onSelect={handleSelect}
       positioning={{
         placement: "right-start",
