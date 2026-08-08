@@ -25,6 +25,8 @@ const (
 	MaxVerificationAttempts  = 5
 )
 
+var ErrCodeSuperseded = fault.New("verification code was replaced before it was used")
+
 type Repository struct {
 	db          *ent.Client
 	accountRepo *account_querier.Querier
@@ -118,19 +120,15 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 		return nil, false, nil
 	}
 
-	if record.VerificationAttempts >= MaxVerificationAttempts {
-		return nil, false, nil
+	claimed, err := r.claimAttempt(ctx, record.ID)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	if record.VerificationCodeExpiresAt == nil || record.VerificationCodeExpiresAt.Before(time.Now()) {
+	if !claimed {
 		return nil, false, nil
 	}
 
 	if subtle.ConstantTimeCompare([]byte(record.VerificationCode), []byte(code)) != 1 {
-		if err := r.recordFailedAttempt(ctx, record.ID); err != nil {
-			return nil, false, fault.Wrap(err, fctx.With(ctx))
-		}
-
 		return nil, false, nil
 	}
 
@@ -156,20 +154,29 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 	return acc, true, nil
 }
 
-func (r *Repository) recordFailedAttempt(ctx context.Context, id xid.ID) error {
-	err := r.db.Email.UpdateOneID(id).AddVerificationAttempts(1).Exec(ctx)
+// the budget check is part of the update so concurrent guesses cannot all pass a stale read
+func (r *Repository) claimAttempt(ctx context.Context, id xid.ID) (bool, error) {
+	affected, err := r.db.Email.Update().
+		Where(
+			email_ent.ID(id),
+			email_ent.VerificationAttemptsLT(MaxVerificationAttempts),
+			email_ent.VerificationCodeExpiresAtGT(time.Now()),
+		).
+		AddVerificationAttempts(1).
+		Save(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return nil
+	return affected > 0, nil
 }
 
-func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address) error {
-	_, err := r.db.Email.Update().
+func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address, code string) error {
+	affected, err := r.db.Email.Update().
 		Where(
 			email_ent.EmailAddress(email.Address),
 			email_ent.AccountID(xid.ID(accountID)),
+			email_ent.VerificationCode(code),
 		).
 		SetVerified(true).
 		SetVerificationAttempts(0).
@@ -177,6 +184,9 @@ func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, em
 		Save(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if affected == 0 {
+		return fault.Wrap(ErrCodeSuperseded, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 	}
 
 	r.trySyncVerifiedStatus(ctx, accountID)

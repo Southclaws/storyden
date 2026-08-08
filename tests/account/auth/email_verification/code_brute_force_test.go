@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"sync"
 	"testing"
 	"time"
 
@@ -159,6 +160,55 @@ func TestResendRotatesTheCodeAndClearsAttempts(t *testing.T) {
 			})
 			r.NoError(err)
 			a.Equal(http.StatusOK, resp.StatusCode(), "a fresh code must work again after a lockout")
+		}))
+	}))
+}
+
+func TestConcurrentGuessesCannotOutrunTheAttemptBudget(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		mail mailer.Sender,
+		db *ent.Client,
+	) {
+		inbox := mail.(*mailer.Mock)
+
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+			r := require.New(t)
+
+			address := xid.New().String() + "@storyden.org"
+			code := signupAndReadCode(t, root, cl, inbox, address)
+
+			const parallel = 24
+
+			var wg sync.WaitGroup
+			for range parallel {
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					_, _ = cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{
+						Email: address,
+						Code:  wrongCode(code),
+					})
+				}()
+			}
+			wg.Wait()
+
+			record, err := db.Email.Query().Where(email_ent.EmailAddress(address)).Only(root)
+			r.NoError(err)
+			a.LessOrEqual(record.VerificationAttempts, email.MaxVerificationAttempts,
+				"the budget must cap the counter no matter how many guesses land at once")
+
+			resp, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{
+				Email: address,
+				Code:  code,
+			})
+			r.NoError(err)
+			a.NotEqual(http.StatusOK, resp.StatusCode(), "the lockout must still hold after a concurrent burst")
 		}))
 	}))
 }

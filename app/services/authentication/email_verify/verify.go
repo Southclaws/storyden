@@ -118,7 +118,7 @@ func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code s
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.emailRepo.Verify(ctx, acc.ID, emailAddress)
+	err = s.emailRepo.Verify(ctx, acc.ID, emailAddress, code)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
