@@ -39,6 +39,15 @@ export function useSmartBack(fallbackHref = "/") {
   const router = useRouter();
 
   return useCallback(() => {
+    const navigation = (
+      window as typeof window & { navigation?: NavigationHistory }
+    ).navigation;
+
+    if (navigation === undefined) {
+      router.back();
+      return;
+    }
+
     const previous = getPreviousEntry();
 
     if (previous?.url && isStorydenURL(previous.url)) {
