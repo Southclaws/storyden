@@ -57,11 +57,17 @@ func (r *cachedRepo) Revoke(ctx context.Context, token Token) error {
 func (r *cachedRepo) Validate(ctx context.Context, t Token) (*Validated, error) {
 	sess, found, err := r.get(ctx, t)
 	if err != nil {
-		return nil, r.delete(ctx, t)
-	}
+		// an unreadable entry is evicted so the database decides instead
+		if delErr := r.delete(ctx, t); delErr != nil {
+			return nil, fault.Wrap(delErr, fctx.With(ctx))
+		}
+	} else if found {
+		v, err := sess.Validate()
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 
-	if found {
-		return sess, nil
+		return v, nil
 	}
 
 	// Fall back to database query.
@@ -78,7 +84,7 @@ func (r *cachedRepo) Validate(ctx context.Context, t Token) (*Validated, error) 
 	return v, nil
 }
 
-func (r *cachedRepo) get(ctx context.Context, t Token) (*Validated, bool, error) {
+func (r *cachedRepo) get(ctx context.Context, t Token) (*Session, bool, error) {
 	raw, err := r.store.Get(ctx, t.ID.String())
 	if err != nil {
 		// Cache miss, found=false
@@ -92,12 +98,7 @@ func (r *cachedRepo) get(ctx context.Context, t Token) (*Validated, bool, error)
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	v, err := session.Validate()
-	if err != nil {
-		return nil, false, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return v, true, nil
+	return session, true, nil
 }
 
 func (r *cachedRepo) cache(ctx context.Context, s Session) error {
