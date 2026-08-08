@@ -66,6 +66,7 @@ export function MultiSelectPicker({
   menuVariantProps,
   inputVariantProps,
 }: Props) {
+  const { value: _value, ...menuTriggerProps } = triggerProps ?? {};
   const [queryInput, setQueryInput] = useState("");
   const [hiddenCount, setHiddenCount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -194,7 +195,7 @@ export function MultiSelectPicker({
         justifyContent="space-between"
         cursor="pointer"
         aria-label={`Select items${value.length > 0 ? `, ${value.length} selected` : ""}`}
-        {...triggerProps}
+        {...menuTriggerProps}
       >
         <HStack
           ref={containerRef}

@@ -1,6 +1,6 @@
 import { usePinch, useWheel } from "@use-gesture/react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import AvatarEditor from "react-avatar-editor";
+import { type AvatarEditorRef } from "react-avatar-editor";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
@@ -13,7 +13,7 @@ export type Props = {
 };
 
 export function useAssetUploadEditor(props: Props) {
-  const ref = useRef<AvatarEditor>(null);
+  const ref = useRef<AvatarEditorRef>(null);
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [tempFile, setTempFile] = useState<File | null>(null);

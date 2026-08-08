@@ -62,6 +62,7 @@ it("closes only after a genuine outside interaction", async () => {
     await screen.findByRole("menuitem", { name: "Run action" }),
   ).toBeVisible();
 
+  await new Promise((resolve) => setTimeout(resolve, 0));
   await user.click(screen.getByRole("button", { name: "Outside" }));
 
   await waitFor(() =>

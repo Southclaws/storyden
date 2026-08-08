@@ -1,7 +1,7 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import { forwardRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { blockEditor } from "styled-system/recipes";
 
 import { IconButton, IconButtonProps } from "@/components/ui/icon-button";
@@ -35,11 +35,6 @@ const MenuContent = withContext<HTMLDivElement, Menu.ContentProps>(
   "menuContent",
 );
 
-const MenuAnchor = withContext<HTMLDivElement, HTMLStyledProps<"div">>(
-  "div",
-  "menuAnchor",
-);
-
 export interface MenuHandleProps extends Omit<
   IconButtonProps,
   "children" | "onClick"
@@ -63,6 +58,8 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
     ref,
   ) {
     const [internalOpen, setInternalOpen] = useState(false);
+    const handleRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
     const menuOpen = open ?? internalOpen;
 
     function setMenuOpen(nextOpen: boolean) {
@@ -72,33 +69,50 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
       onOpenChange?.(nextOpen);
     }
 
+    useEffect(() => {
+      if (!menuOpen) return;
+
+      function closeOnOutsidePointerDown(event: PointerEvent) {
+        const target = event.target;
+
+        if (
+          !(target instanceof Node) ||
+          handleRef.current?.contains(target) ||
+          contentRef.current?.contains(target)
+        ) {
+          return;
+        }
+
+        setMenuOpen(false);
+      }
+
+      document.addEventListener("pointerdown", closeOnOutsidePointerDown);
+      return () =>
+        document.removeEventListener("pointerdown", closeOnOutsidePointerDown);
+    }, [menuOpen]);
+
     return (
-      <Handle>
+      <Handle ref={handleRef}>
         <Menu.Root
           lazyMount
           open={menuOpen}
           onOpenChange={({ open: nextOpen }) => setMenuOpen(nextOpen)}
           positioning={{ placement: "right-start", gutter: 0 }}
         >
-          <MenuTrigger
-            {...triggerProps}
-            ref={ref}
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            aria-label={ariaLabel}
-            data-dragging={dragging ? "" : undefined}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            <DragHandleIcon />
-          </MenuTrigger>
-
           <Menu.Trigger asChild>
-            <MenuAnchor aria-hidden="true" tabIndex={-1} />
+            <MenuTrigger
+              {...triggerProps}
+              ref={ref}
+              aria-label={ariaLabel}
+              data-dragging={dragging ? "" : undefined}
+            >
+              <DragHandleIcon />
+            </MenuTrigger>
           </Menu.Trigger>
 
           <Portal>
             <Menu.Positioner>
-              <MenuContent>{children}</MenuContent>
+              <MenuContent ref={contentRef}>{children}</MenuContent>
             </Menu.Positioner>
           </Portal>
         </Menu.Root>

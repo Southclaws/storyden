@@ -10,7 +10,7 @@ type DatePickerVariantMap = {
   [key in keyof DatePickerVariant]: Array<DatePickerVariant[key]>
 }
 
-type DatePickerSlot = "clearTrigger" | "content" | "control" | "input" | "label" | "monthSelect" | "nextTrigger" | "positioner" | "presetTrigger" | "prevTrigger" | "rangeText" | "root" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "view" | "viewControl" | "viewTrigger" | "yearSelect" | "view"
+type DatePickerSlot = "clearTrigger" | "content" | "control" | "input" | "label" | "monthSelect" | "nextTrigger" | "positioner" | "presetTrigger" | "prevTrigger" | "rangeText" | "root" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "view" | "viewControl" | "viewTrigger" | "yearSelect" | "view" | "valueText"
 
 export type DatePickerVariantProps = {
   [key in keyof DatePickerVariant]?: ConditionalValue<DatePickerVariant[key]> | undefined
