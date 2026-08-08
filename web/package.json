@@ -109,7 +109,7 @@
     "eslint-config-next": "16.0.1",
     "jsdom": "^28.1.0",
     "json-schema-to-typescript": "^15.0.4",
-    "orval": "7.2.0",
+    "orval": "7.21.0",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
     "typescript": "^6.0.3",
