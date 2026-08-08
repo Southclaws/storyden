@@ -360,6 +360,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "email_address", Type: field.TypeString, Unique: true, Size: 254},
 		{Name: "verification_code", Type: field.TypeString, Size: 6},
+		{Name: "verification_code_expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "verification_attempts", Type: field.TypeInt, Default: "0"},
 		{Name: "verified", Type: field.TypeBool, Default: "false"},
 		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
@@ -371,7 +373,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "emails_accounts_emails",
-				Columns:    []*schema.Column{EmailsColumns[5]},
+				Columns:    []*schema.Column{EmailsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

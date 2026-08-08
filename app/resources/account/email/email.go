@@ -2,8 +2,10 @@ package email
 
 import (
 	"context"
+	"crypto/subtle"
 	"log/slog"
 	"net/mail"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -16,6 +18,11 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 	email_ent "github.com/Southclaws/storyden/internal/ent/email"
+)
+
+const (
+	VerificationCodeLifespan = time.Hour
+	MaxVerificationAttempts  = 5
 )
 
 type Repository struct {
@@ -49,7 +56,9 @@ func (r *Repository) Add(ctx context.Context,
 		// Already claimed by this account, update the record
 		update := r.db.Email.UpdateOne(existing).
 			Where(email_ent.EmailAddress(email.Address)).
-			SetVerificationCode(code)
+			SetVerificationCode(code).
+			SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan)).
+			SetVerificationAttempts(0)
 
 		if existing.AccountID == nil {
 			update.SetAccountID(xid.ID(accountID))
@@ -70,7 +79,8 @@ func (r *Repository) Add(ctx context.Context,
 	create := r.db.Email.Create().
 		SetAccountID(xid.ID(accountID)).
 		SetEmailAddress(email.Address).
-		SetVerificationCode(code)
+		SetVerificationCode(code).
+		SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan))
 
 	result, err := create.Save(ctx)
 	if err != nil {
@@ -85,31 +95,51 @@ func (r *Repository) Add(ctx context.Context,
 	return account.MapEmail(result), nil
 }
 
-func (r *Repository) GetCode(ctx context.Context, emailAddress mail.Address) (string, error) {
-	q := r.db.Email.Query().
-		Where(email_ent.EmailAddress(emailAddress.Address))
-
-	result, err := q.Only(ctx)
+func (r *Repository) RotateCode(ctx context.Context, emailAddress mail.Address, code string) error {
+	_, err := r.db.Email.Update().
+		Where(email_ent.EmailAddress(emailAddress.Address)).
+		SetVerificationCode(code).
+		SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan)).
+		SetVerificationAttempts(0).
+		Save(ctx)
 	if err != nil {
-		return "", fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return result.VerificationCode, nil
+	return nil
 }
 
 func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, code string) (*account.Account, bool, error) {
-	q := r.db.Account.
-		Query().
-		Where(
-			account_ent.HasEmailsWith(
-				email_ent.EmailAddress(emailAddress.Address),
-				email_ent.VerificationCode(code),
-			),
-		).
-		WithEmails().
-		WithAuthentication()
+	record, exists, err := r.lookupEmail(ctx, emailAddress)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return nil, false, nil
+	}
 
-	result, err := q.Only(ctx)
+	if record.VerificationAttempts >= MaxVerificationAttempts {
+		return nil, false, nil
+	}
+
+	if record.VerificationCodeExpiresAt == nil || record.VerificationCodeExpiresAt.Before(time.Now()) {
+		return nil, false, nil
+	}
+
+	if subtle.ConstantTimeCompare([]byte(record.VerificationCode), []byte(code)) != 1 {
+		if err := r.recordFailedAttempt(ctx, record.ID); err != nil {
+			return nil, false, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return nil, false, nil
+	}
+
+	result, err := r.db.Account.
+		Query().
+		Where(account_ent.HasEmailsWith(email_ent.ID(record.ID))).
+		WithEmails().
+		WithAuthentication().
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, false, nil
@@ -126,6 +156,15 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 	return acc, true, nil
 }
 
+func (r *Repository) recordFailedAttempt(ctx context.Context, id xid.ID) error {
+	err := r.db.Email.UpdateOneID(id).AddVerificationAttempts(1).Exec(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return nil
+}
+
 func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address) error {
 	_, err := r.db.Email.Update().
 		Where(
@@ -133,6 +172,8 @@ func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, em
 			email_ent.AccountID(xid.ID(accountID)),
 		).
 		SetVerified(true).
+		SetVerificationAttempts(0).
+		ClearVerificationCodeExpiresAt().
 		Save(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

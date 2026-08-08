@@ -76,6 +76,16 @@ func VerificationCode(v string) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldVerificationCode, v))
 }
 
+// VerificationCodeExpiresAt applies equality check predicate on the "verification_code_expires_at" field. It's identical to VerificationCodeExpiresAtEQ.
+func VerificationCodeExpiresAt(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationAttempts applies equality check predicate on the "verification_attempts" field. It's identical to VerificationAttemptsEQ.
+func VerificationAttempts(v int) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationAttempts, v))
+}
+
 // Verified applies equality check predicate on the "verified" field. It's identical to VerifiedEQ.
 func Verified(v bool) predicate.Email {
 	return predicate.Email(sql.FieldEQ(FieldVerified, v))
@@ -329,6 +339,96 @@ func VerificationCodeEqualFold(v string) predicate.Email {
 // VerificationCodeContainsFold applies the ContainsFold predicate on the "verification_code" field.
 func VerificationCodeContainsFold(v string) predicate.Email {
 	return predicate.Email(sql.FieldContainsFold(FieldVerificationCode, v))
+}
+
+// VerificationCodeExpiresAtEQ applies the EQ predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtEQ(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtNEQ applies the NEQ predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtNEQ(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldNEQ(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtIn applies the In predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtIn(vs ...time.Time) predicate.Email {
+	return predicate.Email(sql.FieldIn(FieldVerificationCodeExpiresAt, vs...))
+}
+
+// VerificationCodeExpiresAtNotIn applies the NotIn predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtNotIn(vs ...time.Time) predicate.Email {
+	return predicate.Email(sql.FieldNotIn(FieldVerificationCodeExpiresAt, vs...))
+}
+
+// VerificationCodeExpiresAtGT applies the GT predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtGT(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldGT(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtGTE applies the GTE predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtGTE(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldGTE(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtLT applies the LT predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtLT(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldLT(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtLTE applies the LTE predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtLTE(v time.Time) predicate.Email {
+	return predicate.Email(sql.FieldLTE(FieldVerificationCodeExpiresAt, v))
+}
+
+// VerificationCodeExpiresAtIsNil applies the IsNil predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtIsNil() predicate.Email {
+	return predicate.Email(sql.FieldIsNull(FieldVerificationCodeExpiresAt))
+}
+
+// VerificationCodeExpiresAtNotNil applies the NotNil predicate on the "verification_code_expires_at" field.
+func VerificationCodeExpiresAtNotNil() predicate.Email {
+	return predicate.Email(sql.FieldNotNull(FieldVerificationCodeExpiresAt))
+}
+
+// VerificationAttemptsEQ applies the EQ predicate on the "verification_attempts" field.
+func VerificationAttemptsEQ(v int) predicate.Email {
+	return predicate.Email(sql.FieldEQ(FieldVerificationAttempts, v))
+}
+
+// VerificationAttemptsNEQ applies the NEQ predicate on the "verification_attempts" field.
+func VerificationAttemptsNEQ(v int) predicate.Email {
+	return predicate.Email(sql.FieldNEQ(FieldVerificationAttempts, v))
+}
+
+// VerificationAttemptsIn applies the In predicate on the "verification_attempts" field.
+func VerificationAttemptsIn(vs ...int) predicate.Email {
+	return predicate.Email(sql.FieldIn(FieldVerificationAttempts, vs...))
+}
+
+// VerificationAttemptsNotIn applies the NotIn predicate on the "verification_attempts" field.
+func VerificationAttemptsNotIn(vs ...int) predicate.Email {
+	return predicate.Email(sql.FieldNotIn(FieldVerificationAttempts, vs...))
+}
+
+// VerificationAttemptsGT applies the GT predicate on the "verification_attempts" field.
+func VerificationAttemptsGT(v int) predicate.Email {
+	return predicate.Email(sql.FieldGT(FieldVerificationAttempts, v))
+}
+
+// VerificationAttemptsGTE applies the GTE predicate on the "verification_attempts" field.
+func VerificationAttemptsGTE(v int) predicate.Email {
+	return predicate.Email(sql.FieldGTE(FieldVerificationAttempts, v))
+}
+
+// VerificationAttemptsLT applies the LT predicate on the "verification_attempts" field.
+func VerificationAttemptsLT(v int) predicate.Email {
+	return predicate.Email(sql.FieldLT(FieldVerificationAttempts, v))
+}
+
+// VerificationAttemptsLTE applies the LTE predicate on the "verification_attempts" field.
+func VerificationAttemptsLTE(v int) predicate.Email {
+	return predicate.Email(sql.FieldLTE(FieldVerificationAttempts, v))
 }
 
 // VerifiedEQ applies the EQ predicate on the "verified" field.

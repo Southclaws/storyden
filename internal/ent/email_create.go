@@ -65,6 +65,34 @@ func (_c *EmailCreate) SetVerificationCode(v string) *EmailCreate {
 	return _c
 }
 
+// SetVerificationCodeExpiresAt sets the "verification_code_expires_at" field.
+func (_c *EmailCreate) SetVerificationCodeExpiresAt(v time.Time) *EmailCreate {
+	_c.mutation.SetVerificationCodeExpiresAt(v)
+	return _c
+}
+
+// SetNillableVerificationCodeExpiresAt sets the "verification_code_expires_at" field if the given value is not nil.
+func (_c *EmailCreate) SetNillableVerificationCodeExpiresAt(v *time.Time) *EmailCreate {
+	if v != nil {
+		_c.SetVerificationCodeExpiresAt(*v)
+	}
+	return _c
+}
+
+// SetVerificationAttempts sets the "verification_attempts" field.
+func (_c *EmailCreate) SetVerificationAttempts(v int) *EmailCreate {
+	_c.mutation.SetVerificationAttempts(v)
+	return _c
+}
+
+// SetNillableVerificationAttempts sets the "verification_attempts" field if the given value is not nil.
+func (_c *EmailCreate) SetNillableVerificationAttempts(v *int) *EmailCreate {
+	if v != nil {
+		_c.SetVerificationAttempts(*v)
+	}
+	return _c
+}
+
 // SetVerified sets the "verified" field.
 func (_c *EmailCreate) SetVerified(v bool) *EmailCreate {
 	_c.mutation.SetVerified(v)
@@ -137,6 +165,10 @@ func (_c *EmailCreate) defaults() {
 		v := email.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
+	if _, ok := _c.mutation.VerificationAttempts(); !ok {
+		v := email.DefaultVerificationAttempts
+		_c.mutation.SetVerificationAttempts(v)
+	}
 	if _, ok := _c.mutation.Verified(); !ok {
 		v := email.DefaultVerified
 		_c.mutation.SetVerified(v)
@@ -167,6 +199,9 @@ func (_c *EmailCreate) check() error {
 		if err := email.VerificationCodeValidator(v); err != nil {
 			return &ValidationError{Name: "verification_code", err: fmt.Errorf(`ent: validator failed for field "Email.verification_code": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.VerificationAttempts(); !ok {
+		return &ValidationError{Name: "verification_attempts", err: errors.New(`ent: missing required field "Email.verification_attempts"`)}
 	}
 	if _, ok := _c.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "Email.verified"`)}
@@ -223,6 +258,14 @@ func (_c *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.VerificationCode(); ok {
 		_spec.SetField(email.FieldVerificationCode, field.TypeString, value)
 		_node.VerificationCode = value
+	}
+	if value, ok := _c.mutation.VerificationCodeExpiresAt(); ok {
+		_spec.SetField(email.FieldVerificationCodeExpiresAt, field.TypeTime, value)
+		_node.VerificationCodeExpiresAt = &value
+	}
+	if value, ok := _c.mutation.VerificationAttempts(); ok {
+		_spec.SetField(email.FieldVerificationAttempts, field.TypeInt, value)
+		_node.VerificationAttempts = value
 	}
 	if value, ok := _c.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
@@ -327,6 +370,42 @@ func (u *EmailUpsert) UpdateVerificationCode() *EmailUpsert {
 	return u
 }
 
+// SetVerificationCodeExpiresAt sets the "verification_code_expires_at" field.
+func (u *EmailUpsert) SetVerificationCodeExpiresAt(v time.Time) *EmailUpsert {
+	u.Set(email.FieldVerificationCodeExpiresAt, v)
+	return u
+}
+
+// UpdateVerificationCodeExpiresAt sets the "verification_code_expires_at" field to the value that was provided on create.
+func (u *EmailUpsert) UpdateVerificationCodeExpiresAt() *EmailUpsert {
+	u.SetExcluded(email.FieldVerificationCodeExpiresAt)
+	return u
+}
+
+// ClearVerificationCodeExpiresAt clears the value of the "verification_code_expires_at" field.
+func (u *EmailUpsert) ClearVerificationCodeExpiresAt() *EmailUpsert {
+	u.SetNull(email.FieldVerificationCodeExpiresAt)
+	return u
+}
+
+// SetVerificationAttempts sets the "verification_attempts" field.
+func (u *EmailUpsert) SetVerificationAttempts(v int) *EmailUpsert {
+	u.Set(email.FieldVerificationAttempts, v)
+	return u
+}
+
+// UpdateVerificationAttempts sets the "verification_attempts" field to the value that was provided on create.
+func (u *EmailUpsert) UpdateVerificationAttempts() *EmailUpsert {
+	u.SetExcluded(email.FieldVerificationAttempts)
+	return u
+}
+
+// AddVerificationAttempts adds v to the "verification_attempts" field.
+func (u *EmailUpsert) AddVerificationAttempts(v int) *EmailUpsert {
+	u.Add(email.FieldVerificationAttempts, v)
+	return u
+}
+
 // SetVerified sets the "verified" field.
 func (u *EmailUpsert) SetVerified(v bool) *EmailUpsert {
 	u.Set(email.FieldVerified, v)
@@ -425,6 +504,48 @@ func (u *EmailUpsertOne) SetVerificationCode(v string) *EmailUpsertOne {
 func (u *EmailUpsertOne) UpdateVerificationCode() *EmailUpsertOne {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerificationCode()
+	})
+}
+
+// SetVerificationCodeExpiresAt sets the "verification_code_expires_at" field.
+func (u *EmailUpsertOne) SetVerificationCodeExpiresAt(v time.Time) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationCodeExpiresAt(v)
+	})
+}
+
+// UpdateVerificationCodeExpiresAt sets the "verification_code_expires_at" field to the value that was provided on create.
+func (u *EmailUpsertOne) UpdateVerificationCodeExpiresAt() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationCodeExpiresAt()
+	})
+}
+
+// ClearVerificationCodeExpiresAt clears the value of the "verification_code_expires_at" field.
+func (u *EmailUpsertOne) ClearVerificationCodeExpiresAt() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.ClearVerificationCodeExpiresAt()
+	})
+}
+
+// SetVerificationAttempts sets the "verification_attempts" field.
+func (u *EmailUpsertOne) SetVerificationAttempts(v int) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationAttempts(v)
+	})
+}
+
+// AddVerificationAttempts adds v to the "verification_attempts" field.
+func (u *EmailUpsertOne) AddVerificationAttempts(v int) *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.AddVerificationAttempts(v)
+	})
+}
+
+// UpdateVerificationAttempts sets the "verification_attempts" field to the value that was provided on create.
+func (u *EmailUpsertOne) UpdateVerificationAttempts() *EmailUpsertOne {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationAttempts()
 	})
 }
 
@@ -695,6 +816,48 @@ func (u *EmailUpsertBulk) SetVerificationCode(v string) *EmailUpsertBulk {
 func (u *EmailUpsertBulk) UpdateVerificationCode() *EmailUpsertBulk {
 	return u.Update(func(s *EmailUpsert) {
 		s.UpdateVerificationCode()
+	})
+}
+
+// SetVerificationCodeExpiresAt sets the "verification_code_expires_at" field.
+func (u *EmailUpsertBulk) SetVerificationCodeExpiresAt(v time.Time) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationCodeExpiresAt(v)
+	})
+}
+
+// UpdateVerificationCodeExpiresAt sets the "verification_code_expires_at" field to the value that was provided on create.
+func (u *EmailUpsertBulk) UpdateVerificationCodeExpiresAt() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationCodeExpiresAt()
+	})
+}
+
+// ClearVerificationCodeExpiresAt clears the value of the "verification_code_expires_at" field.
+func (u *EmailUpsertBulk) ClearVerificationCodeExpiresAt() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.ClearVerificationCodeExpiresAt()
+	})
+}
+
+// SetVerificationAttempts sets the "verification_attempts" field.
+func (u *EmailUpsertBulk) SetVerificationAttempts(v int) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.SetVerificationAttempts(v)
+	})
+}
+
+// AddVerificationAttempts adds v to the "verification_attempts" field.
+func (u *EmailUpsertBulk) AddVerificationAttempts(v int) *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.AddVerificationAttempts(v)
+	})
+}
+
+// UpdateVerificationAttempts sets the "verification_attempts" field to the value that was provided on create.
+func (u *EmailUpsertBulk) UpdateVerificationAttempts() *EmailUpsertBulk {
+	return u.Update(func(s *EmailUpsert) {
+		s.UpdateVerificationAttempts()
 	})
 }
 
