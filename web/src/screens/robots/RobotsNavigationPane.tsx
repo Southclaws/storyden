@@ -11,6 +11,7 @@ import {
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { RobotIcon } from "@/components/ui/icons/Robot";
+import { LinkButton } from "@/components/ui/link-button";
 
 type Props = {
   robots: Robot[];
@@ -28,24 +29,34 @@ export function RobotsNavigationPane({ robots, sessions }: Props) {
           label="All robots"
           icon={<RobotIcon />}
           active={pathname === "/robots"}
-        />
-        <SidebarNavigationLink
-          href="/robots/new"
-          label="New robot"
-          icon={<AddIcon />}
-          active={pathname === "/robots/new"}
+          action={
+            <LinkButton
+              aria-label="New robot"
+              href="/robots/new"
+              px="0"
+              size="sm"
+              variant="plain"
+            >
+              <AddIcon />
+            </LinkButton>
+          }
         />
         <SidebarNavigationLink
           href="/robots/chats"
           label="All chats"
           icon={<DiscussionIcon />}
           active={pathname === "/robots/chats"}
-        />
-        <SidebarNavigationLink
-          href="/robots/chats/new"
-          label="New chat"
-          icon={<AddIcon />}
-          active={pathname === "/robots/chats/new"}
+          action={
+            <LinkButton
+              aria-label="New chat"
+              href="/robots/chats/new"
+              px="0"
+              size="sm"
+              variant="plain"
+            >
+              <AddIcon />
+            </LinkButton>
+          }
         />
       </SidebarNavigationSection>
 

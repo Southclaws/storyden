@@ -16,13 +16,8 @@ export function LinkIndexView(props: Props) {
   if (form.formState.isLoading) return <Unready />;
 
   return (
-    <VStack>
-      <styled.form
-        display="flex"
-        w="full"
-        onSubmit={handlers.handleSubmission}
-        action="/l"
-      >
+    <VStack w="full">
+      <styled.form display="flex" w="full" onSubmit={handlers.handleSubmission}>
         <Input
           w="full"
           borderRight="none"
@@ -55,7 +50,7 @@ export function LinkIndexView(props: Props) {
       </styled.form>
 
       <PaginationControls
-        path="/l"
+        path="/links"
         params={{ q: data.q }}
         onClick={handlers.handlePage}
         currentPage={props.page ?? 1}

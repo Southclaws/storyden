@@ -57,6 +57,11 @@ type LinkProps = {
   label: string;
   icon: ReactNode;
   active?: boolean;
+  /**
+   * A compact, icon-only action at the trailing edge of a navigation row.
+   * Use it only for an action scoped to the row's destination.
+   */
+  action?: ReactNode;
   description?: string;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
 };
@@ -66,10 +71,11 @@ export function SidebarNavigationLink({
   label,
   icon,
   active,
+  action,
   description,
   onClick,
 }: LinkProps) {
-  return (
+  const link = (
     <Link
       className="sidebar-navigation__link"
       href={href}
@@ -88,5 +94,16 @@ export function SidebarNavigationLink({
         )}
       </span>
     </Link>
+  );
+
+  if (!action) {
+    return link;
+  }
+
+  return (
+    <div className="sidebar-navigation__item" data-active={active || undefined}>
+      {link}
+      <span className="sidebar-navigation__action">{action}</span>
+    </div>
   );
 }

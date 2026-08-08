@@ -13,12 +13,19 @@ import { LinkIcon } from "@/components/ui/icons/Link";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { LinkButton } from "@/components/ui/link-button";
 import { styled } from "@/styled-system/jsx";
 
 const meta = {
   title: "Compositions/Navigation/Sidebar",
   parameters: {
     layout: "fullscreen",
+    docs: {
+      description: {
+        story:
+          "**Sidebar item row button pattern.** Use a compact, icon-only `action` at the trailing edge only for an operation scoped to that row's destination. It remains a separate, accessible control; use the `plain` button variant so it does not introduce a second hover surface. Keep the shared `4px` end inset used by navigation-tree rows.",
+      },
+    },
   },
 } satisfies Meta;
 
@@ -140,21 +147,33 @@ export const RobotsNavigation: Story = {
             href="/robots"
             icon={<RobotIcon />}
             label="All robots"
-          />
-          <SidebarNavigationLink
-            href="/robots/new"
-            icon={<AddIcon />}
-            label="New robot"
+            action={
+              <LinkButton
+                aria-label="New robot"
+                href="/robots/new"
+                px="0"
+                size="sm"
+                variant="plain"
+              >
+                <AddIcon />
+              </LinkButton>
+            }
           />
           <SidebarNavigationLink
             href="/robots/chats"
             icon={<DiscussionIcon />}
             label="All chats"
-          />
-          <SidebarNavigationLink
-            href="/robots/chats/new"
-            icon={<AddIcon />}
-            label="New chat"
+            action={
+              <LinkButton
+                aria-label="New chat"
+                href="/robots/chats/new"
+                px="0"
+                size="sm"
+                variant="plain"
+              >
+                <AddIcon />
+              </LinkButton>
+            }
           />
         </SidebarNavigationSection>
 
