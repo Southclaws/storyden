@@ -19,14 +19,20 @@ export function PluginSettingsIndex({ plugins }: Props) {
   const hasInactive = totalPlugins !== activePlugins;
 
   return (
-    <LStack>
-      <WStack justifyContent="space-between">
-        <PageHeading>Plugins</PageHeading>
+    <LStack gap="4">
+      <LStack gap="1">
+        <WStack justifyContent="space-between">
+          <PageHeading>Plugins</PageHeading>
 
-        <PluginAddTrigger />
-      </WStack>
+          <PluginAddTrigger />
+        </WStack>
 
-      <Text variant="supporting">
+        <Text variant="supporting">
+          Manage installed extensions and integrations.
+        </Text>
+      </LStack>
+
+      <Text variant="metadata">
         {hasInactive ? (
           <span>
             {totalPlugins} plugins, {activePlugins} active.

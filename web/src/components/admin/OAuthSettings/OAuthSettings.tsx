@@ -38,9 +38,11 @@ export function OAuthSettings({
 
   return (
     <LStack gap="4">
-      <LStack gap="2">
+      <LStack gap="1">
         <PageHeading>OAuth</PageHeading>
-        <p>OAuth clients, device authorisations, and refresh tokens.</p>
+        <Text variant="supporting">
+          Manage OAuth clients, device authorisations and refresh tokens.
+        </Text>
       </LStack>
 
       <OAuthClientListView clients={clients} />

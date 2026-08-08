@@ -58,21 +58,23 @@ export function EmailLogSettingsScreen() {
 
   return (
     <LStack gap="4">
-      <WStack>
-        <PageHeading>Email Log</PageHeading>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Email log</PageHeading>
 
-        <Button
-          type="button"
-          variant="subtle"
-          loading={refreshing}
-          onClick={refreshEmailLog}
-        >
-          Refresh
-        </Button>
-      </WStack>
-      <Text variant="supporting">
-        View queued emails and delivery attempts, including failure reasons.
-      </Text>
+          <Button
+            type="button"
+            variant="subtle"
+            loading={refreshing}
+            onClick={refreshEmailLog}
+          >
+            Refresh
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          View queued emails and delivery attempts, including failure reasons.
+        </Text>
+      </LStack>
 
       <Flex
         w="full"

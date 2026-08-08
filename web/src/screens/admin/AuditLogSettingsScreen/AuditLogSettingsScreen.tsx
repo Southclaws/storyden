@@ -58,10 +58,12 @@ export function AuditLogSettingsScreen() {
 
   return (
     <LStack gap="4">
-      <PageHeading>Audit Log</PageHeading>
-      <Text variant="supporting">
-        View all moderation actions and administrative events on this site.
-      </Text>
+      <LStack gap="1">
+        <PageHeading>Audit log</PageHeading>
+        <Text variant="supporting">
+          View all moderation actions and administrative events on this site.
+        </Text>
+      </LStack>
 
       <Flex
         w="full"

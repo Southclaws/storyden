@@ -13,7 +13,15 @@ import { Input } from "@/components/ui/input";
 import { PageHeading } from "@/components/ui/page-heading";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { SelectField } from "@/components/ui/select";
-import { Box, HStack, Stack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import {
+  Box,
+  HStack,
+  LStack,
+  Stack,
+  WStack,
+  styled,
+} from "@/styled-system/jsx";
 
 import { BannerEditor } from "./BannerEditor/BannerEditor";
 import { IconEditor } from "./IconEditor/IconEditor";
@@ -51,10 +59,16 @@ export function BrandSettingsForm(props: Props) {
       alignItems="start"
       onSubmit={onSubmit}
     >
-      <WStack>
-        <PageHeading>Brand settings</PageHeading>
-        <Button type="submit">Save</Button>
-      </WStack>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Brand settings</PageHeading>
+          <Button type="submit">Save</Button>
+        </WStack>
+        <Text variant="supporting">
+          Manage your community&apos;s identity, appearance and site-wide
+          messaging.
+        </Text>
+      </LStack>
 
       <Stack
         gap="4"
