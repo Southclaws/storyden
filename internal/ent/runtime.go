@@ -1969,6 +1969,10 @@ func init() {
 	sessionDescAccountID := sessionFields[0].Descriptor()
 	// session.AccountIDValidator is a validator for the "account_id" field. It is called by the builders before save.
 	session.AccountIDValidator = sessionDescAccountID.Validators[0].(func(string) error)
+	// sessionDescTokenHash is the schema descriptor for token_hash field.
+	sessionDescTokenHash := sessionFields[1].Descriptor()
+	// session.TokenHashValidator is a validator for the "token_hash" field. It is called by the builders before save.
+	session.TokenHashValidator = sessionDescTokenHash.Validators[0].(func(string) error)
 	// sessionDescID is the schema descriptor for id field.
 	sessionDescID := sessionMixinFields0[0].Descriptor()
 	// session.DefaultID holds the default value on creation for the id field.

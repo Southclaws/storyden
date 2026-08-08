@@ -1,67 +1,76 @@
 package token
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"time"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/rs/xid"
 )
 
 var (
 	ErrTokenExpired = fault.New("token expired")
 	ErrTokenRevoked = fault.New("token revoked")
+	ErrTokenInvalid = fault.New("token malformed", ftag.With(ftag.Unauthenticated))
 )
 
-type Token struct{ xid.ID }
+const (
+	secretBytes  = 32
+	secretLength = 43
+)
 
-func FromString(b string) (Token, error) {
-	id, err := xid.FromString(b)
-	if err != nil {
-		return Token{}, err
+// Token is the bearer secret held by the client. It is never persisted, only
+// its hash is, so a database or cache leak cannot be replayed as a session.
+type Token struct{ secret string }
+
+func Generate() (Token, error) {
+	b := make([]byte, secretBytes)
+	if _, err := rand.Read(b); err != nil {
+		return Token{}, fault.Wrap(err)
 	}
 
-	return Token{id}, nil
+	return Token{base64.RawURLEncoding.EncodeToString(b)}, nil
 }
 
-func Generate() Token {
-	return Token{xid.New()}
-}
+func FromString(s string) (Token, error) {
+	if len(s) != secretLength {
+		return Token{}, fault.Wrap(ErrTokenInvalid)
+	}
 
-func (t Token) Bytes() []byte {
-	return t.ID.Bytes()
+	if _, err := base64.RawURLEncoding.DecodeString(s); err != nil {
+		return Token{}, fault.Wrap(ErrTokenInvalid)
+	}
+
+	return Token{s}, nil
 }
 
 func (t Token) String() string {
-	return t.ID.String()
+	return t.secret
 }
 
-// MarshalJSON encodes the token as a bare string (`"c5n4mpk1..."`).
-func (t Token) MarshalJSON() ([]byte, error) {
-	return json.Marshal(t.String())
-}
-
-// UnmarshalJSON decodes the token from a bare string.
-func (t *Token) UnmarshalJSON(b []byte) error {
-	var s string
-	if err := json.Unmarshal(b, &s); err != nil {
-		return err
-	}
-	id, err := xid.FromString(s)
-	if err != nil {
-		return err
-	}
-	*t = Token{id}
-	return nil
+func (t Token) Hash() string {
+	sum := sha256.Sum256([]byte(t.secret))
+	return hex.EncodeToString(sum[:])
 }
 
 type Session struct {
-	Token     Token                   `json:"t"`
+	TokenHash string                  `json:"h"`
 	AccountID account.AccountID       `json:"a"`
 	ExpiresAt time.Time               `json:"e"`
 	RevokedAt opt.Optional[time.Time] `json:"r"`
+}
+
+// Issued pairs a new session with the one and only copy of its secret.
+type Issued struct {
+	Token   Token
+	Session Session
 }
 
 type Validated Session
