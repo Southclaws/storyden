@@ -9,3 +9,5 @@ allowBuilds:
 minimumReleaseAgeExclude:
   # Renovate security update: dompurify@3.4.11
   - dompurify@3.4.11
+  # Renovate security update: next@16.2.11
+  - next@16.2.11
