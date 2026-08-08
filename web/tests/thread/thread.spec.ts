@@ -4,13 +4,6 @@ import { registerUser } from "../access_key_admin_assignment";
 
 const PASSWORD = "TestPassword123!";
 
-async function dismissOnboarding(page: Page) {
-  const skipButton = page.getByRole("button", { name: "Skip" });
-  if (await skipButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await skipButton.click();
-  }
-}
-
 async function logout(page: Page) {
   await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("menuitem", { name: "Logout" }).click();
@@ -26,7 +19,6 @@ async function login(page: Page, username: string) {
   await expect(
     page.getByRole("button", { name: "Account menu" }),
   ).toBeVisible();
-  await dismissOnboarding(page);
 }
 
 async function createThread(
@@ -46,7 +38,6 @@ async function createThread(
   await page.getByRole("button", { name: "Post" }).click();
 
   await expect(page).toHaveURL(/\/t\//, { timeout: 10000 });
-  await dismissOnboarding(page);
 
   const url = page.url();
   return url;
@@ -68,7 +59,6 @@ async function postReply(page: Page, body: string) {
 
 async function navigateToThread(page: Page, threadUrl: string) {
   await page.goto(threadUrl);
-  await dismissOnboarding(page);
 }
 
 test.describe("Thread Creation", () => {
@@ -253,7 +243,6 @@ test.describe("Thread Editing", () => {
     );
 
     await page.goto(threadUrl + "?edit=true");
-    await dismissOnboarding(page);
 
     const titleInput = page
       .locator("main span[contenteditable='true']")
@@ -290,7 +279,6 @@ test.describe("Thread Editing", () => {
     );
 
     await page.goto(threadUrl + "?edit=true");
-    await dismissOnboarding(page);
 
     const titleInput = page
       .locator("main span[contenteditable='true']")

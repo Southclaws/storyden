@@ -1,11 +1,10 @@
-import React, { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
 import { getServerSession } from "@/auth/server-session";
 import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
 
 import { CommandPalette } from "../CommandPalette/CommandPalette";
-import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
 import { LayoutEditModeButton } from "./LayoutEditMode/LayoutEditModeButton";
@@ -29,7 +28,6 @@ export async function Navigation({ children, sidebar }: Props) {
       <div id="navigation__scroll" className="navigation__grid">
         <div className="navigation__main">
           {/*  */}
-          <Onboarding />
           <VerificationBanner
             session={sessionAccount}
             settings={globalSettings}
