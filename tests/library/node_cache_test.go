@@ -139,6 +139,59 @@ func TestNodeCacheCanonicalisesIDQueryForms(t *testing.T) {
 	}))
 }
 
+func TestNodeRenameAndDeleteRejectCurrentValidatorForRetiredSlugs(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+
+			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+			visibility := openapi.VisibilityPublished
+			oldSlug := "cache-retired-node-" + uuid.NewString()
+			newSlug := "cache-current-node-" + uuid.NewString()
+
+			created := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: oldSlug, Slug: &oldSlug, Visibility: &visibility,
+			}, session))(t, http.StatusOK).JSON200
+
+			// Populate the old slug validator before retiring it.
+			tests.AssertRequest(cl.NodeGetWithResponse(ctx, oldSlug, &openapi.NodeGetParams{}))(t, http.StatusOK)
+
+			tests.AssertRequest(cl.NodeUpdateWithResponse(ctx, created.Slug, openapi.NodeMutableProps{
+				Slug: &newSlug,
+			}, session))(t, http.StatusOK)
+
+			current := tests.AssertRequest(cl.NodeGetWithResponse(ctx, newSlug, &openapi.NodeGetParams{}))(t, http.StatusOK)
+			currentETag := current.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(currentETag)
+
+			retired, err := cl.NodeGetWithResponse(ctx, oldSlug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", currentETag)
+				return nil
+			})
+			r.NoError(err)
+			r.Equal(http.StatusNotFound, retired.StatusCode(), "a live validator must not make a retired slug return 304")
+
+			tests.AssertRequest(cl.NodeDeleteWithResponse(ctx, newSlug, &openapi.NodeDeleteParams{}, session))(t, http.StatusOK)
+
+			deleted, err := cl.NodeGetWithResponse(ctx, newSlug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", currentETag)
+				return nil
+			})
+			r.NoError(err)
+			r.Equal(http.StatusNotFound, deleted.StatusCode(), "a deleted slug must not return 304")
+		}))
+	}))
+}
+
 func TestNodeDeleteInvalidatesEveryConditionalRequestAlias(t *testing.T) {
 	t.Parallel()
 
@@ -185,6 +238,52 @@ func TestNodeDeleteInvalidatesEveryConditionalRequestAlias(t *testing.T) {
 				r.NoError(err)
 				r.Equal(http.StatusNotFound, response.StatusCode(), "deleted alias %q must never return 304", key)
 			}
+		}))
+	}))
+}
+
+func TestNodeDeleteInvalidatesParentRepresentation(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			r := require.New(t)
+			a := assert.New(t)
+
+			ctx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+			visibility := openapi.VisibilityPublished
+			parentSlug := "cache-delete-parent-" + uuid.NewString()
+			childSlug := "cache-delete-child-" + uuid.NewString()
+
+			parent := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: parentSlug, Slug: &parentSlug, Visibility: &visibility,
+			}, session))(t, http.StatusOK).JSON200
+			child := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: childSlug, Slug: &childSlug, Visibility: &visibility,
+			}, session))(t, http.StatusOK).JSON200
+
+			tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parent.Slug, child.Slug, session))(t, http.StatusOK)
+
+			before := tests.AssertRequest(cl.NodeGetWithResponse(ctx, parent.Slug, &openapi.NodeGetParams{}))(t, http.StatusOK)
+			parentETag := before.HTTPResponse.Header.Get("ETag")
+			r.NotEmpty(parentETag)
+			r.Len(before.JSON200.Children, 1)
+
+			tests.AssertRequest(cl.NodeDeleteWithResponse(ctx, child.Slug, &openapi.NodeDeleteParams{}, session))(t, http.StatusOK)
+
+			after := tests.AssertRequest(cl.NodeGetWithResponse(ctx, parent.Slug, &openapi.NodeGetParams{}, func(ctx context.Context, req *http.Request) error {
+				req.Header.Set("If-None-Match", parentETag)
+				return nil
+			}))(t, http.StatusOK)
+			r.NotNil(after.JSON200)
+			a.Empty(after.JSON200.Children)
 		}))
 	}))
 }

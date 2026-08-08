@@ -41,7 +41,7 @@ func TestCanonicalKey(t *testing.T) {
 	}
 }
 
-func TestInvalidateInvalidatesCanonicalAliases(t *testing.T) {
+func TestInvalidateRefreshesCurrentAndDeletesRetiredAliases(t *testing.T) {
 	ctx := context.Background()
 	store := newRecordingStore()
 	now := time.Date(2026, time.August, 8, 12, 0, 0, 123, time.UTC)
@@ -51,17 +51,17 @@ func TestInvalidateInvalidatesCanonicalAliases(t *testing.T) {
 		return now.Add(time.Duration(clockCalls) * time.Nanosecond)
 	}}
 	id := xid.New()
+	store.values[cachePrefix+"old-slug"] = "old-validator"
 
-	require.NoError(t, cache.Invalidate(ctx, id, "old-slug", "new-slug", "old-slug"))
+	require.NoError(t, cache.Invalidate(ctx, id, "new-slug", "old-slug", "old-slug", "new-slug"))
 
 	wantValue := now.Add(time.Nanosecond).Format(storeTimeFmt)
 	assert.Equal(t, map[string]string{
 		cachePrefix + id.String(): wantValue,
-		cachePrefix + "old-slug":  wantValue,
 		cachePrefix + "new-slug":  wantValue,
 	}, store.values)
 	assert.Equal(t, 1, clockCalls, "all aliases must share one invalidation instant")
-	assert.Equal(t, 3, store.setCalls, "duplicate aliases must not cause extra cache writes")
+	assert.Equal(t, 2, store.setCalls)
 	assert.Equal(t, 1, store.batchCalls)
 }
 
@@ -72,7 +72,7 @@ func TestInvalidateReturnsBatchStoreFailure(t *testing.T) {
 	cache := &Cache{store: store, clock: time.Now}
 	id := xid.New()
 
-	err := cache.Invalidate(ctx, id, "old-slug", "new-slug")
+	err := cache.Invalidate(ctx, id, "new-slug", "old-slug")
 
 	require.ErrorIs(t, err, store.setErr)
 	assert.Empty(t, store.values)
@@ -178,7 +178,7 @@ func BenchmarkInvalidate(b *testing.B) {
 	ctx := context.Background()
 
 	for b.Loop() {
-		if err := cache.Invalidate(ctx, id, "old-slug", "new-slug"); err != nil {
+		if err := cache.Invalidate(ctx, id, "new-slug", "old-slug"); err != nil {
 			b.Fatal(err)
 		}
 	}

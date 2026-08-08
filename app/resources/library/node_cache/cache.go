@@ -97,12 +97,12 @@ func CanonicalKey(key mark.Queryable) string {
 	return key.String()
 }
 
-// Invalidate invalidates every canonical key by which a node can be read:
-// its stable ID and any current or previous slug aliases supplied by the
-// caller. Supplying both slugs is required when a mutation renames a node.
-func (c *Cache) Invalidate(ctx context.Context, id xid.ID, slugs ...string) error {
-	keys := append([]string{id.String()}, slugs...)
-	seen := make(map[string]struct{}, len(keys))
+// Invalidate refreshes the stable ID and current slug validators, then removes
+// any retired slug aliases. Supplying the previous slug is required when a
+// mutation renames or deletes a node.
+func (c *Cache) Invalidate(ctx context.Context, id xid.ID, currentSlug string, retiredSlugs ...string) error {
+	keys := []string{id.String(), currentSlug}
+	seen := make(map[string]struct{}, len(keys)+len(retiredSlugs))
 	now := c.clock().UTC()
 	value := now.Format(storeTimeFmt)
 	values := make(map[string]string, len(keys))
@@ -119,7 +119,24 @@ func (c *Cache) Invalidate(ctx context.Context, id xid.ID, slugs ...string) erro
 		values[cacheKey] = value
 	}
 
-	return c.store.SetMany(ctx, values, cacheTTL)
+	if err := c.store.SetMany(ctx, values, cacheTTL); err != nil {
+		return err
+	}
+
+	for _, slug := range retiredSlugs {
+		if slug == "" {
+			continue
+		}
+		if _, ok := seen[slug]; ok {
+			continue
+		}
+		seen[slug] = struct{}{}
+		if err := c.delete(ctx, slug); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (c *Cache) delete(ctx context.Context, key string) error {

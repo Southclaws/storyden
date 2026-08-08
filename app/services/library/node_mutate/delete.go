@@ -52,7 +52,21 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug()); err != nil {
+	invalidate := func(currentSlug string, retiredSlugs ...string) error {
+		if err := s.cache.Invalidate(ctx, n.Mark.ID(), currentSlug, retiredSlugs...); err != nil {
+			return err
+		}
+
+		if parent, ok := n.Parent.Get(); ok {
+			if err := s.cache.Invalidate(ctx, parent.Mark.ID(), parent.GetSlug()); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	if err := invalidate(n.GetSlug()); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -61,7 +75,7 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug()); err != nil {
+	if err := invalidate("", n.GetSlug()); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

@@ -85,7 +85,7 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 	if slug, ok := p.Slug.Get(); ok {
 		nextSlug = slug.String()
 	}
-	if err := s.cache.Invalidate(ctx, n.Mark.ID(), previousSlug, nextSlug); err != nil {
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), nextSlug, previousSlug); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -94,20 +94,20 @@ func (s *Manager) update(ctx context.Context, qk library.QueryKey, p Partial, ap
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.cache.Invalidate(ctx, n.Mark.ID(), previousSlug, n.GetSlug()); err != nil {
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if props, ok := p.Properties.Get(); ok {
 		updatedProperties, err := s.applyPropertyMutations(ctx, n, props)
 		if err != nil {
-			_ = s.cache.Invalidate(ctx, n.Mark.ID(), previousSlug, n.GetSlug())
+			_ = s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug)
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		n.Properties = opt.New(*updatedProperties)
 
-		if err := s.cache.Invalidate(ctx, n.Mark.ID(), previousSlug, n.GetSlug()); err != nil {
+		if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug(), previousSlug); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 	}

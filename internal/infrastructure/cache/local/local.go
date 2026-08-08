@@ -12,7 +12,10 @@ import (
 	"github.com/shirou/gopsutil/v4/mem"
 )
 
-var errNotFound = fmt.Errorf("not found")
+var (
+	errNotFound      = fmt.Errorf("not found")
+	errWriteRejected = fmt.Errorf("cache write rejected")
+)
 
 type LocalCache struct {
 	cache *ristretto.Cache[string, []byte]
@@ -59,17 +62,37 @@ func (c *LocalCache) Get(ctx context.Context, key string) (string, error) {
 }
 
 func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
-	c.cache.SetWithTTL(key, []byte(value), 0, ttl)
+	if err := c.setWithTTL(key, []byte(value), ttl); err != nil {
+		return err
+	}
 	c.cache.Wait()
 	return nil
 }
 
 func (c *LocalCache) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
 	for key, value := range values {
-		c.cache.SetWithTTL(key, []byte(value), 0, ttl)
+		if err := c.setWithTTL(key, []byte(value), ttl); err != nil {
+			c.cache.Wait()
+			return err
+		}
 	}
 	c.cache.Wait()
 	return nil
+}
+
+func (c *LocalCache) setWithTTL(key string, value []byte, ttl time.Duration) error {
+	if c.cache.SetWithTTL(key, value, 0, ttl) {
+		return nil
+	}
+
+	// A full write buffer rejects new entries. Drain accepted writes once and
+	// retry before reporting the rejection to the caller.
+	c.cache.Wait()
+	if c.cache.SetWithTTL(key, value, 0, ttl) {
+		return nil
+	}
+
+	return fmt.Errorf("%w for key %q", errWriteRejected, key)
 }
 
 func (c *LocalCache) Delete(ctx context.Context, key string) error {
@@ -125,7 +148,9 @@ func (c *LocalCache) setHSET(key string, hset HSet) error {
 		return err
 	}
 
-	c.cache.Set(key, buf.Bytes(), 0)
+	if err := c.setWithTTL(key, buf.Bytes(), 0); err != nil {
+		return err
+	}
 	c.cache.Wait()
 	return nil
 }
@@ -177,7 +202,9 @@ func (c *LocalCache) HDel(ctx context.Context, key string, field string) error {
 func (c *LocalCache) Expire(ctx context.Context, key string, expiration time.Duration) error {
 	v, exists := c.cache.Get(key)
 	if exists {
-		c.cache.SetWithTTL(key, v, 0, expiration)
+		if err := c.setWithTTL(key, v, expiration); err != nil {
+			return err
+		}
 		c.cache.Wait()
 	}
 
