@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { FormErrorText } from "@/components/ui/form-error-text";
-import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
@@ -12,9 +11,7 @@ export function RegisterHandleForm(props: Props) {
   const {
     form: {
       register,
-      isWebauthnEnabled,
       handlePassword,
-      handleWebauthn,
       errors,
     },
   } = useRegisterHandleForm(props);
@@ -50,24 +47,6 @@ export function RegisterHandleForm(props: Props) {
           autoComplete="new-password"
           {...register("token")}
         />
-        {props.webauthn && isWebauthnEnabled && (
-          <>
-            <span>or</span>
-
-            <Button
-              w="full"
-              variant="ghost"
-              size="sm"
-              type="button"
-              onClick={handleWebauthn}
-            >
-              <styled.span display="flex" gap="1" alignItems="center" px="4">
-                device
-                <BiometricIcon />
-              </styled.span>
-            </Button>
-          </>
-        )}
       </Flex>
       <FormErrorText>{errors.token?.message}</FormErrorText>
       <Button type="submit" w="full" onClick={handlePassword}>

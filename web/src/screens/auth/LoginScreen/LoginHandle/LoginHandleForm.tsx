@@ -11,9 +11,7 @@ export function LoginHandleForm() {
   const {
     form: {
       register,
-      isWebauthnEnabled,
       handlePassword,
-      handleWebauthn,
       errors,
     },
   } = useLoginHandleForm();

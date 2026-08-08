@@ -49,9 +49,7 @@ export async function RegisterScreen({
 
   switch (data.mode) {
     case AuthMode.handle:
-      return (
-        <RegisterHandleForm webauthn={false} invitationID={invitationID} />
-      );
+      return <RegisterHandleForm invitationID={invitationID} />;
 
     case AuthMode.email:
       return <RegisterEmailForm invitationID={invitationID} />;
