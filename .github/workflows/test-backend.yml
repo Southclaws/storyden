@@ -7,7 +7,6 @@ on:
     paths-ignore: &ignored_paths
       - "home/**"
       - "web/**"
-      - ".github/**"
       - ".vscode/**"
       - "*.md"
       - "docker/**"
