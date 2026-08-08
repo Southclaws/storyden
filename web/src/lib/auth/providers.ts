@@ -12,7 +12,6 @@ import { groupAuthProviders } from "@/lib/auth/utils";
 interface Providers {
   password: boolean;
   phone: boolean;
-  webauthn: boolean;
   oauth: AuthProvider[];
 }
 

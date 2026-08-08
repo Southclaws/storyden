@@ -25,10 +25,6 @@ export function AuthMethodSettings() {
       </LStack>
 
       {available.password && <Password active={active.password.length > 0} />}
-
-      {/* NOTE: WebAuthn is not enabled as a 2FA yet. */}
-      {/* {available.webauthn && <Devices active={active.webauthn} />} */}
-
       {(available.oauth.length > 0 || active.methods.length > 0) && (
         <OAuth active={active.methods} available={available.oauth} />
       )}
