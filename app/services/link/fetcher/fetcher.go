@@ -2,7 +2,9 @@
 package fetcher
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -25,9 +27,15 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
-var errEmptyLink = fault.New("empty link")
+var (
+	errEmptyLink     = fault.New("empty link")
+	errAssetTooLarge = fault.New("linked asset exceeds maximum size")
+)
 
-const assetFetchTimeout = 30 * time.Second
+const (
+	assetFetchTimeout  = 30 * time.Second
+	assetFetchMaxBytes = 8 * 1024 * 1024
+)
 
 type Fetcher struct {
 	logger   *slog.Logger
@@ -158,12 +166,29 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 }
 
 func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, error) {
+	body, err := fetchBounded(ctx, s.client, url, assetFetchMaxBytes)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// TODO: Better naming???
+	name := mark.Slugify(url)
+
+	a, err := s.uploader.Upload(ctx, bytes.NewReader(body), int64(len(body)), asset.NewFilename(name), asset_upload.Options{})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return a, nil
+}
+
+func fetchBounded(ctx context.Context, client *http.Client, url string, maxBytes int64) ([]byte, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	resp, err := s.client.Do(req)
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -174,13 +199,17 @@ func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, erro
 		return nil, fault.Wrap(fault.New("failed to get"), fctx.With(ctx))
 	}
 
-	// TODO: Better naming???
-	name := mark.Slugify(url)
+	if resp.ContentLength > maxBytes {
+		return nil, fault.Wrap(errAssetTooLarge, fctx.With(ctx))
+	}
 
-	a, err := s.uploader.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(name), asset_upload.Options{})
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxBytes+1))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if int64(len(body)) > maxBytes {
+		return nil, fault.Wrap(errAssetTooLarge, fctx.With(ctx))
+	}
 
-	return a, nil
+	return body, nil
 }
