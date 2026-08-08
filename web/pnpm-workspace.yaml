@@ -7,5 +7,5 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  # Renovate security update: dompurify@3.4.11
-  - dompurify@3.4.11
+  # Renovate security update: dompurify@3.4.11 || 3.4.12
+  - dompurify@3.4.11 || 3.4.12
