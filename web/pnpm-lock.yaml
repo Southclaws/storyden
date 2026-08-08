@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@ai-sdk/react':
         specifier: 4.0.50
-        version: 4.0.50(react@19.2.8)(zod@3.25.76)
+        version: 4.0.50(react@19.2.8)(zod@4.4.3)
       '@ark-ui/react':
         specifier: 5.37.2
         version: 5.37.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -30,11 +30,11 @@ importers:
         specifier: 2.2.0
         version: 2.2.0(react@19.2.8)
       '@hookform/resolvers':
-        specifier: 4.1.3
-        version: 4.1.3(react-hook-form@7.76.1(react@19.2.8))
+        specifier: 5.6.0
+        version: 5.6.0(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.84.0(react@19.2.8))(zod@4.4.3)
       '@internationalized/date':
-        specifier: 3.12.2
-        version: 3.12.2
+        specifier: 3.12.3
+        version: 3.12.3
       '@radix-ui/react-dialog':
         specifier: 1.1.23
         version: 1.1.23(@types/react-dom@19.2.3(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -94,7 +94,7 @@ importers:
         version: 1.43.0
       ai:
         specifier: 7.0.47
-        version: 7.0.47(zod@3.25.76)
+        version: 7.0.47(zod@4.4.3)
       babel-plugin-react-compiler:
         specifier: 1.0.0
         version: 1.0.0
@@ -159,8 +159,8 @@ importers:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
       react-hook-form:
-        specifier: 7.76.1
-        version: 7.76.1(react@19.2.8)
+        specifier: 7.84.0
+        version: 7.84.0(react@19.2.8)
       react-markdown:
         specifier: 10.1.0
         version: 10.1.0(@types/react@19.2.18)(react@19.2.8)
@@ -198,8 +198,8 @@ importers:
         specifier: 2.9.0
         version: 2.9.0
       zod:
-        specifier: 3.25.76
-        version: 3.25.76
+        specifier: 4.4.3
+        version: 4.4.3
       zustand:
         specifier: 5.0.14
         version: 5.0.14(@types/react@19.2.18)(immer@11.1.15)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
@@ -250,8 +250,8 @@ importers:
         specifier: 7.0.15
         version: 7.0.15
       '@types/lodash':
-        specifier: 4.17.24
-        version: 4.17.24
+        specifier: 4.17.25
+        version: 4.17.25
       '@types/mdast':
         specifier: 4.0.4
         version: 4.0.4
@@ -1163,10 +1163,83 @@ packages:
     peerDependencies:
       react: '>= 16 || ^19.0.0-rc'
 
-  '@hookform/resolvers@4.1.3':
-    resolution: {integrity: sha512-Jsv6UOWYTrEFJ/01ZrnwVXs7KDvP8XIo115i++5PWvNkNvkrsTfGiLS6w+eJ57CYtUtDQalUWovCZDHFJ8u1VQ==}
+  '@hookform/resolvers@5.6.0':
+    resolution: {integrity: sha512-qtgE4NUK/WQFPq8aDe+GOhr0/UiUSKT0m9ta9SMnDS5ZE63yC850ShAGz1lxtwO+dBjhUKvUxmHwkp4eN7/kBQ==}
     peerDependencies:
-      react-hook-form: ^7.0.0
+      '@sinclair/typebox': '>=0.25.24'
+      '@standard-schema/spec': ^1.0.0
+      '@typeschema/main': '>=0.13.7'
+      '@vinejs/vine': ^2.0.0 || ^3.0.0
+      ajv: ^8.12.0
+      ajv-errors: ^3.0.0
+      ajv-formats: ^2.1.1
+      arktype: ^2.0.0
+      ata-validator: ^0.7.0
+      class-transformer: '>=0.4.0'
+      class-validator: '>=0.12.0'
+      computed-types: ^1.0.0
+      effect: ^3.10.3
+      fluentvalidation-ts: ^3.0.0
+      fp-ts: ^2.7.0
+      io-ts: ^2.0.0
+      joi: ^17.0.0
+      nope-validator: '>=0.12.0'
+      react-hook-form: ^7.55.0
+      superstruct: '>=0.12.0'
+      typanion: ^3.3.2
+      valibot: '>=0.31.0 || ^1.0.0-beta.4 || ^1.0.0-rc'
+      vest: '>=3.0.0'
+      yup: ^1.0.0
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      '@sinclair/typebox':
+        optional: true
+      '@standard-schema/spec':
+        optional: true
+      '@typeschema/main':
+        optional: true
+      '@vinejs/vine':
+        optional: true
+      ajv:
+        optional: true
+      ajv-errors:
+        optional: true
+      ajv-formats:
+        optional: true
+      arktype:
+        optional: true
+      ata-validator:
+        optional: true
+      class-transformer:
+        optional: true
+      class-validator:
+        optional: true
+      computed-types:
+        optional: true
+      effect:
+        optional: true
+      fluentvalidation-ts:
+        optional: true
+      fp-ts:
+        optional: true
+      io-ts:
+        optional: true
+      joi:
+        optional: true
+      nope-validator:
+        optional: true
+      superstruct:
+        optional: true
+      typanion:
+        optional: true
+      valibot:
+        optional: true
+      vest:
+        optional: true
+      yup:
+        optional: true
+      zod:
+        optional: true
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1343,6 +1416,9 @@ packages:
 
   '@internationalized/date@3.12.2':
     resolution: {integrity: sha512-FY1Y+H64NDs+HAF6omlnWxm3mEpfgaCSWtL5l551ZZfImA+kGjPFgrnJrGjH6lfmLL0g8Z/mBu1R3kufeCp6Jw==}
+
+  '@internationalized/date@3.12.3':
+    resolution: {integrity: sha512-fuLX+3ZKLsxI73y8b01EG/WjHb6gE6weCqlfawPO27kBWGMh9G1yH6Csv1uU7/cac9H2GHmOMt6CjmuQ1aia4Q==}
 
   '@internationalized/number@3.6.6':
     resolution: {integrity: sha512-iFgmQaXHE0vytNfpLZWOC2mEJCBRzcUxt53Xf/yCXG93lRvqas237i3r7X4RKMwO3txiyZD4mQjKAByFv6UGSQ==}
@@ -2531,8 +2607,8 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
-  '@swc/helpers@0.5.21':
-    resolution: {integrity: sha512-jI/VAmtdjB/RnI8GTnokyX7Ug8c+g+ffD6QRLa6XQewtnGyukKkKSk3wLTM3b5cjt1jNh9x0jfVlagdN2gDKQg==}
+  '@swc/helpers@0.5.23':
+    resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -2818,8 +2894,8 @@ packages:
   '@types/linkify-it@5.0.0':
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}
 
-  '@types/lodash@4.17.24':
-    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
+  '@types/lodash@4.17.25':
+    resolution: {integrity: sha512-+K1NIO8I+F9/wNulfVvu23QYd0Pe9/OCqRrim4NoYIf1VoEDL90Ve4ClzpyqBLc7NpGGWRvYNCKZ1BE/Jpf8dQ==}
 
   '@types/markdown-it@14.1.2':
     resolution: {integrity: sha512-promo4eFwuiW+TfGxhi+0x3czqTYJkG8qB17ZUJiVF10Xm7NLVRSLUsfRTU/6h1e24VvRnXCx+hG7li58lkzog==}
@@ -5689,8 +5765,8 @@ packages:
     peerDependencies:
       react: ^19.2.8
 
-  react-hook-form@7.76.1:
-    resolution: {integrity: sha512-rYM7tPiWlu3nZchkR/ex7piyzui2vFPyaLnXnI/RnblB/L4qfMmyses8llJVtF1NpE9WBBsJlGtcSZzPCXW1qQ==}
+  react-hook-form@7.84.0:
+    resolution: {integrity: sha512-+hWvQP6GLco56mDwrbU4XnHix8t1z90ltZsDIrREl+jnQFQxYLX8oAzqe/Xn8nHpmoXTY5M6oEXrAhbP1qevNQ==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -6738,9 +6814,6 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
@@ -6769,39 +6842,39 @@ snapshots:
 
   '@adobe/css-tools@4.5.0': {}
 
-  '@ai-sdk/gateway@4.0.36(zod@3.25.76)':
+  '@ai-sdk/gateway@4.0.36(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 4.0.4
-      '@ai-sdk/provider-utils': 5.0.18(zod@3.25.76)
+      '@ai-sdk/provider-utils': 5.0.18(zod@4.4.3)
       '@vercel/oidc': 3.2.0
-      zod: 3.25.76
+      zod: 4.4.3
 
-  '@ai-sdk/mcp@2.0.22(zod@3.25.76)':
+  '@ai-sdk/mcp@2.0.22(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 4.0.4
-      '@ai-sdk/provider-utils': 5.0.18(zod@3.25.76)
+      '@ai-sdk/provider-utils': 5.0.18(zod@4.4.3)
       pkce-challenge: 5.0.1
-      zod: 3.25.76
+      zod: 4.4.3
 
-  '@ai-sdk/provider-utils@5.0.18(zod@3.25.76)':
+  '@ai-sdk/provider-utils@5.0.18(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 4.0.4
       '@standard-schema/spec': 1.1.0
       '@workflow/serde': 4.1.0
       eventsource-parser: 3.0.8
       undici: 7.29.0
-      zod: 3.25.76
+      zod: 4.4.3
 
   '@ai-sdk/provider@4.0.4':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@4.0.50(react@19.2.8)(zod@3.25.76)':
+  '@ai-sdk/react@4.0.50(react@19.2.8)(zod@4.4.3)':
     dependencies:
-      '@ai-sdk/mcp': 2.0.22(zod@3.25.76)
+      '@ai-sdk/mcp': 2.0.22(zod@4.4.3)
       '@ai-sdk/provider': 4.0.4
-      '@ai-sdk/provider-utils': 5.0.18(zod@3.25.76)
-      ai: 7.0.47(zod@3.25.76)
+      '@ai-sdk/provider-utils': 5.0.18(zod@4.4.3)
+      ai: 7.0.47(zod@4.4.3)
       react: 19.2.8
       swr: 2.4.1(react@19.2.8)
       throttleit: 2.1.0
@@ -7564,10 +7637,14 @@ snapshots:
     dependencies:
       react: 19.2.8
 
-  '@hookform/resolvers@4.1.3(react-hook-form@7.76.1(react@19.2.8))':
+  '@hookform/resolvers@5.6.0(@standard-schema/spec@1.1.0)(ajv@8.20.0)(react-hook-form@7.84.0(react@19.2.8))(zod@4.4.3)':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.76.1(react@19.2.8)
+      react-hook-form: 7.84.0(react@19.2.8)
+    optionalDependencies:
+      '@standard-schema/spec': 1.1.0
+      ajv: 8.20.0
+      zod: 4.4.3
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -7684,11 +7761,15 @@ snapshots:
 
   '@internationalized/date@3.12.2':
     dependencies:
-      '@swc/helpers': 0.5.21
+      '@swc/helpers': 0.5.23
+
+  '@internationalized/date@3.12.3':
+    dependencies:
+      '@swc/helpers': 0.5.23
 
   '@internationalized/number@3.6.6':
     dependencies:
-      '@swc/helpers': 0.5.21
+      '@swc/helpers': 0.5.23
 
   '@joshwooding/vite-plugin-react-docgen-typescript@0.7.0(typescript@5.9.3)(vite@7.3.2(@types/node@26.1.2)(jiti@2.7.0)(lightningcss@1.31.1)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
@@ -8909,7 +8990,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@swc/helpers@0.5.21':
+  '@swc/helpers@0.5.23':
     dependencies:
       tslib: 2.8.1
 
@@ -9231,7 +9312,7 @@ snapshots:
 
   '@types/linkify-it@5.0.0': {}
 
-  '@types/lodash@4.17.24': {}
+  '@types/lodash@4.17.25': {}
 
   '@types/markdown-it@14.1.2':
     dependencies:
@@ -10254,12 +10335,12 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  ai@7.0.47(zod@3.25.76):
+  ai@7.0.47(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 4.0.36(zod@3.25.76)
+      '@ai-sdk/gateway': 4.0.36(zod@4.4.3)
       '@ai-sdk/provider': 4.0.4
-      '@ai-sdk/provider-utils': 5.0.18(zod@3.25.76)
-      zod: 3.25.76
+      '@ai-sdk/provider-utils': 5.0.18(zod@4.4.3)
+      zod: 4.4.3
 
   ajv-draft-04@1.0.0(ajv@8.20.0):
     optionalDependencies:
@@ -11903,7 +11984,7 @@ snapshots:
     dependencies:
       '@apidevtools/json-schema-ref-parser': 11.7.2
       '@types/json-schema': 7.0.15
-      '@types/lodash': 4.17.24
+      '@types/lodash': 4.17.25
       is-glob: 4.0.3
       js-yaml: 4.1.1
       lodash: 4.18.1
@@ -13108,7 +13189,7 @@ snapshots:
       react: 19.2.8
       scheduler: 0.27.0
 
-  react-hook-form@7.76.1(react@19.2.8):
+  react-hook-form@7.84.0(react@19.2.8):
     dependencies:
       react: 19.2.8
 
@@ -14274,8 +14355,6 @@ snapshots:
   zod-validation-error@4.0.2(zod@3.25.76):
     dependencies:
       zod: 3.25.76
-
-  zod@3.25.76: {}
 
   zod@4.4.3: {}
 
