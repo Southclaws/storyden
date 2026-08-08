@@ -19,6 +19,16 @@ func TestIsDisallowedAddr(t *testing.T) {
 	for _, ip := range []string{"8.8.8.8", "1.1.1.1", "2606:4700:4700::1111"} {
 		assert.False(t, IsDisallowedAddr(netip.MustParseAddr(ip)), ip)
 	}
+
+	// reserved ranges that route to the local host or to unrouteable space
+	for _, ip := range []string{"0.1.2.3", "192.0.0.1", "198.18.0.1", "240.0.0.1", "255.255.255.255", "::"} {
+		assert.True(t, IsDisallowedAddr(netip.MustParseAddr(ip)), ip)
+	}
+
+	// 6to4 and teredo tunnel an arbitrary ipv4 destination inside an ipv6 literal
+	for _, ip := range []string{"2002:7f00:0001::", "2002:a9fe:a9fe::", "2001:0:4136:e378:8000:63bf:3fff:fdd2"} {
+		assert.True(t, IsDisallowedAddr(netip.MustParseAddr(ip)), ip)
+	}
 	// ipv4-mapped and nat64 forms of the metadata address must also be caught
 	assert.True(t, IsDisallowedAddr(netip.MustParseAddr("::ffff:169.254.169.254")))
 	assert.True(t, IsDisallowedAddr(netip.MustParseAddr("64:ff9b::169.254.169.254")))
