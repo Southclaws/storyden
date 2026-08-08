@@ -4,7 +4,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
 import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
@@ -170,23 +170,6 @@ function LibraryPageBlockEditable({
     } as DragItemLibraryBlock,
   });
   const [isOpen, setOpen] = useState(false);
-  const handleRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleClickAway(event: MouseEvent) {
-      if (
-        handleRef.current &&
-        !handleRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("click", handleClickAway);
-    return () => document.removeEventListener("click", handleClickAway);
-  }, [isOpen]);
 
   const dragStyle = {
     transform: CSS.Transform.toString(transform),
@@ -200,10 +183,11 @@ function LibraryPageBlockEditable({
       ref={setNodeRef}
       id={`block-${block.type}_container`}
       className="group"
+      data-block-type={block.type}
       style={dragStyle}
     >
       <BlockEditor.Gutter id={`block-${block.type}_gutter-container`}>
-        <BlockEditor.Handle ref={handleRef}>
+        <BlockEditor.Handle>
           <IconButton
             {...attributes}
             {...listeners}
@@ -218,7 +202,12 @@ function LibraryPageBlockEditable({
           </IconButton>
 
           <Box position="absolute" inset="0" pointerEvents="none">
-            <BlockMenu block={block} index={index} open={isOpen}>
+            <BlockMenu
+              block={block}
+              index={index}
+              open={isOpen}
+              onOpenChange={setOpen}
+            >
               <Box width="full" height="full" />
             </BlockMenu>
           </Box>
