@@ -2,7 +2,9 @@ name: Test frontend
 
 on:
   push:
-    paths-ignore:
+    branches:
+      - main
+    paths-ignore: &ignored_paths
       - "home/**"
       - ".vscode/**"
       - "*.md"
@@ -14,6 +16,9 @@ on:
       - "*.yaml"
       - ".nvmrc"
       - ".vercelignore"
+
+  pull_request:
+    paths-ignore: *ignored_paths
 
 jobs:
   frontend-test:

@@ -2,10 +2,11 @@ name: Test backend
 
 on:
   push:
-    paths-ignore:
+    branches:
+      - main
+    paths-ignore: &ignored_paths
       - "home/**"
       - "web/**"
-      - ".github/**"
       - ".vscode/**"
       - "*.md"
       - "docker/**"
@@ -17,6 +18,9 @@ on:
       - ".nvmrc"
       - ".vercelignore"
       - "Taskfile.yml"
+
+  pull_request:
+    paths-ignore: *ignored_paths
 
 jobs:
   backend-test-postgres:
