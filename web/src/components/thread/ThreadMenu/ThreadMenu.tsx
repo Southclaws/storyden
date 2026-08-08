@@ -3,8 +3,6 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "@/components/site/Action/More";
-
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/CategoryMoveMenu";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
@@ -13,6 +11,7 @@ import {
   truncateBody,
 } from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
+import { MoreAction } from "@/components/site/Action/More";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { LinkIcon } from "@/components/ui/icons/Link";
@@ -46,7 +45,7 @@ export function ThreadMenu(props: Props) {
       lazyMount
     >
       <Menu.Trigger asChild>
-        <MoreAction variant="subtle" size="xs" />
+        <MoreAction variant="subtle" />
       </Menu.Trigger>
 
       <Portal>
@@ -58,7 +57,7 @@ export function ThreadMenu(props: Props) {
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>{`Post by ${thread.author.name}`}</styled.span>
+                <span>{`Post by ${thread.author.name}`}</span>
 
                 <MemberBadge
                   profile={thread.author}

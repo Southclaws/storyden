@@ -1,7 +1,6 @@
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { NotificationIcon } from "@/components/ui/icons/Notification";
-import { Box } from "@/styled-system/jsx";
 
 import { AnchorProps, MenuItem } from "../site/Navigation/Anchors/Anchor";
 
@@ -19,8 +18,12 @@ export function NotificationsTrigger({
   unread,
   ...props
 }: AnchorProps & ButtonProps & Props) {
+  const accessibleLabel = unread
+    ? `${NotificationsLabel}, unread`
+    : NotificationsLabel;
+
   return (
-    <IconButton size="sm" aria-label="Notifications" {...props}>
+    <IconButton size="sm" aria-label={accessibleLabel} {...props}>
       {NotificationsIcon}
       {!hideLabel && (
         <>
@@ -29,14 +32,9 @@ export function NotificationsTrigger({
       )}
 
       {unread && (
-        <Box
-          position="absolute"
-          top="1"
-          right="1"
-          bgColor="fg.destructive/60"
-          borderRadius="full"
-          w="2"
-          h="2"
+        <span
+          aria-hidden="true"
+          className="notifications-trigger__unread-indicator"
         />
       )}
     </IconButton>

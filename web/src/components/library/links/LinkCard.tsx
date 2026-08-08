@@ -1,7 +1,6 @@
 import { LinkReference } from "@/api/openapi-schema";
-
 import { LinkButton } from "@/components/ui/link-button";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import {
   ButtonVariantProps,
   RichCardVariantProps,
@@ -39,7 +38,7 @@ type LinkRefButtonProps = { link: LinkReference } & ButtonVariantProps;
 
 export function LinkRefButton({ link, ...rest }: LinkRefButtonProps) {
   return (
-    <LinkButton size="xs" variant="subtle" href={link.url} {...rest}>
+    <LinkButton variant="subtle" href={link.url} {...rest}>
       {link.domain}
     </LinkButton>
   );

@@ -5,9 +5,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Account, DatagraphItemKind, Thread } from "@/api/openapi-schema";
-
 import { handle } from "@/api/client";
+import { Account, DatagraphItemKind, Thread } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { sendBeacon } from "@/lib/beacon/beacon";
 import type { Settings } from "@/lib/settings/settings";
@@ -32,7 +31,11 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useReplyBox({ initialSession, initialSettings, thread }: Props) {
+export function useReplyBox({
+  initialSession,
+  initialSettings,
+  thread,
+}: Props) {
   const session = useSession(initialSession, initialSettings);
   const { replyTo, clearReplyTo } = useReplyContext();
   const { createReply, revalidate } = useThreadMutations(

@@ -1,38 +1,46 @@
-import { defineConfig, defineTextStyles } from "@pandacss/dev";
+import { defineConfig } from "@pandacss/dev";
 
-import { admonition } from "@/recipes/admonition";
-import { alert } from "@/recipes/alert";
-import { badge } from "@/recipes/badge";
-import { button } from "@/recipes/button";
-import { checkbox } from "@/recipes/checkbox";
-import { clipboard } from "@/recipes/clipboard";
-import { colorPicker } from "@/recipes/color-picker";
-import { combobox } from "@/recipes/combobox";
-import { datePicker } from "@/recipes/date-picker";
-import { fileUpload } from "@/recipes/file-upload";
-import { group } from "@/recipes/group";
-import { headingInput } from "@/recipes/heading-input";
-import { input } from "@/recipes/input";
-import { inputGroup } from "@/recipes/input-group";
-import { menu } from "@/recipes/menu";
-import { numberInput } from "@/recipes/number-input";
-import { pinInput } from "@/recipes/pin-input";
-import { popover } from "@/recipes/popover";
-import { progress } from "@/recipes/progress";
-import { radioGroup } from "@/recipes/radio-group";
-import { richCard } from "@/recipes/rich-card";
-import { select } from "@/recipes/select";
-import { slider } from "@/recipes/slider";
-import { switchRecipe } from "@/recipes/switch";
-import { table } from "@/recipes/table";
-import { tabs } from "@/recipes/tabs";
-import { text } from "@/recipes/text";
-import { toggleGroup } from "@/recipes/toggle-group";
-import { tooltip } from "@/recipes/tooltip";
-import { treeView } from "@/recipes/tree-view";
-import { typographyHeading } from "@/recipes/typography-heading";
+import { admonition } from "@/components/ui/admonition/Admonition.recipe";
+import { alert } from "@/components/ui/alert/Alert.recipe";
+import { badge, badgeColorPalettes } from "@/components/ui/badge/Badge.recipe";
+import { blockEditor } from "@/components/ui/block-editor/BlockEditor.recipe";
+import { button } from "@/components/ui/button/Button.recipe";
+import { cardBox } from "@/components/ui/card-box/CardBox.recipe";
+import { checkbox } from "@/components/ui/checkbox/Checkbox.recipe";
+import { clipboard } from "@/components/ui/clipboard/Clipboard.recipe";
+import { colorPicker } from "@/components/ui/color-picker/ColorPicker.recipe";
+import { combobox } from "@/components/ui/combobox/Combobox.recipe";
+import { datePicker } from "@/components/ui/date-picker/DatePicker.recipe";
+import { fileUpload } from "@/components/ui/file-upload/FileUpload.recipe";
+import { group } from "@/components/ui/group/Group.recipe";
+import { headingInput } from "@/components/ui/heading-input/HeadingInput.recipe";
+import { inputGroup } from "@/components/ui/input-group/InputGroup.recipe";
+import { input } from "@/components/ui/input/Input.recipe";
+import { menu } from "@/components/ui/menu/Menu.recipe";
+import { multiSelectPicker } from "@/components/ui/multi-select-picker/MultiSelectPicker.recipe";
+import { numberInput } from "@/components/ui/number-input/NumberInput.recipe";
+import { pageHeader } from "@/components/ui/page-header/PageHeader.recipe";
+import { pinInput } from "@/components/ui/pin-input/PinInput.recipe";
+import { popover } from "@/components/ui/popover/Popover.recipe";
+import { progress } from "@/components/ui/progress/Progress.recipe";
+import { radioGroup } from "@/components/ui/radio-group/RadioGroup.recipe";
+import { reactList } from "@/components/ui/react-list/ReactList.recipe";
+import { sectionNavigation } from "@/components/ui/section-navigation/SectionNavigation.recipe";
+import { select } from "@/components/ui/select/Select.recipe";
+import { slider } from "@/components/ui/slider/Slider.recipe";
+import { cardGrid } from "@/components/ui/surface/CardGrid.recipe";
+import { cardRows } from "@/components/ui/surface/CardRows.recipe";
+import { richCard } from "@/components/ui/surface/RichCard.recipe";
+import { switchRecipe } from "@/components/ui/switch/Switch.recipe";
+import { table } from "@/components/ui/table/Table.recipe";
+import { tabs } from "@/components/ui/tabs/Tabs.recipe";
+import { text } from "@/components/ui/text/Text.recipe";
+import { toggleGroup } from "@/components/ui/toggle-group/ToggleGroup.recipe";
+import { tooltip } from "@/components/ui/tooltip/Tooltip.recipe";
+import { dragTree } from "@/components/ui/tree-view/DragTree.recipe";
+import { treeView } from "@/components/ui/tree-view/TreeView.recipe";
 import { tokens } from "@/theme/base";
-import { semanticTokens } from "@/theme/semantic";
+import { semanticTokens, textStyles } from "@/theme/semantic";
 
 export default defineConfig({
   presets: ["@pandacss/preset-base"],
@@ -44,6 +52,49 @@ export default defineConfig({
   include: ["./src/**/*.tsx"],
   jsxFramework: "react",
   exclude: [],
+  staticCss: {
+    css: [
+      {
+        properties: {
+          colorPalette: [...badgeColorPalettes],
+        },
+      },
+    ],
+    recipes: {
+      button: [
+        {
+          size: ["sm", "md", "lg"],
+          variant: ["solid", "outline", "ghost", "subtle", "plain"],
+        },
+      ],
+      checkbox: [{ size: ["sm", "md", "lg"] }],
+      combobox: [{ size: ["sm", "md", "lg"] }],
+      input: [
+        {
+          size: ["sm", "md", "lg"],
+          variant: ["outline", "ghost", "inset"],
+        },
+      ],
+      inputGroup: [{ size: ["sm", "md", "lg"] }],
+      multiSelectPicker: [{ size: ["sm", "md", "lg"] }],
+      numberInput: [{ size: ["sm", "md", "lg"] }],
+      pinInput: [{ size: ["sm", "md", "lg"] }],
+      progress: [
+        {
+          shape: ["circle", "horizontal"],
+          size: ["sm", "md", "lg"],
+        },
+      ],
+      radioGroup: [{ size: ["sm", "md", "lg"] }],
+      select: [{ size: ["sm", "md", "lg"], variant: ["outline", "ghost"] }],
+      slider: [{ size: ["sm", "md", "lg"] }],
+      switchRecipe: [{ size: ["sm", "md", "lg"] }],
+      text: [{ variant: ["body", "supporting", "metadata"] }],
+      toggleGroup: [
+        { size: ["sm", "md", "lg"], variant: ["outline", "ghost"] },
+      ],
+    },
+  },
 
   conditions: {
     target: "&:target",
@@ -97,59 +148,6 @@ export default defineConfig({
           };
         },
       },
-      FrostedGlass: {
-        description: `A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.`,
-        properties: {},
-        transform() {
-          return {
-            backgroundColor: "bg.opaque",
-            backdropBlur: "frosted",
-            backdropFilter: "auto",
-          };
-        },
-      },
-      Floating: {
-        description: `Floating overlay elements.`,
-        properties: {},
-        transform() {
-          return {
-            backgroundColor: "bg.opaque",
-            backdropBlur: "frosted",
-            backdropFilter: "auto",
-            boxShadow: "sm",
-          };
-        },
-      },
-      CardBox: {
-        description: `A card component that can be used to display content in a container with a border and a shadow.`,
-        properties: {
-          kind: {
-            type: "enum",
-            value: ["edge", "default"],
-          },
-          display: {
-            type: "property",
-            value: "display",
-          },
-        },
-        transform(props) {
-          const { kind, display, ...rest } = props;
-
-          const padding = kind === "edge" ? "0" : "2";
-
-          return {
-            display,
-            flexDirection: "column",
-            gap: "1",
-            width: "full",
-            boxShadow: "sm",
-            borderRadius: "lg",
-            backgroundColor: "bg.default",
-            padding,
-            ...rest,
-          };
-        },
-      },
       menuItemColorPalette: {
         description: `A color palette for menu items.`,
         properties: {},
@@ -196,33 +194,41 @@ export default defineConfig({
         badge: badge,
         checkbox: checkbox,
         button: button,
+        cardBox: cardBox,
+        cardRows: cardRows,
         group: group,
         input: input,
-        switchRecipe: switchRecipe,
+        multiSelectPicker: multiSelectPicker,
         text: text,
         admonition: admonition,
         headingInput: headingInput,
-        typographyHeading: typographyHeading,
         richCard: richCard,
       },
       slotRecipes: {
         alert: alert,
+        blockEditor: blockEditor,
+        cardGrid: cardGrid,
         clipboard: clipboard,
         numberInput: numberInput,
         inputGroup: inputGroup,
         datePicker: datePicker,
+        dragTree: dragTree,
         select: select,
+        sectionNavigation: sectionNavigation,
         colorPicker: colorPicker,
         combobox: combobox,
         menu: menu,
         fileUpload: fileUpload,
         popover: popover,
         progress: progress,
+        pageHeader: pageHeader,
         table: table,
         slider: slider,
         pinInput: pinInput,
         tabs: tabs,
         radioGroup: radioGroup,
+        reactList: reactList,
+        switchRecipe: switchRecipe,
         treeView: treeView,
         toggleGroup: toggleGroup,
         tooltip: tooltip,
@@ -230,51 +236,25 @@ export default defineConfig({
       semanticTokens,
       tokens: tokens,
       keyframes: {
+        fadeIn: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        fadeOut: {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
+        },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
         targetPulse: {
           "0%, 100%": { backgroundColor: "transparent" },
-          "50%": { backgroundColor: "var(--colors-bg-emphasized)" },
+          "50%": {
+            backgroundColor: "var(--colors-interactive-emphasized-surface)",
+          },
         },
       },
-      textStyles: defineTextStyles({
-        xs: { value: { fontSize: "xs", lineHeight: "1.125rem" } },
-        sm: { value: { fontSize: "sm", lineHeight: "1.25rem" } },
-        md: { value: { fontSize: "md", lineHeight: "1.5rem" } },
-        lg: { value: { fontSize: "lg", lineHeight: "1.75rem" } },
-        xl: { value: { fontSize: "xl", lineHeight: "1.875rem" } },
-        "2xl": { value: { fontSize: "2xl", lineHeight: "2rem" } },
-        "3xl": { value: { fontSize: "3xl", lineHeight: "2.375rem" } },
-        "4xl": {
-          value: {
-            fontSize: "4xl",
-            lineHeight: "2.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "5xl": {
-          value: {
-            fontSize: "5xl",
-            lineHeight: "3.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "6xl": {
-          value: {
-            fontSize: "6xl",
-            lineHeight: "4.5rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-        "7xl": {
-          value: {
-            fontSize: "7xl",
-            lineHeight: "5.75rem",
-            letterSpacing: "-0.02em",
-          },
-        },
-      }),
+      textStyles,
     },
   },
 

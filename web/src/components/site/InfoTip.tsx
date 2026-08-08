@@ -1,9 +1,8 @@
 import { PropsWithChildren } from "react";
 
-import { Portal } from "@ark-ui/react";
 import { IconButton } from "@/components/ui/icon-button";
 import { InfoIcon } from "@/components/ui/icons/Info";
-import * as Popover from "@/components/ui/popover";
+import { Description, Popover, Title } from "@/components/ui/popover";
 import { LStack } from "@/styled-system/jsx";
 
 type Props = {
@@ -12,25 +11,17 @@ type Props = {
 
 export function InfoTip({ title, children }: PropsWithChildren<Props>) {
   return (
-    <Popover.Root>
-      <Popover.Trigger asChild>
-        <IconButton size="xs" variant="ghost" borderRadius="full">
+    <Popover
+      trigger={
+        <IconButton aria-label={title} variant="ghost" borderRadius="full">
           <InfoIcon />
         </IconButton>
-      </Popover.Trigger>
-      <Portal>
-        <Popover.Positioner>
-          <Popover.Content>
-            <Popover.Arrow>
-              <Popover.ArrowTip />
-            </Popover.Arrow>
-            <LStack gap="1">
-              <Popover.Title>{title}</Popover.Title>
-              <Popover.Description>{children}</Popover.Description>
-            </LStack>
-          </Popover.Content>
-        </Popover.Positioner>
-      </Portal>
-    </Popover.Root>
+      }
+    >
+      <LStack gap="1">
+        <Title>{title}</Title>
+        <Description>{children}</Description>
+      </LStack>
+    </Popover>
   );
 }

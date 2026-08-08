@@ -18,7 +18,7 @@ import {
   EmailQueueListResult,
   EmailQueueStatus,
 } from "@/api/openapi-schema";
-import { MultiSelectPickerItem } from "@/components/ui/MultiSelectPicker";
+import { MultiSelectPickerItem } from "@/components/ui/multi-select-picker";
 
 export const EMAIL_STATUS_LABELS: Record<EmailQueueStatus, string> = {
   [EmailQueueStatus.pending]: "Pending",

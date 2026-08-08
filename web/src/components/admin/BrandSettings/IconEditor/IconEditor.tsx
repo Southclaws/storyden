@@ -22,7 +22,7 @@ export function IconEditor(props: Props) {
           display="none"
           width="min"
           type="file"
-          bgColor="bg.subtle"
+          bgColor="background.inset"
           borderRadius="md"
           border="none"
           onChange={onFileChange}
@@ -31,17 +31,11 @@ export function IconEditor(props: Props) {
           <styled.label
             htmlFor="file-input"
             w="full"
-            className={button({ size: "xs", variant: "outline" })}
+            className={button({ variant: "outline" })}
           >
             <MediaAddIcon /> Upload icon
           </styled.label>
-          <Button
-            size="xs"
-            variant="solid"
-            w="full"
-            onClick={onSave}
-            disabled={saving}
-          >
+          <Button variant="solid" w="full" onClick={onSave} disabled={saving}>
             <SaveIcon /> Save icon
           </Button>
         </HStack>

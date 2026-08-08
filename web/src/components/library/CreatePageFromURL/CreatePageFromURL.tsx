@@ -4,7 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { match } from "ts-pattern";
 
-import { Spinner } from "@/components/ui/Spinner";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
@@ -13,6 +12,7 @@ import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
 import { Item } from "@/components/ui/menu";
 import * as Popover from "@/components/ui/popover";
+import { Spinner } from "@/components/ui/spinner";
 import { useCapability } from "@/lib/settings/capabilities";
 import { HStack, styled } from "@/styled-system/jsx";
 import { UtilityValues } from "@/styled-system/types/prop-type";
@@ -142,9 +142,9 @@ export function CreatePageFromURLAction({
       <Popover.Trigger asChild>
         <IconButton
           type="button"
-          size="xs"
           variant="subtle"
           px={hideLabel ? "0" : "1"}
+          aria-label={hideLabel ? CreatePageFromURLLabel : undefined}
           {...props}
         >
           {CreatePageFromURLIcon}
@@ -161,13 +161,11 @@ export function CreatePageFromURLAction({
             <HStack gap="2" transition="all">
               <Input
                 w="64"
-                size="xs"
                 placeholder="Enter URL to import..."
                 value={url.value}
                 onChange={handleInputChange}
               />
               <Button
-                size="xs"
                 onClick={handleImport}
                 disabled={!url.valid || isImporting}
                 loading={isImporting}
@@ -179,10 +177,16 @@ export function CreatePageFromURLAction({
             <HStack gap="2" justify="space-between">
               {match(importState.step)
                 .with("complete", () => (
-                  <CheckCircleIcon color="fg.success" fill="bg.success" />
+                  <CheckCircleIcon
+                    color="status.success.content"
+                    fill="status.success.surface"
+                  />
                 ))
                 .with("failed", () => (
-                  <WarningIcon color="fg.warning" fill="bg.warning" />
+                  <WarningIcon
+                    color="status.warning.content"
+                    fill="status.warning.surface"
+                  />
                 ))
                 .otherwise(() => (
                   <Spinner />
@@ -213,7 +217,10 @@ export function CreatePageFromURLAction({
 
 export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
   return (
-    <Item value={CreatePageFromURLID}>
+    <Item
+      value={CreatePageFromURLID}
+      aria-label={hideLabel ? CreatePageFromURLLabel : undefined}
+    >
       {CreatePageFromURLIcon}
       {!hideLabel && (
         <>
@@ -227,8 +234,8 @@ export function CreatePageFromURLMenuItem({ hideLabel }: Props) {
 function getImportStateColor(state: ImportStep): UtilityValues["color"] {
   switch (state) {
     case "failed":
-      return "fg.warning";
+      return "status.warning.content";
     default:
-      return "fg.muted";
+      return "text.subtle";
   }
 }

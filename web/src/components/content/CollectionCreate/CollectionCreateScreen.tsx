@@ -1,11 +1,11 @@
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { VStack, WStack, styled } from "@/styled-system/jsx";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { Props, useCollectionCreate } from "./useCollectionCreate";
 
@@ -14,10 +14,10 @@ export function CollectionCreateScreen(props: Props) {
 
   return (
     <VStack alignItems="start" gap="4">
-      <styled.p>
+      <Text variant="supporting">
         Use collections to curate content from the community. Collections can
         include threads, pages and other items from the community knowledgebase.
-      </styled.p>
+      </Text>
       <styled.form
         display="flex"
         flexDir="column"

@@ -1,11 +1,10 @@
-import { RegisterScreen } from "@/screens/auth/RegisterScreen/RegisterScreen";
-
 import { RegistrationMode } from "@/api/openapi-schema";
 import { OAuthProviderList } from "@/components/auth/OAuthProviderList";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getProviders } from "@/lib/auth/providers";
 import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
+import { RegisterScreen } from "@/screens/auth/RegisterScreen/RegisterScreen";
 
 type Props = {
   searchParams: Promise<{

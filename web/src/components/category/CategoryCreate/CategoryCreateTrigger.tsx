@@ -1,18 +1,18 @@
 import { Portal } from "@ark-ui/react";
 
-import { useDisclosure } from "@/utils/useDisclosure";
-
-import { Permission } from "@/api/openapi-schema";
+import { type Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { ButtonProps } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
 import { hasPermission } from "@/utils/permissions";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 
 type Props = ButtonProps & {
+  initialSession?: Account;
   parentSlug?: string;
   hideLabel?: boolean;
 };
@@ -22,12 +22,14 @@ export const CreateCategoryLabel = "Create";
 export const CreateCategoryIcon = <CreateIcon />;
 
 export function CategoryCreateTrigger({
+  initialSession,
   parentSlug,
   hideLabel,
   ...props
 }: Props) {
-  const session = useSession();
+  const session = useSession(initialSession);
   const useDisclosureProps = useDisclosure();
+  const Trigger = hideLabel ? IconButton : Button;
 
   if (!hasPermission(session, Permission.MANAGE_CATEGORIES)) {
     return null;
@@ -35,11 +37,10 @@ export function CategoryCreateTrigger({
 
   return (
     <>
-      <IconButton
+      <Trigger
         type="button"
-        size="xs"
         variant="ghost"
-        px={hideLabel ? "0" : "1"}
+        aria-label={hideLabel ? CreateCategoryLabel : undefined}
         onClick={useDisclosureProps.onOpen}
         {...props}
       >
@@ -49,7 +50,7 @@ export function CategoryCreateTrigger({
             <span>{CreateCategoryLabel}</span>
           </>
         )}
-      </IconButton>
+      </Trigger>
 
       <CategoryCreateModal {...useDisclosureProps} defaultParent={parentSlug} />
     </>
@@ -60,7 +61,11 @@ export function CreateCategoryMenuItem({ hideLabel }: Props) {
   const useDisclosureProps = useDisclosure();
 
   return (
-    <Item value={CreateCategoryID} onClick={useDisclosureProps.onOpen}>
+    <Item
+      value={CreateCategoryID}
+      aria-label={hideLabel ? CreateCategoryLabel : undefined}
+      onClick={useDisclosureProps.onOpen}
+    >
       {CreateCategoryIcon}
       {!hideLabel && (
         <>

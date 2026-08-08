@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { FixedCropper, ImageRestriction } from "react-advanced-cropper";
 
-import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Asset } from "@/api/openapi-schema";
+import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
 import { parseNodeMetadata } from "@/lib/library/metadata";
 import { css } from "@/styled-system/css";
@@ -86,15 +86,9 @@ function LibraryPageCoverBlockEditing() {
         onFinish={handleUploadCoverImage}
         accept={["image/png", "image/jpeg", "image/gif"]}
         w="full"
-        size="xs"
         variant="subtle"
       >
-        <Button
-          type="button"
-          w="full"
-          size="xs"
-          variant="subtle"
-        >
+        <Button type="button" w="full" variant="subtle">
           Upload cover image
         </Button>
       </AssetUploadAction>
@@ -110,7 +104,7 @@ function LibraryPageCoverBlockEditing() {
           maxHeight: "64",
           borderRadius: "md",
           // TODO: Remove black background when empty
-          backgroundColor: "bg.default",
+          backgroundColor: "background.surface",
         })}
         onInteractionEnd={handleInteractionEnd}
         defaultPosition={

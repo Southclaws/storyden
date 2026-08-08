@@ -6,11 +6,12 @@ import { useEffect, useMemo } from "react";
 import { RequestError } from "@/api/common";
 import { useOAuthRemoteCallback } from "@/api/openapi-client/auth";
 import { useGetSession } from "@/api/openapi-client/misc";
-import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { LStack, VStack, styled } from "@/styled-system/jsx";
 
 export function OAuthRemoteCallbackScreen() {
@@ -179,8 +180,8 @@ function CallbackMessage({
       )}
 
       <VStack gap="2" textAlign="center">
-        <Heading size="md">{title}</Heading>
-        <styled.p color="fg.muted">{body}</styled.p>
+        <PageHeading>{title}</PageHeading>
+        <Text variant="supporting">{body}</Text>
       </VStack>
 
       {action}
@@ -203,21 +204,21 @@ function callbackErrorMessage(error: unknown) {
 function toneBackground(tone: CallbackMessageProps["tone"]) {
   switch (tone) {
     case "success":
-      return "bg.success";
+      return "status.success.surface";
     case "error":
-      return "bg.error";
+      return "status.danger.surface";
     default:
-      return "bg.subtle";
+      return "background.inset";
   }
 }
 
 function toneForeground(tone: CallbackMessageProps["tone"]) {
   switch (tone) {
     case "success":
-      return "fg.success";
+      return "status.success.content";
     case "error":
-      return "fg.error";
+      return "status.danger.content";
     default:
-      return "fg.muted";
+      return "text.subtle";
   }
 }

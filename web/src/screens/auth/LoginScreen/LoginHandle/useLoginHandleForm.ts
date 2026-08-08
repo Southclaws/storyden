@@ -9,10 +9,9 @@ import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authPasswordSignin } from "@/api/openapi-client/auth";
 import { APIError } from "@/api/openapi-schema";
 import { passkeyLogin } from "@/components/auth/webauthn/utils";
-import { deriveError } from "@/utils/error";
-
 import { ExistingPasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
 import { isWebauthnAvailable } from "@/lib/auth/webauthn";
+import { deriveError } from "@/utils/error";
 
 export type Props = {
   webauthn: boolean;

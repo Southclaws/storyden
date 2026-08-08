@@ -1,5 +1,6 @@
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
@@ -33,9 +34,7 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("newPassword")}
         />
-        <styled.p color="fg.error" fontSize="sm">
-          {errors.newPassword?.message}
-        </styled.p>
+        <FormErrorText>{errors.newPassword?.message}</FormErrorText>
         <Input
           maxW="xs"
           type="password"
@@ -44,12 +43,8 @@ export function PasswordCreateForm() {
           disabled={success}
           {...register("confirmPassword")}
         />
-        <styled.p color="fg.error" fontSize="sm">
-          {errors.confirmPassword?.message}
-        </styled.p>
-        <styled.p color="fg.error" fontSize="sm">
-          {errors.root?.message}
-        </styled.p>
+        <FormErrorText>{errors.confirmPassword?.message}</FormErrorText>
+        <FormErrorText>{errors.root?.message}</FormErrorText>
         <VStack alignItems="start" w="full">
           <Button type="submit" disabled={success}>
             Add password

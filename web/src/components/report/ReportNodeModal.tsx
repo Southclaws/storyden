@@ -1,6 +1,7 @@
 import { DatagraphItemKind, Node } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import { styled, VStack } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { VStack, styled } from "@/styled-system/jsx";
 
 import { ReportModal, ReportModalProps } from "./ReportModal";
 
@@ -35,15 +36,14 @@ export function ReportNodeModal({ node, ...disclosure }: Props) {
           </styled.span>
           <MemberBadge profile={node.owner} size="sm" name="full-horizontal" />
           {node.description && (
-            <styled.p
-              fontSize="sm"
-              color="fg.subtle"
+            <Text
+              variant="supporting"
               whiteSpace="pre-wrap"
               maxW="64"
               wordBreak="break-word"
             >
               {node.description}
-            </styled.p>
+            </Text>
           )}
         </VStack>
       }

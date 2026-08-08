@@ -9,9 +9,10 @@ import {
 } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
-import { Box, HStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Box, HStack } from "@/styled-system/jsx";
 
-import { Spinner } from "../ui/Spinner";
+import { Spinner } from "../ui/spinner";
 
 // NOTE: Should match the MD breakpoint in `panda.config.ts`.
 const MD_BREAKPOINT = 768;
@@ -161,7 +162,7 @@ export function ComposerTools({
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
           cursor="pointer"
-          backgroundColor={isExpanded ? "bg.subtle/80" : "transparent"}
+          backgroundColor={isExpanded ? "background.overlay/80" : "transparent"}
           backdropBlur={isExpanded ? "sm" : undefined}
           backdropFilter={isExpanded ? "auto" : undefined}
           borderRadius="md"
@@ -184,13 +185,13 @@ export function ComposerTools({
                 <HStack gap="1" className="composer-tools__working-status">
                   <Spinner size="sm" />
                   {workingCount > 1 && (
-                    <styled.span
+                    <Text
+                      as="span"
+                      variant="metadata"
                       className="composer-tools__working-status-count"
-                      fontSize="xs"
-                      color="fg.muted"
                     >
                       {workingCount}
-                    </styled.span>
+                    </Text>
                   )}
                 </HStack>
               )}
@@ -212,7 +213,6 @@ export function ComposerTools({
               className="composer-tools__expand-button"
               type="button"
               variant="ghost"
-              size="xs"
               onClick={handleClick}
               aria-label="Show editor tools"
               aria-expanded={isExpanded}

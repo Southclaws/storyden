@@ -1,15 +1,13 @@
-import { Controller } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { NumberInputField } from "@/components/ui/form/NumberInputField";
-import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
-import { Heading } from "@/components/ui/heading";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { NumberInputField } from "@/components/ui/number-input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { RadioGroupField } from "@/components/ui/radio-group";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Props, useInterfaceSettings } from "./useInterfaceSettings";
 
@@ -25,95 +23,73 @@ export function InterfaceSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()}>
+      <LStack gap="1">
         <WStack>
-          <Heading size="md">Interface settings</Heading>
+          <PageHeading>Interface settings</PageHeading>
           <Button type="submit" loading={formState.isSubmitting}>
             Save
           </Button>
         </WStack>
+        <Text variant="supporting">
+          Configure the default editing experience and how member content is
+          displayed.
+        </Text>
+      </LStack>
 
-        <FormControl>
-          <FormLabel>Default editor</FormLabel>
-          <RadioGroupField
-            control={control}
-            name="editorMode"
-            items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
-            ]}
-          />
-          <FormHelperText>
-            Choose the default editor for composing threads, replies and pages.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Default editor</FormLabel>
+        <RadioGroupField
+          control={control}
+          name="editorMode"
+          items={[
+            { label: "Rich text", value: "richtext" },
+            { label: "Markdown", value: "markdown" },
+          ]}
+        />
+        <FormHelperText>
+          Choose the default editor for composing threads, replies and pages.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Default sidebar state</FormLabel>
-          <RadioGroupField
-            control={control}
-            name="sidebarDefaultState"
-            items={[
-              { label: "Open", value: "open" },
-              { label: "Closed", value: "closed" },
-            ]}
-          />
-          <FormHelperText>
-            Choose the default state for the sidebar when members first visit or
-            when they haven't set a preference.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Signatures</FormLabel>
+        <CheckboxField control={control} name="signaturesEnabled" size="sm">
+          Enable member signatures
+        </CheckboxField>
+        <FormHelperText>
+          When disabled, signatures are hidden under posts and on profiles.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Signatures</FormLabel>
-          <Controller
-            control={control}
-            name="signaturesEnabled"
-            render={({ field }) => (
-              <Checkbox
-                size="sm"
-                checked={!!field.value}
-                onCheckedChange={({ checked }) => {
-                  field.onChange(checked === true);
-                }}
-              >
-                Enable member signatures
-              </Checkbox>
-            )}
-          />
-          <FormHelperText>
-            When disabled, signatures are hidden under posts and on profiles.
-          </FormHelperText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Signature max height (px)</FormLabel>
+        <NumberInputField
+          control={control}
+          name="signatureMaxHeight"
+          ariaLabel="Signature max height in pixels"
+          min={32}
+          max={2000}
+          disabled={!signaturesEnabled}
+        />
+        <FormHelperText>
+          Limits how tall member signatures can appear below posts.
+        </FormHelperText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Signature max height (px)</FormLabel>
-          <NumberInputField
-            control={control}
-            name="signatureMaxHeight"
-            min={32}
-            max={2000}
-            disabled={!signaturesEnabled}
-          />
-          <FormHelperText>
-            Limits how tall member signatures can appear below posts.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Signature max characters</FormLabel>
-          <NumberInputField
-            control={control}
-            name="signatureMaxChars"
-            min={1}
-            max={10000}
-            disabled={!signaturesEnabled}
-          />
-          <FormHelperText>
-            Visible characters, not including HTML tags.
-          </FormHelperText>
-        </FormControl>
-      </CardBox>
+      <FormControl>
+        <FormLabel>Signature max characters</FormLabel>
+        <NumberInputField
+          control={control}
+          name="signatureMaxChars"
+          ariaLabel="Signature max characters"
+          min={1}
+          max={10000}
+          disabled={!signaturesEnabled}
+        />
+        <FormHelperText>
+          Visible characters, not including HTML tags.
+        </FormHelperText>
+      </FormControl>
     </styled.form>
   );
 }

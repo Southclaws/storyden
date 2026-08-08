@@ -8,7 +8,7 @@ export default async function Layout({ children }: PropsWithChildren) {
     <VStack w="full">
       {children}
 
-      <LinkButton size="xs" variant="subtle" href="/login">
+      <LinkButton variant="subtle" href="/login">
         Sign in
       </LinkButton>
     </VStack>

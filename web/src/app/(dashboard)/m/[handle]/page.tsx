@@ -1,9 +1,8 @@
-import { UnreadyBanner } from "@/components/site/Unready";
-import { ProfileScreen } from "@/screens/profile/ProfileScreen";
-
 import { profileGet } from "@/api/openapi-server/profiles";
 import { getServerSession } from "@/auth/server-session";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { getSettings } from "@/lib/settings/settings-server";
+import { ProfileScreen } from "@/screens/profile/ProfileScreen";
 
 type Props = {
   params: Promise<{ handle: string }>;

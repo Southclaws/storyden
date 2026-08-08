@@ -1,4 +1,4 @@
-import { Spinner } from "@/components/ui/Spinner";
+import { Spinner } from "@/components/ui/spinner";
 import { Center } from "@/styled-system/jsx";
 
 export function LoadingBanner() {

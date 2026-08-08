@@ -4,6 +4,10 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ProgressVariant {
   /**
+ * @default "horizontal"
+ */
+shape: "circle" | "horizontal"
+/**
  * @default "md"
  */
 size: "sm" | "md" | "lg"

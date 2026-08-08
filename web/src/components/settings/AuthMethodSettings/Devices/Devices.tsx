@@ -1,7 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { DeleteDeviceTrigger } from "./DeleteDevice/DeleteDeviceTrigger";
@@ -12,7 +13,7 @@ export function Devices(props: Props) {
 
   return (
     <VStack w="full" alignItems="start">
-      <Heading size="sm">Devices</Heading>
+      <SectionHeading>Devices</SectionHeading>
 
       <p>
         You can use certain support devices with biometric authentication. You
@@ -27,7 +28,7 @@ export function Devices(props: Props) {
             key={v.id}
             display="flex"
             flexDir="column"
-            borderColor="border.muted"
+            borderColor="border.strong"
             borderWidth="thin"
             borderRadius="md"
             p="2"
@@ -35,7 +36,13 @@ export function Devices(props: Props) {
             minW="0"
           >
             <HStack justify="space-between">
-              <Heading size="xs">{v.name}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {v.name}
+              </Text>
             </HStack>
 
             <styled.p
@@ -50,10 +57,10 @@ export function Devices(props: Props) {
             </styled.p>
 
             <HStack justify="space-between">
-              <styled.p>
+              <Text variant="metadata">
                 Created{" "}
                 <time>{formatDistanceToNow(new Date(v.created_at))}</time> ago
-              </styled.p>
+              </Text>
 
               <DeleteDeviceTrigger id={v.id} />
             </HStack>

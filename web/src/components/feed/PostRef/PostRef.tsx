@@ -2,7 +2,7 @@ import { PostReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Byline } from "@/components/content/Byline";
 import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
 import { HStack } from "@/styled-system/jsx";
 
 type Props = {

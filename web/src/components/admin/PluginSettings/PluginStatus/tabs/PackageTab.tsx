@@ -14,6 +14,7 @@ import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
@@ -122,12 +123,12 @@ export function PackageTab({ plugin }: Props) {
 
   return (
     <LStack gap="4">
-      <styled.p fontSize="sm" color="fg.muted">
+      <Text variant="supporting">
         Upload a replacement plugin package.{" "}
         {plugin.status.active_state === "active"
           ? "This will restart the plugin with the new version."
           : "The new version will be used when the plugin is enabled."}
-      </styled.p>
+      </Text>
 
       <Alert.Root>
         <Alert.Icon asChild>
@@ -206,20 +207,20 @@ export function PackageTab({ plugin }: Props) {
       >
         {success && (
           <LStack gap="1">
-            <styled.p fontSize="sm">
+            <Text variant="supporting" color="text.default">
               Uploaded <styled.code>{success.fileName}</styled.code>.
-            </styled.p>
+            </Text>
             {success.previousVersion || success.newVersion ? (
-              <styled.p fontSize="sm">
+              <Text variant="supporting" color="text.default">
                 Version:{" "}
                 <styled.code>
                   {success.previousVersion ?? "-"} → {success.newVersion ?? "-"}
                 </styled.code>
-              </styled.p>
+              </Text>
             ) : (
-              <styled.p fontSize="sm">
+              <Text variant="supporting" color="text.default">
                 The plugin package was replaced successfully.
-              </styled.p>
+              </Text>
             )}
           </LStack>
         )}
@@ -234,7 +235,9 @@ export function PackageTab({ plugin }: Props) {
         {error && (
           <LStack gap="1">
             {error.overview && (
-              <styled.p fontSize="sm">{error.overview}</styled.p>
+              <Text variant="supporting" color="text.default">
+                {error.overview}
+              </Text>
             )}
             <styled.pre fontSize="xs" whiteSpace="pre-wrap">
               {error.details}

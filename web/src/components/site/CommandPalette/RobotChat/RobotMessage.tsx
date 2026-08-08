@@ -9,12 +9,13 @@ import { Reply, Thread } from "@/api/openapi-schema";
 import { RobotRenderCardData, StorydenUIMessage } from "@/api/robots-types";
 import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { CardBox } from "@/components/ui/card-box";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
-import { Card } from "@/components/ui/rich-card";
+import { Card } from "@/components/ui/surface";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import {
   Box,
-  CardBox,
   Divider,
   HStack,
   LStack,
@@ -144,7 +145,7 @@ function RobotMessagePart({
     return (
       <Box
         className={styles["messageText"]}
-        bg={isUser ? "bg.subtle" : "transparent"}
+        bg={isUser ? "background.inset" : "transparent"}
         borderRadius={isUser ? "2xl" : "none"}
         px={isUser ? "4" : "0"}
         pt={isUser ? "2" : "1"}
@@ -152,7 +153,7 @@ function RobotMessagePart({
         minW="0"
         maxW={isUser ? "3/4" : "full"}
         overflow="hidden"
-        color="fg.default"
+        color="text.default"
         lineHeight="relaxed"
       >
         <ContentComposerMarkdown
@@ -279,11 +280,11 @@ function RobotProfileCard({ data }: { data: RobotRenderCardData }) {
         <WStack>
           <MemberBadge profile={profile} size="md" name="full-vertical" />
 
-          <styled.span color="fg.muted" fontSize="sm">
+          <Text as="span" variant="supporting">
             {"joined "}
             <Timestamp created={profile.createdAt} />
             {" ago"}
-          </styled.span>
+          </Text>
         </WStack>
       </CardBox>
     </Box>
@@ -345,18 +346,18 @@ function RobotReplyCard({ data }: { data: RobotRenderCardData }) {
   return (
     <CardBox w="full" maxW="4/5">
       <LStack>
-        <WStack color="fg.muted" fontSize="xs">
+        <WStack color="text.subtle" fontSize="xs">
           <Link
             href={url}
             className={css({
-              color: "fg.accent",
+              color: "accent.text",
               fontWeight: "medium",
               _hover: { textDecoration: "underline" },
             })}
           >
             <HStack gap="1" alignItems="center">
               <ReplyIcon width="4" height="4" aria-hidden />
-              <styled.span>Reply in this thread</styled.span>
+              <span>Reply in this thread</span>
             </HStack>
           </Link>
           <Box>
@@ -410,20 +411,20 @@ function RobotThreadReferenceCard({
       shape="row"
     >
       <WStack>
-        <HStack gap="2" minW="0" color="fg.muted" fontSize="sm">
+        <HStack gap="2" minW="0" color="text.subtle" fontSize="sm">
           <MemberBadge
             profile={thread.author}
             avatar="visible"
             size="xs"
             name="handle"
           />
-          <styled.span color="fg.subtle">·</styled.span>
+          <styled.span color="text.muted">·</styled.span>
           <Timestamp created={thread.createdAt} />
         </HStack>
 
-        <styled.span color="fg.muted" fontSize="sm">
+        <Text as="span" variant="supporting">
           {replyLabel}
-        </styled.span>
+        </Text>
       </WStack>
     </Card>
   );
@@ -461,19 +462,11 @@ function RobotFallbackLinkCard({
 }
 
 function RobotLoadingCard({ label }: { label: string }) {
-  return (
-    <styled.p color="fg.muted" fontSize="sm">
-      Loading {label.toLowerCase()}...
-    </styled.p>
-  );
+  return <Text variant="supporting">Loading {label.toLowerCase()}...</Text>;
 }
 
 function RobotUnavailableCard({ label }: { label: string }) {
-  return (
-    <styled.p color="fg.muted" fontSize="sm">
-      {label} unavailable.
-    </styled.p>
-  );
+  return <Text variant="supporting">{label} unavailable.</Text>;
 }
 
 function partKey(part: StorydenUIMessage["parts"][number], idx: number) {

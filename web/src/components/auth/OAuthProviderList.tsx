@@ -22,7 +22,7 @@ export async function OAuthProviderList({ providers }: Props) {
 
   return (
     <VStack w="full">
-      <WStack alignItems="center" textWrap="nowrap" color="fg.subtle">
+      <WStack alignItems="center" textWrap="nowrap" color="text.muted">
         <Divider />
         <Text>or via third party</Text>
         <Divider />

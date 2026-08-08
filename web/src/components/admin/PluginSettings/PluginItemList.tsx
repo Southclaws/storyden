@@ -32,7 +32,7 @@ function PluginsEmptyState() {
         <span>
           <a
             className={css({
-              color: "fg.emphasized",
+              color: "interactive.emphasized.content",
               _hover: { textDecoration: "underline" },
             })}
             href="https://www.storyden.org/docs/introduction/plugins"

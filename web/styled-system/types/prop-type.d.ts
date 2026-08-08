@@ -165,7 +165,7 @@ export interface UtilityValues {
 	transitionProperty: "common" | "colors" | "size" | "position" | "background";
 	transition: "all" | "common" | "size" | "position" | "background" | "colors" | "opacity" | "shadow" | "transform";
 	animation: Tokens["animations"];
-	animationName: "shimmer" | "targetPulse";
+	animationName: "fadeIn" | "fadeOut" | "shimmer" | "targetPulse";
 	animationTimingFunction: Tokens["easings"];
 	animationDuration: Tokens["durations"];
 	animationDelay: Tokens["durations"];
@@ -214,8 +214,8 @@ export interface UtilityValues {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "current" | "black" | "white" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "green" | "green.light" | "green.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "red" | "red.light" | "red.dark" | "slate" | "slate.light" | "slate.dark" | "tomato" | "tomato.light" | "tomato.dark" | "gray" | "gray.light" | "gray.dark" | "neutral" | "neutral.light" | "neutral.dark" | "transparent" | "accent" | "accent.light" | "accent.light.text" | "accent.dark" | "accent.dark.text" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV" | "bg" | "fg" | "border" | "visibility" | "visibility.published.bg" | "visibility.published" | "visibility.published.fg" | "visibility.published.border" | "visibility.draft.bg" | "visibility.draft" | "visibility.draft.fg" | "visibility.draft.border" | "visibility.review.bg" | "visibility.review" | "visibility.review.fg" | "visibility.review.border" | "visibility.unlisted.bg" | "visibility.unlisted" | "visibility.unlisted.fg" | "visibility.unlisted.border" | "overflow-fade" | "scroll-fade-top";
-	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
+	colorPalette: "current" | "black" | "white" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "green" | "green.light" | "green.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "red" | "red.light" | "red.dark" | "slate" | "slate.light" | "slate.dark" | "tomato" | "tomato.light" | "tomato.dark" | "gray" | "gray.light" | "gray.dark" | "neutral" | "neutral.light" | "neutral.dark" | "transparent" | "accent" | "accent.light" | "accent.light.text" | "accent.dark" | "accent.dark.text" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV" | "background" | "text" | "border" | "scrim" | "selection" | "interactive" | "interactive.selected" | "interactive.emphasized" | "status" | "status.danger" | "status.success" | "status.warning" | "status.info" | "visibility" | "visibility.published.bg" | "visibility.published" | "visibility.published.fg" | "visibility.published.border" | "visibility.draft.bg" | "visibility.draft" | "visibility.draft.fg" | "visibility.draft.border" | "visibility.review.bg" | "visibility.review" | "visibility.review.fg" | "visibility.review.border" | "visibility.unlisted.bg" | "visibility.unlisted" | "visibility.unlisted.fg" | "visibility.unlisted.border" | "overflow-fade" | "scroll-fade-top";
+	textStyle: "body" | "supporting" | "metadata";
 }
 
 

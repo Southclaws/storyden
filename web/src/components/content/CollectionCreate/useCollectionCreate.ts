@@ -3,12 +3,11 @@ import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
 
-import { getCollectionListKey } from "@/api/openapi-client/collections";
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { handle } from "@/api/client";
+import { getCollectionListKey } from "@/api/openapi-client/collections";
 import { Account } from "@/api/openapi-schema";
 import { useCollectionMutations } from "@/lib/collection/mutation";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the collection."),

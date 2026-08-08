@@ -1,80 +1,64 @@
 "use client";
 
-import { CommandDock } from "@/components/site/CommandDock/CommandDock";
-import { ButtonProps } from "@/components/ui/button";
+import { useSession } from "@/auth";
+import type { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { CloseIcon } from "@/components/ui/icons/Close";
 import { MenuIcon } from "@/components/ui/icons/Menu";
-import { SiteIcon } from "@/components/ui/icons/Site";
-import { WStack } from "@/styled-system/jsx";
 
-import { Search } from "../../../search/Search/Search";
-import { CloseAction } from "../../Action/Close";
 import { AccountMenu } from "../AccountMenu/AccountMenu";
-import { ComposeAnchor } from "../Anchors/Compose";
 import { HomeAnchor } from "../Anchors/Home";
-import { LibraryAnchor } from "../Anchors/Library";
 import { LoginAnchor } from "../Anchors/Login";
-import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
-
-import { useMobileCommandBar } from "./useMobileCommandBar";
 
 type Props = {
-  canRegister?: boolean;
+  isOpen: boolean;
+  onClose: () => void;
+  onOpen: () => void;
 };
 
-export function MobileCommandBar({ canRegister }: Props) {
-  const { isExpanded, onExpand, onClose, account } = useMobileCommandBar();
+export function MobileCommandBar({ isOpen, onClose, onOpen }: Props) {
+  const account = useSession();
 
   return (
-    <CommandDock
-      isOpen={isExpanded}
-      onClickOutside={onClose}
-      render={() => {
-        return <ContentNavigationList />;
-      }}
+    <div
+      aria-label="Primary navigation"
+      className="navigation__mobile-commandbar navigation__surface"
+      role="toolbar"
     >
-      <WStack alignItems="center">
-        {isExpanded ? (
-          <>
-            {account ? (
-              <AccountMenu account={account} size="sm" />
-            ) : (
-              <SiteIcon borderRadius="md" w="8" h="8" />
-            )}
-            <Search />
-            <CloseAction onClick={onClose} size="sm" />
-          </>
+      <NavigationDrawerTrigger
+        isOpen={isOpen}
+        onClick={isOpen ? onClose : onOpen}
+      />
+
+      <div className="navigation__mobile-commandbar-end">
+        <HomeAnchor hideLabel size="sm" />
+        {account ? (
+          <AccountMenu account={account} size="sm" />
         ) : (
-          <>
-            {account ? (
-              <AccountMenu account={account} size="sm" />
-            ) : (
-              <SiteIcon borderRadius="md" w="8" h="8" />
-            )}
-            <HomeAnchor hideLabel size="sm" />
-            {account ? (
-              <ComposeAnchor hideLabel size="sm" />
-            ) : (
-              canRegister && <LoginAnchor />
-            )}
-            <LibraryAnchor hideLabel size="sm" />
-            <ExpandTrigger onClick={onExpand} />
-          </>
+          <LoginAnchor />
         )}
-      </WStack>
-    </CommandDock>
+      </div>
+    </div>
   );
 }
 
-function ExpandTrigger(props: ButtonProps) {
+function NavigationDrawerTrigger({
+  isOpen,
+  ...props
+}: ButtonProps & { isOpen: boolean }) {
+  const label = isOpen ? "Close navigation menu" : "Open navigation menu";
+
   return (
     <IconButton
-      title="Main navigation menu"
+      aria-controls="navigation__leftbar"
+      aria-expanded={isOpen}
+      aria-label={label}
+      type="button"
       variant="ghost"
       size="sm"
       {...props}
     >
-      <MenuIcon />
+      {isOpen ? <CloseIcon /> : <MenuIcon />}
     </IconButton>
   );
 }

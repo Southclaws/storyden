@@ -26,7 +26,7 @@ export function PermissionSummary({ permissions }: Props) {
       }}
     >
       <Popover.Trigger asChild>
-        <Button size="xs" variant="link">
+        <Button size="sm" variant="ghost">
           {permissionLabel}
         </Button>
       </Popover.Trigger>

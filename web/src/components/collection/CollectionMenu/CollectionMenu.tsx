@@ -4,7 +4,6 @@ import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
 import { MoreAction } from "@/components/site/Action/More";
-
 import { DeleteWithConfirmationMenuItem } from "@/components/site/DeleteConfirmationMenuItem";
 import { LinkIcon } from "@/components/ui/icons/Link";
 import { ShareIcon } from "@/components/ui/icons/Share";
@@ -22,7 +21,7 @@ export function CollectionMenu(props: Props) {
   return (
     <Menu.Root lazyMount>
       <Menu.Trigger asChild>
-        <MoreAction variant="subtle" size="xs" />
+        <MoreAction variant="subtle" />
       </Menu.Trigger>
 
       <Portal>
@@ -34,7 +33,7 @@ export function CollectionMenu(props: Props) {
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>{`Collection by ${collection.owner.name}`}</styled.span>
+                <span>{`Collection by ${collection.owner.name}`}</span>
 
                 <styled.time fontWeight="normal">
                   {format(new Date(collection.createdAt), "yyyy-MM-dd")}

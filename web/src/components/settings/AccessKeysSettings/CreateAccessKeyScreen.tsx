@@ -2,14 +2,15 @@ import { ClipboardIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import * as Clipboard from "@/components/ui/clipboard";
-import { DatePickerInputField } from "@/components/ui/form/DatePickerField";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { Heading } from "@/components/ui/heading";
+import { DatePickerField } from "@/components/ui/date-picker";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { getAPIAddress } from "@/config";
 import { LStack, WStack } from "@/styled-system/jsx";
 
@@ -28,7 +29,7 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
     return (
       <LStack h="full" gap="8" justifyContent="space-between">
         <LStack>
-          <Heading>Access Key Created</Heading>
+          <PageHeading>Access Key Created</PageHeading>
           <p>
             <strong>
               This is the only time you&apos;ll see this access key.
@@ -59,15 +60,15 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
               Authorization header with requests to the API.
             </p>
 
-            <Heading size="sm" color="fg.muted">
+            <Text variant="supporting" fontWeight="semibold">
               Header format:
-            </Heading>
+            </Text>
 
             <pre>Authorization: Bearer {createdSecret}</pre>
 
-            <Heading size="sm" color="fg.muted">
+            <Text variant="supporting" fontWeight="semibold">
               API and MCP endpoints:
-            </Heading>
+            </Text>
 
             <pre>
               {getAPIAddress()}/api
@@ -110,7 +111,7 @@ export function CreateAccessKeyScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Expiry Date (Optional)</FormLabel>
-          <DatePickerInputField<Form>
+          <DatePickerField<Form>
             name="expires_at"
             control={form.control}
             // min={now("UTC")}

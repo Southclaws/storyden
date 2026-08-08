@@ -55,7 +55,174 @@ const tokens = defineTokens.colors({
   },
 });
 
+const semanticTokens = defineSemanticTokens.colors({
+  "1": {
+    value: {
+      _osLight: "{colors.tomato.light.1}",
+      _osDark: "{colors.tomato.dark.1}",
+    },
+  },
+  "2": {
+    value: {
+      _osLight: "{colors.tomato.light.2}",
+      _osDark: "{colors.tomato.dark.2}",
+    },
+  },
+  "3": {
+    value: {
+      _osLight: "{colors.tomato.light.3}",
+      _osDark: "{colors.tomato.dark.3}",
+    },
+  },
+  "4": {
+    value: {
+      _osLight: "{colors.tomato.light.4}",
+      _osDark: "{colors.tomato.dark.4}",
+    },
+  },
+  "5": {
+    value: {
+      _osLight: "{colors.tomato.light.5}",
+      _osDark: "{colors.tomato.dark.5}",
+    },
+  },
+  "6": {
+    value: {
+      _osLight: "{colors.tomato.light.6}",
+      _osDark: "{colors.tomato.dark.6}",
+    },
+  },
+  "7": {
+    value: {
+      _osLight: "{colors.tomato.light.7}",
+      _osDark: "{colors.tomato.dark.7}",
+    },
+  },
+  "8": {
+    value: {
+      _osLight: "{colors.tomato.light.8}",
+      _osDark: "{colors.tomato.dark.8}",
+    },
+  },
+  "9": {
+    value: {
+      _osLight: "{colors.tomato.light.9}",
+      _osDark: "{colors.tomato.dark.9}",
+    },
+  },
+  "10": {
+    value: {
+      _osLight: "{colors.tomato.light.10}",
+      _osDark: "{colors.tomato.dark.10}",
+    },
+  },
+  "11": {
+    value: {
+      _osLight: "{colors.tomato.light.11}",
+      _osDark: "{colors.tomato.dark.11}",
+    },
+  },
+  "12": {
+    value: {
+      _osLight: "{colors.tomato.light.12}",
+      _osDark: "{colors.tomato.dark.12}",
+    },
+  },
+  a1: {
+    value: {
+      _osLight: "{colors.tomato.light.a1}",
+      _osDark: "{colors.tomato.dark.a1}",
+    },
+  },
+  a2: {
+    value: {
+      _osLight: "{colors.tomato.light.a2}",
+      _osDark: "{colors.tomato.dark.a2}",
+    },
+  },
+  a3: {
+    value: {
+      _osLight: "{colors.tomato.light.a3}",
+      _osDark: "{colors.tomato.dark.a3}",
+    },
+  },
+  a4: {
+    value: {
+      _osLight: "{colors.tomato.light.a4}",
+      _osDark: "{colors.tomato.dark.a4}",
+    },
+  },
+  a5: {
+    value: {
+      _osLight: "{colors.tomato.light.a5}",
+      _osDark: "{colors.tomato.dark.a5}",
+    },
+  },
+  a6: {
+    value: {
+      _osLight: "{colors.tomato.light.a6}",
+      _osDark: "{colors.tomato.dark.a6}",
+    },
+  },
+  a7: {
+    value: {
+      _osLight: "{colors.tomato.light.a7}",
+      _osDark: "{colors.tomato.dark.a7}",
+    },
+  },
+  a8: {
+    value: {
+      _osLight: "{colors.tomato.light.a8}",
+      _osDark: "{colors.tomato.dark.a8}",
+    },
+  },
+  a9: {
+    value: {
+      _osLight: "{colors.tomato.light.a9}",
+      _osDark: "{colors.tomato.dark.a9}",
+    },
+  },
+  a10: {
+    value: {
+      _osLight: "{colors.tomato.light.a10}",
+      _osDark: "{colors.tomato.dark.a10}",
+    },
+  },
+  a11: {
+    value: {
+      _osLight: "{colors.tomato.light.a11}",
+      _osDark: "{colors.tomato.dark.a11}",
+    },
+  },
+  a12: {
+    value: {
+      _osLight: "{colors.tomato.light.a12}",
+      _osDark: "{colors.tomato.dark.a12}",
+    },
+  },
+  default: {
+    value: {
+      _osLight: "{colors.tomato.light.9}",
+      _osDark: "{colors.tomato.dark.9}",
+    },
+  },
+  emphasized: {
+    value: {
+      _osLight: "{colors.tomato.light.10}",
+      _osDark: "{colors.tomato.dark.10}",
+    },
+  },
+  fg: { value: { _osLight: "black", _osDark: "black" } },
+  text: {
+    value: {
+      _osLight: "{colors.tomato.light.11}",
+      _osDark: "{colors.tomato.dark.11}",
+    },
+  },
+});
+
 export default {
   name: "tomato",
   tokens,
+  semanticTokens,
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
@@ -38,9 +39,7 @@ export function RegisterHandleForm(props: Props) {
         required
         {...register("identifier")}
       />
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.identifier?.message}
-      </styled.p>
+      <FormErrorText>{errors.identifier?.message}</FormErrorText>
       <Flex alignItems="center" gap="2">
         <Input
           type="password"
@@ -53,7 +52,7 @@ export function RegisterHandleForm(props: Props) {
         />
         {props.webauthn && isWebauthnEnabled && (
           <>
-            <styled.span>or</styled.span>
+            <span>or</span>
 
             <Button
               w="full"
@@ -70,15 +69,11 @@ export function RegisterHandleForm(props: Props) {
           </>
         )}
       </Flex>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.token?.message}
-      </styled.p>
+      <FormErrorText>{errors.token?.message}</FormErrorText>
       <Button type="submit" w="full" onClick={handlePassword}>
         Register
       </Button>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.root?.message}
-      </styled.p>
+      <FormErrorText>{errors.root?.message}</FormErrorText>
     </styled.form>
   );
 }

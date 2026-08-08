@@ -7,10 +7,10 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ProfileIcon } from "@/components/ui/icons/Profile";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import {
-  badgeColourCSS,
   getDatagraphKindColour,
   getDatagraphKindLabel,
 } from "../../../datagraph/DatagraphItemCard";
@@ -30,7 +30,6 @@ export function DatagraphSearchItem({ result, handleNavigate }: Props) {
 
   const label = getDatagraphKindLabel(result.kind);
   const colour = getDatagraphKindColour(result.kind);
-  const cssVars = badgeColourCSS(colour);
 
   return (
     <Command.Item value={result.name} onSelect={handleSelect}>
@@ -44,20 +43,18 @@ export function DatagraphSearchItem({ result, handleNavigate }: Props) {
               {result.name}
             </styled.h1>
             {result.description && (
-              <styled.span lineClamp={1} fontSize="xs" fontWeight="normal">
+              <Text
+                as="span"
+                variant="metadata"
+                lineClamp={1}
+                fontWeight="normal"
+              >
                 {result.description}
-              </styled.span>
+              </Text>
             )}
           </LStack>
         </HStack>
-        <Badge
-          size="sm"
-          style={cssVars}
-          backgroundColor="var(--colors-color-palette-bg)"
-          borderColor="var(--colors-color-palette-bo)"
-          color="var(--colors-color-palette-fg)"
-          flexShrink="0"
-        >
+        <Badge size="sm" colorPalette={colour} flexShrink="0">
           {label}
         </Badge>
       </HStack>

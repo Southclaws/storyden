@@ -12,6 +12,7 @@ import { ProfileIcon } from "@/components/ui/icons/Profile";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import { Switch } from "@/components/ui/switch";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { markdownURLTransform, remarkLooseLists } from "@/utils/markdown";
@@ -102,9 +103,9 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
               dangerouslySetInnerHTML={{ __html: previewHTML }}
             />
           ) : (
-            <styled.p height="14" color="fg.muted" fontStyle="italic">
+            <Text variant="supporting" height="14" fontStyle="italic">
               empty...
-            </styled.p>
+            </Text>
           )}
         </>
       ) : (
@@ -125,12 +126,12 @@ export function ContentComposerMarkdown(props: ContentComposerProps) {
             appearance="none"
             border="none"
             outline="none"
-            color="fg.default"
+            color="text.default"
             fontSize="md"
             transitionDuration="normal"
             transitionTimingFunction="default"
             _placeholder={{
-              color: "fg.default",
+              color: "text.default",
             }}
             style={{
               border: "none",
@@ -170,14 +171,14 @@ function SDRInlineReference({
         px: "2",
         verticalAlign: "baseline",
         borderRadius: "full",
-        backgroundColor: "bg.muted",
-        color: "fg.default",
+        backgroundColor: "background.inset",
+        color: "text.default",
         textDecoration: "none",
         fontWeight: "medium",
         fontSize: "xs",
         whiteSpace: "nowrap",
         _hover: {
-          backgroundColor: "bg.subtle",
+          backgroundColor: "background.controlHover",
           textDecoration: "none",
         },
       })}

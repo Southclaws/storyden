@@ -4,6 +4,7 @@ import { getServerSession } from "@/auth/server-session";
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { getCategoryThreadListParams } from "@/lib/feed/category";
 import { nodeListCached } from "@/lib/library/server-node-list";
+import { type FeedBlock } from "@/lib/settings/feed";
 import { type FrontendConfiguration } from "@/lib/settings/settings";
 import { getSettings } from "@/lib/settings/settings-server";
 import { VStack } from "@/styled-system/jsx";
@@ -27,7 +28,7 @@ export async function FeedScreen({ page }: Props) {
   const initialData = await getInitialFeedData(feedConfig, page);
 
   return (
-    <VStack>
+    <VStack paddingBlockEnd="4">
       <FeedScreenContent
         initialData={initialData}
         initialSettings={initialSettings}
@@ -42,67 +43,38 @@ async function getInitialFeedData(
   page?: number,
 ): Promise<InitialData> {
   try {
-    switch (feedConfig.source.type) {
-      case "threads":
-        return {
-          initialPage: page ?? 1,
-          initialThreadList: (
-            await threadList(
-              {
-                page: page?.toString(),
-              },
-              {
-                cache: "no-store",
-                next: {
-                  tags: ["feed"],
-                  revalidate: 0,
-                },
-              },
-            )
-          ).data,
-        };
+    const categoriesBlock = getBlock(feedConfig.blocks, "categories");
+    const threadsBlock = getBlock(feedConfig.blocks, "threads");
+    const libraryBlock = getBlock(feedConfig.blocks, "library");
 
-      case "library":
-        if (feedConfig.source.node) {
-          return {
-            initialLibraryNode: (
-              await nodeGet(feedConfig.source.node, undefined, {
-                cache: "no-store",
-                next: {
-                  tags: ["feed"],
-                  revalidate: 0,
-                },
-              })
-            ).data,
-          };
-        }
+    const [categories, threads, libraryNode, libraryNodes] = await Promise.all([
+      categoriesBlock
+        ? categoryListCached().then(({ data }) => data)
+        : undefined,
+      threadsBlock
+        ? threadList(
+            getCategoryThreadListParams(threadsBlock.source, page),
+            feedRequestOptions,
+          ).then(({ data }) => data)
+        : undefined,
+      libraryBlock?.node
+        ? nodeGet(libraryBlock.node, undefined, feedRequestOptions).then(
+            ({ data }) => data,
+          )
+        : undefined,
+      libraryBlock && !libraryBlock.node
+        ? nodeListCached().then(({ data }) => data)
+        : undefined,
+    ]);
 
-        return {
-          initialLibraryNodeList: (await nodeListCached()).data,
-        };
-
-      case "categories": {
-        const mode = feedConfig.source.threadListMode ?? "all";
-        const categories = (await categoryListCached()).data;
-
-        const threadParams = getCategoryThreadListParams(mode, page);
-        const threads = (
-          await threadList(threadParams, {
-            cache: "no-store",
-            next: {
-              tags: ["feed"],
-              revalidate: 0,
-            },
-          })
-        ).data;
-
-        return {
-          initialCategoryList: categories,
-          initialPage: page ?? 1,
-          initialThreadList: threads,
-        };
-      }
-    }
+    return {
+      initialCategoryList: categories,
+      initialPage: page ?? 1,
+      initialThreadList: threads,
+      initialThreadSource: threadsBlock?.source,
+      initialLibraryNode: libraryNode,
+      initialLibraryNodeList: libraryNodes,
+    };
   } catch (error) {
     // NOTE: Fall back without erroring here, frontend will not be hydrated but
     // it can try the requests again just in case it was a momentary issue. If
@@ -110,4 +82,21 @@ async function getInitialFeedData(
     // does mean SSR requests that fail will get a confusing experience but meh.
     return {};
   }
+}
+
+const feedRequestOptions = {
+  cache: "no-store" as const,
+  next: {
+    tags: ["feed"],
+    revalidate: 0,
+  },
+};
+
+function getBlock<T extends FeedBlock["type"]>(
+  blocks: FeedBlock[],
+  type: T,
+): Extract<FeedBlock, { type: T }> | undefined {
+  return blocks.find(
+    (block): block is Extract<FeedBlock, { type: T }> => block.type === type,
+  );
 }

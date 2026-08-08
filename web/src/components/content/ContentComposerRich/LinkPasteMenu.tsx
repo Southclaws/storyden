@@ -3,8 +3,9 @@ import { BubbleMenu, Editor } from "@tiptap/react";
 import { Button } from "@/components/ui/button";
 import { CardIcon } from "@/components/ui/icons/Card";
 import { LinkIcon } from "@/components/ui/icons/Link";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
 
 import { linkPasteMenuKey } from "./plugins/LinkPasteMenuPlugin";
 
@@ -101,31 +102,19 @@ export function LinkPasteMenu({ editor }: Props) {
       className={css({
         zIndex: "popover",
         borderRadius: "md",
-        backgroundColor: "bg.subtle/80",
+        backgroundColor: "background.overlay/80",
         backdropBlur: "frosted",
         backdropFilter: "auto",
-        boxShadow: "md",
+        boxShadow: "floating",
         padding: "1",
       })}
     >
-      <styled.p color="fg.muted" fontSize="sm">
-        Show link as
-      </styled.p>
+      <Text variant="supporting">Show link as</Text>
       <HStack gap="1">
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={handleLinkChoice}
-        >
+        <Button type="button" variant="subtle" onClick={handleLinkChoice}>
           <LinkIcon /> Text
         </Button>
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={handleCardChoice}
-        >
+        <Button type="button" variant="subtle" onClick={handleCardChoice}>
           <CardIcon /> Preview
         </Button>
       </HStack>

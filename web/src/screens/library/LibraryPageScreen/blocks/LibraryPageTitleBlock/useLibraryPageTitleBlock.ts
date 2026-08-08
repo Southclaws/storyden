@@ -6,8 +6,8 @@ import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
 import { useLibraryPageContext } from "../../Context";
-import { useEditState } from "../../useEditState";
 import { useWatch } from "../../store";
+import { useEditState } from "../../useEditState";
 
 export function useLibraryPageTitleBlock() {
   const { store } = useLibraryPageContext();

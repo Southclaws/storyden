@@ -12,11 +12,13 @@ import { PermissionSummary } from "@/components/role/PermissionList";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CreateOAuthClientModal } from "./CreateOAuthClientModal";
@@ -34,9 +36,9 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
   return (
     <>
       <LStack gap="8">
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack w="full">
-            <Heading size="md">OAuth clients</Heading>
+            <SectionHeading>OAuth clients</SectionHeading>
             <p>
               Create OAuth clients for integrations you own. Each client can
               only request the permission scopes selected here.
@@ -44,9 +46,9 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
           </LStack>
 
           <LStack>
-            <WStack alignItems="center" color="fg.muted">
-              <styled.p>{clients.length} clients.</styled.p>
-              <Button size="xs" variant="subtle" onClick={createModal.onOpen}>
+            <WStack alignItems="center" color="text.subtle">
+              <Text variant="metadata">{clients.length} clients.</Text>
+              <Button variant="subtle" onClick={createModal.onOpen}>
                 <AddIcon />
                 New
               </Button>
@@ -54,16 +56,16 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
 
             <OAuthClientItemList clients={clients} />
           </LStack>
-        </CardBox>
+        </LStack>
 
-        <CardBox className={lstack()} gap="6">
+        <LStack gap="6">
           <LStack>
-            <Heading size="md">Authorised applications</Heading>
+            <SectionHeading>Authorised applications</SectionHeading>
             <p>Applications you have authorised to access this site.</p>
           </LStack>
 
           <OAuthTokenItemList tokens={tokens} />
-        </CardBox>
+        </LStack>
       </LStack>
 
       <CreateOAuthClientModal
@@ -79,9 +81,9 @@ function OAuthClientItemList({ clients }: { clients: OAuthClientList }) {
 
   if (clients.length === 0) {
     return (
-      <styled.p color="fg.muted" fontStyle="italic">
+      <Text variant="supporting" fontStyle="italic">
         No OAuth clients created yet.
-      </styled.p>
+      </Text>
     );
   }
 
@@ -117,10 +119,16 @@ function OAuthClientItem({ client, onDelete }: OAuthClientItemProps) {
       <LStack gap="2">
         <WStack gap="2" alignItems="start">
           <LStack gap="1" minW="0">
-            <Heading size="sm">{client.name}</Heading>
-            <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <Text
+              variant="supporting"
+              color="text.default"
+              fontWeight="semibold"
+            >
+              {client.name}
+            </Text>
+            <Text variant="metadata" wordBreak="break-word">
               {client.client_id}
-            </styled.p>
+            </Text>
           </LStack>
 
           <ConfirmActions
@@ -158,9 +166,9 @@ function OAuthTokenItemList({ tokens }: Pick<Props, "tokens">) {
 
   if (tokens.length === 0) {
     return (
-      <styled.p color="fg.muted" fontStyle="italic">
+      <Text variant="supporting" fontStyle="italic">
         No OAuth applications authorised yet.
-      </styled.p>
+      </Text>
     );
   }
 
@@ -196,7 +204,9 @@ function OAuthTokenItem({ token, onRevoke }: OAuthTokenItemProps) {
     <OAuthRow>
       <LStack gap="2">
         <WStack gap="2" alignItems="start">
-          <Heading size="sm">{token.client_name}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {token.client_name}
+          </Text>
           {inactiveStatus ? (
             <Badge>{inactiveStatus}</Badge>
           ) : (
@@ -254,14 +264,13 @@ function ConfirmActions({
     return (
       <HStack gap="2">
         <Button
-          size="xs"
           variant="subtle"
-          bgColor="bg.destructive"
+          bgColor="status.danger.surface"
           onClick={onConfirm}
         >
           {confirmLabel}
         </Button>
-        <Button size="xs" variant="outline" onClick={onCancel}>
+        <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
       </HStack>
@@ -270,9 +279,8 @@ function ConfirmActions({
 
   return (
     <Button
-      size="xs"
       variant="outline"
-      bgColor="bg.destructive"
+      bgColor="status.danger.surface"
       onClick={onConfirm}
     >
       {idleLabel}

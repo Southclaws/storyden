@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { RobotCreateOKResponse } from "@/api/openapi-schema";
 import { RobotConfigurationForm } from "@/components/robots/RobotConfiguration/RobotConfigurationForm";
-import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
+import { PageHeading } from "@/components/ui/page-heading";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 export function RobotCreateScreen() {
@@ -22,14 +22,12 @@ export function RobotCreateScreen() {
       <WStack>
         <HStack gap="2">
           <Link href="/robots">
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost">
               <ArrowLeftIcon />
             </IconButton>
           </Link>
 
-          <Heading size="md" lineClamp="1">
-            New robot
-          </Heading>
+          <PageHeading lineClamp="1">New robot</PageHeading>
         </HStack>
       </WStack>
 

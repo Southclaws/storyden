@@ -42,10 +42,7 @@ export function VerificationBanner({ session, settings }: Props) {
       >
         <p>
           Please{" "}
-          <Link
-            href="/settings?tab=email"
-            style={{ textDecoration: "underline" }}
-          >
+          <Link href="/settings/email" style={{ textDecoration: "underline" }}>
             verify your email in settings
           </Link>{" "}
           to participate in this community.

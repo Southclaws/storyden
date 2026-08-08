@@ -4,10 +4,11 @@ import { useLinkGet } from "@/api/openapi-client/links";
 import { Link } from "@/api/openapi-schema";
 import { AssetThumbnailList } from "@/components/asset/AssetThumbnailList";
 import { Unready } from "@/components/site/Unready";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { LinkButton } from "@/components/ui/link-button";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
@@ -54,12 +55,7 @@ export function LinkScreen(props: Props) {
           },
         ]}
       >
-        <LinkButton
-          flexShrink="0"
-          size="xs"
-          variant="subtle"
-          href={domainSearch}
-        >
+        <LinkButton flexShrink="0" variant="subtle" href={domainSearch}>
           <SearchIcon />
           More from this site
         </LinkButton>
@@ -74,12 +70,12 @@ export function LinkScreen(props: Props) {
         }}
       >
         <LStack>
-          <Heading size="lg">{titleLabel}</Heading>
+          <PageHeading>{titleLabel}</PageHeading>
 
-          <styled.p color="fg.muted">{descriptionLabel}</styled.p>
+          <Text variant="supporting">{descriptionLabel}</Text>
 
           <HStack>
-            <LinkButton w="min" size="xs" variant="subtle" href={link.url}>
+            <LinkButton w="min" variant="subtle" href={link.url}>
               {link.domain}
             </LinkButton>
           </HStack>

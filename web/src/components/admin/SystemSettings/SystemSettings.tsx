@@ -9,19 +9,21 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { Admonition } from "@/components/ui/admonition";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { SelectField } from "@/components/ui/form/SelectField";
-import { SliderField } from "@/components/ui/form/SliderField";
-import { Heading } from "@/components/ui/heading";
+import { CardBox } from "@/components/ui/card-box";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Input } from "@/components/ui/input";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { SelectField } from "@/components/ui/select";
+import { SliderField } from "@/components/ui/slider";
+import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
-import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
-import { OperationCostOverrides } from "./OperationCostOverrides";
+import { OperationCostOverridesField } from "./OperationCostOverrides.field";
 import {
   DEFAULT_RATE_LIMIT,
   DEFAULT_RATE_LIMIT_BUCKET,
@@ -99,222 +101,227 @@ export function SystemSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()} gap="4">
+      <LStack gap="1">
         <WStack>
-          <Heading size="md">System settings</Heading>
+          <PageHeading>System settings</PageHeading>
           <Button type="submit" loading={formState.isSubmitting}>
             Save
           </Button>
         </WStack>
+        <Text variant="supporting">
+          Configure rate limits and how Storyden resolves client IP addresses.
+        </Text>
+      </LStack>
 
-        {hasErrors && showError && (
-          <Admonition
-            value={true}
-            kind="failure"
-            title="Form validation error"
-            onChange={() => setShowError(false)}
-          >
-            {errorMessages}
-          </Admonition>
-        )}
+      {hasErrors && showError && (
+        <Admonition
+          value={true}
+          kind="failure"
+          title="Form validation error"
+          onChange={() => setShowError(false)}
+        >
+          {errorMessages}
+        </Admonition>
+      )}
 
-        <Heading>Rate limits</Heading>
+      <SectionHeading>Rate limits</SectionHeading>
 
-        <p>
-          Rate limits help protect your installation from spam, DDoS attacks and
-          content scraping. This is achieved by limiting the number of{" "}
-          <strong>Operations</strong>{" "}
-          <InfoTip title="What is an operation?">
-            An "Operation" is a request to Storyden's backend. Loading a screen
-            such as Home, a Thread or a Library Page usually involves 10-30
-            request operations.
-          </InfoTip>{" "}
-          in a time period.
-        </p>
+      <p>
+        Rate limits help protect your installation from spam, DDoS attacks and
+        content scraping. This is achieved by limiting the number of{" "}
+        <strong>Operations</strong>{" "}
+        <InfoTip title="What is an operation?">
+          An "Operation" is a request to Storyden's backend. Loading a screen
+          such as Home, a Thread or a Library Page usually involves 10-30
+          request operations.
+        </InfoTip>{" "}
+        in a time period.
+      </p>
 
-        <p>
-          Members: <styled.strong color="fg.info">{rateLimit}</styled.strong>{" "}
-          operations every{" "}
-          <styled.strong color="fg.info">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
-          </styled.strong>{" "}
-          (~
-          <styled.strong color="fg.info">
-            {memberRequestsPerMinute}
-          </styled.strong>{" "}
-          requests per minute).
-        </p>
+      <p>
+        Members:{" "}
+        <styled.strong color="status.info.content">{rateLimit}</styled.strong>{" "}
+        operations every{" "}
+        <styled.strong color="status.info.content">
+          {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+        </styled.strong>{" "}
+        (~
+        <styled.strong color="status.info.content">
+          {memberRequestsPerMinute}
+        </styled.strong>{" "}
+        requests per minute).
+      </p>
 
-        <p>
-          Guests:{" "}
-          <styled.strong color="fg.info">{guestRateLimit}</styled.strong>{" "}
-          operations every{" "}
-          <styled.strong color="fg.info">
-            {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
-          </styled.strong>{" "}
-          (~
-          <styled.strong color="fg.info">
-            {guestRequestsPerMinute}
-          </styled.strong>{" "}
-          requests per minute).
-        </p>
+      <p>
+        Guests:{" "}
+        <styled.strong color="status.info.content">
+          {guestRateLimit}
+        </styled.strong>{" "}
+        operations every{" "}
+        <styled.strong color="status.info.content">
+          {formatSeconds(rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD)}
+        </styled.strong>{" "}
+        (~
+        <styled.strong color="status.info.content">
+          {guestRequestsPerMinute}
+        </styled.strong>{" "}
+        requests per minute).
+      </p>
 
-        <RateLimitTester />
+      <RateLimitTester />
 
-        <FormControl>
-          <SliderField
-            control={control}
-            name="rate_limit"
-            label={`Rate limit: ${rateLimit} request units`}
-            min={10}
-            max={20000}
-            step={10}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The amount of requests that a user can make within the
-            `rate_limit_period`.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <SliderField
-            control={control}
-            name="rate_limit_period"
-            label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
-            min={60}
-            max={86400}
-            step={60}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_PERIOD}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT_PERIOD,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The period of time in which the `rate_limit` is applied. This is a
-            sliding window, so the `rate_limit` is applied to the last
-            `rate_limit_period` of requests.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <SliderField
-            control={control}
-            name="rate_limit_bucket"
-            label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
-            min={0}
-            max={1200}
-            step={60}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_BUCKET}
-            marks={[
-              {
-                value: DEFAULT_RATE_LIMIT_BUCKET,
-                label: "Default",
-              },
-            ]}
-          />
-          <FormHelperText>
-            The granularity of rate limit counter buckets. Lower values use more
-            memory but provide more accurate rate limiting. Higher values use
-            less memory but may allow short bursts of traffic above the rate
-            limit.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <SliderField
-            control={control}
-            name="rate_limit_guest_cost"
-            label="Guest rate limit cost multiplier"
-            min={1}
-            max={10}
-            step={1}
-            sliderDefaultValue={DEFAULT_RATE_LIMIT_GUEST_COST}
-          />
-          <FormHelperText>
-            The cost multiplier applied to unauthenticated guest visitors. For
-            example, a value of 5 means each operation consumes 5 units from the
-            guest&apos;s rate limit instead of 1, applying stricter limits to
-            non-authenticated traffic.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Operation cost overrides</FormLabel>
-          <FormHelperText>
-            Configure custom cost multipliers for specific API operations.
-            Higher costs reduce the number of requests allowed within the rate
-            limit period.
-          </FormHelperText>
-          <OperationCostOverrides
-            control={control}
-            name="cost_overrides"
-            rateLimit={rateLimit ?? DEFAULT_RATE_LIMIT}
-            rateLimitPeriod={rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD}
-          />
-        </FormControl>
-
-        <Heading>Client IP strategy</Heading>
-
-        <FormControl>
-          <FormLabel>Client IP mode</FormLabel>
-          <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
-            control={control}
-            name="client_ip_mode"
-            collection={CLIENT_IP_MODE_COLLECTION}
-            placeholder="Select client IP mode"
-          />
-          <FormHelperText>
-            Choose how Storyden resolves client addresses for request context.
-            The default uses only RemoteAddr and does not trust forwarded
-            headers. Header-based modes should only be used when your edge
-            proxy/CDN strips or overwrites client-provided forwarding headers.
-          </FormHelperText>
-        </FormControl>
-
-        {clientIPMode === "single_header" && (
-          <FormControl>
-            <FormLabel>Client IP header</FormLabel>
-            <Input {...register("client_ip_header")} />
-            <FormHelperText>
-              Header to trust for the canonical client IP (for example
-              CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
-              unless this header is guaranteed to be injected by trusted
-              infrastructure.
-            </FormHelperText>
-          </FormControl>
-        )}
-
-        {clientIPMode === "xff_trusted_proxies" && (
-          <FormControl>
-            <FormLabel>Trusted proxy CIDRs</FormLabel>
-            <Input
-              {...register("trusted_proxy_cidrs")}
-              placeholder="10.0.0.0/8, 172.16.0.0/12"
-            />
-            <FormHelperText>
-              Comma-separated CIDR ranges that are allowed to append XFF hops.
-              Storyden will only trust XFF when RemoteAddr is in these ranges.
-              Include every proxy hop in your chain to avoid collapsing users to
-              a shared proxy IP.
-            </FormHelperText>
-          </FormControl>
-        )}
-
-        <ClientIPTester
-          canRun={!formState.isDirty && !formState.isSubmitting}
-          initialHeaders={props.settings.headers}
+      <FormControl>
+        <SliderField
+          control={control}
+          name="rate_limit"
+          label={`Rate limit: ${rateLimit} request units`}
+          min={10}
+          max={20000}
+          step={10}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT,
+              label: "Default",
+            },
+          ]}
         />
-      </CardBox>
+        <FormHelperText>
+          The amount of requests that a user can make within the
+          `rate_limit_period`.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <SliderField
+          control={control}
+          name="rate_limit_period"
+          label={`Rate limit period: ${formatSeconds(rateLimitPeriod)}`}
+          min={60}
+          max={86400}
+          step={60}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_PERIOD}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT_PERIOD,
+              label: "Default",
+            },
+          ]}
+        />
+        <FormHelperText>
+          The period of time in which the `rate_limit` is applied. This is a
+          sliding window, so the `rate_limit` is applied to the last
+          `rate_limit_period` of requests.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <SliderField
+          control={control}
+          name="rate_limit_bucket"
+          label={`Rate limit bucket size: ${rateLimitBucket} seconds`}
+          min={0}
+          max={1200}
+          step={60}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_BUCKET}
+          marks={[
+            {
+              value: DEFAULT_RATE_LIMIT_BUCKET,
+              label: "Default",
+            },
+          ]}
+        />
+        <FormHelperText>
+          The granularity of rate limit counter buckets. Lower values use more
+          memory but provide more accurate rate limiting. Higher values use less
+          memory but may allow short bursts of traffic above the rate limit.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <SliderField
+          control={control}
+          name="rate_limit_guest_cost"
+          label="Guest rate limit cost multiplier"
+          min={1}
+          max={10}
+          step={1}
+          sliderDefaultValue={DEFAULT_RATE_LIMIT_GUEST_COST}
+        />
+        <FormHelperText>
+          The cost multiplier applied to unauthenticated guest visitors. For
+          example, a value of 5 means each operation consumes 5 units from the
+          guest&apos;s rate limit instead of 1, applying stricter limits to
+          non-authenticated traffic.
+        </FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <FormLabel>Operation cost overrides</FormLabel>
+        <FormHelperText>
+          Configure custom cost multipliers for specific API operations. Higher
+          costs reduce the number of requests allowed within the rate limit
+          period.
+        </FormHelperText>
+        <OperationCostOverridesField
+          control={control}
+          name="cost_overrides"
+          rateLimit={rateLimit ?? DEFAULT_RATE_LIMIT}
+          rateLimitPeriod={rateLimitPeriod ?? DEFAULT_RATE_LIMIT_PERIOD}
+        />
+      </FormControl>
+
+      <SectionHeading>Client IP strategy</SectionHeading>
+
+      <FormControl>
+        <FormLabel>Client IP mode</FormLabel>
+        <SelectField<Form, (typeof CLIENT_IP_MODE_COLLECTION.items)[number]>
+          control={control}
+          name="client_ip_mode"
+          collection={CLIENT_IP_MODE_COLLECTION}
+          placeholder="Select client IP mode"
+        />
+        <FormHelperText>
+          Choose how Storyden resolves client addresses for request context. The
+          default uses only RemoteAddr and does not trust forwarded headers.
+          Header-based modes should only be used when your edge proxy/CDN strips
+          or overwrites client-provided forwarding headers.
+        </FormHelperText>
+      </FormControl>
+
+      {clientIPMode === "single_header" && (
+        <FormControl>
+          <FormLabel>Client IP header</FormLabel>
+          <Input {...register("client_ip_header")} />
+          <FormHelperText>
+            Header to trust for the canonical client IP (for example
+            CF-Connecting-IP, Fly-Client-IP, X-Real-IP). Do not use this mode
+            unless this header is guaranteed to be injected by trusted
+            infrastructure.
+          </FormHelperText>
+        </FormControl>
+      )}
+
+      {clientIPMode === "xff_trusted_proxies" && (
+        <FormControl>
+          <FormLabel>Trusted proxy CIDRs</FormLabel>
+          <Input
+            {...register("trusted_proxy_cidrs")}
+            placeholder="10.0.0.0/8, 172.16.0.0/12"
+          />
+          <FormHelperText>
+            Comma-separated CIDR ranges that are allowed to append XFF hops.
+            Storyden will only trust XFF when RemoteAddr is in these ranges.
+            Include every proxy hop in your chain to avoid collapsing users to a
+            shared proxy IP.
+          </FormHelperText>
+        </FormControl>
+      )}
+
+      <ClientIPTester
+        canRun={!formState.isDirty && !formState.isSubmitting}
+        initialHeaders={props.settings.headers}
+      />
     </styled.form>
   );
 }
@@ -447,13 +454,17 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
   const warnings = getClientIPWarnings(ssrClientInfo, browserClientInfo);
 
   return (
-    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
-      <styled.p>
+    <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
+      <Text variant="supporting">
         This client IP test runs automatically and compares what Storyden sees
         from an SSR-origin call and a browser-origin call.
-      </styled.p>
+      </Text>
 
-      {error && <styled.p color="fg.error">{error}</styled.p>}
+      {error && (
+        <Text variant="metadata" color="status.danger.content">
+          {error}
+        </Text>
+      )}
 
       {warnings.length > 0 && (
         <Alert.Root>
@@ -500,7 +511,6 @@ function ClientIPTester({ canRun, initialHeaders }: ClientIPTesterProps) {
         <Button
           type="button"
           variant="subtle"
-          size="xs"
           onClick={() => {
             if (!canRun) {
               setError("Save settings before refreshing the client IP test.");
@@ -636,11 +646,11 @@ function RateLimitTester() {
   }
 
   return (
-    <CardBox bgColor="bg.subtle" fontSize="xs" display="flex" gap="2">
-      <styled.p>
+    <CardBox bgColor="background.inset" fontSize="xs" display="flex" gap="2">
+      <Text variant="supporting">
         This is your current rate limit status. Click the &quot;Test&quot;
         button to consume one request.
-      </styled.p>
+      </Text>
 
       <styled.pre textWrap="wrap">
         x-rate-limit-limit = '{rateLimitLimit}'<br />
@@ -657,20 +667,10 @@ function RateLimitTester() {
       </styled.pre>
 
       <HStack justify="end">
-        <Button
-          type="button"
-          variant="subtle"
-          size="xs"
-          onClick={() => run(true)}
-        >
+        <Button type="button" variant="subtle" onClick={() => run(true)}>
           Test as Member
         </Button>
-        <Button
-          type="button"
-          variant="subtle"
-          size="xs"
-          onClick={() => run(false)}
-        >
+        <Button type="button" variant="subtle" onClick={() => run(false)}>
           Test as Guest
         </Button>
       </HStack>

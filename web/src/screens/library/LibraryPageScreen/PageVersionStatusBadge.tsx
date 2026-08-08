@@ -13,9 +13,13 @@ export function PageVersionStatusBadge({
 
   return (
     <Badge
-      borderColor={isApplied ? "border.success" : "visibility.draft.border"}
-      backgroundColor={isApplied ? "bg.success" : "visibility.draft.bg"}
-      color={isApplied ? "fg.success" : "visibility.draft.fg"}
+      borderColor={
+        isApplied ? "status.success.border" : "visibility.draft.border"
+      }
+      backgroundColor={
+        isApplied ? "status.success.surface" : "visibility.draft.bg"
+      }
+      color={isApplied ? "status.success.content" : "visibility.draft.fg"}
       css={{
         "& svg": {
           color: "current",

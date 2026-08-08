@@ -1,20 +1,15 @@
 import { PropsWithChildren } from "react";
 
-import {
-  Box,
-  CardBox,
-  Center,
-  HStack,
-  LStack,
-  styled,
-} from "@/styled-system/jsx";
+import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import type { Settings } from "@/lib/settings/settings";
+import { Box, Center, HStack, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
-import { Spinner } from "../ui/Spinner";
 import { WarningIcon } from "../ui/icons/Warning";
 import { LinkButton } from "../ui/link-button";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   error?: unknown;
@@ -44,7 +39,7 @@ export function Unready({ error }: Props) {
     <HStack
       maxW="xs"
       alignItems="center"
-      color="fg.subtle"
+      color="text.muted"
       role="alert"
       aria-atomic="true"
     >
@@ -90,9 +85,9 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
             </styled.h1>
           </HStack>
 
-          <styled.p id="error__message">
+          <Text id="error__message">
             <span>{message}</span>
-          </styled.p>
+          </Text>
 
           <LStack>{children}</LStack>
         </LStack>
@@ -112,11 +107,11 @@ export function UnauthenticatedBanner({
     <UnreadyBanner error="Please log in to see this page.">
       <HStack w="full">
         {canRegister && (
-          <LinkButton w="full" size="xs" href="/register">
+          <LinkButton w="full" href="/register">
             Register
           </LinkButton>
         )}
-        <LinkButton w="full" size="xs" variant="outline" href="/login">
+        <LinkButton w="full" variant="outline" href="/login">
           Login
         </LinkButton>
       </HStack>

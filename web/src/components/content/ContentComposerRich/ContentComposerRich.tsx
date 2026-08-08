@@ -126,10 +126,10 @@ export function ContentComposerRich(props: ContentComposerProps) {
             maxW: "full",
             gap: "1",
             padding: "1",
-            backgroundColor: "bg.subtle/80",
+            backgroundColor: "background.overlay/80",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            boxShadow: "md",
+            boxShadow: "floating",
           })}
         >
           <EditorMenu

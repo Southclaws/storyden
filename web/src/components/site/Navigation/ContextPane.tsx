@@ -1,7 +1,6 @@
 import { PropsWithChildren } from "react";
 
-import { Box, HStack, styled } from "@/styled-system/jsx";
-import { Floating } from "@/styled-system/patterns";
+import { HStack, styled } from "@/styled-system/jsx";
 
 export function ContextPane({ children }: PropsWithChildren) {
   return (
@@ -13,20 +12,9 @@ export function ContextPane({ children }: PropsWithChildren) {
       width="full"
       height="full"
     >
-      <Box
-        id="desktop-nav-right"
-        className={Floating()}
-        borderRadius="md"
-        w="full"
-        height="min"
-        p="2"
-        pr="0"
-        overflowY="scroll"
-      >
-        {children}
-      </Box>
+      <div id="desktop-nav-right">{children}</div>
 
-      <HStack color="fg.subtle" fontSize="xs">
+      <HStack color="text.muted" fontSize="xs">
         {/* TODO: Provide links to privacy/terms/etc custom pages */}
         {/* <p>copyright {settings.owner}</p> */}
         {/* <a href={PrivacyRoute}>privacy</a> */}

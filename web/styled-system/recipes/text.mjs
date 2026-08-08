@@ -1,24 +1,15 @@
 import { memo, splitProps } from '../helpers.mjs';
 import { createRecipe, mergeRecipes } from './create-recipe.mjs';
 
-const textFn = /* @__PURE__ */ createRecipe('text', {}, [])
+const textFn = /* @__PURE__ */ createRecipe('text', {
+  "variant": "body"
+}, [])
 
 const textVariantMap = {
   "variant": [
-    "heading"
-  ],
-  "size": [
-    "xs",
-    "sm",
-    "md",
-    "lg",
-    "xl",
-    "2xl",
-    "3xl",
-    "4xl",
-    "5xl",
-    "6xl",
-    "7xl"
+    "body",
+    "supporting",
+    "metadata"
   ]
 }
 

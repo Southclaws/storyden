@@ -6,14 +6,11 @@ import {
 import { categoryListCached } from "@/lib/category/server-category-list";
 import { nodeListCached } from "@/lib/library/server-node-list";
 import { type Settings } from "@/lib/settings/settings";
-import { Box, styled } from "@/styled-system/jsx";
-import { Floating } from "@/styled-system/patterns";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
+import { libraryNavigationVisibility } from "../LibraryNavigationTree/LibraryNavigationTree.constants";
 
-import { AdminZone } from "./AdminZone/AdminZone";
-
-type ServerProps = {
+type NavigationPaneProps = {
   initialSession?: Account;
   initialSettings?: Settings;
 };
@@ -21,13 +18,17 @@ type ServerProps = {
 export async function NavigationPane({
   initialSession,
   initialSettings,
-}: ServerProps) {
+}: NavigationPaneProps) {
   try {
-    const { data: initialNodeList } = await nodeListCached({
-      // NOTE: This doesn't work due to a bug in Orval.
-      // visibility: ["draft", "review", "unlisted", "published"],
-    });
-    const { data: initialCategoryList } = await categoryListCached();
+    const [{ data: initialNodeList }, { data: initialCategoryList }] =
+      await Promise.all([
+        nodeListCached(
+          initialSession
+            ? { visibility: libraryNavigationVisibility }
+            : undefined,
+        ),
+        categoryListCached(),
+      ]);
 
     return (
       <NavigationPaneContent
@@ -37,7 +38,7 @@ export async function NavigationPane({
         initialSettings={initialSettings}
       />
     );
-  } catch (e) {
+  } catch {
     return (
       <NavigationPaneContent
         initialSession={initialSession}
@@ -48,37 +49,28 @@ export async function NavigationPane({
 }
 
 type Props = {
-  initialNodeList?: NodeListResult;
-  initialCategoryList?: CategoryListOKResponse;
   initialSession?: Account;
   initialSettings?: Settings;
+  initialNodeList?: NodeListResult;
+  initialCategoryList?: CategoryListOKResponse;
 };
 
 function NavigationPaneContent({
-  initialNodeList,
-  initialCategoryList,
   initialSession,
   initialSettings,
+  initialNodeList,
+  initialCategoryList,
 }: Props) {
   return (
-    <styled.header
-      display="flex"
-      height="full"
-      alignItems="end"
-      flexDirection="column"
-      borderRadius="md"
-      className={Floating()}
-    >
-      <AdminZone
-        initialSession={initialSession}
-        initialSettings={initialSettings}
-      />
-      <Box id="desktop-nav-box" w="full" height="full" minH="0" p="2">
+    <header className="navigation-pane navigation__surface">
+      <div id="desktop-nav-box" className="navigation-pane__content">
         <ContentNavigationList
+          initialSession={initialSession}
+          initialSettings={initialSettings}
           initialNodeList={initialNodeList}
           initialCategoryList={initialCategoryList}
         />
-      </Box>
-    </styled.header>
+      </div>
+    </header>
   );
 }

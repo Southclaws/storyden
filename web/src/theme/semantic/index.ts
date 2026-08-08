@@ -1,20 +1,78 @@
-import { defineSemanticTokens } from "@pandacss/dev";
+import { defineSemanticTokens, defineTextStyles } from "@pandacss/dev";
 
 import { colours } from "./colours";
 
 export const semanticTokens = defineSemanticTokens({
   colors: colours,
   radii: {
-    l1: { value: "{radii.xs}" },
-    l2: { value: "{radii.sm}" },
-    l3: { value: "{radii.md}" },
+    control: { value: "{radii.sm}" },
+    panel: { value: "{radii.lg}" },
+    overlay: { value: "{radii.xl}" },
+    pill: { value: "{radii.full}" },
   },
   fonts: {
     body: { value: "{fonts.inter}" },
     heading: { value: "{fonts.interDisplay}" },
   },
   blurs: {
-    frosted: { value: "10px" },
+    subtle: { value: "{blurs.sm}" },
+    frosted: { value: "{blurs.base}" },
+  },
+  shadows: {
+    surface: {
+      value: [
+        {
+          offsetX: 0,
+          offsetY: 1,
+          blur: 2,
+          spread: 0,
+          color: "{colors.gray.light.a2}",
+        },
+        {
+          offsetX: 0,
+          offsetY: 0,
+          blur: 1,
+          spread: 0,
+          color: "{colors.gray.light.a3}",
+        },
+      ],
+    },
+    floating: {
+      value: [
+        {
+          offsetX: 0,
+          offsetY: 2,
+          blur: 4,
+          spread: 0,
+          color: "{colors.gray.light.a3}",
+        },
+        {
+          offsetX: 0,
+          offsetY: 0,
+          blur: 1,
+          spread: 0,
+          color: "{colors.gray.light.a7}",
+        },
+      ],
+    },
+    overlay: {
+      value: [
+        {
+          offsetX: 0,
+          offsetY: 8,
+          blur: 16,
+          spread: 0,
+          color: "{colors.gray.light.a3}",
+        },
+        {
+          offsetX: 0,
+          offsetY: 0,
+          blur: 1,
+          spread: 0,
+          color: "{colors.gray.light.a7}",
+        },
+      ],
+    },
   },
   opacity: {
     0: { value: "0" },
@@ -37,6 +95,15 @@ export const semanticTokens = defineSemanticTokens({
     thick: { value: "3px" },
   },
   sizes: {
+    layout: {
+      readable: { value: "65ch" },
+      content: { value: "{sizes.4xl}" },
+      contentWide: { value: "{sizes.6xl}" },
+      form: { value: "{sizes.md}" },
+      sidebar: { value: "18rem" },
+      drawer: { value: "{sizes.lg}" },
+      commandBar: { value: "{sizes.sm}" },
+    },
     prose: { value: "65ch" },
     viewportHeight: {
       value: `
@@ -51,8 +118,37 @@ export const semanticTokens = defineSemanticTokens({
     },
   },
   spacing: {
+    gutter: {
+      mobile: { value: "{spacing.2}" },
+      tablet: { value: "{spacing.4}" },
+      desktop: { value: "{spacing.6}" },
+    },
     safeBottom: { value: "env(safe-area-inset-bottom)" },
     safeTop: { value: "calc(env(keyboard-inset-height) + 4px)" },
     scrollGutter: { value: "var(--spacing-2)" },
+  },
+});
+
+export const textStyles = defineTextStyles({
+  body: {
+    value: {
+      fontSize: "md",
+      fontWeight: "normal",
+      lineHeight: "normal",
+    },
+  },
+  supporting: {
+    value: {
+      fontSize: "sm",
+      fontWeight: "normal",
+      lineHeight: "tight",
+    },
+  },
+  metadata: {
+    value: {
+      fontSize: "xs",
+      fontWeight: "medium",
+      lineHeight: "tight",
+    },
   },
 });

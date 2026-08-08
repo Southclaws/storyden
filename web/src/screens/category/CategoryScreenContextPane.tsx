@@ -7,7 +7,6 @@ import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
 import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { Props, useCategoryScreen } from "./CategoryScreen";
 
@@ -52,13 +51,13 @@ export function CategoryScreenContextPane(props: Props) {
   return (
     <LStack gap="1">
       <CategoryBadge category={category} />
-      <p className={css({ color: "fg.muted" })}>{category.description}</p>
+      <p className={css({ color: "text.subtle" })}>{category.description}</p>
 
       <Table.Root size="sm">
         <Table.Body>
           {tableData.map((item) => (
             <Table.Row key={item.label}>
-              <Table.Cell fontWeight="medium" color="fg.muted">
+              <Table.Cell fontWeight="medium" color="text.subtle">
                 <HStack gap="1">
                   <item.icon width="4" />
                   <span>{item.label}</span>
@@ -77,10 +76,6 @@ export function CategoryScreenContextPane(props: Props) {
           ))}
         </Table.Body>
       </Table.Root>
-
-      <p>
-        <ScrollToTop />
-      </p>
     </LStack>
   );
 }

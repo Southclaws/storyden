@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
-import { match } from "ts-pattern";
 import { useSWRConfig } from "swr";
+import { match } from "ts-pattern";
 
 import { handle } from "@/api/client";
 import { mutateTransaction } from "@/api/mutate";
@@ -16,8 +16,9 @@ import {
 } from "@/api/openapi-schema";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
-import { deriveError } from "@/utils/error";
+import { Text } from "@/components/ui/text";
 import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
+import { deriveError } from "@/utils/error";
 
 type Props = {
   pluginID: string;
@@ -86,9 +87,9 @@ export function ConfigurationTab({ pluginID }: Props) {
   if (fields.length === 0) {
     return (
       <Box minH="12">
-        <styled.p fontSize="sm" color="fg.muted">
+        <Text variant="supporting">
           This plugin has no configurable fields.
-        </styled.p>
+        </Text>
       </Box>
     );
   }
@@ -101,9 +102,9 @@ export function ConfigurationTab({ pluginID }: Props) {
       gap="4"
       w="full"
     >
-      <styled.p fontSize="sm" color="fg.muted">
+      <Text variant="supporting">
         Configure the plugin&apos;s settings below.
-      </styled.p>
+      </Text>
 
       <LStack gap="3">
         {fields.map((field) => (
@@ -134,7 +135,11 @@ export function ConfigurationTab({ pluginID }: Props) {
         title="Configuration Error"
         onChange={() => setError(null)}
       >
-        {error && <styled.p fontSize="sm">{error}</styled.p>}
+        {error && (
+          <Text variant="supporting" color="text.default">
+            {error}
+          </Text>
+        )}
       </Admonition>
     </styled.form>
   );
@@ -163,7 +168,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="bg.default"
+        bgColor="background.control"
       />
     ))
     .with({ type: "number" }, (f) => (
@@ -178,7 +183,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         py="2"
         fontSize="sm"
         w="full"
-        bgColor="bg.default"
+        bgColor="background.control"
       />
     ))
     .with({ type: "boolean" }, (f) => (
@@ -201,11 +206,7 @@ function ConfigurationField({ field, value, onChange }: FieldProps) {
         </styled.label>
         {input}
       </WStack>
-      {description && (
-        <styled.p fontSize="xs" color="fg.muted">
-          {description}
-        </styled.p>
-      )}
+      {description && <Text variant="metadata">{description}</Text>}
     </LStack>
   );
 }

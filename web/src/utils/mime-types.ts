@@ -60,10 +60,10 @@ export function getExtensionsForMimeTypes(mimeTypes: string[]): string[] {
     if (mimeType.endsWith("/*")) {
       const topLevelType = mimeType.slice(0, -2); // Remove "/*"
       const matchingKeys = Object.keys(MIME_EXTENSIONS).filter((key) =>
-        key.startsWith(topLevelType + "/")
+        key.startsWith(topLevelType + "/"),
       );
       const wildcardExtensions = matchingKeys.flatMap(
-        (key) => MIME_EXTENSIONS[key] ?? []
+        (key) => MIME_EXTENSIONS[key] ?? [],
       );
       return [...prev, ...wildcardExtensions];
     }

@@ -14,23 +14,18 @@ import { CancelAction } from "@/components/site/Action/Cancel";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { Badge } from "@/components/ui/badge";
+import { DateRangePicker } from "@/components/ui/date-picker";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
-import { Badge } from "@/components/ui/badge";
-import { DateRangePicker } from "@/components/ui/date-picker";
-import { Heading } from "@/components/ui/heading";
+} from "@/components/ui/multi-select-picker";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
-import {
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import {
   ALL_EVENT_TYPES,
@@ -62,11 +57,13 @@ export function AuditLogSettingsScreen() {
   );
 
   return (
-    <CardBox className={lstack()} gap="4">
-      <Heading size="md">Audit Log</Heading>
-      <styled.p>
-        View all moderation actions and administrative events on this site.
-      </styled.p>
+    <LStack gap="4">
+      <LStack gap="1">
+        <PageHeading>Audit log</PageHeading>
+        <Text variant="supporting">
+          View all moderation actions and administrative events on this site.
+        </Text>
+      </LStack>
 
       <Flex
         w="full"
@@ -96,6 +93,7 @@ export function AuditLogSettingsScreen() {
             })}
           />
           <CancelAction
+            aria-label="Clear date filter"
             variant="subtle"
             size="sm"
             borderLeftRadius="none"
@@ -109,7 +107,7 @@ export function AuditLogSettingsScreen() {
         currentPage={currentPage}
         selectedTypes={selectedTypes}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -137,13 +135,12 @@ function AuditLogEventList({
       </ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/audit-log"
         currentPage={currentPage}
         totalPages={data.total_pages}
         pageSize={data.page_size}
         params={{
           types: selectedTypes.map((v) => v.value).join(","),
-          tab: "audit",
         }}
       />
     </>
@@ -162,15 +159,13 @@ function AuditEventItem({ event }: AuditEventItemProps) {
       <LStack gap="2">
         <WStack gap="2" alignItems="center">
           <Badge>{eventLabel}</Badge>
-          <styled.time fontSize="xs" color="fg.muted">
+          <styled.time fontSize="xs" color="text.subtle">
             {formatDate(event.timestamp, "PPpp")}
           </styled.time>
         </WStack>
 
         <HStack>
-          <styled.p fontSize="sm" color="fg.subtle">
-            Enacted by:
-          </styled.p>
+          <Text variant="supporting">Enacted by:</Text>
 
           {event.enacted_by && (
             <MemberBadge
@@ -191,7 +186,7 @@ function EventDetails({ event }: { event: AuditEvent }) {
   switch (event.type) {
     case AuditEventType.thread_deleted:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <Text variant="supporting">
           Thread:{" "}
           <Link
             href={`/t/locate?id=${event.thread_id}`}
@@ -199,12 +194,12 @@ function EventDetails({ event }: { event: AuditEvent }) {
           >
             <code>{event.thread_id}</code>
           </Link>
-        </styled.p>
+        </Text>
       );
 
     case AuditEventType.thread_reply_deleted:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <Text variant="supporting">
           Reply:{" "}
           <Link
             href={`/t/locate?id=${event.reply_id}`}
@@ -212,12 +207,12 @@ function EventDetails({ event }: { event: AuditEvent }) {
           >
             <code>{event.reply_id}</code>
           </Link>
-        </styled.p>
+        </Text>
       );
 
     case AuditEventType.account_suspended:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <Text variant="supporting">
           Account:{" "}
           <Link
             href={`/m/${event.account_id}`}
@@ -225,12 +220,12 @@ function EventDetails({ event }: { event: AuditEvent }) {
           >
             <code>{event.account_id}</code>
           </Link>
-        </styled.p>
+        </Text>
       );
 
     case AuditEventType.account_unsuspended:
       return (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <Text variant="supporting">
           Account:{" "}
           <Link
             href={`/m/${event.account_id}`}
@@ -238,14 +233,14 @@ function EventDetails({ event }: { event: AuditEvent }) {
           >
             <code>{event.account_id}</code>
           </Link>
-        </styled.p>
+        </Text>
       );
 
     case AuditEventType.moderation_note_created:
     case AuditEventType.moderation_note_deleted:
       return (
         <LStack gap="1">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <Text variant="supporting">
             Account:{" "}
             <Link
               href={`/m/${event.account_id}`}
@@ -253,17 +248,17 @@ function EventDetails({ event }: { event: AuditEvent }) {
             >
               <code>{event.account_id}</code>
             </Link>
-          </styled.p>
-          <styled.p fontSize="sm" color="fg.subtle">
+          </Text>
+          <Text variant="supporting">
             Note: <code>{event.note_id}</code>
-          </styled.p>
+          </Text>
         </LStack>
       );
 
     case AuditEventType.account_content_purged:
       return (
         <LStack gap="1">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <Text variant="supporting">
             Account:{" "}
             <Link
               href={`/m/${event.account_id}`}
@@ -271,12 +266,10 @@ function EventDetails({ event }: { event: AuditEvent }) {
             >
               <code>{event.account_id}</code>
             </Link>
-          </styled.p>
+          </Text>
           {event.included && event.included.length > 0 && (
             <HStack gap="1" flexWrap="wrap">
-              <styled.p fontSize="sm" color="fg.subtle">
-                Purged Content:
-              </styled.p>
+              <Text variant="supporting">Purged Content:</Text>
               {event.included.map((type) => (
                 <Badge key={type} size="sm" variant="subtle">
                   {type}

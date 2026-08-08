@@ -19,7 +19,11 @@ import { LibraryPageVersionReview } from "./LibraryPageVersionReview";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 import { LibraryPageEditProvider, useEditState } from "./useEditState";
 
-export function LibraryPageScreen(props: Props) {
+type LibraryPageScreenProps = Props & {
+  embedded?: boolean;
+};
+
+export function LibraryPageScreen(props: LibraryPageScreenProps) {
   const { slug } = useParams<Params>();
   const [editing] = useQueryState("edit", {
     ...parseAsBoolean,
@@ -44,22 +48,28 @@ export function LibraryPageScreen(props: Props) {
     return <UnreadyBanner error={error} />;
   }
 
-  return <LibraryPageForm node={data} childNodes={props.childNodes} />;
+  return (
+    <LibraryPageForm
+      node={data}
+      childNodes={props.childNodes}
+      embedded={props.embedded}
+    />
+  );
 }
 
-const LibraryPageForm = memo((props: Props) => {
+const LibraryPageForm = memo((props: LibraryPageScreenProps) => {
   return (
     <LibraryPageProvider node={props.node} childNodes={props.childNodes}>
-      <LibraryPageEditProvider>
-        <LibraryPageAutosaveController />
-        <LibraryPage />
+      <LibraryPageEditProvider disabled={props.embedded}>
+        {!props.embedded && <LibraryPageAutosaveController />}
+        <LibraryPage embedded={props.embedded} />
       </LibraryPageEditProvider>
     </LibraryPageProvider>
   );
 });
 LibraryPageForm.displayName = "LibraryPageForm";
 
-export function LibraryPage() {
+export function LibraryPage({ embedded = false }: { embedded?: boolean }) {
   const { initialNode, revalidate } = useLibraryPageContext();
   const [versionID] = useQueryState("version", {
     ...parseAsString,
@@ -72,7 +82,7 @@ export function LibraryPage() {
 
   return (
     <LStack h="full" gap="3" alignItems="start">
-      <LibraryPageControls />
+      {!embedded && <LibraryPageControls />}
       {editingDraft && <EditingDraftWarning />}
       {versionID ? (
         <LibraryPageVersionReview

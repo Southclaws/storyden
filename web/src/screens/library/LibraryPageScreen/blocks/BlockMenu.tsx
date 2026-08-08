@@ -1,14 +1,10 @@
-import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { keyBy } from "lodash";
-import { PropsWithChildren } from "react";
 
-import { ButtonProps } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import * as Menu from "@/components/ui/menu";
 import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
-import { styled } from "@/styled-system/jsx";
 
 import { useWatch } from "../store";
 
@@ -19,14 +15,11 @@ import { LibraryPageDirectoryBlockMenuItems } from "./LibraryPageDirectoryBlock/
 import { LibraryPageTitleBlockMenuItems } from "./LibraryPageTitleBlock/LibraryPageTitleBlockMenuItems";
 
 type Props = {
-  open?: boolean;
   block: LibraryPageBlock;
   index: number;
 };
 
-type AllProps = PropsWithChildren<Props & ButtonProps>;
-
-export function BlockMenu({ children, open, block, index }: AllProps) {
+export function BlockMenu({ block, index }: Props) {
   const emit = useEmitLibraryBlockEvent();
 
   const currentMetadata = useWatch((s) => s.draft.meta);
@@ -37,56 +30,28 @@ export function BlockMenu({ children, open, block, index }: AllProps) {
 
   const newBlocksAvailable = blockList.length > 0;
 
-  function handleSelect(value: MenuSelectionDetails) {
-    switch (value.value) {
-      case "delete": {
-        emit("library:remove-block", {
-          type: block.type,
-        });
-      }
-    }
-  }
-
   return (
-    <Menu.Root
-      open={open}
-      lazyMount
-      onSelect={handleSelect}
-      positioning={{
-        placement: "right-start",
-        gutter: 0,
-      }}
-    >
-      <Menu.Trigger asChild>
-        {/*  */}
-        {children}
-      </Menu.Trigger>
+    <Menu.ItemGroup>
+      <Menu.ItemGroupLabel>
+        <span>{LibraryPageBlockName[block.type]}</span>
+      </Menu.ItemGroupLabel>
 
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content minW="36">
-            <Menu.ItemGroup>
-              <Menu.ItemGroupLabel
-                display="flex"
-                flexDir="column"
-                userSelect="none"
-              >
-                <styled.span>{LibraryPageBlockName[block.type]}</styled.span>
-              </Menu.ItemGroupLabel>
+      <Menu.Separator />
 
-              <Menu.Separator />
-
-              <Menu.Item value="delete">
-                <DeleteIcon />
-                &nbsp;Delete
-              </Menu.Item>
-              <BlockConfigMenu index={index} block={block} />
-              {newBlocksAvailable && <CreateBlockMenu />}
-            </Menu.ItemGroup>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
+      <Menu.Item
+        value="delete"
+        onClick={() =>
+          emit("library:remove-block", {
+            type: block.type,
+          })
+        }
+      >
+        <DeleteIcon />
+        &nbsp;Delete
+      </Menu.Item>
+      <BlockConfigMenu index={index} block={block} />
+      {newBlocksAvailable && <CreateBlockMenu />}
+    </Menu.ItemGroup>
   );
 }
 

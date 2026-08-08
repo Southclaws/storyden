@@ -15,7 +15,7 @@ export async function getSettings(): Promise<Settings> {
 
 export function useSettings(
   fallbackData?: Settings,
-  revalidateOnMount = false,
+  revalidateOnMount = fallbackData === undefined,
 ) {
   const { data, error } = useGetInfo({
     swr: {

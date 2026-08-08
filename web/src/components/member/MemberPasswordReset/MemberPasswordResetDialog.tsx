@@ -1,9 +1,8 @@
-import { WithDisclosure } from "@/utils/useDisclosure";
-
 import { useAccountView } from "@/api/openapi-client/accounts";
 import { InstanceCapability, ProfileReference } from "@/api/openapi-schema";
 import { Unready } from "@/components/site/Unready";
 import { useSettings } from "@/lib/settings/settings-client";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 import { MemberPasswordResetForm } from "./MemberPasswordResetForm";
 

@@ -1,7 +1,7 @@
 import { LikeAction } from "@/components/site/Action/Like";
 import { Button } from "@/components/ui/button";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
-import { styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
 
 import { Props, useLikeButton } from "./useLikeButton";
 
@@ -19,9 +19,8 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
         type="button"
         variant="subtle"
         display="flex"
-        size="xs"
         gap="1"
-        color="fg.muted"
+        color="text.subtle"
         aria-label={props.thread.likes.liked ? "Unlike" : "Like"}
         title={props.thread.likes.liked ? "Unlike" : "Like"}
         onClick={handleClick}
@@ -34,14 +33,16 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
             <LikeIcon width="4" />
           )}
         </span>
-        <styled.span
-          fontSize="sm"
+        <Text
+          as="span"
+          variant="supporting"
+          color="text.default"
           fontWeight="medium"
           fontVariantNumeric="tabular-nums"
           fontVariant="tabular-nums"
         >
           {likeCount}
-        </styled.span>
+        </Text>
       </Button>
     );
   }
@@ -49,7 +50,6 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
   return (
     <LikeAction
       variant="subtle"
-      size="xs"
       liked={props.thread.likes.liked}
       onClick={handleClick}
       disabled={!enabled}

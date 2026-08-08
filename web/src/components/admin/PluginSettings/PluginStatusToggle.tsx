@@ -75,7 +75,7 @@ export function PluginStatusToggle({ plugin }: Props) {
   const icon = (() => {
     switch (displayState) {
       case PluginActiveState.active:
-        return <RunningAnimatedIcon size={16} color="fg.accent" />;
+        return <RunningAnimatedIcon size={16} color="accent.text" />;
       case PluginActiveState.inactive:
         return <PauseCircleIcon size={16} />;
       case PluginActiveState.error:
@@ -112,9 +112,9 @@ export function PluginStatusToggle({ plugin }: Props) {
         borderLeftRadius="full"
         px="1"
         overflow="hidden"
-        bgColor={isActive ? "accent.4" : "bg.subtle"}
-        borderColor={isActive ? "accent.3" : "border.subtle"}
-        color={isActive ? "fg.accent" : "fg.subtle"}
+        bgColor={isActive ? "accent.4" : "background.inset"}
+        borderColor={isActive ? "accent.3" : "border.muted"}
+        color={isActive ? "accent.text" : "text.muted"}
         borderRightWidth="none"
       >
         <AnimatePresence mode="wait">
@@ -146,18 +146,17 @@ export function PluginStatusToggle({ plugin }: Props) {
       <Button
         borderLeftRadius="none"
         borderRightRadius="full"
-        size="xs"
         minWidth="var(--btn-min-width)"
         onClick={handleToggleActive}
         disabled={isTransitioning}
         variant={isActive ? "subtle" : "solid"}
-        bgColor={isActive ? "bg.subtle" : "accent.4"}
+        bgColor={isActive ? "background.inset" : "accent.4"}
         borderWidth="thin"
         borderLeftWidth="none"
-        borderColor={isActive ? "border.subtle" : "accent.5"}
-        color={isActive ? "fg.subtle" : "fg.accent"}
+        borderColor={isActive ? "border.muted" : "accent.5"}
+        color={isActive ? "text.muted" : "accent.text"}
         _hover={{
-          bgColor: isActive ? "bg.muted" : "accent.5",
+          bgColor: isActive ? "selection.background" : "accent.5",
         }}
       >
         {actionLabel}

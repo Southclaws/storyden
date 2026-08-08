@@ -6,12 +6,13 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
-import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
-import { CardGroupRadio } from "@/components/ui/form/CardGroupRadio";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { Heading } from "@/components/ui/heading";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { PageHeading } from "@/components/ui/page-heading";
+import { RadioGroupCardField } from "@/components/ui/radio-group";
+import { Text } from "@/components/ui/text";
 import {
   AuthenticationModeDetail,
   AuthenticationModeList,
@@ -22,7 +23,7 @@ import {
   RegistrationModeSchema,
 } from "@/lib/auth/registration-mode";
 import { Settings } from "@/lib/settings/settings";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 export type Props = {
@@ -96,56 +97,61 @@ export function AuthenticationSettingsForm(props: Props) {
     useAuthenticationSettingsForm(props);
 
   return (
-    <CardBox>
-      <styled.form className={lstack()} onSubmit={handleSubmit}>
+    <styled.form className={lstack({ gap: "4" })} onSubmit={handleSubmit}>
+      <LStack gap="1">
         <WStack>
-          <Heading size="md">Authentication settings</Heading>
+          <PageHeading>Authentication settings</PageHeading>
           <Button type="submit" loading={form.formState.isSubmitting}>
             Save
           </Button>
         </WStack>
+        <Text variant="supporting">
+          Configure how members sign in and who can register.
+        </Text>
+      </LStack>
 
-        <FormControl>
-          <FormLabel>Authentication mode</FormLabel>
-          <CardGroupRadio
-            control={form.control}
-            name="authentication_mode"
-            items={availableModes.map((m) => ({
-              value: m.value,
-              label: m.name,
-              description: m.description,
-              disabled: !m.enabled,
-            }))}
-          />
-          <FormErrorText>
-            {form.formState.errors["authentication_mode"]?.message}{" "}
-          </FormErrorText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Authentication mode</FormLabel>
+        <RadioGroupCardField
+          ariaLabel="Authentication mode"
+          control={form.control}
+          name="authentication_mode"
+          items={availableModes.map((m) => ({
+            value: m.value,
+            label: m.name,
+            description: m.description,
+            disabled: !m.enabled,
+          }))}
+        />
+        <FormErrorText>
+          {form.formState.errors["authentication_mode"]?.message}{" "}
+        </FormErrorText>
+      </FormControl>
 
-        <FormControl>
-          <FormLabel>Registration mode</FormLabel>
-          <CardGroupRadio
-            control={form.control}
-            name="registration_mode"
-            items={RegistrationModeList.map((m) => ({
-              value: m.value,
-              label: m.name,
-              description: m.description,
-            }))}
-          />
-          <FormErrorText>
-            {form.formState.errors["registration_mode"]?.message}{" "}
-          </FormErrorText>
-        </FormControl>
+      <FormControl>
+        <FormLabel>Registration mode</FormLabel>
+        <RadioGroupCardField
+          ariaLabel="Registration mode"
+          control={form.control}
+          name="registration_mode"
+          items={RegistrationModeList.map((m) => ({
+            value: m.value,
+            label: m.name,
+            description: m.description,
+          }))}
+        />
+        <FormErrorText>
+          {form.formState.errors["registration_mode"]?.message}{" "}
+        </FormErrorText>
+      </FormControl>
 
-        <FormErrorText>{form.formState.errors["root"]?.message} </FormErrorText>
+      <FormErrorText>{form.formState.errors["root"]?.message} </FormErrorText>
 
-        <WStack justifyContent="end">
-          <Button type="submit" loading={form.formState.isSubmitting}>
-            Save
-          </Button>
-        </WStack>
-      </styled.form>
-    </CardBox>
+      <WStack justifyContent="end">
+        <Button type="submit" loading={form.formState.isSubmitting}>
+          Save
+        </Button>
+      </WStack>
+    </styled.form>
   );
 }

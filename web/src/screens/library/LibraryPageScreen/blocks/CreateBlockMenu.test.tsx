@@ -39,7 +39,9 @@ describe("CreateBlockMenu", () => {
 
     expect(screen.queryByRole("menuitem", { name: "Title" })).toBeNull();
     expect(screen.queryByRole("menuitem", { name: "Cover image" })).toBeNull();
-    expect(screen.getByRole("menuitem", { name: "Directory" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("menuitem", { name: "Directory" }),
+    ).toBeInTheDocument();
   });
 
   it("emits add-block with selected block type", async () => {

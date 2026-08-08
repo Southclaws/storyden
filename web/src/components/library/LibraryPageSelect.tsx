@@ -100,14 +100,14 @@ function LibraryPageSelectCombobox({
       onOpenChange={handleOpenChange}
       onValueChange={handleChange}
       value={value ? [value] : []}
-      size="xs"
+      size="sm"
     >
       <Combobox.Control>
         <Combobox.Input placeholder="Select a Page" asChild>
-          <Input size="xs" />
+          <Input size="sm" />
         </Combobox.Input>
         <Combobox.Trigger asChild>
-          <IconButton variant="link" aria-label="open" size="xs">
+          <IconButton variant="ghost" aria-label="open" size="sm">
             <ChevronUpDownIcon />
           </IconButton>
         </Combobox.Trigger>

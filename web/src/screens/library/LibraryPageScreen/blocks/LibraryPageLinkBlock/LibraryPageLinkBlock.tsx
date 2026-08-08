@@ -38,7 +38,7 @@ function LibraryPageLinkBlockEditing() {
           w="full"
           size="sm"
           variant="ghost"
-          color="fg.muted"
+          color="text.subtle"
           placeholder="External URL..."
           onChange={handlers.handleInputValueChange}
           value={data.inputValue}
@@ -51,7 +51,6 @@ function LibraryPageLinkBlockEditing() {
           </InfoTip>
           <Button
             type="button"
-            size="xs"
             variant="subtle"
             disabled={!data.resolvedLink}
             loading={data.isImporting}

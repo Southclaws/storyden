@@ -9,9 +9,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.success"
-          backgroundColor="bg.success"
-          color="fg.success"
+          borderColor="status.success.border"
+          backgroundColor="status.success.surface"
+          color="status.success.content"
         >
           Active
         </Badge>
@@ -21,9 +21,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.muted"
-          backgroundColor="bg.muted"
-          color="fg.muted"
+          borderColor="border.strong"
+          backgroundColor="background.controlDisabled"
+          color="text.subtle"
         >
           Inactive
         </Badge>
@@ -33,9 +33,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.info"
-          backgroundColor="bg.info"
-          color="fg.info"
+          borderColor="status.info.border"
+          backgroundColor="status.info.surface"
+          color="status.info.content"
         >
           Starting
         </Badge>
@@ -45,9 +45,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.info"
-          backgroundColor="bg.info"
-          color="fg.info"
+          borderColor="status.info.border"
+          backgroundColor="status.info.surface"
+          color="status.info.content"
         >
           Connecting
         </Badge>
@@ -57,9 +57,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.warning"
-          backgroundColor="bg.warning"
-          color="fg.warning"
+          borderColor="status.warning.border"
+          backgroundColor="status.warning.surface"
+          color="status.warning.content"
         >
           Restarting
         </Badge>
@@ -69,9 +69,9 @@ export function PluginStatusBadge({ plugin }: { plugin: Plugin }) {
       return (
         <Badge
           size="sm"
-          borderColor="border.error"
-          backgroundColor="bg.error"
-          color="fg.error"
+          borderColor="status.danger.border"
+          backgroundColor="status.danger.surface"
+          color="status.danger.content"
         >
           Error
         </Badge>

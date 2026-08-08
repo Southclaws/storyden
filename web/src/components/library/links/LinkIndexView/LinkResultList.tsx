@@ -1,5 +1,4 @@
 import { LinkListResult } from "@/api/openapi-schema";
-
 import { EmptyState } from "@/components/site/EmptyState";
 
 import { LinkCardRows } from "../LinkCardList";

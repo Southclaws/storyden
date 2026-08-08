@@ -1,3 +1,3 @@
 export const borders = {
-  none: { value: 'none' },
-}
+  none: { value: "none" },
+};

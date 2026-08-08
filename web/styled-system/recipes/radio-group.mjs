@@ -2,7 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const radioGroupDefaultVariants = {
-  "size": "md"
+  "size": "sm"
 }
 const radioGroupCompoundVariants = []
 

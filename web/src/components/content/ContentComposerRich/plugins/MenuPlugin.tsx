@@ -190,7 +190,7 @@ const menuStyles = css({
   flexWrap: "wrap",
   gap: "1",
   padding: "1",
-  backgroundColor: "bg.subtle",
+  backgroundColor: "background.overlay",
   backdropBlur: "frosted",
   backdropFilter: "auto",
   transition: "all",

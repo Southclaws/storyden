@@ -8,6 +8,7 @@ import {
 export type InitialData = {
   initialPage?: number;
   initialThreadList?: ThreadListResult;
+  initialThreadSource?: "all" | "uncategorised";
   initialLibraryNodeList?: NodeListResult;
   initialLibraryNode?: NodeGetOKResponse;
   initialCategoryList?: CategoryListOKResponse;

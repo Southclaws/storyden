@@ -1,6 +1,6 @@
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
-import { MultiSelectPicker } from "@/components/ui/MultiSelectPicker";
+import { MultiSelectPicker } from "@/components/ui/multi-select-picker";
 import { HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";

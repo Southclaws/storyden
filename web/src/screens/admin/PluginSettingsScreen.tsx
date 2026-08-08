@@ -1,3 +1,5 @@
+"use client";
+
 import { usePluginList } from "@/api/openapi-client/plugins";
 import { PluginSettings } from "@/components/admin/PluginSettings/PluginSettings";
 import { Unready } from "@/components/site/Unready";

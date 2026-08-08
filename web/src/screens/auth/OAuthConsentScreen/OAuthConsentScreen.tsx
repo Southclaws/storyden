@@ -12,9 +12,11 @@ import {
 import { Permission } from "@/api/openapi-schema";
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { WarningIcon } from "@/components/ui/icons/Warning";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import {
   PermissionDetails,
   buildPermissionList,
@@ -133,12 +135,12 @@ export function OAuthConsentScreen() {
   return (
     <LStack gap="2">
       <LStack gap="1">
-        <Heading size="md">{data.client_name}</Heading>
-        <styled.p color="fg.muted">
+        <PageHeading>{data.client_name}</PageHeading>
+        <Text variant="supporting">
           {data.inherits_user_permissions
             ? "This application will act with your current account permissions."
             : "This application is requesting access to your account."}
-        </styled.p>
+        </Text>
       </LStack>
 
       <Alert.Root colorPalette="orange">
@@ -159,9 +161,7 @@ export function OAuthConsentScreen() {
 
       {permissions.length > 0 && (
         <LStack flexShrink="0" gap="2">
-          <Heading size="sm" color="fg.muted">
-            Permissions requested
-          </Heading>
+          <SectionHeading>Permissions requested</SectionHeading>
           <styled.ul
             display="flex"
             flexDir="column"
@@ -181,12 +181,17 @@ export function OAuthConsentScreen() {
                 listStyle="none"
                 p="3"
               >
-                <styled.span fontSize="sm" fontWeight="medium">
+                <Text
+                  as="span"
+                  variant="supporting"
+                  color="text.default"
+                  fontWeight="medium"
+                >
                   {permission.name}
-                </styled.span>
-                <styled.span color="fg.muted" fontSize="sm">
+                </Text>
+                <Text as="span" variant="supporting">
                   {permission.description}
-                </styled.span>
+                </Text>
               </styled.li>
             ))}
           </styled.ul>
@@ -217,8 +222,8 @@ function ConsentMessage({ icon, title, body }: ConsentMessageProps) {
   return (
     <LStack gap="3" textAlign="center" alignItems="center">
       {icon}
-      <Heading size="md">{title}</Heading>
-      <styled.p color="fg.muted">{body}</styled.p>
+      <PageHeading>{title}</PageHeading>
+      <Text variant="supporting">{body}</Text>
     </LStack>
   );
 }

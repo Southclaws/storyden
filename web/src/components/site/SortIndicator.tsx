@@ -53,7 +53,7 @@ export function SortIndicator({ order }: SortIndicatorProps) {
   return (
     <styled.span width="4" height="4" aria-label={label} title={label}>
       {order === "none" ? (
-        <ChevronUpDownIcon width="4" height="4" color="fg.muted" />
+        <ChevronUpDownIcon width="4" height="4" color="text.subtle" />
       ) : order === "asc" ? (
         <ChevronUpIcon width="4" height="4" />
       ) : (

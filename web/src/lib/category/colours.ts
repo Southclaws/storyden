@@ -1,5 +1,6 @@
 import chroma from "chroma-js";
-import { readableColor } from "polished";
+
+import { getReadableTextColour } from "@/utils/colour";
 
 export function categoryColourCSS(c: string) {
   const { bg, bo, fg } = categoryColours(c);
@@ -16,15 +17,7 @@ export function categoryColours(c: string) {
 
   const bg = colour.brighten(1).desaturate(1).css();
   const bo = colour.darken(0).desaturate(1).alpha(0.8).css();
-  const fg = readableColorWithFallback(bg);
+  const fg = getReadableTextColour(bg);
 
   return { bg, bo, fg };
-}
-
-function readableColorWithFallback(rgb: string): string {
-  try {
-    return readableColor(rgb, "#303030", "#E8ECEA", false);
-  } catch (e) {
-    return "#303030";
-  }
 }

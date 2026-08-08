@@ -1,7 +1,7 @@
 import { PluginActiveState, PluginList } from "@/api/openapi-schema";
-import { Heading } from "@/components/ui/heading";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack } from "@/styled-system/jsx";
 
 import { PluginAddTrigger } from "./PluginAddModal/PluginAddModal";
 import { PluginItemList } from "./PluginItemList";
@@ -19,14 +19,20 @@ export function PluginSettingsIndex({ plugins }: Props) {
   const hasInactive = totalPlugins !== activePlugins;
 
   return (
-    <CardBox className={lstack()}>
-      <WStack justifyContent="space-between">
-        <Heading size="md">Plugins</Heading>
+    <LStack gap="4">
+      <LStack gap="1">
+        <WStack justifyContent="space-between">
+          <PageHeading>Plugins</PageHeading>
 
-        <PluginAddTrigger />
-      </WStack>
+          <PluginAddTrigger />
+        </WStack>
 
-      <styled.p color="fg.muted">
+        <Text variant="supporting">
+          Manage installed extensions and integrations.
+        </Text>
+      </LStack>
+
+      <Text variant="metadata">
         {hasInactive ? (
           <span>
             {totalPlugins} plugins, {activePlugins} active.
@@ -34,9 +40,9 @@ export function PluginSettingsIndex({ plugins }: Props) {
         ) : (
           <span>{plugins.length} plugins.</span>
         )}
-      </styled.p>
+      </Text>
 
       <PluginItemList plugins={plugins} />
-    </CardBox>
+    </LStack>
   );
 }

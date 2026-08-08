@@ -5,7 +5,8 @@ import { Visibility } from "@/api/openapi-schema";
 import { QueueNodeList } from "@/components/queue/QueueNodeList";
 import { QueueVersionList } from "@/components/queue/QueueVersionList";
 import { Unready } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
 import { LStack } from "@/styled-system/jsx";
 
 export function QueueScreen() {
@@ -22,13 +23,13 @@ export function QueueScreen() {
   return (
     <LStack gap="8">
       <LStack>
-        <Heading>Submission queue</Heading>
+        <PageHeading>Submission queue</PageHeading>
 
         <QueueNodeList nodes={submissions.nodes} />
       </LStack>
 
       <LStack>
-        <Heading>Page edits for review</Heading>
+        <SectionHeading>Page edits for review</SectionHeading>
 
         <QueueVersionList drafts={drafts.drafts} />
       </LStack>

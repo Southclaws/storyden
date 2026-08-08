@@ -37,7 +37,11 @@ describe("OAuthConsentScreen", () => {
     render(<OAuthConsentScreen />);
 
     expect(screen.getByRole("heading", { name: "Missing code" })).toBeVisible();
-    expect(screen.getByText("Open the full link from the application and try again.")).toBeVisible();
+    expect(
+      screen.getByText(
+        "Open the full link from the application and try again.",
+      ),
+    ).toBeVisible();
   });
 
   it("shows access denied when the OAuth API returns access_denied", () => {
@@ -85,7 +89,9 @@ describe("OAuthConsentScreen", () => {
     expect(screen.getByRole("heading", { name: "Storyden" })).toBeVisible();
     expect(screen.getByText("ABCD-EFGH")).toBeVisible();
     expect(
-      screen.getByText("Only approve if this code matches the code shown where you started authentication."),
+      screen.getByText(
+        "Only approve if this code matches the code shown where you started authentication.",
+      ),
     ).toBeVisible();
     expect(screen.getByText("Create post")).toBeVisible();
     expect(screen.getByText("Members can create posts.")).toBeVisible();
@@ -95,7 +101,9 @@ describe("OAuthConsentScreen", () => {
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Approved" })).toBeVisible();
     });
-    expect(screen.getByText("You can return to the application.")).toBeVisible();
+    expect(
+      screen.getByText("You can return to the application."),
+    ).toBeVisible();
     expect(mocks.submit).toHaveBeenCalledWith({
       user_code: "ABCD-EFGH",
       decision: "approve",

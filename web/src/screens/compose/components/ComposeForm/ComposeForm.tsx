@@ -1,7 +1,7 @@
 import { FormProvider } from "react-hook-form";
 
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
-import { TagListField } from "@/components/thread/ThreadTagList";
+import { ThreadTagListField } from "@/components/thread/ThreadTagList.field";
 import { Button } from "@/components/ui/button";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -36,7 +36,7 @@ export function ComposeForm(props: Props) {
         >
           <HStack width="full">
             <CategorySelect control={form.control} name="category" />
-            <TagListField
+            <ThreadTagListField
               name="tags"
               control={form.control}
               initialTags={props.initialDraft?.tags}
@@ -46,7 +46,6 @@ export function ComposeForm(props: Props) {
           <HStack>
             <Button
               variant="ghost"
-              size="xs"
               disabled={!form.formState.isValid || state.isSavingDraft}
               onClick={handlers.handleSaveDraft}
               loading={state.isSavingDraft}
@@ -56,7 +55,6 @@ export function ComposeForm(props: Props) {
 
             <Button
               variant="subtle"
-              size="xs"
               type="submit"
               disabled={!form.formState.isValid || state.isPublishing}
               loading={state.isPublishing}

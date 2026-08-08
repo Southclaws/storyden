@@ -9,8 +9,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useId, useMemo } from "react";
 
 import { countDiffMarks, diffTipTapJSON } from "@/lib/content/diff";
-import { css } from "@/styled-system/css";
-import { cx } from "@/styled-system/css/index.mjs";
+import { css, cx } from "@/styled-system/css";
 import { LStack } from "@/styled-system/jsx";
 
 import { ImageExtended } from "../ContentComposerRich/plugins/ImagePlugin";

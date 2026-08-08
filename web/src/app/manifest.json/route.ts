@@ -1,10 +1,9 @@
 import { Manifest } from "next/dist/lib/metadata/types/manifest-types";
 import { NextResponse } from "next/server";
 
-import { getColourAsHex } from "@/utils/colour";
-
 import { API_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
+import { getColourAsHex } from "@/utils/colour";
 
 export async function GET() {
   const settings = await getSettings();

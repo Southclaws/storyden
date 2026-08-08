@@ -9,14 +9,16 @@ import {
 import { Account, ProfileReference } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import * as Clipboard from "@/components/ui/clipboard";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { CopyIcon } from "@/components/ui/icons/Copy";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import { Input } from "@/components/ui/input";
 import * as Select from "@/components/ui/select";
+import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { HStack, VStack } from "@/styled-system/jsx";
 
 export type Props = {
   profile: ProfileReference;
@@ -121,32 +123,37 @@ function MemberPasswordResetFormWithEmail({
 
   return (
     <VStack alignItems="start" gap="4">
-      <styled.p>Send a password reset email to {profile.name}?</styled.p>
+      <Text>Send a password reset email to {profile.name}?</Text>
 
       {!hasVerifiedEmailAddress && (
-        <styled.p fontSize="sm" color="fg.error">
+        <FormErrorText>
           This account has no verified email address configured.
-        </styled.p>
+        </FormErrorText>
       )}
 
       {selectedEmailAddress && !hasMultipleVerifiedEmailAddresses && (
         <VStack alignItems="start" gap="1" w="full">
-          <styled.span fontSize="sm" fontWeight="medium">
+          <Text
+            as="span"
+            variant="supporting"
+            color="text.default"
+            fontWeight="medium"
+          >
             Recipient email
-          </styled.span>
-          <styled.p
-            bg="bg.muted"
+          </Text>
+          <Text
+            variant="supporting"
+            bg="background.inset"
             borderColor="border.default"
             borderRadius="md"
             borderWidth="hairline"
-            color="fg.default"
-            fontSize="sm"
+            color="text.default"
             px="3"
             py="2"
             w="full"
           >
             {selectedEmailAddress.email_address}
-          </styled.p>
+          </Text>
         </VStack>
       )}
 
@@ -180,10 +187,10 @@ function MemberPasswordResetFormWithEmail({
         </Select.Root>
       )}
 
-      <styled.p fontSize="sm" color="fg.muted">
+      <Text variant="supporting">
         An email will be sent to their verified email address with instructions
         to reset their password. The link will be valid for 1 hour.
-      </styled.p>
+      </Text>
 
       <HStack w="full">
         <Button type="button" flexGrow="1" variant="outline" onClick={onClose}>
@@ -224,14 +231,14 @@ function MemberPasswordResetFormWithLink({ profile, onClose }: Props) {
   if (resetUrl) {
     return (
       <VStack alignItems="start" gap="4">
-        <styled.p>
+        <Text>
           <strong>Password reset link generated successfully.</strong>
-        </styled.p>
+        </Text>
 
-        <styled.p>
+        <Text variant="supporting">
           Copy this link and send it to {profile.name}. This link is valid for 1
           hour.
-        </styled.p>
+        </Text>
 
         <Clipboard.Root w="full" value={resetUrl}>
           <Clipboard.Control>
@@ -257,13 +264,13 @@ function MemberPasswordResetFormWithLink({ profile, onClose }: Props) {
 
   return (
     <VStack alignItems="start" gap="4">
-      <styled.p>Generate a password reset link for {profile.name}?</styled.p>
+      <Text>Generate a password reset link for {profile.name}?</Text>
 
-      <styled.p fontSize="sm" color="fg.muted">
+      <Text variant="supporting">
         A password reset email cannot be sent for this member. A password reset
         link will be generated for you to copy and send through another
         communication method.
-      </styled.p>
+      </Text>
 
       <HStack w="full">
         <Button type="button" flexGrow="1" variant="outline" onClick={onClose}>

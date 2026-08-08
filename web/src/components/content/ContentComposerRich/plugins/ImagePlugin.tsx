@@ -9,9 +9,9 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
 import { Asset } from "@/api/openapi-schema";
-
 import { Button } from "@/components/ui/button";
 import { ProgressCircle } from "@/components/ui/progress";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 
@@ -98,7 +98,7 @@ function Component(props: NodeViewProps) {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          backgroundColor="bg.error"
+          backgroundColor="status.danger.surface"
           opacity="9"
           borderRadius="md"
           padding="3"
@@ -106,13 +106,16 @@ function Component(props: NodeViewProps) {
           userSelect="none"
           contentEditable={false}
         >
-          <styled.p fontSize="sm" color="fg.error" fontWeight="medium">
+          <Text
+            variant="supporting"
+            color="status.danger.content"
+            fontWeight="medium"
+          >
             Upload failed
-          </styled.p>
+          </Text>
           <styled.div display="flex" gap="2">
             <Button
               type="button"
-              size="xs"
               variant="outline"
               onClick={() => handleRetry(props.view, uploadId)}
             >
@@ -120,7 +123,6 @@ function Component(props: NodeViewProps) {
             </Button>
             <Button
               type="button"
-              size="xs"
               variant="ghost"
               onClick={() => handleCancel(props.view, uploadId)}
             >

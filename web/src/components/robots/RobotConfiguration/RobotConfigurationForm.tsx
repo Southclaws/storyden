@@ -2,17 +2,18 @@ import { useState } from "react";
 
 import { useRobotModelsList } from "@/api/openapi-client/robots";
 import { TOOL_NAMES } from "@/api/robots";
-import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
-import { FormLabel } from "@/components/ui/FormLabel";
+import { Button } from "@/components/ui/button";
+import { ComboboxField } from "@/components/ui/combobox";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { Input } from "@/components/ui/input";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/multi-select-picker";
+import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -99,11 +100,11 @@ export function RobotConfigurationForm(props: Props) {
             borderWidth="thin"
             borderStyle="solid"
             borderColor="border.default"
-            borderRadius="l2"
+            borderRadius="sm"
             resize="vertical"
             _focus={{
               outline: "none",
-              borderColor: "border.accent",
+              borderColor: "accent.default",
             }}
           />
           <FormErrorText>
@@ -113,21 +114,25 @@ export function RobotConfigurationForm(props: Props) {
 
         <FormControl>
           <FormLabel>Model</FormLabel>
-          <RobotModelComboboxField
+          <ComboboxField
             control={form.control}
             name="model"
-            models={models}
+            items={models.map((model) => ({
+              label: model.ref,
+              value: model.ref,
+            }))}
             placeholder={isCreating ? "Use default model" : "Select a model"}
+            ariaLabel="Select model"
             disabled={!modelData || models.length === 0}
           />
           {modelError ? (
             <FormErrorText>Failed to load robot models.</FormErrorText>
           ) : (
-            <styled.p color="fg.muted" fontSize="sm">
+            <Text variant="supporting">
               {isCreating
                 ? "Leave unset to use the configured default model."
                 : "Choose one of the enabled provider models."}
-            </styled.p>
+            </Text>
           )}
           <FormErrorText>{form.formState.errors.model?.message}</FormErrorText>
         </FormControl>
@@ -199,13 +204,13 @@ function RobotDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
       >
         <LStack gap="6">
           <LStack gap="2">
-            <styled.p fontSize="sm">
+            <Text variant="supporting" color="text.default">
               This will permanently delete this robot.
-            </styled.p>
-            <styled.p fontSize="sm" color="fg.muted">
+            </Text>
+            <Text variant="supporting">
               Existing robot chat sessions will remain, but this robot will no
               longer be available.
-            </styled.p>
+            </Text>
           </LStack>
 
           <HStack justifyContent="end" gap="3">

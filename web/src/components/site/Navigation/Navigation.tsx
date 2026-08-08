@@ -1,104 +1,68 @@
-import React, { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
 import { getServerSession } from "@/auth/server-session";
-import { parseMemberSettings } from "@/lib/settings/member-settings";
 import { allowsPublicRegistration } from "@/lib/settings/registration";
 import { getSettings } from "@/lib/settings/settings-server";
-import { Box } from "@/styled-system/jsx";
 
 import { CommandPalette } from "../CommandPalette/CommandPalette";
-import { Onboarding } from "../Onboarding/Onboarding";
 import { VerificationBanner } from "../VerificationBanner/VerificationBanner";
 
-import styles from "./navigation.module.css";
-
-import { ContextPane } from "./ContextPane";
-import { DesktopCommandBar } from "./DesktopCommandBar";
-import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
+import { LayoutEditModeButton } from "./LayoutEditMode/LayoutEditModeButton";
+import { MemberActions } from "./MemberActions";
+import { NavigationChrome } from "./NavigationChrome";
 import { NavigationPane } from "./NavigationPane/NavigationPane";
-import { getServerSidebarState } from "./NavigationPane/server";
 
-type Props = {
-  contextpane: React.ReactNode;
-};
+type Props = PropsWithChildren<{
+  sidebar: ReactNode;
+}>;
 
-export async function Navigation({
-  contextpane,
-  children,
-}: PropsWithChildren<Props>) {
+export async function Navigation({ children, sidebar }: Props) {
   const globalSettings = await getSettings();
+  const sessionAccount = await getServerSession();
   const canRegister = allowsPublicRegistration(
     globalSettings.registration_mode,
   );
-  const sessionAccount = await getServerSession();
-  const session = sessionAccount
-    ? parseMemberSettings(sessionAccount, globalSettings.metadata)
-    : undefined;
-
-  const sidebarDefaultState =
-    session?.meta.sidebar.defaultState ??
-    globalSettings.metadata.sidebar.defaultState;
-  const showLeftBar = await getServerSidebarState(sidebarDefaultState);
 
   return (
-    <Box
-      id="navigation__container"
-      className={styles["navigation__container"]}
-      w="full"
-      data-leftbar-shown={showLeftBar}
-    >
-      <Box id="navigation__scroll" className={styles["navgrid"]}>
-        <Box className={styles["main"]}>
+    <div id="navigation__container" className="navigation__container">
+      <div id="navigation__scroll" className="navigation__grid">
+        <div className="navigation__main">
           {/*  */}
-          <Onboarding />
           <VerificationBanner
             session={sessionAccount}
             settings={globalSettings}
           />
           {children}
           {/*  */}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      <Box
-        id="navigation__fixed"
-        position="fixed"
-        zIndex="docked"
-        top="0"
-        left="0"
-        height="dvh"
-        className={styles["navgrid"]}
-        pointerEvents="none"
-      >
-        <DesktopCommandBar />
-
-        <Box
-          id="navigation__leftbar"
-          className={styles["leftbar"]}
-          aria-hidden={!showLeftBar}
-          inert={!showLeftBar}
-        >
-          <NavigationPane
-            initialSession={sessionAccount}
-            initialSettings={globalSettings}
-          />
-        </Box>
-
-        <Box
-          id="navigation__rightbar"
-          className={styles["rightbar"]}
-          aria-hidden={!showLeftBar}
-          inert={!showLeftBar}
-        >
-          <ContextPane>{contextpane}</ContextPane>
-        </Box>
-
-        <Box className={styles["navpill"]}>
-          <MobileCommandBar canRegister={canRegister} />
-        </Box>
-      </Box>
+      <div id="navigation__fixed" className="navigation__fixed">
+        <NavigationChrome
+          desktopSidebar={sidebar}
+          siteNavigation={
+            <NavigationPane
+              initialSession={sessionAccount ?? undefined}
+              initialSettings={globalSettings}
+            />
+          }
+          layoutEditMode={
+            <LayoutEditModeButton
+              key="layout-edit-mode"
+              initialSession={sessionAccount ?? undefined}
+              initialSettings={globalSettings}
+            />
+          }
+          sidebarBottom={
+            <MemberActions
+              session={sessionAccount ?? undefined}
+              canRegister={canRegister}
+            />
+          }
+        />
+      </div>
 
       <CommandPalette />
-    </Box>
+    </div>
   );
 }

@@ -1,7 +1,9 @@
+import { CardBox } from "@/components/ui/card-box";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { NumberInput } from "@/components/ui/number-input";
-import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { formatSeconds } from "./useSystemSettings";
@@ -26,7 +28,12 @@ export function OperationCostOverrideItem({
   const effectiveLimit = Math.floor(rateLimit / cost);
 
   return (
-    <CardBox className={lstack()} w="full" borderRadius="sm" bg="bg.subtle">
+    <CardBox
+      className={lstack()}
+      w="full"
+      borderRadius="sm"
+      bg="background.inset"
+    >
       <WStack w="full" gap="2" alignItems="center">
         <styled.code fontSize="sm" fontWeight="semibold" flex="1">
           {operationId}
@@ -55,14 +62,16 @@ export function OperationCostOverrideItem({
           </IconButton>
         </HStack>
       </WStack>
-      <styled.p fontSize="xs" color="fg.muted" lineHeight="tight">
+      <Text variant="metadata">
         Can be performed{" "}
-        <styled.strong color="fg.info">{effectiveLimit}</styled.strong> times
-        every{" "}
-        <styled.strong color="fg.info">
+        <styled.strong color="status.info.content">
+          {effectiveLimit}
+        </styled.strong>{" "}
+        times every{" "}
+        <styled.strong color="status.info.content">
           {formatSeconds(rateLimitPeriod)}
         </styled.strong>
-      </styled.p>
+      </Text>
     </CardBox>
   );
 }

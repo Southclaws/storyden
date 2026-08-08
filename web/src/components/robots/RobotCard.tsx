@@ -1,9 +1,10 @@
 import { Robot } from "@/api/openapi-schema";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Badge } from "@/components/ui/badge";
-import { Heading } from "@/components/ui/heading";
+import { CardBox } from "@/components/ui/card-box";
 import { LinkButton } from "@/components/ui/link-button";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 type Props = {
   robot: Robot;
@@ -19,21 +20,20 @@ export function RobotCard({ robot, editHref = `/robots/${robot.id}` }: Props) {
       <LStack gap="2">
         <WStack alignItems="start">
           <LStack gap="1">
-            <Heading size="sm">{robot.name}</Heading>
-            <styled.p fontSize="sm" color="fg.muted">
-              {robot.description}
-            </styled.p>
+            <Text
+              variant="supporting"
+              color="text.default"
+              fontWeight="semibold"
+            >
+              {robot.name}
+            </Text>
+            <Text variant="supporting">{robot.description}</Text>
           </LStack>
         </WStack>
 
-        <styled.p
-          fontSize="sm"
-          color="fg.subtle"
-          lineClamp={2}
-          fontFamily="mono"
-        >
+        <Text variant="supporting" lineClamp={2} fontFamily="mono">
           {robot.playbook}
-        </styled.p>
+        </Text>
 
         <WStack>
           <MemberIdent profile={robot.author} size="sm" name="handle" />
@@ -43,7 +43,7 @@ export function RobotCard({ robot, editHref = `/robots/${robot.id}` }: Props) {
               {toolCountLabel}
             </Badge>
 
-            <LinkButton href={editHref} size="xs" variant="subtle">
+            <LinkButton href={editHref} variant="subtle">
               Edit
             </LinkButton>
           </HStack>
