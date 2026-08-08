@@ -2,17 +2,26 @@ package account_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"strings"
 	"testing"
+	"time"
 
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -157,4 +166,94 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			a.Contains(accGet200.JSON200.Bio, newBio2, "bio should contain the second updated text")
 		}))
 	}))
+}
+
+func TestProfileUpdateStopsBeforeWriteWhenCacheInvalidationFails(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(
+		t,
+		nil,
+		e2e.Setup(),
+		fx.Decorate(func(store cache.Store) cache.Store {
+			return &failingProfileCacheStore{base: store}
+		}),
+		fx.Invoke(func(
+			lc fx.Lifecycle,
+			root context.Context,
+			db *ent.Client,
+			query *account_querier.Querier,
+			updater *account_update.Updater,
+		) {
+			lc.Append(fx.StartHook(func() {
+				r := require.New(t)
+				a := assert.New(t)
+				accountID := xid.New()
+				_, err := db.Account.Create().
+					SetID(accountID).
+					SetHandle("cache-failure-" + accountID.String()).
+					SetName("Cache Failure").
+					Save(root)
+				r.NoError(err)
+
+				before, err := query.GetByID(root, account.AccountID(accountID))
+				r.NoError(err)
+
+				_, err = updater.Update(root, account.AccountID(accountID), account_update.Partial{
+					Bio: opt.New("this write must not happen"),
+				})
+				r.Error(err)
+
+				after, err := query.GetByID(root, account.AccountID(accountID))
+				r.NoError(err)
+				a.Equal(before.Bio, after.Bio)
+			}))
+		}),
+	)
+}
+
+type failingProfileCacheStore struct {
+	base cache.Store
+}
+
+func (s *failingProfileCacheStore) Get(ctx context.Context, key string) (string, error) {
+	return s.base.Get(ctx, key)
+}
+
+func (s *failingProfileCacheStore) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
+	if strings.HasPrefix(key, "profile:last-modified:") {
+		return errors.New("forced profile cache failure")
+	}
+
+	return s.base.Set(ctx, key, value, ttl)
+}
+
+func (s *failingProfileCacheStore) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	for key := range values {
+		if strings.HasPrefix(key, "profile:last-modified:") {
+			return errors.New("forced profile cache failure")
+		}
+	}
+
+	return s.base.SetMany(ctx, values, ttl)
+}
+
+func (s *failingProfileCacheStore) Delete(ctx context.Context, key string) error {
+	return s.base.Delete(ctx, key)
+}
+
+func (s *failingProfileCacheStore) HIncrBy(ctx context.Context, key string, field string, incr int64) (int, error) {
+	return s.base.HIncrBy(ctx, key, field, incr)
+}
+
+func (s *failingProfileCacheStore) HGetAll(ctx context.Context, key string) (map[string]string, error) {
+	return s.base.HGetAll(ctx, key)
+}
+
+func (s *failingProfileCacheStore) HDel(ctx context.Context, key string, field string) error {
+	return s.base.HDel(ctx, key, field)
+}
+
+func (s *failingProfileCacheStore) Expire(ctx context.Context, key string, expiration time.Duration) error {
+	return s.base.Expire(ctx, key, expiration)
 }

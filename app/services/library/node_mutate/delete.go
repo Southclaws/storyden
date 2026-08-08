@@ -52,8 +52,16 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug()); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	err = s.nodeWriter.Delete(ctx, qk)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.cache.Invalidate(ctx, n.Mark.ID(), n.GetSlug()); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

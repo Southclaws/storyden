@@ -13,7 +13,9 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -30,6 +32,7 @@ func TestCategoryCRUD(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
+		categoryCache *category_cache.Cache,
 	) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -76,6 +79,11 @@ func TestCategoryCRUD(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 				r.NotNil(create.JSON200)
 				oldSlug := create.JSON200.Slug
+				oldGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, oldSlug, adminSession))(t, http.StatusOK)
+				oldETag := oldGet.HTTPResponse.Header.Get("ETag")
+				r.NotEmpty(oldETag)
+				oldValidator := cachecontrol.ParseETag(oldETag)
+				r.NoError(categoryCache.Store(root, newSlug, oldValidator.Time))
 
 				update := tests.AssertRequest(cl.CategoryUpdateWithResponse(root, oldSlug, openapi.CategoryUpdateJSONRequestBody{
 					Name: lo.ToPtr(newName),
@@ -85,13 +93,16 @@ func TestCategoryCRUD(t *testing.T) {
 				a.Equal(newSlug, update.JSON200.Slug)
 				a.Equal(newName, update.JSON200.Name)
 
-				get := tests.AssertRequest(cl.CategoryGetWithResponse(root, newSlug, adminSession))(t, http.StatusOK)
+				get := tests.AssertRequest(cl.CategoryGetWithResponse(root, newSlug, adminSession, func(ctx context.Context, req *http.Request) error {
+					req.Header.Set("If-None-Match", oldETag)
+					return nil
+				}))(t, http.StatusOK)
 				r.NotNil(get.JSON200)
 				a.Equal(newSlug, get.JSON200.Slug)
 				a.Equal(newName, get.JSON200.Name)
 
-				oldGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, oldSlug, adminSession))(t, http.StatusNotFound)
-				r.NotNil(oldGet)
+				missingOld := tests.AssertRequest(cl.CategoryGetWithResponse(root, oldSlug, adminSession))(t, http.StatusNotFound)
+				r.NotNil(missingOld)
 
 				list := tests.AssertRequest(cl.CategoryListWithResponse(root, adminSession))(t, http.StatusOK)
 				r.NotNil(list.JSON200)
@@ -209,21 +220,29 @@ func TestCategoryCRUD(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 				r.NotNil(third.JSON200)
 
+				oldETags := map[string]string{}
+				for _, slug := range []string{first.JSON200.Slug, second.JSON200.Slug, third.JSON200.Slug} {
+					cached := tests.AssertRequest(cl.CategoryGetWithResponse(root, slug, adminSession))(t, http.StatusOK)
+					etag := cached.HTTPResponse.Header.Get("ETag")
+					r.NotEmpty(etag)
+					oldETags[slug] = etag
+				}
+
 				moveBody := openapi.CategoryUpdatePositionJSONRequestBody{Before: lo.ToPtr(openapi.Identifier(first.JSON200.Id))}
 				move := tests.AssertRequest(cl.CategoryUpdatePositionWithResponse(root, third.JSON200.Slug, moveBody, adminSession))(t, http.StatusOK)
 				r.NotNil(move.JSON200)
 
-				firstGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, first.JSON200.Slug, adminSession))(t, http.StatusOK)
+				firstGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, first.JSON200.Slug, adminSession, withETag(oldETags[first.JSON200.Slug])))(t, http.StatusOK)
 				r.NotNil(firstGet.JSON200)
 				r.NotNil(firstGet.JSON200.Parent)
 				a.Equal(openapi.Identifier(parent.JSON200.Id), *firstGet.JSON200.Parent)
 
-				secondGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, second.JSON200.Slug, adminSession))(t, http.StatusOK)
+				secondGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, second.JSON200.Slug, adminSession, withETag(oldETags[second.JSON200.Slug])))(t, http.StatusOK)
 				r.NotNil(secondGet.JSON200)
 				r.NotNil(secondGet.JSON200.Parent)
 				a.Equal(openapi.Identifier(parent.JSON200.Id), *secondGet.JSON200.Parent)
 
-				thirdGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, third.JSON200.Slug, adminSession))(t, http.StatusOK)
+				thirdGet := tests.AssertRequest(cl.CategoryGetWithResponse(root, third.JSON200.Slug, adminSession, withETag(oldETags[third.JSON200.Slug])))(t, http.StatusOK)
 				r.NotNil(thirdGet.JSON200)
 				r.NotNil(thirdGet.JSON200.Parent)
 				a.Equal(openapi.Identifier(parent.JSON200.Id), *thirdGet.JSON200.Parent)
@@ -268,4 +287,11 @@ func TestCategoryCRUD(t *testing.T) {
 			})
 		}))
 	}))
+}
+
+func withETag(etag string) openapi.RequestEditorFn {
+	return func(ctx context.Context, req *http.Request) error {
+		req.Header.Set("If-None-Match", etag)
+		return nil
+	}
 }

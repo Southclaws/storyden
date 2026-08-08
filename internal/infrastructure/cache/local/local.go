@@ -64,6 +64,14 @@ func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time
 	return nil
 }
 
+func (c *LocalCache) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	for key, value := range values {
+		c.cache.SetWithTTL(key, []byte(value), 0, ttl)
+	}
+	c.cache.Wait()
+	return nil
+}
+
 func (c *LocalCache) Delete(ctx context.Context, key string) error {
 	c.cache.Del(key)
 	return nil

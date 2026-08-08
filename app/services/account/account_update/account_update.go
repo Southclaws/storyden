@@ -81,6 +81,10 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 		opts = append(opts, account_writer.SetMetadata(v))
 	}
 
+	if err := u.profileCache.Invalidate(ctx, xid.ID(id)); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	acc, err := u.writer.Update(ctx, id, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

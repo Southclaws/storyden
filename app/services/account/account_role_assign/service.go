@@ -30,6 +30,10 @@ func New(assign *role_assign.Assignment, profileCache *profile_cache.Cache, bus 
 }
 
 func (m *Manager) UpdateRoles(ctx context.Context, accountID account_ref.ID, roles ...role_assign.Mutation) error {
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	if err := m.assign.UpdateRoles(ctx, accountID, roles...); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -44,6 +48,10 @@ func (m *Manager) UpdateRoles(ctx context.Context, accountID account_ref.ID, rol
 }
 
 func (m *Manager) SetBadge(ctx context.Context, accountID account_ref.ID, roleID role.RoleID, badge bool) error {
+	if err := m.profileCache.Invalidate(ctx, xid.ID(accountID)); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	if err := m.assign.SetBadge(ctx, accountID, roleID, badge); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

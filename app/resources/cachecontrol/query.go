@@ -47,21 +47,18 @@ func (t ETag) String() string {
 
 // Query represents a HTTP conditional request query.
 type Query struct {
-	ETag          opt.Optional[ETag]
-	ModifiedSince opt.Optional[time.Time]
+	ETag opt.Optional[ETag]
 }
 
 // NewQuery must be constructed from a HTTP request's conditional headers.
-func NewQuery(ifNoneMatch opt.Optional[string], ifModifiedSince opt.Optional[time.Time]) Query {
+func NewQuery(ifNoneMatch opt.Optional[string]) Query {
 	return Query{
-		ETag:          opt.Map(ifNoneMatch, ParseETag),
-		ModifiedSince: ifModifiedSince,
+		ETag: opt.Map(ifNoneMatch, ParseETag),
 	}
 }
 
-// NotModified takes the current updated date of a resource and returns true if
-// the cache control query includes a Is-Modified-Since header and the resource
-// updated date is not after the header value. True means a 304 response header.
+// Check compares the request ETag with the current resource timestamp. It
+// returns true when the representation is unchanged and a 304 can be sent.
 func (q Query) Check(fn func() *time.Time) (*ETag, bool) {
 	resourceUpdated := fn()
 	if resourceUpdated == nil {
@@ -69,24 +66,7 @@ func (q Query) Check(fn func() *time.Time) (*ETag, bool) {
 	}
 
 	if etag, ok := q.ETag.Get(); ok {
-		modified := resourceUpdated.Compare(etag.Time)
-
-		return NewETag(*resourceUpdated), modified <= 0
-	}
-
-	if ms, ok := q.ModifiedSince.Get(); ok {
-
-		// truncate the resourceUpdated to the nearest second because the actual
-		// HTTP header is already truncated but the DB time is in nanoseconds.
-		// If we didn't do this the resource time will always be slightly ahead.
-		truncated := resourceUpdated.Truncate(time.Second)
-
-		// If the resource update time is ahead of the HTTP Last-Modified check,
-		// modified = 1, meaning the resource has been modified since the last
-		// request and should be returned from the DB, instead of a 304 status.
-		modified := truncated.Compare(ms)
-
-		return NewETag(*resourceUpdated), modified <= 0
+		return NewETag(*resourceUpdated), resourceUpdated.Equal(etag.Time)
 	}
 
 	return NewETag(*resourceUpdated), false

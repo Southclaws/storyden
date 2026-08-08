@@ -129,8 +129,7 @@ func TestThreadCacheWithReplies(t *testing.T) {
 
 			etag1 := threadGet1.HTTPResponse.Header.Get("ETag")
 			r.NotEmpty(etag1, "ETag header should be present")
-			lastModified1Header := threadGet1.HTTPResponse.Header.Get("Last-Modified")
-			r.NotEmpty(lastModified1Header, "Last-Modified header should be present for backward compatibility")
+			r.Empty(threadGet1.HTTPResponse.Header.Get("Last-Modified"), "ETag is the sole conditional validator")
 
 			threadGet304 := tests.AssertRequest(cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
 				req.Header.Set("If-None-Match", etag1)
@@ -198,8 +197,7 @@ func TestThreadCacheWithReplyUpdate(t *testing.T) {
 
 			etag1 := threadGet1.HTTPResponse.Header.Get("ETag")
 			r.NotEmpty(etag1, "ETag header should be present")
-			lastModified1Header := threadGet1.HTTPResponse.Header.Get("Last-Modified")
-			r.NotEmpty(lastModified1Header, "Last-Modified header should be present for backward compatibility")
+			r.Empty(threadGet1.HTTPResponse.Header.Get("Last-Modified"), "ETag is the sole conditional validator")
 
 			threadGet304 := tests.AssertRequest(cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, &openapi.ThreadGetParams{}, func(ctx context.Context, req *http.Request) error {
 				req.Header.Set("If-None-Match", etag1)

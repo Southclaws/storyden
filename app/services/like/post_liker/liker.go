@@ -41,6 +41,10 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 		return err
 	}
 
+	if err := l.cache.Invalidate(ctx, xid.ID(postRef.Root)); err != nil {
+		return err
+	}
+
 	err = l.likeWriter.AddPostLike(ctx, accountID, postID)
 	if err != nil {
 		return err
@@ -61,6 +65,10 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.AccountID, postID post.ID) error {
 	postRef, err := l.postQuerier.Probe(ctx, postID)
 	if err != nil {
+		return err
+	}
+
+	if err := l.cache.Invalidate(ctx, xid.ID(postRef.Root)); err != nil {
 		return err
 	}
 

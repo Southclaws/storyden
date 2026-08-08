@@ -45,6 +45,16 @@ func (s *Store) Set(ctx context.Context, key string, object string, ttl time.Dur
 	return nil
 }
 
+func (s *Store) SetMany(ctx context.Context, values map[string]string, ttl time.Duration) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for key, value := range values {
+		s.values[key] = value
+	}
+	return nil
+}
+
 func (s *Store) Delete(ctx context.Context, key string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()

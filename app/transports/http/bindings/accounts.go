@@ -116,7 +116,6 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return openapi.AccountGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: accountGetCacheControl,
-				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		}, nil
@@ -137,7 +136,6 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
 				CacheControl: accountGetCacheControl,
-				LastModified: cachecontrol.HTTPDate(etag.Time),
 				ETag:         etag.String(),
 			},
 		},
@@ -160,7 +158,6 @@ func (i *Accounts) AccountView(ctx context.Context, request openapi.AccountViewR
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
 				CacheControl: "private, no-cache",
-				LastModified: cachecontrol.HTTPDate(acc.UpdatedAt),
 			},
 		},
 	}, nil
@@ -208,7 +205,6 @@ func (i *Accounts) AccountManageCreate(ctx context.Context, request openapi.Acco
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
 				CacheControl: "private, no-cache",
-				LastModified: cachecontrol.HTTPDate(acc.UpdatedAt),
 			},
 		},
 	}, nil
@@ -250,7 +246,6 @@ func (i *Accounts) AccountManageUpdate(ctx context.Context, request openapi.Acco
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
 				CacheControl: "private, no-cache",
-				LastModified: cachecontrol.HTTPDate(acc.UpdatedAt),
 			},
 		},
 	}, nil
