@@ -52,7 +52,7 @@ function createGridItems(count: number) {
 }
 
 const meta = {
-  title: "UI/Surface",
+  title: "Components/Data Display/Surface",
   component: Card,
   args: {
     id: "example-card",

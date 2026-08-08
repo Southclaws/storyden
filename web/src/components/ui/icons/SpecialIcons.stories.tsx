@@ -8,7 +8,7 @@ import { RunningAnimatedIcon } from "./RunningAnimatedIcon";
 import { SiteIcon } from "./Site";
 
 const meta = {
-  title: "UI/Icons/Special",
+  title: "Foundations/Icons/Special",
 } satisfies Meta;
 
 export default meta;

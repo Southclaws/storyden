@@ -5,7 +5,7 @@ import { LStack } from "@/styled-system/jsx";
 import { Switch } from ".";
 
 const meta = {
-  title: "UI/Switch",
+  title: "Components/Forms/Switch",
   component: Switch,
   args: {
     children: "Enable notifications",

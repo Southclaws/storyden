@@ -8,7 +8,7 @@ import * as Popover from ".";
 import { Popover as ClosedPopover } from "./Popover";
 
 const meta = {
-  title: "UI/Popover",
+  title: "Components/Overlays/Popover",
   component: ClosedPopover,
   args: {
     trigger: <Button variant="outline">Open popover</Button>,

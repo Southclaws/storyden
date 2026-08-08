@@ -7,7 +7,7 @@ import { Input } from "../input";
 import { FormControl } from ".";
 
 const meta = {
-  title: "UI/Form Control",
+  title: "Components/Forms/Form Control",
   component: FormControl,
 } satisfies Meta<typeof FormControl>;
 

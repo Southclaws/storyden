@@ -29,7 +29,7 @@ export const pageHeader = defineSlotRecipe({
     heading: {
       display: "flex",
       minWidth: "0",
-      alignItems: "start",
+      alignItems: "center",
       gap: "1",
     },
     titleGroup: {

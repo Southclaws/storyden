@@ -5,7 +5,7 @@ import { LStack, styled } from "@/styled-system/jsx";
 import { Input, InputPrefix } from ".";
 
 const meta = {
-  title: "UI/Input",
+  title: "Components/Forms/Input",
   component: Input,
   args: {
     placeholder: "Search community...",

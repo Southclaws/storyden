@@ -5,7 +5,7 @@ import { styled } from "@/styled-system/jsx";
 import { CardBox } from ".";
 
 const meta = {
-  title: "UI/Card Box",
+  title: "Components/Data Display/Card Box",
   component: CardBox,
   parameters: {
     layout: "centered",

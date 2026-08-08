@@ -22,7 +22,7 @@ type SelectStoryArgs = {
 };
 
 const meta = {
-  title: "UI/Select",
+  title: "Components/Forms/Select",
   args: {
     size: "sm",
     variant: "outline",

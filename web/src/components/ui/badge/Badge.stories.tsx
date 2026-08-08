@@ -5,7 +5,7 @@ import { HStack, LStack } from "@/styled-system/jsx";
 import { Badge, badgeColorPalettes, badgeColourPalette, badgeColours } from ".";
 
 const meta = {
-  title: "UI/Badge",
+  title: "Components/Data Display/Badge",
   component: Badge,
   args: {
     children: "Announcement",

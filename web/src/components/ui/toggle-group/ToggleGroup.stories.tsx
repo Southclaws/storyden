@@ -9,7 +9,7 @@ import { LayoutTableIcon } from "../icons/LayoutTable";
 import * as ToggleGroup from ".";
 
 const meta = {
-  title: "UI/Toggle Group",
+  title: "Components/Forms/Toggle Group",
   component: ToggleGroup.Root,
   args: {
     defaultValue: ["list"],

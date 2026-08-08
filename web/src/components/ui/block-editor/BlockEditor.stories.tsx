@@ -9,7 +9,7 @@ import { Box } from "@/styled-system/jsx";
 import * as BlockEditor from ".";
 
 const meta = {
-  title: "UI/Block Editor",
+  title: "Components/Layout/Block Editor",
   component: BlockEditor.Root,
   parameters: {
     layout: "padded",

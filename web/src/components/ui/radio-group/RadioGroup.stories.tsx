@@ -11,7 +11,7 @@ const options = [
 ];
 
 const meta = {
-  title: "UI/Radio Group",
+  title: "Components/Forms/Radio Group",
   component: RadioGroup.Root,
   args: {
     defaultValue: "public",

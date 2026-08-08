@@ -9,7 +9,7 @@ import { Input } from "../input";
 import { InputGroup } from ".";
 
 const meta = {
-  title: "UI/Input Group",
+  title: "Components/Forms/Input Group",
   component: InputGroup,
   args: {
     size: "sm",

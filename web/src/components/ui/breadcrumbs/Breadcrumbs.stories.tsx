@@ -5,7 +5,7 @@ import { Button } from "../button";
 import { Breadcrumbs } from ".";
 
 const meta = {
-  title: "UI/Breadcrumbs",
+  title: "Components/Navigation/Breadcrumbs",
   component: Breadcrumbs,
 } satisfies Meta<typeof Breadcrumbs>;
 

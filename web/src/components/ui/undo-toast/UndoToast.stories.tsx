@@ -5,7 +5,7 @@ import { Button } from "../button";
 import { showUndoToast } from ".";
 
 const meta = {
-  title: "UI/Undo Toast",
+  title: "Components/Feedback/Undo Toast",
 } satisfies Meta;
 
 export default meta;

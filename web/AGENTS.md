@@ -17,6 +17,23 @@ co-located `*.stories.tsx` file in the component folder.
   normal product usage instead of changing the component export just for the
   catalogue.
 
+Use explicit slash-delimited story titles so the intentionally flat UI source
+directory still produces a predictable Storybook hierarchy:
+
+- `Foundations/Tokens/<Token group>`, `Foundations/Icons/<Catalogue>`, and
+  `Foundations/Layout/<System>` document the raw design-system foundations.
+- `Components/<Role>/<Component>` contains isolated public UI components. Use
+  the established role folders: `Actions`, `Forms`, `Navigation`, `Feedback`,
+  `Overlays`, `Data Display`, `Layout`, and `Typography`.
+- `Compositions/<Domain>/<Pattern>` contains realistic arrangements of several
+  components without importing a complete product screen.
+- `Screens/<Screen>` contains complete representative screens and shell
+  examples.
+
+Do not introduce another top-level category or a miscellaneous component folder
+without first agreeing the taxonomy. The canonical top-level ordering lives in
+`.storybook/preview.tsx`.
+
 Do not start the long-running Storybook dev server from an agent unless the user
 explicitly asks. If the user already has Storybook running, use it for visual
 inspection. Otherwise validate with the static build.

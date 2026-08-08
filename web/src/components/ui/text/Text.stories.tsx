@@ -6,7 +6,7 @@ import { styled } from "@/styled-system/jsx";
 import { Text } from ".";
 
 const meta = {
-  title: "UI/Typography/Text",
+  title: "Components/Typography/Text",
   component: Text,
   args: {
     children: "There are 4 categories available to start discussions.",

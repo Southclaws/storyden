@@ -6,7 +6,7 @@ import { Grid } from "@/styled-system/jsx";
 import { ProgressCircle, ProgressHorizontal } from ".";
 
 const meta = {
-  title: "UI/Progress",
+  title: "Components/Feedback/Progress",
   component: ProgressHorizontal,
   args: {
     value: 64,

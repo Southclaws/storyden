@@ -7,7 +7,7 @@ import { Button } from "../button";
 import { Group } from ".";
 
 const meta = {
-  title: "UI/Group",
+  title: "Components/Layout/Group",
   component: Group,
   argTypes: {
     orientation: {

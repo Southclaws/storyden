@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PageHeading } from ".";
 
 const meta = {
-  title: "UI/Typography/Page Heading",
+  title: "Components/Typography/Page Heading",
   component: PageHeading,
   args: {
     children: "System settings",

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { FormLabel } from ".";
 
 const meta = {
-  title: "UI/Form Label",
+  title: "Components/Forms/Form Label",
   component: FormLabel,
   args: {
     children: "Display name",

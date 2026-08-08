@@ -5,7 +5,7 @@ import { HStack, LStack } from "@/styled-system/jsx";
 import { Button, ButtonGroup } from ".";
 
 const meta = {
-  title: "UI/Button",
+  title: "Components/Actions/Button",
   component: Button,
   args: {
     children: "Create post",

@@ -72,10 +72,12 @@ export function LibraryPageDirectoryBlockContents() {
         <HStack gap="1" alignItems="end" flexWrap="wrap-reverse" justify="end">
           <Input
             variant="inset"
+            background="background.inset"
             placeholder="Search..."
             onChange={handleSearchChange}
             minW="20"
             maxW="min"
+            px="2"
             flexShrink="1"
           />
 

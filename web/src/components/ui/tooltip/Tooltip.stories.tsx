@@ -9,7 +9,7 @@ import { ErrorTooltip } from "./ErrorTooltip.internal";
 import { Tooltip as ClosedTooltip } from "./Tooltip";
 
 const meta = {
-  title: "UI/Tooltip",
+  title: "Components/Overlays/Tooltip",
   component: ClosedTooltip,
   args: {
     children: <Button variant="outline">Hover for tooltip</Button>,

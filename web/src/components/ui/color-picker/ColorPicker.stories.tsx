@@ -20,7 +20,7 @@ const presets = [
 ];
 
 const meta = {
-  title: "UI/Color Picker",
+  title: "Components/Forms/Color Picker",
   component: ColorPicker.Root,
 } satisfies Meta<typeof ColorPicker.Root>;
 

@@ -10,9 +10,7 @@ import {
 } from "@/components/site/Navigation/SidebarNavigation";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { HomeIcon } from "@/components/ui/icons/Home";
 import { RobotIcon } from "@/components/ui/icons/Robot";
-import { useSmartBack } from "@/lib/navigation/smart-back";
 
 type Props = {
   robots: Robot[];
@@ -21,7 +19,6 @@ type Props = {
 
 export function RobotsNavigationPane({ robots, sessions }: Props) {
   const pathname = usePathname();
-  const goBack = useSmartBack();
 
   return (
     <SidebarNavigationPane label="Robots navigation" title="Robots">

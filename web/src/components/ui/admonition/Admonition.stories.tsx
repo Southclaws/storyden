@@ -6,7 +6,7 @@ import { Button } from "../button";
 import { Admonition } from ".";
 
 const meta = {
-  title: "UI/Admonition",
+  title: "Components/Feedback/Admonition",
   component: Admonition,
   args: {
     value: true,
