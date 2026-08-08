@@ -78,7 +78,7 @@ func TestVerificationCodeLocksOutAfterRepeatedGuesses(t *testing.T) {
 				Code:  code,
 			})
 			require.NoError(t, err)
-			a.NotEqual(http.StatusOK, resp.StatusCode(), "the correct code must be refused once the attempt budget is spent")
+			a.NotEqual(http.StatusOK, resp.StatusCode(), "the correct code must be refused once the attempt limit is reached")
 		}))
 	}))
 }
@@ -164,7 +164,7 @@ func TestResendRotatesTheCodeAndClearsAttempts(t *testing.T) {
 	}))
 }
 
-func TestConcurrentGuessesCannotOutrunTheAttemptBudget(t *testing.T) {
+func TestConcurrentGuessesCannotExceedTheAttemptLimit(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -201,14 +201,14 @@ func TestConcurrentGuessesCannotOutrunTheAttemptBudget(t *testing.T) {
 			record, err := db.Email.Query().Where(email_ent.EmailAddress(address)).Only(root)
 			r.NoError(err)
 			a.LessOrEqual(record.VerificationAttempts, email.MaxVerificationAttempts,
-				"the budget must cap the counter no matter how many guesses land at once")
+				"attempts must never exceed the limit, however many guesses arrive at once")
 
 			resp, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{
 				Email: address,
 				Code:  code,
 			})
 			r.NoError(err)
-			a.NotEqual(http.StatusOK, resp.StatusCode(), "the lockout must still hold after a concurrent burst")
+			a.NotEqual(http.StatusOK, resp.StatusCode(), "the lockout must still hold after a burst of parallel guesses")
 		}))
 	}))
 }

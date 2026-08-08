@@ -120,11 +120,11 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 		return nil, false, nil
 	}
 
-	claimed, err := r.claimAttempt(ctx, record.ID)
+	allowed, err := r.recordAttempt(ctx, record.ID)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
-	if !claimed {
+	if !allowed {
 		return nil, false, nil
 	}
 
@@ -154,8 +154,8 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 	return acc, true, nil
 }
 
-// the budget check is part of the update so concurrent guesses cannot all pass a stale read
-func (r *Repository) claimAttempt(ctx context.Context, id xid.ID) (bool, error) {
+// the limit is checked inside the update so concurrent guesses cannot all pass a stale read
+func (r *Repository) recordAttempt(ctx context.Context, id xid.ID) (bool, error) {
 	affected, err := r.db.Email.Update().
 		Where(
 			email_ent.ID(id),
