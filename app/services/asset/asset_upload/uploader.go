@@ -55,22 +55,35 @@ func (s *Uploader) Upload(ctx context.Context, or io.Reader, size int64, name as
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	counter := &countingReader{r: r}
+
+	if err := s.objects.Write(ctx, asset.BuildAssetPath(name), counter, size); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	stored := int(counter.n)
+
 	a, err := func() (asset *asset.Asset, err error) {
 		if pid, ok := opts.ParentID.Get(); ok {
-			return s.assets.AddVersion(ctx, xid.ID(accountID), name, int(size), *mt, pid)
+			return s.assets.AddVersion(ctx, xid.ID(accountID), name, stored, *mt, pid)
 		} else {
-			return s.assets.Add(ctx, xid.ID(accountID), name, int(size), *mt)
+			return s.assets.Add(ctx, xid.ID(accountID), name, stored, *mt)
 		}
 	}()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	path := asset.BuildAssetPath(a.Name)
-
-	if err := s.objects.Write(ctx, path, r, size); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	return a, nil
+}
+
+type countingReader struct {
+	r io.Reader
+	n int64
+}
+
+func (c *countingReader) Read(p []byte) (int, error) {
+	n, err := c.r.Read(p)
+	c.n += int64(n)
+	return n, err
 }
