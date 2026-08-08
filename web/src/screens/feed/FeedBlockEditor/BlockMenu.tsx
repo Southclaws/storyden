@@ -15,59 +15,25 @@ import { CreateBlockMenu } from "./CreateBlockMenu";
 
 type Props = {
   block: FeedBlock;
-  children: React.ReactNode;
   index: number;
-  onOpenChange?: (open: boolean) => void;
-  open?: boolean;
+  onConfigured: () => void;
 };
 
-export function BlockMenu({
-  block,
-  children,
-  index,
-  onOpenChange,
-  open,
-}: Props) {
+export function BlockMenu({ block, index, onConfigured }: Props) {
   const { feed, removeBlock } = useFeedBlockEditor();
   const canAdd = feed.blocks.length < 8;
 
-  function handleSelect({ value }: MenuSelectionDetails) {
-    if (value === "delete") {
-      void removeBlock(block.type);
-    }
-  }
-
   return (
-    <Menu.Root
-      lazyMount
-      open={open}
-      onOpenChange={(details) => onOpenChange?.(details.open)}
-      onSelect={handleSelect}
-      positioning={{ placement: "right-start", gutter: 0 }}
-    >
-      <Menu.Trigger asChild>{children}</Menu.Trigger>
-      <Portal>
-        <Menu.Positioner>
-          <Menu.Content minW="40">
-            <Menu.ItemGroup>
-              <Menu.ItemGroupLabel>
-                {FeedBlockName[block.type]}
-              </Menu.ItemGroupLabel>
-              <Menu.Separator />
-              <BlockConfigMenu
-                block={block}
-                onConfigured={() => onOpenChange?.(false)}
-              />
-              <Menu.Item value="delete">
-                <DeleteIcon />
-                Delete
-              </Menu.Item>
-              {canAdd && <CreateBlockMenu index={index} />}
-            </Menu.ItemGroup>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
+    <Menu.ItemGroup>
+      <Menu.ItemGroupLabel>{FeedBlockName[block.type]}</Menu.ItemGroupLabel>
+      <Menu.Separator />
+      <BlockConfigMenu block={block} onConfigured={onConfigured} />
+      <Menu.Item value="delete" onClick={() => void removeBlock(block.type)}>
+        <DeleteIcon />
+        Delete
+      </Menu.Item>
+      {canAdd && <CreateBlockMenu index={index} />}
+    </Menu.ItemGroup>
   );
 }
 

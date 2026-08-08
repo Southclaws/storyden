@@ -10,7 +10,7 @@ type BlockEditorVariantMap = {
   [key in keyof BlockEditorVariant]: Array<BlockEditorVariant[key]>
 }
 
-type BlockEditorSlot = "root" | "gutter" | "handle" | "content"
+type BlockEditorSlot = "root" | "gutter" | "handle" | "menuTrigger" | "menuAnchor" | "menuContent" | "content"
 
 export type BlockEditorVariantProps = {
   [key in keyof BlockEditorVariant]?: ConditionalValue<BlockEditorVariant[key]> | undefined

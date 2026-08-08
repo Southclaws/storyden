@@ -18,6 +18,18 @@ const blockEditorSlotNames = [
     "block-editor__handle"
   ],
   [
+    "menuTrigger",
+    "block-editor__menuTrigger"
+  ],
+  [
+    "menuAnchor",
+    "block-editor__menuAnchor"
+  ],
+  [
+    "menuContent",
+    "block-editor__menuContent"
+  ],
+  [
     "content",
     "block-editor__content"
   ]

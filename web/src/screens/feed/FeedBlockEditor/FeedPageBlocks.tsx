@@ -8,13 +8,11 @@ import { useCallback, useState } from "react";
 
 import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { DragItemFeedBlock } from "@/lib/dragdrop/provider";
 import { useFeedBlockEvent } from "@/lib/feed/events";
 import { FeedBlock, FeedBlockType } from "@/lib/settings/feed";
-import { Box, LStack } from "@/styled-system/jsx";
+import { LStack } from "@/styled-system/jsx";
 
 import { BlockMenu } from "./BlockMenu";
 import { useFeedBlockEditor } from "./Context";
@@ -133,30 +131,20 @@ function FeedBlockEditable({
       }}
     >
       <BlockEditor.Gutter>
-        <BlockEditor.Handle>
-          <IconButton
-            {...attributes}
-            {...listeners}
-            ref={setActivatorNodeRef}
-            aria-label="Move or configure block"
-            style={{ cursor: isDragging ? "grabbing" : "grab" }}
-            variant="subtle"
-            onClick={() => setOpen((open) => !open)}
-          >
-            <DragHandleIcon />
-          </IconButton>
-
-          <Box position="absolute" inset="0" pointerEvents="none">
-            <BlockMenu
-              block={block}
-              index={index}
-              open={isOpen}
-              onOpenChange={setOpen}
-            >
-              <Box width="full" height="full" />
-            </BlockMenu>
-          </Box>
-        </BlockEditor.Handle>
+        <BlockEditor.MenuHandle
+          {...attributes}
+          {...listeners}
+          ref={setActivatorNodeRef}
+          dragging={isDragging}
+          open={isOpen}
+          onOpenChange={setOpen}
+        >
+          <BlockMenu
+            block={block}
+            index={index}
+            onConfigured={() => setOpen(false)}
+          />
+        </BlockEditor.MenuHandle>
       </BlockEditor.Gutter>
       <BlockEditor.Content>
         <FeedBlockRender block={block} />

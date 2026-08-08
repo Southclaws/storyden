@@ -8,13 +8,10 @@ import { useCallback, useState } from "react";
 
 import * as BlockEditor from "@/components/ui/block-editor";
 import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { DragItemLibraryBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
-import { Box } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -187,31 +184,17 @@ function LibraryPageBlockEditable({
       style={dragStyle}
     >
       <BlockEditor.Gutter id={`block-${block.type}_gutter-container`}>
-        <BlockEditor.Handle>
-          <IconButton
-            {...attributes}
-            {...listeners}
-            ref={setActivatorNodeRef}
-            aria-label="Move or configure block"
-            id={`block-${block.type}_gutter-drag-handle`}
-            style={{ cursor: isDragging ? "grabbing" : "grab" }}
-            variant="subtle"
-            onClick={() => setOpen((open) => !open)}
-          >
-            <DragHandleIcon />
-          </IconButton>
-
-          <Box position="absolute" inset="0" pointerEvents="none">
-            <BlockMenu
-              block={block}
-              index={index}
-              open={isOpen}
-              onOpenChange={setOpen}
-            >
-              <Box width="full" height="full" />
-            </BlockMenu>
-          </Box>
-        </BlockEditor.Handle>
+        <BlockEditor.MenuHandle
+          {...attributes}
+          {...listeners}
+          ref={setActivatorNodeRef}
+          dragging={isDragging}
+          id={`block-${block.type}_gutter-drag-handle`}
+          open={isOpen}
+          onOpenChange={setOpen}
+        >
+          <BlockMenu block={block} index={index} />
+        </BlockEditor.MenuHandle>
       </BlockEditor.Gutter>
       <BlockEditor.Content id={`block-${block.type}_content`}>
         <LibraryPageBlockRender block={block} />
