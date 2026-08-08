@@ -325,12 +325,26 @@ func TestOAuthDeviceFlowRequiresOAuthClientPermission(t *testing.T) {
 				r.NotNil(consent.JSON400)
 				a.Equal("access_denied", consent.JSON400.Error)
 
+				unknownCode := openapi.OAuthUserCodeQuery(differentDeviceUserCode(t, *start.JSON200.UserCode))
+				unknownConsent := tests.AssertRequest(cl.OAuthDeviceConsentWithResponse(root, &openapi.OAuthDeviceConsentParams{
+					UserCode: &unknownCode,
+				}, memberSession))(t, http.StatusBadRequest)
+				r.NotNil(unknownConsent.JSON400)
+				a.Equal("access_denied", unknownConsent.JSON400.Error)
+
 				approve := tests.AssertRequest(cl.OAuthDeviceConsentSubmitWithResponse(root, openapi.OAuthDeviceConsentSubmitJSONRequestBody{
 					UserCode: *start.JSON200.UserCode,
 					Decision: openapi.OAuthDeviceDecisionApprove,
 				}, memberSession))(t, http.StatusBadRequest)
 				r.NotNil(approve.JSON400)
 				a.Equal("access_denied", approve.JSON400.Error)
+
+				unknownApprove := tests.AssertRequest(cl.OAuthDeviceConsentSubmitWithResponse(root, openapi.OAuthDeviceConsentSubmitJSONRequestBody{
+					UserCode: string(unknownCode),
+					Decision: openapi.OAuthDeviceDecisionApprove,
+				}, memberSession))(t, http.StatusBadRequest)
+				r.NotNil(unknownApprove.JSON400)
+				a.Equal("access_denied", unknownApprove.JSON400.Error)
 
 				token := tests.AssertRequest(oauthToken(t, root, cl, oauthTokenRequest{
 					GrantType:  oauthGrantDeviceCode,

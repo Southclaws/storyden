@@ -7,6 +7,8 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -34,6 +36,8 @@ type DeviceConsent struct {
 	InheritsUserPermissions bool
 }
 
+const userCodeGenerationAttempts = 5
+
 func (s *Service) StartDeviceAuthorization(ctx context.Context, clientID string, requestedScope opt.Optional[string]) (*DeviceAuthorisation, *Error, error) {
 	if !s.Enabled() {
 		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
@@ -41,7 +45,10 @@ func (s *Service) StartDeviceAuthorization(ctx context.Context, clientID string,
 
 	cl, err := s.getClientForDeviceAuthorization(ctx, clientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		if ftag.Get(err) == ftag.NotFound {
+			return nil, oauthError("invalid_client", "Client not found"), nil
+		}
+		return nil, nil, err
 	}
 	if cl.Type == oauthresource.ClientTypeConfidential {
 		return nil, oauthError("unauthorized_client", "Confidential clients cannot use device authorization"), nil
@@ -61,32 +68,39 @@ func (s *Service) StartDeviceAuthorization(ctx context.Context, clientID string,
 		return nil, oauthError("invalid_scope", "Requested scope is not permitted for this client"), nil
 	}
 
-	deviceCode, err := randomToken(32)
-	if err != nil {
-		return nil, nil, err
-	}
-	rawToken, err := randomToken(8)
-	if err != nil {
-		return nil, nil, err
-	}
-	raw := strings.ToUpper(rawToken)
-	userCode := raw[:4] + "-" + raw[4:8]
-
 	if _, err := s.tokens.DeleteExpiredDeviceAuthorisations(ctx, time.Now()); err != nil {
 		return nil, nil, err
 	}
 
-	_, err = s.tokens.CreateDeviceAuthorisation(ctx, oauth_writer.DeviceAuthorisationCreate{
-		ClientID:            cl.ID,
-		DeviceCodeHash:      hashString(deviceCode),
-		UserCodeHash:        hashString(normalizeCode(userCode)),
-		UserCodeDisplay:     userCode,
-		Scope:               scope,
-		ExpiresAt:           time.Now().Add(s.cfg.OAuthDeviceCodeTTL),
-		PollIntervalSeconds: int(s.cfg.OAuthDevicePollEvery.Seconds()),
-	})
+	var deviceCode, userCode string
+	for range userCodeGenerationAttempts {
+		deviceCode, err = randomToken(32)
+		if err != nil {
+			return nil, nil, err
+		}
+		userCode, err = generateUserCode()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		_, err = s.tokens.CreateDeviceAuthorisation(ctx, oauth_writer.DeviceAuthorisationCreate{
+			ClientID:            cl.ID,
+			DeviceCodeHash:      hashString(deviceCode),
+			UserCodeHash:        hashString(normalizeCode(userCode)),
+			UserCodeDisplay:     userCode,
+			Scope:               scope,
+			ExpiresAt:           time.Now().Add(s.cfg.OAuthDeviceCodeTTL),
+			PollIntervalSeconds: int(s.cfg.OAuthDevicePollEvery.Seconds()),
+		})
+		if err == nil {
+			break
+		}
+		if ftag.Get(err) != ftag.AlreadyExists {
+			return nil, nil, err
+		}
+	}
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to allocate unique oauth device codes"))
 	}
 
 	verificationURI := s.deviceAuthorizationConsentURL("")
@@ -114,6 +128,9 @@ func (s *Service) getClientForDeviceAuthorization(ctx context.Context, clientID 
 			}
 		}
 		return cl, nil
+	}
+	if ftag.Get(err) != ftag.NotFound {
+		return nil, err
 	}
 
 	if clientID == StorydenCLIClientID {
@@ -144,7 +161,7 @@ func (s *Service) getClientForDeviceAuthorization(ctx context.Context, clientID 
 			if err != nil {
 				return nil, err
 			}
-			return nil, fault.New("invalid CIMD client for device authorization")
+			return nil, fault.New("invalid CIMD client for device authorization", ftag.With(ftag.NotFound))
 		}
 		return cl, nil
 	}
@@ -156,13 +173,13 @@ func (s *Service) GetDeviceConsent(ctx context.Context, accountID account.Accoun
 	if !s.Enabled() {
 		return nil, oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
 	}
+	if !canAuthoriseOAuthClients(accountPermissions) {
+		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
+	}
 
 	rec, oauthErr, err := s.getPendingDeviceAuthorisation(ctx, userCode)
 	if oauthErr != nil || err != nil {
 		return nil, oauthErr, err
-	}
-	if !canAuthoriseOAuthClients(accountPermissions) {
-		return nil, oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
 	claimed, err := s.tokens.ClaimDeviceAuthorisation(ctx, rec.ID, accountID)
@@ -175,7 +192,10 @@ func (s *Service) GetDeviceConsent(ctx context.Context, accountID account.Accoun
 
 	cl, err := s.clients.GetClient(ctx, rec.ClientID)
 	if err != nil {
-		return nil, oauthError("invalid_client", "Client not found"), nil
+		if ftag.Get(err) == ftag.NotFound {
+			return nil, oauthError("invalid_client", "Client not found"), nil
+		}
+		return nil, nil, err
 	}
 
 	grantedScope, err := grantScope(rec.Scope, cl, accountPermissions)
@@ -194,64 +214,80 @@ func (s *Service) GetDeviceConsent(ctx context.Context, accountID account.Accoun
 	}, nil, nil
 }
 
-func (s *Service) ApproveDeviceAuthorization(ctx context.Context, accountID account.AccountID, accountPermissions rbac.Permissions, userCode string, approved bool) *Error {
+func (s *Service) ApproveDeviceAuthorization(ctx context.Context, accountID account.AccountID, accountPermissions rbac.Permissions, userCode string, approved bool) (*Error, error) {
 	if !s.Enabled() {
-		return oauthError("temporarily_unavailable", "OAuth is not enabled on this instance")
+		return oauthError("temporarily_unavailable", "OAuth is not enabled on this instance"), nil
+	}
+	if approved && !canAuthoriseOAuthClients(accountPermissions) {
+		return oauthError("access_denied", "Account is not permitted to authorise OAuth clients"), nil
 	}
 
 	rec, oauthErr, err := s.getPendingDeviceAuthorisation(ctx, userCode)
 	if oauthErr != nil || err != nil {
-		return oauthErr
+		return oauthErr, err
 	}
 
 	if claimant, ok := rec.ClaimedByAccountID.Get(); !ok || claimant != accountID {
-		return oauthError("access_denied", "Only the claiming account can approve or deny this request")
+		return invalidDeviceUserCodeError(), nil
 	}
 
 	if approved {
-		if !canAuthoriseOAuthClients(accountPermissions) {
-			return oauthError("access_denied", "Account is not permitted to authorise OAuth clients")
-		}
-
 		cl, err := s.clients.GetClient(ctx, rec.ClientID)
 		if err != nil {
-			return oauthError("invalid_client", "Client not found")
+			if ftag.Get(err) == ftag.NotFound {
+				return oauthError("invalid_client", "Client not found"), nil
+			}
+			return nil, err
 		}
 
 		grantedScope, err := grantScope(rec.Scope, cl, accountPermissions)
 		if err != nil {
-			return oauthError("invalid_scope", "Requested scope is not permitted for this account")
+			return oauthError("invalid_scope", "Requested scope is not permitted for this account"), nil
 		}
 
 		ok, err := s.tokens.ApproveDeviceAuthorisation(ctx, rec.ID, accountID, grantedScope, time.Now())
-		if err != nil || !ok {
-			return oauthError("invalid_request", "Failed to approve device authorisation")
+		if err != nil {
+			return nil, err
 		}
-		return nil
+		if !ok {
+			return oauthError("invalid_request", "Failed to approve device authorisation"), nil
+		}
+		return nil, nil
 	}
 
 	ok, err := s.tokens.DenyDeviceAuthorisation(ctx, rec.ID, time.Now())
-	if err != nil || !ok {
-		return oauthError("invalid_request", "Failed to deny device authorisation")
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	if !ok {
+		return oauthError("invalid_request", "Failed to deny device authorisation"), nil
+	}
+	return nil, nil
 }
 
 func (s *Service) getPendingDeviceAuthorisation(ctx context.Context, userCode string) (*oauthresource.DeviceAuthorisation, *Error, error) {
-	if strings.TrimSpace(userCode) == "" {
-		return nil, oauthError("invalid_request", "Missing user_code"), nil
+	normalized, ok := parseUserCode(userCode)
+	if !ok {
+		return nil, invalidDeviceUserCodeError(), nil
 	}
 
-	rec, err := s.clients.GetDeviceAuthorisationByUserCodeHash(ctx, hashString(normalizeCode(userCode)))
+	rec, err := s.clients.GetDeviceAuthorisationByUserCodeHash(ctx, hashString(normalized))
 	if err != nil {
-		return nil, oauthError("invalid_request", "User code not found"), nil
+		if ftag.Get(err) == ftag.NotFound {
+			return nil, invalidDeviceUserCodeError(), nil
+		}
+		return nil, nil, err
 	}
 
 	if rec.ExpiresAt.Before(time.Now()) || rec.ConsumedAt.Ok() || rec.ApprovedAt.Ok() || rec.DeniedAt.Ok() {
-		return nil, oauthError("invalid_request", "User code has expired or already been used"), nil
+		return nil, invalidDeviceUserCodeError(), nil
 	}
 
 	return rec, nil, nil
+}
+
+func invalidDeviceUserCodeError() *Error {
+	return oauthError("invalid_request", "User code is invalid or unavailable")
 }
 
 func (s *Service) exchangeDeviceCode(ctx context.Context, input TokenRequest) (*Token, *Error, error) {
@@ -273,7 +309,13 @@ func (s *Service) exchangeDeviceCode(ctx context.Context, input TokenRequest) (*
 	}
 
 	rec, err := s.clients.GetDeviceAuthorisationByDeviceCodeHash(ctx, hashString(deviceCode))
-	if err != nil || rec.ClientID != cl.ID {
+	if err != nil {
+		if ftag.Get(err) == ftag.NotFound {
+			return nil, oauthError("invalid_grant", "Device code is invalid or does not match client"), nil
+		}
+		return nil, nil, err
+	}
+	if rec.ClientID != cl.ID {
 		return nil, oauthError("invalid_grant", "Device code is invalid or does not match client"), nil
 	}
 

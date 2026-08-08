@@ -32,6 +32,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_email "github.com/Southclaws/storyden/internal/ent/email"
+	ent_oauth_device_authorisation "github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
@@ -148,6 +149,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				schema.WithApplyHook(populateLastReplyAt()),
 				schema.WithApplyHook(migrateReplyVisibility()),
 				schema.WithApplyHook(migrateAccountVerifiedStatus()),
+				schema.WithApplyHook(migrateOAuthDeviceUserCodeUniqueness()),
 			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to run schema migration"))
 			}
@@ -167,6 +169,59 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	})
 
 	return client, nil
+}
+
+const oauthDeviceUserCodeHashIndex = "oauthdeviceauthorisation_user_code_hash"
+
+// migrateOAuthDeviceUserCodeUniqueness removes every pending device flow before
+// the non-unique index is replaced with a unique one. Existing rows were hashed
+// with the old normalization rules, so retaining even non-duplicate hashes could
+// make an old code containing I/L/O resolve to a different row after aliases are
+// introduced. Device flows are short-lived and safe to restart, so fail closed.
+func migrateOAuthDeviceUserCodeUniqueness() schema.ApplyHook {
+	return func(next schema.Applier) schema.Applier {
+		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			if !addsUniqueOAuthDeviceUserCodeIndex(plan) {
+				return next.Apply(ctx, conn, plan)
+			}
+
+			if err := deleteOAuthDeviceAuthorisations(ctx, conn); err != nil {
+				return fault.Wrap(err, fmsg.With("failed to invalidate oauth device authorisations created with legacy user-code normalization"))
+			}
+
+			return next.Apply(ctx, conn, plan)
+		})
+	}
+}
+
+func addsUniqueOAuthDeviceUserCodeIndex(plan *migrate.Plan) bool {
+	for _, change := range plan.Changes {
+		modifyTable, ok := change.Source.(*atlas_schema.ModifyTable)
+		if !ok || modifyTable.T.Name != ent_oauth_device_authorisation.Table {
+			continue
+		}
+
+		for _, change := range modifyTable.Changes {
+			switch indexChange := change.(type) {
+			case *atlas_schema.AddIndex:
+				if indexChange.I.Name == oauthDeviceUserCodeHashIndex && indexChange.I.Unique {
+					return true
+				}
+			case *atlas_schema.ModifyIndex:
+				if indexChange.To.Name == oauthDeviceUserCodeHashIndex && indexChange.To.Unique {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+func deleteOAuthDeviceAuthorisations(ctx context.Context, conn dialect.ExecQuerier) error {
+	query := fmt.Sprintf("DELETE FROM %s", ent_oauth_device_authorisation.Table)
+
+	return conn.Exec(ctx, query, []any{}, nil)
 }
 
 func connect(cfg config.Config, driver *sql.DB) (*ent.Client, string, error) {

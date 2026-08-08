@@ -324,6 +324,9 @@ func (w *Writer) CreateDeviceAuthorisation(ctx context.Context, input DeviceAuth
 		SetPollIntervalSeconds(input.PollIntervalSeconds).
 		Save(ctx)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+		}
 		return nil, wrapWriteError(ctx, err)
 	}
 
