@@ -2,8 +2,10 @@ package email
 
 import (
 	"context"
+	"crypto/subtle"
 	"log/slog"
 	"net/mail"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,6 +19,13 @@ import (
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 	email_ent "github.com/Southclaws/storyden/internal/ent/email"
 )
+
+const (
+	VerificationCodeLifespan = time.Hour
+	MaxVerificationAttempts  = 5
+)
+
+var ErrCodeSuperseded = fault.New("verification code was replaced before it was used")
 
 type Repository struct {
 	db          *ent.Client
@@ -49,7 +58,9 @@ func (r *Repository) Add(ctx context.Context,
 		// Already claimed by this account, update the record
 		update := r.db.Email.UpdateOne(existing).
 			Where(email_ent.EmailAddress(email.Address)).
-			SetVerificationCode(code)
+			SetVerificationCode(code).
+			SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan)).
+			SetVerificationAttempts(0)
 
 		if existing.AccountID == nil {
 			update.SetAccountID(xid.ID(accountID))
@@ -70,7 +81,8 @@ func (r *Repository) Add(ctx context.Context,
 	create := r.db.Email.Create().
 		SetAccountID(xid.ID(accountID)).
 		SetEmailAddress(email.Address).
-		SetVerificationCode(code)
+		SetVerificationCode(code).
+		SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan))
 
 	result, err := create.Save(ctx)
 	if err != nil {
@@ -85,31 +97,47 @@ func (r *Repository) Add(ctx context.Context,
 	return account.MapEmail(result), nil
 }
 
-func (r *Repository) GetCode(ctx context.Context, emailAddress mail.Address) (string, error) {
-	q := r.db.Email.Query().
-		Where(email_ent.EmailAddress(emailAddress.Address))
-
-	result, err := q.Only(ctx)
+func (r *Repository) RotateCode(ctx context.Context, emailAddress mail.Address, code string) error {
+	_, err := r.db.Email.Update().
+		Where(email_ent.EmailAddress(emailAddress.Address)).
+		SetVerificationCode(code).
+		SetVerificationCodeExpiresAt(time.Now().Add(VerificationCodeLifespan)).
+		SetVerificationAttempts(0).
+		Save(ctx)
 	if err != nil {
-		return "", fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return result.VerificationCode, nil
+	return nil
 }
 
 func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, code string) (*account.Account, bool, error) {
-	q := r.db.Account.
-		Query().
-		Where(
-			account_ent.HasEmailsWith(
-				email_ent.EmailAddress(emailAddress.Address),
-				email_ent.VerificationCode(code),
-			),
-		).
-		WithEmails().
-		WithAuthentication()
+	record, exists, err := r.lookupEmail(ctx, emailAddress)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return nil, false, nil
+	}
 
-	result, err := q.Only(ctx)
+	allowed, err := r.recordAttempt(ctx, record.ID)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !allowed {
+		return nil, false, nil
+	}
+
+	if subtle.ConstantTimeCompare([]byte(record.VerificationCode), []byte(code)) != 1 {
+		return nil, false, nil
+	}
+
+	result, err := r.db.Account.
+		Query().
+		Where(account_ent.HasEmailsWith(email_ent.ID(record.ID))).
+		WithEmails().
+		WithAuthentication().
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, false, nil
@@ -126,16 +154,39 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 	return acc, true, nil
 }
 
-func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address) error {
-	_, err := r.db.Email.Update().
+// the limit is checked inside the update so concurrent guesses cannot all pass a stale read
+func (r *Repository) recordAttempt(ctx context.Context, id xid.ID) (bool, error) {
+	affected, err := r.db.Email.Update().
+		Where(
+			email_ent.ID(id),
+			email_ent.VerificationAttemptsLT(MaxVerificationAttempts),
+			email_ent.VerificationCodeExpiresAtGT(time.Now()),
+		).
+		AddVerificationAttempts(1).
+		Save(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return affected > 0, nil
+}
+
+func (r *Repository) Verify(ctx context.Context, accountID account.AccountID, email mail.Address, code string) error {
+	affected, err := r.db.Email.Update().
 		Where(
 			email_ent.EmailAddress(email.Address),
 			email_ent.AccountID(xid.ID(accountID)),
+			email_ent.VerificationCode(code),
 		).
 		SetVerified(true).
+		SetVerificationAttempts(0).
+		ClearVerificationCodeExpiresAt().
 		Save(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if affected == 0 {
+		return fault.Wrap(ErrCodeSuperseded, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 	}
 
 	r.trySyncVerifiedStatus(ctx, accountID)

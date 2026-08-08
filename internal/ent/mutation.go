@@ -12349,19 +12349,22 @@ func (m *CollectionPostMutation) ResetEdge(name string) error {
 // EmailMutation represents an operation that mutates the Email nodes in the graph.
 type EmailMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *xid.ID
-	created_at        *time.Time
-	email_address     *string
-	verification_code *string
-	verified          *bool
-	clearedFields     map[string]struct{}
-	account           *xid.ID
-	clearedaccount    bool
-	done              bool
-	oldValue          func(context.Context) (*Email, error)
-	predicates        []predicate.Email
+	op                           Op
+	typ                          string
+	id                           *xid.ID
+	created_at                   *time.Time
+	email_address                *string
+	verification_code            *string
+	verification_code_expires_at *time.Time
+	verification_attempts        *int
+	addverification_attempts     *int
+	verified                     *bool
+	clearedFields                map[string]struct{}
+	account                      *xid.ID
+	clearedaccount               bool
+	done                         bool
+	oldValue                     func(context.Context) (*Email, error)
+	predicates                   []predicate.Email
 }
 
 var _ ent.Mutation = (*EmailMutation)(nil)
@@ -12625,6 +12628,111 @@ func (m *EmailMutation) ResetVerificationCode() {
 	m.verification_code = nil
 }
 
+// SetVerificationCodeExpiresAt sets the "verification_code_expires_at" field.
+func (m *EmailMutation) SetVerificationCodeExpiresAt(t time.Time) {
+	m.verification_code_expires_at = &t
+}
+
+// VerificationCodeExpiresAt returns the value of the "verification_code_expires_at" field in the mutation.
+func (m *EmailMutation) VerificationCodeExpiresAt() (r time.Time, exists bool) {
+	v := m.verification_code_expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVerificationCodeExpiresAt returns the old "verification_code_expires_at" field's value of the Email entity.
+// If the Email object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailMutation) OldVerificationCodeExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVerificationCodeExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVerificationCodeExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVerificationCodeExpiresAt: %w", err)
+	}
+	return oldValue.VerificationCodeExpiresAt, nil
+}
+
+// ClearVerificationCodeExpiresAt clears the value of the "verification_code_expires_at" field.
+func (m *EmailMutation) ClearVerificationCodeExpiresAt() {
+	m.verification_code_expires_at = nil
+	m.clearedFields[email.FieldVerificationCodeExpiresAt] = struct{}{}
+}
+
+// VerificationCodeExpiresAtCleared returns if the "verification_code_expires_at" field was cleared in this mutation.
+func (m *EmailMutation) VerificationCodeExpiresAtCleared() bool {
+	_, ok := m.clearedFields[email.FieldVerificationCodeExpiresAt]
+	return ok
+}
+
+// ResetVerificationCodeExpiresAt resets all changes to the "verification_code_expires_at" field.
+func (m *EmailMutation) ResetVerificationCodeExpiresAt() {
+	m.verification_code_expires_at = nil
+	delete(m.clearedFields, email.FieldVerificationCodeExpiresAt)
+}
+
+// SetVerificationAttempts sets the "verification_attempts" field.
+func (m *EmailMutation) SetVerificationAttempts(i int) {
+	m.verification_attempts = &i
+	m.addverification_attempts = nil
+}
+
+// VerificationAttempts returns the value of the "verification_attempts" field in the mutation.
+func (m *EmailMutation) VerificationAttempts() (r int, exists bool) {
+	v := m.verification_attempts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVerificationAttempts returns the old "verification_attempts" field's value of the Email entity.
+// If the Email object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmailMutation) OldVerificationAttempts(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVerificationAttempts is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVerificationAttempts requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVerificationAttempts: %w", err)
+	}
+	return oldValue.VerificationAttempts, nil
+}
+
+// AddVerificationAttempts adds i to the "verification_attempts" field.
+func (m *EmailMutation) AddVerificationAttempts(i int) {
+	if m.addverification_attempts != nil {
+		*m.addverification_attempts += i
+	} else {
+		m.addverification_attempts = &i
+	}
+}
+
+// AddedVerificationAttempts returns the value that was added to the "verification_attempts" field in this mutation.
+func (m *EmailMutation) AddedVerificationAttempts() (r int, exists bool) {
+	v := m.addverification_attempts
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetVerificationAttempts resets all changes to the "verification_attempts" field.
+func (m *EmailMutation) ResetVerificationAttempts() {
+	m.verification_attempts = nil
+	m.addverification_attempts = nil
+}
+
 // SetVerified sets the "verified" field.
 func (m *EmailMutation) SetVerified(b bool) {
 	m.verified = &b
@@ -12722,7 +12830,7 @@ func (m *EmailMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EmailMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, email.FieldCreatedAt)
 	}
@@ -12734,6 +12842,12 @@ func (m *EmailMutation) Fields() []string {
 	}
 	if m.verification_code != nil {
 		fields = append(fields, email.FieldVerificationCode)
+	}
+	if m.verification_code_expires_at != nil {
+		fields = append(fields, email.FieldVerificationCodeExpiresAt)
+	}
+	if m.verification_attempts != nil {
+		fields = append(fields, email.FieldVerificationAttempts)
 	}
 	if m.verified != nil {
 		fields = append(fields, email.FieldVerified)
@@ -12754,6 +12868,10 @@ func (m *EmailMutation) Field(name string) (ent.Value, bool) {
 		return m.EmailAddress()
 	case email.FieldVerificationCode:
 		return m.VerificationCode()
+	case email.FieldVerificationCodeExpiresAt:
+		return m.VerificationCodeExpiresAt()
+	case email.FieldVerificationAttempts:
+		return m.VerificationAttempts()
 	case email.FieldVerified:
 		return m.Verified()
 	}
@@ -12773,6 +12891,10 @@ func (m *EmailMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldEmailAddress(ctx)
 	case email.FieldVerificationCode:
 		return m.OldVerificationCode(ctx)
+	case email.FieldVerificationCodeExpiresAt:
+		return m.OldVerificationCodeExpiresAt(ctx)
+	case email.FieldVerificationAttempts:
+		return m.OldVerificationAttempts(ctx)
 	case email.FieldVerified:
 		return m.OldVerified(ctx)
 	}
@@ -12812,6 +12934,20 @@ func (m *EmailMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetVerificationCode(v)
 		return nil
+	case email.FieldVerificationCodeExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVerificationCodeExpiresAt(v)
+		return nil
+	case email.FieldVerificationAttempts:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVerificationAttempts(v)
+		return nil
 	case email.FieldVerified:
 		v, ok := value.(bool)
 		if !ok {
@@ -12826,13 +12962,21 @@ func (m *EmailMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *EmailMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addverification_attempts != nil {
+		fields = append(fields, email.FieldVerificationAttempts)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *EmailMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case email.FieldVerificationAttempts:
+		return m.AddedVerificationAttempts()
+	}
 	return nil, false
 }
 
@@ -12841,6 +12985,13 @@ func (m *EmailMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *EmailMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case email.FieldVerificationAttempts:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVerificationAttempts(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Email numeric field %s", name)
 }
@@ -12851,6 +13002,9 @@ func (m *EmailMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(email.FieldAccountID) {
 		fields = append(fields, email.FieldAccountID)
+	}
+	if m.FieldCleared(email.FieldVerificationCodeExpiresAt) {
+		fields = append(fields, email.FieldVerificationCodeExpiresAt)
 	}
 	return fields
 }
@@ -12868,6 +13022,9 @@ func (m *EmailMutation) ClearField(name string) error {
 	switch name {
 	case email.FieldAccountID:
 		m.ClearAccountID()
+		return nil
+	case email.FieldVerificationCodeExpiresAt:
+		m.ClearVerificationCodeExpiresAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Email nullable field %s", name)
@@ -12888,6 +13045,12 @@ func (m *EmailMutation) ResetField(name string) error {
 		return nil
 	case email.FieldVerificationCode:
 		m.ResetVerificationCode()
+		return nil
+	case email.FieldVerificationCodeExpiresAt:
+		m.ResetVerificationCodeExpiresAt()
+		return nil
+	case email.FieldVerificationAttempts:
+		m.ResetVerificationAttempts()
 		return nil
 	case email.FieldVerified:
 		m.ResetVerified()

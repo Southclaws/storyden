@@ -23,6 +23,10 @@ const (
 	FieldEmailAddress = "email_address"
 	// FieldVerificationCode holds the string denoting the verification_code field in the database.
 	FieldVerificationCode = "verification_code"
+	// FieldVerificationCodeExpiresAt holds the string denoting the verification_code_expires_at field in the database.
+	FieldVerificationCodeExpiresAt = "verification_code_expires_at"
+	// FieldVerificationAttempts holds the string denoting the verification_attempts field in the database.
+	FieldVerificationAttempts = "verification_attempts"
 	// FieldVerified holds the string denoting the verified field in the database.
 	FieldVerified = "verified"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
@@ -45,6 +49,8 @@ var Columns = []string{
 	FieldAccountID,
 	FieldEmailAddress,
 	FieldVerificationCode,
+	FieldVerificationCodeExpiresAt,
+	FieldVerificationAttempts,
 	FieldVerified,
 }
 
@@ -65,6 +71,8 @@ var (
 	EmailAddressValidator func(string) error
 	// VerificationCodeValidator is a validator for the "verification_code" field. It is called by the builders before save.
 	VerificationCodeValidator func(string) error
+	// DefaultVerificationAttempts holds the default value on creation for the "verification_attempts" field.
+	DefaultVerificationAttempts int
 	// DefaultVerified holds the default value on creation for the "verified" field.
 	DefaultVerified bool
 	// DefaultID holds the default value on creation for the "id" field.
@@ -99,6 +107,16 @@ func ByEmailAddress(opts ...sql.OrderTermOption) OrderOption {
 // ByVerificationCode orders the results by the verification_code field.
 func ByVerificationCode(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVerificationCode, opts...).ToFunc()
+}
+
+// ByVerificationCodeExpiresAt orders the results by the verification_code_expires_at field.
+func ByVerificationCodeExpiresAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVerificationCodeExpiresAt, opts...).ToFunc()
+}
+
+// ByVerificationAttempts orders the results by the verification_attempts field.
+func ByVerificationAttempts(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVerificationAttempts, opts...).ToFunc()
 }
 
 // ByVerified orders the results by the verified field.

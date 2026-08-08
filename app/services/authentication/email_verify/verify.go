@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
+	"github.com/Southclaws/storyden/internal/otp"
 )
 
 var (
@@ -92,8 +93,12 @@ func (s *Verifier) ResendVerification(ctx context.Context, address mail.Address)
 		return fault.Wrap(ErrAccountNotFound, fctx.With(ctx))
 	}
 
-	code, err := s.emailRepo.GetCode(ctx, address)
+	code, err := otp.Generate()
 	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := s.emailRepo.RotateCode(ctx, address, code); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -113,7 +118,7 @@ func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code s
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.emailRepo.Verify(ctx, acc.ID, emailAddress)
+	err = s.emailRepo.Verify(ctx, acc.ID, emailAddress, code)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
