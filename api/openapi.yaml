@@ -1232,6 +1232,8 @@ paths:
         Reading consent claims the user code for the signed-in account. This
         prevents another account from approving the same code after it has been
         displayed.
+      x-storyden:
+        rate-limit-cost: 20
       tags: [auth]
       security: [browser: []]
       parameters: [{ $ref: "#/components/parameters/OAuthUserCodeQuery" }]
@@ -1250,6 +1252,8 @@ paths:
         account permissions and client policy. For first-party inherited clients
         this means the final token scope may include Storyden permission scopes
         that were not present in the original device authorisation request.
+      x-storyden:
+        rate-limit-cost: 20
       tags: [auth]
       security: [browser: []]
       requestBody:

@@ -282,6 +282,19 @@ func standardScopes() []string {
 	return []string{"openid", "profile", "email", "offline_access"}
 }
 
+func differentDeviceUserCode(t *testing.T, code string) string {
+	t.Helper()
+	require.Len(t, code, 9)
+	require.Equal(t, byte('-'), code[4])
+
+	replacement := byte('0')
+	if code[0] == replacement {
+		replacement = '1'
+	}
+
+	return string(replacement) + code[1:]
+}
+
 func ptr[T any](v T) *T {
 	return &v
 }

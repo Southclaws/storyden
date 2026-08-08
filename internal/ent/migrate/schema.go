@@ -971,7 +971,7 @@ var (
 			},
 			{
 				Name:    "oauthdeviceauthorisation_user_code_hash",
-				Unique:  false,
+				Unique:  true,
 				Columns: []*schema.Column{OauthDeviceAuthorisationsColumns[3]},
 			},
 		},

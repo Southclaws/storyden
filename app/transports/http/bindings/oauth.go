@@ -517,7 +517,10 @@ func (o OAuth) OAuthDeviceConsentSubmit(ctx context.Context, req openapi.OAuthDe
 		return nil, err
 	}
 
-	oauthErr := o.oauth.ApproveDeviceAuthorization(ctx, account.AccountID(acc), permissions, req.Body.UserCode, req.Body.Decision == openapi.OAuthDeviceDecisionApprove)
+	oauthErr, err := o.oauth.ApproveDeviceAuthorization(ctx, account.AccountID(acc), permissions, req.Body.UserCode, req.Body.Decision == openapi.OAuthDeviceDecisionApprove)
+	if err != nil {
+		return nil, err
+	}
 	if oauthErr != nil {
 		return openapi.OAuthDeviceConsentSubmit400JSONResponse{
 			OAuthErrorJSONResponse: openapi.OAuthErrorJSONResponse(openapi.OAuthError{

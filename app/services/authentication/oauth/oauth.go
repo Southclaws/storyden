@@ -35,6 +35,7 @@ const (
 
 	cleanupInterval          = time.Hour
 	dcrClientRetentionPeriod = 7 * 24 * time.Hour
+	maxUserCodeInputLength   = 32
 )
 
 type Error struct {
@@ -247,14 +248,21 @@ func randomToken(n int) (string, error) {
 	return b64url(b), nil
 }
 
-// userCodeAlphabet is Crockford's base32 alphabet: it excludes -, _ (so
-// codes are unambiguous once hyphens are stripped for lookup) and the
-// 0/O/1/I/L/U confusables that are hard to tell apart when read off a screen.
+// userCodeAlphabet is Crockford's base32 alphabet. It excludes the visually
+// ambiguous letters I, L, O, and U; normalizeCode accepts I/L and O as aliases
+// for the digits 1 and 0 when a user transcribes a code.
 const userCodeAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
+var userCodeAliases = strings.NewReplacer(
+	"O", "0",
+	"I", "1",
+	"L", "1",
+)
+
 // generateUserCode produces an 8-character user code formatted as XXXX-XXXX
-// from userCodeAlphabet. 256 is an exact multiple of len(userCodeAlphabet)
-// (32), so masking a random byte to 5 bits introduces no modulo bias.
+// from userCodeAlphabet, providing exactly 40 bits of entropy. 256 is an exact
+// multiple of len(userCodeAlphabet) (32), so masking a random byte to 5 bits
+// introduces no modulo bias.
 func generateUserCode() (string, error) {
 	b := make([]byte, 8)
 	if _, err := rand.Read(b); err != nil {
@@ -288,5 +296,30 @@ func contains(in []string, v string) bool {
 }
 
 func normalizeCode(v string) string {
-	return strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(v), "-", ""))
+	normalized := strings.ToUpper(strings.ReplaceAll(strings.TrimSpace(v), "-", ""))
+
+	return userCodeAliases.Replace(normalized)
+}
+
+func parseUserCode(v string) (string, bool) {
+	// Bound work before trimming, case folding, or removing separators. The
+	// canonical representation is only eight bytes; the extra room permits
+	// harmless surrounding whitespace and separators without accepting an
+	// arbitrarily large value at this low-entropy lookup boundary.
+	if len(v) > maxUserCodeInputLength {
+		return "", false
+	}
+
+	normalized := normalizeCode(v)
+	if len(normalized) != 8 {
+		return "", false
+	}
+
+	for _, c := range normalized {
+		if !strings.ContainsRune(userCodeAlphabet, c) {
+			return "", false
+		}
+	}
+
+	return normalized, true
 }

@@ -58,6 +58,6 @@ func (OAuthDeviceAuthorisation) Edges() []ent.Edge {
 func (OAuthDeviceAuthorisation) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("device_code_hash").Unique(),
-		index.Fields("user_code_hash"),
+		index.Fields("user_code_hash").Unique(),
 	}
 }

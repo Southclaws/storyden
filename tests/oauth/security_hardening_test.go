@@ -493,7 +493,15 @@ func TestOAuthSecurityHardeningDeviceFlowCrossAccountClaim(t *testing.T) {
 					Decision: openapi.OAuthDeviceDecisionApprove,
 				}, attackerSession))(t, http.StatusBadRequest)
 				r.NotNil(blocked.JSON400)
-				a.Equal("access_denied", blocked.JSON400.Error)
+				a.Equal("invalid_request", blocked.JSON400.Error)
+
+				unknown := tests.AssertRequest(cl.OAuthDeviceConsentSubmitWithResponse(root, openapi.OAuthDeviceConsentSubmitJSONRequestBody{
+					UserCode: differentDeviceUserCode(t, *start.JSON200.UserCode),
+					Decision: openapi.OAuthDeviceDecisionApprove,
+				}, attackerSession))(t, http.StatusBadRequest)
+				r.NotNil(unknown.JSON400)
+				a.Equal(blocked.JSON400.Error, unknown.JSON400.Error)
+				a.Equal(blocked.JSON400.ErrorDescription, unknown.JSON400.ErrorDescription)
 			})
 
 			t.Run("attacker_cannot_claim_already_claimed_device_flow", func(t *testing.T) {
