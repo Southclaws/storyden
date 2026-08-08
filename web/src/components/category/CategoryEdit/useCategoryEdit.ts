@@ -18,7 +18,7 @@ export const FormSchema = z.object({
   name: z.string().min(1),
   slug: z.string().transform(slugify).pipe(z.string().min(1)),
   description: z.string().min(1),
-  colour: z.string().default("#fff"),
+  colour: z.string(),
   cover_image: z.custom<Asset>().nullable().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;

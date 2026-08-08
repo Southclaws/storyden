@@ -1,4 +1,5 @@
-import { BubbleMenu, Editor } from "@tiptap/react";
+import { Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 
 import { Button } from "@/components/ui/button";
 import { CardIcon } from "@/components/ui/icons/Card";
@@ -59,44 +60,27 @@ export function LinkPasteMenu({ editor }: Props) {
         const menuState = linkPasteMenuKey.getState(editor.state);
         return menuState?.isVisible ?? false;
       }}
-      tippyOptions={{
+      options={{
         placement: "bottom-start",
-        maxWidth: "100%",
+        offset: { mainAxis: 4 },
+        flip: {
+          fallbackPlacements: ["top-start"],
+          boundary: editor.view.dom,
+          padding: 8,
+        },
+        shift: {
+          boundary: editor.view.dom,
+          crossAxis: true,
+          padding: {
+            top: 0,
+            right: 0,
+            bottom: -40,
+            left: 0,
+          },
+          rootBoundary: "viewport",
+        },
         onHide: () => {
           dismissMenu();
-        },
-        popperOptions: {
-          modifiers: [
-            {
-              name: "offset",
-              options: {
-                offset: [0, 4],
-              },
-            },
-            {
-              name: "flip",
-              options: {
-                fallbackPlacements: ["top-start"],
-                boundary: editor.view.dom,
-                padding: 8,
-              },
-            },
-            {
-              name: "preventOverflow",
-              options: {
-                boundary: editor.view.dom,
-                altAxis: true,
-                padding: {
-                  top: 0,
-                  right: 0,
-                  bottom: -40,
-                  left: 0,
-                },
-                rootBoundary: "viewport",
-                tether: false,
-              },
-            },
-          ],
         },
       }}
       className={css({

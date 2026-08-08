@@ -1,12 +1,18 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import { forwardRef, useEffect, useRef, useState } from "react";
-import { blockEditor } from "styled-system/recipes";
+import {
+  type ComponentProps,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { blockEditor, button } from "styled-system/recipes";
 
-import { IconButton, IconButtonProps } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import * as Menu from "@/components/ui/menu";
+import { cx } from "@/styled-system/css";
 import type { HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
 
@@ -25,8 +31,22 @@ export const Handle = withContext<HTMLDivElement, HTMLStyledProps<"div">>(
   "handle",
 );
 
-const MenuTrigger = withContext<HTMLButtonElement, IconButtonProps>(
-  IconButton,
+type MenuTriggerProps = ComponentProps<typeof Menu.Trigger>;
+
+const MenuTriggerBase = forwardRef<HTMLButtonElement, MenuTriggerProps>(
+  function MenuTriggerBase({ className, ...props }, ref) {
+    return (
+      <Menu.Trigger
+        {...props}
+        ref={ref}
+        className={cx(button({ size: "sm", variant: "subtle" }), className)}
+      />
+    );
+  },
+);
+
+const MenuTrigger = withContext<HTMLButtonElement, MenuTriggerProps>(
+  MenuTriggerBase,
   "menuTrigger",
 );
 
@@ -36,7 +56,7 @@ const MenuContent = withContext<HTMLDivElement, Menu.ContentProps>(
 );
 
 export interface MenuHandleProps extends Omit<
-  IconButtonProps,
+  MenuTriggerProps,
   "children" | "onClick"
 > {
   children: React.ReactNode;
@@ -99,16 +119,15 @@ export const MenuHandle = forwardRef<HTMLButtonElement, MenuHandleProps>(
           onOpenChange={({ open: nextOpen }) => setMenuOpen(nextOpen)}
           positioning={{ placement: "right-start", gutter: 0 }}
         >
-          <Menu.Trigger asChild>
-            <MenuTrigger
-              {...triggerProps}
-              ref={ref}
-              aria-label={ariaLabel}
-              data-dragging={dragging ? "" : undefined}
-            >
-              <DragHandleIcon />
-            </MenuTrigger>
-          </Menu.Trigger>
+          <MenuTrigger
+            {...triggerProps}
+            ref={ref}
+            aria-label={ariaLabel}
+            title={triggerProps.title ?? ariaLabel}
+            data-dragging={dragging ? "" : undefined}
+          >
+            <DragHandleIcon />
+          </MenuTrigger>
 
           <Portal>
             <Menu.Positioner>

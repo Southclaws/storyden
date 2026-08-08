@@ -1,6 +1,6 @@
 "use client";
 
-import { FocusClasses } from "@tiptap/extension-focus";
+import FocusClasses from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
@@ -98,7 +98,7 @@ export function useContentComposer(props: ContentComposerProps) {
   });
 
   const extensions = [
-    StarterKit,
+    StarterKit.configure({ link: false }),
     FocusClasses,
     LinkPreview,
     LinkPasteMenuPlugin,

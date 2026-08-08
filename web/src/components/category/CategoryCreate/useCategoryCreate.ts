@@ -19,7 +19,7 @@ export const FormSchema = z.object({
     .transform(slugify)
     .pipe(z.string().min(1, "Please enter a URL slug for the category.")),
   description: z.string().min(1, "Please enter a short description."),
-  colour: z.string().default("#8577ce"),
+  colour: z.string(),
   parent: z.string().optional(),
   cover_image_asset_id: z.string().optional(),
 });

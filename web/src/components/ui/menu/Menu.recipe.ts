@@ -79,7 +79,10 @@ export const menu = defineSlotRecipe({
       flexDirection: "column",
     },
     positioner: {
-      zIndex: "popover",
+      // Zag snapshots the content z-index into an inline custom property. The
+      // first measurement can happen before recipe styles resolve, leaving the
+      // positioner at `auto`, so keep the portal in the popover layer directly.
+      zIndex: "var(--z-index-popover) !important",
     },
     item: itemStyle,
     triggerItem: itemStyle,

@@ -9,12 +9,7 @@ import {
 const PASSWORD = "TestPassword123!";
 
 async function clickOutsideOpenMenu(page: Page) {
-  const viewport = page.viewportSize();
-  if (!viewport) {
-    throw new Error("Playwright viewport is unavailable");
-  }
-
-  await page.mouse.click(viewport.width - 2, viewport.height - 2);
+  await page.locator("#block-content_content:visible").click();
 }
 
 async function dragBlockBelow(
@@ -43,9 +38,16 @@ async function dragBlockBelow(
     sourceBox.y + sourceBox.height / 2 + 4,
     { steps: 2 },
   );
+  await expect(source).toHaveAttribute("data-dragging", "");
+
+  const liveTargetBox = await target.boundingBox();
+  if (!liveTargetBox) {
+    throw new Error("Live block drag geometry is unavailable");
+  }
+
   await page.mouse.move(
-    targetBox.x + targetBox.width / 2,
-    targetBox.y + targetBox.height - 2,
+    liveTargetBox.x + liveTargetBox.width / 2,
+    liveTargetBox.y + liveTargetBox.height - 2,
     { steps: 12 },
   );
   await page.mouse.up();
@@ -94,7 +96,7 @@ test.describe("Library page block editor", () => {
     const directoryMenuLabel = page
       .locator('[data-scope="menu"][data-part="item-group-label"]')
       .getByText("Directory", { exact: true });
-    await directoryMenuLabel.click();
+    await directoryMenuLabel.dispatchEvent("pointerdown");
     await expect(
       page.getByRole("menuitem", { name: "Layout", exact: true }),
     ).toBeVisible();

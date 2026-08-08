@@ -12,7 +12,7 @@ import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCateg
 export type Props = { editing?: string; initialDraft?: Thread };
 
 export const FormShapeSchema = z.object({
-  title: z.string().default(""),
+  title: z.string(),
   body: z.string().min(1),
   category: z.string().optional(),
   tags: z.string().array().optional(),
@@ -36,7 +36,10 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           tags: initialDraft.tags.map((t) => t.name),
           url: initialDraft.link?.url,
         }
-      : {},
+      : {
+          title: "",
+          body: "",
+        },
   });
 
   const saveDraft = async (data: FormShape) => {

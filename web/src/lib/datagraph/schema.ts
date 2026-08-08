@@ -17,6 +17,5 @@ const DatagraphKinds = Object.keys(DatagraphKindTable) as unknown as readonly [
   ...DatagraphItemKind[],
 ];
 
-export const DatagraphKindSchema: z.ZodType<DatagraphItemKind> =
-  z.enum(DatagraphKinds);
+export const DatagraphKindSchema = z.enum(DatagraphKinds);
 export type DatagraphKind = z.infer<typeof DatagraphKindSchema>;

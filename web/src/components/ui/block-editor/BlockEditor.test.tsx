@@ -90,7 +90,7 @@ it("runs a menu action once and closes the menu", async () => {
   );
 });
 
-it("forwards drag activator props and the button ref to the real menu trigger", async () => {
+it("forwards the pointer drag activator and the button ref", async () => {
   const user = userEvent.setup();
   const onPointerDown = vi.fn();
   const ref = createRef<HTMLButtonElement>();

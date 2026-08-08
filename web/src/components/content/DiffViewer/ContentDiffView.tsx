@@ -1,7 +1,7 @@
 "use client";
 
 import { Mark } from "@tiptap/core";
-import { FocusClasses } from "@tiptap/extension-focus";
+import FocusClasses from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import { generateJSON } from "@tiptap/html";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -101,7 +101,7 @@ export function ContentDiffView({
   // NOTE: The extensions here MUST match the extensions in the composer editor.
   const extensions = useMemo(
     () => [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       FocusClasses,
       DiffInsertion,
       DiffDeletion,

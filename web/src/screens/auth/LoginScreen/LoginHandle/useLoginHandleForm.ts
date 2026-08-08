@@ -38,15 +38,17 @@ export function useLoginHandleForm() {
   async function handlePassword(payload: Form) {
     const parsed = FormPasswordSchema.safeParse(payload);
     if (!parsed.success) {
-      if (parsed.error.formErrors.fieldErrors.identifier) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+
+      if (fieldErrors.identifier) {
         setError("identifier", {
-          message: parsed.error.formErrors.fieldErrors.identifier?.join(", "),
+          message: fieldErrors.identifier.join(", "),
         });
       }
 
-      if (parsed.error.formErrors.fieldErrors.token) {
+      if (fieldErrors.token) {
         setError("token", {
-          message: parsed.error.formErrors.fieldErrors.token?.join(", "),
+          message: fieldErrors.token.join(", "),
         });
       }
 

@@ -21,7 +21,8 @@ it("portals content and reports the selected item", async () => {
   );
 
   await user.click(screen.getByRole("button", { name: "Open menu" }));
-  await user.click(await screen.findByRole("menuitem", { name: "Edit" }));
+  const item = await screen.findByRole("menuitem", { name: "Edit" });
+  await user.click(item);
 
   expect(onSelect).toHaveBeenCalledWith(
     expect.objectContaining({ value: "edit" }),

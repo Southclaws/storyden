@@ -7,7 +7,7 @@ import {
   DragOverlay,
   type DragStartEvent,
   type Modifier,
-  MouseSensor,
+  PointerSensor,
   TouchSensor,
   pointerWithin,
   rectIntersection,
@@ -122,6 +122,29 @@ const centerDragOverlayOnPointer: Modifier = ({
 
 const navigationDragOverlayModifiers = [centerDragOverlayOnPointer];
 
+// Ark menu triggers intentionally expose pointer events but not mouse events.
+// Keep the dedicated delayed touch sensor while activating mouse drags through
+// the pointer event that reaches both plain buttons and composed menu triggers.
+class MousePointerSensor extends PointerSensor {
+  static override activators: typeof PointerSensor.activators = [
+    {
+      eventName: "onPointerDown",
+      handler: ({ nativeEvent: event }, { onActivation }) => {
+        if (
+          !event.isPrimary ||
+          event.button !== 0 ||
+          event.pointerType !== "mouse"
+        ) {
+          return false;
+        }
+
+        onActivation?.({ event });
+        return true;
+      },
+    },
+  ];
+}
+
 const collisionDetectionStrategy: CollisionDetection = (args) => {
   const activeData = args.active.data.current as DragItemData | undefined;
 
@@ -157,7 +180,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
   const [activeItem, setActiveItem] = useState<DragItemData | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
+    useSensor(MousePointerSensor, {
       activationConstraint: {
         distance: 2,
       },
