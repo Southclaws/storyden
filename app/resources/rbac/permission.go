@@ -88,6 +88,19 @@ func NewList(permissions ...Permission) Permissions {
 	return Permissions{permissions, m}
 }
 
+// Intersect returns only the permissions held by both sets, used where a
+// delegated credential must never outrank the account it acts for.
+func (p Permissions) Intersect(other Permissions) Permissions {
+	held := make([]Permission, 0, len(p.p))
+	for _, pp := range p.p {
+		if _, ok := other.m[pp]; ok {
+			held = append(held, pp)
+		}
+	}
+
+	return NewList(held...)
+}
+
 func (p Permissions) HasAll(perms ...Permission) bool {
 	for _, pp := range perms {
 		if _, ok := p.m[pp]; !ok {
