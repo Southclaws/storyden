@@ -142,7 +142,7 @@ export function getAdminSectionGroups(
                 id: "plugins" as const,
                 href: "/admin/plugins",
                 label: "Plugins",
-                description: "Installed extensions and connections",
+                description: "Installed extensions and integrations",
               },
             ]
           : []),

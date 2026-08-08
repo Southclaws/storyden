@@ -12,6 +12,7 @@ import { FormErrorText } from "@/components/ui/form-error-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { PageHeading } from "@/components/ui/page-heading";
 import { RadioGroupCardField } from "@/components/ui/radio-group";
+import { Text } from "@/components/ui/text";
 import {
   AuthenticationModeDetail,
   AuthenticationModeList,
@@ -22,7 +23,7 @@ import {
   RegistrationModeSchema,
 } from "@/lib/auth/registration-mode";
 import { Settings } from "@/lib/settings/settings";
-import { WStack, styled } from "@/styled-system/jsx";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 export type Props = {
@@ -96,13 +97,18 @@ export function AuthenticationSettingsForm(props: Props) {
     useAuthenticationSettingsForm(props);
 
   return (
-    <styled.form className={lstack()} onSubmit={handleSubmit}>
-      <WStack>
-        <PageHeading>Authentication settings</PageHeading>
-        <Button type="submit" loading={form.formState.isSubmitting}>
-          Save
-        </Button>
-      </WStack>
+    <styled.form className={lstack({ gap: "4" })} onSubmit={handleSubmit}>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Authentication settings</PageHeading>
+          <Button type="submit" loading={form.formState.isSubmitting}>
+            Save
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          Configure how members sign in and who can register.
+        </Text>
+      </LStack>
 
       <FormControl>
         <FormLabel>Authentication mode</FormLabel>

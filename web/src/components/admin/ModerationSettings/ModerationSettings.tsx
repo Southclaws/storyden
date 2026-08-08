@@ -4,7 +4,8 @@ import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { NumberInputField } from "@/components/ui/number-input";
 import { PageHeading } from "@/components/ui/page-heading";
-import { Flex, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Flex, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { ModerationWordListEditorField } from "./ModerationWordListEditor.field";
 import { Form, Props, useModerationSettings } from "./useModerationSettings";
@@ -20,12 +21,17 @@ export function ModerationSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <WStack>
-        <PageHeading>Moderation settings</PageHeading>
-        <Button type="submit" loading={formState.isSubmitting}>
-          Save
-        </Button>
-      </WStack>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Moderation settings</PageHeading>
+          <Button type="submit" loading={formState.isSubmitting}>
+            Save
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          Set content limits and automatic word-based moderation rules.
+        </Text>
+      </LStack>
 
       <Flex
         flexDir={{

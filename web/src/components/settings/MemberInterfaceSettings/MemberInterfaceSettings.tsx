@@ -5,7 +5,8 @@ import { FormHelperText } from "@/components/ui/form-helper-text";
 import { FormLabel } from "@/components/ui/form-label";
 import { PageHeading } from "@/components/ui/page-heading";
 import { RadioGroupField } from "@/components/ui/radio-group";
-import { WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 import {
   Props,
@@ -29,12 +30,17 @@ export function MemberInterfaceSettings(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <WStack>
-        <PageHeading>Interface settings</PageHeading>
-        <Button type="submit" loading={formState.isSubmitting}>
-          Save
-        </Button>
-      </WStack>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Interface settings</PageHeading>
+          <Button type="submit" loading={formState.isSubmitting}>
+            Save
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          Customise how you view and experience this site.
+        </Text>
+      </LStack>
 
       <FormControl>
         <FormLabel>Text editor style</FormLabel>

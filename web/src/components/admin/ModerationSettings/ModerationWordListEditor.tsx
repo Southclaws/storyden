@@ -47,7 +47,7 @@ export function ModerationWordListEditor({
 
   return (
     <LStack>
-      <Flex flexWrap="wrap">
+      <Flex flexWrap="wrap" gap="1">
         {value.map((word) => (
           <Badge key={word} pr="0">
             {word}

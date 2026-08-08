@@ -2,6 +2,7 @@
 
 import { Unready } from "@/components/site/Unready";
 import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
 import { LStack } from "@/styled-system/jsx";
 
 import { OAuth } from "./OAuth/OAuth";
@@ -18,13 +19,9 @@ export function AuthMethodSettings() {
 
   return (
     <LStack gap="4">
-      <LStack>
+      <LStack gap="1">
         <PageHeading>Authentication methods</PageHeading>
-        <p>
-          We recommend you add more than one method of authentication to your
-          account. This will help you recover your account if you lose access to
-          one of your devices.
-        </p>
+        <Text variant="supporting">Manage how you log in to this site.</Text>
       </LStack>
 
       {available.password && <Password active={active.password.length > 0} />}

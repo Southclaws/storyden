@@ -20,7 +20,7 @@ import { SelectField } from "@/components/ui/select";
 import { SliderField } from "@/components/ui/slider";
 import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
-import { HStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 import { OperationCostOverridesField } from "./OperationCostOverrides.field";
@@ -101,12 +101,17 @@ export function SystemSettingsForm(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <WStack>
-        <PageHeading>System settings</PageHeading>
-        <Button type="submit" loading={formState.isSubmitting}>
-          Save
-        </Button>
-      </WStack>
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>System settings</PageHeading>
+          <Button type="submit" loading={formState.isSubmitting}>
+            Save
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          Configure rate limits and how Storyden resolves client IP addresses.
+        </Text>
+      </LStack>
 
       {hasErrors && showError && (
         <Admonition

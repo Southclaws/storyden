@@ -48,13 +48,12 @@ export function EmailSettings(props: Props) {
 
   return (
     <LStack gap="4">
-      <LStack>
+      <LStack gap="1">
         <PageHeading>Email settings</PageHeading>
-        <p>
+        <Text variant="supporting">
           Manage your email addresses here. You can add multiple email addresses
-          and use them to log in to your account. Emails are also used for
-          newsletters, notifications and other communications.
-        </p>
+          and use them to log in to your account.
+        </Text>
       </LStack>
 
       <LStack>

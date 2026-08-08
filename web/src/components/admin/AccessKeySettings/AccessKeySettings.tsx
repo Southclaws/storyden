@@ -30,9 +30,15 @@ export function AccessKeySettings({ keys }: Props) {
 
   if (keys.length === 0) {
     return (
-      <LStack>
-        <PageHeading>Access keys</PageHeading>
-        <p>No access keys have been created yet.</p>
+      <LStack gap="4">
+        <LStack gap="1">
+          <PageHeading>Access keys</PageHeading>
+          <Text variant="supporting">
+            All access keys created by members of this site.
+          </Text>
+        </LStack>
+
+        <Text variant="metadata">No access keys have been created yet.</Text>
       </LStack>
     );
   }
@@ -42,9 +48,13 @@ export function AccessKeySettings({ keys }: Props) {
   const hasInactive = totalKeys != totalActiveKeys;
 
   return (
-    <LStack>
-      <PageHeading>Access keys</PageHeading>
-      <p>All access keys created by members of this site.</p>
+    <LStack gap="4">
+      <LStack gap="1">
+        <PageHeading>Access keys</PageHeading>
+        <Text variant="supporting">
+          All access keys created by members of this site.
+        </Text>
+      </LStack>
       <Alert.Root>
         <Alert.Icon asChild>
           <WarningIcon />

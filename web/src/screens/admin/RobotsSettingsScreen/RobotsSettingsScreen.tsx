@@ -107,43 +107,45 @@ export function RobotsSettingsScreen() {
   return (
     <LStack gap="4">
       <LStack gap="4">
-        <WStack justifyContent="space-between">
-          <PageHeading>Robot settings</PageHeading>
+        <LStack gap="1">
+          <WStack justifyContent="space-between">
+            <PageHeading>Robot settings</PageHeading>
 
-          {available ? (
-            <Badge
-              size="sm"
-              borderColor="status.success.border"
-              backgroundColor="status.success.surface"
-              color="status.success.content"
-            >
-              Available
-            </Badge>
-          ) : enabledProviders.length > 0 ? (
-            <Badge
-              size="sm"
-              borderColor="status.warning.border"
-              backgroundColor="status.warning.surface"
-              color="status.warning.content"
-            >
-              Setup incomplete
-            </Badge>
-          ) : (
-            <Badge
-              size="sm"
-              borderColor="border.strong"
-              backgroundColor="background.controlDisabled"
-              color="text.subtle"
-            >
-              Disabled
-            </Badge>
-          )}
-        </WStack>
+            {available ? (
+              <Badge
+                size="sm"
+                borderColor="status.success.border"
+                backgroundColor="status.success.surface"
+                color="status.success.content"
+              >
+                Available
+              </Badge>
+            ) : enabledProviders.length > 0 ? (
+              <Badge
+                size="sm"
+                borderColor="status.warning.border"
+                backgroundColor="status.warning.surface"
+                color="status.warning.content"
+              >
+                Setup incomplete
+              </Badge>
+            ) : (
+              <Badge
+                size="sm"
+                borderColor="border.strong"
+                backgroundColor="background.controlDisabled"
+                color="text.subtle"
+              >
+                Disabled
+              </Badge>
+            )}
+          </WStack>
 
-        <Text color="text.subtle" fontSize="sm">
-          Configure model providers for Robots. Robots become available after at
-          least one provider is enabled and a default model is selected.
-        </Text>
+          <Text variant="supporting">
+            Configure model providers for Robots. Robots become available after
+            at least one provider is enabled and a default model is selected.
+          </Text>
+        </LStack>
 
         {enabledProviders.length > 0 && !defaultModel && (
           <Text color="status.warning.content" fontSize="xs">

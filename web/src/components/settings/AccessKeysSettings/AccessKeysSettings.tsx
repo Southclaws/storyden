@@ -28,16 +28,15 @@ export function AccessKeysSettings({ keys }: Props) {
 
   return (
     <>
-      <LStack gap="8">
-        <LStack>
+      <LStack gap="4">
+        <LStack gap="1">
           <PageHeading>Access keys</PageHeading>
-
-          <p>
+          <Text variant="supporting">
             Access keys allow you to authenticate API requests. They share the
             same permissions as your account. If your account receives new
             roles, your access keys will inherit the permissions assigned to
             those roles.
-          </p>
+          </Text>
         </LStack>
 
         <LStack>
