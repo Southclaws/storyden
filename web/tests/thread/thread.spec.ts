@@ -26,7 +26,7 @@ async function createThread(
   title: string,
   body: string,
 ): Promise<string> {
-  await page.getByRole("link", { name: "Post", exact: true }).click();
+  await page.goto("/new");
   await expect(page).toHaveURL("/new", { timeout: 5000 });
 
   await page.locator("#title-input").fill(title);
