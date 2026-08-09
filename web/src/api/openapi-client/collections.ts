@@ -86,7 +86,10 @@ export const useCollectionCreate = <
   };
 };
 /**
- * List all collections using the filtering options.
+ * List collections using the filtering options, newest first.
+
+Collections accumulate with members, so results are paginated.
+
  */
 export const collectionList = (params?: CollectionListParams) => {
   return fetcher<CollectionListOKResponse>({

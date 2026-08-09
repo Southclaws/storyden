@@ -7,8 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.14-post
  */
-import type { CollectionListOKResponseAllOf } from "./collectionListOKResponseAllOf";
-import type { PaginatedResult } from "./paginatedResult";
+import type { CollectionList } from "./collectionList";
 
-export type CollectionListOKResponse = PaginatedResult &
-  CollectionListOKResponseAllOf;
+export type CollectionListOKResponseAllOf = {
+  collections: CollectionList;
+};

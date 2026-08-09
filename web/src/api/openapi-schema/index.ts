@@ -222,6 +222,7 @@ export * from "./collectionItemMembershipType";
 export * from "./collectionItemMetadata";
 export * from "./collectionList";
 export * from "./collectionListOKResponse";
+export * from "./collectionListOKResponseAllOf";
 export * from "./collectionListParams";
 export * from "./collectionMutableProps";
 export * from "./collectionName";
