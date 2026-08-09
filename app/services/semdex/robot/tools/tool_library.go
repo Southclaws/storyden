@@ -116,7 +116,7 @@ func (lt *libraryTools) newLibraryRequestPageTool() *Tool {
 					InputSchema:   toolDef.InputSchema,
 					IsLongRunning: true,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryRequestPageInput) (*mcp.ToolLibraryRequestPageOutput, error) {
+				func(ctx tool.Context, _ struct{}) (*mcp.ToolLibraryRequestPageOutput, error) {
 					return &mcp.ToolLibraryRequestPageOutput{}, nil
 				},
 			)

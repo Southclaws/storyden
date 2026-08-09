@@ -6,11 +6,10 @@ import "encoding/json"
 import "fmt"
 import "reflect"
 import "regexp"
-import "unicode/utf8"
 
 type CategoryItem struct {
 	// Category description
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Category name
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
@@ -121,10 +120,10 @@ type LibraryPageSearchItem struct {
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Page content excerpt
-	Content *string `json:"content,omitempty,omitzero" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// Brief description
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -178,13 +177,13 @@ type LibraryPageTreeNode struct {
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
 	// Slug of the parent page (omitted for root pages)
-	Parent *string `json:"parent,omitempty,omitzero" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
+	Parent *string `json:"parent,omitempty" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
 
 	// URL-friendly identifier for the page
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
 
 	// Tags associated with this page
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -219,7 +218,7 @@ func (j *LibraryPageTreeNode) UnmarshalJSON(value []byte) error {
 
 type MemberSearchItem struct {
 	// Brief member bio or description
-	Bio *string `json:"bio,omitempty,omitzero" yaml:"bio,omitempty" mapstructure:"bio,omitempty"`
+	Bio *string `json:"bio,omitempty" yaml:"bio,omitempty" mapstructure:"bio,omitempty"`
 
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
@@ -268,7 +267,7 @@ type PostSearchItem struct {
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Brief excerpt
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -321,7 +320,7 @@ type PropertySchemaField struct {
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
 	// Sort key for ordering fields
-	Sort *string `json:"sort,omitempty,omitzero" yaml:"sort,omitempty" mapstructure:"sort,omitempty"`
+	Sort *string `json:"sort,omitempty" yaml:"sort,omitempty" mapstructure:"sort,omitempty"`
 
 	// Data type of the field
 	Type PropertySchemaFieldType `json:"type" yaml:"type" mapstructure:"type"`
@@ -330,7 +329,7 @@ type PropertySchemaField struct {
 type PropertySchemaFieldMutation struct {
 	// Field ID - if provided, updates an existing field. If omitted, creates a new
 	// field.
-	Id *string `json:"id,omitempty,omitzero" yaml:"id,omitempty" mapstructure:"id,omitempty"`
+	Id *string `json:"id,omitempty" yaml:"id,omitempty" mapstructure:"id,omitempty"`
 
 	// Display name of the field
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
@@ -390,7 +389,7 @@ func (j *PropertySchemaFieldMutation) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Name)) < 1 {
+	if len(plain.Name) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
 	}
 	*j = PropertySchemaFieldMutation(plain)
@@ -561,7 +560,7 @@ type PropertyValueResult struct {
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
 	// Data type of the field
-	Type *PropertyValueResultType `json:"type,omitempty,omitzero" yaml:"type,omitempty" mapstructure:"type,omitempty"`
+	Type *PropertyValueResultType `json:"type,omitempty" yaml:"type,omitempty" mapstructure:"type,omitempty"`
 
 	// The current value of this property
 	Value string `json:"value" yaml:"value" mapstructure:"value"`
@@ -631,7 +630,7 @@ type ReplySearchItem struct {
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Brief excerpt from the reply
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -673,17 +672,17 @@ func (j *ReplySearchItem) UnmarshalJSON(value []byte) error {
 type RobotChatContext struct {
 	// Optional reference to a datagraph item if the user is viewing one (e.g., a
 	// thread, library page, profile)
-	DatagraphItem *DatagraphItemRef `json:"datagraph_item,omitempty,omitzero" yaml:"datagraph_item,omitempty" mapstructure:"datagraph_item,omitempty"`
+	DatagraphItem *DatagraphItemRef `json:"datagraph_item,omitempty" yaml:"datagraph_item,omitempty" mapstructure:"datagraph_item,omitempty"`
 
 	// Human-readable page type if not viewing a specific datagraph item. Examples:
 	// 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form
 	// text since the backend doesn't know about frontend routes.
-	PageType *string `json:"page_type,omitempty,omitzero" yaml:"page_type,omitempty" mapstructure:"page_type,omitempty"`
+	PageType *string `json:"page_type,omitempty" yaml:"page_type,omitempty" mapstructure:"page_type,omitempty"`
 }
 
 type RobotItem struct {
 	// Human-readable description of the Robot's purpose
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -719,7 +718,7 @@ type SearchedItem struct {
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Brief description or excerpt
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -799,7 +798,7 @@ type ThreadSearchItem struct {
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Brief excerpt from the thread
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -898,8 +897,6 @@ func (j *ThreadSummary) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-type ToolCategoryListInput map[string]interface{}
-
 type ToolCategoryListOutput struct {
 	// Categories corresponds to the JSON schema field "categories".
 	Categories []CategoryItem `json:"categories" yaml:"categories" mapstructure:"categories"`
@@ -926,7 +923,7 @@ func (j *ToolCategoryListOutput) UnmarshalJSON(value []byte) error {
 // List all thread categories with their names and descriptions
 type ToolCategoryListYaml struct {
 	// Input corresponds to the JSON schema field "input".
-	Input ToolCategoryListInput `json:"input" yaml:"input" mapstructure:"input"`
+	Input map[string]interface{} `json:"input" yaml:"input" mapstructure:"input"`
 
 	// Output corresponds to the JSON schema field "output".
 	Output ToolCategoryListOutput `json:"output" yaml:"output" mapstructure:"output"`
@@ -955,17 +952,17 @@ func (j *ToolCategoryListYaml) UnmarshalJSON(value []byte) error {
 
 type ToolContentSearchInput struct {
 	// Filter by author handles (usernames). Do not use '@' prefix.
-	Authors []string `json:"authors,omitempty,omitzero" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
+	Authors []string `json:"authors,omitempty" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
 
 	// Filter by category names (for forum threads). Category names are
 	// case-insensitive.
-	Categories []string `json:"categories,omitempty,omitzero" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
+	Categories []string `json:"categories,omitempty" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
 
 	// Filter by content types.
-	Kind []DatagraphItemKindYaml `json:"kind,omitempty,omitzero" yaml:"kind,omitempty" mapstructure:"kind,omitempty"`
+	Kind []DatagraphItemKindYaml `json:"kind,omitempty" yaml:"kind,omitempty" mapstructure:"kind,omitempty"`
 
 	// Maximum number of results to return (default 10, max 100)
-	MaxResults *int `json:"max_results,omitempty,omitzero" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
 
 	// Plain text keyword search string. Boolean operators like OR, AND, and NOT,
 	// quoted phrases, and other special query syntax are not supported. Use simple
@@ -973,7 +970,7 @@ type ToolContentSearchInput struct {
 	Query string `json:"query" yaml:"query" mapstructure:"query"`
 
 	// Filter by tag names. Tags are case-sensitive.
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -996,7 +993,7 @@ func (j *ToolContentSearchInput) UnmarshalJSON(value []byte) error {
 	if plain.MaxResults != nil && 1 > *plain.MaxResults {
 		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolContentSearchInput(plain)
@@ -1100,27 +1097,27 @@ func (j *ToolInfo) UnmarshalJSON(value []byte) error {
 
 type ToolLibraryPageCreateInput struct {
 	// The content of the page in HTML format
-	Content *string `json:"content,omitempty,omitzero" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// The name/title of the page
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
 	// Slug of the parent page. Only include if you already have a parent slug
 	// available. Leave empty to create a root-level page.
-	Parent *string `json:"parent,omitempty,omitzero" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
+	Parent *string `json:"parent,omitempty" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
 
 	// The unique slug for this page. If not provided, one will be generated from the
 	// name.
-	Slug *string `json:"slug,omitempty,omitzero" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
+	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
 
 	// Optional tags to categorise this page
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// Optional external URL if this page references a topic on another website
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// Visibility of the page (default: published)
-	Visibility *ToolLibraryPageCreateInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *ToolLibraryPageCreateInputVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 type ToolLibraryPageCreateInputVisibility string
@@ -1167,7 +1164,7 @@ func (j *ToolLibraryPageCreateInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Name)) < 1 {
+	if len(plain.Name) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
 	}
 	*j = ToolLibraryPageCreateInput(plain)
@@ -1266,7 +1263,7 @@ func (j *ToolLibraryPageGetInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolLibraryPageGetInput(plain)
@@ -1282,7 +1279,7 @@ type ToolLibraryPageGetOutput struct {
 	ChildPages []string `json:"child_pages" yaml:"child_pages" mapstructure:"child_pages"`
 
 	// Brief description of the page
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier for the page
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -1416,7 +1413,7 @@ func (j *ToolLibraryPagePropertiesUpdateInput) UnmarshalJSON(value []byte) error
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolLibraryPagePropertiesUpdateInput(plain)
@@ -1496,7 +1493,7 @@ func (j *ToolLibraryPagePropertySchemaGetInput) UnmarshalJSON(value []byte) erro
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolLibraryPagePropertySchemaGetInput(plain)
@@ -1508,7 +1505,7 @@ type ToolLibraryPagePropertySchemaGetOutput struct {
 	Fields []PropertySchemaField `json:"fields" yaml:"fields" mapstructure:"fields"`
 
 	// Whether this page has a property schema defined for its children
-	HasSchema *bool `json:"has_schema,omitempty,omitzero" yaml:"has_schema,omitempty" mapstructure:"has_schema,omitempty"`
+	HasSchema *bool `json:"has_schema,omitempty" yaml:"has_schema,omitempty" mapstructure:"has_schema,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1586,7 +1583,7 @@ func (j *ToolLibraryPagePropertySchemaUpdateInput) UnmarshalJSON(value []byte) e
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolLibraryPagePropertySchemaUpdateInput(plain)
@@ -1652,7 +1649,7 @@ func (j *ToolLibraryPagePropertySchemaUpdateYaml) UnmarshalJSON(value []byte) er
 type ToolLibraryPageTreeInput struct {
 	// Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root +
 	// children, etc.)
-	Depth *int `json:"depth,omitempty,omitzero" yaml:"depth,omitempty" mapstructure:"depth,omitempty"`
+	Depth *int `json:"depth,omitempty" yaml:"depth,omitempty" mapstructure:"depth,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -1694,28 +1691,28 @@ func (j *ToolLibraryPageTreeOutput) UnmarshalJSON(value []byte) error {
 
 type ToolLibraryPageUpdateInput struct {
 	// The new content of the page in HTML format
-	Content *string `json:"content,omitempty,omitzero" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// The unique identifier of the page to update
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 
 	// The new name/title of the page
-	Name *string `json:"name,omitempty,omitzero" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
 
 	// New parent page slug. Provide to move the page to a different parent.
-	Parent *string `json:"parent,omitempty,omitzero" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
+	Parent *string `json:"parent,omitempty" yaml:"parent,omitempty" mapstructure:"parent,omitempty"`
 
 	// The new URL slug for the page
-	Slug *string `json:"slug,omitempty,omitzero" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
+	Slug *string `json:"slug,omitempty" yaml:"slug,omitempty" mapstructure:"slug,omitempty"`
 
 	// New tags to categorise this page
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// New external URL reference
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// New visibility of the page
-	Visibility *ToolLibraryPageUpdateInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *ToolLibraryPageUpdateInputVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 type ToolLibraryPageUpdateInputVisibility string
@@ -1762,13 +1759,13 @@ func (j *ToolLibraryPageUpdateInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
-	if plain.Name != nil && utf8.RuneCountInString(string(*plain.Name)) < 1 {
+	if plain.Name != nil && len(*plain.Name) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
 	}
-	if plain.Slug != nil && utf8.RuneCountInString(string(*plain.Slug)) < 1 {
+	if plain.Slug != nil && len(*plain.Slug) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "slug", 1)
 	}
 	*j = ToolLibraryPageUpdateInput(plain)
@@ -1848,15 +1845,13 @@ func (j *ToolLibraryPageUpdateYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-type ToolLibraryRequestPageInput map[string]interface{}
-
 type ToolLibraryRequestPageOutput struct {
 	// Absolute frontend URL that opens the selected Library page in a browser. Prefer
 	// this in Markdown links when presenting the page to users.
-	BrowserUrl *string `json:"browser_url,omitempty,omitzero" yaml:"browser_url,omitempty" mapstructure:"browser_url,omitempty"`
+	BrowserUrl *string `json:"browser_url,omitempty" yaml:"browser_url,omitempty" mapstructure:"browser_url,omitempty"`
 
 	// Brief description of the selected Library page.
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// Unique identifier for the selected Library page.
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -1897,7 +1892,7 @@ func (j *ToolLibraryRequestPageOutput) UnmarshalJSON(value []byte) error {
 // page.
 type ToolLibraryRequestPageYaml struct {
 	// Input corresponds to the JSON schema field "input".
-	Input ToolLibraryRequestPageInput `json:"input" yaml:"input" mapstructure:"input"`
+	Input map[string]interface{} `json:"input" yaml:"input" mapstructure:"input"`
 
 	// Output corresponds to the JSON schema field "output".
 	Output ToolLibraryRequestPageOutput `json:"output" yaml:"output" mapstructure:"output"`
@@ -1945,7 +1940,7 @@ func (j *ToolLibrarySearchPagesInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolLibrarySearchPagesInput(plain)
@@ -2036,13 +2031,13 @@ func (j *ToolLinkCreateInput) UnmarshalJSON(value []byte) error {
 
 type ToolLinkCreateOutput struct {
 	// Description extracted from OpenGraph metadata
-	OpengraphDescription *string `json:"opengraph_description,omitempty,omitzero" yaml:"opengraph_description,omitempty" mapstructure:"opengraph_description,omitempty"`
+	OpengraphDescription *string `json:"opengraph_description,omitempty" yaml:"opengraph_description,omitempty" mapstructure:"opengraph_description,omitempty"`
 
 	// Title extracted from OpenGraph metadata
-	OpengraphTitle *string `json:"opengraph_title,omitempty,omitzero" yaml:"opengraph_title,omitempty" mapstructure:"opengraph_title,omitempty"`
+	OpengraphTitle *string `json:"opengraph_title,omitempty" yaml:"opengraph_title,omitempty" mapstructure:"opengraph_title,omitempty"`
 
 	// Plain text content extracted from the page
-	PlainText *string `json:"plain_text,omitempty,omitzero" yaml:"plain_text,omitempty" mapstructure:"plain_text,omitempty"`
+	PlainText *string `json:"plain_text,omitempty" yaml:"plain_text,omitempty" mapstructure:"plain_text,omitempty"`
 
 	// Unique identifier for the link
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
@@ -2106,7 +2101,7 @@ func (j *ToolLinkCreateYaml) UnmarshalJSON(value []byte) error {
 
 type ToolMemberSearchInput struct {
 	// Maximum number of results to return (default 10, max 100)
-	MaxResults *int `json:"max_results,omitempty,omitzero" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
 
 	// Plain text keyword search string matching name or handle. Boolean operators
 	// like OR, AND, and NOT, quoted phrases, and other special query syntax are not
@@ -2134,7 +2129,7 @@ func (j *ToolMemberSearchInput) UnmarshalJSON(value []byte) error {
 	if plain.MaxResults != nil && 1 > *plain.MaxResults {
 		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolMemberSearchInput(plain)
@@ -2202,14 +2197,14 @@ func (j *ToolMemberSearchYaml) UnmarshalJSON(value []byte) error {
 
 type ToolPostSearchInput struct {
 	// Filter by author handles (usernames). Do not use '@' prefix.
-	Authors []string `json:"authors,omitempty,omitzero" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
+	Authors []string `json:"authors,omitempty" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
 
 	// Filter by category names (applies to threads). Category names are
 	// case-insensitive.
-	Categories []string `json:"categories,omitempty,omitzero" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
+	Categories []string `json:"categories,omitempty" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
 
 	// Maximum number of results to return (default 10, max 100)
-	MaxResults *int `json:"max_results,omitempty,omitzero" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
 
 	// Plain text keyword search string. Boolean operators like OR, AND, and NOT,
 	// quoted phrases, and other special query syntax are not supported. Use simple
@@ -2217,7 +2212,7 @@ type ToolPostSearchInput struct {
 	Query string `json:"query" yaml:"query" mapstructure:"query"`
 
 	// Filter by tag names. Tags are case-sensitive.
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2240,7 +2235,7 @@ func (j *ToolPostSearchInput) UnmarshalJSON(value []byte) error {
 	if plain.MaxResults != nil && 1 > *plain.MaxResults {
 		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolPostSearchInput(plain)
@@ -2308,10 +2303,10 @@ func (j *ToolPostSearchYaml) UnmarshalJSON(value []byte) error {
 
 type ToolReplySearchInput struct {
 	// Filter by author handles (usernames). Do not use '@' prefix.
-	Authors []string `json:"authors,omitempty,omitzero" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
+	Authors []string `json:"authors,omitempty" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
 
 	// Maximum number of results to return (default 10, max 100)
-	MaxResults *int `json:"max_results,omitempty,omitzero" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
 
 	// Plain text keyword search string. Boolean operators like OR, AND, and NOT,
 	// quoted phrases, and other special query syntax are not supported. Use simple
@@ -2319,7 +2314,7 @@ type ToolReplySearchInput struct {
 	Query string `json:"query" yaml:"query" mapstructure:"query"`
 
 	// Filter by tag names. Tags are case-sensitive.
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2342,7 +2337,7 @@ func (j *ToolReplySearchInput) UnmarshalJSON(value []byte) error {
 	if plain.MaxResults != nil && 1 > *plain.MaxResults {
 		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolReplySearchInput(plain)
@@ -2414,7 +2409,7 @@ type ToolRobotCreateInput struct {
 
 	// The language model ID in provider/model_name format. If omitted, the system
 	// will use a default model configured for Robots.
-	Model *string `json:"model,omitempty,omitzero" yaml:"model,omitempty" mapstructure:"model,omitempty"`
+	Model *string `json:"model,omitempty" yaml:"model,omitempty" mapstructure:"model,omitempty"`
 
 	// The name of the Robot - should be descriptive and help identify its purpose
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
@@ -2425,7 +2420,7 @@ type ToolRobotCreateInput struct {
 	Playbook string `json:"playbook" yaml:"playbook" mapstructure:"playbook"`
 
 	// List of tool names that the Robot can use.
-	Tools []string `json:"tools,omitempty,omitzero" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
+	Tools []string `json:"tools,omitempty" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2448,13 +2443,13 @@ func (j *ToolRobotCreateInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if plain.Model != nil && utf8.RuneCountInString(string(*plain.Model)) < 1 {
+	if plain.Model != nil && len(*plain.Model) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "model", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Name)) < 1 {
+	if len(plain.Name) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Playbook)) < 1 {
+	if len(plain.Playbook) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "playbook", 1)
 	}
 	*j = ToolRobotCreateInput(plain)
@@ -2637,7 +2632,7 @@ func (j *ToolRobotGetInput) UnmarshalJSON(value []byte) error {
 
 type ToolRobotGetOutput struct {
 	// Human-readable description of the Robot's purpose
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// The unique identifier of the Robot
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -2718,7 +2713,7 @@ func (j *ToolRobotGetYaml) UnmarshalJSON(value []byte) error {
 
 type ToolRobotListInput struct {
 	// Maximum number of Robots to return (default 20)
-	Limit *int `json:"limit,omitempty,omitzero" yaml:"limit,omitempty" mapstructure:"limit,omitempty"`
+	Limit *int `json:"limit,omitempty" yaml:"limit,omitempty" mapstructure:"limit,omitempty"`
 }
 
 type ToolRobotListOutput struct {
@@ -2871,23 +2866,23 @@ func (j *ToolRobotSwitchYaml) UnmarshalJSON(value []byte) error {
 
 type ToolRobotUpdateInput struct {
 	// The new description for the Robot
-	Description *string `json:"description,omitempty,omitzero" yaml:"description,omitempty" mapstructure:"description,omitempty"`
+	Description *string `json:"description,omitempty" yaml:"description,omitempty" mapstructure:"description,omitempty"`
 
 	// The unique identifier of the Robot to update. Must be a valid XID format (20
 	// character alphanumeric string).
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 
 	// The new language model ID in provider/model_name format.
-	Model *string `json:"model,omitempty,omitzero" yaml:"model,omitempty" mapstructure:"model,omitempty"`
+	Model *string `json:"model,omitempty" yaml:"model,omitempty" mapstructure:"model,omitempty"`
 
 	// The new name for the Robot
-	Name *string `json:"name,omitempty,omitzero" yaml:"name,omitempty" mapstructure:"name,omitempty"`
+	Name *string `json:"name,omitempty" yaml:"name,omitempty" mapstructure:"name,omitempty"`
 
 	// The new directive/system prompt for the Robot
-	Playbook *string `json:"playbook,omitempty,omitzero" yaml:"playbook,omitempty" mapstructure:"playbook,omitempty"`
+	Playbook *string `json:"playbook,omitempty" yaml:"playbook,omitempty" mapstructure:"playbook,omitempty"`
 
 	// The new list of tool names that the Robot can use.
-	Tools []string `json:"tools,omitempty,omitzero" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
+	Tools []string `json:"tools,omitempty" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -2907,13 +2902,13 @@ func (j *ToolRobotUpdateInput) UnmarshalJSON(value []byte) error {
 	if matched, _ := regexp.MatchString(`^[0-9a-v]{20}$`, string(plain.Id)); !matched {
 		return fmt.Errorf("field %s pattern match: must match %s", "Id", `^[0-9a-v]{20}$`)
 	}
-	if plain.Model != nil && utf8.RuneCountInString(string(*plain.Model)) < 1 {
+	if plain.Model != nil && len(*plain.Model) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "model", 1)
 	}
-	if plain.Name != nil && utf8.RuneCountInString(string(*plain.Name)) < 1 {
+	if plain.Name != nil && len(*plain.Name) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "name", 1)
 	}
-	if plain.Playbook != nil && utf8.RuneCountInString(string(*plain.Playbook)) < 1 {
+	if plain.Playbook != nil && len(*plain.Playbook) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "playbook", 1)
 	}
 	*j = ToolRobotUpdateInput(plain)
@@ -2980,13 +2975,11 @@ func (j *ToolRobotUpdateYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-type ToolSystemRobotToolCatalogInput map[string]interface{}
-
 // List of the tools available in the catalog that you can assign to Robots, with
 // their names and descriptions
 type ToolSystemRobotToolCatalogOutput struct {
 	// Tools corresponds to the JSON schema field "tools".
-	Tools []ToolInfo `json:"tools,omitempty,omitzero" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
+	Tools []ToolInfo `json:"tools,omitempty" yaml:"tools,omitempty" mapstructure:"tools,omitempty"`
 }
 
 // Returns a list of tools that may be assigned to a Robot during Robot creation or
@@ -2994,7 +2987,7 @@ type ToolSystemRobotToolCatalogOutput struct {
 // describes Robot capabilities, not this conversation's capabilities.
 type ToolSystemRobotToolCatalogYaml struct {
 	// Input corresponds to the JSON schema field "input".
-	Input ToolSystemRobotToolCatalogInput `json:"input" yaml:"input" mapstructure:"input"`
+	Input map[string]interface{} `json:"input" yaml:"input" mapstructure:"input"`
 
 	// Output corresponds to the JSON schema field "output".
 	Output ToolSystemRobotToolCatalogOutput `json:"output" yaml:"output" mapstructure:"output"`
@@ -3024,7 +3017,7 @@ func (j *ToolSystemRobotToolCatalogYaml) UnmarshalJSON(value []byte) error {
 type ToolTagListInput struct {
 	// Optional search query to filter tags by name. If not provided, returns all
 	// tags.
-	Query *string `json:"query,omitempty,omitzero" yaml:"query,omitempty" mapstructure:"query,omitempty"`
+	Query *string `json:"query,omitempty" yaml:"query,omitempty" mapstructure:"query,omitempty"`
 }
 
 type ToolTagListOutput struct {
@@ -3091,16 +3084,16 @@ type ToolThreadCreateInput struct {
 	Category string `json:"category" yaml:"category" mapstructure:"category"`
 
 	// Optional tags for the thread
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// The title of the thread
 	Title string `json:"title" yaml:"title" mapstructure:"title"`
 
 	// Optional URL if this thread is about a specific link
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// Thread visibility (default: published)
-	Visibility *ToolThreadCreateInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *ToolThreadCreateInputVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 type ToolThreadCreateInputVisibility string
@@ -3153,10 +3146,10 @@ func (j *ToolThreadCreateInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Body)) < 1 {
+	if len(plain.Body) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "body", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Title)) < 1 {
+	if len(plain.Title) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "title", 1)
 	}
 	*j = ToolThreadCreateInput(plain)
@@ -3165,20 +3158,20 @@ func (j *ToolThreadCreateInput) UnmarshalJSON(value []byte) error {
 
 type ToolThreadCreateOutput struct {
 	// Author handle
-	Author *string `json:"author,omitempty,omitzero" yaml:"author,omitempty" mapstructure:"author,omitempty"`
+	Author *string `json:"author,omitempty" yaml:"author,omitempty" mapstructure:"author,omitempty"`
 
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Category name
-	Category *string `json:"category,omitempty,omitzero" yaml:"category,omitempty" mapstructure:"category,omitempty"`
+	Category *string `json:"category,omitempty" yaml:"category,omitempty" mapstructure:"category,omitempty"`
 
 	// Thread content as plain text
-	Content *string `json:"content,omitempty,omitzero" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// Creation timestamp
-	CreatedAt *string `json:"created_at,omitempty,omitzero" yaml:"created_at,omitempty" mapstructure:"created_at,omitempty"`
+	CreatedAt *string `json:"created_at,omitempty" yaml:"created_at,omitempty" mapstructure:"created_at,omitempty"`
 
 	// Unique identifier for the created thread
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -3187,16 +3180,16 @@ type ToolThreadCreateOutput struct {
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
 
 	// Tags corresponds to the JSON schema field "tags".
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// The thread title
 	Title string `json:"title" yaml:"title" mapstructure:"title"`
 
 	// Associated URL if present
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// Thread visibility
-	Visibility *string `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *string `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3262,7 +3255,7 @@ type ToolThreadGetInput struct {
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 
 	// Page number for replies (default: 1)
-	Page *int `json:"page,omitempty,omitzero" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+	Page *int `json:"page,omitempty" yaml:"page,omitempty" mapstructure:"page,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3279,7 +3272,7 @@ func (j *ToolThreadGetInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	if plain.Page != nil && 1 > *plain.Page {
@@ -3319,7 +3312,7 @@ type ToolThreadGetOutput struct {
 	Title string `json:"title" yaml:"title" mapstructure:"title"`
 
 	// Associated URL if present
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// Visibility corresponds to the JSON schema field "visibility".
 	Visibility string `json:"visibility" yaml:"visibility" mapstructure:"visibility"`
@@ -3403,13 +3396,13 @@ func (j *ToolThreadGetYaml) UnmarshalJSON(value []byte) error {
 
 type ToolThreadListInput struct {
 	// Page number (default: 1)
-	Page *int `json:"page,omitempty,omitzero" yaml:"page,omitempty" mapstructure:"page,omitempty"`
+	Page *int `json:"page,omitempty" yaml:"page,omitempty" mapstructure:"page,omitempty"`
 
 	// Search query to filter threads
-	Query *string `json:"query,omitempty,omitzero" yaml:"query,omitempty" mapstructure:"query,omitempty"`
+	Query *string `json:"query,omitempty" yaml:"query,omitempty" mapstructure:"query,omitempty"`
 
 	// Filter by visibility
-	Visibility *ToolThreadListInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *ToolThreadListInputVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 type ToolThreadListInputVisibility string
@@ -3461,7 +3454,7 @@ type ToolThreadListOutput struct {
 	CurrentPage int `json:"current_page" yaml:"current_page" mapstructure:"current_page"`
 
 	// Next page number if available
-	NextPage *int `json:"next_page,omitempty,omitzero" yaml:"next_page,omitempty" mapstructure:"next_page,omitempty"`
+	NextPage *int `json:"next_page,omitempty" yaml:"next_page,omitempty" mapstructure:"next_page,omitempty"`
 
 	// Threads corresponds to the JSON schema field "threads".
 	Threads []ThreadSummary `json:"threads" yaml:"threads" mapstructure:"threads"`
@@ -3555,10 +3548,10 @@ func (j *ToolThreadReplyInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if utf8.RuneCountInString(string(plain.Body)) < 1 {
+	if len(plain.Body) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "body", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolThreadReplyInput(plain)
@@ -3651,13 +3644,13 @@ func (j *ToolThreadReplyYaml) UnmarshalJSON(value []byte) error {
 
 type ToolThreadSearchInput struct {
 	// Filter by author handles (usernames). Do not use '@' prefix.
-	Authors []string `json:"authors,omitempty,omitzero" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
+	Authors []string `json:"authors,omitempty" yaml:"authors,omitempty" mapstructure:"authors,omitempty"`
 
 	// Filter by category names. Category names are case-insensitive.
-	Categories []string `json:"categories,omitempty,omitzero" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
+	Categories []string `json:"categories,omitempty" yaml:"categories,omitempty" mapstructure:"categories,omitempty"`
 
 	// Maximum number of results to return (default 10, max 100)
-	MaxResults *int `json:"max_results,omitempty,omitzero" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
+	MaxResults *int `json:"max_results,omitempty" yaml:"max_results,omitempty" mapstructure:"max_results,omitempty"`
 
 	// Plain text keyword search string. Boolean operators like OR, AND, and NOT,
 	// quoted phrases, and other special query syntax are not supported. Use simple
@@ -3665,7 +3658,7 @@ type ToolThreadSearchInput struct {
 	Query string `json:"query" yaml:"query" mapstructure:"query"`
 
 	// Filter by tag names. Tags are case-sensitive.
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -3688,7 +3681,7 @@ func (j *ToolThreadSearchInput) UnmarshalJSON(value []byte) error {
 	if plain.MaxResults != nil && 1 > *plain.MaxResults {
 		return fmt.Errorf("field %s: must be >= %v", "max_results", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Query)) < 1 {
+	if len(plain.Query) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "query", 1)
 	}
 	*j = ToolThreadSearchInput(plain)
@@ -3756,19 +3749,19 @@ func (j *ToolThreadSearchYaml) UnmarshalJSON(value []byte) error {
 
 type ToolThreadUpdateInput struct {
 	// New content for the thread in HTML format
-	Body *string `json:"body,omitempty,omitzero" yaml:"body,omitempty" mapstructure:"body,omitempty"`
+	Body *string `json:"body,omitempty" yaml:"body,omitempty" mapstructure:"body,omitempty"`
 
 	// The unique identifier of the thread to update
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
 
 	// New tags for the thread
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// New title for the thread
-	Title *string `json:"title,omitempty,omitzero" yaml:"title,omitempty" mapstructure:"title,omitempty"`
+	Title *string `json:"title,omitempty" yaml:"title,omitempty" mapstructure:"title,omitempty"`
 
 	// New visibility: published or draft
-	Visibility *ToolThreadUpdateInputVisibility `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *ToolThreadUpdateInputVisibility `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 type ToolThreadUpdateInputVisibility string
@@ -3815,10 +3808,10 @@ func (j *ToolThreadUpdateInput) UnmarshalJSON(value []byte) error {
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
 	}
-	if plain.Body != nil && utf8.RuneCountInString(string(*plain.Body)) < 1 {
+	if plain.Body != nil && len(*plain.Body) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "body", 1)
 	}
-	if utf8.RuneCountInString(string(plain.Id)) < 1 {
+	if len(plain.Id) < 1 {
 		return fmt.Errorf("field %s length: must be >= %d", "id", 1)
 	}
 	*j = ToolThreadUpdateInput(plain)
@@ -3827,20 +3820,20 @@ func (j *ToolThreadUpdateInput) UnmarshalJSON(value []byte) error {
 
 type ToolThreadUpdateOutput struct {
 	// Author handle
-	Author *string `json:"author,omitempty,omitzero" yaml:"author,omitempty" mapstructure:"author,omitempty"`
+	Author *string `json:"author,omitempty" yaml:"author,omitempty" mapstructure:"author,omitempty"`
 
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
 	BrowserUrl string `json:"browser_url" yaml:"browser_url" mapstructure:"browser_url"`
 
 	// Category name
-	Category *string `json:"category,omitempty,omitzero" yaml:"category,omitempty" mapstructure:"category,omitempty"`
+	Category *string `json:"category,omitempty" yaml:"category,omitempty" mapstructure:"category,omitempty"`
 
 	// Thread content as plain text
-	Content *string `json:"content,omitempty,omitzero" yaml:"content,omitempty" mapstructure:"content,omitempty"`
+	Content *string `json:"content,omitempty" yaml:"content,omitempty" mapstructure:"content,omitempty"`
 
 	// Creation timestamp
-	CreatedAt *string `json:"created_at,omitempty,omitzero" yaml:"created_at,omitempty" mapstructure:"created_at,omitempty"`
+	CreatedAt *string `json:"created_at,omitempty" yaml:"created_at,omitempty" mapstructure:"created_at,omitempty"`
 
 	// Unique identifier for the thread
 	Id string `json:"id" yaml:"id" mapstructure:"id"`
@@ -3849,16 +3842,16 @@ type ToolThreadUpdateOutput struct {
 	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
 
 	// Tags corresponds to the JSON schema field "tags".
-	Tags []string `json:"tags,omitempty,omitzero" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
+	Tags []string `json:"tags,omitempty" yaml:"tags,omitempty" mapstructure:"tags,omitempty"`
 
 	// The thread title
 	Title string `json:"title" yaml:"title" mapstructure:"title"`
 
 	// Associated URL if present
-	Url *string `json:"url,omitempty,omitzero" yaml:"url,omitempty" mapstructure:"url,omitempty"`
+	Url *string `json:"url,omitempty" yaml:"url,omitempty" mapstructure:"url,omitempty"`
 
 	// Thread visibility
-	Visibility *string `json:"visibility,omitempty,omitzero" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
+	Visibility *string `json:"visibility,omitempty" yaml:"visibility,omitempty" mapstructure:"visibility,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

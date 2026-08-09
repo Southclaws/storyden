@@ -63,6 +63,8 @@ github.com/Southclaws/lexorank v1.2.3 h1:M0EHpygYdzTl5AYSBQt7nrGu0s7w92KCIkYF8uX
 github.com/Southclaws/lexorank v1.2.3/go.mod h1:ckwmJY9zyr8dPHX6ZzKiXnAAA/zBX7co/kkbOUSjMM0=
 github.com/Southclaws/opt v0.6.1 h1:Hi6fQZOuZHrDXO7CbV2dsjkAxJvgFUerw91REo06yQE=
 github.com/Southclaws/opt v0.6.1/go.mod h1:zGjXSHmM4ScFX3TLkCr8TdVvd4KAcZq0mwWtzqoqwwQ=
+github.com/Southclaws/schemancer v1.2.0 h1:ayUpub2EquL3dvMpb3WQU8md8N+wIUPSsKYmCKSeR3k=
+github.com/Southclaws/schemancer v1.2.0/go.mod h1:1ZWtqHRSD/xjO0qudDEkLxcnbHph8GqxRqA9Znf5t04=
 github.com/Southclaws/swirl v1.0.1 h1:xQdYBQ2VURjRNYq7MkjWIRDe9tpEKLJGG0AMnEAkAdo=
 github.com/Southclaws/swirl v1.0.1/go.mod h1:g+5GElHV4itp5HKktH8tiDhNxEUU6TW1uAnxrPzexyI=
 github.com/ThreeDotsLabs/watermill v1.5.1 h1:t5xMivyf9tpmU3iozPqyrCZXHvoV1XQDfihas4sV0fY=

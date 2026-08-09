@@ -5,6 +5,7 @@ go 1.26.4
 tool (
 	entgo.io/ent/cmd/ent
 	github.com/Southclaws/enumerator
+	github.com/Southclaws/schemancer
 	github.com/atombender/go-jsonschema
 	github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
 )
@@ -129,6 +130,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0 // indirect
 	github.com/Masterminds/sprig/v3 v3.3.0 // indirect
 	github.com/RoaringBitmap/roaring/v2 v2.4.5 // indirect
+	github.com/Southclaws/schemancer v1.2.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect

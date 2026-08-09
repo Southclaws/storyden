@@ -2,7 +2,7 @@ package api
 
 //go:generate go run -mod=mod github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.8.0 --config config.yaml openapi.yaml
 
-//go:generate go run github.com/Southclaws/schemancer@latest plugin.yaml
+//go:generate go run github.com/Southclaws/schemancer plugin.yaml
 //go:generate go run github.com/Southclaws/storyden/internal/tools/eventgen
 //go:generate go run github.com/Southclaws/storyden/internal/tools/rpcdocgen
 //go:generate go run github.com/Southclaws/storyden/internal/tools/permissiondocgen
@@ -10,4 +10,4 @@ package api
 //go:generate go run github.com/Southclaws/storyden/internal/tools/schemaderef robots.yaml ../lib/mcp/robots.json
 //go:generate go run github.com/Southclaws/storyden/internal/tools/schemaderef --root-only plugin.yaml ../lib/plugin/plugin.json
 //go:generate go run github.com/Southclaws/storyden/internal/tools/toolbindgen ../lib/mcp/robots.json ../lib/mcp/bindings_gen.go
-//go:generate go run github.com/atombender/go-jsonschema@latest -p mcp -o ../lib/mcp/mcp_schema.go robots.yaml
+//go:generate go run github.com/atombender/go-jsonschema -p mcp -o ../lib/mcp/mcp_schema.go robots.yaml
