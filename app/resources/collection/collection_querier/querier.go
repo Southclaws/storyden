@@ -93,7 +93,12 @@ func (d *Querier) List(ctx context.Context, params pagination.Parameters, filter
 	}
 
 	cols, err := q.
-		Order(ent.Desc(ent_collection.FieldCreatedAt)).
+		// id breaks ties, created_at alone leaves rows sharing a timestamp free
+		// to move between adjacent offset pages
+		Order(
+			ent.Desc(ent_collection.FieldCreatedAt),
+			ent.Desc(ent_collection.FieldID),
+		).
 		Limit(params.Limit()).
 		Offset(params.Offset()).
 		All(ctx)
