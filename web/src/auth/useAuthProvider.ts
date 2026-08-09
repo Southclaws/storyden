@@ -6,8 +6,11 @@ import { usePublicRegistration } from "@/lib/settings/registration";
 
 const PRIVATE_PAGES = ["/settings", "/new", "/admin"];
 
-function privatePage(pathName: string): boolean {
-  return PRIVATE_PAGES.includes(pathName);
+export function isPrivatePage(pathName: string): boolean {
+  return PRIVATE_PAGES.some(
+    (privatePage) =>
+      pathName === privatePage || pathName.startsWith(`${privatePage}/`),
+  );
 }
 
 export function useAuthProvider() {
@@ -17,7 +20,7 @@ export function useAuthProvider() {
   const canRegister = usePublicRegistration();
 
   const loggedIn = Boolean(data) && !error;
-  const isPrivate = pathname && privatePage(pathname);
+  const isPrivate = pathname && isPrivatePage(pathname);
 
   useEffect(() => {
     if (isLoading) return;
