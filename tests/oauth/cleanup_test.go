@@ -73,6 +73,46 @@ func TestOAuthCleanup(t *testing.T) {
 				_, err = oq.GetAuthorisationRequestByRequestIDHash(root, activeHash)
 				a.NoError(err)
 			})
+
+			t.Run("refresh_tokens_are_dropped_once_they_are_long_expired", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				clientID := "cleanup-refresh-token-" + uuid.NewString()
+				client := createClient(t, root, ow, owner.ID, clientID, oauthresource.ClientTypePublic, oauthresource.ScopePolicyExplicit, opt.NewEmpty[string](), standardScopes(), []string{oauth.GrantTypeRefreshToken})
+
+				staleHash := "stale-" + uuid.NewString()
+				recentlyExpiredHash := "recent-" + uuid.NewString()
+				liveHash := "live-" + uuid.NewString()
+
+				create := func(hash string, expiresAt time.Time) {
+					_, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
+						ClientID:  client.ID,
+						AccountID: owner.ID,
+						TokenHash: hash,
+						Scope:     "openid",
+						ExpiresAt: expiresAt,
+					})
+					r.NoError(err)
+				}
+
+				create(staleHash, time.Now().Add(-30*24*time.Hour))
+				create(recentlyExpiredHash, time.Now().Add(-time.Hour))
+				create(liveHash, time.Now().Add(24*time.Hour))
+
+				deleted, err := ow.DeleteExpiredRefreshTokens(root, time.Now().Add(-7*24*time.Hour))
+				r.NoError(err)
+				a.Equal(1, deleted, "only rows past the retention window go")
+
+				_, err = oq.GetRefreshTokenByTokenHash(root, staleHash)
+				a.Error(err)
+
+				_, err = oq.GetRefreshTokenByTokenHash(root, recentlyExpiredHash)
+				a.NoError(err, "a token still inside the window stays so the rotation chain can be walked")
+
+				_, err = oq.GetRefreshTokenByTokenHash(root, liveHash)
+				a.NoError(err)
+			})
 		}))
 	}))
 }
