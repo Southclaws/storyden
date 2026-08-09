@@ -35,7 +35,11 @@ const (
 
 	cleanupInterval          = time.Hour
 	dcrClientRetentionPeriod = 7 * 24 * time.Hour
-	maxUserCodeInputLength   = 32
+
+	// rotation keeps every superseded row so revokeRefreshTokenFamily can walk
+	// the chain, they are dropped once they have been unusable for this long
+	refreshTokenRetentionPeriod = 7 * 24 * time.Hour
+	maxUserCodeInputLength      = 32
 )
 
 type Error struct {
@@ -190,12 +194,19 @@ func (s *Service) cleanupExpiredRecords(ctx context.Context, logger *slog.Logger
 		return
 	}
 
-	if deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 {
+	refreshTokens, err := s.tokens.DeleteExpiredRefreshTokens(ctx, now.Add(-refreshTokenRetentionPeriod))
+	if err != nil {
+		logger.Error("failed to clean expired oauth refresh tokens", slog.Any("error", err))
+		return
+	}
+
+	if deviceAuthorisations > 0 || authorizationRequests > 0 || unusedDCRClients > 0 || refreshTokens > 0 {
 		logger.Debug(
 			"cleaned expired oauth records",
 			slog.Int("device_authorizations", deviceAuthorisations),
 			slog.Int("authorization_requests", authorizationRequests),
 			slog.Int("unused_dcr_clients", unusedDCRClients),
+			slog.Int("refresh_tokens", refreshTokens),
 		)
 	}
 }

@@ -503,6 +503,17 @@ func (w *Writer) DeleteExpiredAuthorisationRequests(ctx context.Context, now tim
 	return deleted, nil
 }
 
+func (w *Writer) DeleteExpiredRefreshTokens(ctx context.Context, before time.Time) (int, error) {
+	deleted, err := w.db.OAuthRefreshToken.Delete().
+		Where(oauthrefreshtoken.ExpiresAtLT(before)).
+		Exec(ctx)
+	if err != nil {
+		return 0, wrapWriteError(ctx, err)
+	}
+
+	return deleted, nil
+}
+
 func (w *Writer) CreateRefreshToken(ctx context.Context, input RefreshTokenCreate) (*oauth.RefreshToken, error) {
 	row, err := w.db.OAuthRefreshToken.Create().
 		SetClientID(input.ClientID.XID()).
