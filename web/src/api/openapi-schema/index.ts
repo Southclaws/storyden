@@ -947,6 +947,7 @@ export * from "./tagListIDs";
 export * from "./tagListOKResponse";
 export * from "./tagListParams";
 export * from "./tagListResult";
+export * from "./tagListResultAllOf";
 export * from "./tagName";
 export * from "./tagNameList";
 export * from "./tagNameListQueryParamParameter";

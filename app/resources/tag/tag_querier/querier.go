@@ -2,15 +2,18 @@ package tag_querier
 
 import (
 	"context"
-	"sort"
+	"fmt"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -29,7 +32,7 @@ func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) *Quer
 	return &Querier{db, raw, roleQuerier}
 }
 
-const tagItemsCountManyQuery = `select
+const tagItemsCountPageQuery = `select
   t.id tag_id,                    -- tag ID
   count(p.id) + count(n.id) items -- number of items,
 from
@@ -38,48 +41,77 @@ from
   left join posts p on p.id = tp.post_id and p.visibility = 'published' and p.deleted_at is null
   left join tag_nodes tn on tn.tag_id = t.id
   left join nodes n on n.id = tn.node_id and n.visibility = 'published' and n.deleted_at is null
+%s
 group by
   t.id
+order by
+  items desc, t.name asc
+limit ? offset ?
 `
 
-func (q *Querier) List(ctx context.Context) (tag_ref.Tags, error) {
-	r, err := q.db.Tag.Query().All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	var counts tag_ref.TagItemsResults
-	err = q.raw.SelectContext(ctx, &counts, tagItemsCountManyQuery)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	tags := tag_ref.Tags(dt.Map(r, tag_ref.Map(counts)))
-
-	sort.Sort(tags)
-
-	return tags, nil
+func (q *Querier) List(ctx context.Context, params pagination.Parameters) (*pagination.Result[*tag_ref.Tag], error) {
+	return q.page(ctx, params, opt.NewEmpty[string]())
 }
 
-func (q *Querier) Search(ctx context.Context, query string) (tag_ref.Tags, error) {
-	r, err := q.db.Tag.Query().
-		Where(
-			ent_tag.NameContainsFold(query),
-		).
-		All(ctx)
+func (q *Querier) Search(ctx context.Context, query string, params pagination.Parameters) (*pagination.Result[*tag_ref.Tag], error) {
+	return q.page(ctx, params, opt.New(query))
+}
+
+// tags are ordered by how much they are used, which only exists in the
+// aggregate, so the page is picked there and the rows are hydrated after
+func (q *Querier) page(ctx context.Context, params pagination.Parameters, search opt.Optional[string]) (*pagination.Result[*tag_ref.Tag], error) {
+	countQuery := q.db.Tag.Query()
+	where := ""
+	args := []any{}
+
+	if s, ok := search.Get(); ok {
+		countQuery = countQuery.Where(ent_tag.NameContainsFold(s))
+		where = "where lower(t.name) like lower(?)"
+		args = append(args, "%"+s+"%")
+	}
+
+	total, err := countQuery.Count(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	args = append(args, params.Limit(), params.Offset())
 
 	var counts tag_ref.TagItemsResults
-	err = q.raw.SelectContext(ctx, &counts, tagItemsCountManyQuery)
+	if err := q.raw.SelectContext(ctx, &counts, q.raw.Rebind(fmt.Sprintf(tagItemsCountPageQuery, where)), args...); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(counts) == 0 {
+		empty := pagination.NewPageResult(params, total, []*tag_ref.Tag{})
+		return &empty, nil
+	}
+
+	ids := make([]xid.ID, 0, len(counts))
+	for _, c := range counts {
+		ids = append(ids, c.TagID)
+	}
+
+	rows, err := q.db.Tag.Query().Where(ent_tag.IDIn(ids...)).All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tags := dt.Map(r, tag_ref.Map(counts))
+	byID := make(map[xid.ID]*tag_ref.Tag, len(rows))
+	for _, t := range dt.Map(rows, tag_ref.Map(counts)) {
+		byID[xid.ID(t.ID)] = t
+	}
 
-	return tags, nil
+	tags := make([]*tag_ref.Tag, 0, len(ids))
+	for _, id := range ids {
+		if t, ok := byID[id]; ok {
+			tags = append(tags, t)
+		}
+	}
+
+	result := pagination.NewPageResult(params, total, tags)
+
+	return &result, nil
 }
 
 func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) {
