@@ -164,7 +164,7 @@ func TestPluginErrorStates(t *testing.T) {
 			if statusKind == resource_plugin.ReportedStateRestarting.String() {
 				statusRestarting, err := getResp.JSON200.Status.AsPluginStatusRestarting()
 				r.NoError(err, "plugin status should be restarting")
-				a.Equal(openapi.PluginActiveStateRestarting, statusRestarting.ActiveState, "API should report restarting state")
+				a.Equal(openapi.PluginStatusRestartingActiveStateRestarting, statusRestarting.ActiveState, "API should report restarting state")
 				a.NotEmpty(statusRestarting.Message, "status message should not be empty")
 				a.Contains(statusRestarting.Message, "exit status", "error message should describe the crash")
 			}
