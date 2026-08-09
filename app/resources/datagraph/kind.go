@@ -1,6 +1,6 @@
 package datagraph
 
-//go:generate go run -mod=mod github.com/Southclaws/enumerator
+//go:generate go run github.com/Southclaws/enumerator
 
 type kindEnum string
 

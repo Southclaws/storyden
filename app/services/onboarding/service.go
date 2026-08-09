@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-//go:generate go run -mod=mod github.com/Southclaws/enumerator
+//go:generate go run github.com/Southclaws/enumerator
 
 type Service interface {
 	GetOnboardingStatus(ctx context.Context) (*Status, error)

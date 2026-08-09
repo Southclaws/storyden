@@ -19,7 +19,7 @@ import (
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
-//go:generate go run -mod=mod github.com/Southclaws/enumerator
+//go:generate go run github.com/Southclaws/enumerator
 
 type kindEnum string
 
@@ -69,7 +69,8 @@ func WithKeywords(q string) Filter {
 					ent_post.TitleContainsFold(q),
 				),
 				ent_post.BodyContainsFold(q),
-			))
+			),
+		)
 	}
 }
 
