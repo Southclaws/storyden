@@ -27,6 +27,10 @@ type Email struct {
 	EmailAddress string `json:"email_address,omitempty"`
 	// A six digit code that is sent to the email address to verify ownership
 	VerificationCode string `json:"verification_code,omitempty"`
+	// When the current verification code stops being accepted
+	VerificationCodeExpiresAt *time.Time `json:"verification_code_expires_at,omitempty"`
+	// Failed verification attempts against the current code, used to stop brute force guessing
+	VerificationAttempts int `json:"verification_attempts,omitempty"`
 	// Whether this email has been verified to be owned by the account via a token send+verify process
 	Verified bool `json:"verified,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -64,9 +68,11 @@ func (*Email) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case email.FieldVerified:
 			values[i] = new(sql.NullBool)
+		case email.FieldVerificationAttempts:
+			values[i] = new(sql.NullInt64)
 		case email.FieldEmailAddress, email.FieldVerificationCode:
 			values[i] = new(sql.NullString)
-		case email.FieldCreatedAt:
+		case email.FieldCreatedAt, email.FieldVerificationCodeExpiresAt:
 			values[i] = new(sql.NullTime)
 		case email.FieldID:
 			values[i] = new(xid.ID)
@@ -115,6 +121,19 @@ func (_m *Email) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field verification_code", values[i])
 			} else if value.Valid {
 				_m.VerificationCode = value.String
+			}
+		case email.FieldVerificationCodeExpiresAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field verification_code_expires_at", values[i])
+			} else if value.Valid {
+				_m.VerificationCodeExpiresAt = new(time.Time)
+				*_m.VerificationCodeExpiresAt = value.Time
+			}
+		case email.FieldVerificationAttempts:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field verification_attempts", values[i])
+			} else if value.Valid {
+				_m.VerificationAttempts = int(value.Int64)
 			}
 		case email.FieldVerified:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -176,6 +195,14 @@ func (_m *Email) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("verification_code=")
 	builder.WriteString(_m.VerificationCode)
+	builder.WriteString(", ")
+	if v := _m.VerificationCodeExpiresAt; v != nil {
+		builder.WriteString("verification_code_expires_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("verification_attempts=")
+	builder.WriteString(fmt.Sprintf("%v", _m.VerificationAttempts))
 	builder.WriteString(", ")
 	builder.WriteString("verified=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Verified))

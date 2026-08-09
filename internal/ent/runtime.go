@@ -529,8 +529,12 @@ func init() {
 	emailDescVerificationCode := emailFields[2].Descriptor()
 	// email.VerificationCodeValidator is a validator for the "verification_code" field. It is called by the builders before save.
 	email.VerificationCodeValidator = emailDescVerificationCode.Validators[0].(func(string) error)
+	// emailDescVerificationAttempts is the schema descriptor for verification_attempts field.
+	emailDescVerificationAttempts := emailFields[4].Descriptor()
+	// email.DefaultVerificationAttempts holds the default value on creation for the verification_attempts field.
+	email.DefaultVerificationAttempts = emailDescVerificationAttempts.Default.(int)
 	// emailDescVerified is the schema descriptor for verified field.
-	emailDescVerified := emailFields[3].Descriptor()
+	emailDescVerified := emailFields[5].Descriptor()
 	// email.DefaultVerified holds the default value on creation for the verified field.
 	email.DefaultVerified = emailDescVerified.Default.(bool)
 	// emailDescID is the schema descriptor for id field.
