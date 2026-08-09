@@ -7,16 +7,14 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
-	"syscall"
 	"time"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	ctx, stop := newRunContext()
 	defer stop()
 
 	if err := run(ctx, os.Args[1:]); err != nil {
@@ -56,10 +54,11 @@ func run(ctx context.Context, playwrightArgs []string) error {
 	}
 	backendCmd.Stdout = os.Stdout
 	backendCmd.Stderr = os.Stderr
-	if err := backendCmd.Start(); err != nil {
+	backend, err := startManagedProcess(backendCmd)
+	if err != nil {
 		return fmt.Errorf("failed to start backend: %w", err)
 	}
-	defer stopProcess("backend", backendCmd)
+	defer stopManagedProcess("backend", backend)
 
 	frontendCmd := exec.CommandContext(ctx, "pnpm", "start", "--port", "3001")
 	frontendCmd.Dir = "web"
@@ -69,10 +68,11 @@ func run(ctx context.Context, playwrightArgs []string) error {
 	)
 	frontendCmd.Stdout = os.Stdout
 	frontendCmd.Stderr = os.Stderr
-	if err := frontendCmd.Start(); err != nil {
+	frontend, err := startManagedProcess(frontendCmd)
+	if err != nil {
 		return fmt.Errorf("failed to start frontend: %w", err)
 	}
-	defer stopProcess("frontend", frontendCmd)
+	defer stopManagedProcess("frontend", frontend)
 
 	log.Println("Waiting for services to be ready...")
 	if err := waitForBackend(ctx, "http://localhost:8001/", 60*time.Second); err != nil {
@@ -103,30 +103,6 @@ func run(ctx context.Context, playwrightArgs []string) error {
 
 	log.Println("E2E tests completed successfully!")
 	return nil
-}
-
-func stopProcess(name string, cmd *exec.Cmd) {
-	if cmd == nil || cmd.Process == nil {
-		return
-	}
-
-	log.Println("Stopping", name, "...")
-
-	_ = cmd.Process.Signal(syscall.SIGTERM)
-
-	done := make(chan error, 1)
-	go func() { done <- cmd.Wait() }()
-
-	select {
-	case err := <-done:
-		if err != nil {
-			log.Println(name, "exited with:", err)
-		}
-	case <-time.After(10 * time.Second):
-		log.Println(name, "did not stop in time; killing")
-		_ = cmd.Process.Kill()
-		<-done
-	}
 }
 
 func waitForBackend(ctx context.Context, url string, timeout time.Duration) error {
