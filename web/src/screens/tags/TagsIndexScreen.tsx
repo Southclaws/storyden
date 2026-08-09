@@ -1,7 +1,10 @@
 "use client";
 
+import { parseAsInteger, useQueryStates } from "nuqs";
+
 import { useTagList } from "@/api/openapi-client/tags";
 import { TagListResult } from "@/api/openapi-schema";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -13,17 +16,19 @@ type Props = {
 };
 
 export function TagsIndexScreen(props: Props) {
+  const [filters] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+  });
+
   const { data, error } = useTagList(
-    {},
+    { page: filters.page.toString() },
     { swr: { fallbackData: props.initialTagList } },
   );
   if (!data) {
     return <Unready error={error} />;
   }
 
-  const tags = data.tags
-    .filter((t) => t.item_count > 0)
-    .sort((a, b) => b.item_count - a.item_count);
+  const tags = data.tags.filter((t) => t.item_count > 0);
 
   return (
     <LStack>
@@ -42,6 +47,13 @@ export function TagsIndexScreen(props: Props) {
       </LStack>
 
       <TagBadgeList tags={tags} showItemCount />
+
+      <PaginationControls
+        path="/tags"
+        currentPage={filters.page}
+        totalPages={data.total_pages}
+        pageSize={data.page_size}
+      />
     </LStack>
   );
 }

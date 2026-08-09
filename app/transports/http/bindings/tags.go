@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -23,22 +24,29 @@ func NewTags(tagQuerier *tag_querier.Querier) Tags {
 }
 
 func (h Tags) TagList(ctx context.Context, request openapi.TagListRequestObject) (openapi.TagListResponseObject, error) {
-	fn := func() (tag_ref.Tags, error) {
+	pageParams := deserialisePageParams(request.Params.Page, 50)
+
+	fn := func() (*pagination.Result[*tag_ref.Tag], error) {
 		if request.Params.Q == nil {
-			return h.tagQuerier.List(ctx)
+			return h.tagQuerier.List(ctx, pageParams)
 		} else {
-			return h.tagQuerier.Search(ctx, *request.Params.Q)
+			return h.tagQuerier.Search(ctx, *request.Params.Q, pageParams)
 		}
 	}
 
-	list, err := fn()
+	result, err := fn()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.TagList200JSONResponse{
 		TagListOKJSONResponse: openapi.TagListOKJSONResponse{
-			Tags: serialiseTagReferenceList(list),
+			CurrentPage: result.CurrentPage,
+			NextPage:    result.NextPage.Ptr(),
+			PageSize:    result.Size,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+			Tags:        serialiseTagReferenceList(result.Items),
 		},
 	}, nil
 }
