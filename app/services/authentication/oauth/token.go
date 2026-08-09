@@ -182,7 +182,7 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 	}
 
 	rec, err := s.clients.GetRefreshTokenByTokenHash(ctx, hashString(refreshToken))
-	if err != nil || rec.ClientID != cl.ID || rec.ExpiresAt.Before(time.Now()) {
+	if err != nil || rec.ClientID != cl.ID {
 		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
 	}
 	if rec.RevokedAt.Ok() {
@@ -196,6 +196,9 @@ func (s *Service) exchangeRefreshToken(ctx context.Context, input TokenRequest) 
 				return nil, nil, err
 			}
 		}
+		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
+	}
+	if rec.ExpiresAt.Before(time.Now()) {
 		return nil, oauthError("invalid_grant", "Refresh token is invalid, expired, or revoked"), nil
 	}
 

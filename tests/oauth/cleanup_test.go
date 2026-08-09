@@ -2,6 +2,9 @@ package oauth_test
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"net/http"
 	"testing"
 	"time"
 
@@ -17,8 +20,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/oauth"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/tests"
 )
 
 func TestOAuthCleanup(t *testing.T) {
@@ -30,6 +35,7 @@ func TestOAuthCleanup(t *testing.T) {
 		aw *account_writer.Writer,
 		oq *oauth_querier.Querier,
 		ow *oauth_writer.Writer,
+		cl *openapi.ClientWithResponses,
 	) {
 		lc.Append(fx.StartHook(func() {
 			_, owner := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -84,6 +90,13 @@ func TestOAuthCleanup(t *testing.T) {
 				staleHash := "stale-" + uuid.NewString()
 				recentlyExpiredHash := "recent-" + uuid.NewString()
 				liveHash := "live-" + uuid.NewString()
+				rotatedParentToken := "rotated-parent-" + uuid.NewString()
+				rotatedChildToken := "rotated-child-" + uuid.NewString()
+				hashToken := func(token string) string {
+					sum := sha256.Sum256([]byte(token))
+					return hex.EncodeToString(sum[:])
+				}
+				now := time.Now()
 
 				create := func(hash string, expiresAt time.Time) {
 					_, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
@@ -96,11 +109,33 @@ func TestOAuthCleanup(t *testing.T) {
 					r.NoError(err)
 				}
 
-				create(staleHash, time.Now().Add(-30*24*time.Hour))
-				create(recentlyExpiredHash, time.Now().Add(-time.Hour))
-				create(liveHash, time.Now().Add(24*time.Hour))
+				create(staleHash, now.Add(-30*24*time.Hour))
+				create(recentlyExpiredHash, now.Add(-time.Hour))
+				create(liveHash, now.Add(24*time.Hour))
 
-				deleted, err := ow.DeleteExpiredRefreshTokens(root, time.Now().Add(-7*24*time.Hour))
+				// A stale, rotated parent must survive cleanup while its child is still
+				// retained, so reuse detection can revoke the whole token family.
+				parent, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
+					ClientID:  client.ID,
+					AccountID: owner.ID,
+					TokenHash: hashToken(rotatedParentToken),
+					Scope:     "openid",
+					ExpiresAt: now.Add(-30 * 24 * time.Hour),
+				})
+				r.NoError(err)
+				child, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
+					ClientID:  client.ID,
+					AccountID: owner.ID,
+					TokenHash: hashToken(rotatedChildToken),
+					Scope:     "openid",
+					ExpiresAt: now.Add(24 * time.Hour),
+				})
+				r.NoError(err)
+				rotated, err := ow.RevokeRefreshToken(root, parent.ID, now, opt.New(child.ID))
+				r.NoError(err)
+				r.True(rotated)
+
+				deleted, err := ow.DeleteExpiredRefreshTokens(root, now.Add(-7*24*time.Hour))
 				r.NoError(err)
 				a.Equal(1, deleted, "only rows past the retention window go")
 
@@ -112,6 +147,25 @@ func TestOAuthCleanup(t *testing.T) {
 
 				_, err = oq.GetRefreshTokenByTokenHash(root, liveHash)
 				a.NoError(err)
+
+				_, err = oq.GetRefreshTokenByTokenHash(root, hashToken(rotatedParentToken))
+				a.NoError(err, "a rotated parent stays so reuse detection can walk to its retained child")
+
+				reuse := tests.AssertRequest(oauthToken(t, root, cl, oauthTokenRequest{
+					GrantType:    oauthGrantRefreshToken,
+					ClientId:     clientID,
+					RefreshToken: &rotatedParentToken,
+				}))(t, http.StatusBadRequest)
+				r.NotNil(reuse.JSON400)
+				a.Equal("invalid_grant", reuse.JSON400.Error)
+
+				familyRevoked := tests.AssertRequest(oauthToken(t, root, cl, oauthTokenRequest{
+					GrantType:    oauthGrantRefreshToken,
+					ClientId:     clientID,
+					RefreshToken: &rotatedChildToken,
+				}))(t, http.StatusBadRequest)
+				r.NotNil(familyRevoked.JSON400)
+				a.Equal("invalid_grant", familyRevoked.JSON400.Error)
 			})
 		}))
 	}))
