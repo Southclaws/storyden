@@ -61,10 +61,14 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 			ctx = fctx.WithMeta(ctx,
 				"schema_error", se.Reason,
 				"schema_field", se.SchemaField,
-				"schema_description", se.Schema.Description,
-				"schema_type", fmt.Sprint(se.Schema.Type),
 				"path", strings.Join(se.JSONPointer(), "."),
 			)
+			if se.Schema != nil {
+				ctx = fctx.WithMeta(ctx,
+					"schema_description", se.Schema.Description,
+					"schema_type", fmt.Sprint(se.Schema.Type),
+				)
+			}
 
 			// These schema errors become nested when the schema is composed of
 			// other schemas using anyOf, allOf, oneOf, etc. This recursion will
