@@ -28,7 +28,7 @@ export function RoleCard({ role, editable, dragHandle }: Props) {
   return (
     <CardBox
       className={css({
-        borderColor: "colorPalette.fg",
+        borderColor: "colorPalette.6",
         display: "flex",
         gap: "2",
       })}

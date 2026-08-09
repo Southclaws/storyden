@@ -23,10 +23,10 @@ const trigger = {
     flexShrink: "0",
   },
   _hover: {
-    bg: "gray.surface.bg.hover",
+    bg: "background.controlHover",
   },
   _active: {
-    bg: "gray.surface.bg.active",
+    bg: "background.controlSubtle",
   },
 };
 

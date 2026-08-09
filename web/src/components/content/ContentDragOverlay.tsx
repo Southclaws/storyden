@@ -20,7 +20,7 @@ export function ContentDragOverlay({ isError, message }: Props) {
       backgroundColor="interactive.emphasized.surface"
       borderWidth="medium"
       borderStyle="dashed"
-      borderColor={isError ? "status.danger.border" : "accent.default"}
+      borderColor={isError ? "status.danger.border" : "accent.solid"}
       borderRadius="md"
       style={{ opacity: 0.95 }}
       role="status"
@@ -30,7 +30,7 @@ export function ContentDragOverlay({ isError, message }: Props) {
       <styled.div
         fontSize="sm"
         fontWeight="medium"
-        color={isError ? "status.danger.content" : "accent.default"}
+        color={isError ? "status.danger.content" : "accent.solid"}
         display="flex"
         flexDirection="column"
         alignItems="center"

@@ -44,6 +44,10 @@ function ColorTokenCard({
   preview = "fill",
 }: TokenExample & { preview?: "fill" | "content" | "border" }) {
   const variable = tokenVar(token);
+  const contentBackground =
+    token === "colors.text.inverse"
+      ? tokenVar("colors.text.default")
+      : tokenVar("colors.background.inset");
 
   return (
     <styled.article
@@ -59,18 +63,23 @@ function ColorTokenCard({
     >
       <styled.div
         alignItems="center"
-        backgroundColor={preview === "content" ? "background.inset" : undefined}
+        aria-disabled={token === "colors.text.disabled" ? true : undefined}
         borderColor={preview === "border" ? undefined : "border.default"}
         borderRadius="control"
         borderWidth={preview === "border" ? "thick" : "thin"}
         color={preview === "content" ? undefined : "text.default"}
         display="flex"
-        fontSize="lg"
-        fontWeight="semibold"
+        fontSize="xl"
+        fontWeight="bold"
         height="12"
         justifyContent="center"
         style={{
-          backgroundColor: preview === "fill" ? variable : undefined,
+          backgroundColor:
+            preview === "fill"
+              ? variable
+              : preview === "content"
+                ? contentBackground
+                : undefined,
           borderColor: preview === "border" ? variable : undefined,
           color: preview === "content" ? variable : undefined,
         }}
@@ -89,6 +98,31 @@ function ColorTokenCard({
           {usage}
         </styled.p>
       </styled.div>
+    </styled.article>
+  );
+}
+
+function SolidPalettePair() {
+  return (
+    <styled.article
+      alignItems="center"
+      backgroundColor="accent.solid"
+      borderColor="accent.solid"
+      borderRadius="control"
+      borderWidth="thin"
+      color="accent.solidForeground"
+      display="flex"
+      flexWrap="wrap"
+      gap="2"
+      justifyContent="space-between"
+      paddingX="3"
+      paddingY="2"
+    >
+      <styled.strong fontSize="sm">Solid accent content</styled.strong>
+      <styled.span display="flex" flexWrap="wrap" gap="2">
+        <TokenCode>colors.accent.solid</TokenCode>
+        <TokenCode>colors.accent.solidForeground</TokenCode>
+      </styled.span>
     </styled.article>
   );
 }
@@ -450,7 +484,11 @@ export const SemanticColors: Story = {
         </styled.div>
       </FoundationSection>
 
-      <FoundationSection title="Accent">
+      <FoundationSection
+        title="Accent"
+        description="Solid fills and their foregrounds are a deliberate pair. Use solidForeground only for content rendered directly on solid; it is not a generic foreground token."
+      >
+        <SolidPalettePair />
         <div className={compactTokenGrid}>
           {accentScaleTokens.map((token) => (
             <ColorTokenCard key={token.token} {...token} />

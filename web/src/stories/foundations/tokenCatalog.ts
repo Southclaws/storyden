@@ -157,26 +157,26 @@ export const statusTokens: StatusTokenExample[] = [
 export const visibilityTokens: StatusTokenExample[] = [
   {
     name: "published",
-    surface: "colors.visibility.published.bg",
-    content: "colors.visibility.published.fg",
+    surface: "colors.visibility.published.surface",
+    content: "colors.visibility.published.content",
     border: "colors.visibility.published.border",
   },
   {
     name: "draft",
-    surface: "colors.visibility.draft.bg",
-    content: "colors.visibility.draft.fg",
+    surface: "colors.visibility.draft.surface",
+    content: "colors.visibility.draft.content",
     border: "colors.visibility.draft.border",
   },
   {
     name: "review",
-    surface: "colors.visibility.review.bg",
-    content: "colors.visibility.review.fg",
+    surface: "colors.visibility.review.surface",
+    content: "colors.visibility.review.content",
     border: "colors.visibility.review.border",
   },
   {
     name: "unlisted",
-    surface: "colors.visibility.unlisted.bg",
-    content: "colors.visibility.unlisted.fg",
+    surface: "colors.visibility.unlisted.surface",
+    content: "colors.visibility.unlisted.content",
     border: "colors.visibility.unlisted.border",
   },
 ];

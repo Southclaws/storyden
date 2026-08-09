@@ -46,7 +46,7 @@ export const ShapeAndDepth: Story = {
             >
               <styled.div
                 backgroundColor="accent.subtle"
-                borderColor="accent.default"
+                borderColor="accent.solid"
                 borderStyle="solid"
                 borderWidth="medium"
                 height="16"

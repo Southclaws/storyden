@@ -150,7 +150,7 @@ export function LibraryPageEditMenu({ node }: Props) {
               Edit
               {hasVisibleDraft && (
                 <Box
-                  bgColor="visibility.draft.fg"
+                  bgColor="visibility.draft.content"
                   borderRadius="full"
                   w="2"
                   h="2"

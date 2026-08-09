@@ -77,7 +77,7 @@ export const ResponsiveScale: Story = {
                 width="full"
               >
                 <styled.div
-                  backgroundColor="accent.default"
+                  backgroundColor="accent.solid"
                   height="full"
                   style={{
                     width: `${(breakpoint.value / maxBreakpoint) * 100}%`,

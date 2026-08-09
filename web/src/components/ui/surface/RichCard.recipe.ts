@@ -145,7 +145,7 @@ export const richCard = defineSlotRecipe({
       },
       accent: {
         root: {
-          backgroundColor: "accent.default",
+          backgroundColor: "accent.solid",
         },
       },
     },

@@ -24,11 +24,11 @@ export const slider = defineSlotRecipe({
       flex: "1",
     },
     range: {
-      background: "accent.default",
+      background: "accent.solid",
     },
     thumb: {
       background: "background.control",
-      borderColor: "accent.default",
+      borderColor: "accent.solid",
       borderRadius: "full",
       borderWidth: "2px",
       boxShadow: "surface",
@@ -37,7 +37,7 @@ export const slider = defineSlotRecipe({
       transition: "box-shadow 0.2s, transform 0.2s",
       _focusVisible: {
         boxShadow: "0 0 0 3px token(colors.accent.4)",
-        outline: "2px solid token(colors.accent.default)",
+        outline: "2px solid token(colors.accent.solid)",
         outlineOffset: "2px",
       },
       _hover: {

@@ -71,7 +71,7 @@ export function FullPageChatInput() {
             fontSize="sm"
             resize="none"
             _focus={{
-              borderColor: "accent.default",
+              borderColor: "accent.solid",
               outline: "none",
             }}
             _disabled={{

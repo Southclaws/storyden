@@ -18,7 +18,7 @@ type ColourPalette = {
   name: string;
   tokens: Record<Theme, Record<string, { value: string }>>;
   semanticTokens: Record<
-    "default" | "fg" | "text",
+    "solid" | "solidForeground" | "text",
     { value: Record<Condition, string> }
   >;
 };
@@ -42,7 +42,7 @@ const canvases = {
 
 function resolveSemanticColour(
   palette: ColourPalette,
-  token: "default" | "fg" | "text",
+  token: "solid" | "solidForeground" | "text",
   theme: Theme,
 ) {
   const condition = theme === "light" ? "_osLight" : "_osDark";
@@ -82,8 +82,12 @@ describe.each(palettes)("$name colour palette", (palette) => {
   it.each(["light", "dark"] as const)(
     "keeps %s solid foreground readable",
     (theme) => {
-      const background = resolveSemanticColour(palette, "default", theme);
-      const foreground = resolveSemanticColour(palette, "fg", theme);
+      const background = resolveSemanticColour(palette, "solid", theme);
+      const foreground = resolveSemanticColour(
+        palette,
+        "solidForeground",
+        theme,
+      );
 
       expect(getContrast(foreground!, background!)).toBeGreaterThanOrEqual(4.5);
     },
@@ -94,7 +98,9 @@ describe("destructive solid colours", () => {
   it.each(["light", "dark"] as const)(
     "uses a light foreground in %s mode",
     (theme) => {
-      expect(resolveSemanticColour(red, "fg", theme)).toBe("white");
+      expect(resolveSemanticColour(red, "solidForeground", theme)).toBe(
+        "white",
+      );
     },
   );
 });

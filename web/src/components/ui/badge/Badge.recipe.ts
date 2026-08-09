@@ -32,8 +32,8 @@ export const badge = defineRecipe({
   variants: {
     variant: {
       solid: {
-        background: "colorPalette.default",
-        color: "colorPalette.fg",
+        background: "colorPalette.solid",
+        color: "colorPalette.solidForeground",
       },
       subtle: {
         background: "colorPalette.3",

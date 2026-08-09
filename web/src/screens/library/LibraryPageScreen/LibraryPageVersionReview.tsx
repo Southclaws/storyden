@@ -563,7 +563,7 @@ function WrappedDiff({ t1, t2 }: { t1: string; t2: string }) {
         left="0"
         width="full"
         visibility="hidden"
-        bgColor="visibility.draft.bg"
+        bgColor="visibility.draft.surface"
         pointerEvents="none"
         aria-hidden
       >

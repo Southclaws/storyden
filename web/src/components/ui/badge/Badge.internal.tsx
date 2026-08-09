@@ -13,23 +13,25 @@ export function badgeColours(hexColour: string) {
   const colour = chroma(hexColour);
   const hue = colour.lch()[2];
 
-  const bg = chroma(0.95, 0.1, hue, "oklch").css();
+  const background = chroma(0.95, 0.1, hue, "oklch").css();
   const border = chroma(0.85, 0.2, hue, "oklch").css();
-  const fg = getReadableTextColour(bg);
+  const foreground = getReadableTextColour(background);
 
-  return { bg, border, fg };
+  return { background, border, foreground };
 }
 
 export function badgeColourPalette(colourStyles: {
-  bg: string;
+  background: string;
   border: string;
-  fg: string;
+  foreground: string;
 }) {
   const cssVars = colourStyles
     ? ({
-        "--colors-color-palette-3": colourStyles.bg,
+        "--colors-color-palette-3": colourStyles.background,
         "--colors-color-palette-6": colourStyles.border,
-        "--colors-color-palette-12": colourStyles.fg,
+        "--colors-color-palette-text": colourStyles.foreground,
+        "--colors-color-palette-solid": colourStyles.background,
+        "--colors-color-palette-solid-foreground": colourStyles.foreground,
       } as React.CSSProperties)
     : undefined;
 

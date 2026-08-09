@@ -54,7 +54,7 @@ export function MemberRoleMenu(props: Props) {
                     <CheckCircleIcon
                       width="4"
                       style={{
-                        fill: "var(--colors-color-palette-bg)",
+                        fill: "var(--colors-color-palette-3)",
                         stroke: "var(--colors-color-palette-text)",
                       }}
                     />

@@ -1,6 +1,6 @@
 export const visibility = {
   published: {
-    bg: {
+    surface: {
       DEFAULT: {
         value: {
           _osLight: "{colors.neutral.light.3}",
@@ -8,7 +8,7 @@ export const visibility = {
         },
       },
     },
-    fg: {
+    content: {
       DEFAULT: {
         value: {
           _osLight: "{colors.neutral.light.12}",
@@ -26,7 +26,7 @@ export const visibility = {
     },
   },
   draft: {
-    bg: {
+    surface: {
       DEFAULT: {
         value: {
           _osLight: "{colors.blue.light.3}",
@@ -34,7 +34,7 @@ export const visibility = {
         },
       },
     },
-    fg: {
+    content: {
       DEFAULT: {
         value: {
           _osLight: "{colors.blue.light.12}",
@@ -52,7 +52,7 @@ export const visibility = {
     },
   },
   review: {
-    bg: {
+    surface: {
       DEFAULT: {
         value: {
           _osLight: "{colors.amber.light.3}",
@@ -60,7 +60,7 @@ export const visibility = {
         },
       },
     },
-    fg: {
+    content: {
       DEFAULT: {
         value: {
           _osLight: "{colors.amber.light.12}",
@@ -78,7 +78,7 @@ export const visibility = {
     },
   },
   unlisted: {
-    bg: {
+    surface: {
       DEFAULT: {
         value: {
           _osLight: "{colors.pink.light.3}",
@@ -86,7 +86,7 @@ export const visibility = {
         },
       },
     },
-    fg: {
+    content: {
       DEFAULT: {
         value: {
           _osLight: "{colors.pink.light.12}",

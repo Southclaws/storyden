@@ -14,9 +14,9 @@ export function VisibilityBadge({ visibility, size = "sm" }: Props) {
     <Badge
       size={size}
       colorPalette={colorPalette}
-      backgroundColor="colorPalette.bg"
+      backgroundColor="colorPalette.surface"
       borderColor="colorPalette.border"
-      color="colorPalette.fg"
+      color="colorPalette.content"
       textTransform="capitalize"
     >
       {visibility}

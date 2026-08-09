@@ -49,7 +49,7 @@ export const inputVariantVariants = {
     px: "0",
     _focus: {
       borderColor: "transparent",
-      boxShadow: "0 0 0 0px var(--colors-color-palette-default)",
+      boxShadow: "0 0 0 0px var(--colors-color-palette-solid)",
     },
   },
   inset: {
@@ -58,7 +58,7 @@ export const inputVariantVariants = {
     px: "0",
     _focus: {
       borderColor: "transparent",
-      boxShadow: "0 0 0 0px var(--colors-color-palette-default)",
+      boxShadow: "0 0 0 0px var(--colors-color-palette-solid)",
     },
   },
 } as const;

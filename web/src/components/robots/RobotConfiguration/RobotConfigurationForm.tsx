@@ -104,7 +104,7 @@ export function RobotConfigurationForm(props: Props) {
             resize="vertical"
             _focus={{
               outline: "none",
-              borderColor: "accent.default",
+              borderColor: "accent.solid",
             }}
           />
           <FormErrorText>

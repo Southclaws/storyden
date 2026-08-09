@@ -5,7 +5,7 @@ import { css, cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 import { badge } from "@/styled-system/recipes";
 
-import { BadgeProps, badgeColours } from "../ui/badge";
+import { BadgeProps, badgeColourPalette, badgeColours } from "../ui/badge";
 
 type TagBadgeProps =
   | {
@@ -28,12 +28,6 @@ export type Props = BadgeProps &
 // tags are always lowercase, which means most ascenders and descenders are
 // slightly mis-aligned to the optical center of the badge.
 const OPTICAL_ALIGNMENT_ADJUSTMENT = 0.5;
-
-const badgeStyles = css({
-  bgColor: "colorPalette.bg",
-  borderColor: "colorPalette.border",
-  color: "colorPalette.fg",
-});
 
 export function TagBadge({
   type,
@@ -76,13 +70,10 @@ export function TagBadge({
     </>
   );
 
-  const tagBadgeStyles = cx(
-    badge({
-      size: "sm",
-      ...props,
-    }),
-    badgeStyles,
-  );
+  const tagBadgeStyles = badge({
+    size: "sm",
+    ...props,
+  });
 
   if (type === "button") {
     const shouldShowHighlightStyles = highlighted !== undefined;
@@ -125,11 +116,5 @@ export function TagBadge({
 }
 
 function badgeColourCSS(c: string) {
-  const { bg, border, fg } = badgeColours(c);
-
-  return {
-    "--colors-color-palette-fg": fg,
-    "--colors-color-palette-border": border,
-    "--colors-color-palette-bg": bg,
-  } as React.CSSProperties;
+  return badgeColourPalette(badgeColours(c));
 }

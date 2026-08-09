@@ -169,6 +169,13 @@ Structural hierarchy and semantic meaning are separate:
   role, or classification. Generated tag colours are valid when paired with
   readable foregrounds.
 
+Low-level palette contracts use `solid`, `solidForeground`, `text`,
+`emphasized`, and numbered ramp steps. `solid` and `solidForeground` are an
+inseparable fill/content pair: use `solidForeground` only for content rendered
+directly on `solid`. Do not introduce ambiguous palette aliases such as `bg`,
+`fg`, or `default`. The `default` in `text.default` and `border.default` is not
+a palette alias; it names the primary semantic text or border role.
+
 Never select raw neutral ramp values at a call site merely because a grey looks
 right. If the existing semantic role is insufficient, define the missing role.
 

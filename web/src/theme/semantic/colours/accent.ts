@@ -5,13 +5,13 @@ export const accent = {
       _osDark: "{colors.accent.dark.text.6}",
     },
   },
-  default: {
+  solid: {
     value: {
       _osLight: "var(--accent-colour-flat-fill-400)",
       _osDark: "var(--accent-colour-dark-fill-500)",
     },
   },
-  fg: {
+  solidForeground: {
     value: {
       _osLight: "var(--accent-colour-flat-text-400)",
       _osDark: "var(--accent-colour-dark-text-500)",

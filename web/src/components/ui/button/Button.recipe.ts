@@ -89,16 +89,16 @@ export const button = defineRecipe({
     },
     variant: {
       solid: {
-        background: "colorPalette.default",
-        color: "colorPalette.fg",
+        background: "colorPalette.solid",
+        color: "colorPalette.solidForeground",
         [withoutIntent]: {
           colorPalette: "accent",
         },
         _hover: {
-          background: "colorPalette.default",
-          color: "colorPalette.fg",
+          background: "colorPalette.solid",
+          color: "colorPalette.solidForeground",
           outline: "1px solid",
-          outlineColor: "colorPalette.fg/20",
+          outlineColor: "colorPalette.solidForeground/20",
           outlineOffset: "-1px",
         },
         _focusVisible: {
@@ -143,12 +143,12 @@ export const button = defineRecipe({
           outlineOffset: "2px",
         },
         _selected: {
-          background: "colorPalette.default",
-          borderColor: "colorPalette.default",
-          color: "colorPalette.fg",
+          background: "colorPalette.solid",
+          borderColor: "colorPalette.solid",
+          color: "colorPalette.solidForeground",
           _hover: {
-            background: "colorPalette.default",
-            borderColor: "colorPalette.default",
+            background: "colorPalette.solid",
+            borderColor: "colorPalette.solid",
           },
         },
       },

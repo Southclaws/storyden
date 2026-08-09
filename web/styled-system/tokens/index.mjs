@@ -3483,49 +3483,49 @@ const tokens = {
     "value": "var(--colors-status-info-border)",
     "variable": "var(--colors-status-info-border)"
   },
-  "colors.visibility.published.bg": {
-    "value": "var(--colors-visibility-published-bg)",
-    "variable": "var(--colors-visibility-published-bg)"
+  "colors.visibility.published.surface": {
+    "value": "var(--colors-visibility-published-surface)",
+    "variable": "var(--colors-visibility-published-surface)"
   },
-  "colors.visibility.published.fg": {
-    "value": "var(--colors-visibility-published-fg)",
-    "variable": "var(--colors-visibility-published-fg)"
+  "colors.visibility.published.content": {
+    "value": "var(--colors-visibility-published-content)",
+    "variable": "var(--colors-visibility-published-content)"
   },
   "colors.visibility.published.border": {
     "value": "var(--colors-visibility-published-border)",
     "variable": "var(--colors-visibility-published-border)"
   },
-  "colors.visibility.draft.bg": {
-    "value": "var(--colors-visibility-draft-bg)",
-    "variable": "var(--colors-visibility-draft-bg)"
+  "colors.visibility.draft.surface": {
+    "value": "var(--colors-visibility-draft-surface)",
+    "variable": "var(--colors-visibility-draft-surface)"
   },
-  "colors.visibility.draft.fg": {
-    "value": "var(--colors-visibility-draft-fg)",
-    "variable": "var(--colors-visibility-draft-fg)"
+  "colors.visibility.draft.content": {
+    "value": "var(--colors-visibility-draft-content)",
+    "variable": "var(--colors-visibility-draft-content)"
   },
   "colors.visibility.draft.border": {
     "value": "var(--colors-visibility-draft-border)",
     "variable": "var(--colors-visibility-draft-border)"
   },
-  "colors.visibility.review.bg": {
-    "value": "var(--colors-visibility-review-bg)",
-    "variable": "var(--colors-visibility-review-bg)"
+  "colors.visibility.review.surface": {
+    "value": "var(--colors-visibility-review-surface)",
+    "variable": "var(--colors-visibility-review-surface)"
   },
-  "colors.visibility.review.fg": {
-    "value": "var(--colors-visibility-review-fg)",
-    "variable": "var(--colors-visibility-review-fg)"
+  "colors.visibility.review.content": {
+    "value": "var(--colors-visibility-review-content)",
+    "variable": "var(--colors-visibility-review-content)"
   },
   "colors.visibility.review.border": {
     "value": "var(--colors-visibility-review-border)",
     "variable": "var(--colors-visibility-review-border)"
   },
-  "colors.visibility.unlisted.bg": {
-    "value": "var(--colors-visibility-unlisted-bg)",
-    "variable": "var(--colors-visibility-unlisted-bg)"
+  "colors.visibility.unlisted.surface": {
+    "value": "var(--colors-visibility-unlisted-surface)",
+    "variable": "var(--colors-visibility-unlisted-surface)"
   },
-  "colors.visibility.unlisted.fg": {
-    "value": "var(--colors-visibility-unlisted-fg)",
-    "variable": "var(--colors-visibility-unlisted-fg)"
+  "colors.visibility.unlisted.content": {
+    "value": "var(--colors-visibility-unlisted-content)",
+    "variable": "var(--colors-visibility-unlisted-content)"
   },
   "colors.visibility.unlisted.border": {
     "value": "var(--colors-visibility-unlisted-border)",
@@ -3575,13 +3575,13 @@ const tokens = {
     "value": "var(--colors-accent-text)",
     "variable": "var(--colors-accent-text)"
   },
-  "colors.accent.default": {
-    "value": "var(--colors-accent-default)",
-    "variable": "var(--colors-accent-default)"
+  "colors.accent.solid": {
+    "value": "var(--colors-accent-solid)",
+    "variable": "var(--colors-accent-solid)"
   },
-  "colors.accent.fg": {
-    "value": "var(--colors-accent-fg)",
-    "variable": "var(--colors-accent-fg)"
+  "colors.accent.solidForeground": {
+    "value": "var(--colors-accent-solid-foreground)",
+    "variable": "var(--colors-accent-solid-foreground)"
   },
   "colors.accent.subtle": {
     "value": "var(--colors-accent-subtle)",
@@ -3687,17 +3687,17 @@ const tokens = {
     "value": "var(--colors-blue-a12)",
     "variable": "var(--colors-blue-a12)"
   },
-  "colors.blue.default": {
-    "value": "var(--colors-blue-default)",
-    "variable": "var(--colors-blue-default)"
+  "colors.blue.solid": {
+    "value": "var(--colors-blue-solid)",
+    "variable": "var(--colors-blue-solid)"
   },
   "colors.blue.emphasized": {
     "value": "var(--colors-blue-emphasized)",
     "variable": "var(--colors-blue-emphasized)"
   },
-  "colors.blue.fg": {
-    "value": "var(--colors-blue-fg)",
-    "variable": "var(--colors-blue-fg)"
+  "colors.blue.solidForeground": {
+    "value": "var(--colors-blue-solid-foreground)",
+    "variable": "var(--colors-blue-solid-foreground)"
   },
   "colors.blue.text": {
     "value": "var(--colors-blue-text)",
@@ -3799,17 +3799,17 @@ const tokens = {
     "value": "var(--colors-green-a12)",
     "variable": "var(--colors-green-a12)"
   },
-  "colors.green.default": {
-    "value": "var(--colors-green-default)",
-    "variable": "var(--colors-green-default)"
+  "colors.green.solid": {
+    "value": "var(--colors-green-solid)",
+    "variable": "var(--colors-green-solid)"
   },
   "colors.green.emphasized": {
     "value": "var(--colors-green-emphasized)",
     "variable": "var(--colors-green-emphasized)"
   },
-  "colors.green.fg": {
-    "value": "var(--colors-green-fg)",
-    "variable": "var(--colors-green-fg)"
+  "colors.green.solidForeground": {
+    "value": "var(--colors-green-solid-foreground)",
+    "variable": "var(--colors-green-solid-foreground)"
   },
   "colors.green.text": {
     "value": "var(--colors-green-text)",
@@ -3911,17 +3911,17 @@ const tokens = {
     "value": "var(--colors-red-a12)",
     "variable": "var(--colors-red-a12)"
   },
-  "colors.red.default": {
-    "value": "var(--colors-red-default)",
-    "variable": "var(--colors-red-default)"
+  "colors.red.solid": {
+    "value": "var(--colors-red-solid)",
+    "variable": "var(--colors-red-solid)"
   },
   "colors.red.emphasized": {
     "value": "var(--colors-red-emphasized)",
     "variable": "var(--colors-red-emphasized)"
   },
-  "colors.red.fg": {
-    "value": "var(--colors-red-fg)",
-    "variable": "var(--colors-red-fg)"
+  "colors.red.solidForeground": {
+    "value": "var(--colors-red-solid-foreground)",
+    "variable": "var(--colors-red-solid-foreground)"
   },
   "colors.red.text": {
     "value": "var(--colors-red-text)",
@@ -4023,17 +4023,17 @@ const tokens = {
     "value": "var(--colors-amber-a12)",
     "variable": "var(--colors-amber-a12)"
   },
-  "colors.amber.default": {
-    "value": "var(--colors-amber-default)",
-    "variable": "var(--colors-amber-default)"
+  "colors.amber.solid": {
+    "value": "var(--colors-amber-solid)",
+    "variable": "var(--colors-amber-solid)"
   },
   "colors.amber.emphasized": {
     "value": "var(--colors-amber-emphasized)",
     "variable": "var(--colors-amber-emphasized)"
   },
-  "colors.amber.fg": {
-    "value": "var(--colors-amber-fg)",
-    "variable": "var(--colors-amber-fg)"
+  "colors.amber.solidForeground": {
+    "value": "var(--colors-amber-solid-foreground)",
+    "variable": "var(--colors-amber-solid-foreground)"
   },
   "colors.amber.text": {
     "value": "var(--colors-amber-text)",
@@ -4135,17 +4135,17 @@ const tokens = {
     "value": "var(--colors-gray-a12)",
     "variable": "var(--colors-gray-a12)"
   },
-  "colors.gray.default": {
-    "value": "var(--colors-gray-default)",
-    "variable": "var(--colors-gray-default)"
+  "colors.gray.solid": {
+    "value": "var(--colors-gray-solid)",
+    "variable": "var(--colors-gray-solid)"
   },
   "colors.gray.emphasized": {
     "value": "var(--colors-gray-emphasized)",
     "variable": "var(--colors-gray-emphasized)"
   },
-  "colors.gray.fg": {
-    "value": "var(--colors-gray-fg)",
-    "variable": "var(--colors-gray-fg)"
+  "colors.gray.solidForeground": {
+    "value": "var(--colors-gray-solid-foreground)",
+    "variable": "var(--colors-gray-solid-foreground)"
   },
   "colors.gray.text": {
     "value": "var(--colors-gray-text)",
@@ -4247,17 +4247,17 @@ const tokens = {
     "value": "var(--colors-neutral-a12)",
     "variable": "var(--colors-neutral-a12)"
   },
-  "colors.neutral.default": {
-    "value": "var(--colors-neutral-default)",
-    "variable": "var(--colors-neutral-default)"
+  "colors.neutral.solid": {
+    "value": "var(--colors-neutral-solid)",
+    "variable": "var(--colors-neutral-solid)"
   },
   "colors.neutral.emphasized": {
     "value": "var(--colors-neutral-emphasized)",
     "variable": "var(--colors-neutral-emphasized)"
   },
-  "colors.neutral.fg": {
-    "value": "var(--colors-neutral-fg)",
-    "variable": "var(--colors-neutral-fg)"
+  "colors.neutral.solidForeground": {
+    "value": "var(--colors-neutral-solid-foreground)",
+    "variable": "var(--colors-neutral-solid-foreground)"
   },
   "colors.neutral.text": {
     "value": "var(--colors-neutral-text)",
@@ -4359,17 +4359,17 @@ const tokens = {
     "value": "var(--colors-orange-a12)",
     "variable": "var(--colors-orange-a12)"
   },
-  "colors.orange.default": {
-    "value": "var(--colors-orange-default)",
-    "variable": "var(--colors-orange-default)"
+  "colors.orange.solid": {
+    "value": "var(--colors-orange-solid)",
+    "variable": "var(--colors-orange-solid)"
   },
   "colors.orange.emphasized": {
     "value": "var(--colors-orange-emphasized)",
     "variable": "var(--colors-orange-emphasized)"
   },
-  "colors.orange.fg": {
-    "value": "var(--colors-orange-fg)",
-    "variable": "var(--colors-orange-fg)"
+  "colors.orange.solidForeground": {
+    "value": "var(--colors-orange-solid-foreground)",
+    "variable": "var(--colors-orange-solid-foreground)"
   },
   "colors.orange.text": {
     "value": "var(--colors-orange-text)",
@@ -4471,17 +4471,17 @@ const tokens = {
     "value": "var(--colors-pink-a12)",
     "variable": "var(--colors-pink-a12)"
   },
-  "colors.pink.default": {
-    "value": "var(--colors-pink-default)",
-    "variable": "var(--colors-pink-default)"
+  "colors.pink.solid": {
+    "value": "var(--colors-pink-solid)",
+    "variable": "var(--colors-pink-solid)"
   },
   "colors.pink.emphasized": {
     "value": "var(--colors-pink-emphasized)",
     "variable": "var(--colors-pink-emphasized)"
   },
-  "colors.pink.fg": {
-    "value": "var(--colors-pink-fg)",
-    "variable": "var(--colors-pink-fg)"
+  "colors.pink.solidForeground": {
+    "value": "var(--colors-pink-solid-foreground)",
+    "variable": "var(--colors-pink-solid-foreground)"
   },
   "colors.pink.text": {
     "value": "var(--colors-pink-text)",
@@ -4583,17 +4583,17 @@ const tokens = {
     "value": "var(--colors-slate-a12)",
     "variable": "var(--colors-slate-a12)"
   },
-  "colors.slate.default": {
-    "value": "var(--colors-slate-default)",
-    "variable": "var(--colors-slate-default)"
+  "colors.slate.solid": {
+    "value": "var(--colors-slate-solid)",
+    "variable": "var(--colors-slate-solid)"
   },
   "colors.slate.emphasized": {
     "value": "var(--colors-slate-emphasized)",
     "variable": "var(--colors-slate-emphasized)"
   },
-  "colors.slate.fg": {
-    "value": "var(--colors-slate-fg)",
-    "variable": "var(--colors-slate-fg)"
+  "colors.slate.solidForeground": {
+    "value": "var(--colors-slate-solid-foreground)",
+    "variable": "var(--colors-slate-solid-foreground)"
   },
   "colors.slate.text": {
     "value": "var(--colors-slate-text)",
@@ -4695,17 +4695,17 @@ const tokens = {
     "value": "var(--colors-tomato-a12)",
     "variable": "var(--colors-tomato-a12)"
   },
-  "colors.tomato.default": {
-    "value": "var(--colors-tomato-default)",
-    "variable": "var(--colors-tomato-default)"
+  "colors.tomato.solid": {
+    "value": "var(--colors-tomato-solid)",
+    "variable": "var(--colors-tomato-solid)"
   },
   "colors.tomato.emphasized": {
     "value": "var(--colors-tomato-emphasized)",
     "variable": "var(--colors-tomato-emphasized)"
   },
-  "colors.tomato.fg": {
-    "value": "var(--colors-tomato-fg)",
-    "variable": "var(--colors-tomato-fg)"
+  "colors.tomato.solidForeground": {
+    "value": "var(--colors-tomato-solid-foreground)",
+    "variable": "var(--colors-tomato-solid-foreground)"
   },
   "colors.tomato.text": {
     "value": "var(--colors-tomato-text)",
@@ -5279,57 +5279,49 @@ const tokens = {
     "value": "var(--colors-color-palette-info-border)",
     "variable": "var(--colors-color-palette-info-border)"
   },
-  "colors.colorPalette.published.bg": {
-    "value": "var(--colors-color-palette-published-bg)",
-    "variable": "var(--colors-color-palette-published-bg)"
+  "colors.colorPalette.published.surface": {
+    "value": "var(--colors-color-palette-published-surface)",
+    "variable": "var(--colors-color-palette-published-surface)"
   },
-  "colors.colorPalette.bg": {
-    "value": "var(--colors-color-palette-bg)",
-    "variable": "var(--colors-color-palette-bg)"
-  },
-  "colors.colorPalette.published.fg": {
-    "value": "var(--colors-color-palette-published-fg)",
-    "variable": "var(--colors-color-palette-published-fg)"
-  },
-  "colors.colorPalette.fg": {
-    "value": "var(--colors-color-palette-fg)",
-    "variable": "var(--colors-color-palette-fg)"
+  "colors.colorPalette.published.content": {
+    "value": "var(--colors-color-palette-published-content)",
+    "variable": "var(--colors-color-palette-published-content)"
   },
   "colors.colorPalette.published.border": {
     "value": "var(--colors-color-palette-published-border)",
     "variable": "var(--colors-color-palette-published-border)"
   },
-  "colors.colorPalette.draft.bg": {
-    "value": "var(--colors-color-palette-draft-bg)",
-    "variable": "var(--colors-color-palette-draft-bg)"
+  "colors.colorPalette.draft.surface": {
+    "value": "var(--colors-color-palette-draft-surface)",
+    "variable": "var(--colors-color-palette-draft-surface)"
   },
-  "colors.colorPalette.draft.fg": {
-    "value": "var(--colors-color-palette-draft-fg)",
-    "variable": "var(--colors-color-palette-draft-fg)"
+  "colors.colorPalette.draft.content": {
+    "value": "var(--colors-color-palette-draft-content)",
+    "variable": "var(--colors-color-palette-draft-content)"
   },
   "colors.colorPalette.draft.border": {
     "value": "var(--colors-color-palette-draft-border)",
     "variable": "var(--colors-color-palette-draft-border)"
   },
-  "colors.colorPalette.review.bg": {
-    "value": "var(--colors-color-palette-review-bg)",
-    "variable": "var(--colors-color-palette-review-bg)"
+  "colors.colorPalette.review.surface": {
+    "value": "var(--colors-color-palette-review-surface)",
+    "variable": "var(--colors-color-palette-review-surface)"
   },
-  "colors.colorPalette.review.fg": {
-    "value": "var(--colors-color-palette-review-fg)",
-    "variable": "var(--colors-color-palette-review-fg)"
+  "colors.colorPalette.review.content": {
+    "value": "var(--colors-color-palette-review-content)",
+    "variable": "var(--colors-color-palette-review-content)"
   },
   "colors.colorPalette.review.border": {
     "value": "var(--colors-color-palette-review-border)",
     "variable": "var(--colors-color-palette-review-border)"
   },
-  "colors.colorPalette.unlisted.bg": {
-    "value": "var(--colors-color-palette-unlisted-bg)",
-    "variable": "var(--colors-color-palette-unlisted-bg)"
+  "colors.colorPalette.unlisted.surface": {
+    "value": "var(--colors-color-palette-unlisted-surface)",
+    "variable": "var(--colors-color-palette-unlisted-surface)"
   },
-  "colors.colorPalette.unlisted.fg": {
-    "value": "var(--colors-color-palette-unlisted-fg)",
-    "variable": "var(--colors-color-palette-unlisted-fg)"
+  "colors.colorPalette.unlisted.content": {
+    "value": "var(--colors-color-palette-unlisted-content)",
+    "variable": "var(--colors-color-palette-unlisted-content)"
   },
   "colors.colorPalette.unlisted.border": {
     "value": "var(--colors-color-palette-unlisted-border)",
@@ -5338,6 +5330,14 @@ const tokens = {
   "colors.colorPalette.text": {
     "value": "var(--colors-color-palette-text)",
     "variable": "var(--colors-color-palette-text)"
+  },
+  "colors.colorPalette.solid": {
+    "value": "var(--colors-color-palette-solid)",
+    "variable": "var(--colors-color-palette-solid)"
+  },
+  "colors.colorPalette.solidForeground": {
+    "value": "var(--colors-color-palette-solid-foreground)",
+    "variable": "var(--colors-color-palette-solid-foreground)"
   },
   "colors.colorPalette.emphasized": {
     "value": "var(--colors-color-palette-emphasized)",

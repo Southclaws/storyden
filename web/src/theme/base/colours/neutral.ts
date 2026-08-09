@@ -201,7 +201,7 @@ const semanticTokens = defineSemanticTokens.colors({
     },
   },
 
-  default: {
+  solid: {
     value: {
       _osLight: "{colors.neutral.light.9}",
       _osDark: "{colors.neutral.dark.9}",
@@ -213,7 +213,7 @@ const semanticTokens = defineSemanticTokens.colors({
       _osDark: "{colors.neutral.dark.12}",
     },
   },
-  fg: {
+  solidForeground: {
     value: {
       _osLight: "black",
       _osDark: "white",

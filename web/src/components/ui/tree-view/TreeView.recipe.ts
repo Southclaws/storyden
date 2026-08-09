@@ -58,7 +58,7 @@ export const treeView = defineSlotRecipe({
       },
     },
     branchIndicator: {
-      color: "accent.default",
+      color: "accent.solid",
       transformOrigin: "center",
       transitionDuration: "normal",
       transitionProperty: "transform",

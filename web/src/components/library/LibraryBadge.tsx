@@ -8,7 +8,7 @@ export function LibraryBadge() {
   return (
     <styled.span
       position="relative"
-      backgroundColor="accent.default"
+      backgroundColor="accent.solid"
       color="accent.text"
       px="1"
       borderRadius="md"
@@ -23,7 +23,7 @@ export function LibraryPageBadge(props: Node) {
   return (
     <styled.span
       position="relative"
-      backgroundColor="accent.default"
+      backgroundColor="accent.solid"
       color="accent.text"
       px="1"
       borderRadius="md"
@@ -41,7 +41,7 @@ export function NewBadge() {
       as="span"
       variant="metadata"
       fontWeight="bold"
-      backgroundColor="accent.default"
+      backgroundColor="accent.solid"
       color="accent.text"
       px="1"
       py="0.5"

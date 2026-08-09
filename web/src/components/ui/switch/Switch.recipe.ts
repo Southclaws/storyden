@@ -11,7 +11,7 @@ export const switchRecipe = defineSlotRecipe({
       display: "flex",
       position: "relative",
       "&:has(input:focus-visible) [data-part=control]": {
-        outline: "2px solid token(colors.accent.default)",
+        outline: "2px solid token(colors.accent.solid)",
         outlineOffset: "2px",
       },
     },
@@ -28,8 +28,8 @@ export const switchRecipe = defineSlotRecipe({
       transitionProperty: "background",
       transitionTimingFunction: "default",
       _checked: {
-        background: "accent.default",
-        boxShadow: "inset 0 0 0 1px token(colors.accent.default)",
+        background: "accent.solid",
+        boxShadow: "inset 0 0 0 1px token(colors.accent.solid)",
       },
       _disabled: {
         background: "background.controlDisabled",
