@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/oauth"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationcode"
 	"github.com/Southclaws/storyden/internal/ent/oauthauthorisationrequest"
@@ -140,27 +141,34 @@ func (q *Querier) GetRefreshTokenByTokenHash(ctx context.Context, tokenHash stri
 	return oauth.MapRefreshToken(row), nil
 }
 
-func (q *Querier) ListRefreshTokens(ctx context.Context) ([]*oauth.RefreshToken, error) {
-	rows, err := q.db.OAuthRefreshToken.Query().
-		WithClient().
-		All(ctx)
-	if err != nil {
-		return nil, wrapReadError(ctx, err)
-	}
-
-	return dt.Map(rows, oauth.MapRefreshToken), nil
+func (q *Querier) ListRefreshTokens(ctx context.Context, params pagination.Parameters) (*pagination.Result[*oauth.RefreshToken], error) {
+	return q.pageRefreshTokens(ctx, params, q.db.OAuthRefreshToken.Query())
 }
 
-func (q *Querier) ListRefreshTokensByAccount(ctx context.Context, accountID account.AccountID) ([]*oauth.RefreshToken, error) {
-	rows, err := q.db.OAuthRefreshToken.Query().
-		Where(oauthrefreshtoken.AccountID(xid.ID(accountID))).
+func (q *Querier) ListRefreshTokensByAccount(ctx context.Context, accountID account.AccountID, params pagination.Parameters) (*pagination.Result[*oauth.RefreshToken], error) {
+	return q.pageRefreshTokens(ctx, params, q.db.OAuthRefreshToken.Query().
+		Where(oauthrefreshtoken.AccountID(xid.ID(accountID))))
+}
+
+func (q *Querier) pageRefreshTokens(ctx context.Context, params pagination.Parameters, query *ent.OAuthRefreshTokenQuery) (*pagination.Result[*oauth.RefreshToken], error) {
+	total, err := query.Clone().Count(ctx)
+	if err != nil {
+		return nil, wrapReadError(ctx, err)
+	}
+
+	rows, err := query.
 		WithClient().
+		Order(ent.Desc(oauthrefreshtoken.FieldCreatedAt)).
+		Limit(params.Limit()).
+		Offset(params.Offset()).
 		All(ctx)
 	if err != nil {
 		return nil, wrapReadError(ctx, err)
 	}
 
-	return dt.Map(rows, oauth.MapRefreshToken), nil
+	result := pagination.NewPageResult(params, total, dt.Map(rows, oauth.MapRefreshToken))
+
+	return &result, nil
 }
 
 func wrapReadError(ctx context.Context, err error) error {

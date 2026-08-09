@@ -868,15 +868,15 @@ func (i *Admin) AdminOAuthRefreshTokenList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tokens, err := i.oauth.ListRefreshTokens(ctx)
+	pageParams := deserialisePageParams(request.Params.Page, 50)
+
+	result, err := i.oauth.ListRefreshTokens(ctx, pageParams)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AdminOAuthRefreshTokenList200JSONResponse{
-		OAuthRefreshTokenListOKJSONResponse: openapi.OAuthRefreshTokenListOKJSONResponse(openapi.OAuthRefreshTokenListResult{
-			Tokens: serialiseOAuthRefreshTokenList(tokens),
-		}),
+		OAuthRefreshTokenListOKJSONResponse: openapi.OAuthRefreshTokenListOKJSONResponse(serialiseOAuthRefreshTokenListResult(result)),
 	}, nil
 }
 

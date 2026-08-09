@@ -127,7 +127,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 				r.NotNil(afterDelete.JSON200)
 				a.Empty(afterDelete.JSON200.Clients)
 
-				afterDeleteTokens := tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, firstSession))(t, http.StatusOK)
+				afterDeleteTokens := tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, &openapi.OAuthRefreshTokenListParams{}, firstSession))(t, http.StatusOK)
 				r.NotNil(afterDeleteTokens.JSON200)
 				a.Empty(afterDeleteTokens.JSON200.Tokens)
 			})
@@ -258,7 +258,7 @@ func TestOAuthMemberClientManagement(t *testing.T) {
 				tests.AssertRequest(cl.OAuthClientGetWithResponse(root, dummyID, nonAdminSession))(t, http.StatusForbidden)
 				tests.AssertRequest(cl.OAuthClientUpdateWithResponse(root, dummyID, openapi.OAuthClientUpdateJSONRequestBody{}, nonAdminSession))(t, http.StatusForbidden)
 				tests.AssertRequest(cl.OAuthClientDeleteWithResponse(root, dummyID, nonAdminSession))(t, http.StatusForbidden)
-				tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, nonAdminSession))(t, http.StatusForbidden)
+				tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, &openapi.OAuthRefreshTokenListParams{}, nonAdminSession))(t, http.StatusForbidden)
 				tests.AssertRequest(cl.OAuthRefreshTokenDeleteWithResponse(root, dummyID, nonAdminSession))(t, http.StatusForbidden)
 			})
 
