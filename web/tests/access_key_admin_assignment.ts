@@ -8,9 +8,14 @@ import { BrowserContext, Page } from "@playwright/test";
 
 import { authPasswordSignup } from "../src/api/openapi-client/auth";
 
-import { createAccessKeyClient, type AccessKeyClient } from "./admin_client";
+import { type AccessKeyClient, createAccessKeyClient } from "./admin_client";
 
 const DEFAULT_ROLE_ADMIN_ID = "00000000000000000a00";
+
+function uniqueUsername(prefix: string) {
+  const suffix = `${Date.now().toString(36)}`;
+  return `${prefix.slice(0, 30 - suffix.length - 1)}-${suffix}`;
+}
 
 // This key has permission to assign administrator role to other accounts.
 export function getAdminAccessKey(): string {
@@ -36,14 +41,18 @@ export async function withAdminAccessKey<T>(
 
 export async function registerUser(
   page: Page,
-  username: string,
+  usernamePrefix: string,
   password: string,
-) {
+): Promise<string> {
+  const username = uniqueUsername(usernamePrefix);
+
   await page.goto("/register");
   await page.getByRole("textbox", { name: "username" }).fill(username);
   await page.getByRole("textbox", { name: "password" }).fill(password);
   await page.getByRole("button", { name: "Register" }).click();
   await page.waitForURL("/", { timeout: 10000 });
+
+  return username;
 }
 
 // Registers for an account via the API (no browser navigation) then uses the

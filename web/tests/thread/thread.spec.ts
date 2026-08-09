@@ -1,5 +1,7 @@
 import { Page, expect, test } from "@playwright/test";
 
+import { registerUser } from "../access_key_admin_assignment";
+
 const PASSWORD = "TestPassword123!";
 
 async function dismissOnboarding(page: Page) {
@@ -7,18 +9,6 @@ async function dismissOnboarding(page: Page) {
   if (await skipButton.isVisible({ timeout: 1000 }).catch(() => false)) {
     await skipButton.click();
   }
-}
-
-async function registerUser(page: Page, username: string) {
-  await page.goto("/register");
-  await page.getByRole("textbox", { name: "username" }).fill(username);
-  await page.getByRole("textbox", { name: "password" }).fill(PASSWORD);
-  await page.getByRole("button", { name: "Register" }).click();
-  await expect(page).toHaveURL("/", { timeout: 10000 });
-  await expect(
-    page.getByRole("button", { name: "Account menu" }),
-  ).toBeVisible();
-  await dismissOnboarding(page);
 }
 
 async function logout(page: Page) {
@@ -83,7 +73,7 @@ async function navigateToThread(page: Page, threadUrl: string) {
 
 test.describe("Thread Creation", () => {
   test("should create a thread with title and body", async ({ page }) => {
-    await registerUser(page, "thread-creator-01");
+    await registerUser(page, "thread-creator", PASSWORD);
 
     const threadUrl = await createThread(
       page,
@@ -105,7 +95,7 @@ test.describe("Thread Replies", () => {
   test("should reply to a thread from a different account", async ({
     page,
   }) => {
-    await registerUser(page, "thread-author-01");
+    await registerUser(page, "thread-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Replies",
@@ -113,7 +103,7 @@ test.describe("Thread Replies", () => {
     );
 
     await logout(page);
-    await registerUser(page, "replier-01");
+    await registerUser(page, "replier", PASSWORD);
 
     await navigateToThread(page, threadUrl);
     await postReply(page, "This is a reply from another user.");
@@ -126,7 +116,7 @@ test.describe("Thread Replies", () => {
   });
 
   test("should reply to a specific reply", async ({ page }) => {
-    await registerUser(page, "thread-author-02");
+    await registerUser(page, "thread-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Reply Threading",
@@ -136,7 +126,7 @@ test.describe("Thread Replies", () => {
     await postReply(page, "First reply to the thread.");
 
     await logout(page);
-    await registerUser(page, "replier-02");
+    await registerUser(page, "replier", PASSWORD);
 
     await navigateToThread(page, threadUrl);
 
@@ -169,7 +159,7 @@ test.describe("Thread Replies", () => {
   });
 
   test("should clear reply-to selection", async ({ page }) => {
-    await registerUser(page, "thread-author-03");
+    await registerUser(page, "thread-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Clear Reply-To",
@@ -197,7 +187,7 @@ test.describe("Thread Notifications", () => {
   test("should show notification when someone replies to your thread", async ({
     page,
   }) => {
-    await registerUser(page, "notification-author-01");
+    const author = await registerUser(page, "notification-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Notification Test",
@@ -205,20 +195,20 @@ test.describe("Thread Notifications", () => {
     );
 
     await logout(page);
-    await registerUser(page, "notification-replier-01");
+    const replier = await registerUser(page, "notification-replier", PASSWORD);
 
     await navigateToThread(page, threadUrl);
     await postReply(page, "A reply that should trigger a notification.");
 
     await logout(page);
-    await login(page, "notification-author-01");
+    await login(page, author);
 
     await expect(
       page.getByRole("button", { name: "Notifications" }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Notifications" }).click();
 
-    await expect(page.getByText("notification-replier-01")).toBeVisible({
+    await expect(page.getByText(replier)).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByText("replied to")).toBeVisible();
@@ -227,7 +217,7 @@ test.describe("Thread Notifications", () => {
 
 test.describe("Thread Reactions", () => {
   test("should add a reaction to a reply", async ({ page }) => {
-    await registerUser(page, "reaction-author-01");
+    await registerUser(page, "reaction-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Reaction Test",
@@ -244,7 +234,7 @@ test.describe("Thread Reactions", () => {
     await reactionButton.click();
 
     const emojiPicker = page.locator(".EmojiPickerReact");
-    await emojiPicker.waitFor({ timeout: 5000 });
+    await expect(emojiPicker).toBeVisible({ timeout: 10000 });
     await emojiPicker.locator("button.epr-emoji").first().click();
 
     await expect(
@@ -255,7 +245,7 @@ test.describe("Thread Reactions", () => {
 
 test.describe("Thread Editing", () => {
   test("should edit thread title and body", async ({ page }) => {
-    await registerUser(page, "edit-author-01");
+    await registerUser(page, "edit-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Original Thread Title",
@@ -292,7 +282,7 @@ test.describe("Thread Editing", () => {
   });
 
   test("should discard thread edits", async ({ page }) => {
-    await registerUser(page, "edit-author-02");
+    await registerUser(page, "edit-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread to Not Edit",
@@ -322,7 +312,7 @@ test.describe("Thread Editing", () => {
 
 test.describe("Reply Editing", () => {
   test("should edit a reply", async ({ page }) => {
-    await registerUser(page, "reply-edit-author-01");
+    await registerUser(page, "reply-edit-author", PASSWORD);
     await createThread(
       page,
       "Thread for Reply Editing",
@@ -359,7 +349,7 @@ test.describe("Reply Editing", () => {
   });
 
   test("should discard reply edits", async ({ page }) => {
-    await registerUser(page, "reply-edit-author-02");
+    await registerUser(page, "reply-edit-author", PASSWORD);
     await createThread(
       page,
       "Thread for Reply Discard",
@@ -400,7 +390,7 @@ test.describe("Thread Pagination", () => {
   test("should paginate replies when exceeding page size", async ({ page }) => {
     test.setTimeout(300000);
 
-    await registerUser(page, "pagination-author-01");
+    await registerUser(page, "pagination-author", PASSWORD);
     const threadUrl = await createThread(
       page,
       "Thread for Pagination Test",
