@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -221,6 +222,68 @@ func TestRefreshTokenListIsPaginated(t *testing.T) {
 				seen[xid.ID(item.ID).String()] = struct{}{}
 			}
 			a.Len(seen, 7, "pages must not overlap")
+		}))
+	}))
+}
+
+func TestRefreshTokenPagesAreStableWhenTimestampsCollide(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		aw *account_writer.Writer,
+		oq *oauth_querier.Querier,
+		ow *oauth_writer.Writer,
+		raw *sqlx.DB,
+	) {
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+			r := require.New(t)
+
+			_, owner := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
+
+			clientID := "collided-timestamps-" + uuid.NewString()
+			client := createClient(t, root, ow, owner.ID, clientID, oauthresource.ClientTypePublic, oauthresource.ScopePolicyExplicit, opt.NewEmpty[string](), standardScopes(), []string{oauth.GrantTypeRefreshToken})
+
+			const total = 9
+			created := make([]oauthresource.RefreshTokenID, 0, total)
+			for range total {
+				rt, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
+					ClientID:  client.ID,
+					AccountID: owner.ID,
+					TokenHash: uuid.NewString(),
+					Scope:     "openid",
+					ExpiresAt: time.Now().Add(24 * time.Hour),
+				})
+				r.NoError(err)
+				created = append(created, rt.ID)
+			}
+
+			// force every row onto the same instant, which is what an ordering
+			// on created_at alone cannot separate
+			shared := time.Now().Truncate(time.Second)
+			for _, id := range created {
+				_, err := raw.ExecContext(root,
+					raw.Rebind("update oauth_refresh_tokens set created_at = ? where id = ?"),
+					shared, xid.ID(id).String())
+				r.NoError(err)
+			}
+
+			seen := map[string]struct{}{}
+			for page := uint(1); page <= 3; page++ {
+				result, err := oq.ListRefreshTokensByAccount(root, owner.ID, pagination.NewPageParams(page, 3))
+				r.NoError(err)
+
+				for _, item := range result.Items {
+					id := xid.ID(item.ID).String()
+					_, repeated := seen[id]
+					a.False(repeated, "a row must not appear on two pages")
+					seen[id] = struct{}{}
+				}
+			}
+
+			a.Len(seen, total, "walking the pages must reach every row exactly once")
 		}))
 	}))
 }

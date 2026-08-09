@@ -158,7 +158,12 @@ func (q *Querier) pageRefreshTokens(ctx context.Context, params pagination.Param
 
 	rows, err := query.
 		WithClient().
-		Order(ent.Desc(oauthrefreshtoken.FieldCreatedAt)).
+		// id breaks ties, created_at alone leaves rows sharing a timestamp free
+		// to move between adjacent offset pages
+		Order(
+			ent.Desc(oauthrefreshtoken.FieldCreatedAt),
+			ent.Desc(oauthrefreshtoken.FieldID),
+		).
 		Limit(params.Limit()).
 		Offset(params.Offset()).
 		All(ctx)
