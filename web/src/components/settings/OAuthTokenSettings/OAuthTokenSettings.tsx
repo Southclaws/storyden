@@ -9,12 +9,13 @@ import {
   Permission,
 } from "@/api/openapi-schema";
 import { PermissionSummary } from "@/components/role/PermissionList";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -23,12 +24,19 @@ import { CreateOAuthClientModal } from "./CreateOAuthClientModal";
 import { useOAuthClientSettings } from "./useOAuthClientSettings";
 import { useOAuthTokenSettings } from "./useOAuthTokenSettings";
 
+type TokenPage = {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+};
+
 type Props = {
   tokens: OAuthRefreshTokenList;
   clients: OAuthClientList;
+  tokenPage: TokenPage;
 };
 
-export function OAuthTokenSettings({ tokens, clients }: Props) {
+export function OAuthTokenSettings({ tokens, clients, tokenPage }: Props) {
   const createModal = useDisclosure();
 
   return (
@@ -62,7 +70,7 @@ export function OAuthTokenSettings({ tokens, clients }: Props) {
             <p>Applications you have authorised to access this site.</p>
           </LStack>
 
-          <OAuthTokenItemList tokens={tokens} />
+          <OAuthTokenItemList tokens={tokens} page={tokenPage} />
         </CardBox>
       </LStack>
 
@@ -153,8 +161,13 @@ function OAuthClientItem({ client, onDelete }: OAuthClientItemProps) {
   );
 }
 
-function OAuthTokenItemList({ tokens }: Pick<Props, "tokens">) {
-  const { revokeToken } = useOAuthTokenSettings();
+function OAuthTokenItemList({
+  tokens,
+  page,
+}: Pick<Props, "tokens"> & { page: TokenPage }) {
+  const { revokeToken } = useOAuthTokenSettings({
+    page: page.currentPage.toString(),
+  });
 
   if (tokens.length === 0) {
     return (
@@ -165,15 +178,25 @@ function OAuthTokenItemList({ tokens }: Pick<Props, "tokens">) {
   }
 
   return (
-    <styled.ul className={lstack({ gap: "3" })} w="full">
-      {tokens.map((token) => (
-        <OAuthTokenItem
-          key={token.id}
-          token={token}
-          onRevoke={() => revokeToken(token.id)}
-        />
-      ))}
-    </styled.ul>
+    <LStack w="full">
+      <styled.ul className={lstack({ gap: "3" })} w="full">
+        {tokens.map((token) => (
+          <OAuthTokenItem
+            key={token.id}
+            token={token}
+            onRevoke={() => revokeToken(token.id)}
+          />
+        ))}
+      </styled.ul>
+
+      <PaginationControls
+        path="/settings"
+        currentPage={page.currentPage}
+        totalPages={page.totalPages}
+        pageSize={page.pageSize}
+        params={{ tab: "oauth" }}
+      />
+    </LStack>
   );
 }
 

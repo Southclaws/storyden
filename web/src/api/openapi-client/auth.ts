@@ -62,6 +62,7 @@ import type {
   OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
   OAuthRefreshTokenListOKResponse,
+  OAuthRefreshTokenListParams,
   OAuthRemoteCallbackOKResponse,
   OAuthRemoteCallbackParams,
   OAuthTokenBody,
@@ -2179,15 +2180,17 @@ default Storyden CLI. Those clients are not created by the member and
 therefore do not appear in the member OAuth client list.
 
  */
-export const oAuthRefreshTokenList = () => {
+export const oAuthRefreshTokenList = (params?: OAuthRefreshTokenListParams) => {
   return fetcher<OAuthRefreshTokenListOKResponse>({
     url: `/auth/oauth/tokens`,
     method: "GET",
+    params,
   });
 };
 
-export const getOAuthRefreshTokenListKey = () =>
-  [`/auth/oauth/tokens`] as const;
+export const getOAuthRefreshTokenListKey = (
+  params?: OAuthRefreshTokenListParams,
+) => [`/auth/oauth/tokens`, ...(params ? [params] : [])] as const;
 
 export type OAuthRefreshTokenListQueryResult = NonNullable<
   Awaited<ReturnType<typeof oAuthRefreshTokenList>>
@@ -2198,19 +2201,22 @@ export type OAuthRefreshTokenListQueryError =
 
 export const useOAuthRefreshTokenList = <
   TError = UnauthorisedResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof oAuthRefreshTokenList>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
+>(
+  params?: OAuthRefreshTokenListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof oAuthRefreshTokenList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getOAuthRefreshTokenListKey() : null));
-  const swrFn = () => oAuthRefreshTokenList();
+    (() => (isEnabled ? getOAuthRefreshTokenListKey(params) : null));
+  const swrFn = () => oAuthRefreshTokenList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

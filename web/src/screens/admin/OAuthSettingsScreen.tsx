@@ -1,3 +1,7 @@
+"use client";
+
+import { parseAsInteger, useQueryStates } from "nuqs";
+
 import {
   useAdminOAuthClientList,
   useAdminOAuthDeviceAuthorisationList,
@@ -7,9 +11,15 @@ import { OAuthSettings } from "@/components/admin/OAuthSettings/OAuthSettings";
 import { Unready } from "@/components/site/Unready";
 
 export function OAuthSettingsScreen() {
+  const [filters] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+  });
+
   const clients = useAdminOAuthClientList();
   const devices = useAdminOAuthDeviceAuthorisationList();
-  const tokens = useAdminOAuthRefreshTokenList();
+  const tokens = useAdminOAuthRefreshTokenList({
+    page: filters.page.toString(),
+  });
 
   if (!clients.data) {
     return <Unready error={clients.error} />;
@@ -26,6 +36,11 @@ export function OAuthSettingsScreen() {
       clients={clients.data.clients}
       deviceAuthorisations={devices.data.device_authorisations}
       tokens={tokens.data.tokens}
+      tokenPage={{
+        currentPage: filters.page,
+        totalPages: tokens.data.total_pages,
+        pageSize: tokens.data.page_size,
+      }}
     />
   );
 }

@@ -10,6 +10,7 @@ import {
   Permission,
 } from "@/api/openapi-schema";
 import { PermissionSummary } from "@/components/role/PermissionList";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
 import { Badge } from "@/components/ui/badge";
@@ -20,16 +21,24 @@ import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
 
 import { useAdminOAuthSettings } from "./useAdminOAuthSettings";
 
+type TokenPage = {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+};
+
 type Props = {
   clients: OAuthClientList;
   deviceAuthorisations: OAuthDeviceAuthorisationList;
   tokens: OAuthRefreshTokenList;
+  tokenPage: TokenPage;
 };
 
 export function OAuthSettings({
   clients,
   deviceAuthorisations,
   tokens,
+  tokenPage,
 }: Props) {
   const activeTokens = tokens.filter((token) => !token.revoked_at).length;
 
@@ -41,7 +50,11 @@ export function OAuthSettings({
       </LStack>
 
       <OAuthClientListView clients={clients} />
-      <OAuthRefreshTokenListView tokens={tokens} activeTokens={activeTokens} />
+      <OAuthRefreshTokenListView
+        tokens={tokens}
+        activeTokens={activeTokens}
+        page={tokenPage}
+      />
       <OAuthDeviceAuthorisationListView
         deviceAuthorisations={deviceAuthorisations}
       />
@@ -109,11 +122,15 @@ function OAuthClientItem({ client }: { client: OAuthClientList[number] }) {
 function OAuthRefreshTokenListView({
   tokens,
   activeTokens,
+  page,
 }: {
   tokens: OAuthRefreshTokenList;
   activeTokens: number;
+  page: TokenPage;
 }) {
-  const { revokeToken } = useAdminOAuthSettings();
+  const { revokeToken } = useAdminOAuthSettings({
+    page: page.currentPage.toString(),
+  });
 
   if (tokens.length === 0) {
     return <Empty title="Refresh tokens" body="No OAuth tokens issued yet." />;
@@ -136,6 +153,14 @@ function OAuthRefreshTokenListView({
           />
         ))}
       </styled.ul>
+
+      <PaginationControls
+        path="/admin"
+        currentPage={page.currentPage}
+        totalPages={page.totalPages}
+        pageSize={page.pageSize}
+        params={{ tab: "oauth" }}
+      />
     </LStack>
   );
 }

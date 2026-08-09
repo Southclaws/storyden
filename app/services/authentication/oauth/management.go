@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
@@ -115,12 +116,12 @@ func (s *Service) ListDeviceAuthorisations(ctx context.Context) ([]*oauthresourc
 	return s.clients.ListDeviceAuthorisations(ctx)
 }
 
-func (s *Service) ListRefreshTokens(ctx context.Context) ([]*oauthresource.RefreshToken, error) {
-	return s.clients.ListRefreshTokens(ctx)
+func (s *Service) ListRefreshTokens(ctx context.Context, params pagination.Parameters) (*pagination.Result[*oauthresource.RefreshToken], error) {
+	return s.clients.ListRefreshTokens(ctx, params)
 }
 
-func (s *Service) ListRefreshTokensByAccount(ctx context.Context, accountID account.AccountID) ([]*oauthresource.RefreshToken, error) {
-	return s.clients.ListRefreshTokensByAccount(ctx, accountID)
+func (s *Service) ListRefreshTokensByAccount(ctx context.Context, accountID account.AccountID, params pagination.Parameters) (*pagination.Result[*oauthresource.RefreshToken], error) {
+	return s.clients.ListRefreshTokensByAccount(ctx, accountID, params)
 }
 
 func (s *Service) RevokeRefreshToken(ctx context.Context, id oauthresource.RefreshTokenID) error {

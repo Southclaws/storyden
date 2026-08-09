@@ -7,18 +7,24 @@ import {
   adminOAuthRefreshTokenDelete,
   getAdminOAuthRefreshTokenListKey,
 } from "@/api/openapi-client/admin";
-import { Identifier, OAuthRefreshTokenList } from "@/api/openapi-schema";
+import {
+  AdminOAuthRefreshTokenListParams,
+  Identifier,
+  OAuthRefreshTokenListResult,
+} from "@/api/openapi-schema";
 
-export function useAdminOAuthSettings() {
+export function useAdminOAuthSettings(
+  params: AdminOAuthRefreshTokenListParams,
+) {
   const { mutate } = useSWRConfig();
 
   const revokeToken = async (tokenID: Identifier) => {
     await handle(async () => {
-      const cacheKey = getAdminOAuthRefreshTokenListKey();
+      const cacheKey = getAdminOAuthRefreshTokenListKey(params);
 
       await mutate(
         cacheKey,
-        async (currentData: { tokens: OAuthRefreshTokenList } | undefined) => {
+        async (currentData: OAuthRefreshTokenListResult | undefined) => {
           if (!currentData) return currentData;
 
           const now = new Date().toISOString();

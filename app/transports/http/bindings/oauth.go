@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	oauth_remote "github.com/Southclaws/storyden/app/resources/oauth/remote"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	oauthservice "github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/oauthremote"
@@ -826,15 +827,15 @@ func (o OAuth) OAuthRefreshTokenList(ctx context.Context, req openapi.OAuthRefre
 		return openapi.OAuthRefreshTokenList401Response{}, nil
 	}
 
-	tokens, err := o.oauth.ListRefreshTokensByAccount(ctx, account.AccountID(acc))
+	pageParams := deserialisePageParams(req.Params.Page, 50)
+
+	result, err := o.oauth.ListRefreshTokensByAccount(ctx, account.AccountID(acc), pageParams)
 	if err != nil {
 		return nil, err
 	}
 
 	return openapi.OAuthRefreshTokenList200JSONResponse{
-		OAuthRefreshTokenListOKJSONResponse: openapi.OAuthRefreshTokenListOKJSONResponse(openapi.OAuthRefreshTokenListResult{
-			Tokens: serialiseOAuthRefreshTokenList(tokens),
-		}),
+		OAuthRefreshTokenListOKJSONResponse: openapi.OAuthRefreshTokenListOKJSONResponse(serialiseOAuthRefreshTokenListResult(result)),
 	}, nil
 }
 
@@ -1119,4 +1120,15 @@ func serialiseOAuthRefreshToken(in *oauthresource.RefreshToken) openapi.OAuthRef
 
 func serialiseOAuthRefreshTokenList(in []*oauthresource.RefreshToken) openapi.OAuthRefreshTokenList {
 	return dt.Map(in, serialiseOAuthRefreshToken)
+}
+
+func serialiseOAuthRefreshTokenListResult(result *pagination.Result[*oauthresource.RefreshToken]) openapi.OAuthRefreshTokenListResult {
+	return openapi.OAuthRefreshTokenListResult{
+		CurrentPage: result.CurrentPage,
+		NextPage:    result.NextPage.Ptr(),
+		PageSize:    result.Size,
+		Results:     result.Results,
+		TotalPages:  result.TotalPages,
+		Tokens:      serialiseOAuthRefreshTokenList(result.Items),
+	}
 }

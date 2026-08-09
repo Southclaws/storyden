@@ -48,6 +48,7 @@ import type {
   OAuthJWKSOKResponse,
   OAuthProviderCallbackBody,
   OAuthRefreshTokenListOKResponse,
+  OAuthRefreshTokenListParams,
   OAuthRemoteCallbackOKResponse,
   OAuthRemoteCallbackParams,
   OAuthTokenBody,
@@ -1245,15 +1246,28 @@ export type oAuthRefreshTokenListResponse = {
   status: number;
 };
 
-export const getOAuthRefreshTokenListUrl = () => {
-  return `/auth/oauth/tokens`;
+export const getOAuthRefreshTokenListUrl = (
+  params?: OAuthRefreshTokenListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/auth/oauth/tokens?${normalizedParams.toString()}`
+    : `/auth/oauth/tokens`;
 };
 
 export const oAuthRefreshTokenList = async (
+  params?: OAuthRefreshTokenListParams,
   options?: RequestInit,
 ): Promise<oAuthRefreshTokenListResponse> => {
   return fetcher<Promise<oAuthRefreshTokenListResponse>>(
-    getOAuthRefreshTokenListUrl(),
+    getOAuthRefreshTokenListUrl(params),
     {
       ...options,
       method: "GET",
