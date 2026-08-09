@@ -2880,11 +2880,15 @@ paths:
         "200": { $ref: "#/components/responses/CollectionCreateOK" }
     get:
       operationId: CollectionList
-      description: List all collections using the filtering options.
+      description: |
+        List collections using the filtering options, newest first.
+
+        Collections accumulate with members, so results are paginated.
       tags: [collections]
       parameters:
         - { $ref: "#/components/parameters/AccountHandleQueryParam" }
         - { $ref: "#/components/parameters/CollectionHasItemQueryParam" }
+        - { $ref: "#/components/parameters/PaginationQuery" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -6263,10 +6267,12 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required: [collections]
-            properties:
-              collections: { $ref: "#/components/schemas/CollectionList" }
+            allOf:
+              - $ref: "#/components/schemas/PaginatedResult"
+              - type: object
+                required: [collections]
+                properties:
+                  collections: { $ref: "#/components/schemas/CollectionList" }
 
     CollectionGetOK:
       description: Collection information and content.

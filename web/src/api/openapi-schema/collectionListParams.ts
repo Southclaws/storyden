@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AccountHandleQueryParamParameter } from "./accountHandleQueryParamParameter";
 import type { CollectionHasItemQueryParamParameter } from "./collectionHasItemQueryParamParameter";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type CollectionListParams = {
   /**
@@ -22,4 +23,8 @@ needing to make two queries to check if an item is in a collection.
 
  */
   has_item?: CollectionHasItemQueryParamParameter;
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
 };

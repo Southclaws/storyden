@@ -1,9 +1,12 @@
 "use client";
 
+import { parseAsInteger, useQueryStates } from "nuqs";
+
 import { useCollectionList } from "@/api/openapi-client/collections";
 import { Account, CollectionListOKResponse } from "@/api/openapi-schema";
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Heading } from "@/components/ui/heading";
@@ -16,7 +19,14 @@ export type Props = {
 };
 
 export function CollectionIndexScreen(props: Props) {
-  const { data, error } = useCollectionList();
+  const [filters] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+  });
+
+  const { data, error } = useCollectionList(
+    { page: filters.page.toString() },
+    { swr: { fallbackData: props.initialCollections } },
+  );
   if (!data) {
     return <UnreadyBanner error={error} />;
   }
@@ -44,6 +54,13 @@ export function CollectionIndexScreen(props: Props) {
           <CollectionCard key={collection.id} collection={collection} />
         ))}
       </CardGrid>
+
+      <PaginationControls
+        path="/c"
+        currentPage={filters.page}
+        totalPages={data.total_pages}
+        pageSize={data.page_size}
+      />
     </LStack>
   );
 }

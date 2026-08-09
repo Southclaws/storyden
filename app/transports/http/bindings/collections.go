@@ -71,16 +71,21 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 		opts = append(opts, collection_querier.WithItemPresenceQuery(v))
 	}
 
-	colls, err := i.colQuerier.List(ctx, opts...)
+	pageParams := deserialisePageParams(request.Params.Page, 50)
+
+	result, err := i.colQuerier.List(ctx, pageParams, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	list := dt.Map(colls, serialiseCollection)
-
 	return openapi.CollectionList200JSONResponse{
 		CollectionListOKJSONResponse: openapi.CollectionListOKJSONResponse{
-			Collections: list,
+			CurrentPage: result.CurrentPage,
+			NextPage:    result.NextPage.Ptr(),
+			PageSize:    result.Size,
+			Results:     result.Results,
+			TotalPages:  result.TotalPages,
+			Collections: dt.Map(result.Items, serialiseCollection),
 		},
 	}, nil
 }
