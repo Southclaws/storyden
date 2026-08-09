@@ -48,7 +48,10 @@ export const collectionCreate = async (
 };
 
 /**
- * List all collections using the filtering options.
+ * List collections using the filtering options, newest first.
+
+Collections accumulate with members, so results are paginated.
+
  */
 export type collectionListResponse = {
   data: CollectionListOKResponse;

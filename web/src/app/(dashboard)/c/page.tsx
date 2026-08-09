@@ -3,10 +3,16 @@ import { getServerSession } from "@/auth/server-session";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { CollectionIndexScreen } from "@/screens/collection/CollectionIndexScreen";
 
-export default async function Page() {
+type Props = {
+  searchParams: Promise<{ page?: string }>;
+};
+
+export default async function Page(props: Props) {
+  const { page } = await props.searchParams;
+
   try {
     const session = await getServerSession();
-    const { data } = await collectionList();
+    const { data } = await collectionList({ page });
 
     return (
       <CollectionIndexScreen session={session} initialCollections={data} />
