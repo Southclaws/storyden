@@ -20,6 +20,7 @@ import (
 
 	entmigrate "github.com/Southclaws/storyden/internal/ent/migrate"
 	ent_oauth_device_authorisation "github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
+	ent_session "github.com/Southclaws/storyden/internal/ent/session"
 )
 
 func TestGetDriverLibsqlRemote(t *testing.T) {
@@ -265,4 +266,78 @@ func TestMigrateOAuthDeviceUserCodeUniqueness(t *testing.T) {
 
 	err = insertDevice("duplicate-device", "unique-user-hash", "ABCD-EFGH")
 	require.Error(t, err, "the migrated index must reject duplicate user-code hashes")
+}
+
+func TestMigrateSessionTokenHash(t *testing.T) {
+	ctx := context.Background()
+	db, err := sql.Open("sqlite", "file:"+t.Name()+"?mode=memory&cache=shared&_pragma=foreign_keys(1)")
+	require.NoError(t, err)
+	t.Cleanup(func() { require.NoError(t, db.Close()) })
+
+	driver := entsql.OpenDB(dialect.SQLite, db)
+
+	legacyTables, err := entschema.CopyTables(entmigrate.Tables)
+	require.NoError(t, err)
+
+	foundTokenHash := false
+	for _, table := range legacyTables {
+		if table.Name != ent_session.Table {
+			continue
+		}
+
+		columns := table.Columns[:0]
+		for _, column := range table.Columns {
+			if column.Name == ent_session.FieldTokenHash {
+				foundTokenHash = true
+				continue
+			}
+			columns = append(columns, column)
+		}
+		table.Columns = columns
+	}
+	require.True(t, foundTokenHash)
+
+	require.NoError(t, entmigrate.Create(ctx, entmigrate.NewSchema(driver), legacyTables))
+
+	accountID := xid.New().String()
+	_, err = db.ExecContext(ctx, `
+		INSERT INTO accounts (id, updated_at, handle, name)
+		VALUES (?, ?, ?, ?)
+	`, accountID, time.Now(), "migration-test-account", "Migration test account")
+	require.NoError(t, err)
+
+	_, err = db.ExecContext(ctx, `
+		INSERT INTO sessions (id, expires_at, account_id)
+		VALUES (?, ?, ?)
+	`, xid.New().String(), time.Now().Add(time.Hour), accountID)
+	require.NoError(t, err)
+
+	require.NoError(t, entmigrate.Create(
+		ctx,
+		entmigrate.NewSchema(driver),
+		entmigrate.Tables,
+		entschema.WithDropColumn(true),
+		entschema.WithApplyHook(migrateSessionTokenHash()),
+	))
+
+	var count int
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT COUNT(*) FROM sessions`).Scan(&count))
+	assert.Zero(t, count, "sessions without recoverable bearer secrets must be invalidated")
+
+	_, err = db.ExecContext(ctx, `
+		INSERT INTO sessions (id, token_hash, expires_at, account_id)
+		VALUES (?, ?, ?, ?)
+	`, xid.New().String(), "new-session-token-hash", time.Now().Add(time.Hour), accountID)
+	require.NoError(t, err)
+
+	// Once token_hash exists, routine migrations must preserve sessions.
+	require.NoError(t, entmigrate.Create(
+		ctx,
+		entmigrate.NewSchema(driver),
+		entmigrate.Tables,
+		entschema.WithDropColumn(true),
+		entschema.WithApplyHook(migrateSessionTokenHash()),
+	))
+	require.NoError(t, db.QueryRowContext(ctx, `SELECT COUNT(*) FROM sessions`).Scan(&count))
+	assert.Equal(t, 1, count)
 }

@@ -34,6 +34,7 @@ import (
 	ent_email "github.com/Southclaws/storyden/internal/ent/email"
 	ent_oauth_device_authorisation "github.com/Southclaws/storyden/internal/ent/oauthdeviceauthorisation"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
+	ent_session "github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
 
@@ -150,6 +151,7 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 				schema.WithApplyHook(migrateReplyVisibility()),
 				schema.WithApplyHook(migrateAccountVerifiedStatus()),
 				schema.WithApplyHook(migrateOAuthDeviceUserCodeUniqueness()),
+				schema.WithApplyHook(migrateSessionTokenHash()),
 			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to run schema migration"))
 			}
@@ -169,6 +171,42 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 	})
 
 	return client, nil
+}
+
+// migrateSessionTokenHash invalidates sessions created before bearer secrets
+// were stored as hashes. The original secrets cannot be reconstructed, so a
+// placeholder hash would leave broken sessions behind. This only runs while
+// adding token_hash; later startup migrations preserve new sessions.
+func migrateSessionTokenHash() schema.ApplyHook {
+	return func(next schema.Applier) schema.Applier {
+		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			if !addsSessionTokenHash(plan) {
+				return next.Apply(ctx, conn, plan)
+			}
+
+			query := fmt.Sprintf("DELETE FROM %s", ent_session.Table)
+			if err := conn.Exec(ctx, query, []any{}, nil); err != nil {
+				return fault.Wrap(err, fmsg.With("failed to invalidate sessions without token hashes"))
+			}
+
+			return next.Apply(ctx, conn, plan)
+		})
+	}
+}
+
+func addsSessionTokenHash(plan *migrate.Plan) bool {
+	for _, change := range plan.Changes {
+		modifyTable, ok := change.Source.(*atlas_schema.ModifyTable)
+		if !ok || modifyTable.T.Name != ent_session.Table {
+			continue
+		}
+
+		if atlas_schema.Changes(modifyTable.Changes).IndexAddColumn(ent_session.FieldTokenHash) != -1 {
+			return true
+		}
+	}
+
+	return false
 }
 
 const oauthDeviceUserCodeHashIndex = "oauthdeviceauthorisation_user_code_hash"
