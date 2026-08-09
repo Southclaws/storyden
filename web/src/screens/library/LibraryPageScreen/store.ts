@@ -10,7 +10,6 @@ import {
   LinkReference,
   NodeMutableProps,
   NodeWithChildren,
-  NodeWithChildrenAllOf,
   PropertyName,
   PropertySchema,
   PropertyType,
@@ -72,7 +71,7 @@ export type Actions = {
   overwriteBlock: (type: LibraryPageBlock) => void;
 
   commit: (
-    callback: (draft: MutationSet) => Promise<NodeWithChildrenAllOf>,
+    callback: (draft: MutationSet) => Promise<NodeWithChildren>,
   ) => Promise<void>;
 };
 
@@ -90,7 +89,7 @@ export const createNodeStore = (initState: State) => {
         });
 
       const commit = async (
-        callback: (draft: MutationSet) => Promise<NodeWithChildrenAllOf>,
+        callback: (draft: MutationSet) => Promise<NodeWithChildren>,
       ) => {
         const current = get().original;
         const draft = get().draft;

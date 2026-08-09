@@ -47,9 +47,7 @@ export type AccessKeyClient = {
     threadSlug: string,
     replyCreateBody: ReplyCreateBody,
   ) => Promise<ReplyCreateOKResponse>;
-  nodeCreate: (
-    nodeCreateBody: NodeCreateBody,
-  ) => Promise<NodeCreateOKResponse>;
+  nodeCreate: (nodeCreateBody: NodeCreateBody) => Promise<NodeCreateOKResponse>;
   robotCreate: (
     robotCreateBody: RobotCreateBody,
   ) => Promise<RobotCreateOKResponse>;
@@ -74,7 +72,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getAdminSettingsUpdateMutationKey(),
         method: "PATCH",
-        data: adminSettingsUpdateBody,
+        body: adminSettingsUpdateBody,
       });
     },
     categoryCreate: async (categoryCreateBody) => {
@@ -82,7 +80,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getCategoryCreateMutationKey(),
         method: "POST",
-        data: categoryCreateBody,
+        body: categoryCreateBody,
       });
     },
     threadCreate: async (threadCreateBody) => {
@@ -90,7 +88,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getThreadCreateMutationKey(),
         method: "POST",
-        data: threadCreateBody,
+        body: threadCreateBody,
       });
     },
     replyCreate: async (threadSlug, replyCreateBody) => {
@@ -98,7 +96,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getReplyCreateMutationKey(threadSlug),
         method: "POST",
-        data: replyCreateBody,
+        body: replyCreateBody,
       });
     },
     nodeCreate: async (nodeCreateBody) => {
@@ -106,7 +104,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getNodeCreateMutationKey(),
         method: "POST",
-        data: nodeCreateBody,
+        body: nodeCreateBody,
       });
     },
     robotCreate: async (robotCreateBody) => {
@@ -114,7 +112,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getRobotCreateMutationKey(),
         method: "POST",
-        data: robotCreateBody,
+        body: robotCreateBody,
       });
     },
     robotGet: async (robotId) => {
@@ -129,7 +127,7 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         accessKey,
         key: getRobotProviderUpdateMutationKey(provider),
         method: "PATCH",
-        data: robotProviderUpdateBody,
+        body: robotProviderUpdateBody,
       });
     },
   };
@@ -139,24 +137,23 @@ async function requestWithAccessKey<T>({
   accessKey,
   key,
   method,
-  data,
+  body,
 }: {
   accessKey: string;
   key: readonly [string];
   method: "GET" | "PATCH" | "POST" | "PUT";
-  data?: unknown;
+  body?: unknown;
 }): Promise<T> {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${accessKey}`,
   };
-  if (data !== undefined) {
+  if (body !== undefined) {
     headers["Content-Type"] = "application/json";
   }
 
-  const request = buildRequest({
-    url: key[0],
+  const request = buildRequest(key[0], {
     method,
-    data,
+    body,
     headers,
   });
 

@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { cache } from "react";
 
-import { RequestError } from "@/api/common";
+import { Options, RequestError } from "@/api/common";
 import { accountGet } from "@/api/openapi-server/accounts";
 
 const getSessionCached = cache(async () => {
@@ -12,7 +12,7 @@ const getSessionCached = cache(async () => {
   });
 });
 
-export async function getServerSession(options?: RequestInit) {
+export async function getServerSession(options?: Options) {
   const session = (await cookies()).get("storyden-session");
 
   if (!session) return;

@@ -4,8 +4,8 @@ import { deriveError } from "@/utils/error";
 
 import { Options, buildRequest, buildResult } from "./common";
 
-export const fetcher = async <T>(opts: Options): Promise<T> => {
-  const request = buildRequest({
+export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
+  const request = buildRequest(url, {
     ...opts,
     // We use the browser default cache behaviour for the client side requests.
     // There's no revalidation set on the client as we're already using SWR for

@@ -4,15 +4,15 @@ import { z } from "zod";
 import { getAPIAddress } from "@/config";
 
 export type Options = {
-  url: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  headers?: Record<string, string>;
+  headers?: HeadersInit;
   params?: Record<string, string | string[] | boolean>;
-  data?: unknown;
+  body?: unknown;
   responseType?: string;
   cookie?: string;
   revalidate?: number;
   cache?: RequestCache;
+  next?: NextFetchRequestConfig;
 };
 
 export const ProblemDetailsSchema = z.object({
@@ -44,15 +44,10 @@ export class RequestError extends Error {
   }
 }
 
-export function buildRequest({
-  url,
-  method = "GET",
-  headers,
-  params,
-  data,
-  revalidate,
-  cache,
-}: Options): Request {
+export function buildRequest(
+  url: string,
+  { method = "GET", headers, params, body, revalidate, cache }: Options,
+): Request {
   const apiAddress = getAPIAddress();
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
@@ -64,7 +59,7 @@ export function buildRequest({
     mode: "cors",
     credentials: "include",
     headers,
-    body: buildPayload(data),
+    body: buildPayload(body),
     cache,
     next: {
       tags,

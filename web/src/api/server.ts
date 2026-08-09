@@ -1,19 +1,9 @@
 import { cookies, headers as nextHeaders } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { RequestError, buildRequest, buildResult } from "./common";
+import { Options, RequestError, buildRequest, buildResult } from "./common";
 
-// Server side variant of fetcher that includes SSR cookies.
-
-type Options = RequestInit & {
-  method: string;
-};
-
-// Orval fetch generated code is a bit different to SWR fetcher for some reason.
-type Result<T> = {
-  data: T;
-  status: number;
-};
+type ResponseData<T> = T extends { data: infer Data } ? Data : never;
 
 const SSR_NETWORK_HEADER_NAMES = ["x-forwarded-for"] as const;
 
@@ -24,11 +14,10 @@ export const fetcher = async <T>(
   const { headers: requestHeaders, ...requestInit } = opts;
   const headers = Object.fromEntries(new Headers(requestHeaders).entries());
 
-  const req = buildRequest({
-    url,
+  const req = buildRequest(url, {
     headers,
     method: method as any,
-    data: requestInit.body,
+    body: requestInit.body,
     // Server side requests are cached a little more aggressively than client
     // side hydration requests. The downside of this is a user may see a flash
     // of stale data as the server render loads which will be replaced by the
@@ -54,12 +43,13 @@ export const fetcher = async <T>(
   const response = await fetch(req);
 
   try {
-    const result = await buildResult<T>(response);
+    const data = await buildResult<ResponseData<T>>(response);
 
-    // Orval generated types are incorrect here. For some reason it generates a
-    // struct with a `data` field, but the actual result type is just the data.
-    // However the generated caller passes T as Promise<T> so we need to cast it.
-    return { data: result, status: response.status } as T;
+    return {
+      data,
+      status: response.status,
+      headers: response.headers,
+    } as T;
   } catch (e) {
     if (e instanceof RequestError && e.status === 404) {
       notFound();

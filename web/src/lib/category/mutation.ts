@@ -10,7 +10,7 @@ import {
   CategoryListOKResponse,
   CategoryMutableProps,
 } from "@/api/openapi-schema";
-import { categoryListResponse } from "@/api/openapi-server/categories";
+import { categoryListResponse200 } from "@/api/openapi-server/categories";
 
 function threadsKeyFilter(key: Arguments) {
   if (!Array.isArray(key)) return false;
@@ -41,7 +41,7 @@ export function useCategoryMutations() {
   }
 
   const revalidateList = async (
-    data?: MutatorCallback<categoryListResponse>,
+    data?: MutatorCallback<categoryListResponse200>,
   ) => {
     await mutate(keyFilterFn, data);
   };

@@ -49,11 +49,10 @@ export function PluginAddExternal({ onClose }: UseDisclosureProps) {
 
     await handle(
       async () => {
-        await fetcher<PluginGetOKResponse>({
-          url: "/plugins",
+        await fetcher<PluginGetOKResponse>("/plugins", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          data: jsonPayload,
+          body: jsonPayload,
         });
         await mutate(getPluginListKey());
         onClose?.();

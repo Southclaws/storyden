@@ -1,15 +1,15 @@
-import { defineConfig } from "orval";
+import { InputOptions, OutputOptions, defineConfig } from "orval";
 
 const input = {
   target: "../api/openapi.yaml",
-  validation: false,
-};
+  validation: true,
+} as InputOptions;
 
 const common = {
   mode: "tags" as const,
   clean: true,
-  prettier: true,
-};
+  formatter: "prettier",
+} as OutputOptions;
 
 export default defineConfig({
   client: {
@@ -20,6 +20,9 @@ export default defineConfig({
       client: "swr",
       schemas: "src/api/openapi-schema",
       override: {
+        fetch: {
+          includeHttpResponseReturnType: false,
+        },
         mutator: {
           path: "./src/api/client.ts",
           name: "fetcher",
@@ -35,6 +38,10 @@ export default defineConfig({
       schemas: "src/api/openapi-schema",
       client: "fetch",
       override: {
+        fetch: {
+          includeHttpResponseReturnType: true,
+          forceSuccessResponse: true,
+        },
         mutator: {
           path: "./src/api/server.ts",
           name: "fetcher",

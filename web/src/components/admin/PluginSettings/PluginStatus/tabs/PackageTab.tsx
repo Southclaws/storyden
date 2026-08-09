@@ -253,11 +253,10 @@ async function pluginUpdatePackage(
   pluginID: string,
   archive: File,
 ): Promise<Plugin> {
-  return fetcher<Plugin>({
-    url: `/plugins/${pluginID}/package`,
+  return fetcher<Plugin>(`/plugins/${pluginID}/package`, {
     method: "PATCH",
     headers: { "Content-Type": "application/zip" },
-    data: archive,
+    body: archive,
   });
 }
 
