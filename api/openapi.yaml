@@ -569,7 +569,11 @@ paths:
         Refresh tokens are account-owned grants for an OAuth client. Revoking a
         refresh token prevents future token renewal, but does not immediately
         invalidate already-issued JWT access tokens.
+
+        Rotation writes a new row per refresh, so this table grows with usage
+        and the response is paginated.
       tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/PaginationQuery" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -1599,6 +1603,7 @@ paths:
         therefore do not appear in the member OAuth client list.
       tags: [auth]
       security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PaginationQuery" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -8953,10 +8958,12 @@ components:
       items: { $ref: "#/components/schemas/OAuthRefreshToken" }
 
     OAuthRefreshTokenListResult:
-      type: object
-      required: [tokens]
-      properties:
-        tokens: { $ref: "#/components/schemas/OAuthRefreshTokenList" }
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [tokens]
+          properties:
+            tokens: { $ref: "#/components/schemas/OAuthRefreshTokenList" }
 
     WebAuthnPublicKeyCreationOptions:
       description: |

@@ -7,18 +7,22 @@ import {
   getOAuthRefreshTokenListKey,
   oAuthRefreshTokenDelete,
 } from "@/api/openapi-client/auth";
-import { Identifier, OAuthRefreshTokenList } from "@/api/openapi-schema";
+import {
+  Identifier,
+  OAuthRefreshTokenListParams,
+  OAuthRefreshTokenListResult,
+} from "@/api/openapi-schema";
 
-export function useOAuthTokenSettings() {
+export function useOAuthTokenSettings(params: OAuthRefreshTokenListParams) {
   const { mutate } = useSWRConfig();
 
   const revokeToken = async (tokenID: Identifier) => {
     await handle(async () => {
-      const cacheKey = getOAuthRefreshTokenListKey();
+      const cacheKey = getOAuthRefreshTokenListKey(params);
 
       await mutate(
         cacheKey,
-        async (currentData: { tokens: OAuthRefreshTokenList } | undefined) => {
+        async (currentData: OAuthRefreshTokenListResult | undefined) => {
           if (!currentData) return currentData;
 
           const now = new Date().toISOString();

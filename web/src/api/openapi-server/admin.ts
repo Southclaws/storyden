@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminOAuthRefreshTokenListParams,
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
@@ -567,21 +568,37 @@ Refresh tokens are account-owned grants for an OAuth client. Revoking a
 refresh token prevents future token renewal, but does not immediately
 invalidate already-issued JWT access tokens.
 
+Rotation writes a new row per refresh, so this table grows with usage
+and the response is paginated.
+
  */
 export type adminOAuthRefreshTokenListResponse = {
   data: OAuthRefreshTokenListOKResponse;
   status: number;
 };
 
-export const getAdminOAuthRefreshTokenListUrl = () => {
-  return `/admin/oauth/refresh-tokens`;
+export const getAdminOAuthRefreshTokenListUrl = (
+  params?: AdminOAuthRefreshTokenListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/admin/oauth/refresh-tokens?${normalizedParams.toString()}`
+    : `/admin/oauth/refresh-tokens`;
 };
 
 export const adminOAuthRefreshTokenList = async (
+  params?: AdminOAuthRefreshTokenListParams,
   options?: RequestInit,
 ): Promise<adminOAuthRefreshTokenListResponse> => {
   return fetcher<Promise<adminOAuthRefreshTokenListResponse>>(
-    getAdminOAuthRefreshTokenListUrl(),
+    getAdminOAuthRefreshTokenListUrl(params),
     {
       ...options,
       method: "GET",

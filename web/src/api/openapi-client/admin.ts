@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   AccountGetOKResponse,
   AdminAccessKeyListOKResponse,
+  AdminOAuthRefreshTokenListParams,
   AdminSettingsGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
@@ -1032,16 +1033,23 @@ Refresh tokens are account-owned grants for an OAuth client. Revoking a
 refresh token prevents future token renewal, but does not immediately
 invalidate already-issued JWT access tokens.
 
+Rotation writes a new row per refresh, so this table grows with usage
+and the response is paginated.
+
  */
-export const adminOAuthRefreshTokenList = () => {
+export const adminOAuthRefreshTokenList = (
+  params?: AdminOAuthRefreshTokenListParams,
+) => {
   return fetcher<OAuthRefreshTokenListOKResponse>({
     url: `/admin/oauth/refresh-tokens`,
     method: "GET",
+    params,
   });
 };
 
-export const getAdminOAuthRefreshTokenListKey = () =>
-  [`/admin/oauth/refresh-tokens`] as const;
+export const getAdminOAuthRefreshTokenListKey = (
+  params?: AdminOAuthRefreshTokenListParams,
+) => [`/admin/oauth/refresh-tokens`, ...(params ? [params] : [])] as const;
 
 export type AdminOAuthRefreshTokenListQueryResult = NonNullable<
   Awaited<ReturnType<typeof adminOAuthRefreshTokenList>>
@@ -1052,19 +1060,22 @@ export type AdminOAuthRefreshTokenListQueryError =
 
 export const useAdminOAuthRefreshTokenList = <
   TError = ForbiddenResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof adminOAuthRefreshTokenList>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
+>(
+  params?: AdminOAuthRefreshTokenListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof adminOAuthRefreshTokenList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAdminOAuthRefreshTokenListKey() : null));
-  const swrFn = () => adminOAuthRefreshTokenList();
+    (() => (isEnabled ? getAdminOAuthRefreshTokenListKey(params) : null));
+  const swrFn = () => adminOAuthRefreshTokenList(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

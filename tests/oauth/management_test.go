@@ -67,7 +67,7 @@ func TestOAuthRefreshTokenManagement(t *testing.T) {
 			r.NotNil(token.JSON200)
 			r.NotNil(token.JSON200.RefreshToken)
 
-			tokens := tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, adminSession))(t, http.StatusOK)
+			tokens := tests.AssertRequest(cl.OAuthRefreshTokenListWithResponse(root, &openapi.OAuthRefreshTokenListParams{}, adminSession))(t, http.StatusOK)
 			r.NotNil(tokens.JSON200)
 			r.NotEmpty(tokens.JSON200.Tokens)
 

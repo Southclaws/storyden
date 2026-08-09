@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
+	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -18,6 +19,7 @@ import (
 	oauthresource "github.com/Southclaws/storyden/app/resources/oauth"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_querier"
 	"github.com/Southclaws/storyden/app/resources/oauth/oauth_writer"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/oauth"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -167,6 +169,58 @@ func TestOAuthCleanup(t *testing.T) {
 				r.NotNil(familyRevoked.JSON400)
 				a.Equal("invalid_grant", familyRevoked.JSON400.Error)
 			})
+		}))
+	}))
+}
+
+func TestRefreshTokenListIsPaginated(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, oauthConfig(t), e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		aw *account_writer.Writer,
+		oq *oauth_querier.Querier,
+		ow *oauth_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			a := assert.New(t)
+			r := require.New(t)
+
+			_, owner := e2e.WithAccount(root, aw, seed.Account_002_Frigg)
+
+			clientID := "paged-refresh-tokens-" + uuid.NewString()
+			client := createClient(t, root, ow, owner.ID, clientID, oauthresource.ClientTypePublic, oauthresource.ScopePolicyExplicit, opt.NewEmpty[string](), standardScopes(), []string{oauth.GrantTypeRefreshToken})
+
+			const total = 12
+			for range total {
+				_, err := ow.CreateRefreshToken(root, oauth_writer.RefreshTokenCreate{
+					ClientID:  client.ID,
+					AccountID: owner.ID,
+					TokenHash: uuid.NewString(),
+					Scope:     "openid",
+					ExpiresAt: time.Now().Add(24 * time.Hour),
+				})
+				r.NoError(err)
+			}
+
+			first, err := oq.ListRefreshTokensByAccount(root, owner.ID, pagination.NewPageParams(1, 5))
+			r.NoError(err)
+			a.Len(first.Items, 5, "a page must not hand back the whole table")
+			a.Equal(5, first.Results)
+			a.Equal(3, first.TotalPages, "total_pages is how the client learns there are 12 rows")
+			a.True(first.NextPage.Ok())
+
+			last, err := oq.ListRefreshTokensByAccount(root, owner.ID, pagination.NewPageParams(3, 5))
+			r.NoError(err)
+			a.Len(last.Items, 2)
+			a.False(last.NextPage.Ok(), "the final page must not advertise another")
+
+			seen := map[string]struct{}{}
+			for _, item := range append(first.Items, last.Items...) {
+				seen[xid.ID(item.ID).String()] = struct{}{}
+			}
+			a.Len(seen, 7, "pages must not overlap")
 		}))
 	}))
 }
