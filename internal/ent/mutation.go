@@ -49386,6 +49386,7 @@ type SessionMutation struct {
 	typ            string
 	id             *xid.ID
 	created_at     *time.Time
+	token_hash     *string
 	expires_at     *time.Time
 	revoked_at     *time.Time
 	clearedFields  map[string]struct{}
@@ -49572,6 +49573,42 @@ func (m *SessionMutation) ResetAccountID() {
 	m.account = nil
 }
 
+// SetTokenHash sets the "token_hash" field.
+func (m *SessionMutation) SetTokenHash(s string) {
+	m.token_hash = &s
+}
+
+// TokenHash returns the value of the "token_hash" field in the mutation.
+func (m *SessionMutation) TokenHash() (r string, exists bool) {
+	v := m.token_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenHash returns the old "token_hash" field's value of the Session entity.
+// If the Session object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SessionMutation) OldTokenHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenHash: %w", err)
+	}
+	return oldValue.TokenHash, nil
+}
+
+// ResetTokenHash resets all changes to the "token_hash" field.
+func (m *SessionMutation) ResetTokenHash() {
+	m.token_hash = nil
+}
+
 // SetExpiresAt sets the "expires_at" field.
 func (m *SessionMutation) SetExpiresAt(t time.Time) {
 	m.expires_at = &t
@@ -49718,12 +49755,15 @@ func (m *SessionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SessionMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, session.FieldCreatedAt)
 	}
 	if m.account != nil {
 		fields = append(fields, session.FieldAccountID)
+	}
+	if m.token_hash != nil {
+		fields = append(fields, session.FieldTokenHash)
 	}
 	if m.expires_at != nil {
 		fields = append(fields, session.FieldExpiresAt)
@@ -49743,6 +49783,8 @@ func (m *SessionMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case session.FieldAccountID:
 		return m.AccountID()
+	case session.FieldTokenHash:
+		return m.TokenHash()
 	case session.FieldExpiresAt:
 		return m.ExpiresAt()
 	case session.FieldRevokedAt:
@@ -49760,6 +49802,8 @@ func (m *SessionMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldCreatedAt(ctx)
 	case session.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case session.FieldTokenHash:
+		return m.OldTokenHash(ctx)
 	case session.FieldExpiresAt:
 		return m.OldExpiresAt(ctx)
 	case session.FieldRevokedAt:
@@ -49786,6 +49830,13 @@ func (m *SessionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAccountID(v)
+		return nil
+	case session.FieldTokenHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenHash(v)
 		return nil
 	case session.FieldExpiresAt:
 		v, ok := value.(time.Time)
@@ -49864,6 +49915,9 @@ func (m *SessionMutation) ResetField(name string) error {
 		return nil
 	case session.FieldAccountID:
 		m.ResetAccountID()
+		return nil
+	case session.FieldTokenHash:
+		m.ResetTokenHash()
 		return nil
 	case session.FieldExpiresAt:
 		m.ResetExpiresAt()

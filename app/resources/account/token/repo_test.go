@@ -21,8 +21,10 @@ type fakeRepo struct {
 	calls   int
 }
 
-func (f *fakeRepo) Issue(context.Context, account.AccountID) (*Session, error) { return f.session, nil }
-func (f *fakeRepo) Revoke(context.Context, Token) error                        { return nil }
+func (f *fakeRepo) Issue(context.Context, account.AccountID) (*Issued, error) {
+	return &Issued{Session: *f.session}, nil
+}
+func (f *fakeRepo) Revoke(context.Context, Token) error { return nil }
 
 func (f *fakeRepo) Validate(context.Context, Token) (*Validated, error) {
 	f.calls++
@@ -34,7 +36,7 @@ func (f *fakeRepo) Validate(context.Context, Token) (*Validated, error) {
 
 func liveSession(t Token) Session {
 	return Session{
-		Token:     t,
+		TokenHash: t.Hash(),
 		AccountID: account.AccountID(xid.New()),
 		ExpiresAt: time.Now().Add(time.Hour),
 	}
@@ -45,7 +47,7 @@ func seed(t *testing.T, store *cachetest.Store, s Session) {
 
 	payload, err := s.Serialise()
 	require.NoError(t, err)
-	require.NoError(t, store.Set(context.Background(), cacheKey(s.Token), string(payload), time.Hour))
+	require.NoError(t, store.Set(context.Background(), cachePrefix+s.TokenHash, string(payload), time.Hour))
 }
 
 func TestCachedValidateRejectsRevokedCachedSession(t *testing.T) {
@@ -55,7 +57,7 @@ func TestCachedValidateRejectsRevokedCachedSession(t *testing.T) {
 	inner := &fakeRepo{}
 	repo := NewCachedRepository(inner, store)
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	revoked := liveSession(tok)
 	revoked.RevokedAt = opt.New(time.Now())
 	seed(t, store, revoked)
@@ -75,7 +77,7 @@ func TestCachedValidateRejectsExpiredCachedSession(t *testing.T) {
 	inner := &fakeRepo{}
 	repo := NewCachedRepository(inner, store)
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	expired := liveSession(tok)
 	expired.ExpiresAt = time.Now().Add(-time.Minute)
 	seed(t, store, expired)
@@ -92,7 +94,7 @@ func TestCachedValidateFallsBackWhenEntryIsUnreadable(t *testing.T) {
 
 	store := cachetest.New()
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	stored := liveSession(tok)
 	inner := &fakeRepo{session: &stored}
 	repo := NewCachedRepository(inner, store)
@@ -114,7 +116,7 @@ func TestCachedValidateServesValidCachedSession(t *testing.T) {
 	inner := &fakeRepo{}
 	repo := NewCachedRepository(inner, store)
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	stored := liveSession(tok)
 	seed(t, store, stored)
 
@@ -124,4 +126,13 @@ func TestCachedValidateServesValidCachedSession(t *testing.T) {
 	require.NotNil(t, v)
 	assert.Equal(t, stored.AccountID, v.AccountID)
 	assert.Zero(t, inner.calls, "a usable cached session must not hit the database")
+}
+
+func mustGenerate(t *testing.T) Token {
+	t.Helper()
+
+	tok, err := Generate()
+	require.NoError(t, err)
+
+	return tok
 }

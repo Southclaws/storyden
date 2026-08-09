@@ -19,8 +19,8 @@ type revokeRacingRepo struct {
 	duringRevoke func()
 }
 
-func (f *revokeRacingRepo) Issue(context.Context, account.AccountID) (*Session, error) {
-	return &f.session, nil
+func (f *revokeRacingRepo) Issue(context.Context, account.AccountID) (*Issued, error) {
+	return &Issued{Session: f.session}, nil
 }
 
 func (f *revokeRacingRepo) Revoke(context.Context, Token) error {
@@ -45,10 +45,10 @@ func TestCachedRevokeEvictsSessionCachedDuringTheWrite(t *testing.T) {
 	ctx := context.Background()
 	store := cachetest.New()
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	inner := &revokeRacingRepo{
 		session: Session{
-			Token:     tok,
+			TokenHash: tok.Hash(),
 			AccountID: account.AccountID(xid.New()),
 			ExpiresAt: time.Now().Add(90 * 24 * time.Hour),
 		},
@@ -64,7 +64,7 @@ func TestCachedRevokeEvictsSessionCachedDuringTheWrite(t *testing.T) {
 	require.NoError(t, repo.Revoke(ctx, tok))
 	require.True(t, inner.revoked)
 
-	_, err := store.Get(ctx, tok.String())
+	_, err := store.Get(ctx, cacheKey(tok))
 	assert.Error(t, err, "the pre-revocation session must not survive in the cache")
 
 	v, err := repo.Validate(ctx, tok)

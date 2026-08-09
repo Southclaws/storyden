@@ -22,6 +22,12 @@ func (Session) Fields() []ent.Field {
 			GoType(xid.ID{}).
 			NotEmpty(),
 
+		field.String("token_hash").
+			Immutable().
+			Unique().
+			NotEmpty().
+			Comment("SHA-256 of the bearer secret, the secret itself is never stored"),
+
 		field.Time("expires_at").
 			Immutable(),
 

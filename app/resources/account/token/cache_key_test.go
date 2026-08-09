@@ -15,8 +15,8 @@ import (
 
 type keyStubRepo struct{ session Session }
 
-func (f *keyStubRepo) Issue(context.Context, account.AccountID) (*Session, error) {
-	return &f.session, nil
+func (f *keyStubRepo) Issue(context.Context, account.AccountID) (*Issued, error) {
+	return &Issued{Session: f.session}, nil
 }
 func (f *keyStubRepo) Revoke(context.Context, Token) error { return nil }
 func (f *keyStubRepo) Validate(context.Context, Token) (*Validated, error) {
@@ -30,9 +30,9 @@ func TestSessionCacheKeysAreNamespaced(t *testing.T) {
 	ctx := context.Background()
 	store := cachetest.New()
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	inner := &keyStubRepo{session: Session{
-		Token:     tok,
+		TokenHash: tok.Hash(),
 		AccountID: account.AccountID(xid.New()),
 		ExpiresAt: time.Now().Add(time.Hour),
 	}}
@@ -43,9 +43,9 @@ func TestSessionCacheKeysAreNamespaced(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = store.Get(ctx, tok.String())
-	assert.Error(t, err, "the bare token must not be usable as a cache key")
+	assert.Error(t, err, "the bare secret must not be usable as a cache key")
 
-	_, err = store.Get(ctx, cachePrefix+tok.String())
+	_, err = store.Get(ctx, cachePrefix+tok.Hash())
 	assert.NoError(t, err)
 }
 
@@ -55,9 +55,9 @@ func TestSessionCacheReadWriteAndDeleteAgree(t *testing.T) {
 	ctx := context.Background()
 	store := cachetest.New()
 
-	tok := Generate()
+	tok := mustGenerate(t)
 	inner := &keyStubRepo{session: Session{
-		Token:     tok,
+		TokenHash: tok.Hash(),
 		AccountID: account.AccountID(xid.New()),
 		ExpiresAt: time.Now().Add(time.Hour),
 	}}
@@ -69,6 +69,6 @@ func TestSessionCacheReadWriteAndDeleteAgree(t *testing.T) {
 
 	require.NoError(t, repo.Revoke(ctx, tok))
 
-	_, err = store.Get(ctx, cachePrefix+tok.String())
+	_, err = store.Get(ctx, cachePrefix+tok.Hash())
 	assert.Error(t, err, "revoke must delete the key that cache and get use")
 }

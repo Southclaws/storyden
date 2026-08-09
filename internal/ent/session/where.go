@@ -66,6 +66,11 @@ func AccountID(v xid.ID) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldAccountID, v))
 }
 
+// TokenHash applies equality check predicate on the "token_hash" field. It's identical to TokenHashEQ.
+func TokenHash(v string) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldTokenHash, v))
+}
+
 // ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
 func ExpiresAt(v time.Time) predicate.Session {
 	return predicate.Session(sql.FieldEQ(FieldExpiresAt, v))
@@ -184,6 +189,71 @@ func AccountIDEqualFold(v xid.ID) predicate.Session {
 func AccountIDContainsFold(v xid.ID) predicate.Session {
 	vc := v.String()
 	return predicate.Session(sql.FieldContainsFold(FieldAccountID, vc))
+}
+
+// TokenHashEQ applies the EQ predicate on the "token_hash" field.
+func TokenHashEQ(v string) predicate.Session {
+	return predicate.Session(sql.FieldEQ(FieldTokenHash, v))
+}
+
+// TokenHashNEQ applies the NEQ predicate on the "token_hash" field.
+func TokenHashNEQ(v string) predicate.Session {
+	return predicate.Session(sql.FieldNEQ(FieldTokenHash, v))
+}
+
+// TokenHashIn applies the In predicate on the "token_hash" field.
+func TokenHashIn(vs ...string) predicate.Session {
+	return predicate.Session(sql.FieldIn(FieldTokenHash, vs...))
+}
+
+// TokenHashNotIn applies the NotIn predicate on the "token_hash" field.
+func TokenHashNotIn(vs ...string) predicate.Session {
+	return predicate.Session(sql.FieldNotIn(FieldTokenHash, vs...))
+}
+
+// TokenHashGT applies the GT predicate on the "token_hash" field.
+func TokenHashGT(v string) predicate.Session {
+	return predicate.Session(sql.FieldGT(FieldTokenHash, v))
+}
+
+// TokenHashGTE applies the GTE predicate on the "token_hash" field.
+func TokenHashGTE(v string) predicate.Session {
+	return predicate.Session(sql.FieldGTE(FieldTokenHash, v))
+}
+
+// TokenHashLT applies the LT predicate on the "token_hash" field.
+func TokenHashLT(v string) predicate.Session {
+	return predicate.Session(sql.FieldLT(FieldTokenHash, v))
+}
+
+// TokenHashLTE applies the LTE predicate on the "token_hash" field.
+func TokenHashLTE(v string) predicate.Session {
+	return predicate.Session(sql.FieldLTE(FieldTokenHash, v))
+}
+
+// TokenHashContains applies the Contains predicate on the "token_hash" field.
+func TokenHashContains(v string) predicate.Session {
+	return predicate.Session(sql.FieldContains(FieldTokenHash, v))
+}
+
+// TokenHashHasPrefix applies the HasPrefix predicate on the "token_hash" field.
+func TokenHashHasPrefix(v string) predicate.Session {
+	return predicate.Session(sql.FieldHasPrefix(FieldTokenHash, v))
+}
+
+// TokenHashHasSuffix applies the HasSuffix predicate on the "token_hash" field.
+func TokenHashHasSuffix(v string) predicate.Session {
+	return predicate.Session(sql.FieldHasSuffix(FieldTokenHash, v))
+}
+
+// TokenHashEqualFold applies the EqualFold predicate on the "token_hash" field.
+func TokenHashEqualFold(v string) predicate.Session {
+	return predicate.Session(sql.FieldEqualFold(FieldTokenHash, v))
+}
+
+// TokenHashContainsFold applies the ContainsFold predicate on the "token_hash" field.
+func TokenHashContainsFold(v string) predicate.Session {
+	return predicate.Session(sql.FieldContainsFold(FieldTokenHash, v))
 }
 
 // ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
