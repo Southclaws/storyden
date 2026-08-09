@@ -20,7 +20,11 @@ import type {
 } from "../openapi-schema";
 
 /**
- * Get a list of all tags on the site.
+ * Get a list of tags on the site, most used first.
+
+The tag table grows with content, so results are paginated. Callers
+that only need suggestions can read the first page and stop.
+
  */
 export const tagList = (params?: TagListParams) => {
   return fetcher<TagListOKResponse>({ url: `/tags`, method: "GET", params });

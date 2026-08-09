@@ -7,7 +7,9 @@ import (
 	"google.golang.org/adk/tool"
 	"google.golang.org/adk/tool/functiontool"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/lib/mcp"
 )
 
@@ -52,35 +54,29 @@ func (tt *tagTools) newTagListTool() *Tool {
 	}
 }
 
+const toolTagPageSize = 100
+
 func (tt *tagTools) ExecuteTagList(ctx context.Context, args mcp.ToolTagListInput) (*mcp.ToolTagListOutput, error) {
-	var tags []mcp.TagItem
+	params := pagination.NewPageParams(1, toolTagPageSize)
+
+	var result *pagination.Result[*tag_ref.Tag]
+	var err error
 
 	if args.Query != nil && *args.Query != "" {
-		tagList, err := tt.tagQuerier.Search(ctx, *args.Query)
-		if err != nil {
-			return nil, err
-		}
-
-		tags = make([]mcp.TagItem, 0, len(tagList))
-		for _, tag := range tagList {
-			tags = append(tags, mcp.TagItem{
-				Name:      tag.Name.String(),
-				ItemCount: tag.ItemCount,
-			})
-		}
+		result, err = tt.tagQuerier.Search(ctx, *args.Query, params)
 	} else {
-		tagList, err := tt.tagQuerier.List(ctx)
-		if err != nil {
-			return nil, err
-		}
+		result, err = tt.tagQuerier.List(ctx, params)
+	}
+	if err != nil {
+		return nil, err
+	}
 
-		tags = make([]mcp.TagItem, 0, len(tagList))
-		for _, tag := range tagList {
-			tags = append(tags, mcp.TagItem{
-				Name:      tag.Name.String(),
-				ItemCount: tag.ItemCount,
-			})
-		}
+	tags := make([]mcp.TagItem, 0, len(result.Items))
+	for _, tag := range result.Items {
+		tags = append(tags, mcp.TagItem{
+			Name:      tag.Name.String(),
+			ItemCount: tag.ItemCount,
+		})
 	}
 
 	output := mcp.ToolTagListOutput{

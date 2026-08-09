@@ -15,7 +15,11 @@ import type {
 import { fetcher } from "../server";
 
 /**
- * Get a list of all tags on the site.
+ * Get a list of tags on the site, most used first.
+
+The tag table grows with content, so results are paginated. Callers
+that only need suggestions can read the first page and stop.
+
  */
 export type tagListResponse = {
   data: TagListOKResponse;

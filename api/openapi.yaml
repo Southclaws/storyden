@@ -2528,9 +2528,15 @@ paths:
   /tags:
     get:
       operationId: TagList
-      description: Get a list of all tags on the site.
+      description: |
+        Get a list of tags on the site, most used first.
+
+        The tag table grows with content, so results are paginated. Callers
+        that only need suggestions can read the first page and stop.
       tags: [tags]
-      parameters: [$ref: "#/components/parameters/SearchQuery"]
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/TagListOK" }
@@ -10205,10 +10211,12 @@ components:
       items: { $ref: "#/components/schemas/Identifier" }
 
     TagListResult:
-      type: object
-      required: [tags]
-      properties:
-        tags: { $ref: "#/components/schemas/TagReferenceList" }
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [tags]
+          properties:
+            tags: { $ref: "#/components/schemas/TagReferenceList" }
 
     #
     # 8888888b.                   888
