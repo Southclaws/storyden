@@ -8,8 +8,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.26.14-post
  */
 import type { Metadata } from "./metadata";
+import type { NullableIdentifier } from "./nullableIdentifier";
 import type { RobotModelRef } from "./robotModelRef";
-import type { RobotMutablePropsWorkspaceId } from "./robotMutablePropsWorkspaceId";
 import type { RobotToolNameList } from "./robotToolNameList";
 
 export interface RobotMutableProps {
@@ -22,6 +22,5 @@ export interface RobotMutableProps {
   /** The directive/system prompt that defines the robot's behavior */
   playbook?: string;
   tools?: RobotToolNameList;
-  /** @nullable */
-  workspace_id?: RobotMutablePropsWorkspaceId;
+  workspace_id?: NullableIdentifier;
 }

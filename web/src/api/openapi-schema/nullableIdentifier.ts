@@ -10,6 +10,5 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
 /**
  * A unique identifier for this resource.
- * @nullable
  */
 export type NullableIdentifier = string | null;

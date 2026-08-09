@@ -105,7 +105,7 @@ func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openap
 	return openapi.WebAuthnRequestCredential200JSONResponse{
 		WebAuthnRequestCredentialOKJSONResponse: openapi.WebAuthnRequestCredentialOKJSONResponse{
 			Headers: openapi.WebAuthnRequestCredentialOKResponseHeaders{
-				SetCookie: cookie.String(),
+				SetCookie: ptr(cookie.String()),
 			},
 			Body: serialiseWebAuthnCredentialCreationOptions(*cred),
 		},
@@ -163,7 +163,7 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.cj.Create(*t).String(),
+				SetCookie: ptr(a.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -200,7 +200,7 @@ func (a *WebAuthn) WebAuthnGetAssertion(ctx context.Context, request openapi.Web
 		WebAuthnGetAssertionOKJSONResponse: openapi.WebAuthnGetAssertionOKJSONResponse{
 			Body: serialiseWebAuthnCredentialRequestOptions(cred.Response),
 			Headers: openapi.WebAuthnGetAssertionOKResponseHeaders{
-				SetCookie: cookie.String(),
+				SetCookie: ptr(cookie.String()),
 			},
 		},
 	}, nil
@@ -251,7 +251,7 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.cj.Create(*t).String(),
+				SetCookie: ptr(a.cj.Create(*t).String()),
 			},
 		},
 	}, nil

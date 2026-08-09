@@ -189,9 +189,9 @@ func (p *Plugins) PluginDownloadPackage(ctx context.Context, request openapi.Plu
 		PluginDownloadPackageOKApplicationzipResponse: openapi.PluginDownloadPackageOKApplicationzipResponse{
 			Body: bytes.NewReader(data),
 			Headers: openapi.PluginDownloadPackageOKResponseHeaders{
-				ContentDisposition: mime.FormatMediaType("attachment", map[string]string{
+				ContentDisposition: ptr(mime.FormatMediaType("attachment", map[string]string{
 					"filename": pluginPackageFilename(manifestID),
-				}),
+				})),
 			},
 			ContentLength: int64(len(data)),
 		},
@@ -345,45 +345,45 @@ func serialisePluginStatus(in *plugin.Record) openapi.PluginStatus {
 	switch in.ReportedState {
 	case plugin.ReportedStateActive:
 		as.FromPluginStatusActive(openapi.PluginStatusActive{
-			ActiveState: openapi.Active,
+			ActiveState: openapi.PluginStatusActiveActiveStateActive,
 			ActivatedAt: in.StartedAt,
 		})
 
 	case plugin.ReportedStateInactive:
 		as.FromPluginStatusInactive(openapi.PluginStatusInactive{
-			ActiveState:   openapi.Inactive,
+			ActiveState:   openapi.PluginStatusInactiveActiveStateInactive,
 			DeactivatedAt: in.StateChangedAt,
 		})
 
 	case plugin.ReportedStateStarting:
 		as.FromPluginStatusStarting(openapi.PluginStatusStarting{
-			ActiveState: openapi.Starting,
+			ActiveState: openapi.PluginStatusStartingActiveStateStarting,
 			StartingAt:  in.StateChangedAt,
 		})
 
 	case plugin.ReportedStateConnecting:
 		as.FromPluginStatusConnecting(openapi.PluginStatusConnecting{
-			ActiveState:  openapi.Connecting,
+			ActiveState:  openapi.PluginStatusConnectingActiveStateConnecting,
 			ConnectingAt: in.StateChangedAt,
 		})
 
 	case plugin.ReportedStateError:
 		as.FromPluginStatusError(openapi.PluginStatusError{
-			ActiveState: openapi.Error,
+			ActiveState: openapi.PluginStatusErrorActiveStateError,
 			Message:     in.StatusMessage,
 			Details:     nonNilDetails(in.Details),
 		})
 
 	case plugin.ReportedStateRestarting:
 		as.FromPluginStatusRestarting(openapi.PluginStatusRestarting{
-			ActiveState: openapi.Restarting,
+			ActiveState: openapi.PluginStatusRestartingActiveStateRestarting,
 			Message:     in.StatusMessage,
 			Details:     nonNilDetails(in.Details),
 		})
 
 	default:
 		as.FromPluginStatusInactive(openapi.PluginStatusInactive{
-			ActiveState:   openapi.Inactive,
+			ActiveState:   openapi.PluginStatusInactiveActiveStateInactive,
 			DeactivatedAt: in.StateChangedAt,
 		})
 	}

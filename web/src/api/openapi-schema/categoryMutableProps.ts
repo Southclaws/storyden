@@ -7,18 +7,15 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.14-post
  */
-import type { CategoryMutablePropsCoverImageAssetId } from "./categoryMutablePropsCoverImageAssetId";
 import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
 import type { Metadata } from "./metadata";
+import type { NullableIdentifier } from "./nullableIdentifier";
 
 export interface CategoryMutableProps {
   colour?: string;
-  /**
-   * Optional cover image asset identifier for the category.
-   * @nullable
-   */
-  cover_image_asset_id?: CategoryMutablePropsCoverImageAssetId;
+  /** Optional cover image asset identifier for the category. */
+  cover_image_asset_id?: NullableIdentifier;
   description?: string;
   meta?: Metadata;
   name?: CategoryName;

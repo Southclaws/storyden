@@ -42,7 +42,7 @@ func (o *Authentication) OAuthProviderCallback(ctx context.Context, request open
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: account.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: o.cj.Create(*t).String(),
+				SetCookie: ptr(o.cj.Create(*t).String()),
 			},
 		},
 	}, nil

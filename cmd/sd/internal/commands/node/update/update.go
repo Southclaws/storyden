@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/oapi-codegen/nullable"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -192,10 +193,10 @@ func buildMutableProps(cmd *cobra.Command, input mutablePropsInput) (openapi.Nod
 		props.Tags = &input.tags
 	}
 	if cmd.Flags().Changed("url") {
-		props.Url.Set(input.url)
+		props.Url = nullable.NewNullableWithValue(input.url)
 	}
 	if input.clearURL {
-		props.Url.SetNull()
+		props.Url = nullable.NewNullNullable[string]()
 	}
 	if cmd.Flags().Changed("hide-child-tree") {
 		props.HideChildTree = &input.hideChildTree

@@ -146,8 +146,8 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	if notModified {
 		return openapi.ProfileGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		}, nil
 	}
@@ -166,8 +166,8 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Body: serialiseProfile(pro),
 			Headers: openapi.ProfileGetOKResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		},
 	}, nil

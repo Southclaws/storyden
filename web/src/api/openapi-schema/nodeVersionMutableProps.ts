@@ -22,9 +22,7 @@ merged with existing values when the version is applied.
 
  */
 export interface NodeVersionMutableProps {
-  /** @nullable */
   content?: NodeVersionMutablePropsContent;
-  /** @nullable */
   description?: NodeVersionMutablePropsDescription;
   meta?: Metadata;
   name?: NodeName;

@@ -27,9 +27,9 @@ import (
 const (
 	welcomeSubjectPrefix       = "Welcome to "
 	passwordResetSubjectPrefix = "Reset your password on "
-	testPassword         = "mysupersecretpasswordwhichissosecretiforgotwhatitwas"
-	emailQueueWait       = 15 * time.Second
-	emailQueuePoll       = 100 * time.Millisecond
+	testPassword               = "mysupersecretpasswordwhichissosecretiforgotwhatitwas"
+	emailQueueWait             = 15 * time.Second
+	emailQueuePoll             = 100 * time.Millisecond
 )
 
 func TestEmailQueueList(t *testing.T) {
@@ -422,7 +422,7 @@ func waitForEmailQueueListWithParams(
 			return false
 		}
 
-		items = *list.JSON200.Emails
+		items = list.JSON200.Emails
 		return match(items)
 	}, emailQueueWait, emailQueuePoll)
 

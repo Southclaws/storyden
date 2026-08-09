@@ -55,7 +55,7 @@ func (i *PhoneAuth) PhoneSubmitCode(ctx context.Context, request openapi.PhoneSu
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil

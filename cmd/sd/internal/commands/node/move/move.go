@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/oapi-codegen/nullable"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -159,10 +160,9 @@ func emitters(cmd *cobra.Command, format string) (func(batch.Result), func(int, 
 func buildProps(parent, before, after string, toRoot bool) openapi.NodePositionMutableProps {
 	props := openapi.NodePositionMutableProps{}
 	if parent != "" {
-		props.Parent.Set(parent)
+		props.Parent = nullable.NewNullableWithValue(parent)
 	} else if toRoot {
-		props.Parent.Set("")
-		props.Parent.SetNull()
+		props.Parent = nullable.NewNullNullable[string]()
 	}
 	if before != "" {
 		props.Before = &before

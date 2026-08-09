@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.14-post
  */
+import type { NodePositionMutablePropsParent } from "./nodePositionMutablePropsParent";
 
 /**
  * Parameters for repositioning a node in the hierarchy. You may change the
@@ -20,10 +21,7 @@ export interface NodePositionMutableProps {
   after?: string;
   /** Move this node before the sibling with this ID. */
   before?: string;
-  /**
-   * Optional new parent node slug. Set to null to move node to the root.
-
-   * @nullable
+  /** Optional new parent node slug. Set to null to move node to the root.
    */
-  parent?: string | null;
+  parent?: NodePositionMutablePropsParent;
 }

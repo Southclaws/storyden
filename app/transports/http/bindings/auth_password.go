@@ -25,7 +25,7 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -51,7 +51,7 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -77,7 +77,7 @@ func (i *Authentication) AuthPasswordCreate(ctx context.Context, request openapi
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -103,7 +103,7 @@ func (i *Authentication) AuthPasswordUpdate(ctx context.Context, request openapi
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -124,7 +124,7 @@ func (i *Authentication) AuthPasswordReset(ctx context.Context, request openapi.
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil

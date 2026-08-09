@@ -7,9 +7,5 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.14-post
  */
-import type { PostContent } from "./postContent";
 
-/**
- * @nullable
- */
-export type NodeVersionInitialPropsContent = PostContent | null;
+export type NodeVersionInitialPropsContent = string | null;

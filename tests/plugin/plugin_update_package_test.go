@@ -160,7 +160,7 @@ func TestSupervisedPluginUpdatePackageInactiveKeepsInactive(t *testing.T) {
 
 			status, err := updateResp.JSON200.Status.AsPluginStatusInactive()
 			r.NoError(err)
-			r.Equal(openapi.Inactive, status.ActiveState)
+			r.Equal(openapi.PluginActiveStateInactive, status.ActiveState)
 			requireSessionState(t, root, runner, installationID, resource_plugin.ReportedStateInactive)
 
 			tests.AssertRequest(

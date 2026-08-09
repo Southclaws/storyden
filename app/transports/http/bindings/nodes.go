@@ -248,8 +248,8 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 	if notModified {
 		return openapi.NodeGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		}, nil
 	}
@@ -268,8 +268,8 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse{
 			Body: serialiseNodeWithItems(node),
 			Headers: openapi.NodeGetOKResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		},
 	}, nil
@@ -376,7 +376,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse{
 			Body: serialiseUpdatedNode(node),
 			Headers: openapi.NodeUpdateOKResponseHeaders{
-				CacheControl: "private, no-cache, no-store, must-revalidate",
+				CacheControl: ptr("private, no-cache, no-store, must-revalidate"),
 			},
 		},
 	}, nil

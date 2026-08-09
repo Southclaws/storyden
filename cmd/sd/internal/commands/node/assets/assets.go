@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/oapi-codegen/nullable"
 	"github.com/spf13/cobra"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -420,7 +421,7 @@ func setPrimaryAsset(
 	assetID string,
 ) (*openapi.NodeWithChildren, error) {
 	props := openapi.NodeMutableProps{}
-	props.PrimaryImageAssetId.Set(assetID)
+	props.PrimaryImageAssetId = nullable.NewNullableWithValue(assetID)
 
 	return nodeapi.Update(ctx, client, slug, props)
 }
@@ -431,7 +432,7 @@ func clearPrimaryAsset(
 	slug string,
 ) (*openapi.NodeWithChildren, error) {
 	props := openapi.NodeMutableProps{}
-	props.PrimaryImageAssetId.SetNull()
+	props.PrimaryImageAssetId = nullable.NewNullNullable[string]()
 
 	return nodeapi.Update(ctx, client, slug, props)
 }
@@ -455,7 +456,7 @@ func attachAsset(
 	node := response.JSON200
 	if primary {
 		props := openapi.NodeMutableProps{}
-		props.PrimaryImageAssetId.Set(assetID)
+		props.PrimaryImageAssetId = nullable.NewNullableWithValue(assetID)
 
 		updated, err := nodeapi.Update(ctx, client, slug, props)
 		if err != nil {

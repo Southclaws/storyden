@@ -41,7 +41,7 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil
@@ -67,7 +67,7 @@ func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request op
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(*t).String(),
+				SetCookie: ptr(i.cj.Create(*t).String()),
 			},
 		},
 	}, nil

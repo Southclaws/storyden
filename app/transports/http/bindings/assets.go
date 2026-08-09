@@ -39,7 +39,7 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: "public, max-age=31536000",
+				CacheControl: ptr("public, max-age=31536000"),
 			},
 		},
 	}, nil

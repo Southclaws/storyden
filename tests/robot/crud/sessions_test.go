@@ -43,7 +43,7 @@ func startSession(t *testing.T, ctx context.Context, ts *httptest.Server, sessio
 	sessionID := xid.New().String()
 
 	var textPart openapi.UIMessagePart
-	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.Text, Text: "hello"}))
+	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: "hello"}))
 
 	var robotIDPtr *string
 	if robotID != "" {

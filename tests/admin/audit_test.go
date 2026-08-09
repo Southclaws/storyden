@@ -53,7 +53,7 @@ func TestAuditEventList(t *testing.T) {
 				a.NotEmpty(list.JSON200.Events)
 
 				// Find the account_suspended event for this specific member
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountSuspended {
 						return false
 					}
@@ -85,7 +85,7 @@ func TestAuditEventList(t *testing.T) {
 				}, adminSession)
 				tests.Ok(t, err, list)
 
-				for _, event := range *list.JSON200.Events {
+				for _, event := range list.JSON200.Events {
 					a.Equal(openapi.AccountSuspended, event.Type)
 				}
 			})
@@ -153,7 +153,7 @@ func TestAccountWarningUpdateAuditEvent(t *testing.T) {
 			r.NotNil(list.JSON200)
 			r.NotNil(list.JSON200.Events)
 
-			updatedEvent, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+			updatedEvent, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 				if e.Type != openapi.AccountWarningUpdated {
 					return false
 				}
@@ -210,7 +210,7 @@ func TestAuditEventGet(t *testing.T) {
 				r.NotEmpty(list.JSON200.Events)
 
 				// Find the account_suspended event for this specific member
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountSuspended {
 						return false
 					}
@@ -280,7 +280,7 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.ThreadDeleted {
 						return false
 					}
@@ -329,7 +329,7 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.ThreadReplyDeleted {
 						return false
 					}
@@ -364,7 +364,7 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountSuspended {
 						return false
 					}
@@ -402,7 +402,7 @@ func TestAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountUnsuspended {
 						return false
 					}
@@ -456,7 +456,7 @@ func TestAuditLogging(t *testing.T) {
 				r.NotNil(list.JSON200)
 				r.NotNil(list.JSON200.Events)
 
-				createdEvent, foundCreated := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				createdEvent, foundCreated := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.ModerationNoteCreated {
 						return false
 					}
@@ -476,7 +476,7 @@ func TestAuditLogging(t *testing.T) {
 				a.Equal(openapi.Identifier(member.ID.String()), createdTyped.AccountId)
 				a.Equal(createResp.JSON200.Id, createdTyped.NoteId)
 
-				deletedEvent, foundDeleted := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				deletedEvent, foundDeleted := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.ModerationNoteDeleted {
 						return false
 					}

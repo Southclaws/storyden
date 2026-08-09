@@ -424,6 +424,9 @@ export const authEmailSignin = async (
  * Verify an email address using a token that was emailed to one of the
 account's email addresses either set via sign up or added later.
 
+The code is only six digits, so this endpoint MUST be rate limited to
+keep the search space out of reach of an unauthenticated caller.
+
  */
 export type authEmailVerifyResponse = {
   data: AuthSuccessOKResponse;

@@ -11,6 +11,7 @@ import type { AssetIDs } from "./assetIDs";
 import type { AssetSourceList } from "./assetSourceList";
 import type { Metadata } from "./metadata";
 import type { NodeDescription } from "./nodeDescription";
+import type { NodeMutablePropsUrl } from "./nodeMutablePropsUrl";
 import type { NodeName } from "./nodeName";
 import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PostContent } from "./postContent";
@@ -35,6 +36,5 @@ export interface NodeMutableProps {
   properties?: PropertyMutationList;
   slug?: Slug;
   tags?: TagNameList;
-  /** @nullable */
-  url?: string | null;
+  url?: NodeMutablePropsUrl;
 }

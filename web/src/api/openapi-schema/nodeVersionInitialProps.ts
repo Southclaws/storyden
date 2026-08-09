@@ -22,9 +22,7 @@ with existing values when the version is applied.
 
  */
 export interface NodeVersionInitialProps {
-  /** @nullable */
   content?: NodeVersionInitialPropsContent;
-  /** @nullable */
   description?: NodeVersionInitialPropsDescription;
   meta?: Metadata;
   name?: NodeName;

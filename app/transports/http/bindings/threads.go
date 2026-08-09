@@ -228,7 +228,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 				TotalPages:  result.TotalPages,
 			},
 			Headers: openapi.ThreadListOKResponseHeaders{
-				CacheControl: "no-store",
+				CacheControl: ptr("no-store"),
 			},
 		},
 	}, nil
@@ -244,8 +244,8 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	if notModified {
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		}, nil
 	}
@@ -266,8 +266,8 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse{
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
-				ETag:         etag.String(),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
+				ETag:         ptr(etag.String()),
 			},
 		},
 	}, nil

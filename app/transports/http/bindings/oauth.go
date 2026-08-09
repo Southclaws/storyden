@@ -549,7 +549,7 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 			Headers: openapi.OAuthAuthoriseFoundResponseHeaders{
 				// TODO: Make this configurable, the API should not depend on
 				// frontend implementation path design and route layout etc.
-				Location: o.webAddress.String() + "/login",
+				Location: ptr(o.webAddress.String() + "/login"),
 			},
 		}, nil
 	}
@@ -583,7 +583,7 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 	}
 
 	return openapi.OAuthAuthorise302Response{
-		Headers: openapi.OAuthAuthoriseFoundResponseHeaders{Location: result.Location},
+		Headers: openapi.OAuthAuthoriseFoundResponseHeaders{Location: ptr(result.Location)},
 	}, nil
 }
 
@@ -735,7 +735,7 @@ func (o OAuth) OAuthToken(ctx context.Context, req openapi.OAuthTokenRequestObje
 						ErrorDescription: &oauthErr.Description,
 					},
 					Headers: openapi.OAuthTokenUnauthorisedResponseHeaders{
-						WWWAuthenticate: `Basic realm="` + o.apiAddress.Hostname() + `"`,
+						WWWAuthenticate: ptr(`Basic realm="` + o.apiAddress.Hostname() + `"`),
 					},
 				},
 			}, nil

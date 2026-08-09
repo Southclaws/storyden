@@ -153,7 +153,7 @@ func (r *resolver) loadDocument(path string) (map[string]any, error) {
 	}
 
 	var doc map[string]any
-	if err := yaml.Unmarshal(data, &doc); err != nil {
+	if _, err := yaml.Unmarshal(data, &doc, yaml.DecodeOpts{}); err != nil {
 		return nil, fmt.Errorf("unmarshal schema %s: %w", path, err)
 	}
 
@@ -375,7 +375,7 @@ func dereferenceSchemaLegacy(data any, baseDir string, rootDefs map[string]any) 
 				}
 
 				var refSchema map[string]any
-				if err := yaml.Unmarshal(refData, &refSchema); err != nil {
+				if _, err := yaml.Unmarshal(refData, &refSchema, yaml.DecodeOpts{}); err != nil {
 					return fmt.Errorf("unmarshal ref %s: %w", ref, err)
 				}
 

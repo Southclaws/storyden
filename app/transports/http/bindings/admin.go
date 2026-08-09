@@ -363,7 +363,7 @@ func (a *Admin) AuditEventList(ctx context.Context, request openapi.AuditEventLi
 	return openapi.AuditEventList200JSONResponse{
 		AuditEventListOKJSONResponse: openapi.AuditEventListOKJSONResponse{
 			CurrentPage: result.CurrentPage,
-			Events:      &eventList,
+			Events:      eventList,
 			NextPage:    result.NextPage.Ptr(),
 			PageSize:    result.Size,
 			Results:     result.Results,
@@ -424,7 +424,7 @@ func (a *Admin) EmailQueueList(ctx context.Context, request openapi.EmailQueueLi
 	return openapi.EmailQueueList200JSONResponse{
 		EmailQueueListOKJSONResponse: openapi.EmailQueueListOKJSONResponse{
 			CurrentPage: result.CurrentPage,
-			Emails:      &emailList,
+			Emails:      emailList,
 			NextPage:    result.NextPage.Ptr(),
 			PageSize:    result.Size,
 			Results:     result.Results,

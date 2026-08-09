@@ -52,7 +52,7 @@ func doChat(
 	t.Helper()
 
 	var textPart openapi.UIMessagePart
-	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.Text, Text: message}))
+	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
 
 	robotID = normaliseRobotID(robotID)
 
@@ -229,7 +229,7 @@ func doChatStatus(
 	t.Helper()
 
 	var textPart openapi.UIMessagePart
-	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.Text, Text: message}))
+	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
 
 	robotID := normaliseRobotID("")
 

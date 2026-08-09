@@ -7,10 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.26.14-post
  */
-import type { NullableIdentifier } from "./nullableIdentifier";
 
 /**
- * Optional cover image asset identifier for the category.
- * @nullable
+ * Optional new parent node slug. Set to null to move node to the root.
+
  */
-export type CategoryMutablePropsCoverImageAssetId = NullableIdentifier | null;
+export type NodePositionMutablePropsParent = string | null;

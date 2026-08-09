@@ -65,7 +65,7 @@ func (i Info) GetSession(ctx context.Context, request openapi.GetSessionRequestO
 		GetSessionOKJSONResponse: openapi.GetSessionOKJSONResponse{
 			Body: sessionInfo,
 			Headers: openapi.GetSessionOKResponseHeaders{
-				CacheControl: getAuthStateCacheControl(ctx, "no-cache"),
+				CacheControl: ptr(getAuthStateCacheControl(ctx, "no-cache")),
 			},
 		},
 	}, nil
@@ -94,7 +94,7 @@ func (i Info) IconGet(ctx context.Context, request openapi.IconGetRequestObject)
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: "public, max-age=31536000",
+				CacheControl: ptr("public, max-age=31536000"),
 			},
 		},
 	}, nil
@@ -121,7 +121,7 @@ func (i Info) BannerGet(ctx context.Context, request openapi.BannerGetRequestObj
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 			Headers: openapi.AssetGetOKResponseHeaders{
-				CacheControl: "public, max-age=3600",
+				CacheControl: ptr("public, max-age=3600"),
 			},
 		},
 	}, nil

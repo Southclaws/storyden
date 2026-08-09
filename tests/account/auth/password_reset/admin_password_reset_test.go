@@ -120,7 +120,6 @@ func TestAdminPasswordResetTokenGet(t *testing.T) {
 				r.NoError(err)
 				r.Equal(http.StatusNotFound, tokenResp.StatusCode())
 			})
-
 		}))
 	}))
 }
@@ -460,7 +459,7 @@ func TestAdminPasswordResetAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountPasswordResetTokenIssued {
 						return false
 					}
@@ -516,7 +515,7 @@ func TestAdminPasswordResetAuditLogging(t *testing.T) {
 				list, err := cl.AuditEventListWithResponse(adminCtx, &openapi.AuditEventListParams{}, adminSession)
 				tests.Ok(t, err, list)
 
-				event, found := lo.Find(*list.JSON200.Events, func(e openapi.AuditEvent) bool {
+				event, found := lo.Find(list.JSON200.Events, func(e openapi.AuditEvent) bool {
 					if e.Type != openapi.AccountPasswordResetEmailSent {
 						return false
 					}

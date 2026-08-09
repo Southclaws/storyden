@@ -413,7 +413,7 @@ func TestPurgeAccountContent(t *testing.T) {
 				tests.Ok(t, err, list)
 
 				var found bool
-				for _, event := range *list.JSON200.Events {
+				for _, event := range list.JSON200.Events {
 					if event.Type == openapi.AccountContentPurged {
 						purgedEvent, err := event.AsAuditEventAccountContentPurged()
 						r.NoError(err)

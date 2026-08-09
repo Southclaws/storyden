@@ -6679,9 +6679,8 @@ components:
       description: A unique identifier for this resource.
 
     NullableIdentifier:
-      type: string
+      type: [string, "null"]
       format: xid
-      nullable: true
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
 
@@ -10063,7 +10062,6 @@ components:
         cover_image_asset_id:
           allOf:
             - $ref: "#/components/schemas/NullableIdentifier"
-          nullable: true
           description: Optional cover image asset identifier for the category.
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -10920,9 +10918,8 @@ components:
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url:
-          type: string
+          type: [string, "null"]
           format: url
-          nullable: true
         description: { $ref: "#/components/schemas/NodeDescription" }
         primary_image_asset_id:
           { $ref: "#/components/schemas/NullableIdentifier" }
@@ -10967,11 +10964,9 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         description:
-          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
-          nullable: true
+          type: [string, "null"]
         content:
-          allOf: [{ $ref: "#/components/schemas/PostContent" }]
-          nullable: true
+          type: [string, "null"]
         properties:
           description: |
             Complete desired-state property list for the target node.
@@ -11051,11 +11046,9 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         description:
-          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
-          nullable: true
+          type: [string, "null"]
         content:
-          allOf: [{ $ref: "#/components/schemas/PostContent" }]
-          nullable: true
+          type: [string, "null"]
         properties: { $ref: "#/components/schemas/PropertyMutationList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -11070,11 +11063,9 @@ components:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
         description:
-          allOf: [{ $ref: "#/components/schemas/NodeDescription" }]
-          nullable: true
+          type: [string, "null"]
         content:
-          allOf: [{ $ref: "#/components/schemas/PostContent" }]
-          nullable: true
+          type: [string, "null"]
         properties: { $ref: "#/components/schemas/PropertyMutationList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -11241,8 +11232,7 @@ components:
         properties is not allowed.
       properties:
         parent:
-          type: string
-          nullable: true
+          type: [string, "null"]
           description: |
             Optional new parent node slug. Set to null to move node to the root.
         before:
@@ -11727,7 +11717,6 @@ components:
         workspace_id:
           allOf:
             - $ref: "#/components/schemas/NullableIdentifier"
-          nullable: true
           description: Optional default workspace template for this robot.
         author: { $ref: "#/components/schemas/ProfileReference" }
         tools: { $ref: "#/components/schemas/RobotToolNameList" }
@@ -12540,7 +12529,6 @@ components:
         workspace_id:
           allOf:
             - $ref: "#/components/schemas/NullableIdentifier"
-          nullable: true
         tools:
           $ref: "#/components/schemas/RobotToolNameList"
         meta: { $ref: "#/components/schemas/Metadata" }

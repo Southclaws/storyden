@@ -26,10 +26,8 @@ copied into the target node upon publishing of the changes.
  */
 export interface NodeVersion {
   author: ProfileReference;
-  /** @nullable */
   content?: NodeVersionContent;
   created_at: string;
-  /** @nullable */
   description?: NodeVersionDescription;
   id: Identifier;
   meta: Metadata;
