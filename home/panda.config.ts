@@ -182,28 +182,6 @@ export default defineConfig({
   theme: {
     extend: {
       semanticTokens: defineSemanticTokens({
-        colors: {
-          // fg: {
-          //   default: {
-          //     value: {
-          //       base: "{colors.blackAlpha.700}",
-          //       _dark: "{colors.gray.50}",
-          //     },
-          //   },
-          // },
-          // bg: {
-          //   canvas: { value: "{colors.gray.100}" },
-          //   default: {
-          //     value: { base: "{colors.white}", _dark: "{colors.gray.200}" },
-          //   },
-          //   opaque: {
-          //     value: {
-          //       base: "{colors.whiteAlpha.700}",
-          //       _dark: "{colors.blackAlpha.700}",
-          //     },
-          //   },
-          // },
-        },
         blurs: {
           frosted: { value: "8px" },
         },
