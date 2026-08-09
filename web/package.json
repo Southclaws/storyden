@@ -9,7 +9,6 @@
     "start": "next start",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "openapi": "orval",
     "test": "uvu -r tsx src '\\.test\\.ts$'",
