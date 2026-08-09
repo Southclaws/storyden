@@ -8,7 +8,7 @@ export function SaveAction({
   ...props
 }: PropsWithChildren<ButtonProps>) {
   return (
-    <Button variant="subtle" size="xs" {...props}>
+    <Button variant="subtle" {...props}>
       <SaveIcon /> {children}
     </Button>
   );

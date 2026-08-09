@@ -7,9 +7,9 @@ import * as z from "zod";
 
 import { handle } from "@/api/client";
 import { authPasswordReset } from "@/api/openapi-client/auth";
-import { FormControl } from "@/components/ui/FormControl";
 import { Button } from "@/components/ui/button";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { PasswordSchema } from "@/lib/auth/schemas";
 import { styled } from "@/styled-system/jsx";

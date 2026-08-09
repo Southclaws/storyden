@@ -149,19 +149,14 @@ export function BannerEditor() {
           onFileReject={handleFileReject}
         >
           <FileUpload.Trigger w="min" asChild>
-            <Button type="button" size="xs" variant="outline">
+            <Button type="button" variant="outline">
               <MediaAddIcon /> Upload banner
             </Button>
           </FileUpload.Trigger>
           <FileUpload.HiddenInput data-testid="input" />
         </FileUpload.Root>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="solid"
-          onClick={handleSaveCurrentCrop}
-        >
+        <Button type="button" variant="solid" onClick={handleSaveCurrentCrop}>
           <SaveIcon /> Save banner
         </Button>
       </HStack>
@@ -174,7 +169,7 @@ export function BannerEditor() {
             maxHeight: "64",
             borderRadius: "md",
             // TODO: Remove black background when empty
-            backgroundColor: "bg.default",
+            backgroundColor: "background.surface",
           })}
           onTransformImageEnd={handleSaveCurrentCrop}
           // defaultPosition={

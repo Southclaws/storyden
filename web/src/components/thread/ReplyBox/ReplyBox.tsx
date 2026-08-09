@@ -1,19 +1,18 @@
 import Link from "next/link";
-import { Controller, ControllerProps } from "react-hook-form";
 
-import { Anchor } from "@/components/site/Anchor";
-
-import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
+import { Anchor } from "@/components/site/Anchor";
 import { Admonition } from "@/components/ui/admonition";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { Text } from "@/components/ui/text";
 import { usePublicRegistration } from "@/lib/settings/registration";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { timestamp } from "@/utils/date";
 
 import { useReplyContext } from "../ReplyContext";
@@ -44,11 +43,11 @@ export function ReplyBox(props: Props) {
       >
         {postedReply && (
           <LStack h="full" justifyContent="center">
-            <styled.p fontSize="sm" color="fg.muted">
+            <Text variant="supporting">
               Your reply has been posted on{" "}
               <Link
                 className={css({
-                  color: "fg.emphasized",
+                  color: "interactive.emphasized.content",
                   _hover: { textDecoration: "underline" },
                 })}
                 href={postedReply.permalink}
@@ -57,13 +56,13 @@ export function ReplyBox(props: Props) {
                 page {postedReply.pageNumber}
               </Link>
               .
-            </styled.p>
+            </Text>
           </LStack>
         )}
       </Admonition>
 
       <styled.form
-        className={CardBox()}
+        className={cardBox()}
         display="flex"
         flexDirection="column"
         gap="1"
@@ -71,9 +70,9 @@ export function ReplyBox(props: Props) {
         onSubmit={handlers.handleSubmit}
       >
         {replyTo && (
-          <WStack py="1" px="2" borderRadius="md" bgColor="bg.muted">
-            <HStack gap="1" fontSize="sm" color="fg.muted">
-              <styled.span>Replying&nbsp;to</styled.span>
+          <WStack py="1" px="2" borderRadius="md" bgColor="background.inset">
+            <HStack gap="1" fontSize="sm" color="text.subtle">
+              <span>Replying&nbsp;to</span>
               <MemberIdent
                 profile={replyTo.reply.author}
                 name="handle"
@@ -86,7 +85,6 @@ export function ReplyBox(props: Props) {
 
             <IconButton
               type="button"
-              size="xs"
               variant="ghost"
               aria-label="Clear reply-to"
               onClick={clearReplyTo}
@@ -106,46 +104,19 @@ export function ReplyBox(props: Props) {
             />
           </HStack>
 
-          <Button type="submit" size="xs" disabled={isLoading || isEmpty}>
+          <Button type="submit" disabled={isLoading || isEmpty}>
             Post
           </Button>
         </HStack>
 
-        <ReplyBodyInput
+        <ContentComposerField
           name="body"
           control={form.control}
-          handleEmptyStateChange={handlers.handleEmptyStateChange}
+          onEmptyStateChange={handlers.handleEmptyStateChange}
           resetKey={resetKey}
         />
       </styled.form>
     </VStack>
-  );
-}
-
-type ReplyBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
-  handleEmptyStateChange: (isEmpty: boolean) => void;
-  resetKey: string;
-};
-
-function ReplyBodyInput({
-  control,
-  name,
-  handleEmptyStateChange,
-  resetKey,
-}: ReplyBodyInputProps) {
-  return (
-    <Controller<Form>
-      render={({ field: { onChange } }) => {
-        function handleChange(value: string, isEmpty: boolean) {
-          handleEmptyStateChange(isEmpty);
-          onChange(value);
-        }
-
-        return <ContentComposer onChange={handleChange} resetKey={resetKey} />;
-      }}
-      control={control}
-      name={name}
-    />
   );
 }
 
@@ -162,14 +133,15 @@ function LoginToReply({
       w="full"
       p="8"
       borderRadius="xl"
-      bgColor="border.muted"
+      bgColor="border.strong"
       justifyContent="center"
     >
       <DiscussionIcon width="4" />
 
       <p>
-        Please <Anchor href={canRegister ? "/register" : "/login"}>{action}</Anchor>{" "}
-        to reply
+        Please{" "}
+        <Anchor href={canRegister ? "/register" : "/login"}>{action}</Anchor> to
+        reply
       </p>
     </HStack>
   );

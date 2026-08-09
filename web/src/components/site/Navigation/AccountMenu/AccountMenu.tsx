@@ -3,8 +3,11 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 
 import { Account } from "@/api/openapi-schema";
-import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import {
+  MemberIdent,
+  type Props as MemberIdentProps,
+} from "@/components/member/MemberBadge/MemberIdent";
 import * as Menu from "@/components/ui/menu";
 import { hasPermission } from "@/utils/permissions";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -27,9 +30,10 @@ import {
 type Props = {
   account: Account;
   size?: "sm" | "md";
+  name?: MemberIdentProps["name"];
 };
 
-export function AccountMenu({ account, size = "md" }: Props) {
+export function AccountMenu({ account, size = "md", name = "hidden" }: Props) {
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
   const canCreateInvitations = hasPermission(account, "CREATE_INVITATION");
   const invitationDisclosure = useDisclosure();
@@ -58,8 +62,13 @@ export function AccountMenu({ account, size = "md" }: Props) {
           shift: size === "md" ? 24 : 0,
         }}
       >
-        <Menu.Trigger cursor="pointer" aria-label="Account menu">
-          <MemberAvatar profile={account} size={size} />
+        <Menu.Trigger
+          cursor="pointer"
+          maxW="full"
+          minW="0"
+          aria-label="Account menu"
+        >
+          <MemberIdent profile={account} size={size} name={name} />
         </Menu.Trigger>
 
         <Portal>

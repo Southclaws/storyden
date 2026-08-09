@@ -1,9 +1,8 @@
-import { Unready } from "@/components/site/Unready";
-
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
-import { CardGrid } from "@/components/ui/rich-card";
+import { Unready } from "@/components/site/Unready";
+import { CardGrid } from "@/components/ui/surface";
 import * as Tabs from "@/components/ui/tabs";
 import { HStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";

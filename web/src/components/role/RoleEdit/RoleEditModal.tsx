@@ -48,12 +48,11 @@ export function RoleEditModalTrigger({ role }: Props) {
     <>
       <IconButton
         variant="ghost"
-        size="xs"
         minWidth="5"
         width="5"
         height="5"
         padding="0"
-        color="fg.muted"
+        color="text.subtle"
         disabled={cannotEdit}
         title={titleLabel}
         onClick={disclosure.onOpen}
@@ -102,7 +101,7 @@ export function RoleCreateModalTrigger() {
 
   return (
     <>
-      <IconButton px="2" variant="subtle" size="xs" onClick={handleCreate}>
+      <IconButton px="2" variant="subtle" onClick={handleCreate}>
         <CreateIcon /> Create role
       </IconButton>
 

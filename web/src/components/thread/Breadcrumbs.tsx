@@ -5,7 +5,6 @@ import {
   Thread,
   ThreadReference,
 } from "@/api/openapi-schema";
-
 import { BreadcrumbIcon } from "@/components/ui/icons/Breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
@@ -54,13 +53,12 @@ export function Breadcrumbs({ thread }: Props) {
   return (
     <HStack
       w="full"
-      color="fg.subtle"
+      color="text.muted"
       overflowX="scroll"
       pt="scrollGutter"
       mt="-scrollGutter"
     >
       <LinkButton
-        size="xs"
         variant="subtle"
         flexShrink="0"
         minW="min"
@@ -89,7 +87,6 @@ function BreadcrumbButton({ breadcrumb }: { breadcrumb: Breadcrumb }) {
       // TODO: Explore using the CategoryBadge component with subtle colour.
       return (
         <LinkButton
-          size="xs"
           variant="subtle"
           flexShrink="0"
           maxW="64"
@@ -103,7 +100,6 @@ function BreadcrumbButton({ breadcrumb }: { breadcrumb: Breadcrumb }) {
     case "thread":
       return (
         <LinkButton
-          size="xs"
           variant="subtle"
           flexShrink="0"
           maxW="64"

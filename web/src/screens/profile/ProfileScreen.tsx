@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from "date-fns";
 
-import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { MemberOptionsMenu } from "@/components/member/MemberOptions/MemberOptionsMenu";
@@ -15,16 +15,11 @@ import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
 import { Unready } from "@/components/site/Unready";
+import { CardBox } from "@/components/ui/card-box";
 import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
-import {
-  Box,
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  styled,
-} from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
@@ -115,18 +110,18 @@ export function ProfileScreen(props: Props) {
           </Flex>
 
           <HStack gap="1">
-            <styled.p color="fg.muted" wordBreak="keep-all">
+            <Text variant="supporting" wordBreak="keep-all">
               Joined{" "}
               <styled.time textWrap="nowrap">
                 {formatDistanceToNow(new Date(profile.createdAt), {
                   addSuffix: true,
                 })}
               </styled.time>
-            </styled.p>
+            </Text>
             <DotSeparator />
             <HStack
               gap="1"
-              color="fg.subtle"
+              color="text.muted"
               wordBreak="keep-all"
               textWrap="nowrap"
             >
@@ -138,11 +133,11 @@ export function ProfileScreen(props: Props) {
           </HStack>
 
           {isEmpty && !isEditing ? (
-            <styled.p color="fg.subtle" fontStyle="italic">
+            <Text variant="supporting" fontStyle="italic">
               This profile has no bio yet...
-            </styled.p>
+            </Text>
           ) : (
-            <ContentFormField<Form>
+            <ContentComposerField<Form>
               control={form.control}
               name="bio"
               initialValue={profile.bio}
@@ -153,11 +148,11 @@ export function ProfileScreen(props: Props) {
 
           {signaturesEnabled &&
             (isSignatureEmpty && !isEditing ? (
-              <styled.p color="fg.subtle" fontStyle="italic">
+              <Text variant="supporting" fontStyle="italic">
                 This profile has no signature yet...
-              </styled.p>
+              </Text>
             ) : (
-              <ContentFormField<Form>
+              <ContentComposerField<Form>
                 control={form.control}
                 name="signature"
                 initialValue={profile.signature ?? ""}

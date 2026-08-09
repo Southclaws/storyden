@@ -1,7 +1,9 @@
+"use client";
+
 import { createListCollection } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type MouseEvent, useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useSWRConfig } from "swr";
 import { z } from "zod";
 
@@ -38,34 +40,27 @@ import {
   RobotWorkspaceProvider,
 } from "@/api/openapi-schema";
 import { RobotMCPOnboardingModal } from "@/components/robots/RobotMCPOnboardingModal";
-import { RobotModelComboboxField } from "@/components/robots/RobotModelComboboxField";
 import { EmptyState } from "@/components/site/EmptyState";
 import { InfoTip } from "@/components/site/InfoTip";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Unready } from "@/components/site/Unready";
-import { FormControl } from "@/components/ui/FormControl";
-import { FormErrorText } from "@/components/ui/FormErrorText";
-import { FormLabel } from "@/components/ui/FormLabel";
 import * as Alert from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Heading } from "@/components/ui/heading";
-import { CheckIcon } from "@/components/ui/icons/Check";
-import { SelectIcon } from "@/components/ui/icons/Select";
+import { CardBox } from "@/components/ui/card-box";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { ComboboxField } from "@/components/ui/combobox";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
-import * as Select from "@/components/ui/select";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { SelectField } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import { useSettingsMutation } from "@/lib/settings/mutation";
-import {
-  CardBox,
-  HStack,
-  LStack,
-  VStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { timestamp } from "@/utils/date";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -111,47 +106,49 @@ export function RobotsSettingsScreen() {
 
   return (
     <LStack gap="4">
-      <CardBox className={lstack()} gap="4">
-        <WStack justifyContent="space-between">
-          <Heading size="md">Robot settings</Heading>
+      <LStack gap="4">
+        <LStack gap="1">
+          <WStack justifyContent="space-between">
+            <PageHeading>Robot settings</PageHeading>
 
-          {available ? (
-            <Badge
-              size="sm"
-              borderColor="border.success"
-              backgroundColor="bg.success"
-              color="fg.success"
-            >
-              Available
-            </Badge>
-          ) : enabledProviders.length > 0 ? (
-            <Badge
-              size="sm"
-              borderColor="border.warning"
-              backgroundColor="bg.warning"
-              color="fg.warning"
-            >
-              Setup incomplete
-            </Badge>
-          ) : (
-            <Badge
-              size="sm"
-              borderColor="border.muted"
-              backgroundColor="bg.muted"
-              color="fg.muted"
-            >
-              Disabled
-            </Badge>
-          )}
-        </WStack>
+            {available ? (
+              <Badge
+                size="sm"
+                borderColor="status.success.border"
+                backgroundColor="status.success.surface"
+                color="status.success.content"
+              >
+                Available
+              </Badge>
+            ) : enabledProviders.length > 0 ? (
+              <Badge
+                size="sm"
+                borderColor="status.warning.border"
+                backgroundColor="status.warning.surface"
+                color="status.warning.content"
+              >
+                Setup incomplete
+              </Badge>
+            ) : (
+              <Badge
+                size="sm"
+                borderColor="border.strong"
+                backgroundColor="background.controlDisabled"
+                color="text.subtle"
+              >
+                Disabled
+              </Badge>
+            )}
+          </WStack>
 
-        <Text color="fg.muted" fontSize="sm">
-          Configure model providers for Robots. Robots become available after at
-          least one provider is enabled and a default model is selected.
-        </Text>
+          <Text variant="supporting">
+            Configure model providers for Robots. Robots become available after
+            at least one provider is enabled and a default model is selected.
+          </Text>
+        </LStack>
 
         {enabledProviders.length > 0 && !defaultModel && (
-          <Text color="fg.warning" fontSize="xs">
+          <Text variant="metadata" color="status.warning.content">
             Robots are enabled, but no default model has been selected yet.
           </Text>
         )}
@@ -173,7 +170,7 @@ export function RobotsSettingsScreen() {
             ))}
           </LStack>
         )}
-      </CardBox>
+      </LStack>
 
       <RobotMCPServersSettings />
     </LStack>
@@ -187,21 +184,16 @@ function RobotMCPServersSettings() {
   const servers = serversQuery.data?.servers ?? [];
 
   return (
-    <CardBox className={lstack()} gap="4">
+    <LStack gap="4">
       <WStack justifyContent="space-between">
         <LStack gap="1">
-          <Heading size="md">MCP servers</Heading>
-          <Text color="fg.muted" fontSize="sm">
+          <SectionHeading>MCP servers</SectionHeading>
+          <Text variant="supporting">
             Connect external MCP servers and add their tools to Robots.
           </Text>
         </LStack>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={disclosure.onOpen}
-        >
+        <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
           Connect
         </Button>
       </WStack>
@@ -234,7 +226,7 @@ function RobotMCPServersSettings() {
         onOpen={disclosure.onOpen}
         onOpenChange={disclosure.onOpenChange}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -253,19 +245,14 @@ function RobotWorkspaceTemplatesSection({
     <LStack gap="3" pt="3">
       <WStack justifyContent="space-between" alignItems="start">
         <LStack gap="1">
-          <Heading size="md">Workspace templates</Heading>
-          <Text color="fg.muted" fontSize="sm">
+          <SectionHeading>Workspace templates</SectionHeading>
+          <Text variant="supporting">
             Create reusable workspace templates. Robot sessions create live
             instances from these templates when they mount a workspace.
           </Text>
         </LStack>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={disclosure.onOpen}
-        >
+        <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
           Create
         </Button>
       </WStack>
@@ -348,21 +335,27 @@ function RobotWorkspaceTemplateItem({
         <WStack justifyContent="space-between" alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{workspace.name}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {workspace.name}
+              </Text>
               <Badge
                 size="sm"
-                borderColor="border.info"
-                backgroundColor="bg.info"
-                color="fg.info"
+                borderColor="status.info.border"
+                backgroundColor="status.info.surface"
+                color="status.info.content"
               >
                 {workspace.provider}
               </Badge>
               {workspace.allow_untrusted_commands ? (
                 <Badge
                   size="sm"
-                  borderColor="border.warning"
-                  backgroundColor="bg.warning"
-                  color="fg.warning"
+                  borderColor="status.warning.border"
+                  backgroundColor="status.warning.surface"
+                  color="status.warning.content"
                 >
                   Shell
                 </Badge>
@@ -370,21 +363,16 @@ function RobotWorkspaceTemplateItem({
             </HStack>
 
             {workspace.description ? (
-              <Text color="fg.muted" fontSize="xs">
-                {workspace.description}
-              </Text>
+              <Text variant="metadata">{workspace.description}</Text>
             ) : (
-              <Text color="fg.muted" fontSize="xs">
-                No description.
-              </Text>
+              <Text variant="metadata">No description.</Text>
             )}
           </LStack>
 
           <Button
             type="button"
             variant="ghost"
-            colorPalette="red"
-            size="xs"
+            intent="destructive"
             onClick={handleDelete}
           >
             Delete
@@ -427,21 +415,17 @@ function RobotWorkspaceInstancesDrawer({
     <ModalDrawer title={workspace.name} isOpen={isOpen} onClose={onClose}>
       <LStack gap="4">
         <LStack gap="1">
-          <Text color="fg.muted" fontSize="sm">
+          <Text variant="supporting">
             Live workspace instances created from this template.
           </Text>
-          <Text color="fg.muted" fontSize="xs">
-            Template ID: {workspace.id}
-          </Text>
+          <Text variant="metadata">Template ID: {workspace.id}</Text>
         </LStack>
 
         {!data ? (
           <Unready error={error} />
         ) : instances.length === 0 ? (
           <CardBox>
-            <Text color="fg.muted" fontSize="sm">
-              No live instances yet.
-            </Text>
+            <Text variant="supporting">No live instances yet.</Text>
           </CardBox>
         ) : (
           <LStack gap="2">
@@ -467,22 +451,24 @@ function RobotWorkspaceInstanceRow({
     <CardBox>
       <LStack gap="2">
         <WStack justifyContent="space-between">
-          <Heading size="xs">{instance.id}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {instance.id}
+          </Text>
           <Badge
             size="sm"
-            borderColor="border.info"
-            backgroundColor="bg.info"
-            color="fg.info"
+            borderColor="status.info.border"
+            backgroundColor="status.info.surface"
+            color="status.info.content"
           >
             {instance.provider}
           </Badge>
         </WStack>
 
         <LStack gap="1">
-          <Text color="fg.muted" fontSize="xs">
+          <Text variant="metadata">
             Created {timestamp(instance.createdAt, false)}
           </Text>
-          <Text color="fg.muted" fontSize="xs">
+          <Text variant="metadata">
             Updated {timestamp(instance.updatedAt, false)}
           </Text>
         </LStack>
@@ -594,55 +580,25 @@ function RobotWorkspaceCreateForm({ onClose }: { onClose: () => void }) {
 
       <FormControl>
         <FormLabel>Provider</FormLabel>
-        <Controller
+        <SelectField
           control={form.control}
           name="provider"
-          render={({ field }) => (
-            <Select.Root
-              collection={providerCollection}
-              value={field.value ? [field.value] : []}
-              onValueChange={({ value }) => field.onChange(value[0] ?? "")}
-              positioning={{ sameWidth: true }}
-              disabled={providers.length === 0}
-            >
-              <Select.Control>
-                <Select.Trigger w="full">
-                  <Select.ValueText placeholder="Select a provider" />
-                  <SelectIcon />
-                </Select.Trigger>
-              </Select.Control>
-              <Select.Positioner>
-                <Select.Content>
-                  {providerCollection.items.map((item) => (
-                    <Select.Item key={item.value} item={item}>
-                      <Select.ItemText>{item.label}</Select.ItemText>
-                      <Select.ItemIndicator>
-                        <CheckIcon />
-                      </Select.ItemIndicator>
-                    </Select.Item>
-                  ))}
-                </Select.Content>
-              </Select.Positioner>
-            </Select.Root>
-          )}
+          collection={providerCollection}
+          placeholder="Select a provider"
+          positioning={{ sameWidth: true }}
+          disabled={providers.length === 0}
         />
         {providersQuery.error ? <Unready error={providersQuery.error} /> : null}
         <FormErrorText>{form.formState.errors.provider?.message}</FormErrorText>
       </FormControl>
 
-      <Controller
+      <CheckboxField
         control={form.control}
         name="allow_untrusted_commands"
-        render={({ field }) => (
-          <Checkbox
-            size="sm"
-            checked={!!field.value}
-            onCheckedChange={({ checked }) => field.onChange(checked === true)}
-          >
-            Allow untrusted commands
-          </Checkbox>
-        )}
-      />
+        size="sm"
+      >
+        Allow untrusted commands
+      </CheckboxField>
 
       <WStack justifyContent="end">
         <Button type="button" variant="ghost" onClick={onClose}>
@@ -711,7 +667,13 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
         <WStack alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{server.name}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {server.name}
+              </Text>
               <Badge size="sm">{server.enabled ? "Enabled" : "Disabled"}</Badge>
               {server.has_bearer_token && <Badge size="sm">Bearer</Badge>}
               {server.oauth_remote_connection_id && (
@@ -720,7 +682,7 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
                 </Badge>
               )}
             </HStack>
-            <Text color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <Text variant="metadata" wordBreak="break-word">
               {server.endpoint_url}
             </Text>
           </LStack>
@@ -728,7 +690,6 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           <HStack gap="2">
             <Button
               type="button"
-              size="xs"
               variant="outline"
               loading={isRefreshing}
               onClick={refresh}
@@ -737,9 +698,8 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
             </Button>
             <Button
               type="button"
-              size="xs"
               variant="ghost"
-              colorPalette="red"
+              intent="destructive"
               loading={isDeleting}
               onClick={remove}
             >
@@ -748,12 +708,10 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           </HStack>
         </WStack>
 
-        <Text color="fg.muted" fontSize="xs">
-          {server.tools.length} tools cached.
-        </Text>
+        <Text variant="metadata">{server.tools.length} tools cached.</Text>
 
         {server.last_error && (
-          <Text color="fg.error" fontSize="xs">
+          <Text variant="metadata" color="status.danger.content">
             {server.last_error}
           </Text>
         )}
@@ -801,11 +759,17 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
         <WStack justifyContent="space-between" alignItems="start">
           <LStack gap="1">
             <HStack gap="2" flexWrap="wrap">
-              <Heading size="xs">{provider.provider}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {provider.provider}
+              </Text>
               <ProviderStatusBadge provider={provider} />
             </HStack>
 
-            <Text color="fg.muted" fontSize="xs">
+            <Text variant="metadata">
               {provider.models.length} models available. Last refresh:{" "}
               {lastRefreshed}.
             </Text>
@@ -813,28 +777,18 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
 
           <HStack gap="2">
             {provider.settings.has_api_key && (
-              <Button
-                type="button"
-                size="xs"
-                variant="outline"
-                onClick={refreshModels}
-              >
+              <Button type="button" variant="outline" onClick={refreshModels}>
                 Refresh
               </Button>
             )}
-            <Button
-              type="button"
-              variant="subtle"
-              size="xs"
-              onClick={disclosure.onOpen}
-            >
+            <Button type="button" variant="subtle" onClick={disclosure.onOpen}>
               Configure
             </Button>
           </HStack>
         </WStack>
 
         {provider.cache.last_error && (
-          <Text color="fg.error" fontSize="xs">
+          <Text variant="metadata" color="status.danger.content">
             {provider.cache.last_error}
           </Text>
         )}
@@ -855,9 +809,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
     return (
       <Badge
         size="sm"
-        borderColor="border.success"
-        backgroundColor="bg.success"
-        color="fg.success"
+        borderColor="status.success.border"
+        backgroundColor="status.success.surface"
+        color="status.success.content"
       >
         Enabled
       </Badge>
@@ -868,9 +822,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
     return (
       <Badge
         size="sm"
-        borderColor="border.info"
-        backgroundColor="bg.info"
-        color="fg.info"
+        borderColor="status.info.border"
+        backgroundColor="status.info.surface"
+        color="status.info.content"
       >
         Configured
       </Badge>
@@ -880,9 +834,9 @@ function ProviderStatusBadge({ provider }: { provider: RobotProviderStatus }) {
   return (
     <Badge
       size="sm"
-      borderColor="border.muted"
-      backgroundColor="bg.muted"
-      color="fg.muted"
+      borderColor="border.strong"
+      backgroundColor="background.controlDisabled"
+      color="text.subtle"
     >
       Disabled
     </Badge>
@@ -1041,19 +995,9 @@ function RobotProviderConfigurationForm({
         </Alert.Root>
       )}
 
-      <Controller
-        control={form.control}
-        name="enabled"
-        render={({ field }) => (
-          <Checkbox
-            size="sm"
-            checked={!!field.value}
-            onCheckedChange={({ checked }) => field.onChange(checked === true)}
-          >
-            Enable provider
-          </Checkbox>
-        )}
-      />
+      <CheckboxField control={form.control} name="enabled" size="sm">
+        Enable provider
+      </CheckboxField>
 
       <FormControl>
         <FormLabel>API key</FormLabel>
@@ -1149,43 +1093,50 @@ function GlobalDefaultModelForm({
 
   return (
     <styled.form w="full" onSubmit={onSubmit}>
-      <WStack justifyContent="space-between" alignItems="end">
-        <FormControl>
-          <HStack gap="1">
-            <FormLabel mb="0">Default model</FormLabel>
-            <InfoTip title="Default Robot model">
-              The model used by the Robot Builder. Other Robots can have their
-              own models configured.
-            </InfoTip>
-          </HStack>
-          <RobotModelComboboxField
+      <FormControl>
+        <HStack gap="1">
+          <FormLabel mb="0">Default model</FormLabel>
+          <InfoTip title="Default Robot model">
+            The model used by the Robot Builder. Other Robots can have their own
+            models configured.
+          </InfoTip>
+        </HStack>
+
+        <WStack alignItems="center">
+          <ComboboxField
             control={form.control}
             name="default_model"
-            models={models}
+            items={models.map((model) => ({
+              label: model.ref,
+              value: model.ref,
+            }))}
             placeholder={
               disabled ? "Configure a provider first" : "Select default model"
             }
+            ariaLabel="Select default model"
             disabled={disabled}
           />
-          {helperText && (
-            <Text color="fg.warning" fontSize="xs">
-              {helperText}
-            </Text>
-          )}
-          <FormErrorText>
-            {form.formState.errors.default_model?.message}
-          </FormErrorText>
-        </FormControl>
 
-        <Button
-          type="submit"
-          size="sm"
-          loading={form.formState.isSubmitting}
-          disabled={disabled || !form.formState.isDirty}
-        >
-          Save
-        </Button>
-      </WStack>
+          <Button
+            type="submit"
+            size="sm"
+            flexShrink="0"
+            loading={form.formState.isSubmitting}
+            disabled={disabled || !form.formState.isDirty}
+          >
+            Save
+          </Button>
+        </WStack>
+
+        {helperText && (
+          <Text variant="metadata" color="status.warning.content">
+            {helperText}
+          </Text>
+        )}
+        <FormErrorText>
+          {form.formState.errors.default_model?.message}
+        </FormErrorText>
+      </FormControl>
     </styled.form>
   );
 }

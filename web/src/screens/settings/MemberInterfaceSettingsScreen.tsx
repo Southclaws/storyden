@@ -1,3 +1,5 @@
+"use client";
+
 import { useSession } from "@/auth";
 import { MemberInterfaceSettings } from "@/components/settings/MemberInterfaceSettings/MemberInterfaceSettings";
 

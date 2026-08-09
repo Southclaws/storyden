@@ -1,10 +1,12 @@
-import { BubbleMenu, Editor } from "@tiptap/react";
+import { Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 
 import { Button } from "@/components/ui/button";
 import { CardIcon } from "@/components/ui/icons/Card";
 import { LinkIcon } from "@/components/ui/icons/Link";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
 
 import { linkPasteMenuKey } from "./plugins/LinkPasteMenuPlugin";
 
@@ -58,74 +60,48 @@ export function LinkPasteMenu({ editor }: Props) {
         const menuState = linkPasteMenuKey.getState(editor.state);
         return menuState?.isVisible ?? false;
       }}
-      tippyOptions={{
+      options={{
         placement: "bottom-start",
-        maxWidth: "100%",
+        offset: { mainAxis: 4 },
+        flip: {
+          fallbackPlacements: ["top-start"],
+          boundary: editor.view.dom,
+          padding: 8,
+        },
+        shift: {
+          boundary: editor.view.dom,
+          crossAxis: true,
+          padding: {
+            top: 0,
+            right: 0,
+            bottom: -40,
+            left: 0,
+          },
+          rootBoundary: "viewport",
+        },
         onHide: () => {
           dismissMenu();
-        },
-        popperOptions: {
-          modifiers: [
-            {
-              name: "offset",
-              options: {
-                offset: [0, 4],
-              },
-            },
-            {
-              name: "flip",
-              options: {
-                fallbackPlacements: ["top-start"],
-                boundary: editor.view.dom,
-                padding: 8,
-              },
-            },
-            {
-              name: "preventOverflow",
-              options: {
-                boundary: editor.view.dom,
-                altAxis: true,
-                padding: {
-                  top: 0,
-                  right: 0,
-                  bottom: -40,
-                  left: 0,
-                },
-                rootBoundary: "viewport",
-                tether: false,
-              },
-            },
-          ],
         },
       }}
       className={css({
         zIndex: "popover",
         borderRadius: "md",
-        backgroundColor: "bg.subtle/80",
-        backdropBlur: "frosted",
+        background: "background.overlay",
+        backdropBlur: "subtle",
         backdropFilter: "auto",
-        boxShadow: "md",
+        borderColor: "border.strong",
+        borderWidth: "thin",
+        boxShadow: "floating",
+        color: "text.default",
         padding: "1",
       })}
     >
-      <styled.p color="fg.muted" fontSize="sm">
-        Show link as
-      </styled.p>
+      <Text variant="supporting">Show link as</Text>
       <HStack gap="1">
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={handleLinkChoice}
-        >
+        <Button type="button" variant="subtle" onClick={handleLinkChoice}>
           <LinkIcon /> Text
         </Button>
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          onClick={handleCardChoice}
-        >
+        <Button type="button" variant="subtle" onClick={handleCardChoice}>
           <CardIcon /> Preview
         </Button>
       </HStack>

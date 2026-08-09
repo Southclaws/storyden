@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDuration, intervalToDuration } from "date-fns";
-import { register } from "node:module";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -27,16 +26,18 @@ export function formatSeconds(seconds: number): string {
 }
 
 export const FormSchema = z.object({
-  rate_limit: z.number().default(DEFAULT_RATE_LIMIT),
-  rate_limit_period: z.number().default(DEFAULT_RATE_LIMIT_PERIOD),
-  rate_limit_bucket: z.number().default(DEFAULT_RATE_LIMIT_BUCKET),
-  rate_limit_guest_cost: z.number().default(DEFAULT_RATE_LIMIT_GUEST_COST),
-  cost_overrides: z.record(z.string(), z.number()).default({}),
-  client_ip_mode: z
-    .enum(["remote_addr", "single_header", "xff_trusted_proxies"])
-    .default("remote_addr"),
-  client_ip_header: z.string().default(DEFAULT_CLIENT_IP_HEADER),
-  trusted_proxy_cidrs: z.string().default(""),
+  rate_limit: z.number(),
+  rate_limit_period: z.number(),
+  rate_limit_bucket: z.number(),
+  rate_limit_guest_cost: z.number(),
+  cost_overrides: z.record(z.string(), z.number()),
+  client_ip_mode: z.enum([
+    "remote_addr",
+    "single_header",
+    "xff_trusted_proxies",
+  ]),
+  client_ip_header: z.string(),
+  trusted_proxy_cidrs: z.string(),
 });
 export type Form = z.infer<typeof FormSchema>;
 

@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 
 import { Role } from "@/api/openapi-schema";
-import { Heading } from "@/components/ui/heading";
+import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
 import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
-import { CardBox, HStack, WStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 
 import { Badge } from "../ui/badge";
 
@@ -27,7 +28,7 @@ export function RoleCard({ role, editable, dragHandle }: Props) {
   return (
     <CardBox
       className={css({
-        borderColor: "colorPalette.fg",
+        borderColor: "colorPalette.6",
         display: "flex",
         gap: "2",
       })}
@@ -38,7 +39,9 @@ export function RoleCard({ role, editable, dragHandle }: Props) {
       }}
     >
       <WStack alignItems="flex-start">
-        <Heading>{role.name}</Heading>
+        <Text variant="supporting" color="text.default" fontWeight="semibold">
+          {role.name}
+        </Text>
 
         <HStack>
           {isDefault && (

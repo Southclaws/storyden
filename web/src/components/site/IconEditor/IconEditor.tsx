@@ -16,14 +16,17 @@ export function IconEditor(props: Props) {
     scale,
     position,
     onPositionChange,
+    onImageChange,
     onFileChange,
     onSave,
     saving,
     file,
     isDirty,
+    preview,
   } = useIconEditor(props);
 
   const { showPreviews } = props;
+  const previewSize = avatarSize("sm");
 
   return (
     <LStack
@@ -34,19 +37,15 @@ export function IconEditor(props: Props) {
       borderRadius="xl"
     >
       {showPreviews && (
-        <HStack pl="2" pt="2" color="fg.subtle">
-          <AvatarEditor
-            image={file}
-            style={{
-              borderRadius: "100%",
-              ...avatarSize("sm"),
-            }}
-            border={0}
-            color={[255, 255, 255, 1]}
-            scale={scale}
-            position={position}
-            onPositionChange={onPositionChange}
-          />
+        <HStack pl="2" pt="2" color="text.muted">
+          <Box
+            overflow="hidden"
+            borderRadius="full"
+            backgroundColor="background.inset"
+            style={previewSize}
+          >
+            {preview && <styled.img src={preview} alt="" w="full" h="full" />}
+          </Box>
           <ArrowLeftIcon width="4" />
           <p>How it&apos;ll look on posts</p>
         </HStack>
@@ -64,6 +63,8 @@ export function IconEditor(props: Props) {
           <AvatarEditor
             ref={ref}
             image={file}
+            width={250}
+            height={250}
             style={
               {
                 width: "100%",
@@ -78,6 +79,7 @@ export function IconEditor(props: Props) {
             scale={scale}
             position={position}
             onPositionChange={onPositionChange}
+            onImageChange={onImageChange}
           />
         </Box>
 

@@ -1,4 +1,3 @@
-import chroma from "chroma-js";
 import Link from "next/link";
 
 import { TagReference } from "@/api/openapi-schema";
@@ -6,7 +5,7 @@ import { css, cx } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 import { badge } from "@/styled-system/recipes";
 
-import { BadgeProps } from "../ui/badge";
+import { BadgeProps, badgeColourPalette, badgeColours } from "../ui/badge";
 
 type TagBadgeProps =
   | {
@@ -29,12 +28,6 @@ export type Props = BadgeProps &
 // tags are always lowercase, which means most ascenders and descenders are
 // slightly mis-aligned to the optical center of the badge.
 const OPTICAL_ALIGNMENT_ADJUSTMENT = 0.5;
-
-const badgeStyles = css({
-  bgColor: "colorPalette.bg",
-  borderColor: "colorPalette.border",
-  color: "colorPalette.fg",
-});
 
 export function TagBadge({
   type,
@@ -77,13 +70,10 @@ export function TagBadge({
     </>
   );
 
-  const tagBadgeStyles = cx(
-    badge({
-      size: "sm",
-      ...props,
-    }),
-    badgeStyles,
-  );
+  const tagBadgeStyles = badge({
+    size: "sm",
+    ...props,
+  });
 
   if (type === "button") {
     const shouldShowHighlightStyles = highlighted !== undefined;
@@ -126,23 +116,5 @@ export function TagBadge({
 }
 
 function badgeColourCSS(c: string) {
-  const { bg, bo, fg } = badgeColours(c);
-
-  return {
-    "--colors-color-palette-fg": fg,
-    "--colors-color-palette-border": bo,
-    "--colors-color-palette-bg": bg,
-  } as React.CSSProperties;
-}
-
-function badgeColours(c: string) {
-  const colour = chroma(c);
-
-  const hue = colour.lch()[2];
-
-  const bg = chroma(0.95, 0.1, hue, "oklch").css();
-  const bo = chroma(0.85, 0.2, hue, "oklch").css();
-  const fg = chroma(0.55, 0.2, hue, "oklch").css();
-
-  return { bg, bo, fg };
+  return badgeColourPalette(badgeColours(c));
 }

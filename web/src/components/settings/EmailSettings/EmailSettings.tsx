@@ -2,10 +2,11 @@ import { useState } from "react";
 
 import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { CardBox, LStack, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack } from "@/styled-system/jsx";
 
 import { EmailCard } from "./EmailCard";
 import { EmailCreateForm } from "./EmailCreateForm";
@@ -46,32 +47,27 @@ export function EmailSettings(props: Props) {
   const { data, handlers } = useEmailSettings(props);
 
   return (
-    <CardBox className={lstack()} gap="4">
-      <LStack>
-        <Heading size="md">Email settings</Heading>
-        <p>
+    <LStack gap="4">
+      <LStack gap="1">
+        <PageHeading>Email settings</PageHeading>
+        <Text variant="supporting">
           Manage your email addresses here. You can add multiple email addresses
-          and use them to log in to your account. Emails are also used for
-          newsletters, notifications and other communications.
-        </p>
+          and use them to log in to your account.
+        </Text>
       </LStack>
 
       <LStack>
         <WStack>
-          <Heading size="sm">Email addresses</Heading>
-          <Button
-            size="xs"
-            variant="subtle"
-            onClick={handlers.handleStartNewEmail}
-          >
+          <SectionHeading>Email addresses</SectionHeading>
+          <Button variant="subtle" onClick={handlers.handleStartNewEmail}>
             <AddIcon /> new email address
           </Button>
         </WStack>
 
         {data.emails.length === 0 ? (
-          <styled.p color="fg.muted">
+          <Text variant="supporting">
             You do not have any email addresses associated with your account.
-          </styled.p>
+          </Text>
         ) : (
           data.emails.map((email) => <EmailCard key={email.id} email={email} />)
         )}
@@ -83,6 +79,6 @@ export function EmailSettings(props: Props) {
           />
         )}
       </LStack>
-    </CardBox>
+    </LStack>
   );
 }

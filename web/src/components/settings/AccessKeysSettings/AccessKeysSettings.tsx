@@ -4,10 +4,12 @@ import { AccessKey, AccessKeyList } from "@/api/openapi-schema";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 import { useDisclosure } from "@/utils/useDisclosure";
 
 import { CreateAccessKeyModal } from "./CreateAccessKeyModal";
@@ -26,28 +28,27 @@ export function AccessKeysSettings({ keys }: Props) {
 
   return (
     <>
-      <CardBox className={lstack()} gap="8">
-        <LStack>
-          <Heading size="md">Access keys</Heading>
-
-          <p>
+      <LStack gap="4">
+        <LStack gap="1">
+          <PageHeading>Access keys</PageHeading>
+          <Text variant="supporting">
             Access keys allow you to authenticate API requests. They share the
             same permissions as your account. If your account receives new
             roles, your access keys will inherit the permissions assigned to
             those roles.
-          </p>
+          </Text>
         </LStack>
 
         <LStack>
-          <WStack alignItems="center" color="fg.muted">
+          <WStack alignItems="center" color="text.subtle">
             {hasInactive ? (
-              <styled.p>
+              <Text variant="metadata">
                 {totalKeys} access keys, {totalActiveKeys} active.
-              </styled.p>
+              </Text>
             ) : (
-              <styled.p>{keys.length} access keys.</styled.p>
+              <Text variant="metadata">{keys.length} access keys.</Text>
             )}
-            <Button size="xs" variant="subtle" onClick={createModal.onOpen}>
+            <Button variant="subtle" onClick={createModal.onOpen}>
               <AddIcon />
               New
             </Button>
@@ -55,7 +56,7 @@ export function AccessKeysSettings({ keys }: Props) {
 
           <AccessKeyItemList keys={keys} />
         </LStack>
-      </CardBox>
+      </LStack>
 
       <CreateAccessKeyModal
         isOpen={createModal.isOpen}
@@ -110,33 +111,29 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
     <li className={cardBox()}>
       <LStack>
         <WStack>
-          <Heading size="sm">{accessKey.name}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {accessKey.name}
+          </Text>
 
           {inactiveStatus === undefined ? (
             <HStack>
               {isConfirming ? (
                 <>
                   <Button
-                    size="xs"
                     variant="subtle"
-                    bgColor="bg.destructive"
+                    bgColor="status.danger.surface"
                     onClick={handleConfirmAction}
                   >
                     Confirm Revoke
                   </Button>
-                  <Button
-                    size="xs"
-                    variant="outline"
-                    onClick={handleCancelAction}
-                  >
+                  <Button variant="outline" onClick={handleCancelAction}>
                     Cancel
                   </Button>
                 </>
               ) : (
                 <Button
-                  size="xs"
                   variant="outline"
-                  bgColor="bg.destructive"
+                  bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
                 >
                   Revoke
@@ -149,9 +146,9 @@ function AccessKeyItem({ accessKey, onRevoke }: AccessKeyItemProps) {
         </WStack>
 
         <WStack flexWrap="wrap">
-          <styled.p fontSize="xs">
+          <Text variant="metadata">
             Created: <time>{formatDate(accessKey.createdAt, "PPpp")}</time>
-          </styled.p>
+          </Text>
 
           {accessKey.expires_at && (
             <Badge gap="1">

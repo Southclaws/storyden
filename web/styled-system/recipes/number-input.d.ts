@@ -4,13 +4,13 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface NumberInputVariant {
   /**
- * @default "md"
- */
-size: "sm" | "md" | "lg" | "xl"
-/**
  * @default "outline"
  */
 variant: "outline" | "ghost"
+/**
+ * @default "sm"
+ */
+size: "sm" | "md" | "lg"
 }
 
 type NumberInputVariantMap = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { BiometricIcon } from "@/components/ui/icons/Biometric";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
@@ -11,9 +11,7 @@ export function RegisterHandleForm(props: Props) {
   const {
     form: {
       register,
-      isWebauthnEnabled,
       handlePassword,
-      handleWebauthn,
       errors,
     },
   } = useRegisterHandleForm(props);
@@ -38,9 +36,7 @@ export function RegisterHandleForm(props: Props) {
         required
         {...register("identifier")}
       />
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.identifier?.message}
-      </styled.p>
+      <FormErrorText>{errors.identifier?.message}</FormErrorText>
       <Flex alignItems="center" gap="2">
         <Input
           type="password"
@@ -51,34 +47,12 @@ export function RegisterHandleForm(props: Props) {
           autoComplete="new-password"
           {...register("token")}
         />
-        {props.webauthn && isWebauthnEnabled && (
-          <>
-            <styled.span>or</styled.span>
-
-            <Button
-              w="full"
-              variant="ghost"
-              size="sm"
-              type="button"
-              onClick={handleWebauthn}
-            >
-              <styled.span display="flex" gap="1" alignItems="center" px="4">
-                device
-                <BiometricIcon />
-              </styled.span>
-            </Button>
-          </>
-        )}
       </Flex>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.token?.message}
-      </styled.p>
+      <FormErrorText>{errors.token?.message}</FormErrorText>
       <Button type="submit" w="full" onClick={handlePassword}>
         Register
       </Button>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.root?.message}
-      </styled.p>
+      <FormErrorText>{errors.root?.message}</FormErrorText>
     </styled.form>
   );
 }

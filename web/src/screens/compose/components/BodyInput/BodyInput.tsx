@@ -1,33 +1,27 @@
-import { PropsWithChildren } from "react";
-import { Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 import { Asset } from "@/api/openapi-schema";
+import { ContentComposerField } from "@/components/content/ContentComposer";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 
-import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
-import { FormControl } from "@/components/ui/form/FormControl";
-
-import { useBodyInput } from "./useBodyInput";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 type Props = {
   onAssetUpload: (asset: Asset) => void;
 };
 
-export function BodyInput({ onAssetUpload }: PropsWithChildren<Props>) {
-  const { control } = useBodyInput();
+export function BodyInput({ onAssetUpload }: Props) {
+  const form = useFormContext<FormShape>();
 
   return (
     <FormControl h="full">
-      <Controller
-        render={({ field, formState }) => (
-          <ContentComposer
-            onChange={field.onChange}
-            onAssetUpload={onAssetUpload}
-            initialValue={formState.defaultValues?.["body"]}
-          />
-        )}
-        control={control}
+      <ContentComposerField
+        onAssetUpload={onAssetUpload}
+        control={form.control}
         name="body"
       />
+      <FormErrorText>{form.formState.errors.body?.message}</FormErrorText>
     </FormControl>
   );
 }

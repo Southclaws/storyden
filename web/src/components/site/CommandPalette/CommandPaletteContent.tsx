@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { datagraphMatches } from "@/api/openapi-client/datagraph";
 import { DatagraphMatch } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { Spinner } from "@/components/ui/Spinner";
 import { IconButton } from "@/components/ui/icon-button";
 import { AdminIcon } from "@/components/ui/icons/Admin";
 import { CloseIcon } from "@/components/ui/icons/Close";
@@ -15,6 +14,7 @@ import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { HomeIcon } from "@/components/ui/icons/Home";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
+import { Spinner } from "@/components/ui/spinner";
 import { HStack, LStack } from "@/styled-system/jsx";
 
 import "./styles.css";

@@ -18,7 +18,7 @@ export function AccountPurgeTrigger({ accountId, handle }: Props) {
 
   return (
     <>
-      <Button size="xs" variant="outline" colorPalette="red" onClick={onOpen}>
+      <Button variant="outline" intent="destructive" onClick={onOpen}>
         <WarningIcon />
         Purge Content
       </Button>

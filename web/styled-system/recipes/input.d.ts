@@ -4,13 +4,13 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface InputVariant {
   /**
- * @default "md"
+ * @default "sm"
  */
-size: "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+size: "sm" | "md" | "lg"
 /**
  * @default "outline"
  */
-variant: "outline" | "ghost"
+variant: "outline" | "ghost" | "inset"
 }
 
 type InputVariantMap = {
@@ -20,7 +20,7 @@ type InputVariantMap = {
 
 
 export type InputVariantProps = {
-  [key in keyof InputVariant]?: ConditionalValue<InputVariant[key]> | undefined
+  [key in keyof InputVariant]?: InputVariant[key] | undefined
 }
 
 export interface InputRecipe {

@@ -1,35 +1,26 @@
-import { Controller } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { HeadingInput } from "@/components/ui/heading-input";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { HeadingInputField } from "@/components/ui/heading-input";
 
-import { useTitleInput } from "./useTitleInput";
+import { FormShape } from "../ComposeForm/useComposeForm";
 
 export function TitleInput() {
-  const { control, fieldError } = useTitleInput();
+  const form = useFormContext<FormShape>();
 
   return (
-    <>
-      <FormControl>
-        <Controller
-          render={({ field: { onChange, ...field }, formState }) => {
-            return (
-              <HeadingInput
-                id="title-input"
-                placeholder="Thread title..."
-                onValueChange={onChange}
-                defaultValue={formState.defaultValues?.["title"]}
-                {...field}
-              />
-            );
-          }}
-          control={control}
-          name="title"
-        />
+    <FormControl>
+      <HeadingInputField
+        id="title-input"
+        placeholder="Thread title..."
+        control={form.control}
+        name="title"
+      />
 
-        <FormErrorText>{fieldError?.message?.toString()}</FormErrorText>
-      </FormControl>
-    </>
+      <FormErrorText>
+        {form.formState.errors.title?.message?.toString()}
+      </FormErrorText>
+    </FormControl>
   );
 }

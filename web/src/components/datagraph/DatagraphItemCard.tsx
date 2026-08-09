@@ -1,5 +1,3 @@
-import chroma from "chroma-js";
-
 import {
   DatagraphItem,
   DatagraphItemKind,
@@ -17,7 +15,7 @@ import { htmlToMarkdown } from "@/utils/markdown";
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
 import { Timestamp } from "../site/Timestamp";
 import { Badge } from "../ui/badge";
-import { Card } from "../ui/rich-card";
+import { Card } from "../ui/surface";
 
 type Props = {
   item: DatagraphItem;
@@ -64,7 +62,7 @@ export function DatagraphItemPostGenericCard({
       text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge
               profile={ref.author}
               size="sm"
@@ -92,7 +90,7 @@ export function DatagraphItemReplyCard({ item }: { item: DatagraphItemReply }) {
       text={ref.description ?? htmlToMarkdown(ref.body)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge
               profile={ref.author}
               size="sm"
@@ -121,7 +119,7 @@ export function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
       image={getAssetURL(ref.primary_image?.path)}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge profile={ref.owner} size="sm" name="full-horizontal" />
             <Timestamp created={ref.createdAt} />
           </HStack>
@@ -149,7 +147,7 @@ export function DatagraphItemProfileCard({
       text={ref.bio}
       controls={
         <WStack>
-          <HStack gap="1" minWidth="0" color="fg.subtle">
+          <HStack gap="1" minWidth="0" color="text.muted">
             <MemberBadge profile={ref} size="sm" name="full-horizontal" />
             <Timestamp created={ref.createdAt} />
           </HStack>
@@ -165,38 +163,7 @@ export function DatagraphItemBadge({ kind }: { kind: DatagraphItemKind }) {
   const label = getDatagraphKindLabel(kind);
   const colour = getDatagraphKindColour(kind);
 
-  const cssVars = badgeColourCSS(colour);
-
-  return (
-    <Badge
-      style={cssVars}
-      backgroundColor="var(--colors-color-palette-bg)"
-      borderColor="var(--colors-color-palette-bo)"
-      color="var(--colors-color-palette-fg)"
-    >
-      {label}
-    </Badge>
-  );
-}
-
-export function badgeColourCSS(c: string) {
-  const { bg, bo, fg } = badgeColours(c);
-
-  return {
-    "--colors-color-palette-fg": fg,
-    "--colors-color-palette-bo": bo,
-    "--colors-color-palette-bg": bg,
-  } as React.CSSProperties;
-}
-
-export function badgeColours(c: string) {
-  const colour = chroma(c);
-
-  const bg = colour.luminance(0.8).css();
-  const bo = colour.luminance(0.6).saturate(1.3).css();
-  const fg = colour.darken(1.5).saturate(2).css();
-
-  return { bg, bo, fg };
+  return <Badge colorPalette={colour}>{label}</Badge>;
 }
 
 export function getDatagraphKindLabel(kind: DatagraphItemKind): string {

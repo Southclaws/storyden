@@ -9,7 +9,6 @@ export const size = {
   height: 630,
 };
 
-export const runtime = "edge";
 export const contentType = "image/png";
 
 export default async function Image() {
@@ -20,29 +19,27 @@ export default async function Image() {
   const { title, accent_colour } = settings;
 
   return new ImageResponse(
-    (
-      <div
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#fff",
+      }}
+    >
+      <img
+        src={backgroundImageURL}
+        width="100%"
+        height="100%"
         style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#fff",
+          objectPosition: "center",
+          objectFit: "cover",
         }}
-      >
-        <img
-          src={backgroundImageURL}
-          width="100%"
-          height="100%"
-          style={{
-            objectPosition: "center",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-    ),
+      />
+    </div>,
     {
       ...size,
       emoji: "fluent",

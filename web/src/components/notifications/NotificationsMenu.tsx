@@ -7,7 +7,8 @@ import { ArchiveIcon } from "@/components/ui/icons/Archive";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
-import { Center, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Center, LStack, WStack } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
@@ -21,7 +22,7 @@ export function NotificationsMenu(props: Props) {
     return (
       <NotificationsTrigger
         hideLabel
-        size="md"
+        size="sm"
         variant="ghost"
         disabled
         title={deriveError(error)}
@@ -38,7 +39,7 @@ export function NotificationsMenu(props: Props) {
       <Menu.Trigger cursor="pointer" position="relative" asChild>
         <NotificationsTrigger
           hideLabel
-          size="md"
+          size="sm"
           variant="ghost"
           unread={!isEmpty}
         />
@@ -51,15 +52,9 @@ export function NotificationsMenu(props: Props) {
               <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
                 <LStack fontSize="sm">
                   <WStack>
-                    <styled.p color="fg.muted">
-                      Notifications ({unreads})
-                    </styled.p>
+                    <Text variant="supporting">Notifications ({unreads})</Text>
 
-                    <LinkButton
-                      href="/notifications"
-                      size="xs"
-                      variant="outline"
-                    >
+                    <LinkButton href="/notifications" variant="outline">
                       see all
                     </LinkButton>
                   </WStack>
@@ -69,7 +64,7 @@ export function NotificationsMenu(props: Props) {
               <Menu.Separator />
 
               {isEmpty ? (
-                <Center w="full" py="4" color="fg.muted" fontSize="xs">
+                <Center w="full" py="4" color="text.subtle" fontSize="xs">
                   You&apos;re all caught up!
                 </Center>
               ) : (
@@ -94,7 +89,10 @@ export function NotificationsMenu(props: Props) {
                       >
                         <NotificationAvatar notification={notification} />
                         <LStack gap="0" minW="0">
-                          <styled.span
+                          <Text
+                            as="span"
+                            variant="supporting"
+                            color="text.default"
                             fontWeight="bold"
                             textWrap="nowrap"
                             textOverflow="ellipsis"
@@ -102,10 +100,10 @@ export function NotificationsMenu(props: Props) {
                             maxW="full"
                           >
                             {notification.source?.handle ?? "System"}
-                          </styled.span>
-                          <styled.span fontWeight="normal">
+                          </Text>
+                          <Text as="span" variant="supporting">
                             {notification.description}
-                          </styled.span>
+                          </Text>
                         </LStack>
                       </Link>
 

@@ -2,7 +2,7 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const selectDefaultVariants = {
-  "size": "md",
+  "size": "sm",
   "variant": "outline"
 }
 const selectCompoundVariants = []
@@ -93,7 +93,6 @@ export const select = /* @__PURE__ */ Object.assign(selectFn, {
     "ghost"
   ],
   "size": [
-    "xs",
     "sm",
     "md",
     "lg"

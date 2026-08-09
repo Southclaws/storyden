@@ -21,7 +21,4 @@ export * from './visually-hidden';
 export * from './cq';
 export * from './lstack';
 export * from './wstack';
-export * from './frosted-glass';
-export * from './floating';
-export * from './card-box';
 export * from './menu-item-color-palette';

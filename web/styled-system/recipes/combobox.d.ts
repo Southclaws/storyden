@@ -4,9 +4,9 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface ComboboxVariant {
   /**
- * @default "md"
+ * @default "sm"
  */
-size: "xs" | "sm" | "md" | "lg"
+size: "sm" | "md" | "lg"
 }
 
 type ComboboxVariantMap = {

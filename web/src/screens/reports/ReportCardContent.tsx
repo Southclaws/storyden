@@ -14,6 +14,7 @@ import {
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Badge } from "@/components/ui/badge";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 function getItemPath(
@@ -45,10 +46,10 @@ export function ReportCardContent({ report }: Props) {
 
   if (!item) {
     return (
-      <Box p="3" borderRadius="md" bg="bg.muted">
-        <styled.p color="fg.muted" fontStyle="italic">
+      <Box p="3" borderRadius="md" bg="background.inset">
+        <Text variant="supporting" fontStyle="italic">
           Content no longer available
-        </styled.p>
+        </Text>
       </Box>
     );
   }
@@ -64,8 +65,8 @@ export function ReportCardContent({ report }: Props) {
       return <ProfileContent item={item} reportID={report.id} />;
     default:
       return (
-        <Box p="3" borderRadius="md" bg="bg.muted">
-          <styled.p color="fg.muted">Unknown content type</styled.p>
+        <Box p="3" borderRadius="md" bg="background.inset">
+          <Text variant="supporting">Unknown content type</Text>
         </Box>
       );
   }
@@ -81,7 +82,7 @@ function PostContent({ reportID, item }: PostContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -95,10 +96,10 @@ function PostContent({ reportID, item }: PostContentProps) {
               {ref.title || "(Untitled post)"}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
-        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+        <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
           <MemberBadge profile={ref.author} size="sm" name="handle" />
 
           {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -118,7 +119,7 @@ function NodeContent({ reportID, item }: NodeContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -132,17 +133,17 @@ function NodeContent({ reportID, item }: NodeContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
         <LStack>
           <div>
-            <styled.p fontSize="sm" color="fg.subtle" lineClamp={3}>
+            <Text variant="supporting" lineClamp={3}>
               {ref.description}
-            </styled.p>
+            </Text>
           </div>
 
-          <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+          <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
             <MemberBadge profile={ref.owner} size="sm" name="handle" />
 
             {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -163,7 +164,7 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
   const path = getItemPath(reportID, item);
 
   return (
-    <Box p="3" borderRadius="md" bg="bg.muted">
+    <Box p="3" borderRadius="md" bg="background.inset">
       <LStack gap="2">
         <WStack>
           {path ? (
@@ -177,10 +178,10 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} color="fg.subtle" large />
+          <Timestamp created={ref.createdAt} color="text.muted" large />
         </WStack>
 
-        <WStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
+        <WStack gap="2" fontSize="sm" color="text.muted" flexWrap="wrap">
           <MemberBadge profile={ref} size="sm" name="handle" />
 
           {ref.deletedAt !== undefined && <ContentDeletedBadge />}
@@ -193,9 +194,9 @@ function ProfileContent({ reportID, item }: ProfileContentProps) {
 function ContentDeletedBadge() {
   return (
     <Badge
-      bg="bg.destructive"
-      color="fg.destructive"
-      borderColor="border.destructive"
+      bg="status.danger.surface"
+      color="status.danger.content"
+      borderColor="status.danger.border"
     >
       Content deleted
     </Badge>

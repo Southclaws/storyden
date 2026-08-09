@@ -3,12 +3,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { iconUpload } from "@/api/openapi-client/misc";
-import { getColourVariants } from "@/utils/colour";
-
 import { handle } from "@/api/client";
+import { iconUpload } from "@/api/openapi-client/misc";
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { MotdAlertTypeSchema, Settings } from "@/lib/settings/settings";
+import { getColourVariants } from "@/utils/colour";
 import { getIconURL } from "@/utils/icon";
 
 export type Props = {

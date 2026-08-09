@@ -12,8 +12,7 @@ const RegistrationModes = Object.keys(
   RegistrationModeTable,
 ) as unknown as readonly [RegistrationMode, ...RegistrationMode[]];
 
-export const RegistrationModeSchema: z.ZodType<RegistrationMode> =
-  z.enum(RegistrationModes);
+export const RegistrationModeSchema = z.enum(RegistrationModes);
 
 export type RegistrationModeDetail = {
   value: RegistrationMode;

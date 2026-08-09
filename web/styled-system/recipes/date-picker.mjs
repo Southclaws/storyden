@@ -104,6 +104,10 @@ const datePickerSlotNames = [
   [
     "view",
     "datePicker__view"
+  ],
+  [
+    "valueText",
+    "datePicker__valueText"
   ]
 ]
 const datePickerSlotFns = /* @__PURE__ */ datePickerSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, datePickerDefaultVariants, getSlotCompoundVariant(datePickerCompoundVariants, slotName))])

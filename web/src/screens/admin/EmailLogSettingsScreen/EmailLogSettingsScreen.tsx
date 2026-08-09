@@ -8,26 +8,20 @@ import { CancelAction } from "@/components/site/Action/Cancel";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
-import {
-  MultiSelectPicker,
-  MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DateRangePicker } from "@/components/ui/date-picker";
-import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { css } from "@/styled-system/css";
 import {
-  Box,
-  CardBox,
-  Flex,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+  MultiSelectPicker,
+  MultiSelectPickerItem,
+} from "@/components/ui/multi-select-picker";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { css } from "@/styled-system/css";
+import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import {
   ALL_EMAIL_STATUSES,
@@ -63,23 +57,24 @@ export function EmailLogSettingsScreen() {
   );
 
   return (
-    <CardBox className={lstack()} gap="4">
-      <WStack>
-        <Heading size="md">Email Log</Heading>
+    <LStack gap="4">
+      <LStack gap="1">
+        <WStack>
+          <PageHeading>Email log</PageHeading>
 
-        <Button
-          type="button"
-          size="xs"
-          variant="subtle"
-          loading={refreshing}
-          onClick={refreshEmailLog}
-        >
-          Refresh
-        </Button>
-      </WStack>
-      <styled.p>
-        View queued emails and delivery attempts, including failure reasons.
-      </styled.p>
+          <Button
+            type="button"
+            variant="subtle"
+            loading={refreshing}
+            onClick={refreshEmailLog}
+          >
+            Refresh
+          </Button>
+        </WStack>
+        <Text variant="supporting">
+          View queued emails and delivery attempts, including failure reasons.
+        </Text>
+      </LStack>
 
       <Flex
         w="full"
@@ -117,6 +112,7 @@ export function EmailLogSettingsScreen() {
             })}
           />
           <CancelAction
+            aria-label="Clear date filter"
             variant="subtle"
             size="sm"
             borderLeftRadius="none"
@@ -133,7 +129,7 @@ export function EmailLogSettingsScreen() {
         onRetry={retryEmail}
         retryingEmailId={retryingEmailId}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -182,7 +178,7 @@ function EmailLogList({
       </ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/email"
         currentPage={currentPage}
         totalPages={data.total_pages}
         pageSize={data.page_size}
@@ -226,26 +222,22 @@ function EmailItem({
             </Badge>
           </HStack>
 
-          <styled.time fontSize="xs" color="fg.muted">
+          <styled.time fontSize="xs" color="text.subtle">
             {formatDate(email.queued_at, "PPpp")}
           </styled.time>
         </WStack>
 
         <WStack>
-          <styled.p fontSize="sm" color="fg.subtle">
-            “{email.subject}”
-          </styled.p>
+          <Text variant="supporting">“{email.subject}”</Text>
 
-          <styled.p fontSize="xs" color="fg.subtle">
-            {recipient}
-          </styled.p>
+          <Text variant="metadata">{recipient}</Text>
         </WStack>
 
         <styled.details
           borderWidth="thin"
-          borderColor="border.subtle"
+          borderColor="border.muted"
           borderRadius="md"
-          bg="bg.subtle"
+          bg="background.inset"
           overflow="hidden"
         >
           <styled.summary
@@ -255,7 +247,7 @@ function EmailItem({
             py="2.5"
             fontSize="sm"
             fontWeight="medium"
-            color="fg.default"
+            color="text.default"
             _marker={{ display: "none" }}
             css={{
               "&::-webkit-details-marker": {
@@ -264,10 +256,10 @@ function EmailItem({
             }}
           >
             <LStack gap="1">
-              <styled.span>{attemptCountLabel}</styled.span>
-              <styled.span fontSize="xs" color="fg.muted" fontWeight="normal">
+              <span>{attemptCountLabel}</span>
+              <Text as="span" variant="metadata" fontWeight="normal">
                 {error ? error : "Open to review the full delivery history."}
-              </styled.span>
+              </Text>
             </LStack>
           </styled.summary>
 
@@ -276,7 +268,7 @@ function EmailItem({
               <Box
                 key={`${attempt.timestamp}-${index}`}
                 borderTopWidth={index === 0 ? "none" : "thin"}
-                borderColor="border.subtle"
+                borderColor="border.muted"
                 pt={index === 0 ? "0" : "2"}
               >
                 <Box
@@ -299,7 +291,7 @@ function EmailItem({
                       {attempt.status}
                     </Badge>
 
-                    <styled.time fontSize="xs" color="fg.muted">
+                    <styled.time fontSize="xs" color="text.subtle">
                       {formatDate(attempt.timestamp, "PPpp")}
                     </styled.time>
                   </WStack>
@@ -309,7 +301,7 @@ function EmailItem({
                     minW="0"
                     fontSize="xs"
                     lineHeight="normal"
-                    color={attempt.error ? "fg.default" : "fg.muted"}
+                    color={attempt.error ? "text.default" : "text.subtle"}
                     whiteSpace="pre-wrap"
                     overflowWrap="anywhere"
                     wordBreak="break-word"
@@ -328,7 +320,6 @@ function EmailItem({
           {email.status === "failed" && (
             <Button
               type="button"
-              size="xs"
               variant="subtle"
               loading={retrying}
               loadingText="Retrying..."
@@ -356,6 +347,5 @@ function buildEmailLogPaginationParams(
     ...(selectedStatuses.length > 0
       ? { statuses: selectedStatuses.map((status) => status.value).join(",") }
       : {}),
-    tab: "email",
   };
 }

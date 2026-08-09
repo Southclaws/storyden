@@ -1,9 +1,8 @@
 import React, { PropsWithChildren } from "react";
 
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { Button } from "@/components/ui/button";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 import { MemberSuspensionConfirmation } from "./MemberSuspensionConfirmation";
 import { Props } from "./useMemberSuspension";
@@ -29,7 +28,10 @@ export function MemberSuspensionTrigger({
           },
         )
       ) : (
-        <Button colorPalette="red" onClick={onOpen}>
+        <Button
+          intent={profile.suspended ? undefined : "destructive"}
+          onClick={onOpen}
+        >
           {profile.suspended ? "Reinstate" : "Suspend"}
         </Button>
       )}

@@ -46,9 +46,9 @@ export function CreatePageAction({
   return (
     <IconButton
       type="button"
-      size="xs"
       variant="subtle"
       px={hideLabel ? "0" : "1"}
+      aria-label={hideLabel ? CreatePageLabel : undefined}
       onClick={handleCreate}
       {...props}
     >
@@ -64,7 +64,10 @@ export function CreatePageAction({
 
 export function CreatePageMenuItem({ hideLabel }: Props) {
   return (
-    <Item value={CreatePageID}>
+    <Item
+      value={CreatePageID}
+      aria-label={hideLabel ? CreatePageLabel : undefined}
+    >
       {CreatePageIcon}
       {!hideLabel && (
         <>

@@ -1,15 +1,15 @@
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-
 import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
-import { ColourPickerField } from "@/components/ui/ColourPickerField";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { SelectField } from "@/components/ui/form/SelectField";
+import { ColorPickerField } from "@/components/ui/color-picker";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { Input, InputPrefix } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
+import { Text } from "@/components/ui/text";
 import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
@@ -22,7 +22,7 @@ import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
 export type { CategoryCreateProps };
 
 export function CategoryCreateScreen(props: CategoryCreateProps) {
-  const { register, onSubmit, control, handleImageUpload } =
+  const { register, slugInput, onSubmit, control, handleImageUpload } =
     useCategoryCreate(props);
 
   const { data: categoryListResult } = useCategoryList();
@@ -42,12 +42,12 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
   return (
     <VStack alignItems="start" gap="4">
-      <styled.p>
+      <Text variant="supporting">
         Use categories to organise posts. A post can only have one category,
         unlike tags. So it&apos;s best to keep categories high-level and
         different enough so that it&apos;s not easy to get confused between
         them.
-      </styled.p>
+      </Text>
       <styled.form
         display="flex"
         flexDir="column"
@@ -85,7 +85,7 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
               {hostname}/d/
             </InputPrefix>
             <Input
-              {...register("slug")}
+              {...slugInput}
               type="text"
               flex="1"
               borderTopLeftRadius={{
@@ -128,7 +128,11 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
 
         <FormControl>
           <FormLabel>Colour</FormLabel>
-          <ColourPickerField control={control} name="colour" />
+          <ColorPickerField
+            control={control}
+            name="colour"
+            ariaLabel="Category colour"
+          />
           <FormHelperText>The colour for the category</FormHelperText>
         </FormControl>
 

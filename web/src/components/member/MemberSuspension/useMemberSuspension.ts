@@ -1,14 +1,13 @@
 import { Arguments, useSWRConfig } from "swr";
 
-import { getProfileListKey } from "@/api/openapi-client/profiles";
-import { ProfileReference } from "@/api/openapi-schema";
-import { WithDisclosure } from "@/utils/useDisclosure";
-
 import { handle } from "@/api/client";
 import {
   adminAccountBanCreate,
   adminAccountBanRemove,
 } from "@/api/openapi-client/admin";
+import { getProfileListKey } from "@/api/openapi-client/profiles";
+import { ProfileReference } from "@/api/openapi-schema";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 export type Props = {
   profile: ProfileReference;

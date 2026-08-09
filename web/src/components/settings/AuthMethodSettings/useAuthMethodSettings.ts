@@ -1,7 +1,6 @@
 import { find } from "lodash";
 
 import { useAccountAuthProviderList } from "@/api/openapi-client/accounts";
-
 import { groupAuthMethods, groupAuthProviders } from "@/lib/auth/utils";
 
 export function useAuthMethodSettings() {
@@ -15,12 +14,11 @@ export function useAuthMethodSettings() {
 
   const { active, available } = data;
 
-  const { password, phone, webauthn, oauth } = groupAuthProviders(available);
+  const { password, phone, oauth } = groupAuthProviders(available);
 
   const {
     password: passwordActive,
     phone: phoneActive,
-    webauthn: webauthnActive,
     methods,
   } = groupAuthMethods(active);
 
@@ -37,13 +35,11 @@ export function useAuthMethodSettings() {
       available: {
         password,
         phone,
-        webauthn,
         oauth: sorted,
       },
       active: {
         password: passwordActive ?? [],
         phone: phoneActive ?? [],
-        webauthn: webauthnActive ?? [],
         methods,
       },
     },

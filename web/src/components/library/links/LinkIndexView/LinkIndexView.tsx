@@ -1,6 +1,5 @@
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { Unready } from "@/components/site/Unready";
-
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
@@ -17,13 +16,8 @@ export function LinkIndexView(props: Props) {
   if (form.formState.isLoading) return <Unready />;
 
   return (
-    <VStack>
-      <styled.form
-        display="flex"
-        w="full"
-        onSubmit={handlers.handleSubmission}
-        action="/l"
-      >
+    <VStack w="full">
+      <styled.form display="flex" w="full" onSubmit={handlers.handleSubmission}>
         <Input
           w="full"
           borderRight="none"
@@ -56,7 +50,7 @@ export function LinkIndexView(props: Props) {
       </styled.form>
 
       <PaginationControls
-        path="/l"
+        path="/links"
         params={{ q: data.q }}
         onClick={handlers.handlePage}
         currentPage={props.page ?? 1}

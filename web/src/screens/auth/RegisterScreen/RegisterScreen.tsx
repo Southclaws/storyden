@@ -1,5 +1,6 @@
 import { AuthMode, RegistrationMode } from "@/api/openapi-schema";
 import { authProviderList } from "@/api/openapi-server/auth";
+import { Text } from "@/components/ui/text";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { RegisterEmailForm } from "./RegisterEmail/RegisterEmailForm";
@@ -24,10 +25,10 @@ export async function RegisterScreen({
     return (
       <VStack textAlign="center">
         <styled.h1 fontWeight="bold">Registration is invite-only.</styled.h1>
-        <styled.p color="fg.muted" textWrap="balance">
+        <Text variant="supporting" textWrap="balance">
           Ask a community member or administrator for an invitation link to
           join.
-        </styled.p>
+        </Text>
       </VStack>
     );
   }
@@ -39,18 +40,16 @@ export async function RegisterScreen({
         <styled.h1 fontWeight="bold">
           Registration is currently closed.
         </styled.h1>
-        <styled.p color="fg.muted" textWrap="balance">
+        <Text variant="supporting" textWrap="balance">
           This site has closed public registration of accounts.
-        </styled.p>
+        </Text>
       </VStack>
     );
   }
 
   switch (data.mode) {
     case AuthMode.handle:
-      return (
-        <RegisterHandleForm webauthn={false} invitationID={invitationID} />
-      );
+      return <RegisterHandleForm invitationID={invitationID} />;
 
     case AuthMode.email:
       return <RegisterEmailForm invitationID={invitationID} />;

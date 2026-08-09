@@ -3,8 +3,9 @@ import { getServerSession } from "@/auth/server-session";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { LinkButton } from "@/components/ui/link-button";
+import { Text } from "@/components/ui/text";
 import { getSettings } from "@/lib/settings/settings-server";
-import { Box, Divider, LStack, VStack, styled } from "@/styled-system/jsx";
+import { Box, Divider, LStack, VStack } from "@/styled-system/jsx";
 
 type Props = {
   params: Promise<{
@@ -33,9 +34,9 @@ export default async function Page({ params }: Props) {
               name="full-vertical"
             />
           </Box>
-          <styled.p>
+          <Text>
             has invited you to <strong>{settings.title}</strong>
-          </styled.p>
+          </Text>
         </VStack>
 
         {session ? (
@@ -44,20 +45,20 @@ export default async function Page({ params }: Props) {
             gap="4"
             borderWidth="thin"
             borderStyle="solid"
-            borderColor="border.warning"
-            bgColor="bg.warning"
-            color="fg.warning"
+            borderColor="status.warning.border"
+            bgColor="status.warning.surface"
+            color="status.warning.content"
             borderRadius="md"
             p="4"
           >
             <VStack gap="1" textWrap="balance">
-              <styled.p fontWeight="semibold">
+              <Text fontWeight="semibold">
                 You&apos;re already signed in as{" "}
                 <strong>{session.handle}</strong> on {settings.title}.
-              </styled.p>
-              <styled.p fontSize="sm">
+              </Text>
+              <Text variant="supporting" color="text.default">
                 You cannot accept an invitation while already signed in.
-              </styled.p>
+              </Text>
             </VStack>
 
             <LinkButton w="full" href="/">

@@ -1,12 +1,11 @@
 import { keyBy } from "lodash/fp";
 import { z } from "zod";
 
-import { SearchScreen } from "@/screens/search/SearchScreen";
-
 import { categoryList } from "@/api/openapi-server/categories";
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { DatagraphKindSchema } from "@/lib/datagraph/schema";
+import { SearchScreen } from "@/screens/search/SearchScreen";
 
 type Props = {
   searchParams: Promise<Query>;

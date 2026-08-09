@@ -1,20 +1,20 @@
 "use client";
 
-import { DatagraphSearchResults } from "@/components/search/DatagraphSearchResults";
-import { UnreadyBanner } from "@/components/site/Unready";
-
 import { DatagraphItemKind } from "@/api/openapi-schema";
+import { DatagraphSearchResults } from "@/components/search/DatagraphSearchResults";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
-import { MultiSelectPicker } from "@/components/ui/MultiSelectPicker";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
-import { DatagraphKindFilterField } from "@/components/ui/form/DatagraphKindFilterField";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { ReplyIcon } from "@/components/ui/icons/Reply";
 import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
+import { MultiSelectPicker } from "@/components/ui/multi-select-picker";
+import { PageHeading } from "@/components/ui/page-heading";
+import { ToggleGroupField } from "@/components/ui/toggle-group";
 import { Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
@@ -34,6 +34,7 @@ export function SearchScreen(props: Props) {
       onSubmit={handlers.handleSearch}
       action="/search"
     >
+      <PageHeading srOnly>Search</PageHeading>
       <WStack gap="0">
         <Input
           w="full"
@@ -41,7 +42,7 @@ export function SearchScreen(props: Props) {
           borderRight="none"
           borderRightRadius="none"
           type="search"
-          background="bg.default"
+          background="background.control"
           placeholder={`Search...`}
           _focus={{
             // NOTE: This disables the default focus behaviour styles for inputs.
@@ -80,7 +81,7 @@ export function SearchScreen(props: Props) {
       </WStack>
 
       <LStack w="full" gap="2">
-        <DatagraphKindFilterField
+        <ToggleGroupField
           control={form.control}
           name="kind"
           items={[

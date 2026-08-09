@@ -3,13 +3,12 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "@/components/site/Action/More";
-
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import {
   ReportPostMenuItem,
   truncateBody,
 } from "@/components/report/ReportPostMenuItem";
+import { MoreAction } from "@/components/site/Action/More";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { LinkIcon } from "@/components/ui/icons/Link";
@@ -26,7 +25,7 @@ export function ReplyMenu(props: Props) {
   return (
     <Menu.Root lazyMount>
       <Menu.Trigger asChild>
-        <MoreAction size="xs" />
+        <MoreAction />
       </Menu.Trigger>
 
       <Portal>
@@ -38,7 +37,7 @@ export function ReplyMenu(props: Props) {
                 flexDir="column"
                 userSelect="none"
               >
-                <styled.span>{`Post by ${props.reply.author.name}`}</styled.span>
+                <span>{`Post by ${props.reply.author.name}`}</span>
 
                 <styled.time fontWeight="normal">
                   {format(new Date(props.reply.createdAt), "yyyy-MM-dd")}

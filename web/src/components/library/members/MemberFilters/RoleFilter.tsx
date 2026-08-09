@@ -9,7 +9,7 @@ import { Role } from "@/api/openapi-schema";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
+} from "@/components/ui/multi-select-picker";
 import { isDefaultRole } from "@/lib/role/defaults";
 import { deriveError } from "@/utils/error";
 

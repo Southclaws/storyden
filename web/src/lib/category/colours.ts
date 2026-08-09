@@ -1,30 +1,18 @@
 import chroma from "chroma-js";
-import { readableColor } from "polished";
+
+import { badgeColourPalette } from "@/components/ui/badge/Badge.internal";
+import { getReadableTextColour } from "@/utils/colour";
 
 export function categoryColourCSS(c: string) {
-  const { bg, bo, fg } = categoryColours(c);
-
-  return {
-    "--colors-color-palette-fg": fg,
-    "--colors-color-palette-border": bo,
-    "--colors-color-palette-bg": bg,
-  } as React.CSSProperties;
+  return badgeColourPalette(categoryColours(c));
 }
 
 export function categoryColours(c: string) {
   const colour = chroma(c);
 
-  const bg = colour.brighten(1).desaturate(1).css();
-  const bo = colour.darken(0).desaturate(1).alpha(0.8).css();
-  const fg = readableColorWithFallback(bg);
+  const background = colour.brighten(1).desaturate(1).css();
+  const border = colour.darken(0).desaturate(1).alpha(0.8).css();
+  const foreground = getReadableTextColour(background);
 
-  return { bg, bo, fg };
-}
-
-function readableColorWithFallback(rgb: string): string {
-  try {
-    return readableColor(rgb, "#303030", "#E8ECEA", false);
-  } catch (e) {
-    return "#303030";
-  }
+  return { background, border, foreground };
 }

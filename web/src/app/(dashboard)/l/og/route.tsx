@@ -26,64 +26,62 @@ export async function GET(req: NextRequest) {
     data.primary_image;
 
   return new ImageResponse(
-    (
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "flex-start",
-          backgroundColor: accent_colour,
-          fontSize: 16,
-        }}
-      >
-        {image ? (
-          // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-          <img
-            src={getAssetURL(image.path)}
-            width="100%"
-            height="100%"
-            style={{
-              objectPosition: "center",
-              objectFit: "cover",
-            }}
-          />
-        ) : (
+    <div
+      style={{
+        height: "100%",
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        backgroundColor: accent_colour,
+        fontSize: 16,
+      }}
+    >
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+        <img
+          src={getAssetURL(image.path)}
+          width="100%"
+          height="100%"
+          style={{
+            objectPosition: "center",
+            objectFit: "cover",
+          }}
+        />
+      ) : (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            display: "flex",
+            flexDirection: "column",
+            padding: "2rem",
+            width: "100%",
+            backgroundColor: "hsla(180deg, 10%, 10%, 0.58)",
+            color: "white",
+          }}
+        >
           <div
             style={{
-              position: "absolute",
-              bottom: 0,
-              display: "flex",
-              flexDirection: "column",
-              padding: "2rem",
-              width: "100%",
-              backgroundColor: "hsla(180deg, 10%, 10%, 0.58)",
-              color: "white",
+              fontSize: "4rem",
+              fontWeight: 600,
             }}
           >
-            <div
-              style={{
-                fontSize: "4rem",
-                fontWeight: 600,
-              }}
-            >
-              {data.name}
-            </div>
-
-            <div
-              style={{
-                fontSize: "2rem",
-                fontWeight: 300,
-              }}
-            >
-              {data.description}
-            </div>
+            {data.name}
           </div>
-        )}
-      </div>
-    ),
+
+          <div
+            style={{
+              fontSize: "2rem",
+              fontWeight: 300,
+            }}
+          >
+            {data.description}
+          </div>
+        </div>
+      )}
+    </div>,
     {
       ...size,
       emoji: "fluent",

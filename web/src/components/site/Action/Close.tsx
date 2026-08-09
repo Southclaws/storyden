@@ -4,7 +4,7 @@ import { CloseIcon } from "@/components/ui/icons/Close";
 
 export function CloseAction(props: ButtonProps) {
   return (
-    <IconButton variant="ghost" size="sm" {...props}>
+    <IconButton aria-label="Close" variant="ghost" size="sm" {...props}>
       <CloseIcon />
     </IconButton>
   );

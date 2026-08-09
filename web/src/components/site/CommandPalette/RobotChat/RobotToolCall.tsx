@@ -15,6 +15,7 @@ import {
 } from "@/api/robots-types";
 import { Button } from "@/components/ui/button";
 import { ToolIcon } from "@/components/ui/icons/Tool";
+import { Text } from "@/components/ui/text";
 import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
 import { wstack } from "@/styled-system/patterns";
 
@@ -52,7 +53,7 @@ export function RobotToolCall({ part }: Props) {
       py="1.5"
       bg="transparent"
       borderLeftWidth="medium"
-      borderLeftColor="border.subtle"
+      borderLeftColor="border.muted"
       borderLeftRadius="none"
       fontSize="sm"
       w="full"
@@ -76,14 +77,14 @@ function RobotToolCallTitle({ part, toolName }: Props & { toolName: string }) {
         aria-label={`${toolName} tool call details`}
         cursor="pointer"
         fontSize="xs"
-        color="fg.muted"
-        _groupHover={{ color: "fg.default" }}
+        color="text.subtle"
+        _groupHover={{ color: "text.default" }}
       >
         <styled.span
           display="flex"
           alignItems="center"
           _detailsOpen={{
-            color: "fg.default",
+            color: "text.default",
           }}
         >
           <ToolIcon w="3" h="3" />
@@ -95,7 +96,7 @@ function RobotToolCallTitle({ part, toolName }: Props & { toolName: string }) {
         <styled.pre
           fontSize="xs"
           p="2"
-          bg="bg.subtle"
+          bg="background.inset"
           borderRadius="sm"
           overflow="auto"
           maxH="32"
@@ -237,7 +238,7 @@ function RobotToolCallStatus({ part }: Props) {
     .with("output-denied", () => "Denied")
     .otherwise(() => "Tool complete");
 
-  return <styled.span>{label}</styled.span>;
+  return <span>{label}</span>;
 }
 
 function RobotToolConfirmation({ part }: Props) {
@@ -259,7 +260,6 @@ function RobotToolConfirmation({ part }: Props) {
     <HStack gap="2" justifyContent="flex-start">
       <Button
         aria-label="Approve"
-        size="xs"
         variant="solid"
         onClick={() =>
           resolveToolConfirmation({
@@ -273,7 +273,6 @@ function RobotToolConfirmation({ part }: Props) {
       </Button>
       <Button
         aria-label="Deny"
-        size="xs"
         variant="outline"
         onClick={() =>
           resolveToolConfirmation({
@@ -301,7 +300,8 @@ export function RobotToolConfirmationBatch({
       !getToolConfirmationResolution(part, messages),
   );
   const hasPending = pendingParts.length > 0;
-  const isPartiallyResolved = hasPending && pendingParts.length !== parts.length;
+  const isPartiallyResolved =
+    hasPending && pendingParts.length !== parts.length;
 
   const resolvePart = (part: ConfirmationPart, approved: boolean) =>
     part.approval?.id
@@ -321,7 +321,9 @@ export function RobotToolConfirmationBatch({
   return (
     <LStack
       role="group"
-      aria-label={isPartiallyResolved ? "Partial approvals" : "Confirmation batch"}
+      aria-label={
+        isPartiallyResolved ? "Partial approvals" : "Confirmation batch"
+      }
       className="group"
       gap="2"
       pl="3"
@@ -329,20 +331,23 @@ export function RobotToolConfirmationBatch({
       py="1.5"
       bg="transparent"
       borderLeftWidth="medium"
-      borderLeftColor="border.subtle"
+      borderLeftColor="border.muted"
       borderLeftRadius="none"
       fontSize="sm"
       w="full"
       alignSelf="flex-start"
     >
-      <styled.div className={wstack()} fontSize="xs" color="fg.muted">
+      <styled.div className={wstack()} fontSize="xs" color="text.subtle">
         <styled.span display="flex" alignItems="center">
           <ToolIcon w="3" h="3" />
-          &nbsp;{hasPending ? `Approve these ${parts.length} actions?` : `${parts.length} actions resolved`}
+          &nbsp;
+          {hasPending
+            ? `Approve these ${parts.length} actions?`
+            : `${parts.length} actions resolved`}
         </styled.span>
-        <styled.span>
+        <span>
           {hasPending ? `${pendingParts.length} pending` : "Tool complete"}
-        </styled.span>
+        </span>
       </styled.div>
 
       <LStack as="ul" gap="2" alignItems="stretch" w="full">
@@ -362,7 +367,6 @@ export function RobotToolConfirmationBatch({
         <HStack gap="2" justifyContent="flex-start" pt="1">
           <Button
             aria-label="Approve all confirmations"
-            size="xs"
             variant="solid"
             onClick={() => resolveAll(true)}
           >
@@ -370,7 +374,6 @@ export function RobotToolConfirmationBatch({
           </Button>
           <Button
             aria-label="Deny all confirmations"
-            size="xs"
             variant="outline"
             onClick={() => resolveAll(false)}
           >
@@ -411,7 +414,7 @@ function ConfirmationBatchRow({
       w="full"
       listStyle="none"
     >
-      <HStack gap="1.5" minW="0" color="fg.muted">
+      <HStack gap="1.5" minW="0" color="text.subtle">
         <ToolIcon w="3" h="3" flexShrink="0" />
         <styled.span overflow="hidden" textOverflow="ellipsis">
           {label}
@@ -422,7 +425,6 @@ function ConfirmationBatchRow({
         <HStack gap="1.5" flexShrink="0">
           <Button
             aria-label={`Approve ${label}`}
-            size="xs"
             variant="solid"
             onClick={onApprove}
           >
@@ -430,7 +432,6 @@ function ConfirmationBatchRow({
           </Button>
           <Button
             aria-label={`Deny ${label}`}
-            size="xs"
             variant="outline"
             onClick={onDeny}
           >
@@ -438,9 +439,13 @@ function ConfirmationBatchRow({
           </Button>
         </HStack>
       ) : (
-        <styled.span fontSize="xs" color={denied ? "fg.muted" : "fg.default"}>
+        <Text
+          as="span"
+          variant="metadata"
+          color={denied ? "text.subtle" : "text.default"}
+        >
           {denied ? "Denied" : "Approved"}
-        </styled.span>
+        </Text>
       )}
     </HStack>
   );
@@ -562,17 +567,21 @@ function RobotLibraryPageRequest({ part }: Props) {
   }
 
   if (isLoading) {
-    return <styled.p color="fg.muted">Loading pages...</styled.p>;
+    return <Text variant="supporting">Loading pages...</Text>;
   }
 
   if (error) {
-    return <styled.p color="fg.error">Could not load Library pages.</styled.p>;
+    return (
+      <Text variant="supporting" color="status.danger.content">
+        Could not load Library pages.
+      </Text>
+    );
   }
 
   const pages = flattenLibraryPages(data?.nodes ?? []);
 
   if (pages.length === 0) {
-    return <styled.p color="fg.muted">No Library pages found.</styled.p>;
+    return <Text variant="supporting">No Library pages found.</Text>;
   }
 
   return (
@@ -597,7 +606,6 @@ function RobotLibraryPageRequest({ part }: Props) {
           <Button
             key={page.id}
             aria-label={`Select Library page ${page.name}`}
-            size="xs"
             variant="outline"
             justifyContent="flex-start"
             h="auto"
@@ -619,15 +627,15 @@ function RobotLibraryPageRequest({ part }: Props) {
               >
                 {page.name}
               </styled.span>
-              <styled.span
-                color="fg.muted"
-                fontSize="xs"
+              <Text
+                as="span"
+                variant="metadata"
                 maxW="full"
                 overflow="hidden"
                 textOverflow="ellipsis"
               >
                 /{page.slug}
-              </styled.span>
+              </Text>
             </LStack>
           </Button>
         );

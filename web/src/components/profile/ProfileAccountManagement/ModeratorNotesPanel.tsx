@@ -19,6 +19,7 @@ import { Timestamp } from "@/components/site/Timestamp";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Button } from "@/components/ui/button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { Text } from "@/components/ui/text";
 import { Box, Flex, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
@@ -102,7 +103,6 @@ export function ModeratorNotesPanel({
           />
           <WStack justifyContent="end">
             <Button
-              size="xs"
               variant="subtle"
               onClick={submitNote}
               loading={isMutating}
@@ -116,25 +116,21 @@ export function ModeratorNotesPanel({
       )}
 
       {createNoteError ? (
-        <styled.p fontSize="sm" color="fg.destructive">
+        <Text variant="metadata" color="status.danger.content">
           {deriveError(createNoteError)}
-        </styled.p>
+        </Text>
       ) : null}
 
       {canViewModerationNotes ? (
         <LStack gap="3" w="full" minW="0">
           {notesError ? (
-            <styled.p fontSize="sm" color="fg.destructive">
+            <Text variant="metadata" color="status.danger.content">
               {deriveError(notesError)}
-            </styled.p>
+            </Text>
           ) : notesLoading ? (
-            <styled.p fontSize="sm" color="fg.subtle">
-              Loading moderation notes...
-            </styled.p>
+            <Text variant="supporting">Loading moderation notes...</Text>
           ) : (notesData?.notes?.length ?? 0) === 0 ? (
-            <styled.p fontSize="sm" color="fg.subtle">
-              No moderation notes yet.
-            </styled.p>
+            <Text variant="supporting">No moderation notes yet.</Text>
           ) : (
             (notesData?.notes ?? []).map((note) => (
               <ModerationNoteCard
@@ -147,10 +143,10 @@ export function ModeratorNotesPanel({
           )}
         </LStack>
       ) : (
-        <styled.p fontSize="sm" color="fg.subtle">
+        <Text variant="supporting">
           You can add notes, but you do not have permission to view note
           history.
-        </styled.p>
+        </Text>
       )}
     </LStack>
   );
@@ -207,7 +203,7 @@ function ModerationNoteCard({
       borderWidth="thin"
       borderRadius="sm"
       p="2"
-      bgColor="bg.subtle"
+      bgColor="background.inset"
       w="full"
     >
       <Flex
@@ -224,22 +220,24 @@ function ModerationNoteCard({
         )}
 
         <HStack gap="2" alignItems="center" flexShrink="0">
-          <Timestamp created={note.created_at} color="fg.muted" fontSize="xs" />
+          <Timestamp
+            created={note.created_at}
+            color="text.subtle"
+            fontSize="xs"
+          />
 
           {canManageModerationNotes &&
             (isConfirming ? (
               <HStack gap="1">
                 <Button
-                  size="xs"
                   variant="subtle"
-                  bgColor="bg.destructive"
+                  bgColor="status.danger.surface"
                   onClick={handleConfirmAction}
                   loading={isMutating}
                 >
                   Confirm delete
                 </Button>
                 <Button
-                  size="xs"
                   variant="subtle"
                   onClick={handleCancelAction}
                   disabled={isMutating}
@@ -249,7 +247,6 @@ function ModerationNoteCard({
               </HStack>
             ) : (
               <Button
-                size="xs"
                 variant="ghost"
                 aria-label="Delete moderation note"
                 title="Delete note"
@@ -261,14 +258,14 @@ function ModerationNoteCard({
         </HStack>
       </Flex>
 
-      <styled.p fontSize="sm" whiteSpace="pre-wrap">
+      <Text variant="supporting" color="text.default" whiteSpace="pre-wrap">
         {note.content}
-      </styled.p>
+      </Text>
 
       {deleteNoteError ? (
-        <styled.p mt="2" fontSize="sm" color="fg.destructive">
+        <Text variant="metadata" mt="2" color="status.danger.content">
           {deriveError(deleteNoteError)}
-        </styled.p>
+        </Text>
       ) : null}
     </Box>
   );

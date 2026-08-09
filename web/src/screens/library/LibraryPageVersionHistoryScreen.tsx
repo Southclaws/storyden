@@ -8,9 +8,11 @@ import {
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
-import { Heading } from "@/components/ui/heading";
+import { CardBox } from "@/components/ui/card-box";
 import { LinkButton } from "@/components/ui/link-button";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { PageVersionStatusBadge } from "./LibraryPageScreen/PageVersionStatusBadge";
 
@@ -35,26 +37,20 @@ export function LibraryPageVersionHistoryScreen({
           visibility={node.visibility}
           create="show"
         />
-        <LinkButton href={pageHref} size="xs" variant="subtle" flexShrink="0">
+        <LinkButton href={pageHref} variant="subtle" flexShrink="0">
           View page
         </LinkButton>
       </WStack>
 
       <WStack alignItems="start" gap="3">
         <LStack gap="1">
-          <Heading fontSize="heading.2" fontWeight="bold">
-            {node.name}
-          </Heading>
-          <styled.p color="fg.muted" fontSize="sm">
-            Version history
-          </styled.p>
+          <PageHeading>{node.name}</PageHeading>
+          <Text variant="supporting">Version history</Text>
         </LStack>
       </WStack>
 
       {versions.length === 0 ? (
-        <styled.p color="fg.muted" fontSize="sm">
-          No versions or drafts yet.
-        </styled.p>
+        <Text variant="supporting">No versions or drafts yet.</Text>
       ) : (
         <LStack gap="2">
           {versions.map((version) => (
@@ -86,9 +82,9 @@ function VersionHistoryItem({
       <LStack>
         <WStack>
           <PageVersionStatusBadge status={version.status} />
-          <styled.span color="fg.muted" fontSize="xs">
+          <Text as="span" variant="metadata">
             <Timestamp created={version.updated_at} /> ago
-          </styled.span>
+          </Text>
         </WStack>
 
         <WStack alignItems="end">
@@ -101,7 +97,7 @@ function VersionHistoryItem({
             />
           </HStack>
 
-          <LinkButton href={versionUrl} size="xs" variant="subtle">
+          <LinkButton href={versionUrl} variant="subtle">
             {buttonLabel}
           </LinkButton>
         </WStack>

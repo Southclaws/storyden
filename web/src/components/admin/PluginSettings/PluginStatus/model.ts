@@ -8,7 +8,10 @@ export type PluginTab =
 
 export const DEFAULT_PLUGIN_TAB: PluginTab = "overview";
 
-export function isPluginTab(tab: string | null, external: boolean): tab is PluginTab {
+export function isPluginTab(
+  tab: string | null,
+  external: boolean,
+): tab is PluginTab {
   if (!tab) {
     return false;
   }

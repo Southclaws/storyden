@@ -1,4 +1,4 @@
-import { CardGrid, CardRows } from "@/components/ui/rich-card";
+import { CardGrid, CardRows } from "@/components/ui/surface";
 import { CategoryTree } from "@/lib/category/tree";
 
 import { CategoryCard } from "./CategoryCard";
@@ -27,7 +27,7 @@ export function CategoryCardGrid({ categories }: Props) {
   return (
     <CardGrid>
       {categories.map((c) => (
-        <CategoryCard key={c.id} category={c} showChildren={true} />
+        <CategoryCard key={c.id} category={c} showChildren={false} />
       ))}
     </CardGrid>
   );
@@ -37,7 +37,7 @@ export function CategoryCardList({ categories }: Props) {
   return (
     <CardRows>
       {categories.map((c) => (
-        <CategoryCard key={c.id} category={c} showChildren={true} />
+        <CategoryCard key={c.id} category={c} showChildren={false} />
       ))}
     </CardRows>
   );

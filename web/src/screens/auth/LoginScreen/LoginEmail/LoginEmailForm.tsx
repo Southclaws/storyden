@@ -1,8 +1,8 @@
 "use client";
 
-import { FormControl } from "@/components/ui/FormControl";
 import { Button } from "@/components/ui/button";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";

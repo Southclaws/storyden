@@ -1,9 +1,8 @@
-import { LoginScreen } from "@/screens/auth/LoginScreen/LoginScreen";
-
 import { OAuthProviderList } from "@/components/auth/OAuthProviderList";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getProviders } from "@/lib/auth/providers";
 import { getSettings } from "@/lib/settings/settings-server";
+import { LoginScreen } from "@/screens/auth/LoginScreen/LoginScreen";
 
 export default async function Page() {
   try {

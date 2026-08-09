@@ -66,10 +66,9 @@ export function useSettingsMutation() {
             } satisfies Info;
           },
           commit: (current, result) => {
-            const updated = result;
             if (!current) return current;
 
-            return adminToInfo(updated);
+            return mergeAdminSettingsIntoInfo(current, result);
           },
         },
       ],
@@ -85,11 +84,23 @@ export function useSettingsMutation() {
   };
 }
 
-function adminToInfo(admin: AdminSettingsProps): Info {
+export function mergeAdminSettingsIntoInfo(
+  current: Info,
+  admin: AdminSettingsProps,
+): Info {
   return {
-    ...admin,
-    capabilities: admin.capabilities ?? [],
-    onboarding_status: "complete",
+    ...current,
+    accent_colour: admin.accent_colour,
+    api_address: admin.api_address,
+    authentication_mode: admin.authentication_mode,
+    capabilities: admin.capabilities ?? current.capabilities,
+    content: admin.content,
+    description: admin.description,
+    metadata: admin.metadata ?? current.metadata,
+    motd: admin.motd,
+    registration_mode: admin.registration_mode,
+    title: admin.title,
+    web_address: admin.web_address,
   };
 }
 

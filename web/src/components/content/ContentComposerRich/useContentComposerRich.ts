@@ -1,6 +1,6 @@
 "use client";
 
-import { FocusClasses } from "@tiptap/extension-focus";
+import FocusClasses from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
@@ -10,9 +10,8 @@ import { Extension, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useRef, useState } from "react";
 
-import { Asset } from "@/api/openapi-schema";
-
 import { handle } from "@/api/client";
+import { Asset } from "@/api/openapi-schema";
 import { css } from "@/styled-system/css";
 import { getAssetURL } from "@/utils/asset";
 
@@ -99,7 +98,7 @@ export function useContentComposer(props: ContentComposerProps) {
   });
 
   const extensions = [
-    StarterKit,
+    StarterKit.configure({ link: false }),
     FocusClasses,
     LinkPreview,
     LinkPasteMenuPlugin,

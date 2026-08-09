@@ -1,0 +1,98 @@
+import { ark } from "@ark-ui/react/factory";
+import { createContext, mergeProps } from "@ark-ui/react/utils";
+import type { ComponentProps } from "react";
+import { forwardRef, useMemo } from "react";
+
+import { cx } from "@/styled-system/css";
+import { styled } from "@/styled-system/jsx";
+import { ButtonVariantProps, button, group } from "@/styled-system/recipes";
+
+import { Group, GroupProps } from "../group";
+import { Spinner } from "../spinner";
+
+export const StyledButton = styled(ark.button, button);
+export interface StyledButtonProps extends ComponentProps<
+  typeof StyledButton
+> {}
+
+interface ButtonLoadingProps {
+  loading?: boolean;
+  loadingText?: React.ReactNode;
+}
+
+export interface ButtonProps
+  extends Omit<StyledButtonProps, "colorPalette">, ButtonLoadingProps {}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (props, ref) => {
+    const propsContext = useButtonPropsContext();
+    const buttonProps = useMemo(
+      () => mergeProps<ButtonProps>(propsContext, props),
+      [propsContext, props],
+    );
+    const { loading, disabled, loadingText, children, ...rest } = buttonProps;
+
+    const trulyDisabled = loading || disabled;
+
+    return (
+      <StyledButton
+        aria-busy={loading || undefined}
+        disabled={trulyDisabled}
+        ref={ref}
+        {...rest}
+      >
+        {loading ? (
+          loadingText ? (
+            loadingText
+          ) : (
+            <>
+              <span className="button__loading-content">{children}</span>
+              <span className="button__loading-indicator" aria-hidden="true">
+                <Spinner />
+              </span>
+            </>
+          )
+        ) : (
+          children
+        )}
+      </StyledButton>
+    );
+  },
+);
+
+Button.displayName = "Button";
+
+export interface ButtonGroupProps
+  extends Omit<GroupProps, "colorPalette">, ButtonVariantProps {}
+
+export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
+  function ButtonGroup(props, ref) {
+    const [buttonVariantProps, groupVariantProps, otherProps] = useMemo(() => {
+      const [buttonVariantProps, groupProps] = button.splitVariantProps(props);
+      const [groupVariantProps, otherProps] =
+        group.splitVariantProps(groupProps);
+
+      return [buttonVariantProps, groupVariantProps, otherProps];
+    }, [props]);
+
+    return (
+      <ButtonPropsProvider value={buttonVariantProps}>
+        <Group
+          ref={ref}
+          {...otherProps}
+          className={cx(group(groupVariantProps), otherProps.className)}
+        />
+      </ButtonPropsProvider>
+    );
+  },
+);
+
+const [ButtonPropsProvider, useButtonPropsContext] =
+  createContext<ButtonVariantProps>({
+    name: "ButtonPropsContext",
+    hookName: "useButtonPropsContext",
+    providerName: "<ButtonPropsProvider />",
+    strict: false,
+  });
+
+export { useButtonPropsContext };

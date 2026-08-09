@@ -8,7 +8,7 @@ import { profileList } from "@/api/openapi-client/profiles";
 import {
   MultiSelectPicker,
   MultiSelectPickerItem,
-} from "@/components/ui/MultiSelectPicker";
+} from "@/components/ui/multi-select-picker";
 import { deriveError } from "@/utils/error";
 
 export function InvitedByFilter() {

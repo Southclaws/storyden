@@ -19,7 +19,6 @@ type HTMLProps = React.HTMLAttributes<HTMLElement>;
 
 export function useCallbackRef<T extends (...args: any[]) => any>(
   callback: T | undefined,
-  deps: React.DependencyList = [],
 ) {
   const callbackRef = useRef(callback);
 
@@ -28,7 +27,10 @@ export function useCallbackRef<T extends (...args: any[]) => any>(
   });
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useCallback(((...args) => callbackRef.current?.(...args)) as T, deps);
+  return useCallback(
+    (...args: Parameters<T>) => callbackRef.current?.(...args),
+    [],
+  ) as T;
 }
 
 export function useDisclosure(props: UseDisclosureProps = {}) {

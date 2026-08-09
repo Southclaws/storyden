@@ -8,10 +8,11 @@ import { useEffect } from "react";
 
 import { useLinkCreate } from "@/api/openapi-client/links";
 import { LinkCard } from "@/components/library/links/LinkCard";
-import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { LinkButton } from "@/components/ui/link-button";
+import { Spinner } from "@/components/ui/spinner";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { Center, LStack, styled } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
@@ -77,7 +78,7 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   flexDirection="column"
                   alignItems="center"
                   justifyContent="center"
-                  backgroundColor="bg.error"
+                  backgroundColor="status.danger.surface"
                   borderRadius="lg"
                   padding="2"
                   height="min"
@@ -87,17 +88,16 @@ function LinkPreviewComponent(props: NodeViewProps) {
                   role="alert"
                   aria-live="polite"
                 >
-                  <styled.p
-                    fontSize="sm"
-                    color="fg.error"
+                  <Text
+                    variant="supporting"
+                    color="status.danger.content"
                     fontWeight="medium"
                     maxW="prose"
                   >
                     Link preview failed: {deriveError(error)}
-                  </styled.p>
+                  </Text>
                   <Button
                     type="button"
-                    size="xs"
                     variant="subtle"
                     onClick={() => trigger({ url: href })}
                     loading={isMutating}
@@ -107,13 +107,13 @@ function LinkPreviewComponent(props: NodeViewProps) {
                 </styled.div>
               ) : (
                 <LStack w="full" gap="1" userSelect="none">
-                  <LinkButton size="xs" variant="subtle" href={href}>
+                  <LinkButton variant="subtle" href={href}>
                     {href}
                   </LinkButton>
-                  <styled.p fontSize="xs" color="fg.muted">
+                  <Text variant="metadata">
                     <WarningIcon w="3" display="inline" />
                     &nbsp;<span>Link preview failed to load</span>
-                  </styled.p>
+                  </Text>
                 </LStack>
               )
             ) : (

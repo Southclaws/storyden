@@ -11,7 +11,7 @@ type Props = {
 };
 
 const linkStyles = cx(
-  button({ variant: "ghost", size: "xs" }),
+  button({ variant: "ghost" }),
   css({
     p: "1",
   }),

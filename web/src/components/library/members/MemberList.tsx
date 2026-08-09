@@ -1,10 +1,10 @@
 import { PublicProfileList } from "@/api/openapi-schema";
-
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Timestamp } from "@/components/site/Timestamp";
 import * as Table from "@/components/ui/table";
-import { Box, HStack, LStack, VStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { Box, HStack, LStack, VStack } from "@/styled-system/jsx";
 
 type Props = {
   profiles: PublicProfileList;
@@ -43,9 +43,9 @@ export function MemberList({ profiles }: Props) {
                     {profile.invited_by ? (
                       <MemberBadge profile={profile.invited_by} name="handle" />
                     ) : (
-                      <styled.p color="fg.subtle" fontStyle="italic">
+                      <Text variant="supporting" fontStyle="italic">
                         n/a
-                      </styled.p>
+                      </Text>
                     )}
                   </Table.Cell>
 
@@ -55,10 +55,10 @@ export function MemberList({ profiles }: Props) {
                     <LStack gap="1" alignItems="end">
                       <Timestamp created={profile.createdAt} large />
                       {isBanned && (
-                        <styled.p color="fg.destructive">
+                        <Text variant="metadata" color="status.danger.content">
                           banned{" "}
                           <Timestamp created={profile.deletedAt!} large />
-                        </styled.p>
+                        </Text>
                       )}
                     </LStack>
                   </Table.Cell>
@@ -89,37 +89,25 @@ export function MemberList({ profiles }: Props) {
 
                 <VStack alignItems="stretch">
                   <HStack justifyContent="space-between" gap="2">
-                    <styled.span
-                      color="fg.subtle"
-                      fontSize="sm"
-                      fontWeight="medium"
-                    >
+                    <Text as="span" variant="supporting" fontWeight="medium">
                       Joined
-                    </styled.span>
+                    </Text>
                     <Timestamp created={profile.createdAt} large />
                   </HStack>
 
                   <HStack justifyContent="space-between" gap="2">
-                    <styled.span
-                      color="fg.subtle"
-                      fontSize="sm"
-                      fontWeight="medium"
-                    >
+                    <Text as="span" variant="supporting" fontWeight="medium">
                       Likes
-                    </styled.span>
-                    <styled.span fontSize="sm">
+                    </Text>
+                    <Text as="span" variant="supporting" color="text.default">
                       {profile.like_score}
-                    </styled.span>
+                    </Text>
                   </HStack>
 
                   <HStack justifyContent="space-between" gap="2">
-                    <styled.span
-                      color="fg.subtle"
-                      fontSize="sm"
-                      fontWeight="medium"
-                    >
+                    <Text as="span" variant="supporting" fontWeight="medium">
                       Invited by
-                    </styled.span>
+                    </Text>
                     <Box>
                       {profile.invited_by ? (
                         <MemberBadge
@@ -127,13 +115,9 @@ export function MemberList({ profiles }: Props) {
                           name="handle"
                         />
                       ) : (
-                        <styled.span
-                          color="fg.subtle"
-                          fontStyle="italic"
-                          fontSize="sm"
-                        >
+                        <Text as="span" variant="supporting" fontStyle="italic">
                           n/a
-                        </styled.span>
+                        </Text>
                       )}
                     </Box>
                   </HStack>
@@ -142,18 +126,18 @@ export function MemberList({ profiles }: Props) {
                     <Box
                       mt="1"
                       p="2"
-                      bg="bg.error"
+                      bg="status.danger.surface"
                       borderRadius="md"
                       borderWidth="thin"
-                      borderColor="border.error"
+                      borderColor="status.danger.border"
                     >
-                      <styled.p
-                        color="fg.error"
-                        fontSize="sm"
+                      <Text
+                        variant="metadata"
+                        color="status.danger.content"
                         fontWeight="medium"
                       >
                         Banned <Timestamp created={profile.deletedAt!} large />
-                      </styled.p>
+                      </Text>
                     </Box>
                   )}
                 </VStack>

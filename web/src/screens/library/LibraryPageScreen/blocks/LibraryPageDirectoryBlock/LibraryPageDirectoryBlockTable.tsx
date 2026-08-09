@@ -115,10 +115,10 @@ export function LibraryPageDirectoryBlockTable({
                     "data-active": "",
                   })}
                   _hover={{
-                    bg: "bg.muted",
+                    bg: "background.controlHover",
                   }}
                   _active={{
-                    bg: "bg.muted",
+                    bg: "background.controlHover",
                   }}
                   p="0"
                 >
@@ -142,7 +142,6 @@ export function LibraryPageDirectoryBlockTable({
                     <IconButton
                       type="button"
                       variant="ghost"
-                      size="xs"
                       onClick={handleClickSortAction}
                     >
                       <SortIndicator order={sortState} />
@@ -179,21 +178,19 @@ export function LibraryPageDirectoryBlockTable({
           <Table.Foot
             borderBottomStyle="solid"
             borderBottomWidth="thin"
-            borderBlockColor="border.subtle"
+            borderBlockColor="border.muted"
           >
             <Table.Row>
               <Table.Cell colSpan={columns.length}>
                 <HStack gap="2">
                   <CreatePageAction
                     variant="ghost"
-                    size="xs"
                     parentSlug={nodeID}
                     disableRedirect
                     onComplete={handleCreatePageComplete}
                   />
                   <CreatePageFromURLAction
                     variant="ghost"
-                    size="xs"
                     parentSlug={nodeID}
                     onComplete={handleCreatePageComplete}
                   />
@@ -327,9 +324,9 @@ function Row({
             // class is also used in the page edit level, need to
             // create a second level of hover grouping or something.
             // _groupHover={{
-            //   bg: "bg.muted",
+            //   bg: "background.controlHover",
             // }}
-            _hover={{ bg: "bg.subtle" }}
+            _hover={{ bg: "background.controlHover" }}
             position="relative"
           >
             {editing ? (
@@ -360,12 +357,11 @@ function Row({
                                 base: "subtle",
                                 md: "ghost",
                               }}
-                              size="xs"
                               minWidth="5"
                               width="5"
                               height="5"
                               padding="0"
-                              color="fg.muted"
+                              color="text.subtle"
                               onClick={handleMenuToggle}
                             >
                               <DragHandleIcon width="4" />
@@ -438,13 +434,15 @@ function Row({
                   .with("fixed:name", () => (
                     <Link href={column.href ?? "#"}>
                       {column.value || (
-                        <styled.em color="fg.muted">(untitled page)</styled.em>
+                        <styled.em color="text.subtle">
+                          (untitled page)
+                        </styled.em>
                       )}
                     </Link>
                   ))
                   .with("fixed:link", () =>
                     child.link ? (
-                      <LinkRefButton link={child.link} variant="link" />
+                      <LinkRefButton link={child.link} />
                     ) : (
                       <>{column.value}</>
                     ),

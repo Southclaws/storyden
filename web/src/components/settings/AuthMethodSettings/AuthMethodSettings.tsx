@@ -1,8 +1,9 @@
-import { Unready } from "@/components/site/Unready";
+"use client";
 
-import { Heading } from "@/components/ui/heading";
-import { CardBox, LStack } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { Unready } from "@/components/site/Unready";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { LStack } from "@/styled-system/jsx";
 
 import { OAuth } from "./OAuth/OAuth";
 import { Password } from "./Password/Password";
@@ -17,24 +18,16 @@ export function AuthMethodSettings() {
   const { active, available } = data;
 
   return (
-    <CardBox className={lstack()} gap="4">
-      <LStack>
-        <Heading size="md">Authentication methods</Heading>
-        <p>
-          We recommend you add more than one method of authentication to your
-          account. This will help you recover your account if you lose access to
-          one of your devices.
-        </p>
+    <LStack gap="4">
+      <LStack gap="1">
+        <PageHeading>Authentication methods</PageHeading>
+        <Text variant="supporting">Manage how you log in to this site.</Text>
       </LStack>
 
       {available.password && <Password active={active.password.length > 0} />}
-
-      {/* NOTE: WebAuthn is not enabled as a 2FA yet. */}
-      {/* {available.webauthn && <Devices active={active.webauthn} />} */}
-
       {(available.oauth.length > 0 || active.methods.length > 0) && (
         <OAuth active={active.methods} available={available.oauth} />
       )}
-    </CardBox>
+    </LStack>
   );
 }

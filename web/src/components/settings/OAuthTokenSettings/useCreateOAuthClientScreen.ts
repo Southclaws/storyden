@@ -25,8 +25,7 @@ export const FormSchema = z.object({
   preset: z.enum(["machine", "app_integration", "public_app"]),
   redirectUris: z
     .array(z.object({ value: z.string().url("Must be a valid URL") }))
-    .optional()
-    .default([]),
+    .optional(),
   permissions: z.array(PermissionSchema),
 });
 export type Form = z.infer<typeof FormSchema>;

@@ -13,12 +13,12 @@ import { nodeVersionCreate } from "@/api/openapi-client/nodes";
 import { NodeVersion } from "@/api/openapi-schema";
 
 import { useLibraryPageContext } from "./Context";
+import { LibraryPageEditMode, normaliseLibraryPageEditMode } from "./editMode";
 import {
   directEditorSourceKey,
   liveEditorSourceKey,
   versionEditorSourceKey,
 } from "./editorSource";
-import { LibraryPageEditMode, normaliseLibraryPageEditMode } from "./editMode";
 import { useLibraryPagePermissions } from "./permissions";
 import { overlayNodeVersion } from "./versionedEdit";
 
@@ -41,8 +41,11 @@ type EditStateContext = {
 
 const Context = createContext<EditStateContext | null>(null);
 
-export function LibraryPageEditProvider({ children }: PropsWithChildren) {
-  const [editing, setEditing] = useQueryState("edit", {
+export function LibraryPageEditProvider({
+  children,
+  disabled = false,
+}: PropsWithChildren<{ disabled?: boolean }>) {
+  const [queryEditing, setQueryEditing] = useQueryState("edit", {
     ...parseAsBoolean,
     defaultValue: false,
     clearOnDefault: true,
@@ -76,12 +79,18 @@ export function LibraryPageEditProvider({ children }: PropsWithChildren) {
     useLibraryPagePermissions();
 
   const editMode = normaliseLibraryPageEditMode(rawEditMode);
+  const editing = disabled ? false : queryEditing;
   const isDirectEditing = editing && editMode === LibraryPageEditMode.direct;
   const isProposalEditing =
     editing && editMode === LibraryPageEditMode.proposal;
 
+  function setEditing(value: boolean) {
+    if (disabled) return;
+    void setQueryEditing(value);
+  }
+
   function startDirectEdit() {
-    if (!isAllowedToDirectEdit) return;
+    if (disabled || !isAllowedToDirectEdit) return;
 
     setProposalVersion(undefined);
     setReviewVersionID(null);
@@ -91,7 +100,7 @@ export function LibraryPageEditProvider({ children }: PropsWithChildren) {
   }
 
   async function startProposalEdit(existingVersion?: NodeVersion) {
-    if (!isAllowedToProposeEdit) return;
+    if (disabled || !isAllowedToProposeEdit) return;
 
     setSaving(true);
     try {
@@ -172,7 +181,7 @@ export function LibraryPageEditProvider({ children }: PropsWithChildren) {
     setEditing(false);
     setRawEditMode(LibraryPageEditMode.direct);
     toast.error("Start a draft edit from the page controls.");
-  }, [isProposalEditing, proposalVersion, setEditing, setRawEditMode]);
+  }, [isProposalEditing, proposalVersion, setRawEditMode]);
 
   useEffect(() => {
     if (editing) {

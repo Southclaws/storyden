@@ -8,18 +8,12 @@ import * as z from "zod";
 import { useAccountGet } from "@/api/openapi-client/accounts";
 import { authPasswordSignup } from "@/api/openapi-client/auth";
 import { APIError } from "@/api/openapi-schema";
-import { passkeyRegister } from "@/components/auth/webauthn/utils";
 import { PasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
-import { isWebauthnAvailable } from "@/lib/auth/webauthn";
 import { deriveError } from "@/utils/error";
 
 export type Props = {
-  webauthn: boolean;
   invitationID?: string;
 };
-
-const KindSchema = z.enum(["password", "webauthn"]);
-type Kind = z.infer<typeof KindSchema>;
 
 const FormSchema = z.object({
   identifier: UsernameSchema,
@@ -43,31 +37,20 @@ export function useRegisterHandleForm({ invitationID }: Props) {
   const { push } = useRouter();
   const { mutate } = useAccountGet();
 
-  const isWebauthnEnabled = isWebauthnAvailable();
-
-  function handler(kind: Kind) {
-    return handleSubmit((payload) => {
-      switch (kind) {
-        case "password":
-          return handlePassword(payload);
-        case "webauthn":
-          return handleWebauthn(payload);
-      }
-    });
-  }
-
   async function handlePassword(payload: Form) {
     const parsed = FormPasswordSchema.safeParse(payload);
     if (!parsed.success) {
-      if (parsed.error.formErrors.fieldErrors.identifier) {
+      const fieldErrors = parsed.error.flatten().fieldErrors;
+
+      if (fieldErrors.identifier) {
         setError("identifier", {
-          message: parsed.error.formErrors.fieldErrors.identifier?.join(", "),
+          message: fieldErrors.identifier.join(", "),
         });
       }
 
-      if (parsed.error.formErrors.fieldErrors.token) {
+      if (fieldErrors.token) {
         setError("token", {
-          message: parsed.error.formErrors.fieldErrors.token?.join(", "),
+          message: fieldErrors.token.join(", "),
         });
       }
 
@@ -82,22 +65,10 @@ export function useRegisterHandleForm({ invitationID }: Props) {
       .catch((e: APIError) => setError("root", { message: deriveError(e) }));
   }
 
-  async function handleWebauthn(payload: Form) {
-    try {
-      await passkeyRegister(payload.identifier);
-      push("/");
-      mutate();
-    } catch (error) {
-      setError("root", { message: deriveError(error) });
-    }
-  }
-
   return {
     form: {
       register,
-      isWebauthnEnabled,
-      handlePassword: handler("password"),
-      handleWebauthn: handler("webauthn"),
+      handlePassword: handleSubmit(handlePassword),
       errors,
     },
   };

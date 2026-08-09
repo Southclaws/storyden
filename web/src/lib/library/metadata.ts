@@ -36,28 +36,28 @@ export type LibraryPageBlockType = z.infer<typeof LibraryPageBlockTypeSchema>;
 // -
 
 export const LibraryPageBlockTypeTitleSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.title),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.title),
 });
 export type LibraryPageBlockTypeTitle = z.infer<
   typeof LibraryPageBlockTypeTitleSchema
 >;
 
 export const LibraryPageBlockTypeCoverSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.cover),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.cover),
 });
 export type LibraryPageBlockTypeCover = z.infer<
   typeof LibraryPageBlockTypeCoverSchema
 >;
 
 export const LibraryPageBlockTypeLinkSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.link),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.link),
 });
 export type LibraryPageBlockTypeLink = z.infer<
   typeof LibraryPageBlockTypeLinkSchema
 >;
 
 export const LibraryPageBlockTypeContentSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.content),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.content),
 });
 export type LibraryPageBlockTypeContent = z.infer<
   typeof LibraryPageBlockTypeContentSchema
@@ -77,7 +77,7 @@ export type LibraryPageBlockTypeAssetsConfig = z.infer<
 >;
 
 export const LibraryPageBlockTypeAssetsSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.assets),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.assets),
   config: LibraryPageBlockTypeAssetsConfigSchema.optional(),
 });
 export type LibraryPageBlockTypeAssets = z.infer<
@@ -85,7 +85,7 @@ export type LibraryPageBlockTypeAssets = z.infer<
 >;
 
 export const LibraryPageBlockTypePropertiesSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.properties),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.properties),
 });
 export type LibraryPageBlockTypeProperties = z.infer<
   typeof LibraryPageBlockTypePropertiesSchema
@@ -116,7 +116,7 @@ export type LibraryPageBlockTypeDirectoryConfig = z.infer<
 >;
 
 export const LibraryPageBlockTypeDirectorySchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.directory),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.directory),
   config: LibraryPageBlockTypeDirectoryConfigSchema.optional(),
 });
 export type LibraryPageBlockTypeDirectory = z.infer<
@@ -124,7 +124,7 @@ export type LibraryPageBlockTypeDirectory = z.infer<
 >;
 
 export const LibraryPageBlockTypeTagsSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.tags),
+  type: z.literal(LibraryPageBlockTypeSchema.enum.tags),
 });
 export type LibraryPageBlockTypeTags = z.infer<
   typeof LibraryPageBlockTypeTagsSchema

@@ -1,7 +1,6 @@
+import { handle } from "@/api/client";
 import { useCollectionList } from "@/api/openapi-client/collections";
 import { Account, Collection, PostReference } from "@/api/openapi-schema";
-
-import { handle } from "@/api/client";
 import { useCollectionItemMutations } from "@/lib/collection/mutation";
 
 export type Props = {

@@ -1,6 +1,6 @@
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
-import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
+import { PageHeading } from "@/components/ui/page-heading";
 import { LStack, WStack } from "@/styled-system/jsx";
 
 import { useWatch } from "../../store";
@@ -16,11 +16,7 @@ export function LibraryPageTitleBlock() {
     return <LibraryPageTitleBlockEditing />;
   }
 
-  return (
-    <Heading fontSize="heading.2" fontWeight="bold">
-      {name || "(untitled)"}
-    </Heading>
-  );
+  return <PageHeading>{name || "(untitled)"}</PageHeading>;
 }
 
 function LibraryPageTitleBlockEditing() {
@@ -44,8 +40,6 @@ function LibraryPageTitleBlockEditing() {
           <HeadingInput
             key={`title:${titleInputKey}`}
             id="name-input"
-            size={"2xl" as any}
-            fontWeight="bold"
             placeholder="Name..."
             onValueChange={handleChangeAndReset}
             defaultValue={defaultValue}

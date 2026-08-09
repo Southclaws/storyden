@@ -38,7 +38,7 @@ function isomorphicEnvironment(): Config {
       console.error(
         `Invalid config loaded from \`window.__storyden__\`, this indicates a problem running the root layout <script> tag on the server render which should inject the API_ADDRESS and WEB_ADDRESS environment variables.
 
-A default configuration will be used, however this configuration will most likely not work correctly in most production environments.
+A default configuration will be used, however this configuration will not work correctly in production environments.
 
 If you see this, please open an issue at https://github.com/Southclaws/storyden/issues/new
 `,

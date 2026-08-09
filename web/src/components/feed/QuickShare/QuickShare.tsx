@@ -2,13 +2,14 @@ import { match } from "ts-pattern";
 
 import { LinkReference } from "@/api/openapi-schema";
 import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
-import { Spinner } from "@/components/ui/Spinner";
+import { ContentComposerField } from "@/components/content/ContentComposer";
 import { Button } from "@/components/ui/button";
-import { ComposeField } from "@/components/ui/form/ComposeField";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { CardBox } from "@/components/ui/card-box";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { CreateIcon } from "@/components/ui/icons/Create";
-import { Card } from "@/components/ui/rich-card";
-import { CardBox, Flex, HStack, WStack } from "@/styled-system/jsx";
+import { Spinner } from "@/components/ui/spinner";
+import { Card } from "@/components/ui/surface";
+import { Flex, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
@@ -27,7 +28,7 @@ export function QuickShare(props: Props) {
   }
 
   return (
-    <CardBox bgColor="bg.default">
+    <CardBox bgColor="background.control" borderRadius="md">
       <form
         className={lstack({
           gap: "2",
@@ -36,7 +37,7 @@ export function QuickShare(props: Props) {
         onFocus={handlers.handleFocus}
         onSubmit={handlers.handlePost}
       >
-        <ComposeField
+        <ContentComposerField
           control={form.control}
           name="body"
           placeholder="Share a thought, a link, something cool..."

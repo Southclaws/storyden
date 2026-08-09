@@ -7,7 +7,8 @@ import { PluginArchiveUpload } from "@/components/admin/PluginSettings/PluginArc
 import * as Alert from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { WarningIcon } from "@/components/ui/icons/Warning";
-import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 import { UseDisclosureProps } from "@/utils/useDisclosure";
 
@@ -54,10 +55,10 @@ export function PluginAddUpload({ onClose }: UseDisclosureProps) {
 
   return (
     <LStack gap="4">
-      <styled.p color="fg.muted">
+      <Text variant="supporting">
         Upload a Storyden Plugin (.sdx or .zip) file to extend Storyden's
         functionality.
-      </styled.p>
+      </Text>
 
       <Alert.Root>
         <Alert.Icon asChild>

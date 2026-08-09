@@ -4,16 +4,15 @@ import { formatDate } from "date-fns";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Unready } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
 import { AuthorIcon } from "@/components/ui/icons/Author";
 import { CalendarIcon } from "@/components/ui/icons/Calendar";
 import { MembersIcon } from "@/components/ui/icons/Members";
 import { ParticipatingIcon } from "@/components/ui/icons/Participating";
 import { SlugIcon } from "@/components/ui/icons/Slug";
+import { SectionHeading } from "@/components/ui/section-heading";
 import * as Table from "@/components/ui/table";
 import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
-import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { Props, useThreadScreen } from "./useThreadScreen";
 
@@ -80,14 +79,14 @@ export function ThreadScreenContextPane(props: Props) {
 
   return (
     <LStack gap="1">
-      <Heading>{thread.title}</Heading>
-      <p className={css({ color: "fg.muted" })}>{thread.description}</p>
+      <SectionHeading>{thread.title}</SectionHeading>
+      <p className={css({ color: "text.subtle" })}>{thread.description}</p>
 
       <Table.Root size="sm" tableLayout="fixed" w="full" overflow="hidden">
         <Table.Body>
           {tableData.map((item) => (
             <Table.Row key={item.label}>
-              <Table.Cell fontWeight="medium" color="fg.muted">
+              <Table.Cell fontWeight="medium" color="text.subtle">
                 <HStack gap="1" flexShrink="0">
                   <item.icon width="4" />
                   <span>{item.label}</span>
@@ -111,10 +110,6 @@ export function ThreadScreenContextPane(props: Props) {
           ))}
         </Table.Body>
       </Table.Root>
-
-      <p>
-        <ScrollToTop />
-      </p>
     </LStack>
   );
 }

@@ -3,8 +3,10 @@ import type { ConditionalValue } from '../types/index';
 import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface TextVariant {
-  variant: "heading"
-size: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl"
+  /**
+ * @default "body"
+ */
+variant: "body" | "supporting" | "metadata"
 }
 
 type TextVariantMap = {

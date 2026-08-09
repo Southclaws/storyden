@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-09T12:00:00Z",
+  "title": "Design System: Storyden",
+  "extensions": {
+    "colorMeta": {
+      "background-canvas": {
+        "role": "structural",
+        "displayName": "background.canvas",
+        "canonical": "#fcfcfc"
+      },
+      "background-surface": {
+        "role": "structural",
+        "displayName": "background.surface",
+        "canonical": "#f9f9f9"
+      },
+      "background-inset": {
+        "role": "structural",
+        "displayName": "background.inset",
+        "canonical": "#f0f0f0"
+      },
+      "background-overlay": {
+        "role": "structural",
+        "displayName": "background.overlay",
+        "canonical": "rgba(255, 255, 255, 0.95)"
+      },
+      "background-control": {
+        "role": "control",
+        "displayName": "background.control",
+        "canonical": "#fcfcfc"
+      },
+      "text-default": {
+        "role": "foreground",
+        "displayName": "text.default",
+        "canonical": "#202020"
+      },
+      "text-muted": {
+        "role": "foreground",
+        "displayName": "text.muted",
+        "canonical": "#646464"
+      },
+      "border-default": {
+        "role": "boundary",
+        "displayName": "border.default",
+        "canonical": "#e0e0e0"
+      },
+      "accent-default": {
+        "role": "primary",
+        "displayName": "accent.default",
+        "canonical": "var(--accent-colour-flat-fill-400)"
+      }
+    },
+    "typographyMeta": {
+      "page-heading": {
+        "displayName": "Page heading",
+        "purpose": "The single h1 that identifies a product screen."
+      },
+      "section-heading": {
+        "displayName": "Section heading",
+        "purpose": "A muted, compact h2 for meaningful screen subdivisions."
+      },
+      "body": {
+        "displayName": "UI body",
+        "purpose": "Primary product prose and explanations."
+      },
+      "supporting": {
+        "displayName": "Supporting text",
+        "purpose": "Secondary guidance below headings or primary content."
+      },
+      "metadata": {
+        "displayName": "Metadata",
+        "purpose": "Timestamps, counts, identifiers, and compact annotations."
+      }
+    },
+    "shadows": [
+      {
+        "name": "surface",
+        "value": "0 1px 2px rgb(0 0 0 / 2.4%), 0 0 1px rgb(0 0 0 / 6%)",
+        "purpose": "Optional quiet depth; every Surface still retains a border."
+      },
+      {
+        "name": "floating",
+        "value": "0 2px 4px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)",
+        "purpose": "Tooltips and compact transient content."
+      },
+      {
+        "name": "overlay",
+        "value": "0 8px 16px rgb(0 0 0 / 6%), 0 0 1px rgb(0 0 0 / 19%)",
+        "purpose": "Menus, popovers, dialogs, and other overlapping content."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fast",
+        "value": "150ms cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Compact hover and highlight transitions."
+      },
+      {
+        "name": "normal",
+        "value": "200ms cubic-bezier(0.2, 0, 0, 1)",
+        "purpose": "Default control state transitions."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" },
+      { "name": "2xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Subtle Button",
+      "kind": "button",
+      "refersTo": "button-subtle",
+      "description": "The compact default for routine Storyden commands.",
+      "html": "<button class=\"ds-button-subtle\">Save</button>",
+      "css": ".ds-button-subtle { height:1.5rem; padding:0 .5rem; border:0; border-radius:.25rem; background:var(--colors-background-control-subtle, #e8e8e8); color:var(--colors-text-default, #202020); font:500 .75rem/1.125rem Inter, sans-serif; }"
+    },
+    {
+      "name": "Solid Button",
+      "kind": "button",
+      "refersTo": "button-solid",
+      "description": "The single decisive completion action in a workflow.",
+      "html": "<button class=\"ds-button-solid\">Continue</button>",
+      "css": ".ds-button-solid { height:1.5rem; padding:0 .5rem; border:0; border-radius:.25rem; background:var(--colors-accent-default); color:var(--colors-text-inverse); font:500 .75rem/1.125rem Inter, sans-serif; }"
+    },
+    {
+      "name": "Surface",
+      "kind": "card",
+      "refersTo": "surface",
+      "description": "An independent content object. Every Surface and Card has a border.",
+      "html": "<article class=\"ds-surface\"><strong>Discussion</strong><p>Independent community content.</p></article>",
+      "css": ".ds-surface { padding:.5rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:.5rem; background:var(--colors-background-surface, #f9f9f9); color:var(--colors-text-default, #202020); }"
+    },
+    {
+      "name": "Outlined Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The default compact form control on the control background.",
+      "html": "<input class=\"ds-input\" placeholder=\"Community name\" />",
+      "css": ".ds-input { width:100%; height:1.5rem; padding:0 .5rem; border:1px solid var(--colors-border-default, #e0e0e0); border-radius:.25rem; background:var(--colors-background-control, #fcfcfc); color:var(--colors-text-default, #202020); font:400 .875rem/1.25rem Inter, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Campfire",
+    "overview": "Storyden is compact, calm community software. Neutral structural layers guide participation and curation while the community's content, identity, imagery, and configured accent remain primary.",
+    "keyCharacteristics": [
+      "Community-native rather than generic corporate SaaS.",
+      "Compact and information dense without becoming crowded.",
+      "White-label foundations with selective semantic colour.",
+      "Storybook as directional product guidance, not only a prop catalogue.",
+      "WCAG 2.2 AA, keyboard access, reduced motion, and stable responsive layouts."
+    ],
+    "rules": [
+      {
+        "name": "Meaning before appearance",
+        "body": "Choose the semantic role first: navigation, action, content object, supporting region, status, or overlay.",
+        "section": "overview"
+      },
+      {
+        "name": "Every Surface has a border",
+        "body": "All Cards are Surfaces and all Surfaces retain a border.default boundary; fill alone is not sufficient separation from Canvas.",
+        "section": "colors"
+      },
+      {
+        "name": "Composition before invention",
+        "body": "Consult Storybook and existing components before introducing a new visual language or local wrapper.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Use semantic background, text, border, control, status, and accent tokens.",
+      "Use compact defaults and stable dimensions for repeated workflows.",
+      "Keep community content stronger than application chrome.",
+      "Use PageLayout and PageHeader as screen-level decisions.",
+      "Test interaction-heavy components from the outside."
+    ],
+    "donts": [
+      "Do not invent ad-hoc structural backgrounds or text roles.",
+      "Do not nest visually identical Surfaces or use CardBox as a page wrapper.",
+      "Do not use accent colour when neutral selection communicates the state.",
+      "Do not duplicate the expensive navigation tree for responsive layouts.",
+      "Do not treat Storybook as a capability-only prop playground."
+    ]
+  }
+}

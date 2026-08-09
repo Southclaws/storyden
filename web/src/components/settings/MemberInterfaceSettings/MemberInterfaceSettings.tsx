@@ -1,12 +1,12 @@
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { RadioGroupField } from "@/components/ui/form/RadioGroupField";
-import { Heading } from "@/components/ui/heading";
-import { CardBox, WStack, styled } from "@/styled-system/jsx";
-import { lstack } from "@/styled-system/patterns";
+import { FormControl } from "@/components/ui/form-control";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
+import { PageHeading } from "@/components/ui/page-heading";
+import { RadioGroupField } from "@/components/ui/radio-group";
+import { Text } from "@/components/ui/text";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 import {
   Props,
@@ -30,46 +30,33 @@ export function MemberInterfaceSettings(props: Props) {
       gap="4"
       onSubmit={onSubmit}
     >
-      <CardBox className={lstack()}>
+      <LStack gap="1">
         <WStack>
-          <Heading size="md">Interface settings</Heading>
+          <PageHeading>Interface settings</PageHeading>
           <Button type="submit" loading={formState.isSubmitting}>
             Save
           </Button>
         </WStack>
+        <Text variant="supporting">
+          Customise how you view and experience this site.
+        </Text>
+      </LStack>
 
-        <FormControl>
-          <FormLabel>Text editor style</FormLabel>
-          <RadioGroupField
-            control={control}
-            name="editorMode"
-            items={[
-              { label: "Rich text", value: "richtext" },
-              { label: "Markdown", value: "markdown" },
-            ]}
-          />
-          <FormHelperText>
-            Choose your preferred editor style for composing threads, replies
-            and pages.
-          </FormHelperText>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel>Sidebar default state</FormLabel>
-          <RadioGroupField
-            control={control}
-            name="sidebarDefaultState"
-            items={[
-              { label: "Open", value: "open" },
-              { label: "Closed", value: "closed" },
-            ]}
-          />
-          <FormHelperText>
-            Choose your preferred default state for the sidebar when you visit
-            the site.
-          </FormHelperText>
-        </FormControl>
-      </CardBox>
+      <FormControl>
+        <FormLabel>Text editor style</FormLabel>
+        <RadioGroupField
+          control={control}
+          name="editorMode"
+          items={[
+            { label: "Rich text", value: "richtext" },
+            { label: "Markdown", value: "markdown" },
+          ]}
+        />
+        <FormHelperText>
+          Choose your preferred editor style for composing threads, replies and
+          pages.
+        </FormHelperText>
+      </FormControl>
     </styled.form>
   );
 }

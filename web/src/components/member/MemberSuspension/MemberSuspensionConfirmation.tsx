@@ -1,7 +1,7 @@
-import { WithDisclosure } from "@/utils/useDisclosure";
-
 import { Button } from "@/components/ui/button";
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { HStack, VStack } from "@/styled-system/jsx";
+import { WithDisclosure } from "@/utils/useDisclosure";
 
 import { Props, useMemberSuspension } from "./useMemberSuspension";
 
@@ -11,13 +11,11 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
   return (
     <VStack alignItems="start">
       {props.profile.suspended ? (
-        <styled.p>
+        <Text>
           Do you want to reinstate the suspended account {props.profile.name}?
-        </styled.p>
+        </Text>
       ) : (
-        <styled.p>
-          Do you want to suspend the account {props.profile.name}?
-        </styled.p>
+        <Text>Do you want to suspend the account {props.profile.name}?</Text>
       )}
 
       <HStack w="full">
@@ -29,7 +27,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
           <Button
             // w="full"
             flexGrow="1"
-            colorPalette="red"
+            variant="solid"
             onClick={handlers.handleReinstate}
           >
             Reinstate
@@ -38,7 +36,8 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
           <Button
             // w="full"
             flexGrow="1"
-            colorPalette="red"
+            intent="destructive"
+            variant="solid"
             onClick={handlers.handleSuspension}
           >
             Suspend

@@ -1,17 +1,17 @@
 import Image, { ImageOptions } from "@tiptap/extension-image";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { EditorView } from "@tiptap/pm/view";
 import {
   NodeViewProps,
   NodeViewWrapper,
   ReactNodeViewRenderer,
   mergeAttributes,
 } from "@tiptap/react";
-import { Plugin, PluginKey } from "prosemirror-state";
-import { EditorView } from "prosemirror-view";
 
 import { Asset } from "@/api/openapi-schema";
-
 import { Button } from "@/components/ui/button";
 import { ProgressCircle } from "@/components/ui/progress";
+import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import { styled } from "@/styled-system/jsx";
 
@@ -26,9 +26,9 @@ export const uploadPositionsKey = new PluginKey<Map<string, number>>(
 );
 
 type Options = {
-  handleFiles: (view: EditorView, files: File[]) => Promise<Asset[]>;
-  handleRetry: (view: EditorView, uploadId: string) => void;
-  handleCancel: (view: EditorView, uploadId: string) => void;
+  handleFiles?: (view: EditorView, files: File[]) => Promise<Asset[]>;
+  handleRetry?: (view: EditorView, uploadId: string) => void;
+  handleCancel?: (view: EditorView, uploadId: string) => void;
 };
 
 function Component(props: NodeViewProps) {
@@ -38,9 +38,7 @@ function Component(props: NodeViewProps) {
   const uploadProgress = props.node.attrs["data-upload-progress"];
   const progressPercent = uploadProgress ? parseInt(uploadProgress, 10) : 0;
   const dataDiff = props.node.attrs["data-diff"] as
-    | "insertion"
-    | "deletion"
-    | undefined;
+    "insertion" | "deletion" | undefined;
 
   const isEditable = props.editor.isEditable;
   const isSelected = props.selected && isEditable;
@@ -98,7 +96,7 @@ function Component(props: NodeViewProps) {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          backgroundColor="bg.error"
+          backgroundColor="status.danger.surface"
           opacity="9"
           borderRadius="md"
           padding="3"
@@ -106,23 +104,25 @@ function Component(props: NodeViewProps) {
           userSelect="none"
           contentEditable={false}
         >
-          <styled.p fontSize="sm" color="fg.error" fontWeight="medium">
+          <Text
+            variant="supporting"
+            color="status.danger.content"
+            fontWeight="medium"
+          >
             Upload failed
-          </styled.p>
+          </Text>
           <styled.div display="flex" gap="2">
             <Button
               type="button"
-              size="xs"
               variant="outline"
-              onClick={() => handleRetry(props.view, uploadId)}
+              onClick={() => handleRetry?.(props.view, uploadId)}
             >
               Retry
             </Button>
             <Button
               type="button"
-              size="xs"
               variant="ghost"
-              onClick={() => handleCancel(props.view, uploadId)}
+              onClick={() => handleCancel?.(props.view, uploadId)}
             >
               Remove
             </Button>
@@ -137,6 +137,10 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
   content: "inline*",
   addOptions() {
     return {
+      inline: false,
+      allowBase64: false,
+      HTMLAttributes: {},
+      resize: false,
       ...this.parent?.(),
     };
   },
@@ -274,7 +278,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
             }
 
             event.preventDefault();
-            handleFiles(view, images);
+            void handleFiles?.(view, images);
             return true;
           },
         },

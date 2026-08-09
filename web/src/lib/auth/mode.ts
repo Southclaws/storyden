@@ -12,8 +12,7 @@ const AuthenticationModes = Object.keys(
   AuthenticationModeTable,
 ) as unknown as readonly [AuthMode, ...AuthMode[]];
 
-export const AuthenticationModeSchema: z.ZodType<AuthMode> =
-  z.enum(AuthenticationModes);
+export const AuthenticationModeSchema = z.enum(AuthenticationModes);
 export type AuthenticationMode = z.infer<typeof AuthenticationModeSchema>;
 
 export type AuthenticationModeDetail = {

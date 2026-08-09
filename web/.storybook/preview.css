@@ -1,0 +1,72 @@
+@font-face {
+  font-family: "Inter";
+  src: url("../src/app/fonts/static/InterVariable.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../src/app/fonts/static/InterVariable-Italic.woff2") format("woff2");
+  font-display: swap;
+  font-style: italic;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("../src/app/fonts/static/InterDisplay-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Inter Display";
+  src: url("../src/app/fonts/static/InterDisplay-Bold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+:root,
+body,
+#storybook-root {
+  --font-inter: "Inter", sans-serif;
+  --font-inter-display: "Inter Display", "Inter", sans-serif;
+}
+
+html,
+body,
+#storybook-root {
+  font-family: var(--fonts-body);
+}
+
+.storybook-preview {
+  min-height: 100vh;
+  background: var(--colors-background-canvas);
+  color: var(--colors-text-default);
+  font-family: var(--fonts-body);
+}
+
+.storybook-preview__story {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--spacing-6);
+}
+
+.storybook-preview__story[data-layout="centered"] {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+}
+
+.storybook-preview__story[data-layout="padded"] {
+  min-height: 100vh;
+}
+
+.storybook-preview__story[data-layout="fullscreen"] {
+  min-height: 100vh;
+  padding: 0;
+}

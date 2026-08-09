@@ -1,7 +1,7 @@
 import { createListCollection } from "@ark-ui/react";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-import { ListCollectionItem } from "@/components/ui/form/SelectField";
+import { SelectFieldItem } from "@/components/ui/select";
 
 export const NO_CATEGORY_VALUE = "__none__";
 
@@ -14,7 +14,7 @@ export function useCategorySelect() {
     }
 
     // An empty collection because we don't want to show an errored/empty state.
-    const collection = createListCollection<ListCollectionItem>({ items: [] });
+    const collection = createListCollection<SelectFieldItem>({ items: [] });
 
     return {
       ready: false as const,

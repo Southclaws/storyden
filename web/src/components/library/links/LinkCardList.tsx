@@ -1,6 +1,5 @@
 import { LinkReference } from "@/api/openapi-schema";
-
-import { CardGrid, CardRows } from "@/components/ui/rich-card";
+import { CardGrid, CardRows } from "@/components/ui/surface";
 
 import { LinkCard } from "./LinkCard";
 

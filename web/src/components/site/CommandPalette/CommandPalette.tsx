@@ -51,7 +51,13 @@ function CommandPaletteDialog() {
           <CommandPaletteContent />
         )}
 
-        <WStack fontSize="xs" color="fg.muted" lineHeight="tight" px="1" pt="2">
+        <WStack
+          fontSize="xs"
+          color="text.subtle"
+          lineHeight="tight"
+          px="1"
+          pt="2"
+        >
           <CommandPaletteStatusBar />
         </WStack>
       </RobotChatContext>
@@ -69,8 +75,8 @@ function CommandPaletteStatusBar() {
     default:
       return (
         <>
-          <styled.p>Storyden</styled.p>
-          <styled.p>{mode}</styled.p>
+          <p>Storyden</p>
+          <p>{mode}</p>
         </>
       );
   }

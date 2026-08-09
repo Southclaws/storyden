@@ -7,7 +7,6 @@ import { colours } from "./colours";
 import { durations } from "./durations";
 import { easings } from "./easings";
 import { radii } from "./radii";
-import { shadows } from "./shadows";
 import { sizes } from "./sizes";
 import { spacing } from "./spacing";
 import {
@@ -35,5 +34,4 @@ export const tokens = defineTokens({
   sizes,
   spacing,
   zIndex,
-  shadows,
 });

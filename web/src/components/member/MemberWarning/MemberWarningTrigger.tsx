@@ -2,17 +2,17 @@ import React, { ReactNode, useState } from "react";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
-import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-import { useDisclosure } from "@/utils/useDisclosure";
-
 import { handle } from "@/api/client";
 import {
   getAccountWarningListKey,
   useAccountWarningCreate,
 } from "@/api/openapi-client/accounts";
 import { ProfileReference } from "@/api/openapi-schema";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { useDisclosure } from "@/utils/useDisclosure";
 
 type MemberWarningTriggerProps = {
   children?: ReactNode;
@@ -51,7 +51,7 @@ export function MemberWarningTrigger({
   }>(children) ? (
     React.cloneElement(children, { onClick: onOpen })
   ) : (
-    <Button colorPalette="orange" onClick={onOpen}>
+    <Button intent="warning" onClick={onOpen}>
       Warn
     </Button>
   );
@@ -65,9 +65,9 @@ export function MemberWarningTrigger({
         title={`Issue warning to ${profile.name}`}
       >
         <VStack alignItems="start" gap="3">
-          <styled.p fontSize="sm" color="fg.subtle">
+          <Text variant="supporting">
             Warnings are recorded for internal moderation history.
-          </styled.p>
+          </Text>
           <styled.textarea
             rows={5}
             value={reason}
@@ -92,7 +92,8 @@ export function MemberWarningTrigger({
             <Button
               type="button"
               flexGrow="1"
-              colorPalette="orange"
+              intent="warning"
+              variant="solid"
               onClick={issueWarning}
               loading={loading}
             >

@@ -78,7 +78,7 @@ export function MemberName({
     case "full-horizontal": {
       const decorationStyle = getRoleDecorationStyle(
         profile.roles,
-        token("colors.fg.default"),
+        token("colors.text.default"),
         size === "lg"
           ? token("fontWeights.semibold")
           : token("fontWeights.normal"),
@@ -116,7 +116,7 @@ export function MemberName({
           </styled.p>
           <styled.p
             className="member-name__show-horizontal-handle"
-            color="fg.subtle"
+            color="text.muted"
             minW="0"
             textWrap="nowrap"
             textOverflow="ellipsis"
@@ -141,7 +141,7 @@ export function MemberName({
     case "full-vertical": {
       const decorationStyle = getRoleDecorationStyle(
         profile.roles,
-        token("colors.fg.default"),
+        token("colors.text.default"),
         size === "lg"
           ? token("fontWeights.bold")
           : token("fontWeights.semibold"),
@@ -183,7 +183,7 @@ export function MemberName({
             w="full"
             minW="0"
             textWrap="nowrap"
-            color="fg.subtle"
+            color="text.muted"
             overflowX="hidden"
             overflowY="clip"
             textOverflow="ellipsis"
@@ -202,7 +202,7 @@ export function MemberName({
     case "handle": {
       const decorationStyle = getRoleDecorationStyle(
         profile.roles,
-        token("colors.fg.subtle"),
+        token("colors.text.muted"),
         size === "lg"
           ? token("fontWeights.medium")
           : token("fontWeights.normal"),

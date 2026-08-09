@@ -1,7 +1,7 @@
 "use client";
 
 import { Mark } from "@tiptap/core";
-import { FocusClasses } from "@tiptap/extension-focus";
+import FocusClasses from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import { generateJSON } from "@tiptap/html";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -9,8 +9,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useId, useMemo } from "react";
 
 import { countDiffMarks, diffTipTapJSON } from "@/lib/content/diff";
-import { css } from "@/styled-system/css";
-import { cx } from "@/styled-system/css/index.mjs";
+import { css, cx } from "@/styled-system/css";
 import { LStack } from "@/styled-system/jsx";
 
 import { ImageExtended } from "../ContentComposerRich/plugins/ImagePlugin";
@@ -102,7 +101,7 @@ export function ContentDiffView({
   // NOTE: The extensions here MUST match the extensions in the composer editor.
   const extensions = useMemo(
     () => [
-      StarterKit,
+      StarterKit.configure({ link: false }),
       FocusClasses,
       DiffInsertion,
       DiffDeletion,

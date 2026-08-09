@@ -15,13 +15,7 @@ export function RoleBadge({ role }: Props) {
   const cssVars = badgeColourCSS(role.colour);
 
   return (
-    <Badge
-      size="sm"
-      style={cssVars}
-      bgColor="colorPalette.bg"
-      borderColor="colorPalette.border"
-      color="colorPalette.fg"
-    >
+    <Badge size="sm" style={cssVars}>
       {role.name}
     </Badge>
   );

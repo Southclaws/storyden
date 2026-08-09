@@ -1,12 +1,14 @@
 import { useFilter, useListCollection } from "@ark-ui/react";
 
+import { CardBox } from "@/components/ui/card-box";
 import * as Combobox from "@/components/ui/combobox";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
 import { NumberInput } from "@/components/ui/number-input";
-import { CardBox, HStack, LStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { formatSeconds } from "./useSystemSettings";
 
@@ -66,7 +68,7 @@ export function OperationCostOverrideAddForm({
                 <Input size="sm" />
               </Combobox.Input>
               <Combobox.Trigger asChild>
-                <IconButton variant="link" aria-label="open" size="xs">
+                <IconButton variant="ghost" aria-label="open" size="sm">
                   <ChevronUpDownIcon />
                 </IconButton>
               </Combobox.Trigger>
@@ -100,14 +102,16 @@ export function OperationCostOverrideAddForm({
           </IconButton>
         </HStack>
 
-        <styled.p fontSize="xs" color="fg.muted">
+        <Text variant="metadata">
           Can be performed{" "}
-          <styled.strong color="fg.info">{effectiveLimit}</styled.strong> times
-          every{" "}
-          <styled.strong color="fg.info">
+          <styled.strong color="status.info.content">
+            {effectiveLimit}
+          </styled.strong>{" "}
+          times every{" "}
+          <styled.strong color="status.info.content">
             {formatSeconds(rateLimitPeriod)}
           </styled.strong>
-        </styled.p>
+        </Text>
       </LStack>
     </CardBox>
   );

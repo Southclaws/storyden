@@ -16,7 +16,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "8",
         "minW": "8",
-        "textStyle": "sm",
+        "fontSize": "sm",
+        "lineHeight": "1.25rem",
         "px": "3"
       },
       "content": {
@@ -35,7 +36,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "9",
         "minW": "9",
-        "textStyle": "sm",
+        "fontSize": "sm",
+        "lineHeight": "1.25rem",
         "px": "3.5"
       },
       "content": {
@@ -54,7 +56,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "10",
         "minW": "10",
-        "textStyle": "sm",
+        "fontSize": "sm",
+        "lineHeight": "1.25rem",
         "px": "4"
       },
       "content": {
@@ -70,7 +73,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "9",
         "minW": "9",
-        "textStyle": "sm",
+        "fontSize": "sm",
+        "lineHeight": "1.25rem",
         "px": "3.5"
       },
       "content": {
@@ -85,7 +89,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "10",
         "minW": "10",
-        "textStyle": "sm",
+        "fontSize": "sm",
+        "lineHeight": "1.25rem",
         "px": "4"
       },
       "content": {
@@ -100,7 +105,8 @@ const tabsCompoundVariants = [
       "trigger": {
         "h": "11",
         "minW": "11",
-        "textStyle": "md",
+        "fontSize": "md",
+        "lineHeight": "1.5rem",
         "px": "4.5"
       },
       "content": {

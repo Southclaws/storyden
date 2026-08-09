@@ -12,12 +12,15 @@ import {
 import { PermissionSummary } from "@/components/role/PermissionList";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { useConfirmation } from "@/components/site/useConfirmation";
-import { MetaGrid, MetaItem } from "@/components/ui/MetaGrid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heading } from "@/components/ui/heading";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { CardBox as cardBox, lstack } from "@/styled-system/patterns";
+import { MetaGrid, MetaItem } from "@/components/ui/meta-grid";
+import { PageHeading } from "@/components/ui/page-heading";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
+import { cardBox } from "@/styled-system/recipes";
 
 import { useAdminOAuthSettings } from "./useAdminOAuthSettings";
 
@@ -43,10 +46,12 @@ export function OAuthSettings({
   const activeTokens = tokens.filter((token) => !token.revoked_at).length;
 
   return (
-    <CardBox className={lstack()} gap="4">
-      <LStack gap="2">
-        <Heading size="md">OAuth</Heading>
-        <p>OAuth clients, device authorisations, and refresh tokens.</p>
+    <LStack gap="4">
+      <LStack gap="1">
+        <PageHeading>OAuth</PageHeading>
+        <Text variant="supporting">
+          Manage OAuth clients, device authorisations and refresh tokens.
+        </Text>
       </LStack>
 
       <OAuthClientListView clients={clients} />
@@ -58,7 +63,7 @@ export function OAuthSettings({
       <OAuthDeviceAuthorisationListView
         deviceAuthorisations={deviceAuthorisations}
       />
-    </CardBox>
+    </LStack>
   );
 }
 
@@ -69,7 +74,7 @@ function OAuthClientListView({ clients }: { clients: OAuthClientList }) {
 
   return (
     <LStack gap="3">
-      <Heading size="sm">Clients</Heading>
+      <SectionHeading>Clients</SectionHeading>
       <styled.ul className={lstack({ gap: "3" })} w="full">
         {clients.map((client) => (
           <OAuthClientItem key={client.id} client={client} />
@@ -90,10 +95,16 @@ function OAuthClientItem({ client }: { client: OAuthClientList[number] }) {
       <LStack gap="2">
         <WStack gap="2" alignItems="start">
           <LStack gap="1" minW="0">
-            <Heading size="sm">{client.name}</Heading>
-            <styled.p color="fg.muted" fontSize="xs" wordBreak="break-word">
+            <Text
+              variant="supporting"
+              color="text.default"
+              fontWeight="semibold"
+            >
+              {client.name}
+            </Text>
+            <Text variant="metadata" wordBreak="break-word">
               {client.client_id}
-            </styled.p>
+            </Text>
           </LStack>
           <HStack gap="2">
             <Badge>{client.type}</Badge>
@@ -139,10 +150,10 @@ function OAuthRefreshTokenListView({
   return (
     <LStack gap="3">
       <styled.div display="flex" gap="3" alignItems="baseline" flexWrap="wrap">
-        <Heading size="sm">Refresh tokens</Heading>
-        <styled.p color="fg.muted" fontSize="sm">
+        <SectionHeading>Refresh tokens</SectionHeading>
+        <Text variant="supporting">
           {tokens.length} tokens, {activeTokens} active.
-        </styled.p>
+        </Text>
       </styled.div>
       <styled.ul className={lstack({ gap: "3" })} w="full">
         {tokens.map((token) => (
@@ -155,11 +166,10 @@ function OAuthRefreshTokenListView({
       </styled.ul>
 
       <PaginationControls
-        path="/admin"
+        path="/admin/oauth"
         currentPage={page.currentPage}
         totalPages={page.totalPages}
         pageSize={page.pageSize}
-        params={{ tab: "oauth" }}
       />
     </LStack>
   );
@@ -179,28 +189,28 @@ function OAuthRefreshTokenItem({
     <OAuthRow>
       <LStack gap="2">
         <WStack gap="2" alignItems="start">
-          <Heading size="sm">{token.client_name}</Heading>
+          <Text variant="supporting" color="text.default" fontWeight="semibold">
+            {token.client_name}
+          </Text>
           {token.revoked_at ? (
             <Badge>Revoked</Badge>
           ) : isConfirming ? (
             <HStack flexWrap="wrap" gap="2">
               <Button
-                size="xs"
                 variant="subtle"
-                bgColor="bg.destructive"
+                bgColor="status.danger.surface"
                 onClick={handleConfirmAction}
               >
                 Confirm revoke
               </Button>
-              <Button size="xs" variant="outline" onClick={handleCancelAction}>
+              <Button variant="outline" onClick={handleCancelAction}>
                 Cancel
               </Button>
             </HStack>
           ) : (
             <Button
-              size="xs"
               variant="outline"
-              bgColor="bg.destructive"
+              bgColor="status.danger.surface"
               onClick={handleConfirmAction}
             >
               Revoke
@@ -238,12 +248,18 @@ function OAuthDeviceAuthorisationListView({
 
   return (
     <LStack gap="3">
-      <Heading size="sm">Device authorisations</Heading>
+      <SectionHeading>Device authorisations</SectionHeading>
       <styled.ul className={lstack({ gap: "3" })} w="full">
         {deviceAuthorisations.map((device) => (
           <OAuthRow key={device.id}>
             <WStack gap="2" alignItems="center">
-              <Heading size="sm">{device.user_code}</Heading>
+              <Text
+                variant="supporting"
+                color="text.default"
+                fontWeight="semibold"
+              >
+                {device.user_code}
+              </Text>
               <Badge>
                 {device.approved_at
                   ? "Approved"
@@ -279,10 +295,12 @@ function formatGrant(grant: string) {
 function Empty({ title, body }: { title: string; body: string }) {
   return (
     <LStack>
-      <Heading size="sm">{title}</Heading>
-      <styled.p color="fg.muted" fontStyle="italic">
+      <Text variant="supporting" color="text.default" fontWeight="semibold">
+        {title}
+      </Text>
+      <Text variant="supporting" fontStyle="italic">
         {body}
-      </styled.p>
+      </Text>
     </LStack>
   );
 }

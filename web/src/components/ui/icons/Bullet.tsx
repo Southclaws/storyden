@@ -7,7 +7,7 @@ const Bullet = () => (
     width="16"
     height="16"
     viewBox="0 0 24 24"
-    fill={token("colors.fg.muted")}
+    fill={token("colors.text.subtle")}
   >
     <circle cx="12.1" cy="12.1" r="2.5" />
   </svg>

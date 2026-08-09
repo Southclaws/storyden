@@ -8,11 +8,12 @@ import {
 } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { Button } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
+import { Menu as ClosedMenu } from "@/components/ui/menu";
 
 type Props = ComponentProps<typeof Button>;
 
 export function RobotListMenu({
-  size = "xs",
+  size = "sm",
   variant = "ghost",
   ...buttonProps
 }: Props) {
@@ -34,35 +35,33 @@ export function RobotListMenu({
     : DEFAULT_ROBOT_NAME;
 
   return (
-    <Menu.Root onSelect={handleSelectRobot}>
-      <Menu.Trigger asChild>
+    <ClosedMenu
+      contentProps={{ minW: "48", userSelect: "none" }}
+      onSelect={handleSelectRobot}
+      trigger={
         <Button size={size} variant={variant} {...buttonProps}>
           {selectedRobotLabel}
         </Button>
-      </Menu.Trigger>
+      }
+    >
+      <Menu.ItemGroup>
+        <Menu.ItemGroupLabel>Select Robot</Menu.ItemGroupLabel>
+        {BUILT_IN_ROBOTS.map((r) => {
+          return (
+            <Menu.Item key={r.id} value={r.id}>
+              {r.name}
+            </Menu.Item>
+          );
+        })}
 
-      <Menu.Positioner>
-        <Menu.Content minW="48" userSelect="none">
-          <Menu.ItemGroup>
-            <Menu.ItemGroupLabel>Select Robot</Menu.ItemGroupLabel>
-            {BUILT_IN_ROBOTS.map((r) => {
-              return (
-                <Menu.Item key={r.id} value={r.id}>
-                  {r.name}
-                </Menu.Item>
-              );
-            })}
-
-            {robots.map((r) => {
-              return (
-                <Menu.Item key={r.id} value={r.id}>
-                  {r.name}
-                </Menu.Item>
-              );
-            })}
-          </Menu.ItemGroup>
-        </Menu.Content>
-      </Menu.Positioner>
-    </Menu.Root>
+        {robots.map((r) => {
+          return (
+            <Menu.Item key={r.id} value={r.id}>
+              {r.name}
+            </Menu.Item>
+          );
+        })}
+      </Menu.ItemGroup>
+    </ClosedMenu>
   );
 }

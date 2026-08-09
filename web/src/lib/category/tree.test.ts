@@ -49,7 +49,10 @@ test("buildCategoryTree sorts roots and children by sort", () => {
 test("buildCategoryTree treats unknown parent as root", () => {
   const categories = [category("orphan", 1, "missing-parent")];
   const tree = buildCategoryTree(categories);
-  assert.equal(tree.map((c) => c.id), ["orphan"]);
+  assert.equal(
+    tree.map((c) => c.id),
+    ["orphan"],
+  );
 });
 
 test("isDescendant finds deep descendants", () => {
@@ -64,7 +67,10 @@ test("isDescendant finds deep descendants", () => {
 });
 
 test("isDescendant returns false when ancestor does not exist", () => {
-  const tree = buildCategoryTree([category("root", 1), category("leaf", 1, "root")]);
+  const tree = buildCategoryTree([
+    category("root", 1),
+    category("leaf", 1, "root"),
+  ]);
   assert.not.ok(isDescendant(tree, "missing", "leaf"));
 });
 

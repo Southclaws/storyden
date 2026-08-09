@@ -1,6 +1,6 @@
 import { usePinch, useWheel } from "@use-gesture/react";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
-import AvatarEditor from "react-avatar-editor";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type AvatarEditorRef } from "react-avatar-editor";
 
 import { handle } from "@/api/client";
 import { accountSetAvatar } from "@/api/openapi-client/accounts";
@@ -18,13 +18,14 @@ export type Props = {
 
 export function useIconEditor(props: Props) {
   const session = useSession();
-  const ref = useRef<AvatarEditor>(null);
+  const ref = useRef<AvatarEditorRef>(null);
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [file, setFile] = useState<File | string>(props.initialValue ?? "");
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [scale, setScale] = useState(1);
+  const [preview, setPreview] = useState<string>();
 
   const pinchCaptureRef = useRef<HTMLDivElement>(null);
 
@@ -66,6 +67,7 @@ export function useIconEditor(props: Props) {
 
   useEffect(() => {
     if (props.initialValue && !isDirty) {
+      setPreview(undefined);
       setFile(props.initialValue);
     }
   }, [props.initialValue, isDirty]);
@@ -78,6 +80,17 @@ export function useIconEditor(props: Props) {
     setIsDirty(true);
   }
 
+  const onImageChange = useCallback(() => {
+    const image = ref.current?.getImageScaledToCanvas();
+    if (image) {
+      try {
+        setPreview(image.toDataURL());
+      } catch {
+        setPreview(undefined);
+      }
+    }
+  }, []);
+
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
@@ -85,6 +98,7 @@ export function useIconEditor(props: Props) {
       throw new Error("Unexpected problem: File is missing from uploader.");
     }
 
+    setPreview(undefined);
     setFile(file);
     setIsDirty(true);
   }
@@ -133,10 +147,12 @@ export function useIconEditor(props: Props) {
     scale,
     position,
     onPositionChange,
+    onImageChange,
     onFileChange,
     onSave,
     saving,
     file,
     isDirty,
+    preview,
   };
 }

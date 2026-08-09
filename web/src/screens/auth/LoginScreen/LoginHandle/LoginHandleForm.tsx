@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { FormErrorText } from "@/components/ui/form-error-text";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
@@ -10,9 +11,7 @@ export function LoginHandleForm() {
   const {
     form: {
       register,
-      isWebauthnEnabled,
       handlePassword,
-      handleWebauthn,
       errors,
     },
   } = useLoginHandleForm();
@@ -37,9 +36,7 @@ export function LoginHandleForm() {
         required
         {...register("identifier")}
       />
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.identifier?.message}
-      </styled.p>
+      <FormErrorText>{errors.identifier?.message}</FormErrorText>
       <Flex alignItems="center" gap="2">
         <Input
           type="password"
@@ -51,15 +48,11 @@ export function LoginHandleForm() {
           {...register("token")}
         />
       </Flex>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.token?.message}
-      </styled.p>
+      <FormErrorText>{errors.token?.message}</FormErrorText>
       <Button type="submit" w="full" onClick={handlePassword}>
         Login
       </Button>
-      <styled.p color="fg.error" fontSize="sm">
-        {errors.root?.message}
-      </styled.p>
+      <FormErrorText>{errors.root?.message}</FormErrorText>
     </styled.form>
   );
 }

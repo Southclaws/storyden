@@ -3,19 +3,18 @@ import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
-import { UseDisclosureProps } from "@/utils/useDisclosure";
-
 import { handle } from "@/api/client";
 import { reportCreate } from "@/api/openapi-client/reports";
 import { DatagraphItemKind } from "@/api/openapi-schema";
+import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { Button } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { FormHelperText } from "@/components/ui/form/FormHelperText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormHelperText } from "@/components/ui/form-helper-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
+import { UseDisclosureProps } from "@/utils/useDisclosure";
 
 import { Input } from "../ui/input";
 
@@ -88,14 +87,14 @@ export function ReportModal({
         onSubmit={handleSubmit}
         className={lstack()}
       >
-        <styled.div color="fg.muted">{description}</styled.div>
+        <styled.div color="text.subtle">{description}</styled.div>
 
         {subject && (
           <styled.div
             borderWidth="thin"
             borderRadius="md"
-            borderColor="border.subtle"
-            background="bg.subtle"
+            borderColor="border.muted"
+            background="background.inset"
             padding="3"
           >
             {subject}
@@ -124,7 +123,7 @@ export function ReportModal({
           </Button>
           <Button
             type="submit"
-            colorPalette="red"
+            variant="solid"
             loading={form.formState.isSubmitting}
           >
             {submitLabel}

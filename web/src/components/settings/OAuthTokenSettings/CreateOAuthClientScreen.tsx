@@ -1,28 +1,28 @@
 "use client";
 
 import { ClipboardIcon, PlusIcon, Trash2Icon } from "lucide-react";
-import { Controller, useFieldArray } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 
-import { Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { CheckboxGroupField } from "@/components/ui/checkbox";
 import * as Clipboard from "@/components/ui/clipboard";
-import { FormControl } from "@/components/ui/form/FormControl";
-import { FormErrorText } from "@/components/ui/form/FormErrorText";
-import { FormLabel } from "@/components/ui/form/FormLabel";
-import { Heading } from "@/components/ui/heading";
+import { FormControl } from "@/components/ui/form-control";
+import { FormErrorText } from "@/components/ui/form-error-text";
+import { FormLabel } from "@/components/ui/form-label";
 import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { Input } from "@/components/ui/input";
-import * as RadioGroup from "@/components/ui/radio-group";
+import { PageHeading } from "@/components/ui/page-heading";
+import { RadioGroupField } from "@/components/ui/radio-group";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { Text } from "@/components/ui/text";
 import { PermissionList } from "@/lib/permission/permission";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 import {
   Form,
-  OAuthClientPreset,
   Props,
   useCreateOAuthClientScreen,
 } from "./useCreateOAuthClientScreen";
@@ -51,7 +51,7 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
       <LStack h="full" gap="8" justifyContent="space-between">
         <LStack gap="5">
           <LStack>
-            <Heading>OAuth Client Created</Heading>
+            <PageHeading>OAuth Client Created</PageHeading>
             <p>
               <strong>
                 This is the only time you&apos;ll see this secret.
@@ -86,10 +86,10 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
     <styled.form onSubmit={handleSubmit}>
       <LStack gap="5">
         <LStack gap="1">
-          <Heading size="sm">Create OAuth Client</Heading>
-          <styled.p color="fg.muted" fontSize="sm">
+          <SectionHeading>Create OAuth Client</SectionHeading>
+          <Text variant="supporting">
             Configure your OAuth client for different integration types.
-          </styled.p>
+          </Text>
         </LStack>
 
         <FormControl>
@@ -100,65 +100,68 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Client Type</FormLabel>
-          <Controller
+          <RadioGroupField
             control={form.control}
             name="preset"
-            render={({ field }) => (
-              <RadioGroup.Root
-                value={field.value}
-                onValueChange={(details) =>
-                  field.onChange(details.value as OAuthClientPreset)
-                }
-              >
-                <LStack gap="2">
-                  <RadioGroup.Item value="app_integration">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <styled.span fontWeight="medium">
-                          App Integration
-                        </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
-                          For third-party apps like MCP clients
-                          (authorization_code + refresh_token, confidential,
-                          PKCE required)
-                        </styled.span>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-
-                  <RadioGroup.Item value="public_app">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <styled.span fontWeight="medium">
-                          Public App
-                        </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
-                          For browser/mobile apps (authorization_code +
-                          refresh_token, public, PKCE required)
-                        </styled.span>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-
-                  <RadioGroup.Item value="machine">
-                    <RadioGroup.ItemControl />
-                    <RadioGroup.ItemText>
-                      <LStack gap="0">
-                        <styled.span fontWeight="medium">
-                          Machine Client
-                        </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
-                          For server-to-server (client_credentials,
-                          confidential, no redirect URIs)
-                        </styled.span>
-                      </LStack>
-                    </RadioGroup.ItemText>
-                  </RadioGroup.Item>
-                </LStack>
-              </RadioGroup.Root>
-            )}
+            items={[
+              {
+                value: "app_integration",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      App Integration
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For third-party apps like MCP clients (authorization_code
+                      + refresh_token, confidential, PKCE required)
+                    </Text>
+                  </LStack>
+                ),
+              },
+              {
+                value: "public_app",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      Public App
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For browser/mobile apps (authorization_code +
+                      refresh_token, public, PKCE required)
+                    </Text>
+                  </LStack>
+                ),
+              },
+              {
+                value: "machine",
+                label: (
+                  <LStack gap="0">
+                    <Text
+                      as="span"
+                      variant="supporting"
+                      color="text.default"
+                      fontWeight="medium"
+                    >
+                      Machine Client
+                    </Text>
+                    <Text as="span" variant="metadata">
+                      For server-to-server (client_credentials, confidential, no
+                      redirect URIs)
+                    </Text>
+                  </LStack>
+                ),
+              },
+            ]}
           />
           <FormErrorText>{form.formState.errors.preset?.message}</FormErrorText>
         </FormControl>
@@ -207,44 +210,27 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 
         <FormControl>
           <FormLabel>Permissions</FormLabel>
-          <Controller
+          <CheckboxGroupField
             control={form.control}
             name="permissions"
-            render={({ field }) => (
-              <LStack gap="2">
-                {selectablePermissions.map((permission) => {
-                  const checked = field.value.includes(permission.value);
-
-                  return (
-                    <Checkbox
-                      key={permission.value}
-                      size="sm"
-                      checked={checked}
-                      onCheckedChange={({ checked }) => {
-                        const next = checked
-                          ? Array.from(
-                              new Set([...field.value, permission.value]),
-                            )
-                          : field.value.filter(
-                              (value: Permission) => value !== permission.value,
-                            );
-
-                        field.onChange(next);
-                      }}
-                    >
-                      <LStack gap="0">
-                        <styled.span fontWeight="medium">
-                          {permission.name}
-                        </styled.span>
-                        <styled.span color="fg.muted" fontSize="xs">
-                          {permission.description}
-                        </styled.span>
-                      </LStack>
-                    </Checkbox>
-                  );
-                })}
-              </LStack>
-            )}
+            items={selectablePermissions.map((permission) => ({
+              value: permission.value,
+              label: (
+                <LStack gap="0">
+                  <Text
+                    as="span"
+                    variant="supporting"
+                    color="text.default"
+                    fontWeight="medium"
+                  >
+                    {permission.name}
+                  </Text>
+                  <Text as="span" variant="metadata">
+                    {permission.description}
+                  </Text>
+                </LStack>
+              ),
+            }))}
           />
           <FormErrorText>
             {form.formState.errors.permissions?.message}
@@ -276,9 +262,9 @@ export function CreateOAuthClientScreen({ onClose }: Props) {
 function SecretField({ label, value }: { label: string; value: string }) {
   return (
     <LStack gap="2">
-      <Heading size="sm" color="fg.muted">
+      <Text variant="supporting" fontWeight="semibold">
         {label}
-      </Heading>
+      </Text>
       <Clipboard.Root w="full" value={value}>
         <Clipboard.Control>
           <Clipboard.Input asChild>

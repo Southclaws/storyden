@@ -19,9 +19,9 @@ export function Signature({ signature, maxHeight = 160 }: Props) {
       pt="1"
       width="full"
       borderTopWidth="thin"
-      borderTopColor="border.subtle"
+      borderTopColor="border.muted"
       // Force all typography to be subtle, to avoid distracting from content.
-      color="fg.muted"
+      color="text.subtle"
       fontSize="sm"
       overflow="hidden"
       style={{ maxHeight }}

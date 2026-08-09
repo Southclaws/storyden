@@ -1,5 +1,6 @@
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Extension } from "@tiptap/react";
+
 import { normalizeLink } from "@/lib/link/validation";
 
 export type LinkPasteMenuState = {

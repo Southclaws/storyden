@@ -9,14 +9,9 @@ import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { SystemBadge } from "@/components/system/SystemBadge";
 import { Button } from "@/components/ui/button";
-import {
-  Box,
-  CardBox,
-  HStack,
-  LStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { CardBox } from "@/components/ui/card-box";
+import { Text } from "@/components/ui/text";
+import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { ReportCardContent } from "../ReportCardContent";
 import { ReportStatusBadge } from "../ReportStatusBadge";
@@ -104,9 +99,9 @@ export function ReportCard({ report }: Props) {
 
         <WStack gap="1">
           <HStack gap="2" alignItems="center" minW="0" maxW="1/2">
-            <styled.span fontSize="sm" color="fg.subtle" fontWeight="medium">
+            <Text as="span" variant="supporting" fontWeight="medium">
               Reporter:
-            </styled.span>
+            </Text>
             {report.reported_by ? (
               <MemberBadge
                 profile={report.reported_by}
@@ -120,9 +115,9 @@ export function ReportCard({ report }: Props) {
           </HStack>
 
           <HStack gap="2" alignItems="center" minW="0" maxW="1/2">
-            <styled.span fontSize="sm" color="fg.subtle" fontWeight="medium">
+            <Text as="span" variant="supporting" fontWeight="medium">
               Handler:
-            </styled.span>
+            </Text>
             {report.handled_by ? (
               <MemberBadge
                 profile={report.handled_by}
@@ -131,9 +126,9 @@ export function ReportCard({ report }: Props) {
                 as="link"
               />
             ) : (
-              <styled.span color="fg.subtle" fontStyle="italic">
+              <Text as="span" variant="metadata" fontStyle="italic">
                 Unassigned
-              </styled.span>
+              </Text>
             )}
           </HStack>
         </WStack>
@@ -143,8 +138,6 @@ export function ReportCard({ report }: Props) {
         <WStack>
           <Button
             type="button"
-            size="xs"
-            variant="subtle"
             disabled={isAcknowledged || isResolved}
             onClick={handleAcknowledge}
           >
@@ -152,7 +145,6 @@ export function ReportCard({ report }: Props) {
           </Button>
           <Button
             type="button"
-            size="xs"
             variant="solid"
             disabled={isResolved}
             onClick={handleResolve}

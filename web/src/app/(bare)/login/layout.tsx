@@ -14,12 +14,12 @@ export default async function Layout({ children }: PropsWithChildren) {
       {children}
 
       <HStack>
-        <LinkButton size="xs" variant="ghost" href="/password-reset">
+        <LinkButton variant="ghost" href="/password-reset">
           Forgot password
         </LinkButton>
 
         {canRegister && (
-          <LinkButton size="xs" variant="subtle" href="/register">
+          <LinkButton variant="subtle" href="/register">
             Register
           </LinkButton>
         )}

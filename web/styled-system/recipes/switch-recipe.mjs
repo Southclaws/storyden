@@ -9,19 +9,19 @@ const switchRecipeCompoundVariants = []
 const switchRecipeSlotNames = [
   [
     "root",
-    "switchRecipe__root"
+    "switch__root"
   ],
   [
     "label",
-    "switchRecipe__label"
+    "switch__label"
   ],
   [
     "control",
-    "switchRecipe__control"
+    "switch__control"
   ],
   [
     "thumb",
-    "switchRecipe__thumb"
+    "switch__thumb"
   ]
 ]
 const switchRecipeSlotFns = /* @__PURE__ */ switchRecipeSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, switchRecipeDefaultVariants, getSlotCompoundVariant(switchRecipeCompoundVariants, slotName))])

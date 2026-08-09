@@ -66,12 +66,12 @@ export function FullPageChatInput() {
             borderRadius="md"
             borderWidth="thin"
             borderColor="border.default"
-            bg="bg.default"
-            color="fg.default"
+            bg="background.control"
+            color="text.default"
             fontSize="sm"
             resize="none"
             _focus={{
-              borderColor: "accent.default",
+              borderColor: "accent.solid",
               outline: "none",
             }}
             _disabled={{

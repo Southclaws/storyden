@@ -2,9 +2,8 @@
 
 import { useRouter } from "next/navigation";
 
-import { Account, Collection } from "@/api/openapi-schema";
-
 import { handle } from "@/api/client";
+import { Account, Collection } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useCollectionMutations } from "@/lib/collection/mutation";

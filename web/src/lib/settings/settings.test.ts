@@ -8,6 +8,8 @@ import type {
 } from "@/api/openapi-schema";
 import { AuthMode, RegistrationMode } from "@/api/openapi-schema";
 
+import { DefaultFeedConfig } from "./feed";
+import { DefaultNavigationConfig } from "./navigation";
 import {
   DefaultFrontendConfig,
   parseAdminSettings,
@@ -62,11 +64,40 @@ test("parseSettings keeps valid metadata and applies nested defaults", () => {
   );
 
   assert.equal(parsed.metadata.feed, {
-    layout: { type: "grid" },
-    source: { type: "categories", threadListMode: "uncategorised", quickShare: "enabled" },
+    blocks: [
+      { type: "categories", layout: "grid" },
+      { type: "quick-share", showCategorySelect: false },
+      { type: "threads", source: "uncategorised" },
+    ],
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
+  assert.equal(parsed.metadata.navigation, DefaultNavigationConfig);
+});
+
+test("parseSettings uses the fresh feed for absent or empty metadata", () => {
+  const absent = parseSettings(baseInfo({ metadata: undefined }));
+  const empty = parseSettings(baseInfo({ metadata: {} }));
+
+  assert.equal(absent.metadata.feed, DefaultFeedConfig);
+  assert.equal(empty.metadata.feed, DefaultFeedConfig);
+});
+
+test("parseSettings defaults a missing feed without discarding other metadata", () => {
+  const parsed = parseSettings(
+    baseInfo({
+      metadata: {
+        editor: { mode: "markdown" },
+        signatures: { enabled: false, maxHeight: 320 },
+      },
+    }),
+  );
+
+  assert.equal(parsed.metadata, {
+    feed: DefaultFeedConfig,
+    navigation: DefaultNavigationConfig,
+    editor: { mode: "markdown" },
+    signatures: { enabled: false, maxHeight: 320 },
+  });
 });
 
 test("parseSettings falls back to defaults for invalid metadata", () => {
@@ -97,7 +128,7 @@ test("parseSettings falls back to defaults for invalid metadata", () => {
   assert.equal(parsed.metadata, DefaultFrontendConfig);
 });
 
-test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
+test("parseAdminSettings fills missing editor with defaults", () => {
   const parsed = parseAdminSettings(
     baseAdminSettings({
       metadata: {
@@ -110,11 +141,13 @@ test("parseAdminSettings fills missing editor/sidebar with defaults", () => {
   );
 
   assert.equal(parsed.metadata.feed, {
-    layout: { type: "list" },
-    source: { type: "threads", quickShare: "enabled" },
+    blocks: [
+      { type: "quick-share", showCategorySelect: true },
+      { type: "threads", source: "all" },
+    ],
   });
   assert.equal(parsed.metadata.editor, { mode: "richtext" });
-  assert.equal(parsed.metadata.sidebar, { defaultState: "closed" });
+  assert.equal(parsed.metadata.navigation, DefaultNavigationConfig);
 });
 
 test("parseSettings keeps valid motd metadata type", () => {

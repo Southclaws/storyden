@@ -53,7 +53,7 @@ export function AssetUploadEditor(props: AssetUploadEditorProps) {
           ref={pinchCaptureRef}
           width="full"
           aspectRatio={aspectRatio}
-          backgroundColor="bg.muted"
+          backgroundColor="background.inset"
           borderTopRadius="xl"
           display="flex"
           alignItems="center"

@@ -17,8 +17,9 @@ import { IconButton } from "@/components/ui/icon-button";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { WarningIcon } from "@/components/ui/icons/Warning";
 import { Input } from "@/components/ui/input";
+import { Text } from "@/components/ui/text";
 import { API_ADDRESS } from "@/config";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack } from "@/styled-system/jsx";
 
 type Props = {
   plugin: Plugin & { connection: PluginExternalProps };
@@ -61,15 +62,15 @@ export function ConnectionTab({ plugin }: Props) {
 
   return (
     <LStack gap="4">
-      <styled.p fontSize="sm" color="fg.muted">
+      <Text variant="supporting">
         This plugin is an External plugin. This means Storyden does not manage
         its process lifecycle and cannot provide connection information. Use
         this token to connect the plugin to Storyden via RPC.
-      </styled.p>
-      <styled.p fontSize="sm" color="fg.muted">
+      </Text>
+      <Text variant="supporting">
         External plugins are responsible for handling its own restarting and
         reconnection.
-      </styled.p>
+      </Text>
 
       <Alert.Root>
         <Alert.Icon asChild>
@@ -85,9 +86,7 @@ export function ConnectionTab({ plugin }: Props) {
       </Alert.Root>
 
       <LStack gap="1">
-        <styled.p fontSize="xs" color="fg.muted">
-          Plugin token
-        </styled.p>
+        <Text variant="metadata">Plugin token</Text>
 
         <Clipboard.Root w="full" value={plugin.connection.token}>
           <Clipboard.Control gap="0">
@@ -106,9 +105,7 @@ export function ConnectionTab({ plugin }: Props) {
       </LStack>
 
       <LStack gap="1">
-        <styled.p fontSize="xs" color="fg.muted">
-          Development environment variable
-        </styled.p>
+        <Text variant="metadata">Development environment variable</Text>
         <Clipboard.Root w="full" value={envURL}>
           <Clipboard.Control gap="0">
             <Clipboard.Input asChild>
@@ -127,10 +124,10 @@ export function ConnectionTab({ plugin }: Props) {
 
       <HStack w="full" justify="end">
         <InfoTip title="Regenerating Plugin Token">
-          <styled.p fontSize="sm" color="fg.muted">
+          <Text variant="supporting">
             This will immediately invalidate the old token and force the plugin
             to disconnect if it&apos;s currently connected.
-          </styled.p>
+          </Text>
         </InfoTip>
 
         {isConfirming ? (

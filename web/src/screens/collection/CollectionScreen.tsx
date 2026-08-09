@@ -1,17 +1,17 @@
 "use client";
 
-import { CollectionWithItems } from "@/api/openapi-schema";
-import { Unready } from "@/components/site/Unready";
-
 import { useCollectionGet } from "@/api/openapi-client/collections";
+import { CollectionWithItems } from "@/api/openapi-schema";
 import { Account } from "@/api/openapi-schema";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
-import { CardGrid } from "@/components/ui/rich-card";
-import { LStack, VStack, styled } from "@/styled-system/jsx";
+import { Unready } from "@/components/site/Unready";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
+import { PageHeading } from "@/components/ui/page-heading";
+import { CardGrid } from "@/components/ui/surface";
+import { Text } from "@/components/ui/text";
+import { LStack, VStack } from "@/styled-system/jsx";
 
 type Props = {
   session?: Account;
@@ -40,22 +40,22 @@ export function CollectionScreen({ session, initialCollection }: Props) {
         crumbs={[{ label: collection.name, href: url }]}
       >
         {session && (
-          <CollectionCreateTrigger session={session} size="xs" label="Create" />
+          <CollectionCreateTrigger session={session} label="Create" />
         )}
       </Breadcrumbs>
 
       <LStack gap="1">
-        <Heading size="xl">{collection.name}</Heading>
+        <PageHeading>{collection.name}</PageHeading>
 
-        <styled.p fontSize="sm">
+        <Text variant="supporting" color="text.default">
           {collection.description ? (
-            <styled.span>{collection.description}</styled.span>
+            <span>{collection.description}</span>
           ) : (
-            <styled.span color="fg.muted" fontStyle="italic">
+            <Text as="span" variant="metadata" fontStyle="italic">
               (no description)
-            </styled.span>
+            </Text>
           )}
-        </styled.p>
+        </Text>
 
         <MemberBadge
           profile={collection.owner}

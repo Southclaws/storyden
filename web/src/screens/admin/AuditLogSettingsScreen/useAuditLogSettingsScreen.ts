@@ -10,7 +10,7 @@ import {
 
 import { useAuditEventList } from "@/api/openapi-client/admin";
 import { AuditEventType } from "@/api/openapi-schema";
-import { MultiSelectPickerItem } from "@/components/ui/MultiSelectPicker";
+import { MultiSelectPickerItem } from "@/components/ui/multi-select-picker";
 
 export const EVENT_TYPE_LABELS: Record<AuditEventType, string> = {
   [AuditEventType.thread_deleted]: "Thread Deleted",

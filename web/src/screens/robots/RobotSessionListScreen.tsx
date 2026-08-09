@@ -2,70 +2,44 @@
 
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { useRobotSessionsList } from "@/api/openapi-client/robots";
-import {
-  Account,
-  RobotSessionRef,
-  RobotSessionsListResult,
-} from "@/api/openapi-schema";
-import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { RobotSessionRef, RobotSessionsListResult } from "@/api/openapi-schema";
+import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
+import { BackAction } from "@/components/site/Action/Back";
 import { EmptyState } from "@/components/site/EmptyState";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Heading } from "@/components/ui/heading";
-import { IconButton } from "@/components/ui/icon-button";
-import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
+import { CardBox } from "@/components/ui/card-box";
 import { LinkButton } from "@/components/ui/link-button";
-import {
-  CardBox,
-  HStack,
-  LStack,
-  VStack,
-  WStack,
-  styled,
-} from "@/styled-system/jsx";
+import { PageHeading } from "@/components/ui/page-heading";
+import { Text } from "@/components/ui/text";
+import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
-type Props = {
-  initialSession: Account;
-  initialChatSessionList: RobotSessionsListResult;
-  initialChatPage?: string;
-};
-
-export function RobotSessionListScreen(props: Props) {
-  const { data, error } = useRobotSessionsList(
-    {
-      page: props.initialChatPage,
-    },
-    {
-      swr: {
-        fallbackData: props.initialChatSessionList,
-      },
-    },
-  );
+export function RobotSessionListScreen() {
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page") ?? undefined;
+  const { data, error } = useRobotSessionsList({
+    page,
+  });
 
   if (!data) {
     return <UnreadyBanner error={error} />;
   }
 
-  const currentPage = props.initialChatPage
-    ? parseInt(props.initialChatPage, 10)
-    : 1;
+  const currentPage = page ? parseInt(page, 10) : 1;
 
   return (
     <LStack className={lstack()} gap="4" w="full">
       <WStack>
         <HStack gap="2">
-          <Link href="/robots">
-            <IconButton variant="ghost" size="xs">
-              <ArrowLeftIcon />
-            </IconButton>
-          </Link>
-          <Heading size="md">Robot Chat Sessions</Heading>
+          <BackAction fallbackHref="/robots" />
+          <PageHeading>Robot Chat Sessions</PageHeading>
         </HStack>
 
-        <LinkButton href="/robots/chats/new" variant="subtle" size="xs">
+        <LinkButton href="/robots/chats/new" variant="subtle">
           New
         </LinkButton>
       </WStack>
@@ -129,16 +103,14 @@ function RobotSessionCard({ session }: RobotSessionCardProps) {
       <Link href={`/robots/chats/${session.id}`}>
         <LStack gap="2">
           <WStack alignItems="center">
-            <styled.p fontSize="sm" color="fg.subtle">
-              {session.name}
-            </styled.p>
-            <styled.time fontSize="xs" color="fg.muted">
+            <Text variant="supporting">{session.name}</Text>
+            <styled.time fontSize="xs" color="text.subtle">
               {timeAgo}
             </styled.time>
           </WStack>
 
           <WStack>
-            <MemberBadge profile={session.created_by} size="sm" name="handle" />
+            <MemberIdent profile={session.created_by} size="sm" name="handle" />
           </WStack>
         </LStack>
       </Link>

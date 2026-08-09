@@ -62,7 +62,7 @@ export function LibraryPageDirectoryBlockContents() {
 
   return (
     <LStack w="full" gap="2">
-      <WStack bgColor="bg.subtle" borderRadius="sm" p="1">
+      <WStack bgColor="background.inset" borderRadius="sm" p="1">
         <TagBadgeList
           tags={tags}
           type="button"
@@ -71,29 +71,26 @@ export function LibraryPageDirectoryBlockContents() {
         />
         <HStack gap="1" alignItems="end" flexWrap="wrap-reverse" justify="end">
           <Input
-            variant="ghost"
+            variant="inset"
+            background="background.inset"
             placeholder="Search..."
-            size="xs"
             onChange={handleSearchChange}
             minW="20"
             maxW="min"
+            px="2"
             flexShrink="1"
           />
 
           {isDirectEditing && (
             <HStack gap="1">
               <AddPropertyMenu unavailable={!hasChildren}>
-                <IconButton
-                  size="xs"
-                  variant="ghost"
-                  title="Add a new property."
-                >
+                <IconButton variant="ghost" title="Add a new property.">
                   <AddIcon />
                 </IconButton>
               </AddPropertyMenu>
 
               <PropertyListMenu>
-                <IconButton size="xs" variant="ghost">
+                <IconButton variant="ghost">
                   <MenuIcon />
                 </IconButton>
               </PropertyListMenu>

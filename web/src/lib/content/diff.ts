@@ -1,11 +1,10 @@
 import type { JSONContent } from "@tiptap/core";
 
-import {
-  diff_match_patch as DiffMatchPatch,
-  DIFF_DELETE,
-  DIFF_INSERT,
-  DIFF_EQUAL,
-} from "@/utils/diff-match-patch";
+import DiffMatchPatch from "@/utils/diff-match-patch";
+
+const DIFF_DELETE = -1;
+const DIFF_EQUAL = 0;
+const DIFF_INSERT = 1;
 
 // NOTE: This one was fully AI written using Claude including the tests.
 
@@ -198,7 +197,7 @@ function mergeContentArrays(
       origChild &&
       modChild &&
       !nodesAreDifferent(origChild, modChild) &&
-      (lcs[i]?.[j] ?? 0) === ((lcs[i + 1]?.[j + 1] ?? 0) + 1);
+      (lcs[i]?.[j] ?? 0) === (lcs[i + 1]?.[j + 1] ?? 0) + 1;
 
     if (isMatch) {
       // Nodes match - recursively merge them
@@ -230,10 +229,7 @@ function mergeContentArrays(
  * Compute LCS (Longest Common Subsequence) matrix for two content arrays.
  * This helps find the optimal alignment between nodes.
  */
-function computeLCS(
-  arr1: JSONContent[],
-  arr2: JSONContent[],
-): number[][] {
+function computeLCS(arr1: JSONContent[], arr2: JSONContent[]): number[][] {
   const m = arr1.length;
   const n = arr2.length;
   const dp: number[][] = Array(m + 1)

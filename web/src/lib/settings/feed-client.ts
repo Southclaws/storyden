@@ -1,22 +1,11 @@
 "use client";
 
-import { useQueryState } from "nuqs";
-
 import { handle } from "@/api/client";
-import { type Account, Permission } from "@/api/openapi-schema";
-import { useSession } from "@/auth";
-import { type Editing, EditingSchema } from "@/components/site/editing";
-import { hasPermission } from "@/utils/permissions";
 
 import { DefaultFeedConfig, type FeedConfig } from "./feed";
 import { useSettingsMutation } from "./mutation";
 import { type Settings } from "./settings";
 import { useSettings } from "./settings-client";
-
-type FeedEditorStateOptions = {
-  initialSession?: Account;
-  initialSettings?: Settings;
-};
 
 export function useFeedConfig(
   initialSettings?: Settings,
@@ -54,35 +43,5 @@ export function useFeedMutation() {
 
   return {
     updateFeed,
-  };
-}
-
-export function useFeedEditorState({
-  initialSession,
-  initialSettings,
-}: FeedEditorStateOptions = {}) {
-  const session = useSession(initialSession, initialSettings);
-  const [editing, setEditing] = useQueryState<null | Editing>("editing", {
-    defaultValue: null,
-    clearOnDefault: true,
-    parse: EditingSchema.parse,
-  });
-
-  const isEditingEnabled = hasPermission(session, Permission.MANAGE_SETTINGS);
-  const isEditing = editing === "feed";
-
-  function handleToggleEditing() {
-    if (editing === "feed") {
-      setEditing(null);
-    } else {
-      setEditing("feed");
-    }
-  }
-
-  return {
-    session,
-    isEditingEnabled,
-    isEditing,
-    handleToggleEditing,
   };
 }

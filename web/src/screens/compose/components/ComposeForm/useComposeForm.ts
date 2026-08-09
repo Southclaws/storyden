@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { handle } from "@/api/client";
 import { threadCreate, threadUpdate } from "@/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "@/api/openapi-schema";
-
-import { handle } from "@/api/client";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
 export const FormShapeSchema = z.object({
-  title: z.string().default(""),
+  title: z.string(),
   body: z.string().min(1),
   category: z.string().optional(),
   tags: z.string().array().optional(),
@@ -37,7 +36,10 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           tags: initialDraft.tags.map((t) => t.name),
           url: initialDraft.link?.url,
         }
-      : {},
+      : {
+          title: "",
+          body: "",
+        },
   });
 
   const saveDraft = async (data: FormShape) => {

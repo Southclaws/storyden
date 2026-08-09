@@ -258,7 +258,7 @@ function GridCard({
       className={cx(visibilityStyles)}
       position="relative"
       borderRadius="md"
-      bg="bg.muted"
+      bg="background.inset"
       display="flex"
       flexDirection="column"
       justifyContent="space-between"
@@ -289,7 +289,6 @@ function GridCard({
                 <IconButton
                   style={dragHandleStyle}
                   variant="subtle"
-                  size="xs"
                   minWidth="5"
                   width="5"
                   height="5"
@@ -357,7 +356,7 @@ function GridCard({
                 <styled.span
                   textAlign="center"
                   textWrap="balance"
-                  color="fg.muted"
+                  color="text.subtle"
                   lineClamp={3}
                 >
                   {node.name}
@@ -410,7 +409,7 @@ function GridCard({
                 w="full"
                 placeholder="Description..."
                 _placeholder={{
-                  color: "fg.subtle",
+                  color: "text.muted",
                 }}
                 defaultValue={node.description}
                 onChange={(event) =>
@@ -428,7 +427,7 @@ function GridCard({
               node.description && (
                 <styled.div
                   fontSize="sm"
-                  color="fg.muted"
+                  color="text.subtle"
                   lineClamp="1"
                   textOverflow="ellipsis"
                   wordBreak="break-all"
@@ -444,7 +443,7 @@ function GridCard({
                 w="full"
                 placeholder="Link..."
                 _placeholder={{
-                  color: "fg.subtle",
+                  color: "text.muted",
                 }}
                 defaultValue={node.link?.url}
                 onChange={(event) =>
@@ -462,7 +461,7 @@ function GridCard({
               node.link && (
                 <styled.a
                   fontSize="sm"
-                  color="fg.muted"
+                  color="text.subtle"
                   lineClamp="1"
                   textOverflow="ellipsis"
                   wordBreak="break-all"
@@ -521,7 +520,7 @@ function GridCard({
                       gap="1"
                       textWrap="nowrap"
                       flexWrap="nowrap"
-                      color="fg.subtle"
+                      color="text.muted"
                     >
                       {property.name}
                     </styled.dt>

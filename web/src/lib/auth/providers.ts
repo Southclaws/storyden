@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import "server-only";
 
 import { AuthProvider } from "@/api/openapi-schema";
-
 import {
   authProviderList,
   getAuthProviderListUrl,
@@ -13,7 +12,6 @@ import { groupAuthProviders } from "@/lib/auth/utils";
 interface Providers {
   password: boolean;
   phone: boolean;
-  webauthn: boolean;
   oauth: AuthProvider[];
 }
 
