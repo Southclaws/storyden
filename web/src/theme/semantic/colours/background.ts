@@ -19,8 +19,8 @@ export const background = {
   },
   overlay: {
     value: {
-      _osLight: "{colors.white}",
-      _osDark: "{colors.slate.dark.2}",
+      _osLight: "{colors.white.a12}",
+      _osDark: "hsla(220, 5.9%, 10%, 0.95)",
     },
   },
   control: {

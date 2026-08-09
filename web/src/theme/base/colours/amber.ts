@@ -219,8 +219,8 @@ const semanticTokens = defineSemanticTokens.colors({
   },
   text: {
     value: {
-      _osLight: "{colors.amber.light.a11}",
-      _osDark: "{colors.amber.dark.a11}",
+      _osLight: "{colors.amber.light.12}",
+      _osDark: "{colors.amber.dark.11}",
     },
   },
 });

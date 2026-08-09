@@ -1,6 +1,8 @@
 import { colorPickerAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 export const colorPicker = defineSlotRecipe({
   className: "colorPicker",
   slots: colorPickerAnatomy.keys(),
@@ -34,12 +36,8 @@ export const colorPicker = defineSlotRecipe({
       },
     },
     content: {
-      background: "background.overlay",
-      borderColor: "border.strong",
+      ...overlayContentStyles,
       borderRadius: "md",
-      borderWidth: "thin",
-      boxShadow: "overlay",
-      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",
@@ -81,7 +79,7 @@ export const colorPicker = defineSlotRecipe({
       display: "grid",
       gridTemplateColumns: "repeat(7, 1fr)",
       gap: "2",
-      background: "background.overlay",
+      background: "transparent",
     },
     swatch: {
       height: "6",

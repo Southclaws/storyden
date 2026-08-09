@@ -24,6 +24,12 @@ const meta = {
   },
   parameters: {
     layout: "fullscreen",
+    docs: {
+      description: {
+        component:
+          "Selects the workspace width for the current page without changing the global shell. `content` is the default for reading, forms, feeds, and settings; `wide` is for dashboards, tables, Robots, and multi-column tools; `full` is reserved for canvas-like editors and data tools. Prose remains constrained inside wide layouts.",
+      },
+    },
   },
 } satisfies Meta<typeof PageLayout>;
 

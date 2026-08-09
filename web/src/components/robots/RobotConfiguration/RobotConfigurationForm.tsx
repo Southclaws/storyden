@@ -191,7 +191,7 @@ function RobotDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
         size="sm"
         minW="32"
         variant="ghost"
-        colorPalette="red"
+        intent="destructive"
         onClick={disclosure.onOpen}
       >
         Delete robot
@@ -224,7 +224,8 @@ function RobotDeleteButton({ onDelete }: { onDelete: () => Promise<void> }) {
             </Button>
             <Button
               type="button"
-              colorPalette="red"
+              intent="destructive"
+              variant="solid"
               loading={isDeleting}
               onClick={handleDelete}
             >

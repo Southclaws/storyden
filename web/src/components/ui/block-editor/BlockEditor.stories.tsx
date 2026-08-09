@@ -14,6 +14,12 @@ const meta = {
   component: BlockEditor.Root,
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Shared editing chrome for block-based screens. The UI layer owns gutters, handles, menus, and theme-ready styling; each domain editor owns block data, permissions, persistence, and the drag payload understood by the global drag-and-drop provider. Read mode must remain visually stable when edit mode is enabled.",
+      },
+    },
   },
 } satisfies Meta<typeof BlockEditor.Root>;
 

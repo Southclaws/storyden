@@ -20,7 +20,8 @@ interface ButtonLoadingProps {
   loadingText?: React.ReactNode;
 }
 
-export interface ButtonProps extends StyledButtonProps, ButtonLoadingProps {}
+export interface ButtonProps
+  extends Omit<StyledButtonProps, "colorPalette">, ButtonLoadingProps {}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (props, ref) => {
@@ -61,7 +62,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = "Button";
 
-export interface ButtonGroupProps extends GroupProps, ButtonVariantProps {}
+export interface ButtonGroupProps
+  extends Omit<GroupProps, "colorPalette">, ButtonVariantProps {}
 
 export const ButtonGroup = forwardRef<HTMLDivElement, ButtonGroupProps>(
   function ButtonGroup(props, ref) {

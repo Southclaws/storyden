@@ -1,5 +1,8 @@
 import { defineRecipe } from "@pandacss/dev";
 
+const withoutIntent =
+  "&:not(.button--intent_success):not(.button--intent_warning):not(.button--intent_destructive)";
+
 export const button = defineRecipe({
   className: "button",
   jsx: ["Button", "IconButton", "SubmitButton"],
@@ -7,6 +10,7 @@ export const button = defineRecipe({
     alignItems: "center",
     appearance: "none",
     borderRadius: "sm",
+    colorPalette: "gray",
     cursor: "pointer",
     display: "inline-flex",
     fontWeight: "semibold",
@@ -87,14 +91,19 @@ export const button = defineRecipe({
       solid: {
         background: "colorPalette.default",
         color: "colorPalette.fg",
-        colorPalette: "accent",
+        [withoutIntent]: {
+          colorPalette: "accent",
+        },
         _hover: {
-          background: "colorPalette.default/80",
+          background: "colorPalette.default",
           color: "colorPalette.fg",
+          outline: "1px solid",
+          outlineColor: "colorPalette.fg/20",
+          outlineOffset: "-1px",
         },
         _focusVisible: {
           outline: "2px solid",
-          outlineColor: "colorPalette.default",
+          outlineColor: "colorPalette.text",
           outlineOffset: "2px",
         },
         _disabled: {
@@ -108,48 +117,52 @@ export const button = defineRecipe({
         },
       },
       outline: {
+        background: "background.control",
         borderWidth: "1px",
-        borderColor: "border.muted",
-        color: "text.muted",
-        colorPalette: "gray",
+        borderColor: "colorPalette.7",
+        color: "colorPalette.text",
         _hover: {
-          background: "colorPalette.subtle",
-          color: "colorPalette.default",
+          background: "colorPalette.3",
+          borderColor: "colorPalette.8",
+          color: "colorPalette.text",
         },
         _disabled: {
+          background: "background.controlDisabled",
           borderColor: "border.disabled",
           color: "text.disabled",
           cursor: "not-allowed",
           _hover: {
-            background: "transparent",
+            background: "background.controlDisabled",
             borderColor: "border.disabled",
             color: "text.disabled",
           },
         },
         _focusVisible: {
           outline: "2px solid",
-          outlineColor: "colorPalette.default",
+          outlineColor: "colorPalette.text",
           outlineOffset: "2px",
         },
         _selected: {
-          background: "accent.default",
-          borderColor: "accent.default",
-          color: "accent.fg",
+          background: "colorPalette.default",
+          borderColor: "colorPalette.default",
+          color: "colorPalette.fg",
           _hover: {
-            background: "accent.default/80",
-            borderColor: "accent.default/80",
+            background: "colorPalette.default",
+            borderColor: "colorPalette.default",
           },
         },
       },
       ghost: {
         color: "text.muted",
-        colorPalette: "accent",
+        [withoutIntent]: {
+          colorPalette: "accent",
+        },
         _hover: {
-          background: "colorPalette.subtle",
-          color: "text.default",
+          background: "colorPalette.3",
+          color: "colorPalette.text",
         },
         _selected: {
-          background: "colorPalette.muted",
+          background: "colorPalette.4",
         },
         _disabled: {
           color: "text.disabled",
@@ -161,23 +174,22 @@ export const button = defineRecipe({
         },
         _focusVisible: {
           outline: "2px solid",
-          outlineColor: "colorPalette.default",
+          outlineColor: "colorPalette.text",
           outlineOffset: "2px",
         },
       },
       subtle: {
-        colorPalette: "accent",
-        background: "background.controlSubtle/80",
-        color: "text.muted",
+        background: "colorPalette.3/80",
+        color: "colorPalette.text",
         backdropBlur: "sm",
         backdropFilter: "auto",
         _hover: {
-          background: "colorPalette.subtle",
-          color: "text.default",
+          background: "colorPalette.4",
+          color: "colorPalette.text",
         },
         _focusVisible: {
           outline: "2px solid",
-          outlineColor: "colorPalette.default",
+          outlineColor: "colorPalette.text",
           outlineOffset: "2px",
         },
         _disabled: {
@@ -224,6 +236,17 @@ export const button = defineRecipe({
           transform: "translate(-50%, -50%)",
           width: "6",
         },
+      },
+    },
+    intent: {
+      success: {
+        colorPalette: "green",
+      },
+      warning: {
+        colorPalette: "amber",
+      },
+      destructive: {
+        colorPalette: "red",
       },
     },
   },

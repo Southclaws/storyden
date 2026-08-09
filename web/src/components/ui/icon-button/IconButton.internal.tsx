@@ -19,7 +19,7 @@ interface IconButtonLoadingProps {
 }
 
 export interface IconButtonProps
-  extends StyledIconButtonProps, IconButtonLoadingProps {}
+  extends Omit<StyledIconButtonProps, "colorPalette">, IconButtonLoadingProps {}
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (props, ref) => {

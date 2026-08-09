@@ -7,6 +7,14 @@ import { Badge, badgeColorPalettes, badgeColourPalette, badgeColours } from ".";
 const meta = {
   title: "Components/Data Display/Badge",
   component: Badge,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Compact metadata for categories, statuses, roles, and short classifications. Prefer the quiet `subtle` treatment and use `colorPalette` only when colour carries stable meaning. Badges are not buttons, headings, or decoration; avoid long prose and clusters that compete with the primary content.",
+      },
+    },
+  },
   args: {
     children: "Announcement",
     size: "md",

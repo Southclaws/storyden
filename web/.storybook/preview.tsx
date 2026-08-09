@@ -74,7 +74,7 @@ const preview: Preview = {
         locales: "en-US",
         order: [
           "Foundations",
-          ["Tokens", "Icons", "Layout", "*"],
+          ["Principles", "Tokens", "Icons", "Layout", "*"],
           "Components",
           [
             "Actions",

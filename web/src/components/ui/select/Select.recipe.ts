@@ -1,14 +1,12 @@
 import { selectAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 export const selectBaseStyles = {
   content: {
-    background: "background.overlay",
-    borderColor: "border.strong",
+    ...overlayContentStyles,
     borderRadius: "sm",
-    borderWidth: "thin",
-    boxShadow: "overlay",
-    color: "text.default",
     display: "flex",
     flexDirection: "column",
     maxHeight: "[min(24rem,calc(100vh-2rem))]",

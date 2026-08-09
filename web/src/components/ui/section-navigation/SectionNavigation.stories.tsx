@@ -9,6 +9,12 @@ const meta = {
   component: SectionNavigation,
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        component:
+          "Compact page navigation for section-heavy settings and administration on small screens. It mirrors the contextual desktop sidebar without duplicating the global navigation tree. Use it for routes, not form values; use Tabs instead when switching among a small set of views inside one feature.",
+      },
+    },
   },
   decorators: [
     (Story) => (

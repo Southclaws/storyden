@@ -7,6 +7,14 @@ import * as Tabs from ".";
 const meta = {
   title: "Components/Navigation/Tabs",
   component: Tabs.Root,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Use Tabs for a small, stable set of peer views within one product feature, such as Robots and Sessions. Do not use them for large settings hierarchies, cross-page admin navigation, or content whose semantic structure should remain visible without tab state.",
+      },
+    },
+  },
   args: {
     defaultValue: "overview",
     size: "md",

@@ -8,6 +8,14 @@ import { ProgressCircle, ProgressHorizontal } from ".";
 const meta = {
   title: "Components/Feedback/Progress",
   component: ProgressHorizontal,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Shows measurable completion for an operation with known progress. Use the horizontal form when comparison or a label matters and the circular form in compact chrome. Use Spinner for indeterminate waiting and a skeleton when preserving the shape of loading content.",
+      },
+    },
+  },
   args: {
     value: 64,
     size: "md",
@@ -47,13 +55,13 @@ export const Sizes: Story = {
       rowGap="5"
       w="full"
     >
-      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
+      <Text fontWeight="semibold" variant="metadata">
         Size
       </Text>
-      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
+      <Text fontWeight="semibold" variant="metadata">
         Linear
       </Text>
-      <Text color="text.subtle" fontWeight="semibold" variant="metadata">
+      <Text fontWeight="semibold" variant="metadata">
         Circular
       </Text>
 

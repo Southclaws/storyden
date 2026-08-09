@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
-import { LStack, styled } from "@/styled-system/jsx";
+import { Text } from "@/components/ui/text";
+import { LStack } from "@/styled-system/jsx";
 
 import * as RadioGroup from ".";
 
@@ -13,6 +14,14 @@ const options = [
 const meta = {
   title: "Components/Forms/Radio Group",
   component: RadioGroup.Root,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Presents a small set of mutually exclusive choices that should remain visible for comparison. Use Select when space is constrained or the list is longer, Checkbox for independent booleans, and Switch for an immediate on/off setting.",
+      },
+    },
+  },
   args: {
     defaultValue: "public",
     orientation: "vertical",
@@ -56,16 +65,16 @@ export const Sizes: Story = {
     <LStack gap="6">
       {(["sm", "md", "lg"] as const).map((size) => (
         <LStack key={size} gap="2">
-          <styled.span color="text.subtle" fontSize="xs" lineHeight="normal">
+          <Text as="span" variant="metadata">
             {size}
-          </styled.span>
+          </Text>
           <Example size={size} defaultValue="public" />
         </LStack>
       ))}
       <LStack gap="2">
-        <styled.span color="text.subtle" fontSize="xs" lineHeight="normal">
+        <Text as="span" variant="metadata">
           Horizontal
-        </styled.span>
+        </Text>
         <Example size="md" orientation="horizontal" defaultValue="members" />
       </LStack>
     </LStack>

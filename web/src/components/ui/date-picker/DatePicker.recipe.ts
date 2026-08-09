@@ -1,6 +1,8 @@
 import { datePickerAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 export const datePicker = defineSlotRecipe({
   className: "datePicker",
   jsx: ["DatePicker"],
@@ -12,12 +14,8 @@ export const datePicker = defineSlotRecipe({
       gap: "1.5",
     },
     content: {
-      background: "background.overlay",
-      borderColor: "border.strong",
+      ...overlayContentStyles,
       borderRadius: "md",
-      borderWidth: "thin",
-      boxShadow: "overlay",
-      color: "text.default",
       display: "flex",
       flexDirection: "column",
       gap: "3",

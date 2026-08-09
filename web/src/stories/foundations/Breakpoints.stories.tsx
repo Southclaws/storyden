@@ -26,14 +26,17 @@ const containerConditions = [
   {
     name: "containerSmall",
     value: "@container (max-width: 560px)",
+    exampleWidth: "30rem",
   },
   {
     name: "containerMedium",
     value: "@container (min-width: 561px) and (max-width: 999px)",
+    exampleWidth: "45rem",
   },
   {
     name: "containerLarge",
     value: "@container (min-width: 1000px)",
+    exampleWidth: "65rem",
   },
 ] as const;
 
@@ -93,7 +96,7 @@ export const ResponsiveScale: Story = {
         title="Container conditions"
         description="Container conditions are for components that adapt to their parent rather than the viewport."
       >
-        <styled.div display="grid" gap="3">
+        <styled.div display="grid" gap="3" overflowX="auto">
           {containerConditions.map((condition) => (
             <styled.article
               key={condition.name}
@@ -102,18 +105,21 @@ export const ResponsiveScale: Story = {
               borderColor="border.muted"
               borderRadius="panel"
               borderWidth="thin"
+              containerType="inline-size"
               display="grid"
               gap="3"
               gridTemplateColumns={{
                 base: "1fr",
-                md: "12rem minmax(0, 1fr)",
+                md: "12rem minmax(0, 1fr) auto",
               }}
               padding="4"
+              style={{ inlineSize: condition.exampleWidth }}
             >
               <TokenCode>{condition.name}</TokenCode>
               <styled.span color="text.muted" fontFamily="mono" fontSize="sm">
                 {condition.value}
               </styled.span>
+              <ContainerConditionState condition={condition.name} />
             </styled.article>
           ))}
         </styled.div>
@@ -121,3 +127,62 @@ export const ResponsiveScale: Story = {
     </FoundationPage>
   ),
 };
+
+function ContainerConditionState({
+  condition,
+}: {
+  condition: (typeof containerConditions)[number]["name"];
+}) {
+  const commonProps = {
+    borderColor: "border.default",
+    borderRadius: "control",
+    borderWidth: "thin",
+    color: "text.muted",
+    fontSize: "xs",
+    paddingInline: "2",
+    paddingBlock: "1",
+  } as const;
+
+  if (condition === "containerSmall") {
+    return (
+      <styled.span
+        {...commonProps}
+        _containerSmall={{
+          backgroundColor: "status.success.surface",
+          borderColor: "status.success.border",
+          color: "status.success.content",
+        }}
+      >
+        Matched at 480px
+      </styled.span>
+    );
+  }
+
+  if (condition === "containerMedium") {
+    return (
+      <styled.span
+        {...commonProps}
+        _containerMedium={{
+          backgroundColor: "status.success.surface",
+          borderColor: "status.success.border",
+          color: "status.success.content",
+        }}
+      >
+        Matched at 720px
+      </styled.span>
+    );
+  }
+
+  return (
+    <styled.span
+      {...commonProps}
+      _containerLarge={{
+        backgroundColor: "status.success.surface",
+        borderColor: "status.success.border",
+        color: "status.success.content",
+      }}
+    >
+      Matched at 1040px
+    </styled.span>
+  );
+}

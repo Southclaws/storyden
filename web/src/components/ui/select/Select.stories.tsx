@@ -23,6 +23,14 @@ type SelectStoryArgs = {
 
 const meta = {
   title: "Components/Forms/Select",
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Chooses one value from a short, known option set. Use Combobox when search is needed, Radio Group when the choices benefit from visible comparison, and SectionNavigation when the options are routes rather than form values.",
+      },
+    },
+  },
   args: {
     size: "sm",
     variant: "outline",

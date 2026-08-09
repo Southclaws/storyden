@@ -24,6 +24,14 @@ type ComboboxStoryArgs = {
 
 const meta = {
   title: "Components/Forms/Combobox",
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A searchable selection control for longer or dynamic collections. Use Select for a short known option set and Input for free-form values. The trigger, input, and icon inherit one shared size, and the option list uses canonical Overlay positioning.",
+      },
+    },
+  },
   argTypes: {
     size: {
       control: "select",

@@ -11,6 +11,7 @@ size: "sm" | "md" | "lg"
  * @default "subtle"
  */
 variant: "solid" | "outline" | "ghost" | "subtle" | "plain"
+intent: "success" | "warning" | "destructive"
 }
 
 type ButtonVariantMap = {

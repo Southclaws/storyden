@@ -1,17 +1,15 @@
 import { tooltipAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { floatingOverlayStyles } from "@/theme/semantic/overlay";
+
 export const tooltip = defineSlotRecipe({
   className: "tooltip",
   slots: tooltipAnatomy.keys(),
   base: {
     content: {
-      background: "background.overlay",
-      borderColor: "border.strong",
+      ...floatingOverlayStyles,
       borderRadius: "sm",
-      borderWidth: "thin",
-      boxShadow: "floating",
-      color: "text.default",
       fontWeight: "semibold",
       px: "3",
       py: "2",

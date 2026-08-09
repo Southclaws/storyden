@@ -63,6 +63,7 @@ export default defineConfig({
     recipes: {
       button: [
         {
+          intent: ["success", "warning", "destructive"],
           size: ["sm", "md", "lg"],
           variant: ["solid", "outline", "ghost", "subtle", "plain"],
         },

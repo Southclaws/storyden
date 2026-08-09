@@ -9,6 +9,14 @@ import { FormControl } from ".";
 const meta = {
   title: "Components/Forms/Form Control",
   component: FormControl,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The canonical vertical field composition: label, control, then supporting or error feedback. Keep related fields in a compact stack and use the component's built-in spacing rather than adding local margins between its parts.",
+      },
+    },
+  },
 } satisfies Meta<typeof FormControl>;
 
 export default meta;

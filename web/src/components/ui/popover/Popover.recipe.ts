@@ -1,6 +1,8 @@
 import { popoverAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 export const popover = defineSlotRecipe({
   className: "popover",
   slots: popoverAnatomy.keys(),
@@ -11,13 +13,9 @@ export const popover = defineSlotRecipe({
       height: "min",
     },
     content: {
+      ...overlayContentStyles,
       maxHeight: "var(--available-height)",
-      background: "background.overlay",
-      borderColor: "border.strong",
       borderRadius: "md",
-      borderWidth: "thin",
-      boxShadow: "overlay",
-      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxWidth: "sm",

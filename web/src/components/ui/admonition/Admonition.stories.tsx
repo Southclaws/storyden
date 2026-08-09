@@ -8,6 +8,14 @@ import { Admonition } from ".";
 const meta = {
   title: "Components/Feedback/Admonition",
   component: Admonition,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The preferred in-flow alternative to a toast for task-level errors, warnings, and meaningful success feedback. An Admonition stays near the relevant content and may be dismissed once acknowledged. Use Alert when the message must remain visible while its condition applies; use helper text for routine instructions and field validation.",
+      },
+    },
+  },
   args: {
     value: true,
     kind: "neutral",

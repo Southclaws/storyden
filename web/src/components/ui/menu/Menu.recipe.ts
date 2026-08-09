@@ -1,6 +1,8 @@
 import { menuAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 const itemStyle = {
   alignItems: "center",
   borderRadius: "xs",
@@ -48,17 +50,11 @@ export const menu = defineSlotRecipe({
       lineHeight: "1.25rem",
     },
     content: {
+      ...overlayContentStyles,
       maxHeight: "var(--available-height)",
       maxW: "20rem",
       overflowY: "scroll",
-      background: "background.overlay",
-      backdropBlur: "frosted",
-      backdropFilter: "auto",
-      borderColor: "border.strong",
       borderRadius: "sm",
-      borderWidth: "thin",
-      boxShadow: "overlay",
-      color: "text.default",
       display: "flex",
       flexDirection: "column",
       outline: "none",

@@ -9,6 +9,12 @@ const meta = {
   component: CardBox,
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component:
+          "A compact compatibility Surface for independent arbitrary content. It always retains the canonical Surface border, padding, and radius. Prefer the richer Surface components for titled, repeated, media-backed, or metadata-heavy objects; do not use CardBox as a generic wrapper around top-level settings or page sections.",
+      },
+    },
   },
 } satisfies Meta<typeof CardBox>;
 

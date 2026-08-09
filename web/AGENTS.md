@@ -6,6 +6,12 @@ Storybook is the canonical place to work on `web` UI components in isolation.
 When changing components under `src/components/ui/**`, add or update the
 co-located `*.stories.tsx` file in the component folder.
 
+Storybook is also the directional design-system authority, not merely a prop
+catalogue. Before composing a new screen or choosing visual variants, read
+`Foundations/Principles/Storyden` and the relevant component/composition
+stories. Treat those stories as the approved decision rules for hierarchy,
+layering, density, actions, navigation, feedback, and screen composition.
+
 - Use stories to exercise all Panda recipe variants exposed by the component,
   especially `size`, `variant`, `kind`, `shape`, and slot recipes.
 - Prefer public component imports from the folder `index.ts`; avoid reaching
@@ -22,6 +28,8 @@ directory still produces a predictable Storybook hierarchy:
 
 - `Foundations/Tokens/<Token group>`, `Foundations/Icons/<Catalogue>`, and
   `Foundations/Layout/<System>` document the raw design-system foundations.
+- `Foundations/Principles/<Guide>` documents why and when those foundations
+  are used in Storyden. Principles precede token or component choice.
 - `Components/<Role>/<Component>` contains isolated public UI components. Use
   the established role folders: `Actions`, `Forms`, `Navigation`, `Feedback`,
   `Overlays`, `Data Display`, `Layout`, and `Typography`.

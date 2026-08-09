@@ -61,6 +61,12 @@ const meta = {
   },
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        component:
+          "The canonical Surface family for independent content objects. Every Surface and Card has a `border.default` boundary; fill alone is not enough separation from Canvas. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
+      },
+    },
   },
 } satisfies Meta<typeof Card>;
 

@@ -64,7 +64,8 @@ export function CategoryDeleteScreen(props: CategoryDeleteProps) {
           </Button>
           <Button
             type="submit"
-            colorPalette="red"
+            intent="destructive"
+            variant="solid"
             loading={form.formState.isSubmitting}
           >
             Delete Category

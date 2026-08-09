@@ -7,6 +7,14 @@ import * as Alert from ".";
 const meta = {
   title: "Components/Feedback/Alert",
   component: Alert.Root,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Persistent contextual information that affects the current task. Alert uses Inset structure and adds status colour only to communicate meaning. Use it for risks, requirements, and important consequences; ordinary field guidance belongs in helper text, and transient operation feedback belongs in a toast.",
+      },
+    },
+  },
 } satisfies Meta<typeof Alert.Root>;
 
 export default meta;

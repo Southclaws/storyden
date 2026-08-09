@@ -27,7 +27,7 @@ export const slider = defineSlotRecipe({
       background: "accent.default",
     },
     thumb: {
-      background: "background.overlay",
+      background: "background.control",
       borderColor: "accent.default",
       borderRadius: "full",
       borderWidth: "2px",

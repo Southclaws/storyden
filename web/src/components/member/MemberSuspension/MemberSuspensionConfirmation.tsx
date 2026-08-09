@@ -27,7 +27,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
           <Button
             // w="full"
             flexGrow="1"
-            colorPalette="red"
+            variant="solid"
             onClick={handlers.handleReinstate}
           >
             Reinstate
@@ -36,7 +36,8 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
           <Button
             // w="full"
             flexGrow="1"
-            colorPalette="red"
+            intent="destructive"
+            variant="solid"
             onClick={handlers.handleSuspension}
           >
             Suspend

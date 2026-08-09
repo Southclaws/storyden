@@ -1,6 +1,8 @@
 import { comboboxAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
+import { overlayContentStyles } from "@/theme/semantic/overlay";
+
 export const combobox = defineSlotRecipe({
   className: "combobox",
   slots: comboboxAnatomy.keys(),
@@ -31,12 +33,8 @@ export const combobox = defineSlotRecipe({
       top: "0",
     },
     content: {
-      background: "background.overlay",
-      borderColor: "border.strong",
+      ...overlayContentStyles,
       borderRadius: "sm",
-      borderWidth: "thin",
-      boxShadow: "overlay",
-      color: "text.default",
       display: "flex",
       flexDirection: "column",
       maxHeight: "[min(24rem,calc(100vh-2rem))]",

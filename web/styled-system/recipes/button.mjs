@@ -18,6 +18,11 @@ const buttonVariantMap = {
     "ghost",
     "subtle",
     "plain"
+  ],
+  "intent": [
+    "success",
+    "warning",
+    "destructive"
   ]
 }
 

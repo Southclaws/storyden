@@ -42,7 +42,7 @@ export const switchRecipe = defineSlotRecipe({
       fontWeight: "medium",
     },
     thumb: {
-      background: "background.overlay",
+      background: "background.control",
       borderRadius: "full",
       boxShadow: "surface",
       transitionDuration: "normal",
@@ -50,7 +50,7 @@ export const switchRecipe = defineSlotRecipe({
       transitionTimingFunction: "default",
       _checked: {
         transform: "translateX(100%)",
-        background: "background.overlay",
+        background: "background.control",
       },
       _disabled: {
         background: "text.disabled",

@@ -51,7 +51,7 @@ export function MemberWarningTrigger({
   }>(children) ? (
     React.cloneElement(children, { onClick: onOpen })
   ) : (
-    <Button colorPalette="orange" onClick={onOpen}>
+    <Button intent="warning" onClick={onOpen}>
       Warn
     </Button>
   );
@@ -92,7 +92,8 @@ export function MemberWarningTrigger({
             <Button
               type="button"
               flexGrow="1"
-              colorPalette="orange"
+              intent="warning"
+              variant="solid"
               onClick={issueWarning}
               loading={loading}
             >

@@ -7,6 +7,14 @@ import { Switch } from ".";
 const meta = {
   title: "Components/Forms/Switch",
   component: Switch,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "An immediate on/off setting whose effect is clear from its label. Use Checkbox when values are staged for form submission or several independent options are selected together. The track, thumb, label, focus, and disabled states must remain distinct in both themes.",
+      },
+    },
+  },
   args: {
     children: "Enable notifications",
     size: "md",

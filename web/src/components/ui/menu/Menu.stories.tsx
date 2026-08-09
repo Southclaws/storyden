@@ -13,6 +13,14 @@ import { Menu as ClosedMenu } from "./Menu";
 const meta = {
   title: "Components/Overlays/Menu",
   component: ClosedMenu,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A compact Overlay for contextual commands. Prefer the closed Menu so portalling, placement, collision handling, and click-away behavior use Storyden's defaults. Use the compound slots only when the menu genuinely needs custom composition. Menus contain commands, not primary navigation or complete forms.",
+      },
+    },
+  },
   args: {
     trigger: <Button variant="outline">Open menu</Button>,
     children: <Menu.Item value="example">Example</Menu.Item>,

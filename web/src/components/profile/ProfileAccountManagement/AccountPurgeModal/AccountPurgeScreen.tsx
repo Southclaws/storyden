@@ -107,6 +107,7 @@ export function AccountPurgeScreen(props: Props) {
       <WStack>
         <Button
           flexGrow="1"
+          intent="destructive"
           variant="solid"
           disabled={!form.formState.isDirty || form.formState.isSubmitting}
           loading={form.formState.isSubmitting}

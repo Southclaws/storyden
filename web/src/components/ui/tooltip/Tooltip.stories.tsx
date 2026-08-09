@@ -11,6 +11,14 @@ import { Tooltip as ClosedTooltip } from "./Tooltip";
 const meta = {
   title: "Components/Overlays/Tooltip",
   component: ClosedTooltip,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A short accessible name or explanation for an unfamiliar compact control. Prefer the closed Tooltip and keep content to one concise phrase. Tooltips do not replace visible labels, validation, or instructions that users need without hovering.",
+      },
+    },
+  },
   args: {
     children: <Button variant="outline">Hover for tooltip</Button>,
     content: "Create a new discussion",

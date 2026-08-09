@@ -45,8 +45,8 @@ body,
 
 .storybook-preview {
   min-height: 100vh;
-  background: var(--colors-bg-site);
-  color: var(--colors-fg-default);
+  background: var(--colors-background-canvas);
+  color: var(--colors-text-default);
   font-family: var(--fonts-body);
 }
 

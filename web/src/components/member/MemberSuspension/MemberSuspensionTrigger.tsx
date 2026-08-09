@@ -28,7 +28,10 @@ export function MemberSuspensionTrigger({
           },
         )
       ) : (
-        <Button colorPalette="red" onClick={onOpen}>
+        <Button
+          intent={profile.suspended ? undefined : "destructive"}
+          onClick={onOpen}
+        >
           {profile.suspended ? "Reinstate" : "Suspend"}
         </Button>
       )}

@@ -7,6 +7,14 @@ import { Spinner } from ".";
 const meta = {
   title: "Components/Feedback/Spinner",
   component: Spinner,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Indeterminate activity for compact controls or regions whose completion cannot be measured. Preserve the control's width while loading. Use Progress for measurable work and a skeleton when loading content should retain its eventual layout.",
+      },
+    },
+  },
   args: {
     size: "md",
   },

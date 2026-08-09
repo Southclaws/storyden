@@ -148,7 +148,7 @@ export function RobotsSettingsScreen() {
         </LStack>
 
         {enabledProviders.length > 0 && !defaultModel && (
-          <Text color="status.warning.content" fontSize="xs">
+          <Text variant="metadata" color="status.warning.content">
             Robots are enabled, but no default model has been selected yet.
           </Text>
         )}
@@ -188,7 +188,7 @@ function RobotMCPServersSettings() {
       <WStack justifyContent="space-between">
         <LStack gap="1">
           <SectionHeading>MCP servers</SectionHeading>
-          <Text color="text.subtle" fontSize="sm">
+          <Text variant="supporting">
             Connect external MCP servers and add their tools to Robots.
           </Text>
         </LStack>
@@ -246,7 +246,7 @@ function RobotWorkspaceTemplatesSection({
       <WStack justifyContent="space-between" alignItems="start">
         <LStack gap="1">
           <SectionHeading>Workspace templates</SectionHeading>
-          <Text color="text.subtle" fontSize="sm">
+          <Text variant="supporting">
             Create reusable workspace templates. Robot sessions create live
             instances from these templates when they mount a workspace.
           </Text>
@@ -363,20 +363,16 @@ function RobotWorkspaceTemplateItem({
             </HStack>
 
             {workspace.description ? (
-              <Text color="text.subtle" fontSize="xs">
-                {workspace.description}
-              </Text>
+              <Text variant="metadata">{workspace.description}</Text>
             ) : (
-              <Text color="text.subtle" fontSize="xs">
-                No description.
-              </Text>
+              <Text variant="metadata">No description.</Text>
             )}
           </LStack>
 
           <Button
             type="button"
             variant="ghost"
-            colorPalette="red"
+            intent="destructive"
             onClick={handleDelete}
           >
             Delete
@@ -419,21 +415,17 @@ function RobotWorkspaceInstancesDrawer({
     <ModalDrawer title={workspace.name} isOpen={isOpen} onClose={onClose}>
       <LStack gap="4">
         <LStack gap="1">
-          <Text color="text.subtle" fontSize="sm">
+          <Text variant="supporting">
             Live workspace instances created from this template.
           </Text>
-          <Text color="text.subtle" fontSize="xs">
-            Template ID: {workspace.id}
-          </Text>
+          <Text variant="metadata">Template ID: {workspace.id}</Text>
         </LStack>
 
         {!data ? (
           <Unready error={error} />
         ) : instances.length === 0 ? (
           <CardBox>
-            <Text color="text.subtle" fontSize="sm">
-              No live instances yet.
-            </Text>
+            <Text variant="supporting">No live instances yet.</Text>
           </CardBox>
         ) : (
           <LStack gap="2">
@@ -473,10 +465,10 @@ function RobotWorkspaceInstanceRow({
         </WStack>
 
         <LStack gap="1">
-          <Text color="text.subtle" fontSize="xs">
+          <Text variant="metadata">
             Created {timestamp(instance.createdAt, false)}
           </Text>
-          <Text color="text.subtle" fontSize="xs">
+          <Text variant="metadata">
             Updated {timestamp(instance.updatedAt, false)}
           </Text>
         </LStack>
@@ -690,7 +682,7 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
                 </Badge>
               )}
             </HStack>
-            <Text color="text.subtle" fontSize="xs" wordBreak="break-word">
+            <Text variant="metadata" wordBreak="break-word">
               {server.endpoint_url}
             </Text>
           </LStack>
@@ -707,7 +699,7 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
             <Button
               type="button"
               variant="ghost"
-              colorPalette="red"
+              intent="destructive"
               loading={isDeleting}
               onClick={remove}
             >
@@ -716,12 +708,10 @@ function RobotMCPServerItem({ server }: { server: RobotMCPServer }) {
           </HStack>
         </WStack>
 
-        <Text color="text.subtle" fontSize="xs">
-          {server.tools.length} tools cached.
-        </Text>
+        <Text variant="metadata">{server.tools.length} tools cached.</Text>
 
         {server.last_error && (
-          <Text color="status.danger.content" fontSize="xs">
+          <Text variant="metadata" color="status.danger.content">
             {server.last_error}
           </Text>
         )}
@@ -779,7 +769,7 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
               <ProviderStatusBadge provider={provider} />
             </HStack>
 
-            <Text color="text.subtle" fontSize="xs">
+            <Text variant="metadata">
               {provider.models.length} models available. Last refresh:{" "}
               {lastRefreshed}.
             </Text>
@@ -798,7 +788,7 @@ function RobotProviderItem({ provider }: { provider: RobotProviderStatus }) {
         </WStack>
 
         {provider.cache.last_error && (
-          <Text color="status.danger.content" fontSize="xs">
+          <Text variant="metadata" color="status.danger.content">
             {provider.cache.last_error}
           </Text>
         )}
@@ -1139,7 +1129,7 @@ function GlobalDefaultModelForm({
         </WStack>
 
         {helperText && (
-          <Text color="status.warning.content" fontSize="xs">
+          <Text variant="metadata" color="status.warning.content">
             {helperText}
           </Text>
         )}

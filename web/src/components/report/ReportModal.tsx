@@ -123,7 +123,7 @@ export function ReportModal({
           </Button>
           <Button
             type="submit"
-            colorPalette="red"
+            variant="solid"
             loading={form.formState.isSubmitting}
           >
             {submitLabel}

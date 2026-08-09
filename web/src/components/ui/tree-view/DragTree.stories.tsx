@@ -74,6 +74,12 @@ const meta = {
   title: "Components/Navigation/Drag Tree",
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component:
+          "The sortable hierarchy used for Library and discussion navigation. The component owns dense tree presentation and drag behavior while callers provide domain data, persistence, links, actions, and a route-agnostic selected matcher. Use Tree View when the hierarchy is read-only.",
+      },
+    },
   },
   decorators: [
     (Story) => (

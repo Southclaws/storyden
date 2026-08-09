@@ -5,6 +5,14 @@ import { treeView } from "@/styled-system/recipes";
 
 const meta = {
   title: "Components/Navigation/Tree View",
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "A read-only hierarchy that shares Drag Tree's dense visual language without editing or sort behavior. Use it when users need to inspect or navigate a tree but cannot reorganise it.",
+      },
+    },
+  },
   argTypes: {
     variant: {
       control: "select",

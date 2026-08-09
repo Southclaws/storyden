@@ -86,10 +86,13 @@ export function LinkPasteMenu({ editor }: Props) {
       className={css({
         zIndex: "popover",
         borderRadius: "md",
-        backgroundColor: "background.overlay/80",
-        backdropBlur: "frosted",
+        background: "background.overlay",
+        backdropBlur: "subtle",
         backdropFilter: "auto",
+        borderColor: "border.strong",
+        borderWidth: "thin",
         boxShadow: "floating",
+        color: "text.default",
         padding: "1",
       })}
     >

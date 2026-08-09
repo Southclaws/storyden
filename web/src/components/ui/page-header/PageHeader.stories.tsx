@@ -11,6 +11,12 @@ const meta = {
   component: PageHeader,
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        component:
+          "The canonical top-of-page composition for a page heading, supporting text, return/breadcrumb navigation, and a small action group. Omit it only when the content makes the page identity genuinely obvious. Breadcrumbs describe hierarchy; BackAction describes a return path.",
+      },
+    },
   },
 } satisfies Meta<typeof PageHeader>;
 

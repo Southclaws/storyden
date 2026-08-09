@@ -38,4 +38,17 @@ describe("Button", () => {
       container.querySelector(".button__loading-indicator"),
     ).not.toBeNull();
   });
+
+  it("applies semantic intent independently from visual priority", () => {
+    render(
+      <Button variant="outline" intent="destructive">
+        Delete account
+      </Button>,
+    );
+
+    expect(screen.getByRole("button")).toHaveClass(
+      "button--variant_outline",
+      "button--intent_destructive",
+    );
+  });
 });

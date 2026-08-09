@@ -7,6 +7,14 @@ import { Checkbox } from ".";
 const meta = {
   title: "Components/Forms/Checkbox",
   component: Checkbox,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Selects an independent boolean option or multiple values in a set. Use Switch when a single setting takes effect immediately, and Radio Group when exactly one mutually exclusive choice is required. The label is part of the hit target.",
+      },
+    },
+  },
   args: {
     children: "Email me replies",
   },

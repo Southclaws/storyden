@@ -11,6 +11,14 @@ import { IconButton } from ".";
 const meta = {
   title: "Components/Actions/Icon Button",
   component: IconButton,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The icon-only form of Button and subject to the same size and emphasis rules. Use it only when the symbol is familiar in context. Provide one accessible label; the component owns the corresponding tooltip/title behavior. Prefer a labelled Button when the command would otherwise be ambiguous.",
+      },
+    },
+  },
   args: {
     "aria-label": "Create",
     children: <AddIcon />,

@@ -18,6 +18,14 @@ const meta = {
       options: ["body", "supporting", "metadata"],
     },
   },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Constrained product-UI prose. Use `body` for primary explanations, `supporting` below headings or for secondary guidance, and `metadata` for timestamps, counts, IDs, and low-priority annotations. Rich community-authored content belongs to the separate `.typography` system.",
+      },
+    },
+  },
 } satisfies Meta<typeof Text>;
 
 export default meta;

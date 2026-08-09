@@ -66,7 +66,7 @@ export function WarningsPanel({
       {canManageWarnings && (
         <WStack justifyContent="flex-end">
           <MemberWarningTrigger profile={profile}>
-            <Button colorPalette="orange" variant="subtle">
+            <Button intent="warning" variant="subtle">
               Issue warning
             </Button>
           </MemberWarningTrigger>

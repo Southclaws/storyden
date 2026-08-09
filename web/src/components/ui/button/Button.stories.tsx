@@ -13,6 +13,10 @@ const meta = {
     variant: "subtle",
   },
   argTypes: {
+    intent: {
+      control: "select",
+      options: [undefined, "success", "warning", "destructive"],
+    },
     size: {
       control: "select",
       options: ["sm", "md", "lg"],
@@ -20,6 +24,14 @@ const meta = {
     variant: {
       control: "select",
       options: ["solid", "outline", "ghost", "subtle", "plain"],
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Storyden's compact command control. `subtle` is the routine default; use `solid` for the single decisive completion action, `outline` for a visible secondary peer, `ghost` for low-emphasis chrome/content actions, and `plain` only for dense rows where a visible container would set the row height. Variant expresses priority; `intent` expresses success, warning, or destructive meaning.",
+      },
     },
   },
 } satisfies Meta<typeof Button>;
@@ -58,6 +70,22 @@ export const States: Story = {
       </Button>
       <Button disabled>Disabled</Button>
     </HStack>
+  ),
+};
+
+export const Intents: Story = {
+  render: () => (
+    <LStack gap="3" alignItems="start">
+      {(["success", "warning", "destructive"] as const).map((intent) => (
+        <HStack key={intent} gap="3" flexWrap="wrap">
+          {(["subtle", "outline", "solid"] as const).map((variant) => (
+            <Button key={variant} intent={intent} variant={variant}>
+              {intent} {variant}
+            </Button>
+          ))}
+        </HStack>
+      ))}
+    </LStack>
   ),
 };
 

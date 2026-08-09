@@ -10,6 +10,14 @@ import { Popover as ClosedPopover } from "./Popover";
 const meta = {
   title: "Components/Overlays/Popover",
   component: ClosedPopover,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Temporary supporting content anchored to a trigger. Prefer the closed Popover so portalling, placement, collision handling, and viewport fitting use Storyden defaults. Use Menu for a command list, Tooltip for a short label, and Dialog for work that requires focused interruption.",
+      },
+    },
+  },
   args: {
     trigger: <Button variant="outline">Open popover</Button>,
     children: <Popover.Title>Topic settings</Popover.Title>,

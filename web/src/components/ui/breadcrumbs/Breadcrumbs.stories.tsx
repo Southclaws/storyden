@@ -7,6 +7,14 @@ import { Breadcrumbs } from ".";
 const meta = {
   title: "Components/Navigation/Breadcrumbs",
   component: Breadcrumbs,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Describes the current page's place in a Library, discussion, or other information hierarchy. Breadcrumbs answer 'where am I?'; use BackAction when the requirement is 'return to where I came from'. Keep labels compact and allow deep trailing items to truncate.",
+      },
+    },
+  },
 } satisfies Meta<typeof Breadcrumbs>;
 
 export default meta;

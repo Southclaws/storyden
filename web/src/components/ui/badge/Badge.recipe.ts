@@ -39,13 +39,13 @@ export const badge = defineRecipe({
         background: "colorPalette.3",
         borderColor: "colorPalette.6",
         borderWidth: "1px",
-        color: "colorPalette.12",
+        color: "colorPalette.text",
         "& svg": {
-          color: "colorPalette.12",
+          color: "colorPalette.text",
         },
       },
       outline: {
-        color: "colorPalette.12",
+        color: "colorPalette.text",
         borderWidth: "2px",
         borderColor: "colorPalette.7",
       },

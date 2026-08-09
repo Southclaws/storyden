@@ -7,6 +7,14 @@ import { Input, InputPrefix } from ".";
 const meta = {
   title: "Components/Forms/Input",
   component: Input,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "The standard compact text control. Use the default `sm` outline input on the control background for ordinary forms. Use `inset` only when the control is embedded in an Inset region, and `ghost` for deliberate inline-editing or composer treatments where a bordered field would add noise.",
+      },
+    },
+  },
   args: {
     placeholder: "Search community...",
     size: "sm",

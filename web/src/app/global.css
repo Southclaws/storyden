@@ -1105,9 +1105,16 @@ body *::-webkit-scrollbar-thumb {
   Fix for Panda CSS or LightningCSS bug:
   https://github.com/parcel-bundler/lightningcss/issues/695
 
-  Every recipe/style that uses backdrop filter must be also manually set here.
+  Every recipe class that uses backdrop filter must be listed here. Atomic
+  styles emit `.bkdp_auto` and are covered by the final selector.
  */
 .menu__content,
+.popover__content,
+.tooltip__content,
+.datePicker__content,
+.select__content,
+.combobox__content,
+.colorPicker__content,
 .button--variant_subtle,
 .bkdp_auto {
   -webkit-backdrop-filter: var(--backdrop-blur,) var(--backdrop-brightness,)

@@ -7,6 +7,14 @@ import { LinkButton } from ".";
 const meta = {
   title: "Components/Actions/Link Button",
   component: LinkButton,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Navigation presented with button emphasis. Use LinkButton when activation changes location but must participate in an action group; use Button for commands and an ordinary Anchor for inline or navigational text. It follows the same variant hierarchy as Button.",
+      },
+    },
+  },
   args: {
     href: "/",
     children: "Open discussion",
