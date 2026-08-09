@@ -33,17 +33,25 @@ func New(db *ent.Client, raw *sqlx.DB, roleQuerier *role_hydrate.Hydrator) *Quer
 }
 
 const tagItemsCountPageQuery = `select
-  t.id tag_id,                    -- tag ID
-  count(p.id) + count(n.id) items -- number of items,
+  t.id tag_id,
+  (
+    select count(*)
+    from tag_posts tp
+    join posts p on p.id = tp.post_id
+    where tp.tag_id = t.id
+      and p.visibility = 'published'
+      and p.deleted_at is null
+  ) + (
+    select count(*)
+    from tag_nodes tn
+    join nodes n on n.id = tn.node_id
+    where tn.tag_id = t.id
+      and n.visibility = 'published'
+      and n.deleted_at is null
+  ) items
 from
   tags t
-  left join tag_posts tp on tp.tag_id = t.id
-  left join posts p on p.id = tp.post_id and p.visibility = 'published' and p.deleted_at is null
-  left join tag_nodes tn on tn.tag_id = t.id
-  left join nodes n on n.id = tn.node_id and n.visibility = 'published' and n.deleted_at is null
 %s
-group by
-  t.id
 order by
   items desc, t.name asc
 limit ? offset ?

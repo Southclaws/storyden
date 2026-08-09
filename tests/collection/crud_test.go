@@ -244,7 +244,7 @@ func TestCollectionListIsPaged(t *testing.T) {
 			ctx, acc := e2e.WithAccount(root, aw, seed.Account_002_Frigg)
 			session := sh.WithSession(ctx)
 
-			const total = 7
+			const total = 52
 			for i := range total {
 				resp, err := cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 					Name: fmt.Sprintf("paged collection %d %s", i, uuid.NewString()),
@@ -260,15 +260,27 @@ func TestCollectionListIsPaged(t *testing.T) {
 			}))(t, http.StatusOK)
 			r.NotNil(first.JSON200)
 			a.Equal(1, first.JSON200.CurrentPage)
-			a.LessOrEqual(len(first.JSON200.Collections), first.JSON200.PageSize,
-				"a page must never exceed the page size")
-			a.GreaterOrEqual(first.JSON200.TotalPages, 1)
+			a.Len(first.JSON200.Collections, first.JSON200.PageSize)
+			a.Equal(2, first.JSON200.TotalPages)
+
+			second := tests.AssertRequest(cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+				AccountHandle: &handle,
+				Page:          ptr("2"),
+			}))(t, http.StatusOK)
+			r.NotNil(second.JSON200)
+			a.Equal(2, second.JSON200.CurrentPage)
+			a.Len(second.JSON200.Collections, total-first.JSON200.PageSize)
 
 			seen := map[string]struct{}{}
 			for _, c := range first.JSON200.Collections {
 				seen[c.Id] = struct{}{}
 			}
-			a.Len(seen, len(first.JSON200.Collections), "a page must not repeat a collection")
+			for _, c := range second.JSON200.Collections {
+				_, repeated := seen[c.Id]
+				a.False(repeated, "a collection must not appear on two pages")
+				seen[c.Id] = struct{}{}
+			}
+			a.Len(seen, total, "walking the pages must reach every collection")
 		}))
 	}))
 }

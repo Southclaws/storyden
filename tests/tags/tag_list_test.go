@@ -39,11 +39,12 @@ func TestTagListIsPagedAndOrderedByUse(t *testing.T) {
 
 			run := uuid.NewString()[:8]
 
-			// popular gets three threads, the rest get one each, so the
-			// ordering is not the insertion order
+			// popular gets three threads and one node, the rest get one thread
+			// each, so the ordering is not the insertion order
 			popular := openapi.TagName(fmt.Sprintf("%s-popular", run))
 			names := []openapi.TagName{popular}
-			for i := range 6 {
+			const quietTagCount = 55
+			for i := range quietTagCount {
 				names = append(names, openapi.TagName(fmt.Sprintf("%s-quiet-%d", run, i)))
 			}
 
@@ -60,6 +61,11 @@ func TestTagListIsPagedAndOrderedByUse(t *testing.T) {
 			for range 3 {
 				create([]openapi.TagName{popular})
 			}
+			tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				Name:       "tag paging " + uuid.NewString(),
+				Visibility: opt.New(openapi.VisibilityPublished).Ptr(),
+				Tags:       &[]openapi.TagName{popular},
+			}, session))(t, http.StatusOK)
 			for _, n := range names[1:] {
 				create([]openapi.TagName{n})
 			}
@@ -71,24 +77,40 @@ func TestTagListIsPagedAndOrderedByUse(t *testing.T) {
 				}))(t, http.StatusOK)
 
 				r.NotNil(page.JSON200)
-				a.Len(page.JSON200.Tags, 7, "the run's tags fit on one page")
+				a.Len(page.JSON200.Tags, page.JSON200.PageSize)
+				a.Equal(2, page.JSON200.TotalPages)
 				a.Equal(popular, openapi.TagName(page.JSON200.Tags[0].Name),
 					"the most used tag sorts first")
+				a.Equal(4, page.JSON200.Tags[0].ItemCount,
+					"posts and nodes are each counted once")
 			})
 
 			t.Run("second_page_does_not_repeat_the_first", func(t *testing.T) {
 				first := tests.AssertRequest(cl.TagListWithResponse(root, &openapi.TagListParams{
-					Q: ptr(run),
+					Q:    ptr(run),
+					Page: ptr("1"),
 				}))(t, http.StatusOK)
 				r.NotNil(first.JSON200)
-				a.GreaterOrEqual(first.JSON200.TotalPages, 1)
+				a.Equal(2, first.JSON200.TotalPages)
 				a.Equal(1, first.JSON200.CurrentPage)
+
+				second := tests.AssertRequest(cl.TagListWithResponse(root, &openapi.TagListParams{
+					Q:    ptr(run),
+					Page: ptr("2"),
+				}))(t, http.StatusOK)
+				r.NotNil(second.JSON200)
+				a.Equal(2, second.JSON200.CurrentPage)
 
 				seen := map[string]struct{}{}
 				for _, tag := range first.JSON200.Tags {
 					seen[tag.Name] = struct{}{}
 				}
-				a.Len(seen, len(first.JSON200.Tags), "a page must not repeat a tag")
+				for _, tag := range second.JSON200.Tags {
+					_, repeated := seen[tag.Name]
+					a.False(repeated, "a tag must not appear on two pages")
+					seen[tag.Name] = struct{}{}
+				}
+				a.Len(seen, quietTagCount+1, "walking the pages must reach every tag")
 			})
 
 			t.Run("unfiltered_list_is_bounded", func(t *testing.T) {
