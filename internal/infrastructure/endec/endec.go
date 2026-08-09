@@ -4,11 +4,13 @@ import (
 	"time"
 )
 
+// Purpose is the RFC 7519 "typ" header value, explicit typing per RFC 8725
+// section 3.11 is what stops one feature's token verifying as another's
 type Purpose string
 
 const (
-	PurposePasswordReset Purpose = "password_reset"
-	PurposeOAuthState    Purpose = "oauth_state"
+	PurposePasswordReset Purpose = "storyden-password-reset+jwt"
+	PurposeOAuthState    Purpose = "storyden-oauth-state+jwt"
 )
 
 type Encrypter interface {

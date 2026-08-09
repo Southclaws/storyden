@@ -1,6 +1,9 @@
 package jwt
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -63,14 +66,15 @@ func TestPurposeIsNotInterchangeable(t *testing.T) {
 	assert.Error(t, err, "an oauth state value must not be accepted as a password reset token")
 }
 
-func TestPurposeClaimCannotBeOverriddenByCaller(t *testing.T) {
+func TestPurposeCannotBeForgedFromClaims(t *testing.T) {
 	t.Parallel()
 
 	ed, err := New(config.Config{JWTSecret: []byte("07d422e512b23a056ccc953994d1593f")})
 	require.NoError(t, err)
 
+	// typ lives in the header, so a caller cannot reach it through Claims
 	token, err := ed.Encrypt(endec.PurposePasswordReset, endec.Claims{
-		purposeClaim: string(endec.PurposeOAuthState),
+		"typ": string(endec.PurposeOAuthState),
 	}, time.Hour)
 	require.NoError(t, err)
 
@@ -79,6 +83,27 @@ func TestPurposeClaimCannotBeOverriddenByCaller(t *testing.T) {
 
 	_, err = ed.Decrypt(endec.PurposePasswordReset, token)
 	assert.NoError(t, err)
+}
+
+func TestPurposeIsCarriedInTheTypHeader(t *testing.T) {
+	t.Parallel()
+
+	ed, err := New(config.Config{JWTSecret: []byte("07d422e512b23a056ccc953994d1593f")})
+	require.NoError(t, err)
+
+	token, err := ed.Encrypt(endec.PurposeOAuthState, endec.Claims{"redirect": "/"}, time.Minute)
+	require.NoError(t, err)
+
+	segments := strings.Split(token, ".")
+	require.Len(t, segments, 3)
+
+	raw, err := base64.RawURLEncoding.DecodeString(segments[0])
+	require.NoError(t, err)
+
+	var header map[string]any
+	require.NoError(t, json.Unmarshal(raw, &header))
+
+	assert.Equal(t, string(endec.PurposeOAuthState), header["typ"])
 }
 
 func TestEncryptRequiresAPurpose(t *testing.T) {

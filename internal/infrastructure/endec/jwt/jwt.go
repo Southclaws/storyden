@@ -13,8 +13,6 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
 
-const purposeClaim = "sdp"
-
 type jwtEncrypterDecrypter struct {
 	key []byte
 }
@@ -62,9 +60,8 @@ func (e *jwtEncrypterDecrypter) Encrypt(purpose endec.Purpose, data endec.Claims
 		claims[k] = v
 	}
 
-	claims[purposeClaim] = string(purpose)
-
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	t.Header["typ"] = string(purpose)
 
 	s, err := t.SignedString(e.key)
 	if err != nil {
@@ -75,7 +72,7 @@ func (e *jwtEncrypterDecrypter) Encrypt(purpose endec.Purpose, data endec.Claims
 }
 
 func (e *jwtEncrypterDecrypter) Decrypt(purpose endec.Purpose, message string) (endec.Claims, error) {
-	t, err := jwt.Parse(message, e.keyfunc)
+	t, err := jwt.Parse(message, e.keyfunc, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -84,14 +81,13 @@ func (e *jwtEncrypterDecrypter) Decrypt(purpose endec.Purpose, message string) (
 		return nil, fault.New("token flagged as invalid but no error was reported")
 	}
 
+	if typ, ok := t.Header["typ"].(string); !ok || typ != string(purpose) {
+		return nil, fault.Newf("token was not issued for %s", purpose)
+	}
+
 	claims, ok := t.Claims.(jwt.MapClaims)
 	if !ok {
 		return nil, fault.New("invalid token")
-	}
-
-	got, ok := claims[purposeClaim].(string)
-	if !ok || got != string(purpose) {
-		return nil, fault.Newf("token was not issued for %s", purpose)
 	}
 
 	return endec.Claims(claims), nil
