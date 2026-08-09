@@ -9,7 +9,7 @@ type Props = {
 
 export function ThreadReferenceList(props: Props) {
   return (
-    <styled.ol width="full" display="flex" flexDirection="column" gap="3">
+    <styled.ol width="full" display="flex" flexDirection="column" gap="4">
       {props.threads.map((t) => (
         <ThreadReferenceCard key={t.id} thread={t} />
       ))}

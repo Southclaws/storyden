@@ -8,8 +8,8 @@ transform(props) {
     gap: "3",
     flexDirection: "column",
     width: "full",
-    alignItems: "start"
-    // ...props,
+    alignItems: "start",
+    ...props
   };
 }}
 

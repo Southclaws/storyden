@@ -12,7 +12,7 @@ export const cardGrid = defineSlotRecipe({
     grid: {
       display: "grid",
       width: "full",
-      gap: "2",
+      gap: "4",
       gridTemplateColumns: {
         base: "minmax(0, 1fr)",
         _containerMedium: "repeat(2, minmax(0, 1fr))",

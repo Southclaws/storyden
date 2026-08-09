@@ -131,7 +131,7 @@ export default defineConfig({
             flexDirection: "column",
             width: "full",
             alignItems: "start",
-            // ...props,
+            ...props,
           };
         },
       },

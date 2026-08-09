@@ -74,7 +74,7 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
           onClick={handlePageChange}
         />
       )}
-      <ol className={lstack()}>
+      <ol className={lstack({ gap: "4" })}>
         {data.threads.map((t) => {
           return (
             <ThreadReferenceCard

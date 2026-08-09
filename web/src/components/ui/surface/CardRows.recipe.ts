@@ -8,6 +8,6 @@ export const cardRows = defineRecipe({
     alignItems: "start",
     width: "full",
     maxHeight: "min",
-    gap: "3",
+    gap: "4",
   },
 });

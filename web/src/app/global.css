@@ -74,7 +74,7 @@
   --navigation-content-column-gap: var(--spacing-8);
   --navigation-content-column-gap-desktop: var(--spacing-6);
   --navigation-content-column-gap-wide: var(--spacing-8);
-  --navigation-content-offset-block: var(--spacing-2);
+  --navigation-content-offset-block: var(--spacing-4);
   --navigation-topbar-height: 3rem;
   --navigation-topbar-title-width-max: 50vw;
   /* Navigation mobile grid */
