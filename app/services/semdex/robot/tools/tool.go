@@ -3,12 +3,17 @@ package tools
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
 	"github.com/Southclaws/storyden/lib/mcp"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/model"
+	adktool "google.golang.org/adk/v2/tool"
+	"google.golang.org/genai"
 )
 
 // ToolResult is just because adk doesn't allow returning an error. Since adk
@@ -32,7 +37,7 @@ func NewErrorMsg[T any](msg string) ToolResult[T] {
 
 // Handler is a context.Context-based handler for use by non-ADK transports
 // (e.g. the MCP SSE transport). It receives raw JSON arguments and returns raw
-// JSON output, avoiding a dependency on google.golang.org/adk/tool.Context.
+// JSON output, avoiding a dependency on google.golang.org/adk/v2/adkagent.Context.
 type Handler func(ctx context.Context, args json.RawMessage) (json.RawMessage, error)
 
 // Tool is a wrapper around an actual tool definition, it includes the actual
@@ -118,8 +123,10 @@ func (t *Tool) IsLongRunning() bool {
 
 // Toolset implements adktool.Toolset
 type Toolset struct {
-	name     string
-	ToolList []adktool.Tool
+	name         string
+	ToolList     []adktool.Tool
+	Registered   Tools
+	BuildContext context.Context
 }
 
 var _ adktool.Toolset = (*Toolset)(nil)
@@ -129,5 +136,47 @@ func (d *Toolset) Name() string {
 }
 
 func (d *Toolset) Tools(ctx adkagent.ReadonlyContext) ([]adktool.Tool, error) {
+	if len(d.Registered) > 0 {
+		available := make(Tools, 0, len(d.Registered))
+		for _, registered := range d.Registered {
+			if registered.Definition.RequiresWorkspace && !workspacestate.Available(ctx.ReadonlyState()) {
+				continue
+			}
+			available = append(available, registered)
+		}
+		return available.ToADKTools(d.BuildContext)
+	}
 	return d.ToolList, nil
+}
+
+func (d *Toolset) ProcessRequest(ctx adkagent.Context, request *model.LLMRequest) error {
+	if len(d.Registered) == 0 || workspacestate.Available(ctx.ReadonlyState()) {
+		return nil
+	}
+
+	var unavailable []string
+	for _, registered := range d.Registered {
+		if !registered.Definition.RequiresWorkspace {
+			continue
+		}
+		name := registered.Definition.Title
+		if strings.TrimSpace(name) == "" {
+			name = registered.Definition.Name
+		}
+		unavailable = append(unavailable, fmt.Sprintf("%s (%s)", name, registered.Definition.Name))
+	}
+	if len(unavailable) == 0 {
+		return nil
+	}
+
+	instruction := "The following configured tools require an active Robot workspace and are unavailable in this conversation: " + strings.Join(unavailable, ", ") + ". Start or continue the conversation with a workspace before attempting work that depends on them."
+	if request.Config == nil {
+		request.Config = &genai.GenerateContentConfig{}
+	}
+	if request.Config.SystemInstruction == nil {
+		request.Config.SystemInstruction = genai.NewContentFromText(instruction, genai.RoleUser)
+		return nil
+	}
+	request.Config.SystemInstruction.Parts = append(request.Config.SystemInstruction.Parts, genai.NewPartFromText("\n\n"+instruction))
+	return nil
 }

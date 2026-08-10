@@ -1,5 +1,8 @@
 $schema: "http://json-schema.org/draft-07/schema#"
 $id: "ToolMemberSearch"
+x-storyden:
+  toolsets:
+    - system.content_search
 x-storyden-tool:
   title: Member Search
   annotations:

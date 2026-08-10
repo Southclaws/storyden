@@ -3,9 +3,9 @@ package agent_history
 import (
 	"log/slog"
 
-	agentpkg "google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/model"
+	agentpkg "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
@@ -21,7 +21,7 @@ func RepairInterruptedToolCallsBeforeModel(logger *slog.Logger) llmagent.BeforeM
 		logger = slog.Default()
 	}
 
-	return func(ctx agentpkg.CallbackContext, req *model.LLMRequest) (*model.LLMResponse, error) {
+	return func(ctx agentpkg.Context, req *model.LLMRequest) (*model.LLMResponse, error) {
 		repaired := RepairInterruptedToolCalls(req)
 		if repaired > 0 {
 			logger.Warn("repaired interrupted tool call history",

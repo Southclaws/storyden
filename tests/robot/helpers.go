@@ -12,20 +12,24 @@ import (
 func WithRobotSettings(model string) fx.Option {
 	return fx.Invoke(func(lc fx.Lifecycle, root context.Context, repo *settings.SettingsRepository) {
 		lc.Append(fx.StartHook(func() error {
-			_, err := repo.Set(root, settings.Settings{
-				Services: opt.New(settings.ServiceSettings{
-					Robots: opt.New(settings.RobotServiceSettings{
-						Enabled:      opt.New(true),
-						DefaultModel: opt.New(model),
-						Providers: opt.New(map[string]settings.RobotProviderSettings{
-							"mock": {
-								Enabled: opt.New(true),
-							},
-						}),
-					}),
-				}),
-			})
-			return err
+			return SetRobotSettings(root, repo, model)
 		}))
 	})
+}
+
+func SetRobotSettings(ctx context.Context, repo *settings.SettingsRepository, model string) error {
+	_, err := repo.Set(ctx, settings.Settings{
+		Services: opt.New(settings.ServiceSettings{
+			Robots: opt.New(settings.RobotServiceSettings{
+				Enabled:      opt.New(true),
+				DefaultModel: opt.New(model),
+				Providers: opt.New(map[string]settings.RobotProviderSettings{
+					"mock": {
+						Enabled: opt.New(true),
+					},
+				}),
+			}),
+		}),
+	})
+	return err
 }

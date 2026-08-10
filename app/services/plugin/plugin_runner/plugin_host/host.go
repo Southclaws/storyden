@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime/local"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/supervised_runtime/sprites"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	robot_toolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -38,6 +39,7 @@ type Host struct {
 	pluginReader      *plugin_reader.Reader
 	modelProviders    *llm_provider.Factory
 	toolRegistry      *robot_tools.Registry
+	toolsetRegistry   *robot_toolsets.Registry
 	pluginProviders   *xsync.Map[plugin.InstallationID, []model_ref.Provider]
 	pluginTools       *xsync.Map[plugin.InstallationID, []string]
 	rpcHandlerFactory *rpc_handler.Factory
@@ -53,6 +55,7 @@ func New(
 	pluginReader *plugin_reader.Reader,
 	modelProviders *llm_provider.Factory,
 	toolRegistry *robot_tools.Registry,
+	toolsetRegistry *robot_toolsets.Registry,
 	pluginLogger *plugin_logger.Writer,
 	rpcHandlerFactory *rpc_handler.Factory,
 	bus *pubsub.Bus,
@@ -112,6 +115,7 @@ func New(
 		pluginReader:      pluginReader,
 		modelProviders:    modelProviders,
 		toolRegistry:      toolRegistry,
+		toolsetRegistry:   toolsetRegistry,
 		pluginProviders:   xsync.NewMap[plugin.InstallationID, []model_ref.Provider](),
 		pluginTools:       xsync.NewMap[plugin.InstallationID, []string](),
 		rpcHandlerFactory: rpcHandlerFactory,
@@ -282,6 +286,15 @@ func (h *Host) registerModelProviders(id plugin.InstallationID, manifest *plugin
 
 func (h *Host) registerRobotTools(id plugin.InstallationID, manifest *plugin.Validated, sess plugin_runner.Session) error {
 	var registered []string
+	var registeredToolsets []string
+	rollback := func() {
+		for _, toolsetID := range registeredToolsets {
+			h.toolsetRegistry.Unregister(toolsetID)
+		}
+		for _, name := range registered {
+			h.toolRegistry.Unregister(name)
+		}
+	}
 
 	for _, capability := range manifest.Metadata.Capabilities {
 		declaration, ok := capability.CapabilityConfigUnion.(*rpc.RobotToolProviderCapabilityConfig)
@@ -291,17 +304,18 @@ func (h *Host) registerRobotTools(id plugin.InstallationID, manifest *plugin.Val
 
 		pluginTools, err := plugin_robottools.NewToolsForProvider(id, *declaration, sess)
 		if err != nil {
-			for _, name := range registered {
-				h.toolRegistry.Unregister(name)
-			}
+			rollback()
+			return err
+		}
+		pluginToolsets, err := plugin_robottools.ToolsetDefinitions(id, *declaration)
+		if err != nil {
+			rollback()
 			return err
 		}
 
 		for _, pluginTool := range pluginTools {
 			if err := h.toolRegistry.Register(pluginTool); err != nil {
-				for _, name := range registered {
-					h.toolRegistry.Unregister(name)
-				}
+				rollback()
 				return err
 			}
 			registered = append(registered, pluginTool.Definition.Name)
@@ -310,6 +324,18 @@ func (h *Host) registerRobotTools(id plugin.InstallationID, manifest *plugin.Val
 				slog.String("plugin_id", id.String()),
 				slog.String("provider", declaration.ID),
 				slog.String("tool", pluginTool.Definition.Name))
+		}
+
+		for _, pluginToolset := range pluginToolsets {
+			if err := h.toolsetRegistry.Register(pluginToolset); err != nil {
+				rollback()
+				return err
+			}
+			registeredToolsets = append(registeredToolsets, pluginToolset.ID)
+			h.logger.Info("registered plugin Robot Toolset",
+				slog.String("plugin_id", id.String()),
+				slog.String("provider", declaration.ID),
+				slog.String("toolset", pluginToolset.ID))
 		}
 	}
 
@@ -321,6 +347,7 @@ func (h *Host) registerRobotTools(id plugin.InstallationID, manifest *plugin.Val
 }
 
 func (h *Host) unregisterRobotTools(id plugin.InstallationID) {
+	h.toolsetRegistry.UnregisterSource(id.String())
 	toolNames, ok := h.pluginTools.LoadAndDelete(id)
 	if !ok {
 		return

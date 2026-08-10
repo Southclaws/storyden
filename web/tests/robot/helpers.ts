@@ -61,18 +61,6 @@ export async function sendMessage(page: Page, text: string) {
   await expect(sentMessage).toBeVisible({ timeout: 15000 });
 }
 
-export async function switchToRobot(page: Page, robotName: string) {
-  await page.getByRole("button", { name: "Storyden Robot Builder" }).click();
-
-  const menuItem = page.getByRole("menuitem", { name: robotName });
-  await expect(menuItem).toBeVisible({ timeout: 15000 });
-  await menuItem.click();
-
-  await expect(page.getByRole("button", { name: robotName })).toBeVisible({
-    timeout: 15000,
-  });
-}
-
 export async function waitForPersistedChatRoute(page: Page) {
   await expect(page).toHaveURL(/\/robots\/chats\/(?!new(?:[/?#]|$))[^/?#]+/, {
     timeout: 15000,

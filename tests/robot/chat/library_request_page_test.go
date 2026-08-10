@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
@@ -46,6 +47,7 @@ func TestRobotLibraryRequestPagePausesAndResumes(t *testing.T) {
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
 			sessionRepo *robot_session.Repository,
+			settingsRepo *settings.SettingsRepository,
 		) {
 			lc.Append(fx.StartHook(func() {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -68,6 +70,7 @@ func TestRobotLibraryRequestPagePausesAndResumes(t *testing.T) {
       finish: "stop"
 `)
 				defer os.Remove(scriptPath)
+				require.NoError(t, robot_tests.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				actor := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
@@ -75,7 +78,7 @@ func TestRobotLibraryRequestPagePausesAndResumes(t *testing.T) {
 						Description: "robot that asks the user to select a Library page",
 						Playbook:    "you ask the user to select a page when required",
 						Model:       robotModelPtr("mock/../scripts/" + scriptName),
-						Tools:       robotToolsPtr("library_request_page"),
+						Toolsets:    robotToolsetsPtr("system.library"),
 					},
 					adminSession,
 				))(t, http.StatusOK)

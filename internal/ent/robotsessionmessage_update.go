@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/rs/xid"
 )
 
@@ -57,6 +58,46 @@ func (_u *RobotSessionMessageUpdate) SetNillableInvocationID(v *string) *RobotSe
 	if v != nil {
 		_u.SetInvocationID(*v)
 	}
+	return _u
+}
+
+// SetBranch sets the "branch" field.
+func (_u *RobotSessionMessageUpdate) SetBranch(v string) *RobotSessionMessageUpdate {
+	_u.mutation.SetBranch(v)
+	return _u
+}
+
+// SetNillableBranch sets the "branch" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableBranch(v *string) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetBranch(*v)
+	}
+	return _u
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (_u *RobotSessionMessageUpdate) ClearBranch() *RobotSessionMessageUpdate {
+	_u.mutation.ClearBranch()
+	return _u
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (_u *RobotSessionMessageUpdate) SetIsolationScope(v string) *RobotSessionMessageUpdate {
+	_u.mutation.SetIsolationScope(v)
+	return _u
+}
+
+// SetNillableIsolationScope sets the "isolation_scope" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableIsolationScope(v *string) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetIsolationScope(*v)
+	}
+	return _u
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (_u *RobotSessionMessageUpdate) ClearIsolationScope() *RobotSessionMessageUpdate {
+	_u.mutation.ClearIsolationScope()
 	return _u
 }
 
@@ -121,8 +162,16 @@ func (_u *RobotSessionMessageUpdate) ClearAccountID() *RobotSessionMessageUpdate
 }
 
 // SetEventData sets the "event_data" field.
-func (_u *RobotSessionMessageUpdate) SetEventData(v map[string]interface{}) *RobotSessionMessageUpdate {
+func (_u *RobotSessionMessageUpdate) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageUpdate {
 	_u.mutation.SetEventData(v)
+	return _u
+}
+
+// SetNillableEventData sets the "event_data" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableEventData(v *schema.RobotSessionEvent) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetEventData(*v)
+	}
 	return _u
 }
 
@@ -233,6 +282,18 @@ func (_u *RobotSessionMessageUpdate) sqlSave(ctx context.Context) (_node int, er
 	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Branch(); ok {
+		_spec.SetField(robotsessionmessage.FieldBranch, field.TypeString, value)
+	}
+	if _u.mutation.BranchCleared() {
+		_spec.ClearField(robotsessionmessage.FieldBranch, field.TypeString)
+	}
+	if value, ok := _u.mutation.IsolationScope(); ok {
+		_spec.SetField(robotsessionmessage.FieldIsolationScope, field.TypeString, value)
+	}
+	if _u.mutation.IsolationScopeCleared() {
+		_spec.ClearField(robotsessionmessage.FieldIsolationScope, field.TypeString)
 	}
 	if value, ok := _u.mutation.BuiltinRobot(); ok {
 		_spec.SetField(robotsessionmessage.FieldBuiltinRobot, field.TypeString, value)
@@ -380,6 +441,46 @@ func (_u *RobotSessionMessageUpdateOne) SetNillableInvocationID(v *string) *Robo
 	return _u
 }
 
+// SetBranch sets the "branch" field.
+func (_u *RobotSessionMessageUpdateOne) SetBranch(v string) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetBranch(v)
+	return _u
+}
+
+// SetNillableBranch sets the "branch" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableBranch(v *string) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetBranch(*v)
+	}
+	return _u
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (_u *RobotSessionMessageUpdateOne) ClearBranch() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearBranch()
+	return _u
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (_u *RobotSessionMessageUpdateOne) SetIsolationScope(v string) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetIsolationScope(v)
+	return _u
+}
+
+// SetNillableIsolationScope sets the "isolation_scope" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableIsolationScope(v *string) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetIsolationScope(*v)
+	}
+	return _u
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (_u *RobotSessionMessageUpdateOne) ClearIsolationScope() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearIsolationScope()
+	return _u
+}
+
 // SetRobotID sets the "robot_id" field.
 func (_u *RobotSessionMessageUpdateOne) SetRobotID(v xid.ID) *RobotSessionMessageUpdateOne {
 	_u.mutation.SetRobotID(v)
@@ -441,8 +542,16 @@ func (_u *RobotSessionMessageUpdateOne) ClearAccountID() *RobotSessionMessageUpd
 }
 
 // SetEventData sets the "event_data" field.
-func (_u *RobotSessionMessageUpdateOne) SetEventData(v map[string]interface{}) *RobotSessionMessageUpdateOne {
+func (_u *RobotSessionMessageUpdateOne) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageUpdateOne {
 	_u.mutation.SetEventData(v)
+	return _u
+}
+
+// SetNillableEventData sets the "event_data" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableEventData(v *schema.RobotSessionEvent) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetEventData(*v)
+	}
 	return _u
 }
 
@@ -583,6 +692,18 @@ func (_u *RobotSessionMessageUpdateOne) sqlSave(ctx context.Context) (_node *Rob
 	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Branch(); ok {
+		_spec.SetField(robotsessionmessage.FieldBranch, field.TypeString, value)
+	}
+	if _u.mutation.BranchCleared() {
+		_spec.ClearField(robotsessionmessage.FieldBranch, field.TypeString)
+	}
+	if value, ok := _u.mutation.IsolationScope(); ok {
+		_spec.SetField(robotsessionmessage.FieldIsolationScope, field.TypeString, value)
+	}
+	if _u.mutation.IsolationScopeCleared() {
+		_spec.ClearField(robotsessionmessage.FieldIsolationScope, field.TypeString)
 	}
 	if value, ok := _u.mutation.BuiltinRobot(); ok {
 		_spec.SetField(robotsessionmessage.FieldBuiltinRobot, field.TypeString, value)

@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryPagePropertySchemaUpdate
+x-storyden:
+  toolsets:
+    - system.library
 x-storyden-tool:
   title: Update Property Schema
   role: MANAGE_LIBRARY

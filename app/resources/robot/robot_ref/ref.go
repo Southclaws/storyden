@@ -26,6 +26,7 @@ func NewID(s string) (ID, error) {
 	return ID(id), nil
 }
 
+type ToolsetRef string
 type ToolName string
 
 type Robot struct {
@@ -38,6 +39,7 @@ type Robot struct {
 	Playbook    string
 	Model       model_ref.ModelRef
 	Tools       []ToolName
+	Toolsets    []ToolsetRef
 	Metadata    map[string]any
 	WorkspaceID opt.Optional[xid.ID]
 
@@ -55,6 +57,9 @@ func Map(in *ent.Robot) (*Robot, error) {
 	tools := dt.Map(in.Tools, func(tool string) ToolName {
 		return ToolName(tool)
 	})
+	toolsets := dt.Map(in.Toolsets, func(toolset string) ToolsetRef {
+		return ToolsetRef(toolset)
+	})
 
 	workspaceID := opt.NewEmpty[xid.ID]()
 	if in.WorkspaceID != nil {
@@ -71,6 +76,7 @@ func Map(in *ent.Robot) (*Robot, error) {
 		Playbook:    in.Playbook,
 		Model:       model,
 		Tools:       tools,
+		Toolsets:    toolsets,
 		Metadata:    in.Metadata,
 		WorkspaceID: workspaceID,
 

@@ -29,6 +29,10 @@ const richCardSlotNames = [
     "rich-card__titleContainer"
   ],
   [
+    "titleIcon",
+    "rich-card__titleIcon"
+  ],
+  [
     "title",
     "rich-card__title"
   ],

@@ -7,6 +7,7 @@ import * as Tabs from "@/components/ui/tabs";
 
 const routes = {
   robots: "/robots",
+  toolsets: "/robots/toolsets",
   sessions: "/robots/chats",
 } as const;
 
@@ -17,7 +18,9 @@ export function RobotsTabs({ children }: PropsWithChildren) {
   const router = useRouter();
   const activeTab: RobotTab = pathname.startsWith(routes.sessions)
     ? "sessions"
-    : "robots";
+    : pathname.startsWith(routes.toolsets)
+      ? "toolsets"
+      : "robots";
 
   return (
     <Tabs.Root
@@ -30,6 +33,7 @@ export function RobotsTabs({ children }: PropsWithChildren) {
     >
       <Tabs.List className="robots-tabs__list" aria-label="Robots sections">
         <Tabs.Trigger value="robots">Robots</Tabs.Trigger>
+        <Tabs.Trigger value="toolsets">Toolsets</Tabs.Trigger>
         <Tabs.Trigger value="sessions">Sessions</Tabs.Trigger>
         <Tabs.Indicator />
       </Tabs.List>

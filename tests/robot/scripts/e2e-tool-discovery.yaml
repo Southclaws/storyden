@@ -1,0 +1,38 @@
+steps:
+  - match:
+      tool_result: throw_an_error
+    respond:
+      text: "The dynamically loaded tool ran and reported its expected test error."
+      finish: "stop"
+  - match:
+      tool_result: tool_load
+    respond:
+      tool_calls:
+        - id: call_loaded_tool_1
+          name: throw_an_error
+          args: {}
+  - match:
+      tool_result: tool_get
+    respond:
+      tool_calls:
+        - id: call_tool_load_1
+          name: tool_load
+          args:
+            tools:
+              - throw_an_error
+  - match:
+      tool_result: tool_search
+    respond:
+      tool_calls:
+        - id: call_tool_get_1
+          name: tool_get
+          args:
+            id: throw_an_error
+  - match:
+      contains: "find and load one error tool"
+    respond:
+      tool_calls:
+        - id: call_tool_search_1
+          name: tool_search
+          args:
+            query: "intentional error handling"

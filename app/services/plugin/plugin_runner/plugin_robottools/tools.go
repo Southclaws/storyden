@@ -10,12 +10,14 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/rs/xid"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/lib/mcp"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
@@ -24,6 +26,50 @@ var unsafeToolNameChars = regexp.MustCompile(`[^a-zA-Z0-9_]`)
 
 func FullyQualifiedName(installationID plugin.InstallationID, providerID, toolID string) string {
 	return "plugin__" + safeSegment(installationID.String()) + "__" + safeSegment(providerID) + "__" + safeSegment(toolID)
+}
+
+func FullyQualifiedToolsetID(installationID plugin.InstallationID, providerID, toolsetID string) string {
+	return "plugin." + safeSegment(installationID.String()) + "." + safeSegment(providerID) + "." + safeSegment(toolsetID)
+}
+
+func ToolsetDefinitions(installationID plugin.InstallationID, provider rpc.RobotToolProviderCapabilityConfig) ([]toolsets.Definition, error) {
+	available := make(map[string]struct{}, len(provider.Tools))
+	for _, declaration := range provider.Tools {
+		if _, exists := available[declaration.ID]; exists {
+			return nil, fmt.Errorf("duplicate plugin Robot tool ID %q", declaration.ID)
+		}
+		available[declaration.ID] = struct{}{}
+	}
+
+	seen := make(map[string]struct{}, len(provider.Toolsets))
+	definitions := make([]toolsets.Definition, 0, len(provider.Toolsets))
+	for _, declaration := range provider.Toolsets {
+		if _, exists := seen[declaration.ID]; exists {
+			return nil, fmt.Errorf("duplicate plugin Robot Toolset ID %q", declaration.ID)
+		}
+		seen[declaration.ID] = struct{}{}
+
+		toolNames := make([]string, 0, len(declaration.Tools))
+		for _, localID := range declaration.Tools {
+			if _, ok := available[localID]; !ok {
+				return nil, fmt.Errorf("plugin Robot Toolset %q references unknown tool %q", declaration.ID, localID)
+			}
+			toolNames = append(toolNames, FullyQualifiedName(installationID, provider.ID, localID))
+		}
+
+		definitions = append(definitions, toolsets.Definition{
+			ID:                FullyQualifiedToolsetID(installationID, provider.ID, declaration.ID),
+			Name:              declaration.Name,
+			Description:       declaration.Description,
+			Instruction:       declaration.Instruction.Or(""),
+			ToolNames:         toolNames,
+			RequiresWorkspace: declaration.RequiresWorkspace.Or(false),
+			Source:            toolsets.SourcePlugin,
+			SourceRef:         installationID.String(),
+		})
+	}
+
+	return definitions, nil
 }
 
 func safeSegment(value string) string {
@@ -78,6 +124,7 @@ func newTool(
 		InputSchema:          inputSchema,
 		OutputSchema:         outputSchema,
 		RequiresConfirmation: declaration.RequiresConfirmation.Or(false),
+		RequiresWorkspace:    declaration.RequiresWorkspace.Or(false),
 		Annotations:          annotationsFromManifest(declaration.Annotations),
 	}
 
@@ -93,7 +140,7 @@ func newTool(
 					InputSchema:         def.InputSchema,
 					RequireConfirmation: def.RequiresConfirmation && !robot_tools.ConfirmationDisabled(ctx),
 				},
-				func(ctx tool.Context, args map[string]interface{}) (robot_tools.ToolResult[map[string]interface{}], error) {
+				func(ctx adkagent.Context, args map[string]interface{}) (robot_tools.ToolResult[map[string]interface{}], error) {
 					return execute(ctx, sess, providerID, declaration.ID, run, args), nil
 				},
 			)

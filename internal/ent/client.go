@@ -59,6 +59,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -161,6 +162,8 @@ type Client struct {
 	RobotSession *RobotSessionClient
 	// RobotSessionMessage is the client for interacting with the RobotSessionMessage builders.
 	RobotSessionMessage *RobotSessionMessageClient
+	// RobotToolset is the client for interacting with the RobotToolset builders.
+	RobotToolset *RobotToolsetClient
 	// RobotWorkspace is the client for interacting with the RobotWorkspace builders.
 	RobotWorkspace *RobotWorkspaceClient
 	// RobotWorkspaceInstance is the client for interacting with the RobotWorkspaceInstance builders.
@@ -229,6 +232,7 @@ func (c *Client) init() {
 	c.RobotProviderModel = NewRobotProviderModelClient(c.config)
 	c.RobotSession = NewRobotSessionClient(c.config)
 	c.RobotSessionMessage = NewRobotSessionMessageClient(c.config)
+	c.RobotToolset = NewRobotToolsetClient(c.config)
 	c.RobotWorkspace = NewRobotWorkspaceClient(c.config)
 	c.RobotWorkspaceInstance = NewRobotWorkspaceInstanceClient(c.config)
 	c.Role = NewRoleClient(c.config)
@@ -371,6 +375,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		RobotProviderModel:           NewRobotProviderModelClient(cfg),
 		RobotSession:                 NewRobotSessionClient(cfg),
 		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
+		RobotToolset:                 NewRobotToolsetClient(cfg),
 		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
 		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
 		Role:                         NewRoleClient(cfg),
@@ -440,6 +445,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		RobotProviderModel:           NewRobotProviderModelClient(cfg),
 		RobotSession:                 NewRobotSessionClient(cfg),
 		RobotSessionMessage:          NewRobotSessionMessageClient(cfg),
+		RobotToolset:                 NewRobotToolsetClient(cfg),
 		RobotWorkspace:               NewRobotWorkspaceClient(cfg),
 		RobotWorkspaceInstance:       NewRobotWorkspaceInstanceClient(cfg),
 		Role:                         NewRoleClient(cfg),
@@ -485,7 +491,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
 		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.RobotSession, c.RobotSessionMessage, c.RobotToolset, c.RobotWorkspace,
 		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Use(hooks...)
@@ -505,7 +511,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.OAuthRemoteAuthorisationFlow, c.OAuthRemoteConnection, c.Plugin, c.Post,
 		c.PostRead, c.Property, c.PropertySchema, c.PropertySchemaField, c.React,
 		c.Report, c.Robot, c.RobotMCPServer, c.RobotMCPTool, c.RobotProviderModel,
-		c.RobotSession, c.RobotSessionMessage, c.RobotWorkspace,
+		c.RobotSession, c.RobotSessionMessage, c.RobotToolset, c.RobotWorkspace,
 		c.RobotWorkspaceInstance, c.Role, c.Session, c.Setting, c.Tag, c.Warning,
 	} {
 		n.Intercept(interceptors...)
@@ -601,6 +607,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RobotSession.mutate(ctx, m)
 	case *RobotSessionMessageMutation:
 		return c.RobotSessionMessage.mutate(ctx, m)
+	case *RobotToolsetMutation:
+		return c.RobotToolset.mutate(ctx, m)
 	case *RobotWorkspaceMutation:
 		return c.RobotWorkspace.mutate(ctx, m)
 	case *RobotWorkspaceInstanceMutation:
@@ -1313,6 +1321,22 @@ func (c *AccountClient) QueryRobots(_m *Account) *RobotQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(robot.Table, robot.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotsTable, account.RobotsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRobotToolsets queries the robot_toolsets edge of a Account.
+func (c *AccountClient) QueryRobotToolsets(_m *Account) *RobotToolsetQuery {
+	query := (&RobotToolsetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(robottoolset.Table, robottoolset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotToolsetsTable, account.RobotToolsetsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -8977,6 +9001,155 @@ func (c *RobotSessionMessageClient) mutate(ctx context.Context, m *RobotSessionM
 	}
 }
 
+// RobotToolsetClient is a client for the RobotToolset schema.
+type RobotToolsetClient struct {
+	config
+}
+
+// NewRobotToolsetClient returns a client for the RobotToolset from the given config.
+func NewRobotToolsetClient(c config) *RobotToolsetClient {
+	return &RobotToolsetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `robottoolset.Hooks(f(g(h())))`.
+func (c *RobotToolsetClient) Use(hooks ...Hook) {
+	c.hooks.RobotToolset = append(c.hooks.RobotToolset, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `robottoolset.Intercept(f(g(h())))`.
+func (c *RobotToolsetClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RobotToolset = append(c.inters.RobotToolset, interceptors...)
+}
+
+// Create returns a builder for creating a RobotToolset entity.
+func (c *RobotToolsetClient) Create() *RobotToolsetCreate {
+	mutation := newRobotToolsetMutation(c.config, OpCreate)
+	return &RobotToolsetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RobotToolset entities.
+func (c *RobotToolsetClient) CreateBulk(builders ...*RobotToolsetCreate) *RobotToolsetCreateBulk {
+	return &RobotToolsetCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RobotToolsetClient) MapCreateBulk(slice any, setFunc func(*RobotToolsetCreate, int)) *RobotToolsetCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RobotToolsetCreateBulk{err: fmt.Errorf("calling to RobotToolsetClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RobotToolsetCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RobotToolsetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RobotToolset.
+func (c *RobotToolsetClient) Update() *RobotToolsetUpdate {
+	mutation := newRobotToolsetMutation(c.config, OpUpdate)
+	return &RobotToolsetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RobotToolsetClient) UpdateOne(_m *RobotToolset) *RobotToolsetUpdateOne {
+	mutation := newRobotToolsetMutation(c.config, OpUpdateOne, withRobotToolset(_m))
+	return &RobotToolsetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RobotToolsetClient) UpdateOneID(id xid.ID) *RobotToolsetUpdateOne {
+	mutation := newRobotToolsetMutation(c.config, OpUpdateOne, withRobotToolsetID(id))
+	return &RobotToolsetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RobotToolset.
+func (c *RobotToolsetClient) Delete() *RobotToolsetDelete {
+	mutation := newRobotToolsetMutation(c.config, OpDelete)
+	return &RobotToolsetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RobotToolsetClient) DeleteOne(_m *RobotToolset) *RobotToolsetDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RobotToolsetClient) DeleteOneID(id xid.ID) *RobotToolsetDeleteOne {
+	builder := c.Delete().Where(robottoolset.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RobotToolsetDeleteOne{builder}
+}
+
+// Query returns a query builder for RobotToolset.
+func (c *RobotToolsetClient) Query() *RobotToolsetQuery {
+	return &RobotToolsetQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRobotToolset},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RobotToolset entity by its id.
+func (c *RobotToolsetClient) Get(ctx context.Context, id xid.ID) (*RobotToolset, error) {
+	return c.Query().Where(robottoolset.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RobotToolsetClient) GetX(ctx context.Context, id xid.ID) *RobotToolset {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAuthor queries the author edge of a RobotToolset.
+func (c *RobotToolsetClient) QueryAuthor(_m *RobotToolset) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robottoolset.Table, robottoolset.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, robottoolset.AuthorTable, robottoolset.AuthorColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RobotToolsetClient) Hooks() []Hook {
+	return c.hooks.RobotToolset
+}
+
+// Interceptors returns the client interceptors.
+func (c *RobotToolsetClient) Interceptors() []Interceptor {
+	return c.inters.RobotToolset
+}
+
+func (c *RobotToolsetClient) mutate(ctx context.Context, m *RobotToolsetMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RobotToolsetCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RobotToolsetUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RobotToolsetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RobotToolsetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RobotToolset mutation op: %q", m.Op())
+	}
+}
+
 // RobotWorkspaceClient is a client for the RobotWorkspace schema.
 type RobotWorkspaceClient struct {
 	config
@@ -10127,8 +10300,8 @@ type (
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
 		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
 		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
-		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
-		Setting, Tag, Warning []ent.Hook
+		RobotSessionMessage, RobotToolset, RobotWorkspace, RobotWorkspaceInstance,
+		Role, Session, Setting, Tag, Warning []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, AuditLog, Authentication, Category,
@@ -10139,8 +10312,8 @@ type (
 		OAuthRefreshToken, OAuthRemoteAuthorisationFlow, OAuthRemoteConnection, Plugin,
 		Post, PostRead, Property, PropertySchema, PropertySchemaField, React, Report,
 		Robot, RobotMCPServer, RobotMCPTool, RobotProviderModel, RobotSession,
-		RobotSessionMessage, RobotWorkspace, RobotWorkspaceInstance, Role, Session,
-		Setting, Tag, Warning []ent.Interceptor
+		RobotSessionMessage, RobotToolset, RobotWorkspace, RobotWorkspaceInstance,
+		Role, Session, Setting, Tag, Warning []ent.Interceptor
 	}
 )
 

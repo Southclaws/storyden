@@ -8,8 +8,8 @@ import (
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/adk/session"
-	adktool "google.golang.org/adk/tool"
+	"google.golang.org/adk/v2/session"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspacestate"
@@ -149,7 +149,7 @@ func TestInstructionIncludesUnboundState(t *testing.T) {
 	assert.Contains(t, instruction, "compare the implemented plugin against the user’s original requested outcome")
 	assert.Contains(t, instruction, "Never ask the user to perform development work")
 	assert.Contains(t, instruction, "Do not ask the user to resolve compiler errors")
-	assert.Contains(t, instruction, "The managed Plugin Builder flow is authoritative")
+	assert.Contains(t, instruction, "The managed Plugin Studio flow is authoritative")
 	assert.Contains(t, instruction, "Before writing code, decide whether the requested behaviour only reacts to delivered events")
 	assert.Contains(t, instruction, "Never invent third-party SDK methods")
 	assert.Contains(t, instruction, "If plugin code uses BuildAPIClient, manifest.yaml must include access")

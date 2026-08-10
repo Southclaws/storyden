@@ -8,8 +8,10 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/openai/openai-go/v3/packages/param"
 	"github.com/openai/openai-go/v3/responses"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider/toolschema"
 )
 
 const openAIReasoningItemKey = "openai_reasoning_item"
@@ -134,37 +136,10 @@ func convertToOpenAITools(req *model.LLMRequest) []responses.ToolUnionParam {
 		}
 
 		for _, fn := range tool.FunctionDeclarations {
-			schema := map[string]any{
-				"type":       "object",
-				"properties": map[string]any{},
-			}
-
-			// Try Parameters first (genai.Schema)
-			if fn.Parameters != nil {
-				if b, err := json.Marshal(fn.Parameters); err == nil {
-					var parsed map[string]any
-					if json.Unmarshal(b, &parsed) == nil && parsed != nil {
-						schema = parsed
-					}
-				}
-			}
-
-			// Fallback to ParametersJsonSchema if Parameters is nil
-			if fn.ParametersJsonSchema != nil {
-				if schemaMap, ok := fn.ParametersJsonSchema.(map[string]interface{}); ok && schemaMap != nil {
-					schema = schemaMap
-				} else if b, err := json.Marshal(fn.ParametersJsonSchema); err == nil {
-					var parsed map[string]any
-					if json.Unmarshal(b, &parsed) == nil && parsed != nil {
-						schema = parsed
-					}
-				}
-			}
-
 			tools = append(tools, responses.ToolUnionParam{OfFunction: &responses.FunctionToolParam{
 				Name:        fn.Name,
 				Description: param.NewOpt(fn.Description),
-				Parameters:  schema,
+				Parameters:  toolschema.FromFunctionDeclaration(fn),
 				Strict:      param.NewOpt(false),
 			}})
 		}

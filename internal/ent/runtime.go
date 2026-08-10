@@ -49,6 +49,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -1816,6 +1817,49 @@ func init() {
 	// robotsessionmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	robotsessionmessage.IDValidator = func() func(string) error {
 		validators := robotsessionmessageDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robottoolsetMixin := schema.RobotToolset{}.Mixin()
+	robottoolsetMixinFields0 := robottoolsetMixin[0].Fields()
+	_ = robottoolsetMixinFields0
+	robottoolsetMixinFields1 := robottoolsetMixin[1].Fields()
+	_ = robottoolsetMixinFields1
+	robottoolsetMixinFields2 := robottoolsetMixin[2].Fields()
+	_ = robottoolsetMixinFields2
+	robottoolsetFields := schema.RobotToolset{}.Fields()
+	_ = robottoolsetFields
+	// robottoolsetDescCreatedAt is the schema descriptor for created_at field.
+	robottoolsetDescCreatedAt := robottoolsetMixinFields1[0].Descriptor()
+	// robottoolset.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robottoolset.DefaultCreatedAt = robottoolsetDescCreatedAt.Default.(func() time.Time)
+	// robottoolsetDescUpdatedAt is the schema descriptor for updated_at field.
+	robottoolsetDescUpdatedAt := robottoolsetMixinFields2[0].Descriptor()
+	// robottoolset.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robottoolset.DefaultUpdatedAt = robottoolsetDescUpdatedAt.Default.(func() time.Time)
+	// robottoolset.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robottoolset.UpdateDefaultUpdatedAt = robottoolsetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robottoolsetDescName is the schema descriptor for name field.
+	robottoolsetDescName := robottoolsetFields[0].Descriptor()
+	// robottoolset.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	robottoolset.NameValidator = robottoolsetDescName.Validators[0].(func(string) error)
+	// robottoolsetDescID is the schema descriptor for id field.
+	robottoolsetDescID := robottoolsetMixinFields0[0].Descriptor()
+	// robottoolset.DefaultID holds the default value on creation for the id field.
+	robottoolset.DefaultID = robottoolsetDescID.Default.(func() xid.ID)
+	// robottoolset.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robottoolset.IDValidator = func() func(string) error {
+		validators := robottoolsetDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

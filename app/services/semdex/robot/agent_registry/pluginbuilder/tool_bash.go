@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	adkagent "google.golang.org/adk/v2/agent"
 	"time"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -24,7 +24,7 @@ func (a *Agent) addBashTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_run_bash",
 		Description: "Run one synchronous Bash command in the managed plugin workspace. Only available when the workspace template allows untrusted commands. Use for one-shot inspection or commands not covered by focused tools. Do not use for long-running dev servers, background processes, secrets, deployment, packaging, or install; prefer focused plugin_* tools whenever they exist.",
-	}, func(ctx adktool.Context, args RunBashInput) (CommandResult, error) {
+	}, func(ctx adkagent.Context, args RunBashInput) (CommandResult, error) {
 		return a.RunBash(ctx, args)
 	}))
 }

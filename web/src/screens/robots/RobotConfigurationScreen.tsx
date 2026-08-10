@@ -78,8 +78,11 @@ export function RobotConfigurationScreen({ robotId }: Props) {
           <PageHeading lineClamp="1">{data.name}</PageHeading>
         </HStack>
 
-        <LinkButton variant="subtle" href="/robots/chats">
-          Chats
+        <LinkButton
+          variant="subtle"
+          href={`/robots/chats/new?robot=${encodeURIComponent(robotId)}`}
+        >
+          Test Robot
         </LinkButton>
       </WStack>
 

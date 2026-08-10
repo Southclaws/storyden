@@ -9,6 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
+	"google.golang.org/adk/v2/model"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/genai"
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -42,16 +45,19 @@ func TestGetWithMessageFiltersReturnsNewestNotOldest(t *testing.T) {
 			// we can identify them after retrieval.
 			invocations := []string{"inv-A", "inv-B", "inv-C", "inv-D", "inv-E"}
 			for _, inv := range invocations {
+				event := &adksession.Event{
+					InvocationID: inv,
+					Author:       "user",
+					LLMResponse: model.LLMResponse{
+						Content: genai.NewContentFromText(inv, genai.RoleUser),
+					},
+				}
 				err := sessionRepo.AppendMessage(
 					root,
 					sessionID,
-					inv,
 					opt.New(accountID),
 					opt.NewEmpty[robot.Actor](),
-					map[string]any{
-						"author":  "user",
-						"content": map[string]any{"parts": []any{map[string]any{"text": inv}}},
-					},
+					event,
 				)
 				require.NoError(t, err)
 				// Small sleep so created_at timestamps differ on fast hardware.

@@ -1,0 +1,37 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolLoad
+x-storyden:
+  toolsets: []
+x-storyden-tool:
+  title: Load Tools
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: tool_load
+description: Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolLoadInput" }
+  output: { $ref: "#/definitions/ToolToolLoadOutput" }
+definitions:
+  ToolToolLoadInput:
+    type: object
+    required: [tools]
+    properties:
+      tools:
+        type: array
+        minItems: 1
+        items: { type: string }
+        description: Stable tool IDs inspected with tool_get.
+    additionalProperties: false
+  ToolToolLoadOutput:
+    type: object
+    required: [loaded, next_action]
+    properties:
+      loaded:
+        type: array
+        description: Tools activated for subsequent model steps in this conversation.
+        items: { $ref: "../../common/RobotToolCatalogueItem.yaml" }
+      next_action:
+        type: string
+        description: Recommended continuation now that the selected tools are available.
+    additionalProperties: false

@@ -9,6 +9,7 @@
  */
 import type {
   BadRequestResponse,
+  ConflictResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
@@ -36,6 +37,10 @@ import type {
   RobotSessionsListOKResponse,
   RobotSessionsListParams,
   RobotToolsListOKResponse,
+  RobotToolsetCreateBody,
+  RobotToolsetGetOKResponse,
+  RobotToolsetUpdateBody,
+  RobotToolsetsListOKResponse,
   RobotUpdateBody,
   RobotWorkspaceCreateBody,
   RobotWorkspaceCreateOKResponse,
@@ -159,6 +164,11 @@ export type robotCreateResponse200 = {
   status: 200;
 };
 
+export type robotCreateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type robotCreateResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -171,14 +181,17 @@ export type robotCreateResponse403 = {
 
 export type robotCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 403>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
 };
 
 export type robotCreateResponseSuccess = robotCreateResponse200 & {
   headers: Headers;
 };
 export type robotCreateResponseError = (
-  robotCreateResponse401 | robotCreateResponse403 | robotCreateResponseDefault
+  | robotCreateResponse400
+  | robotCreateResponse401
+  | robotCreateResponse403
+  | robotCreateResponseDefault
 ) & {
   headers: Headers;
 };
@@ -190,12 +203,13 @@ export const getRobotCreateUrl = () => {
 /**
  * Create a new Robot with the specified configuration. A Robot in Storyden
  * consists of a name and description (for humans) as well as a playbook,
- * and a set of available tools to interact with Storyden or plugins. The
- * playbook is a detailed set of instructions that guides behaviour of the
- * Robot to help it assist members in achieving a specific automation goal.
- * Tools are available from either Storyden or plugins that allow it to
- * perform actions or query data. Robots never need all tools and it's best
- * to build goal-specific Robots with minimal sets of tools.
+ * and a set of direct tools and reusable Toolsets to interact with Storyden
+ * or plugins. The playbook is a detailed set of instructions that guides
+ * behaviour of the Robot to help it assist members in achieving a specific
+ * automation goal.
+ * Direct tools support narrowly scoped Robots, while Toolsets bundle tools
+ * with optional specialist instructions. Toolsets can be shared across
+ * Robots and can come from Storyden, members, or plugins.
  * @summary Create a robot
  */
 export const robotCreate = async (
@@ -259,6 +273,302 @@ export const robotToolsList = async (
   });
 };
 
+export type robotToolsetsListResponse200 = {
+  data: RobotToolsetsListOKResponse;
+  status: 200;
+};
+
+export type robotToolsetsListResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotToolsetsListResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotToolsetsListResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 403>;
+};
+
+export type robotToolsetsListResponseSuccess = robotToolsetsListResponse200 & {
+  headers: Headers;
+};
+export type robotToolsetsListResponseError = (
+  | robotToolsetsListResponse401
+  | robotToolsetsListResponse403
+  | robotToolsetsListResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotToolsetsListUrl = () => {
+  return `/robots/toolsets`;
+};
+
+/**
+ * List reusable Toolsets available to Robots. Toolsets group tools with
+ * optional instructions and may be provided by Storyden, members, or
+ * plugins.
+ * @summary List Robot Toolsets
+ */
+export const robotToolsetsList = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotToolsetsListResponseSuccess> => {
+  return fetcher<robotToolsetsListResponseSuccess>(getRobotToolsetsListUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export type robotToolsetCreateResponse200 = {
+  data: RobotToolsetGetOKResponse;
+  status: 200;
+};
+
+export type robotToolsetCreateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotToolsetCreateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotToolsetCreateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotToolsetCreateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403>;
+};
+
+export type robotToolsetCreateResponseSuccess =
+  robotToolsetCreateResponse200 & {
+    headers: Headers;
+  };
+export type robotToolsetCreateResponseError = (
+  | robotToolsetCreateResponse400
+  | robotToolsetCreateResponse401
+  | robotToolsetCreateResponse403
+  | robotToolsetCreateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotToolsetCreateUrl = () => {
+  return `/robots/toolsets`;
+};
+
+/**
+ * Create a reusable member-authored Toolset.
+ * @summary Create a Robot Toolset
+ */
+export const robotToolsetCreate = async (
+  robotToolsetCreateBody: RobotToolsetCreateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotToolsetCreateResponseSuccess> => {
+  return fetcher<robotToolsetCreateResponseSuccess>(
+    getRobotToolsetCreateUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(robotToolsetCreateBody),
+    },
+  );
+};
+
+export type robotToolsetGetResponse200 = {
+  data: RobotToolsetGetOKResponse;
+  status: 200;
+};
+
+export type robotToolsetGetResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotToolsetGetResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotToolsetGetResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 404>;
+};
+
+export type robotToolsetGetResponseSuccess = robotToolsetGetResponse200 & {
+  headers: Headers;
+};
+export type robotToolsetGetResponseError = (
+  | robotToolsetGetResponse401
+  | robotToolsetGetResponse404
+  | robotToolsetGetResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotToolsetGetUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Retrieve a built-in, custom, or plugin Toolset by ID.
+ * @summary Get a Robot Toolset
+ */
+export const robotToolsetGet = async (
+  toolsetId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotToolsetGetResponseSuccess> => {
+  return fetcher<robotToolsetGetResponseSuccess>(
+    getRobotToolsetGetUrl(toolsetId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+export type robotToolsetUpdateResponse200 = {
+  data: RobotToolsetGetOKResponse;
+  status: 200;
+};
+
+export type robotToolsetUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
+export type robotToolsetUpdateResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotToolsetUpdateResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotToolsetUpdateResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotToolsetUpdateResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
+};
+
+export type robotToolsetUpdateResponseSuccess =
+  robotToolsetUpdateResponse200 & {
+    headers: Headers;
+  };
+export type robotToolsetUpdateResponseError = (
+  | robotToolsetUpdateResponse400
+  | robotToolsetUpdateResponse401
+  | robotToolsetUpdateResponse403
+  | robotToolsetUpdateResponse404
+  | robotToolsetUpdateResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotToolsetUpdateUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Update a member-authored Toolset.
+ * @summary Update a Robot Toolset
+ */
+export const robotToolsetUpdate = async (
+  toolsetId: string,
+  robotToolsetUpdateBody: RobotToolsetUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotToolsetUpdateResponseSuccess> => {
+  return fetcher<robotToolsetUpdateResponseSuccess>(
+    getRobotToolsetUpdateUrl(toolsetId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(robotToolsetUpdateBody),
+    },
+  );
+};
+
+export type robotToolsetDeleteResponse200 = {
+  data: void;
+  status: 200;
+};
+
+export type robotToolsetDeleteResponse401 = {
+  data: UnauthorisedResponse;
+  status: 401;
+};
+
+export type robotToolsetDeleteResponse403 = {
+  data: ForbiddenResponse;
+  status: 403;
+};
+
+export type robotToolsetDeleteResponse404 = {
+  data: NotFoundResponse;
+  status: 404;
+};
+
+export type robotToolsetDeleteResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
+export type robotToolsetDeleteResponseDefault = {
+  data: InternalServerErrorResponse;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404 | 409>;
+};
+
+export type robotToolsetDeleteResponseSuccess =
+  robotToolsetDeleteResponse200 & {
+    headers: Headers;
+  };
+export type robotToolsetDeleteResponseError = (
+  | robotToolsetDeleteResponse401
+  | robotToolsetDeleteResponse403
+  | robotToolsetDeleteResponse404
+  | robotToolsetDeleteResponse409
+  | robotToolsetDeleteResponseDefault
+) & {
+  headers: Headers;
+};
+
+export const getRobotToolsetDeleteUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Delete an unused member-authored Toolset.
+ * @summary Delete a Robot Toolset
+ */
+export const robotToolsetDelete = async (
+  toolsetId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<robotToolsetDeleteResponseSuccess> => {
+  return fetcher<robotToolsetDeleteResponseSuccess>(
+    getRobotToolsetDeleteUrl(toolsetId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
 export type robotChatSSEResponse200 = {
   data: RobotChatStreamResponse;
   status: 200;
@@ -279,9 +589,14 @@ export type robotChatSSEResponse404 = {
   status: 404;
 };
 
+export type robotChatSSEResponse409 = {
+  data: ConflictResponse;
+  status: 409;
+};
+
 export type robotChatSSEResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404 | 409>;
 };
 
 export type robotChatSSEResponseSuccess = robotChatSSEResponse200 & {
@@ -291,6 +606,7 @@ export type robotChatSSEResponseError = (
   | robotChatSSEResponse401
   | robotChatSSEResponse403
   | robotChatSSEResponse404
+  | robotChatSSEResponse409
   | robotChatSSEResponseDefault
 ) & {
   headers: Headers;
@@ -304,6 +620,11 @@ export const getRobotChatSSEUrl = () => {
  * Send a message to a Robot and receive its response. This endpoint
  * manages sessions automatically, creating new sessions as needed or
  * continuing existing sessions based on the provided session ID.
+ *
+ * New sessions use Denbot unless `robotId` selects a custom Robot. The
+ * selected Robot remains the root for that session. Denbot can search for
+ * Toolsets, load specialist capabilities, and
+ * delegate bounded work to custom Robots without leaving its session.
  *
  * Each message sent to the Robot is processed according to its playbook
  * and available tools, allowing it to perform actions or retrieve data
@@ -1134,6 +1455,11 @@ export type robotUpdateResponse200 = {
   status: 200;
 };
 
+export type robotUpdateResponse400 = {
+  data: BadRequestResponse;
+  status: 400;
+};
+
 export type robotUpdateResponse401 = {
   data: UnauthorisedResponse;
   status: 401;
@@ -1151,13 +1477,14 @@ export type robotUpdateResponse404 = {
 
 export type robotUpdateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 200 | 401 | 403 | 404>;
+  status: Exclude<HTTPStatusCodes, 200 | 400 | 401 | 403 | 404>;
 };
 
 export type robotUpdateResponseSuccess = robotUpdateResponse200 & {
   headers: Headers;
 };
 export type robotUpdateResponseError = (
+  | robotUpdateResponse400
   | robotUpdateResponse401
   | robotUpdateResponse403
   | robotUpdateResponse404
@@ -1171,7 +1498,7 @@ export const getRobotUpdateUrl = (robotId: string) => {
 };
 
 /**
- * Update a Robot's name, description, playbook or available tools.
+ * Update a Robot's name, description, playbook, direct tools, or assigned Toolsets.
  * @summary Update a robot
  */
 export const robotUpdate = async (
@@ -1284,10 +1611,9 @@ export const getRobotSessionsListUrl = (params?: RobotSessionsListParams) => {
 
 /**
  * Get a paginated list of Robot sessions. These are chat sessions with the
- * Robot system. One session may span multiple Robots as members can switch
- * which Robot they are talking to mid conversation, or the Robot itself
- * may choose to switch to another Robot to achieve a goal. A session is a
- * representation of an entire conversation thread with the Robot system.
+ * Robot system. Denbot may delegate work to specialised Robots
+ * inside the same session. Delegated events retain their ADK branch and
+ * isolation scope so the execution tree remains inspectable.
  *
  * You may include an account ID to filter sessions by account. Only those
  * with "USE_ROBOTS" permission can use Robots, however sessions, messages

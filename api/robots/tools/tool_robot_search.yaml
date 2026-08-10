@@ -1,0 +1,55 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolRobotSearch
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Search Robots
+  role: USE_ROBOTS
+  annotations:
+    readOnlyHint: true
+    destructiveHint: false
+    idempotentHint: true
+    openWorldHint: false
+title: robot_search
+description: Search specialised Robots by capability before delegating a task.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolRobotSearchInput" }
+  output: { $ref: "#/definitions/ToolRobotSearchOutput" }
+definitions:
+  ToolRobotSearchInput:
+    type: object
+    required: [query]
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: The task or capability a specialised Robot should handle.
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 20
+    additionalProperties: false
+  ToolRobotSearchOutput:
+    type: object
+    required: [robots, next_action]
+    properties:
+      robots:
+        type: array
+        items: { $ref: "#/definitions/RobotSearchResult" }
+      next_action:
+        type: string
+    additionalProperties: false
+  RobotSearchResult:
+    type: object
+    required: [id, delegate_to, name, description]
+    properties:
+      id: { type: string }
+      delegate_to:
+        type: string
+        description: Delegation target name.
+      name: { type: string }
+      description: { type: string }
+    additionalProperties: false

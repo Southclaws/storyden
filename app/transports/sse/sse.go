@@ -16,15 +16,17 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	adksession "google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/robot"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	storydenagent "github.com/Southclaws/storyden/app/services/semdex/robot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
@@ -59,6 +61,7 @@ func MountSSE(
 
 	chatAgent *storydenagent.Agent,
 	sessionRepo *robot_session.Repository,
+	robotQuerier *robot_querier.Querier,
 	toolRegistry *tools.Registry,
 
 	mux *http.ServeMux,
@@ -69,7 +72,7 @@ func MountSSE(
 	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
 ) {
-	handler := newChatHandler(logger, chatAgent, sessionRepo, toolRegistry)
+	handler := newChatHandler(logger, chatAgent, sessionRepo, robotQuerier, toolRegistry)
 
 	applied := httpserver.Apply(handler,
 		ri.WithHeaderContext(),
@@ -133,6 +136,7 @@ func newChatHandler(
 	logger *slog.Logger,
 	chatAgent *storydenagent.Agent,
 	sessionRepo *robot_session.Repository,
+	robotQuerier *robot_querier.Querier,
 	toolRegistry *tools.Registry,
 ) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -156,10 +160,10 @@ func newChatHandler(
 			return
 		}
 
-		robotRef := strings.TrimSpace(req.RobotID)
+		requestedRobotRef := strings.TrimSpace(req.RobotID)
+		robotRef := requestedRobotRef
 		if robotRef == "" {
-			http.Error(w, "robotId is required", http.StatusBadRequest)
-			return
+			robotRef = denbot.ID
 		}
 
 		sessionID := firstNonEmpty(req.SessionID, req.ThreadID, req.ID)
@@ -182,6 +186,14 @@ func newChatHandler(
 			http.Error(w, "failed to retrieve session: "+sessionErr.Error(), http.StatusInternalServerError)
 			return
 		}
+		if existingSess != nil {
+			rootRobotRef := storydenagent.SessionRootRobotRef(existingSess.State).Or(denbot.ID)
+			if requestedRobotRef != "" && requestedRobotRef != rootRobotRef {
+				http.Error(w, "robotId can only select the root Robot when starting a session", http.StatusConflict)
+				return
+			}
+			robotRef = rootRobotRef
+		}
 
 		reconciliation := reconcilePendingClientTools(req.Messages, readPendingClientTools(existingSessState(existingSess)))
 		pendingToolIDs := reconciliation.Pending.IDs
@@ -189,35 +201,6 @@ func newChatHandler(
 			writeChatError(w, interaction)
 			return
 		}
-		if recovery, ok := reconciliation.StaleRobotSwitch.Get(); ok {
-			logger.Warn("recovering stale pending robot switch",
-				slog.String("session_id", sessionID),
-				slog.String("tool_call_id", recovery.ToolCallID),
-				slog.String("robot_id", recovery.RobotID))
-
-			if err := persistClientToolResult(ctx, sessionRepo, robotSessionID, accountID, robotSwitchToolResultContent(recovery.ToolCallID, recovery.RobotID)); err != nil {
-				logger.Error("failed to persist recovered robot switch tool result",
-					slog.String("error", err.Error()),
-					slog.String("robot_id", recovery.RobotID))
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-
-			state := clearPendingClientTools(existingSessState(existingSess))
-			if err := updateCurrentRobotID(ctx, sessionRepo, robotSessionID, state, opt.New(recovery.RobotID)); err != nil {
-				logger.Error("failed to recover current robot after stale switch",
-					slog.String("error", err.Error()),
-					slog.String("robot_id", recovery.RobotID))
-				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-
-			robotRef = recovery.RobotID
-			pendingToolIDs = nil
-		} else if ownerRobotID, ok := reconciliation.OwnerRobotID.Get(); ok {
-			robotRef = ownerRobotID
-		}
-
 		workspaceSpec, err := workspaceMountSpecFromRequest(req.Workspace)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -236,48 +219,6 @@ func newChatHandler(
 			if err := sessionRepo.UpdateState(ctx, robotSessionID, state); err != nil {
 				logger.Error("failed to clear pending tool IDs", slog.String("error", err.Error()))
 			}
-		}
-
-		nextCurrentRobotID := getRobotSwitchTargetID(req.Messages, pendingToolIDs)
-		if targetRobotID, ok := nextCurrentRobotID.Get(); ok {
-			if len(pendingToolIDs) > 0 {
-				if err := persistClientToolResult(ctx, sessionRepo, robotSessionID, accountID, initMessage); err != nil {
-					logger.Error("failed to persist robot switch tool result",
-						slog.String("error", err.Error()),
-						slog.String("robot_id", targetRobotID))
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-					return
-				}
-
-				sess, _, err := sessionRepo.Get(ctx, robotSessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
-				if err != nil {
-					logger.Error("failed to retrieve session after robot switch",
-						slog.String("error", err.Error()),
-						slog.String("robot_id", targetRobotID))
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-					return
-				}
-				if err := updateCurrentRobotID(ctx, sessionRepo, robotSessionID, sess.State, opt.New(targetRobotID)); err != nil {
-					logger.Error("failed to update current robot after switch",
-						slog.String("error", err.Error()),
-						slog.String("robot_id", targetRobotID))
-					http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-					return
-				}
-			}
-
-			if err := finishEmptyStream(w); err != nil {
-				logger.Error("failed to finish robot switch stream",
-					slog.String("error", err.Error()),
-					slog.String("robot_id", targetRobotID))
-				return
-			}
-
-			logger.Info("robot switch completed without resuming previous robot",
-				slog.String("session_id", sessionID),
-				slog.String("robot_id", targetRobotID),
-				slog.Bool("pending", len(pendingToolIDs) > 0))
-			return
 		}
 
 		logger.Debug("sse chat request",
@@ -327,6 +268,15 @@ func newChatHandler(
 		finishReason := defaultFinishReason
 		finalSeen := false
 		eventCount := 0
+		sessionIDSent := false
+		fallbackTextID := textID
+		delegations := newDelegationStream(
+			ctx,
+			robotQuerier,
+			robotprojection.ToolMetadataFromRegistry(ctx, toolRegistry),
+			emitter,
+			logger,
+		)
 
 		for event, streamErr := range stream {
 			eventCount++
@@ -338,6 +288,7 @@ func newChatHandler(
 				}
 
 				humanReadable := streamErrorText(streamErr)
+				delegations.Fail(humanReadable)
 
 				logger.Error("sse stream error",
 					slog.Int("event_num", eventCount),
@@ -358,10 +309,16 @@ func newChatHandler(
 			}
 
 			if event != nil {
+				if !sessionIDSent {
+					_ = emitter.Send(robotprojection.DataStreamPart("data-session_id", sessionID))
+					sessionIDSent = true
+				}
+
 				logger.Info("sse event received",
 					slog.Int("event_num", eventCount),
 					slog.String("author", event.Author),
 					slog.String("branch", event.Branch),
+					slog.String("isolation_scope", event.IsolationScope),
 					slog.Bool("is_final", event.IsFinalResponse()),
 					slog.Bool("has_content", event.LLMResponse.Content != nil),
 					slog.Bool("is_partial", event.LLMResponse.Partial),
@@ -371,15 +328,28 @@ func newChatHandler(
 			}
 
 			if event != nil && event.LLMResponse.Content != nil {
-				// Check for tool calls first
+				delegatedEvent := delegations.AppendEvent(event)
 				for _, part := range event.LLMResponse.Content.Parts {
 					if part == nil {
 						continue
 					}
 
+					if !delegatedEvent {
+						presentationParts, consumedFallback := robotprojection.PresentationPartStreamParts(event, part, fallbackTextID)
+						for _, presentationPart := range presentationParts {
+							_ = emitter.Send(presentationPart)
+						}
+						if consumedFallback {
+							fallbackTextID = ""
+						}
+					}
+
 					if part.FunctionCall != nil {
+						if !delegatedEvent && delegations.Start(part.FunctionCall) {
+							continue
+						}
 						if part.FunctionCall.Name == toolconfirmation.FunctionCallName {
-							sendToolConfirmationCall(ctx, event, part, emitter, sessionRepo, robotSessionID, opt.New(robotRef), toolRegistry, logger)
+							sendToolConfirmationCall(ctx, event, part, emitter, sessionRepo, robotSessionID, toolRegistry, logger)
 						} else if toolRequiresConfirmation(ctx, toolRegistry, part.FunctionCall.Name) {
 							continue
 						} else {
@@ -388,6 +358,9 @@ func newChatHandler(
 					}
 
 					if part.FunctionResponse != nil {
+						if !delegatedEvent && delegations.Complete(part.FunctionResponse) {
+							continue
+						}
 						if event.Author == "user" {
 							continue
 						}
@@ -420,7 +393,7 @@ func newChatHandler(
 							logger.Info("client-side tool pending, ending stream to wait for client result",
 								slog.String("tool_call_id", part.FunctionResponse.ID))
 
-							if err := storePendingToolID(ctx, sessionRepo, robotSessionID, part.FunctionResponse.ID, opt.New(robotRef)); err != nil {
+							if err := storePendingToolID(ctx, sessionRepo, robotSessionID, part.FunctionResponse.ID); err != nil {
 								logger.Error("failed to store pending tool ID",
 									slog.String("error", err.Error()),
 									slog.String("tool_call_id", part.FunctionResponse.ID))
@@ -442,8 +415,6 @@ func newChatHandler(
 
 					return
 				}
-
-				sendPresentationChunks(event, textID, emitter)
 			}
 
 			if event != nil && event.IsFinalResponse() {
@@ -465,20 +436,6 @@ func newChatHandler(
 
 		sess, _, err := sessionRepo.Get(ctx, robotSessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
 		if err == nil {
-			if id, ok := nextCurrentRobotID.Get(); ok {
-				if err := updateCurrentRobotID(ctx, sessionRepo, robotSessionID, sess.State, opt.New(id)); err != nil {
-					logger.Error("failed to update current robot",
-						slog.String("error", err.Error()),
-						slog.String("robot_id", id))
-				}
-			} else {
-				if err := updateCurrentRobotID(ctx, sessionRepo, robotSessionID, sess.State, opt.New(robotRef)); err != nil {
-					logger.Error("failed to update current robot",
-						slog.String("error", err.Error()),
-						slog.String("robot_id", robotRef))
-				}
-			}
-
 			dataPart := openapi.StreamPart{}
 			dataPart.FromDataPart(openapi.DataPart{
 				Data: sess.Name,
@@ -641,20 +598,6 @@ func isStorydenConfirmationOutput(output json.RawMessage) bool {
 	return ok
 }
 
-func updateCurrentRobotID(ctx context.Context, sessionRepo *robot_session.Repository, sessionID robot.SessionID, state map[string]any, robotID opt.Optional[string]) error {
-	if state == nil {
-		state = make(map[string]any)
-	}
-
-	if id, ok := robotID.Get(); ok {
-		state["current_robot_id"] = id
-	} else {
-		delete(state, "current_robot_id")
-	}
-
-	return sessionRepo.UpdateState(ctx, sessionID, state)
-}
-
 func lastUserMessage(messages []chatMessage) string {
 	for i := len(messages) - 1; i >= 0; i-- {
 		msg := messages[i]
@@ -767,12 +710,6 @@ func hasPendingConfirmation(event *adksession.Event) bool {
 	return false
 }
 
-func sendPresentationChunks(event *adksession.Event, fallbackTextID string, emitter *streamEmitter) {
-	for _, streamPart := range robotprojection.PresentationStreamParts(event, fallbackTextID) {
-		_ = emitter.Send(streamPart)
-	}
-}
-
 func streamErrorText(err error) string {
 	raw := strings.TrimSpace(err.Error())
 	issue := strings.TrimSpace(fmsg.GetIssue(err))
@@ -817,7 +754,6 @@ func sendToolConfirmationCall(
 	emitter *streamEmitter,
 	sessionRepo *robot_session.Repository,
 	robotSessionID robot.SessionID,
-	robotID opt.Optional[string],
 	toolRegistry *tools.Registry,
 	logger *slog.Logger,
 ) {
@@ -842,7 +778,7 @@ func sendToolConfirmationCall(
 		slog.Any("long_running_ids", event.LongRunningToolIDs),
 	)
 
-	if err := storePendingToolID(ctx, sessionRepo, robotSessionID, fc.ID, robotID); err != nil {
+	if err := storePendingToolID(ctx, sessionRepo, robotSessionID, fc.ID); err != nil {
 		logger.Error("failed to store pending confirmation ID",
 			slog.String("error", err.Error()),
 			slog.String("tool_call_id", fc.ID))

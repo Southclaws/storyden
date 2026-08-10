@@ -35,10 +35,10 @@ func TestRegistryRegisterValidatesRequiredDefinitionFields(t *testing.T) {
 func TestRegistryRegisterRejectsDuplicates(t *testing.T) {
 	registry := New(slog.Default())
 	def := Definition{
-		ID:          "robot_builder",
-		Name:        "Robot Builder",
-		AppName:     "storyden",
-		AgentName:   "storyden",
+		ID:          "coordinator",
+		Name:        "Coordinator",
+		AppName:     "coordinator",
+		AgentName:   "coordinator",
 		Instruction: "Build robots.",
 	}
 

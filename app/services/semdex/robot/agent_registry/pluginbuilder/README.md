@@ -1,10 +1,9 @@
-# Plugin Builder Robot
+# Plugin Builder Agent
 
-The Plugin Builder Robot is Storyden's built-in agent for creating and maintaining
-supervised Storyden plugins from natural language. It is exposed as the built-in
-Robot ID `plugin_builder`, so API clients and the UI can treat it like any other
-Robot while the runtime selects a preconfigured ADK agent instead of loading a
-database-backed Robot definition.
+The Plugin Builder Agent gives Denbot the specialised
+instructions and tools required to create and maintain supervised Storyden
+plugins from natural language. It is registered as `system.plugin_studio` and
+is discovered and loaded inside the user's existing Denbot conversation.
 
 Its job is intentionally narrow: build Go plugins for Storyden, validate them,
 package them, and install or update them through the supervised plugin manager.
@@ -13,20 +12,20 @@ desktop, or host-machine administration capabilities.
 
 ## Runtime Model
 
-`Agent` declares Plugin Builder's identity, instructions, capabilities, and
-toolset, then registers that definition with the Robot agent registry during
-service startup. The central Robot runner owns ADK agent construction, session
-history, memory, artifact services, callbacks, model selection, workspace
-mounting, and SSE delivery.
+`Agent` implements the workspace-aware prompt and tool construction, then
+registers a Toolset definition during service startup. The central Robot runner
+owns Denbot, session history, callbacks, model selection, workspace mounting,
+Toolset discovery, and SSE delivery. There is no Plugin Studio Robot ID or
+separate chat mode.
 
-The registry entry declares that this Robot requires an active workspace, so
-runs fail before tool execution when no workspace is mounted. The only special
-behavior is the built-in Robot definition and its constrained plugin-building
-toolset.
+Plugin tools require an active workspace. Denbot can mount that workspace on
+the root session, load `system.plugin_studio`, and continue in the same
+invocation. A user can also assign this Toolset to a custom Robot to reproduce
+a focused Plugin Studio specialist.
 
 ## Workspace Model
 
-Plugin Builder tools operate on the active Robot workspace from ADK session
+Plugin Studio tools operate on the active Robot workspace from ADK session
 state. Tool inputs do not include workspace IDs because workspace selection is
 execution context, not model intent.
 
@@ -42,10 +41,10 @@ The workspace abstraction provides:
 - generic command execution for typed tools to call
 - provider-owned path confinement and platform details
 
-This boundary keeps Plugin Builder portable across local, Windows, Unix, macOS,
+This boundary keeps Plugin Studio portable across local, Windows, Unix, macOS,
 and remote sandbox providers.
 
-Each Plugin Builder chat edits one plugin. For a new plugin, the agent creates
+Each Plugin Studio chat edits one plugin. For a new plugin, the agent creates
 starter files in an empty active workspace. For an existing supervised plugin,
 the agent lists editable installed plugins, imports the selected plugin archive
 into an empty active workspace, and keeps working with that exact installation.
@@ -75,20 +74,14 @@ Tools should expose task-level inputs only. Environment details such as
 workspace ID, provider type, filesystem path roots, operating system, or command
 runtime are owned by the runner and workspace provider layers.
 
-The toolset is filtered by chat state:
-
-1. Before a plugin is selected, only workspace inspection, new-plugin scaffold,
-   installed-plugin listing, and installed-plugin import tools are visible.
-2. Once a plugin is selected, editing, discovery, validation, package, and
-   install tools become visible; create/import tools are hidden.
-3. Once the selected plugin has an installation, runtime log reading is visible.
-
-Runtime guards still enforce the same one-chat-one-plugin rule even if a stale
-or malformed state exposes an unexpected path.
+Storyden exposes the complete Plugin Studio Toolset after it is loaded. Runtime
+guards enforce the one-session-one-plugin workflow and validate stage-specific
+operations. Tool descriptions and the Toolset prompt teach the intended order;
+the runtime does not rely on schema visibility as an authorization boundary.
 
 ### Go Discovery
 
-Plugin Builder learns SDK surfaces from the workspace module graph instead of
+Plugin Studio learns SDK surfaces from the workspace module graph instead of
 relying on hard-coded reference text. Discovery is intentionally progressive:
 
 1. `plugin_go_packages` lists packages by Go package pattern. Use `./...` for
@@ -111,7 +104,7 @@ invalid; the agent should search for plain terms such as `Event`, `Reply`, or
 ### Storyden SDK Discovery
 
 Storyden SDK discovery is a narrower Go-powered layer over the same package
-graph. It exists because Plugin Builder frequently needs a specific Storyden
+graph. It exists because Plugin Studio frequently needs a specific Storyden
 surface, such as plugin event names, event payload fields, manifest types, or
 generated host HTTP API methods. The general Go discovery tools remain useful
 for arbitrary dependencies, but their broad responses can include unrelated
@@ -137,7 +130,7 @@ browser. When choosing manifest `access.permissions`, fetch
 `/docs/introduction/members/permissions` and treat that page as the permission
 vocabulary.
 
-During discovery, Plugin Builder should decide whether the requested behavior
+During discovery, Plugin Studio should decide whether the requested behavior
 can be implemented from delivered event payloads alone, or whether it needs to
 call Storyden host HTTP APIs to read or write installation data. If it needs
 host API calls, the implementation must use `BuildAPIClient` and the manifest
@@ -178,7 +171,7 @@ search, SDK reference text, or documentation lookup.
 
 ## Editing Strategy
 
-Plugin Builder should act as the maintainer of one Storyden plugin for the
+Plugin Studio should act as the maintainer of one Storyden plugin for the
 chat. Its operating loop is:
 
 1. Understand the requested Storyden outcome.
@@ -223,7 +216,7 @@ entire files.
 
 Use [EVAL_PLAYBOOK.md](./EVAL_PLAYBOOK.md) for the manual end-to-end eval loop:
 run a local backend, authenticate, attach a Robot workspace, send `/sse/chat`
-requests to `plugin_builder`, inspect transcripts and workspace state, improve
+requests to Denbot with `system.plugin_studio` available, inspect transcripts and workspace state, improve
 tool contracts or validation, and rerun the same prompt.
 
 Focused edits use exact text replacement. The edit tool reads file bytes through
@@ -238,7 +231,7 @@ manifest schema as its tool input shape, then decodes and validates through
 `rpc.ManifestFromMap` before writing `manifest.yaml`. This keeps field names
 such as `configuration_schema` aligned with the runtime manifest contract.
 
-Plugin Builder instructions are self-contained because built-in Robots run in a
+Plugin Studio instructions are self-contained because built-in Robots run in a
 network-restricted environment. Useful Storyden plugin conventions from external
 authoring guides should be distilled into this package instead of linked as
 runtime references. The managed tools in this package remain authoritative:
@@ -254,13 +247,13 @@ the plugin as a side effect. The individual Go tools remain available as repair
 instruments after a specific validation check fails.
 
 The active workspace is the source of truth for the plugin. Before broad
-changes, Plugin Builder should inspect the existing implementation and preserve
+changes, Plugin Studio should inspect the existing implementation and preserve
 the plugin's established architecture, style, and behavior unless the user
 requested otherwise. New work should fit into the plugin as a product: extend
 existing behavior where possible, avoid parallel implementations and duplicate
 configuration, and keep behavior manifest-driven.
 
-Plugin Builder is allowed to iterate with the user. It does not need to solve
+Plugin Studio is allowed to iterate with the user. It does not need to solve
 every product detail in one turn. It must not, however, present partial, stubbed,
 simulated, dry-run-only, or placeholder behavior as complete. Installed plugins
 should not contain TODOs, fake success paths, "would do this" behavior, or
@@ -282,10 +275,10 @@ skip; real operation failures should still return errors.
 External integration setup values should be modeled as configuration instead of
 questions that block development. When a requested plugin needs credentials,
 destination IDs, user IDs, channel IDs, guild IDs, project IDs, webhook URLs, or
-similar values that were not provided, Plugin Builder should add clear
+similar values that were not provided, Plugin Studio should add clear
 `configuration_schema` fields and keep the plugin safely unconfigured until the
 user fills them in. Compiler errors and missing SDK methods are development
-failures for Plugin Builder to solve with discovery tools, not user questions.
+failures for Plugin Studio to solve with discovery tools, not user questions.
 
 Event subscriptions and handlers must stay aligned. If manifest.yaml lists an
 event in `events_consumed`, the Go source should register the matching SDK
@@ -295,13 +288,13 @@ timeouts for API or network work, and return errors for real operation failures.
 For generated `WithResponse` API calls, check non-2xx status codes explicitly;
 403 responses usually indicate missing or too-narrow manifest permissions.
 
-Plugin Builder should treat the plugin as software it owns. When touching nearby
+Plugin Studio should treat the plugin as software it owns. When touching nearby
 code, it may improve clarity, consolidate duplicated logic, remove obsolete
 unreachable code, and fix clearly safe correctness, validation, documentation,
 naming, or complexity issues. These improvements must not change unrelated
 user-visible behavior.
 
-Because Plugin Builder source is primarily maintained by robots, comments and
+Because Plugin Studio source is primarily maintained by robots, comments and
 lightweight documentation are useful state compression for later runs. Comments
 should preserve intent, assumptions, architectural decisions, Storyden concept
 mappings, capabilities, non-obvious SDK/API usage, and safety assumptions. They
@@ -312,7 +305,7 @@ changes, external integrations, and safety or moderation assumptions.
 
 ## Runtime Logging
 
-Plugin Builder should add useful runtime logging with the Go standard library
+Plugin Studio should add useful runtime logging with the Go standard library
 logger. Logs are for future robot maintenance and for non-technical user
 support, so they should describe what the plugin is doing in product terms.
 
@@ -335,4 +328,4 @@ tracing.
   details.
 
 Keep new functionality on the provider-backed workspace boundary unless it is
-truly Plugin Builder-specific behavior.
+truly Plugin Studio-specific behavior.

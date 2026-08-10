@@ -16,7 +16,6 @@ import { Text } from "@/components/ui/text";
 import { css } from "@/styled-system/css";
 import {
   Box,
-  Divider,
   HStack,
   LStack,
   VStack,
@@ -30,6 +29,7 @@ import { Timestamp } from "../../Timestamp";
 
 import styles from "./RobotMessage.module.css";
 
+import { RobotDelegation } from "./RobotDelegation";
 import {
   ConfirmationPart,
   RobotToolCall,
@@ -110,23 +110,15 @@ function RobotMessagePart({
   isUser: boolean;
 }) {
   if (isToolUIPart(part)) {
-    if (
-      part.type === "tool-robot_switch" &&
-      part.state === "output-available"
-    ) {
-      return (
-        <>
-          <RobotSwitchDivider />
-          <RobotToolCall part={part} />
-        </>
-      );
-    }
-
     return <RobotToolCall part={part} />;
   }
 
   if (isDataUIPart(part)) {
     switch (part.type) {
+      case "data-delegation":
+        return (
+          <RobotDelegation data={part.data} renderParts={renderMessageParts} />
+        );
       case "data-render_card":
         return (
           // padding 1 since cardbox has shadow (should remove shadow in future)
@@ -137,7 +129,40 @@ function RobotMessagePart({
     }
   }
 
-  if (part.type === "text" || part.type === "reasoning") {
+  if (part.type === "reasoning") {
+    if (!("text" in part) || !part.text) {
+      return null;
+    }
+
+    return (
+      <styled.details w="full" color="text.subtle" fontSize="sm">
+        <styled.summary
+          cursor="pointer"
+          w="fit"
+          fontSize="xs"
+          _hover={{ color: "text.default" }}
+        >
+          Thought
+        </styled.summary>
+        <Box
+          mt="2"
+          pl="3"
+          borderLeftWidth="thin"
+          borderLeftColor="border.muted"
+          color="text.muted"
+          className={styles["messageText"]}
+        >
+          <ContentComposerMarkdown
+            disabled
+            initialValue={part.text}
+            initialValueFormat="markdown"
+          />
+        </Box>
+      </styled.details>
+    );
+  }
+
+  if (part.type === "text") {
     if (!("text" in part) || !part.text) {
       return null;
     }
@@ -166,12 +191,6 @@ function RobotMessagePart({
   }
 
   return null;
-}
-
-function RobotSwitchDivider() {
-  return (
-    <Divider role="separator" aria-label="Robot switched" w="full" my="2" />
-  );
 }
 
 function RobotRenderCard({ data }: { data: RobotRenderCardData }) {

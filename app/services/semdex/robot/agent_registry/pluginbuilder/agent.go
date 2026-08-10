@@ -6,20 +6,21 @@ import (
 	"strings"
 
 	"go.uber.org/fx"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
+	adktool "google.golang.org/adk/v2/tool"
 
 	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_manager"
 	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner/plugin_logger"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets/system_plugin_studio"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
 
 const (
 	AgentName        = "storyden_plugin_builder"
-	AgentDescription = "Builds, tests, packages, installs, and updates Storyden Go plugins from a managed workspace."
+	AgentDescription = system_plugin_studio.Description
 )
 
 type Agent struct {
@@ -34,8 +35,8 @@ type Agent struct {
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(newAgent),
-		fx.Invoke(func(agent *Agent, registry *agent_registry.Registry) error {
-			if err := registerAgent(registry, agent); err != nil {
+		fx.Invoke(func(agent *Agent, registry *toolsets.Registry) error {
+			if err := registerToolset(registry, agent); err != nil {
 				return err
 			}
 			return nil
@@ -77,7 +78,7 @@ func (a *Agent) instruction(ctx adkagent.ReadonlyContext) (string, error) {
 	}
 
 	return fmt.Sprintf(`
-You are Storyden’s plugin builder robot.
+You are Storyden’s Plugin Studio specialist.
 
 Your job is to turn a user’s requested community feature into a working Storyden plugin inside the managed plugin workspace.
 
@@ -93,7 +94,7 @@ Environment assumptions:
 %s
 - Only the provided tools can inspect, edit, validate, package, install, or debug plugins.
 - Available tools are the complete operating environment. Do not imply or assume access to tools that are not listed.
-- The managed Plugin Builder flow is authoritative. Do not use sd CLI plugin commands, manual package artifacts, or manifest command names from external tutorials.
+- The managed Plugin Studio flow is authoritative. Do not use sd CLI plugin commands, manual package artifacts, or manifest command names from external tutorials.
 - Some tools are only valid after this chat has created, imported, installed, or activated a plugin. Follow the workflow order even when later-stage tools are visible.
 - Never ask the user to perform development tasks on your behalf.
 - Assume every development task that is possible can be completed using the available tools.
@@ -495,21 +496,18 @@ func (a *Agent) buildToolset() (adktool.Toolset, error) {
 	return &pluginBuilderToolset{tools: out, toolsByName: byName}, nil
 }
 
-func registerAgent(registry *agent_registry.Registry, builder *Agent) error {
-	return registry.Register(agent_registry.Definition{
-		ID:                  agent_registry.PluginBuilderID,
-		Name:                "Plugin Builder",
-		Description:         AgentDescription,
+func registerToolset(registry *toolsets.Registry, builder *Agent) error {
+	return registry.Register(toolsets.Definition{
+		ID:                  system_plugin_studio.ID,
+		Name:                system_plugin_studio.Name,
+		Description:         system_plugin_studio.Description,
 		RequiresWorkspace:   true,
-		AppName:             AgentName,
-		AgentName:           AgentName,
+		Source:              toolsets.SourceSystem,
 		InstructionProvider: builder.instruction,
-		ToolsetBuilders: []agent_registry.ToolsetBuilder{
-			func(ctx context.Context) (adktool.Toolset, error) {
-				return builder.buildToolset()
-			},
+		Builder: func(context.Context) (adktool.Toolset, error) {
+			return builder.buildToolset()
 		},
-		Capabilities: []string{
+		ToolNames: []string{
 			"plugin_workspace_create",
 			"plugin_workspace_info",
 			"plugin_installed_list",

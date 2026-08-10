@@ -1,5 +1,7 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLinkCreate
+x-storyden:
+  toolsets: []
 x-storyden-tool:
   title: Create Link
   role: CREATE_POST

@@ -47,8 +47,25 @@ class RobotToolProviderToolConfig(BaseModel):
     name: str
     output_schema: RobotToolJSONSchema | None = None
     requires_confirmation: bool | None = None
+    """Whether this tool requires an active Robot workspace."""
+    requires_workspace: bool | None = None
     """Optional display title for MCP clients and Robot builders."""
     title: str | None = None
+
+
+class RobotToolProviderToolsetConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    description: str
+    """Stable provider-local Toolset identifier."""
+    id: str = Field(pattern=r"^[a-zA-Z0-9][a-zA-Z0-9_]*$")
+    """Specialist instructions injected whenever the Toolset is active."""
+    instruction: str | None = None
+    name: str
+    """Whether this entire Toolset requires an active Robot workspace."""
+    requires_workspace: bool | None = None
+    """Provider-local tool IDs included in this Toolset."""
+    tools: List[str] = Field(min_length=1)
 
 
 class RobotLLMProviderCapabilityConfig(CapabilityConfigBase):
@@ -59,6 +76,8 @@ class RobotToolProviderCapabilityConfig(CapabilityConfigBase):
     type: Literal["robot.tool_provider"]
     """Robot tools statically provided by this plugin."""
     tools: List[RobotToolProviderToolConfig]
+    """Reusable prompt-decorated Toolsets assembled from this provider's tools."""
+    toolsets: List[RobotToolProviderToolsetConfig] | None = None
 
 CapabilityConfig = Annotated[
     Union[RobotLLMProviderCapabilityConfig, RobotToolProviderCapabilityConfig],

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 	"gopkg.in/yaml.v3"
 
@@ -58,6 +58,7 @@ type mockMatcher struct {
 
 type mockResponse struct {
 	Text      string         `yaml:"text"`
+	Thought   string         `yaml:"thought"`
 	ToolCalls []mockToolCall `yaml:"tool_calls"`
 	Err       string         `yaml:"error"`
 	Finish    string         `yaml:"finish"`
@@ -166,6 +167,13 @@ func lastMockContent(contents []*genai.Content) *genai.Content {
 
 func buildMockResponse(r mockResponse) *model.LLMResponse {
 	content := &genai.Content{Role: genai.RoleModel}
+
+	if r.Thought != "" {
+		content.Parts = append(content.Parts, &genai.Part{
+			Text:    r.Thought,
+			Thought: true,
+		})
+	}
 
 	if r.Text != "" {
 		content.Parts = append(content.Parts, &genai.Part{Text: r.Text})

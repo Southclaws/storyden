@@ -1096,9 +1096,9 @@ function GlobalDefaultModelForm({
       <FormControl>
         <HStack gap="1">
           <FormLabel mb="0">Default model</FormLabel>
-          <InfoTip title="Default Robot model">
-            The model used by the Robot Builder. Other Robots can have their own
-            models configured.
+          <InfoTip title="Robot default model">
+            The model used by Denbot and by custom Robots without their own
+            model.
           </InfoTip>
         </HStack>
 

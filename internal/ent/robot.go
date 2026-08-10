@@ -35,6 +35,8 @@ type Robot struct {
 	Model string `json:"model,omitempty"`
 	// A list of tool names that the robot can use
 	Tools []string `json:"tools,omitempty"`
+	// A list of reusable Toolset references that the robot can use
+	Toolsets []string `json:"toolsets,omitempty"`
 	// Arbitrary metadata used by clients to store domain specific information
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Optional default workspace template for this robot
@@ -98,7 +100,7 @@ func (*Robot) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case robot.FieldWorkspaceID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case robot.FieldTools, robot.FieldMetadata:
+		case robot.FieldTools, robot.FieldToolsets, robot.FieldMetadata:
 			values[i] = new([]byte)
 		case robot.FieldName, robot.FieldDescription, robot.FieldPlaybook, robot.FieldModel:
 			values[i] = new(sql.NullString)
@@ -169,6 +171,14 @@ func (_m *Robot) assignValues(columns []string, values []any) error {
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &_m.Tools); err != nil {
 					return fmt.Errorf("unmarshal field tools: %w", err)
+				}
+			}
+		case robot.FieldToolsets:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field toolsets", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.Toolsets); err != nil {
+					return fmt.Errorf("unmarshal field toolsets: %w", err)
 				}
 			}
 		case robot.FieldMetadata:
@@ -263,6 +273,9 @@ func (_m *Robot) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tools=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Tools))
+	builder.WriteString(", ")
+	builder.WriteString("toolsets=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Toolsets))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))

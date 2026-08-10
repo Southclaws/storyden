@@ -11,6 +11,7 @@ import {
 import { AddIcon } from "@/components/ui/icons/Add";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { RobotIcon } from "@/components/ui/icons/Robot";
+import { ToolsetIcon } from "@/components/ui/icons/Toolset";
 import { LinkButton } from "@/components/ui/link-button";
 
 type Props = {
@@ -26,7 +27,7 @@ export function RobotsNavigationPane({ robots, sessions }: Props) {
       <SidebarNavigationSection>
         <SidebarNavigationLink
           href="/robots"
-          label="All robots"
+          label="Robots"
           icon={<RobotIcon />}
           active={pathname === "/robots"}
           action={
@@ -42,8 +43,25 @@ export function RobotsNavigationPane({ robots, sessions }: Props) {
           }
         />
         <SidebarNavigationLink
+          href="/robots/toolsets"
+          label="Toolsets"
+          icon={<ToolsetIcon />}
+          active={pathname.startsWith("/robots/toolsets")}
+          action={
+            <LinkButton
+              aria-label="New Toolset"
+              href="/robots/toolsets/new"
+              px="0"
+              size="sm"
+              variant="plain"
+            >
+              <AddIcon />
+            </LinkButton>
+          }
+        />
+        <SidebarNavigationLink
           href="/robots/chats"
-          label="All chats"
+          label="Chats"
           icon={<DiscussionIcon />}
           active={pathname === "/robots/chats"}
           action={

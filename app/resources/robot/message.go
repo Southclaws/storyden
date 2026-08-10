@@ -1,13 +1,12 @@
 package robot
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"google.golang.org/adk/session"
+	"google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -24,11 +23,13 @@ type Message struct {
 	ID        MessageID
 	CreatedAt time.Time
 
-	SessionID    SessionID
-	InvocationID string
-	Robot        opt.Optional[*Robot]
-	Actor        opt.Optional[Actor]
-	Author       opt.Optional[*account.Account]
+	SessionID      SessionID
+	InvocationID   string
+	Branch         opt.Optional[string]
+	IsolationScope opt.Optional[string]
+	Robot          opt.Optional[*Robot]
+	Actor          opt.Optional[Actor]
+	Author         opt.Optional[*account.Account]
 
 	Event session.Event
 }
@@ -86,20 +87,17 @@ func MapMessage(m *ent.RobotSessionMessage) (*Message, error) {
 		authorOpt = opt.New(a)
 	}
 
-	evt, err := mapToADKEventFromMessage(m.EventData)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
 	return &Message{
-		ID:           MessageID(m.ID),
-		CreatedAt:    m.CreatedAt,
-		SessionID:    SessionID(m.SessionID),
-		InvocationID: m.InvocationID,
-		Robot:        robotOpt,
-		Actor:        actorOpt,
-		Author:       authorOpt,
-		Event:        *evt,
+		ID:             MessageID(m.ID),
+		CreatedAt:      m.CreatedAt,
+		SessionID:      SessionID(m.SessionID),
+		InvocationID:   m.InvocationID,
+		Branch:         opt.NewIf(m.Branch, func(value string) bool { return value != "" }),
+		IsolationScope: opt.NewIf(m.IsolationScope, func(value string) bool { return value != "" }),
+		Robot:          robotOpt,
+		Actor:          actorOpt,
+		Author:         authorOpt,
+		Event:          m.EventData.ADK(),
 	}, nil
 }
 
@@ -121,18 +119,4 @@ func MapMessageActor(m *ent.RobotSessionMessage, robotOpt opt.Optional[*Robot]) 
 	}
 
 	return opt.NewEmpty[Actor](), nil
-}
-
-func mapToADKEventFromMessage(data map[string]any) (*session.Event, error) {
-	var event session.Event
-	dataBytes, err := json.Marshal(data)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := json.Unmarshal(dataBytes, &event); err != nil {
-		return nil, err
-	}
-
-	return &event, nil
 }

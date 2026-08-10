@@ -223,6 +223,11 @@ var (
 	OperationIDRobotsList                             = OperationID{`RobotsList`}
 	OperationIDRobotCreate                            = OperationID{`RobotCreate`}
 	OperationIDRobotToolsList                         = OperationID{`RobotToolsList`}
+	OperationIDRobotToolsetsList                      = OperationID{`RobotToolsetsList`}
+	OperationIDRobotToolsetCreate                     = OperationID{`RobotToolsetCreate`}
+	OperationIDRobotToolsetGet                        = OperationID{`RobotToolsetGet`}
+	OperationIDRobotToolsetUpdate                     = OperationID{`RobotToolsetUpdate`}
+	OperationIDRobotToolsetDelete                     = OperationID{`RobotToolsetDelete`}
 	OperationIDRobotChatSSE                           = OperationID{`RobotChatSSE`}
 	OperationIDRobotProvidersList                     = OperationID{`RobotProvidersList`}
 	OperationIDRobotProviderUpdate                    = OperationID{`RobotProviderUpdate`}
@@ -710,6 +715,16 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDRobotCreate, nil
 	case string(`RobotToolsList`):
 		return OperationIDRobotToolsList, nil
+	case string(`RobotToolsetsList`):
+		return OperationIDRobotToolsetsList, nil
+	case string(`RobotToolsetCreate`):
+		return OperationIDRobotToolsetCreate, nil
+	case string(`RobotToolsetGet`):
+		return OperationIDRobotToolsetGet, nil
+	case string(`RobotToolsetUpdate`):
+		return OperationIDRobotToolsetUpdate, nil
+	case string(`RobotToolsetDelete`):
+		return OperationIDRobotToolsetDelete, nil
 	case string(`RobotChatSSE`):
 		return OperationIDRobotChatSSE, nil
 	case string(`RobotProvidersList`):

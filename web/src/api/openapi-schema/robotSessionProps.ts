@@ -12,7 +12,7 @@ import type { RobotWorkspaceMount } from "./robotWorkspaceMount";
 
 export interface RobotSessionProps {
   message_list: PaginatedRobotMessageList;
-  /** Most recently active Robot ID for this session, including built-in Robot IDs. */
-  active_robot_id?: string;
+  /** Root Robot selected when this session was created, including built-in Robot IDs. */
+  root_robot_id?: string;
   active_workspace?: RobotWorkspaceMount;
 }

@@ -2,10 +2,8 @@ package robot
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"iter"
-	"strings"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -14,16 +12,15 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 )
-
-const currentRobotIDStateKey = "current_robot_id"
 
 type sessionStorage struct {
 	robotQuerier     *robot_querier.Querier
@@ -217,6 +214,32 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 		return fault.Wrap(fmt.Errorf("unexpected session type %T", sess), fctx.With(ctx))
 	}
 
+	storedEvent := event
+	liveEvent := event
+	inferredScope := ""
+	if event.IsolationScope == "" {
+		inferredScope = inferDelegationIsolationScope(ourSession.events, event)
+		if inferredScope != "" {
+			// TODO(robot-async-delegation): This is a temporary ADK 2.2
+			// compatibility shim. SingleTurnTool does not propagate the parent
+			// function-call ID as the delegated run's isolation scope. Inferring
+			// the most recent unresolved call only works while delegations are
+			// sequential and must not be used for concurrent or asynchronous
+			// tasks. See tasks/1-todo/robot-asynchronous-delegation.md.
+			//
+			// The delegated agent's next model step expects its own tool history
+			// to remain unscoped, so keep the live history intact while decorating
+			// the durable event and streamed event with the Robot call ID used for
+			// attribution and hydration.
+			storedCopy := *event
+			storedCopy.IsolationScope = inferredScope
+			storedEvent = &storedCopy
+
+			liveCopy := *event
+			liveEvent = &liveCopy
+		}
+	}
+
 	var accountIDOpt opt.Optional[account.AccountID]
 	if event.Author == "user" {
 		accountID, err := xid.FromString(sess.UserID())
@@ -228,45 +251,74 @@ func (s *sessionStorage) AppendEvent(ctx context.Context, sess adksession.Sessio
 
 	actorOpt := opt.NewEmpty[robot.Actor]()
 	if event.Author != "user" {
-		actor, err := s.actorForEvent(ctx, sess, event)
+		actor, err := s.actorForEvent(ctx, storedEvent)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 		actorOpt = actor
 	}
 
-	eventData, err := structToMap(event)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
 	err = s.robotSessionRepo.AppendMessage(
 		ctx,
 		robot.SessionID(sessionID),
-		event.InvocationID,
 		accountIDOpt,
 		actorOpt,
-		eventData,
+		storedEvent,
 	)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ourSession.events = append(ourSession.events.(adkEvents), event)
+	ourSession.events = append(ourSession.events.(adkEvents), liveEvent)
 	ourSession.lastUpdateTime = event.Timestamp
+	if inferredScope != "" {
+		event.IsolationScope = inferredScope
+	}
 
 	return nil
 }
 
-func (s *sessionStorage) actorForEvent(ctx context.Context, sess adksession.Session, event *adksession.Event) (opt.Optional[robot.Actor], error) {
-	if actor, ok, err := actorFromSessionState(sess.State()); err != nil {
-		return opt.NewEmpty[robot.Actor](), err
-	} else if ok {
-		return opt.New(actor), nil
+func inferDelegationIsolationScope(events adksession.Events, event *adksession.Event) string {
+	if event == nil || event.Branch == "" {
+		return ""
+	}
+	if _, ok := robot_ref.IDFromAgentName(event.Author); !ok {
+		return ""
 	}
 
-	if event.Author == "storyden" {
-		return opt.New(robot.NewBuiltinActor(agent_registry.RobotBuilderID)), nil
+	closedCalls := make(map[string]bool)
+	for i := events.Len() - 1; i >= 0; i-- {
+		previous := events.At(i)
+		if previous == nil || previous.LLMResponse.Content == nil {
+			continue
+		}
+		for _, part := range previous.LLMResponse.Content.Parts {
+			if part == nil {
+				continue
+			}
+			if part.FunctionResponse != nil {
+				closedCalls[part.FunctionResponse.ID] = true
+				continue
+			}
+			if part.FunctionCall == nil || part.FunctionCall.Name != event.Author {
+				continue
+			}
+			if !closedCalls[part.FunctionCall.ID] {
+				return part.FunctionCall.ID
+			}
+		}
+	}
+
+	return ""
+}
+
+func (s *sessionStorage) actorForEvent(ctx context.Context, event *adksession.Event) (opt.Optional[robot.Actor], error) {
+	if event.Author == denbot.AgentName {
+		return opt.New(robot.NewBuiltinActor(denbot.ID)), nil
+	}
+
+	if id, ok := robot_ref.IDFromAgentName(event.Author); ok {
+		return opt.New(robot.NewDatabaseActor(xid.ID(id))), nil
 	}
 
 	dbRobot, err := s.robotQuerier.GetByName(ctx, event.Author)
@@ -278,43 +330,6 @@ func (s *sessionStorage) actorForEvent(ctx context.Context, sess adksession.Sess
 	}
 
 	return opt.New(robot.NewBuiltinActor(event.Author)), nil
-}
-
-func actorFromSessionState(state adksession.State) (robot.Actor, bool, error) {
-	if state == nil {
-		return robot.Actor{}, false, nil
-	}
-
-	raw, err := state.Get(currentRobotIDStateKey)
-	if err != nil {
-		return robot.Actor{}, false, nil
-	}
-
-	ref, ok := raw.(string)
-	if !ok || strings.TrimSpace(ref) == "" {
-		return robot.Actor{}, false, nil
-	}
-
-	actor, err := robot.NewActorFromRobotRef(ref)
-	if err != nil {
-		return robot.Actor{}, false, err
-	}
-
-	return actor, true, nil
-}
-
-func CurrentRobotIDFromState(state map[string]any) opt.Optional[string] {
-	raw, ok := state[currentRobotIDStateKey]
-	if !ok {
-		return opt.NewEmpty[string]()
-	}
-
-	ref, ok := raw.(string)
-	if !ok || strings.TrimSpace(ref) == "" {
-		return opt.NewEmpty[string]()
-	}
-
-	return opt.New(ref)
 }
 
 func isClientSidePendingEvent(event *adksession.Event) bool {
@@ -365,24 +380,6 @@ func mapToADKEventsFromMessages(messages []*robot.Message) adksession.Events {
 	})
 
 	return adkEvents(events)
-}
-
-func structToMap(v any) (map[string]any, error) {
-	if v == nil {
-		return nil, nil
-	}
-
-	data, err := json.Marshal(v)
-	if err != nil {
-		return nil, err
-	}
-
-	var result map[string]any
-	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
 }
 
 func getDefaultSessionName() string {

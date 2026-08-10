@@ -16,6 +16,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
@@ -42,6 +43,7 @@ func TestRobotDeleteRequiresConfirmation(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			settingsRepo *settings.SettingsRepository,
 		) {
 			lc.Append(fx.StartHook(func() {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -76,6 +78,7 @@ func TestRobotDeleteRequiresConfirmation(t *testing.T) {
       finish: "stop"
 `)
 				defer os.Remove(scriptPath)
+				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				deleter := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
@@ -83,7 +86,7 @@ func TestRobotDeleteRequiresConfirmation(t *testing.T) {
 						Description: "robot that asks to delete another robot",
 						Playbook:    "you are a delete actor",
 						Model:       robotModelPtr("mock/../scripts/" + scriptName),
-						Tools:       robotToolsPtr("robot_delete"),
+						Toolsets:    robotToolsetsPtr("system.robot_studio"),
 					},
 					adminSession,
 				))(t, http.StatusOK)
@@ -142,6 +145,7 @@ func TestRobotDeleteConfirmationAfterPriorToolCallWithoutRobotID(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			settingsRepo *settings.SettingsRepository,
 		) {
 			lc.Append(fx.StartHook(func() {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -191,6 +195,7 @@ func TestRobotDeleteConfirmationAfterPriorToolCallWithoutRobotID(t *testing.T) {
       finish: "stop"
 `)
 				defer os.Remove(scriptPath)
+				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				actor := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
@@ -198,7 +203,7 @@ func TestRobotDeleteConfirmationAfterPriorToolCallWithoutRobotID(t *testing.T) {
 						Description: "robot that creates before deleting",
 						Playbook:    "you create first, then delete later",
 						Model:       robotModelPtr("mock/../scripts/" + scriptName),
-						Tools:       robotToolsPtr("robot_create", "robot_delete"),
+						Toolsets:    robotToolsetsPtr("system.robot_studio"),
 					},
 					adminSession,
 				))(t, http.StatusOK)
@@ -251,6 +256,7 @@ func TestRobotDeleteMultipleConfirmationsInSameTurn(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			settingsRepo *settings.SettingsRepository,
 		) {
 			lc.Append(fx.StartHook(func() {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -300,6 +306,7 @@ func TestRobotDeleteMultipleConfirmationsInSameTurn(t *testing.T) {
       finish: "stop"
 `)
 				defer os.Remove(scriptPath)
+				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				deleter := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
@@ -307,7 +314,7 @@ func TestRobotDeleteMultipleConfirmationsInSameTurn(t *testing.T) {
 						Description: "robot that asks to delete two robots",
 						Playbook:    "you are a multi-delete actor",
 						Model:       robotModelPtr("mock/../scripts/" + scriptName),
-						Tools:       robotToolsPtr("robot_delete"),
+						Toolsets:    robotToolsetsPtr("system.robot_studio"),
 					},
 					adminSession,
 				))(t, http.StatusOK)
@@ -372,115 +379,6 @@ func TestRobotDeleteMultipleConfirmationsInSameTurn(t *testing.T) {
 				assert.Equal(t, "Both delete flows finished.", strings.Join(collectTextDeltas(confirmed), ""))
 				tests.AssertRequest(cl.RobotGetWithResponse(root, openapi.RobotIDParam(firstVictimID), adminSession))(t, http.StatusNotFound)
 				tests.AssertRequest(cl.RobotGetWithResponse(root, openapi.RobotIDParam(secondVictimID), adminSession))(t, http.StatusNotFound)
-			}))
-		}),
-	)
-}
-
-func TestRobotSessionCurrentRobotFollowsRobotSwitch(t *testing.T) {
-	t.Parallel()
-
-	integration.Test(t,
-		&config.Config{
-			LanguageModelProvider: "mock",
-		},
-		e2e.Setup(),
-		robot.WithRobotSettings(mockModelAck),
-		sse.Build(),
-		fx.Invoke(func(
-			lc fx.Lifecycle,
-			root context.Context,
-			ts *httptest.Server,
-			cl *openapi.ClientWithResponses,
-			sh *e2e.SessionHelper,
-			aw *account_writer.Writer,
-		) {
-			lc.Append(fx.StartHook(func() {
-				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-				adminSession := sh.WithSession(adminCtx)
-
-				targetScriptName := "robot-chat-current-target-" + xid.New().String() + ".yaml"
-				targetScriptPath := filepath.Join("..", "scripts", targetScriptName)
-				writeScript(t, targetScriptPath, `steps:
-  - match:
-      contains: "target followup"
-    respond:
-      text: "Target robot handled followup."
-      finish: "stop"
-`)
-				defer os.Remove(targetScriptPath)
-
-				target := tests.AssertRequest(cl.RobotCreateWithResponse(root,
-					openapi.RobotCreateJSONRequestBody{
-						Name:        "current-target-" + xid.New().String(),
-						Description: "target robot for current session state",
-						Playbook:    "you are the target robot",
-						Model:       robotModelPtr("mock/../scripts/" + targetScriptName),
-					},
-					adminSession,
-				))(t, http.StatusOK)
-				require.NotNil(t, target.JSON200)
-				targetID := string(target.JSON200.Id)
-
-				actorScriptName := "robot-chat-current-actor-" + xid.New().String() + ".yaml"
-				actorScriptPath := filepath.Join("..", "scripts", actorScriptName)
-				writeScript(t, actorScriptPath, `steps:
-  - match:
-      contains: "switch to target"
-    respond:
-      tool_calls:
-        - id: call_switch_1
-          name: robot_switch
-          args:
-            robot_id: "`+targetID+`"
-  - match:
-      contains: "ROBOT SWITCH"
-    respond:
-      text: "Switched to target."
-      finish: "stop"
-  - match:
-      any: true
-    respond:
-      text: "Actor robot stayed active."
-      finish: "stop"
-`)
-				defer os.Remove(actorScriptPath)
-
-				actor := tests.AssertRequest(cl.RobotCreateWithResponse(root,
-					openapi.RobotCreateJSONRequestBody{
-						Name:        "current-actor-" + xid.New().String(),
-						Description: "actor robot that switches to target",
-						Playbook:    "you switch to the target robot",
-						Model:       robotModelPtr("mock/../scripts/" + actorScriptName),
-						Tools:       robotToolsPtr("robot_switch"),
-					},
-					adminSession,
-				))(t, http.StatusOK)
-				require.NotNil(t, actor.JSON200)
-
-				sessionID := xid.New().String()
-				first := doChat(t, root, ts, adminSession, sessionID, string(actor.JSON200.Id), "switch to target")
-				inputs := collectToolInputs(first)
-				require.Len(t, inputs, 1)
-				assert.Equal(t, "robot_switch", string(inputs[0].ToolName))
-
-				switched := doChatToolOutput(t, root, ts, adminSession, sessionID, string(actor.JSON200.Id), "robot_switch", string(inputs[0].ToolCallId), inputs[0].Input.(map[string]any), map[string]any{
-					"success":  true,
-					"robot_id": targetID,
-				})
-				assert.Empty(t, strings.Join(collectTextDeltas(switched), ""))
-
-				currentSession := tests.AssertRequest(cl.RobotSessionGetWithResponse(root,
-					openapi.RobotSessionIDParam(sessionID),
-					&openapi.RobotSessionGetParams{},
-					adminSession,
-				))(t, http.StatusOK)
-				require.NotNil(t, currentSession.JSON200)
-				require.NotNil(t, currentSession.JSON200.ActiveRobotId)
-				assert.Equal(t, targetID, *currentSession.JSON200.ActiveRobotId)
-
-				followup := doChat(t, root, ts, adminSession, sessionID, targetID, "target followup")
-				assert.Equal(t, "Target robot handled followup.", strings.Join(collectTextDeltas(followup), ""))
 			}))
 		}),
 	)

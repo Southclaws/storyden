@@ -6,7 +6,6 @@ import {
   goToNewChat,
   sendMessage,
   setupRobotProviderWithScript,
-  switchToRobot,
 } from "./helpers";
 
 test.beforeAll(async () => {
@@ -14,12 +13,9 @@ test.beforeAll(async () => {
 });
 
 test.describe("Robot Chat — content_search tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-content-search-robot-${Date.now()}`;
     await withAdminAccessKey(
-      async ({ robotCreate, nodeCreate, categoryCreate, threadCreate }) => {
+      async ({ nodeCreate, categoryCreate, threadCreate }) => {
         await nodeCreate({
           name: `Magnolia Library Page ${Date.now()}`,
           visibility: "published",
@@ -38,20 +34,15 @@ test.describe("Robot Chat — content_search tool", () => {
           category: category.id,
           visibility: "published",
         });
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot for content_search tool",
-          playbook: "you are a test robot",
-          model: "mock/../robot/scripts/robot-chat-content-search.yaml",
-        });
       },
+    );
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-content-search.yaml",
     );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("content_search tool completes and returns results", async ({
@@ -73,28 +64,20 @@ test.describe("Robot Chat — content_search tool", () => {
 });
 
 test.describe("Robot Chat — library_search_pages tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-library-search-robot-${Date.now()}`;
-    await withAdminAccessKey(async ({ robotCreate, nodeCreate }) => {
+    await withAdminAccessKey(async ({ nodeCreate }) => {
       await nodeCreate({
         name: `Magnolia Library Page ${Date.now()}`,
         visibility: "published",
       });
-
-      await robotCreate({
-        name: robotName,
-        description: "E2E robot for library_search_pages tool",
-        playbook: "you are a test robot",
-        model: "mock/../robot/scripts/robot-chat-library-search-pages.yaml",
-      });
     });
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-library-search-pages.yaml",
+    );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("library_search_pages tool is invoked", async ({ page }) => {
@@ -114,12 +97,9 @@ test.describe("Robot Chat — library_search_pages tool", () => {
 });
 
 test.describe("Robot Chat — thread_search tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-thread-search-robot-${Date.now()}`;
     await withAdminAccessKey(
-      async ({ robotCreate, categoryCreate, threadCreate }) => {
+      async ({ categoryCreate, threadCreate }) => {
         const category = await categoryCreate({
           colour: "#3b82f6",
           description: "thread search test category",
@@ -133,20 +113,15 @@ test.describe("Robot Chat — thread_search tool", () => {
           category: category.id,
           visibility: "published",
         });
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot for thread_search tool",
-          playbook: "you are a test robot",
-          model: "mock/../robot/scripts/robot-chat-thread-search.yaml",
-        });
       },
+    );
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-thread-search.yaml",
     );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("thread_search tool is invoked", async ({ page }) => {
@@ -166,12 +141,9 @@ test.describe("Robot Chat — thread_search tool", () => {
 });
 
 test.describe("Robot Chat — reply_search tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-reply-search-robot-${Date.now()}`;
     await withAdminAccessKey(
-      async ({ robotCreate, categoryCreate, threadCreate, replyCreate }) => {
+      async ({ categoryCreate, threadCreate, replyCreate }) => {
         const category = await categoryCreate({
           colour: "#3b82f6",
           description: "reply search test category",
@@ -189,20 +161,15 @@ test.describe("Robot Chat — reply_search tool", () => {
         await replyCreate(thread.slug, {
           body: "<p>magnolia blossom reply content</p>",
         });
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot for reply_search tool",
-          playbook: "you are a test robot",
-          model: "mock/../robot/scripts/robot-chat-reply-search.yaml",
-        });
       },
+    );
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-reply-search.yaml",
     );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("reply_search tool is invoked", async ({ page }) => {
@@ -222,12 +189,9 @@ test.describe("Robot Chat — reply_search tool", () => {
 });
 
 test.describe("Robot Chat — post_search tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-post-search-robot-${Date.now()}`;
     await withAdminAccessKey(
-      async ({ robotCreate, categoryCreate, threadCreate }) => {
+      async ({ categoryCreate, threadCreate }) => {
         const category = await categoryCreate({
           colour: "#3b82f6",
           description: "post search test category",
@@ -241,20 +205,15 @@ test.describe("Robot Chat — post_search tool", () => {
           category: category.id,
           visibility: "published",
         });
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot for post_search tool",
-          playbook: "you are a test robot",
-          model: "mock/../robot/scripts/robot-chat-post-search.yaml",
-        });
       },
+    );
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-post-search.yaml",
     );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("post_search tool is invoked", async ({ page }) => {
@@ -274,23 +233,14 @@ test.describe("Robot Chat — post_search tool", () => {
 });
 
 test.describe("Robot Chat — member_search tool", () => {
-  let robotName: string;
-
   test.beforeAll(async () => {
-    robotName = `e2e-member-search-robot-${Date.now()}`;
-    await withAdminAccessKey(async ({ robotCreate }) => {
-      await robotCreate({
-        name: robotName,
-        description: "E2E robot for member_search tool",
-        playbook: "you are a test robot",
-        model: "mock/../robot/scripts/robot-chat-member-search.yaml",
-      });
-    });
+    await setupRobotProviderWithScript(
+      "mock/../robot/scripts/robot-chat-member-search.yaml",
+    );
   });
 
   test.beforeEach(async ({ page }) => {
     await goToNewChat(page);
-    await switchToRobot(page, robotName);
   });
 
   test("member_search tool is invoked", async ({ page }) => {

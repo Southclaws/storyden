@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/rs/xid"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
@@ -24,7 +26,7 @@ import (
 	"github.com/Southclaws/storyden/tests/robot"
 )
 
-func TestRobotCreateWithoutToolsPersistsEmptyToolList(t *testing.T) {
+func TestRobotCreateWithoutToolsetsPersistsEmptyToolsetList(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
 		&config.Config{
@@ -60,13 +62,13 @@ func TestRobotCreateWithoutToolsPersistsEmptyToolList(t *testing.T) {
 				))(t, http.StatusOK)
 				require.NotNil(t, fetched.JSON200)
 
-				assert.Empty(t, fetched.JSON200.Tools)
+				assert.Empty(t, fetched.JSON200.Toolsets)
 			}))
 		}),
 	)
 }
 
-func TestRobotCreateToolPersistsTools(t *testing.T) {
+func TestRobotCreateToolPersistsToolsets(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
 		&config.Config{
@@ -82,6 +84,7 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			settingsRepo *settings.SettingsRepository,
 		) {
 			lc.Append(fx.StartHook(func() {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
@@ -101,8 +104,10 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
             description: "robot that should retain selected tools"
             playbook: "you use the tools you were configured with"
             tools:
-              - library_request_page
-              - get_library_page
+              - thread_get
+              - throw_an_error
+            toolsets:
+              - system.discussions
   - match:
       tool_result: robot_create
     respond:
@@ -110,6 +115,7 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
       finish: "stop"
 `)
 				defer os.Remove(scriptPath)
+				require.NoError(t, robot.SetRobotSettings(root, settingsRepo, "mock/../scripts/"+scriptName))
 
 				actor := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
@@ -117,7 +123,7 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
 						Description: "robot that creates another robot with tools",
 						Playbook:    "you create robots",
 						Model:       robotModelPtr("mock/../scripts/" + scriptName),
-						Tools:       robotToolsPtr("robot_create"),
+						Toolsets:    robotToolsetsPtr("system.robot_studio"),
 					},
 					adminSession,
 				))(t, http.StatusOK)
@@ -138,20 +144,80 @@ func TestRobotCreateToolPersistsTools(t *testing.T) {
 				))(t, http.StatusOK)
 				require.NotNil(t, fetched.JSON200)
 
-				assert.ElementsMatch(t, []string{"library_request_page", "get_library_page"}, fetched.JSON200.Tools)
+				assert.Equal(t, openapi.RobotToolNameList{"throw_an_error"}, fetched.JSON200.Tools)
+				assert.Equal(t, openapi.RobotToolsetRefList{"system.discussions"}, fetched.JSON200.Toolsets)
 			}))
 		}),
 	)
 }
 
-func TestRobotWithNoToolsRejectsToolCalls(t *testing.T) {
+func TestCustomRobotCanRunAnIndividualTool(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
 		&config.Config{
 			LanguageModelProvider: "mock",
 		},
 		e2e.Setup(),
-		robot.WithRobotSettings(mockModelLibraryTool),
+		robot.WithRobotSettings(mockModelAck),
+		sse.Build(),
+		fx.Invoke(func(
+			lc fx.Lifecycle,
+			root context.Context,
+			ts *httptest.Server,
+			cl *openapi.ClientWithResponses,
+			sh *e2e.SessionHelper,
+			aw *account_writer.Writer,
+		) {
+			lc.Append(fx.StartHook(func() {
+				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminSession := sh.WithSession(adminCtx)
+
+				scriptName := "robot-chat-individual-tool-" + xid.New().String() + ".yaml"
+				scriptPath := filepath.Join("..", "scripts", scriptName)
+				writeScript(t, scriptPath, `steps:
+  - match:
+      contains: "list configured tools"
+    respond:
+      tool_calls:
+        - id: call_individual_tool_1
+          name: throw_an_error
+          args: {}
+  - match:
+      tool_result: throw_an_error
+    respond:
+      text: "Individual tool executed."
+      finish: "stop"
+`)
+				defer os.Remove(scriptPath)
+
+				created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+					openapi.RobotCreateJSONRequestBody{
+						Name:        "individual-tool-runtime-" + xid.New().String(),
+						Description: "robot with one directly assigned tool",
+						Playbook:    "use the directly assigned tool",
+						Model:       robotModelPtr("mock/../scripts/" + scriptName),
+						Tools:       robotToolsPtr("throw_an_error"),
+					},
+					adminSession,
+				))(t, http.StatusOK)
+				require.NotNil(t, created.JSON200)
+
+				stream := doChat(t, root, ts, adminSession, xid.New().String(), string(created.JSON200.Id), "list configured tools")
+				assert.Contains(t, collectToolCalls(stream), "throw_an_error")
+				assert.Equal(t, "Individual tool executed.", strings.Join(collectTextDeltas(stream), ""))
+			}))
+		}),
+	)
+}
+
+func TestRobotChatStartsAndContinuesWithRequestedCustomRobot(t *testing.T) {
+	t.Parallel()
+	integration.Test(t,
+		&config.Config{
+			LanguageModelProvider: "mock",
+		},
+		e2e.Setup(),
+		robot.WithRobotSettings(mockModelSimple),
 		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
@@ -167,56 +233,54 @@ func TestRobotWithNoToolsRejectsToolCalls(t *testing.T) {
 
 				created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 					openapi.RobotCreateJSONRequestBody{
-						Name:        "restricted-robot-" + xid.New().String(),
-						Description: "robot that should only be able to search",
-						Playbook:    "you are a restricted test robot",
+						Name:        "direct-chat-robot-" + xid.New().String(),
+						Description: "robot selected directly as the session root",
+						Playbook:    "respond as the directly selected custom Robot",
+						Model:       robotModelPtr("mock/../scripts/robot-chat-specialist.yaml"),
 					},
 					adminSession,
 				))(t, http.StatusOK)
+				require.NotNil(t, created.JSON200)
 				robotID := string(created.JSON200.Id)
+				sessionID := xid.New().String()
 
-				vis := openapi.VisibilityPublished
-				tests.AssertRequest(cl.NodeCreateWithResponse(root,
-					openapi.NodeCreateJSONRequestBody{
-						Name:       "Restricted Robot Test Page",
-						Visibility: &vis,
-					},
+				first := doChat(t, root, ts, adminSession, sessionID, robotID, "hello specialist")
+				assert.Equal(t, "Specialist found the delegated result.", strings.Join(collectTextDeltas(first), ""))
+
+				second := doChat(t, root, ts, adminSession, sessionID, "", "continue")
+				assert.Equal(t, "Specialist found the delegated result.", strings.Join(collectTextDeltas(second), ""))
+				assert.Equal(t, http.StatusConflict, doChatWithRobotStatus(t, root, ts, adminSession, sessionID, "denbot", "switch roots"))
+
+				session := tests.AssertRequest(cl.RobotSessionGetWithResponse(root,
+					openapi.RobotSessionIDParam(sessionID),
+					&openapi.RobotSessionGetParams{},
 					adminSession,
 				))(t, http.StatusOK)
+				require.NotNil(t, session.JSON200)
+				require.NotNil(t, session.JSON200.RootRobotId)
+				assert.Equal(t, robotID, *session.JSON200.RootRobotId)
 
-				t.Run("restricted_tool_should_not_be_callable", func(t *testing.T) {
-					a := assert.New(t)
-
-					stream := doChat(t, root, ts, adminSession, xid.New().String(), robotID, "list pages")
-					toolOutputs := collectToolOutputs(stream)
-
-					// The mock LLM always attempts the call, but the ADK rejects it
-					// because library_page_list is not in this robot's toolset.
-					a.NotEmpty(toolOutputs, "expected tool-output-available events in stream")
-					hasRejection := false
-					for _, out := range toolOutputs {
-						if output, ok := out.Output.(map[string]any); ok {
-							if _, ok := output["error"].(string); ok {
-								hasRejection = true
-								break
-							}
-						}
+				var customResponseFound bool
+				for _, message := range session.JSON200.MessageList.Messages {
+					if message.Robot != nil && string(message.Robot.Id) == robotID {
+						customResponseFound = true
+						break
 					}
-					a.True(hasRejection, "expected library_page_list to be rejected (not in robot toolset)")
-				})
+				}
+				assert.True(t, customResponseFound, "custom Robot response should retain its actor attribution")
 			}))
 		}),
 	)
 }
 
-func TestDefaultToolsContainsThrowAnError(t *testing.T) {
+func TestDenbotIncludesToolsetDiscovery(t *testing.T) {
 	t.Parallel()
 	integration.Test(t,
 		&config.Config{
 			LanguageModelProvider: "mock",
 		},
 		e2e.Setup(),
-		robot.WithRobotSettings("mock/../scripts/robot-chat-tool-error.yaml"),
+		robot.WithRobotSettings("mock/../scripts/robot-chat-toolset-search.yaml"),
 		sse.Build(),
 		fx.Invoke(func(
 			lc fx.Lifecycle,
@@ -230,13 +294,14 @@ func TestDefaultToolsContainsThrowAnError(t *testing.T) {
 				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 				adminSession := sh.WithSession(adminCtx)
 
-				t.Run("throw_an_error_is_available_on_default_agent", func(t *testing.T) {
+				t.Run("toolset_search_is_available_on_denbot", func(t *testing.T) {
 					a := assert.New(t)
 
 					stream := doChat(t, root, ts, adminSession, xid.New().String(), "", "trigger error")
 					toolNames := collectToolCalls(stream)
 
-					a.Contains(toolNames, "throw_an_error")
+					a.Contains(toolNames, "toolset_search")
+					a.Equal("Toolsets searched.", strings.Join(collectTextDeltas(stream), ""))
 				})
 			}))
 		}),

@@ -3,6 +3,8 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Badge } from "../badge";
 import { IconButton } from "../icon-button";
 import { MoreIcon } from "../icons/More";
+import { PinIcon } from "../icons/Pin";
+import { ToolsetIcon } from "../icons/Toolset";
 import { SectionHeading } from "../section-heading";
 import { Text } from "../text";
 
@@ -64,7 +66,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "The canonical Surface family for independent content objects. Every Surface and Card has a `border.default` boundary; fill alone is not enough separation from Canvas. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
+          "The canonical Surface family for independent content objects. Every Surface and Card has a `border.default` boundary; fill alone is not enough separation from Canvas. Use `Card` when content has a title, description, metadata, media, or controls; use `CardRows` and `CardGrid` for repeated collections. `titleIcon` is an optional, decorative 16px semantic marker whose size and muted colour are owned by Card. Use a product-owned icon when it adds deliberate object identity or state; do not substitute a visually similar icon from another domain. Do not wrap arbitrary page sections in cards, and use an Inset treatment for subordinate content inside a Surface.",
       },
     },
   },
@@ -83,6 +85,46 @@ export const Row: Story = {
     shape: "row",
     children: <Badge>Announcement</Badge>,
     disableAnchors: true,
+  },
+};
+
+export const ObjectIcon: Story = {
+  args: {
+    id: "plugin-builder-toolset",
+    title: "Plugin Studio",
+    url: "/robots/toolsets/plugin-builder",
+    text: "Builds, tests, packages, and validates Storyden plugins.",
+    titleIcon: <ToolsetIcon />,
+    shape: "row",
+    disableAnchors: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A recurring product object may use its dedicated semantic identity icon. `ToolsetIcon` is backed by Lucide Toolbox; it does not borrow `CollectionIcon` merely because both metaphors contain grouped objects.",
+      },
+    },
+  },
+};
+
+export const StateIcon: Story = {
+  args: {
+    id: "pinned-discussion",
+    title: "Pinned community guidelines",
+    url: "/d/pinned-discussion",
+    text: "A title icon may communicate exceptional state. Card owns its compact size, alignment, colour, and decorative accessibility treatment.",
+    titleIcon: <PinIcon />,
+    shape: "row",
+    disableAnchors: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Use a semantic icon export when it adds deliberate product identity or state. This example communicates pinned state; object-family icons should likewise have their own product name rather than borrowing a visually similar symbol.",
+      },
+    },
   },
 };
 

@@ -243,6 +243,10 @@
                         "requires_confirmation": {
                           "type": "boolean"
                         },
+                        "requires_workspace": {
+                          "description": "Whether this tool requires an active Robot workspace.",
+                          "type": "boolean"
+                        },
                         "title": {
                           "description": "Optional display title for MCP clients and Robot builders.",
                           "type": "string"
@@ -253,6 +257,50 @@
                         "name",
                         "description",
                         "input_schema"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "toolsets": {
+                    "description": "Reusable prompt-decorated Toolsets assembled from this provider's tools.",
+                    "items": {
+                      "properties": {
+                        "description": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "description": "Stable provider-local Toolset identifier.",
+                          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+                          "type": "string"
+                        },
+                        "instruction": {
+                          "description": "Specialist instructions injected whenever the Toolset is active.\n",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "requires_workspace": {
+                          "description": "Whether this entire Toolset requires an active Robot workspace.",
+                          "type": "boolean"
+                        },
+                        "tools": {
+                          "description": "Provider-local tool IDs included in this Toolset.",
+                          "items": {
+                            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_]*$",
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "type": "array",
+                          "uniqueItems": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "description",
+                        "tools"
                       ],
                       "type": "object"
                     },

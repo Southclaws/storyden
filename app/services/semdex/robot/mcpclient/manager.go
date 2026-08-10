@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	adkagent "google.golang.org/adk/v2/agent"
 	"io"
 	"log/slog"
 	"net/http"
@@ -28,8 +29,8 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"golang.org/x/oauth2"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 )
 
 const (
@@ -233,7 +234,9 @@ func (m *Manager) SyncRegistry(ctx context.Context) error {
 			if !cachedTool.Enabled {
 				continue
 			}
-			m.registry.Register(m.makeTool(server, cachedTool))
+			if err := m.registry.Register(m.makeTool(server, cachedTool)); err != nil {
+				return fmt.Errorf("register MCP tool %q: %w", cachedTool.ID, err)
+			}
 		}
 	}
 
@@ -422,7 +425,7 @@ func (m *Manager) makeTool(server mcp.Server, cachedTool mcp.Tool) *tools.Tool {
 					Description: cachedTool.Description,
 					InputSchema: def.InputSchema,
 				},
-				func(ctx tool.Context, args map[string]any) (map[string]any, error) {
+				func(ctx adkagent.Context, args map[string]any) (map[string]any, error) {
 					return m.callTool(ctx, server, cachedTool.RemoteName, args), nil
 				},
 			)

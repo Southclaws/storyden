@@ -11,7 +11,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
@@ -33,13 +32,36 @@ const (
 	mockModelMemberSearch       = "mock/../scripts/robot-chat-member-search.yaml"
 )
 
+func robotToolsetsPtr(ids ...string) *openapi.RobotToolsetRefList {
+	toolsets := openapi.RobotToolsetRefList(ids)
+	return &toolsets
+}
+
 func robotToolsPtr(names ...string) *openapi.RobotToolNameList {
 	tools := openapi.RobotToolNameList(names)
 	return &tools
 }
 
+func robotIDPtr(robotID string) *string {
+	robotID = strings.TrimSpace(robotID)
+	if robotID == "" {
+		return nil
+	}
+	return &robotID
+}
+
 type fullResponse struct {
 	parts []openapi.StreamPart
+}
+
+type delegationStreamData struct {
+	StreamID string                 `json:"-"`
+	CallID   string                 `json:"callId"`
+	Robot    openapi.RobotReference `json:"robot"`
+	Request  string                 `json:"request"`
+	Status   string                 `json:"status"`
+	Messages []openapi.UIMessage    `json:"messages"`
+	Error    string                 `json:"error,omitempty"`
 }
 
 func doChat(
@@ -54,12 +76,10 @@ func doChat(
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
 
-	robotID = normaliseRobotID(robotID)
-
 	body, err := json.Marshal(openapi.RobotChatRequest{
 		Id:        sessionID,
 		SessionId: &sessionID,
-		RobotId:   &robotID,
+		RobotId:   robotIDPtr(robotID),
 		Messages: []openapi.UIMessage{{
 			Id:    xid.New().String(),
 			Role:  openapi.UIMessageRoleUser,
@@ -131,18 +151,19 @@ func doChatToolOutputs(
 ) *fullResponse {
 	t.Helper()
 
-	robotID = normaliseRobotID(robotID)
-
-	body, err := json.Marshal(map[string]any{
+	requestBody := map[string]any{
 		"id":        sessionID,
 		"sessionId": sessionID,
-		"robotId":   robotID,
 		"messages": []map[string]any{{
 			"id":    xid.New().String(),
 			"role":  "assistant",
 			"parts": parts,
 		}},
-	})
+	}
+	if robotID = strings.TrimSpace(robotID); robotID != "" {
+		requestBody["robotId"] = robotID
+	}
+	body, err := json.Marshal(requestBody)
 	require.NoError(t, err)
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
@@ -176,13 +197,6 @@ func doChatToolOutputs(
 	require.NoError(t, scanner.Err())
 
 	return ev
-}
-
-func normaliseRobotID(robotID string) string {
-	if robotID == "" {
-		return agent_registry.RobotBuilderID
-	}
-	return robotID
 }
 
 func collectToolInputs(ev *fullResponse) []openapi.ToolInputAvailablePart {
@@ -226,17 +240,25 @@ func doChatStatus(
 	session openapi.RequestEditorFn,
 	sessionID, message string,
 ) int {
+	return doChatWithRobotStatus(t, ctx, ts, session, sessionID, "", message)
+}
+
+func doChatWithRobotStatus(
+	t *testing.T,
+	ctx context.Context,
+	ts *httptest.Server,
+	session openapi.RequestEditorFn,
+	sessionID, robotID, message string,
+) int {
 	t.Helper()
 
 	var textPart openapi.UIMessagePart
 	require.NoError(t, textPart.FromTextUIPart(openapi.TextUIPart{Type: openapi.TextUIPartTypeText, Text: message}))
 
-	robotID := normaliseRobotID("")
-
 	body, err := json.Marshal(openapi.RobotChatRequest{
 		Id:        sessionID,
 		SessionId: &sessionID,
-		RobotId:   &robotID,
+		RobotId:   robotIDPtr(robotID),
 		Messages: []openapi.UIMessage{{
 			Id:    xid.New().String(),
 			Role:  openapi.UIMessageRoleUser,
@@ -267,18 +289,19 @@ func doChatToolOutputsStatus(
 ) int {
 	t.Helper()
 
-	robotID = normaliseRobotID(robotID)
-
-	body, err := json.Marshal(map[string]any{
+	requestBody := map[string]any{
 		"id":        sessionID,
 		"sessionId": sessionID,
-		"robotId":   robotID,
 		"messages": []map[string]any{{
 			"id":    xid.New().String(),
 			"role":  "assistant",
 			"parts": parts,
 		}},
-	})
+	}
+	if robotID = strings.TrimSpace(robotID); robotID != "" {
+		requestBody["robotId"] = robotID
+	}
+	body, err := json.Marshal(requestBody)
 	require.NoError(t, err)
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, ts.URL+"/sse/chat", bytes.NewReader(body))
@@ -302,6 +325,20 @@ func collectTextDeltas(ev *fullResponse) []string {
 		p, err := part.AsTextDeltaPart()
 		if err == nil {
 			deltas = append(deltas, p.Delta)
+		}
+	}
+	return deltas
+}
+
+func collectReasoningDeltas(ev *fullResponse) []string {
+	var deltas []string
+	for _, part := range ev.parts {
+		if part.Type != "reasoning-delta" {
+			continue
+		}
+		reasoning, err := part.AsReasoningDeltaPart()
+		if err == nil {
+			deltas = append(deltas, reasoning.Delta)
 		}
 	}
 	return deltas
@@ -347,6 +384,31 @@ func collectErrorParts(ev *fullResponse) []string {
 		}
 	}
 	return errs
+}
+
+func collectDelegations(ev *fullResponse) []delegationStreamData {
+	var delegations []delegationStreamData
+	for _, part := range ev.parts {
+		if part.Type != "data-delegation" {
+			continue
+		}
+		dataPart, err := part.AsDataPart()
+		if err != nil {
+			continue
+		}
+		encoded, err := json.Marshal(dataPart.Data)
+		if err != nil {
+			continue
+		}
+		var delegation delegationStreamData
+		if err := json.Unmarshal(encoded, &delegation); err == nil {
+			if dataPart.Id != nil {
+				delegation.StreamID = *dataPart.Id
+			}
+			delegations = append(delegations, delegation)
+		}
+	}
+	return delegations
 }
 
 func writeScript(t *testing.T, path, content string) {

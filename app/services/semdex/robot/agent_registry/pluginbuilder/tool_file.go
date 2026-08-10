@@ -10,11 +10,11 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	adkagent "google.golang.org/adk/v2/agent"
 	"io/fs"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 )
@@ -139,7 +139,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_list",
 		Description: "List workspace files with paths, sizes, and modification times. Use to orient before reading or editing. This returns metadata only, not file contents; use plugin_file_read, plugin_file_search, or plugin_file_outline for source context.",
-	}, func(ctx adktool.Context, args ListFilesInput) (ListFilesResult, error) {
+	}, func(ctx adkagent.Context, args ListFilesInput) (ListFilesResult, error) {
 		result, err := a.ListFiles(ctx, args)
 		if err != nil {
 			return ListFilesResult{}, err
@@ -152,7 +152,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_read",
 		Description: "Read targeted text from one workspace file. Prefer focused reads over whole-file reads: use start_line/max_lines, around_line/context_lines, or symbol/context_lines for Go files. Returns line numbers and a revision for precise follow-up edits.",
-	}, func(ctx adktool.Context, args ReadFileInput) (ReadFileResult, error) {
+	}, func(ctx adkagent.Context, args ReadFileInput) (ReadFileResult, error) {
 		result, err := a.ReadFile(ctx, args)
 		if err != nil {
 			return ReadFileResult{}, err
@@ -165,7 +165,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_outline",
 		Description: "Return a compact Go source outline: package, imports, types, functions, and methods with line ranges. Use before reading large Go files to choose the smallest useful line range.",
-	}, func(ctx adktool.Context, args FileOutlineInput) (FileOutlineResult, error) {
+	}, func(ctx adkagent.Context, args FileOutlineInput) (FileOutlineResult, error) {
 		result, err := a.FileOutline(ctx, args)
 		if err != nil {
 			return FileOutlineResult{}, err
@@ -178,7 +178,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	if err := add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_write",
 		Description: "Write complete content to a new workspace-relative file. For existing files, first inspect with plugin_file_read or plugin_file_outline and use plugin_file_edit for normal changes. Set overwrite_existing=true only after inspection when a full-file replacement is intentionally safer than focused edits.",
-	}, func(ctx adktool.Context, args WriteFileInput) (WriteFileResult, error) {
+	}, func(ctx adkagent.Context, args WriteFileInput) (WriteFileResult, error) {
 		result, err := a.WriteFile(ctx, args)
 		if err != nil {
 			return WriteFileResult{}, err
@@ -191,7 +191,7 @@ func (a *Agent) addFileTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_file_search",
 		Description: "Search workspace text files for a literal case-insensitive substring and return contextual snippets with line numbers and revisions. Use before broad edits to find all relevant behavior. For Go structure, prefer plugin_file_outline after identifying candidate files.",
-	}, func(ctx adktool.Context, args SearchInput) (SearchResult, error) {
+	}, func(ctx adkagent.Context, args SearchInput) (SearchResult, error) {
 		result, err := a.Search(ctx, args)
 		if err != nil {
 			return SearchResult{}, err

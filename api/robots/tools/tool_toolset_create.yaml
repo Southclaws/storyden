@@ -1,0 +1,35 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolsetCreate
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Create Toolset
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false }
+title: toolset_create
+description: Create a reusable custom Toolset from available tool identifiers and optional specialised prompt guidance.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolsetCreateInput" }
+  output: { $ref: "#/definitions/ToolToolsetCreateOutput" }
+definitions:
+  ToolToolsetCreateInput:
+    type: object
+    required: [name, description, tools]
+    properties:
+      name: { type: string, minLength: 1 }
+      description: { type: string }
+      instruction: { type: string }
+      tools:
+        type: array
+        items: { type: string }
+    additionalProperties: false
+  ToolToolsetCreateOutput:
+    type: object
+    required: [id, name]
+    properties:
+      id: { type: string }
+      name: { type: string }
+    additionalProperties: false

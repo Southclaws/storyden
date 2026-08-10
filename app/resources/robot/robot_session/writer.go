@@ -2,16 +2,20 @@ package robot_session
 
 import (
 	"context"
+	"maps"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	adksession "google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	entschema "github.com/Southclaws/storyden/internal/ent/schema"
 )
 
 func (q *Repository) Create(
@@ -85,15 +89,62 @@ func (q *Repository) UpdateState(
 func (q *Repository) AppendMessage(
 	ctx context.Context,
 	sessionID robot.SessionID,
-	invocationID string,
 	accountID opt.Optional[account.AccountID],
 	actor opt.Optional[robot.Actor],
-	eventData map[string]any,
+	event *adksession.Event,
 ) error {
-	create := q.db.RobotSessionMessage.Create().
+	if event == nil {
+		return fault.New("robot session message event is required", fctx.With(ctx))
+	}
+
+	storedEvent, stateDelta := eventForPersistence(event)
+	if len(stateDelta) == 0 {
+		return saveMessage(ctx, q.db.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent)
+	}
+
+	err := ent.WithTx(ctx, q.db, func(tx *ent.Tx) error {
+		session, err := tx.RobotSession.Query().
+			Where(ent_robot_session.IDEQ(xid.ID(sessionID))).
+			Only(ctx)
+		if err != nil {
+			return err
+		}
+
+		state := maps.Clone(session.State)
+		if state == nil {
+			state = make(map[string]any, len(stateDelta))
+		}
+		maps.Copy(state, stateDelta)
+		if err := tx.RobotSession.UpdateOneID(xid.ID(sessionID)).SetState(state).Exec(ctx); err != nil {
+			return err
+		}
+
+		return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent)
+	})
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	return nil
+}
+
+func saveMessage(
+	ctx context.Context,
+	create *ent.RobotSessionMessageCreate,
+	sessionID robot.SessionID,
+	accountID opt.Optional[account.AccountID],
+	actor opt.Optional[robot.Actor],
+	event *adksession.Event,
+) error {
+	create = create.
 		SetSessionID(xid.ID(sessionID)).
-		SetInvocationID(invocationID).
-		SetEventData(eventData)
+		SetInvocationID(event.InvocationID).
+		SetEventData(entschema.NewRobotSessionEvent(*event))
+	if event.Branch != "" {
+		create.SetBranch(event.Branch)
+	}
+	if event.IsolationScope != "" {
+		create.SetIsolationScope(event.IsolationScope)
+	}
 
 	if aid, ok := accountID.Get(); ok {
 		create.SetAccountID(xid.ID(aid))
@@ -109,6 +160,30 @@ func (q *Repository) AppendMessage(
 	}
 
 	return nil
+}
+
+// eventForPersistence applies ADK's session-state contract without mutating
+// the event yielded to the active invocation. Temporary keys are invocation
+// scoped and must not be written to either the session state or event history.
+func eventForPersistence(event *adksession.Event) (*adksession.Event, map[string]any) {
+	if len(event.Actions.StateDelta) == 0 {
+		return event, nil
+	}
+
+	stateDelta := make(map[string]any, len(event.Actions.StateDelta))
+	for key, value := range event.Actions.StateDelta {
+		if strings.HasPrefix(key, adksession.KeyPrefixTemp) {
+			continue
+		}
+		stateDelta[key] = value
+	}
+	if len(stateDelta) == len(event.Actions.StateDelta) {
+		return event, stateDelta
+	}
+
+	stored := *event
+	stored.Actions.StateDelta = stateDelta
+	return &stored, stateDelta
 }
 
 func applyMessageActor(create *ent.RobotSessionMessageCreate, accountID opt.Optional[account.AccountID], actorOpt opt.Optional[robot.Actor]) error {

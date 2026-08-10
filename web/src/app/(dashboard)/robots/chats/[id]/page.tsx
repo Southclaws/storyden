@@ -13,7 +13,7 @@ export default function Page() {
       sessionId={id === "new" ? undefined : id}
       initialChatBefore={searchParams.get("before") ?? undefined}
       initialChatLimit={searchParams.get("limit") ?? undefined}
-      initialSelectedRobotID={searchParams.get("robot") ?? undefined}
+      initialRobotID={searchParams.get("robot") ?? undefined}
     />
   );
 }

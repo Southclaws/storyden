@@ -1,5 +1,7 @@
 import { UIDataTypes, UIMessage, UIMessagePart, isToolUIPart } from "ai";
 
+import { RobotReference } from "./openapi-schema/robotReference";
+import { RobotSessionMessage } from "./openapi-schema/robotSessionMessage";
 import { RobotSessionMessageList } from "./openapi-schema/robotSessionMessageList";
 import { StorydenTools } from "./robots";
 
@@ -9,16 +11,35 @@ export type RobotRenderCardData = {
   id: string;
 };
 
+export type RobotDelegationStatus = "running" | "completed" | "failed";
+
+export interface RobotDelegationData {
+  callId: string;
+  robot: RobotReference;
+  request: string;
+  status: RobotDelegationStatus;
+  messages: StorydenUIMessage[];
+  error?: string;
+}
+
 export type StorydenUIDataTypes = {
+  session_id: string;
   session_name: string;
   render_card: RobotRenderCardData;
+  delegation: RobotDelegationData;
 };
 
 export type StorydenUIMessage = UIMessage<
   unknown,
   StorydenUIDataTypes,
   StorydenTools
->;
+> &
+  Partial<
+    Pick<
+      RobotSessionMessage,
+      "created_at" | "robot" | "branch" | "isolation_scope"
+    >
+  >;
 
 export function toStorydenUIMessages(
   messages: RobotSessionMessageList,
@@ -28,8 +49,8 @@ export function toStorydenUIMessages(
 
 type Part = StorydenUIMessage["parts"][number];
 
-type ToolType = Extract<Part["type"], `tool-${string}`>; // "tool-search" | "tool-robot_switch" | ...
-export type ToolName = ToolType extends `tool-${infer N}` ? N : never; // "search" | "robot_switch" | ...
+type ToolType = Extract<Part["type"], `tool-${string}`>; // "tool-search" | "tool-toolset_load" | ...
+export type ToolName = ToolType extends `tool-${infer N}` ? N : never; // "search" | "toolset_load" | ...
 
 export function isToolType(t: Part["type"]): t is ToolType {
   return t.startsWith("tool-");

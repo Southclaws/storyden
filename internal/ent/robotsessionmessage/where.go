@@ -71,6 +71,16 @@ func InvocationID(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldInvocationID, v))
 }
 
+// Branch applies equality check predicate on the "branch" field. It's identical to BranchEQ.
+func Branch(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldBranch, v))
+}
+
+// IsolationScope applies equality check predicate on the "isolation_scope" field. It's identical to IsolationScopeEQ.
+func IsolationScope(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldIsolationScope, v))
+}
+
 // RobotID applies equality check predicate on the "robot_id" field. It's identical to RobotIDEQ.
 func RobotID(v xid.ID) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldRobotID, v))
@@ -259,6 +269,156 @@ func InvocationIDEqualFold(v string) predicate.RobotSessionMessage {
 // InvocationIDContainsFold applies the ContainsFold predicate on the "invocation_id" field.
 func InvocationIDContainsFold(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldInvocationID, v))
+}
+
+// BranchEQ applies the EQ predicate on the "branch" field.
+func BranchEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldBranch, v))
+}
+
+// BranchNEQ applies the NEQ predicate on the "branch" field.
+func BranchNEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldBranch, v))
+}
+
+// BranchIn applies the In predicate on the "branch" field.
+func BranchIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldBranch, vs...))
+}
+
+// BranchNotIn applies the NotIn predicate on the "branch" field.
+func BranchNotIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldBranch, vs...))
+}
+
+// BranchGT applies the GT predicate on the "branch" field.
+func BranchGT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGT(FieldBranch, v))
+}
+
+// BranchGTE applies the GTE predicate on the "branch" field.
+func BranchGTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGTE(FieldBranch, v))
+}
+
+// BranchLT applies the LT predicate on the "branch" field.
+func BranchLT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLT(FieldBranch, v))
+}
+
+// BranchLTE applies the LTE predicate on the "branch" field.
+func BranchLTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLTE(FieldBranch, v))
+}
+
+// BranchContains applies the Contains predicate on the "branch" field.
+func BranchContains(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContains(FieldBranch, v))
+}
+
+// BranchHasPrefix applies the HasPrefix predicate on the "branch" field.
+func BranchHasPrefix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasPrefix(FieldBranch, v))
+}
+
+// BranchHasSuffix applies the HasSuffix predicate on the "branch" field.
+func BranchHasSuffix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasSuffix(FieldBranch, v))
+}
+
+// BranchIsNil applies the IsNil predicate on the "branch" field.
+func BranchIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldBranch))
+}
+
+// BranchNotNil applies the NotNil predicate on the "branch" field.
+func BranchNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldBranch))
+}
+
+// BranchEqualFold applies the EqualFold predicate on the "branch" field.
+func BranchEqualFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEqualFold(FieldBranch, v))
+}
+
+// BranchContainsFold applies the ContainsFold predicate on the "branch" field.
+func BranchContainsFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldBranch, v))
+}
+
+// IsolationScopeEQ applies the EQ predicate on the "isolation_scope" field.
+func IsolationScopeEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldIsolationScope, v))
+}
+
+// IsolationScopeNEQ applies the NEQ predicate on the "isolation_scope" field.
+func IsolationScopeNEQ(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldIsolationScope, v))
+}
+
+// IsolationScopeIn applies the In predicate on the "isolation_scope" field.
+func IsolationScopeIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIn(FieldIsolationScope, vs...))
+}
+
+// IsolationScopeNotIn applies the NotIn predicate on the "isolation_scope" field.
+func IsolationScopeNotIn(vs ...string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldIsolationScope, vs...))
+}
+
+// IsolationScopeGT applies the GT predicate on the "isolation_scope" field.
+func IsolationScopeGT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGT(FieldIsolationScope, v))
+}
+
+// IsolationScopeGTE applies the GTE predicate on the "isolation_scope" field.
+func IsolationScopeGTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldGTE(FieldIsolationScope, v))
+}
+
+// IsolationScopeLT applies the LT predicate on the "isolation_scope" field.
+func IsolationScopeLT(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLT(FieldIsolationScope, v))
+}
+
+// IsolationScopeLTE applies the LTE predicate on the "isolation_scope" field.
+func IsolationScopeLTE(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldLTE(FieldIsolationScope, v))
+}
+
+// IsolationScopeContains applies the Contains predicate on the "isolation_scope" field.
+func IsolationScopeContains(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContains(FieldIsolationScope, v))
+}
+
+// IsolationScopeHasPrefix applies the HasPrefix predicate on the "isolation_scope" field.
+func IsolationScopeHasPrefix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasPrefix(FieldIsolationScope, v))
+}
+
+// IsolationScopeHasSuffix applies the HasSuffix predicate on the "isolation_scope" field.
+func IsolationScopeHasSuffix(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldHasSuffix(FieldIsolationScope, v))
+}
+
+// IsolationScopeIsNil applies the IsNil predicate on the "isolation_scope" field.
+func IsolationScopeIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldIsolationScope))
+}
+
+// IsolationScopeNotNil applies the NotNil predicate on the "isolation_scope" field.
+func IsolationScopeNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldIsolationScope))
+}
+
+// IsolationScopeEqualFold applies the EqualFold predicate on the "isolation_scope" field.
+func IsolationScopeEqualFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEqualFold(FieldIsolationScope, v))
+}
+
+// IsolationScopeContainsFold applies the ContainsFold predicate on the "isolation_scope" field.
+func IsolationScopeContainsFold(v string) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldContainsFold(FieldIsolationScope, v))
 }
 
 // RobotIDEQ applies the EQ predicate on the "robot_id" field.

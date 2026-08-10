@@ -2,6 +2,7 @@ package crud_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"testing"
 
@@ -25,6 +26,11 @@ const testModel = "anthropic/claude-3-sonnet"
 func robotModel(s string) *openapi.RobotModelRef {
 	m := openapi.RobotModelRef(s)
 	return &m
+}
+
+func robotToolsets(ids ...string) *openapi.RobotToolsetRefList {
+	list := openapi.RobotToolsetRefList(ids)
+	return &list
 }
 
 func robotTools(names ...string) *openapi.RobotToolNameList {
@@ -73,33 +79,69 @@ func TestRobotCRUD(t *testing.T) {
 					a.NotEmpty(create.JSON200.Id)
 				})
 
-				t.Run("create_with_tools", func(t *testing.T) {
+				t.Run("create_with_toolsets", func(t *testing.T) {
 					a := assert.New(t)
 
 					create := tests.AssertRequest(cl.RobotCreateWithResponse(root,
 						openapi.RobotCreateJSONRequestBody{
 							Name:        "tool-bot-" + uuid.NewString(),
-							Description: "Bot with tools",
-							Playbook:    "Use your tools.",
+							Description: "Bot with Toolsets",
+							Playbook:    "Use your Toolsets.",
 							Model:       robotModel(testModel),
-							Tools:       robotTools("library_search_pages", "thread_search"),
+							Toolsets:    robotToolsets("system.discussions"),
 						},
 						adminSession,
 					))(t, http.StatusOK)
 
-					a.ElementsMatch([]string{"library_search_pages", "thread_search"}, create.JSON200.Tools)
+					a.ElementsMatch([]string{"system.discussions"}, create.JSON200.Toolsets)
 				})
 
-				t.Run("create_with_unknown_tool_returns_400", func(t *testing.T) {
+				t.Run("create_with_individual_tools", func(t *testing.T) {
+					a := assert.New(t)
+
+					create := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "individual-tool-bot-" + uuid.NewString(),
+							Description: "Bot with individual tools",
+							Playbook:    "Use only the assigned tools.",
+							Model:       robotModel(testModel),
+							Tools:       robotTools("thread_get", "throw_an_error"),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					a.ElementsMatch([]string{"thread_get", "throw_an_error"}, create.JSON200.Tools)
+				})
+
+				t.Run("create_with_toolset_removes_overlapping_individual_tools", func(t *testing.T) {
+					a := assert.New(t)
+
+					create := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "composed-tool-bot-" + uuid.NewString(),
+							Description: "Bot with composed tools",
+							Playbook:    "Use the assigned capabilities.",
+							Model:       robotModel(testModel),
+							Tools:       robotTools("thread_get", "throw_an_error"),
+							Toolsets:    robotToolsets("system.discussions"),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					a.Equal([]string{"throw_an_error"}, create.JSON200.Tools)
+					a.Equal([]string{"system.discussions"}, create.JSON200.Toolsets)
+				})
+
+				t.Run("create_with_unknown_toolset_returns_400", func(t *testing.T) {
 					r := require.New(t)
 
 					create, err := cl.RobotCreateWithResponse(root,
 						openapi.RobotCreateJSONRequestBody{
 							Name:        "unknown-tool-bot-" + uuid.NewString(),
-							Description: "Bot with unknown tool",
-							Playbook:    "Use your tools.",
+							Description: "Bot with unknown Toolset",
+							Playbook:    "Use your Toolsets.",
 							Model:       robotModel(testModel),
-							Tools:       robotTools("unknown_tool"),
+							Toolsets:    robotToolsets("unknown_toolset"),
 						},
 						adminSession,
 					)
@@ -213,7 +255,7 @@ func TestRobotCRUD(t *testing.T) {
 					a.Equal(newPlaybook, get.JSON200.Playbook)
 				})
 
-				t.Run("update_tools", func(t *testing.T) {
+				t.Run("update_toolsets", func(t *testing.T) {
 					a := assert.New(t)
 
 					created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
@@ -222,24 +264,81 @@ func TestRobotCRUD(t *testing.T) {
 							Description: "Tool update test",
 							Playbook:    "Playbook.",
 							Model:       robotModel(testModel),
-							Tools:       robotTools("library_search_pages"),
+							Toolsets:    robotToolsets("system.discussions"),
 						},
 						adminSession,
 					))(t, http.StatusOK)
-					a.ElementsMatch([]string{"library_search_pages"}, created.JSON200.Tools)
+					a.ElementsMatch([]string{"system.discussions"}, created.JSON200.Toolsets)
 
 					updated := tests.AssertRequest(cl.RobotUpdateWithResponse(root,
 						created.JSON200.Id,
 						openapi.RobotUpdateJSONRequestBody{
-							Tools: robotTools("thread_search", "member_search"),
+							Toolsets: robotToolsets("system.robot_studio"),
 						},
 						adminSession,
 					))(t, http.StatusOK)
 
-					a.ElementsMatch([]string{"thread_search", "member_search"}, updated.JSON200.Tools)
+					a.ElementsMatch([]string{"system.robot_studio"}, updated.JSON200.Toolsets)
 				})
 
-				t.Run("update_with_unknown_tool_returns_400", func(t *testing.T) {
+				t.Run("adding_toolset_removes_overlapping_individual_tools", func(t *testing.T) {
+					a := assert.New(t)
+
+					created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "toolset-precedence-bot-" + uuid.NewString(),
+							Description: "Toolset precedence test",
+							Playbook:    "Playbook.",
+							Model:       robotModel(testModel),
+							Tools:       robotTools("thread_get", "throw_an_error"),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					updated := tests.AssertRequest(cl.RobotUpdateWithResponse(root,
+						created.JSON200.Id,
+						openapi.RobotUpdateJSONRequestBody{
+							Toolsets: robotToolsets("system.discussions"),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					a.Equal([]string{"throw_an_error"}, updated.JSON200.Tools)
+					a.Equal([]string{"system.discussions"}, updated.JSON200.Toolsets)
+				})
+
+				t.Run("adding_individual_tool_already_in_toolset_returns_named_400", func(t *testing.T) {
+					r := require.New(t)
+					a := assert.New(t)
+
+					created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
+						openapi.RobotCreateJSONRequestBody{
+							Name:        "tool-conflict-bot-" + uuid.NewString(),
+							Description: "Tool conflict test",
+							Playbook:    "Playbook.",
+							Model:       robotModel(testModel),
+							Toolsets:    robotToolsets("system.discussions"),
+						},
+						adminSession,
+					))(t, http.StatusOK)
+
+					updated, err := cl.RobotUpdateWithResponse(root,
+						created.JSON200.Id,
+						openapi.RobotUpdateJSONRequestBody{
+							Tools: robotTools("thread_get"),
+						},
+						adminSession,
+					)
+					r.NoError(err)
+					r.Equal(http.StatusBadRequest, updated.StatusCode())
+					var problem openapi.APIError
+					r.NoError(json.Unmarshal(updated.Body, &problem))
+					r.NotNil(problem.Detail)
+					a.Contains(*problem.Detail, `tool "thread_get"`)
+					a.Contains(*problem.Detail, `Toolset "Discussion management"`)
+				})
+
+				t.Run("update_with_unknown_toolset_returns_400", func(t *testing.T) {
 					r := require.New(t)
 
 					created := tests.AssertRequest(cl.RobotCreateWithResponse(root,
@@ -255,7 +354,7 @@ func TestRobotCRUD(t *testing.T) {
 					updated, err := cl.RobotUpdateWithResponse(root,
 						created.JSON200.Id,
 						openapi.RobotUpdateJSONRequestBody{
-							Tools: robotTools("unknown_tool"),
+							Toolsets: robotToolsets("unknown_toolset"),
 						},
 						adminSession,
 					)

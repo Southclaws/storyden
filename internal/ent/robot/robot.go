@@ -29,6 +29,8 @@ const (
 	FieldModel = "model"
 	// FieldTools holds the string denoting the tools field in the database.
 	FieldTools = "tools"
+	// FieldToolsets holds the string denoting the toolsets field in the database.
+	FieldToolsets = "toolsets"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldWorkspaceID holds the string denoting the workspace_id field in the database.
@@ -76,6 +78,7 @@ var Columns = []string{
 	FieldPlaybook,
 	FieldModel,
 	FieldTools,
+	FieldToolsets,
 	FieldMetadata,
 	FieldWorkspaceID,
 	FieldAuthorID,

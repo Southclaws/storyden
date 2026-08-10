@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"go/ast"
 	"go/types"
+	adkagent "google.golang.org/adk/v2/agent"
 	"reflect"
 	"sort"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	plugindev "github.com/Southclaws/storyden/lib/plugin/dev"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -90,7 +90,7 @@ Examples:
 
 Use the event field value in manifest.yaml. Use the payload_type name in Go
 handler signatures.`,
-	}, func(ctx adktool.Context, args StorydenSDKEventsInput) (StorydenSDKEventsResult, error) {
+	}, func(ctx adkagent.Context, args StorydenSDKEventsInput) (StorydenSDKEventsResult, error) {
 		return a.StorydenSDKEvents(ctx, args)
 	})); err != nil {
 		return err
@@ -114,7 +114,7 @@ Areas:
 - all: all of the above
 
 The query is a literal case-insensitive substring, not regex or wildcard search.`,
-	}, func(ctx adktool.Context, args StorydenSDKSearchInput) (StorydenSDKSearchResult, error) {
+	}, func(ctx adkagent.Context, args StorydenSDKSearchInput) (StorydenSDKSearchResult, error) {
 		return a.StorydenSDKSearch(ctx, args)
 	}))
 }

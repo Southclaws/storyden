@@ -9,6 +9,6 @@
  */
 
 /**
- * A list of tool names that the robot can use.
+ * A list of raw tool names contained by a Toolset.
  */
 export type RobotToolNameList = string[];

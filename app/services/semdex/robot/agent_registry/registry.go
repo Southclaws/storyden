@@ -1,7 +1,6 @@
 package agent_registry
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"sort"
@@ -9,16 +8,10 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	adkagent "google.golang.org/adk/agent"
-	adktool "google.golang.org/adk/tool"
+	adkagent "google.golang.org/adk/v2/agent"
 	"google.golang.org/genai"
 
 	robotresource "github.com/Southclaws/storyden/app/resources/robot"
-)
-
-const (
-	RobotBuilderID  = "robot_builder"
-	PluginBuilderID = "plugin_builder"
 )
 
 type RunMode string
@@ -49,31 +42,26 @@ type RunOptions struct {
 }
 
 type ADKRunRequest struct {
-	AppName              string
-	Agent                adkagent.Agent
-	RobotRef             string
-	UserID               string
-	SessionID            string
-	Content              *genai.Content
-	DefaultWorkspaceID   opt.Optional[xid.ID]
-	WorkspaceRequirement *Definition
-	Options              RunOptions
+	AppName            string
+	Agent              adkagent.Agent
+	RobotRef           string
+	UserID             string
+	SessionID          string
+	Content            *genai.Content
+	DefaultWorkspaceID opt.Optional[xid.ID]
+	Options            RunOptions
 }
-
-type ToolsetBuilder func(context.Context) (adktool.Toolset, error)
 
 type Definition struct {
 	ID                  string
 	Name                string
 	Description         string
-	RequiresWorkspace   bool
 	Hidden              bool
 	AppName             string
 	AgentName           string
 	Instruction         string
 	InstructionProvider func(adkagent.ReadonlyContext) (string, error)
-	ToolNames           []string
-	ToolsetBuilders     []ToolsetBuilder
+	ToolsetRefs         []string
 	Capabilities        []string
 }
 

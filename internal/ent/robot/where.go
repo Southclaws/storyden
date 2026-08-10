@@ -456,6 +456,16 @@ func ToolsNotNil() predicate.Robot {
 	return predicate.Robot(sql.FieldNotNull(FieldTools))
 }
 
+// ToolsetsIsNil applies the IsNil predicate on the "toolsets" field.
+func ToolsetsIsNil() predicate.Robot {
+	return predicate.Robot(sql.FieldIsNull(FieldToolsets))
+}
+
+// ToolsetsNotNil applies the NotNil predicate on the "toolsets" field.
+func ToolsetsNotNil() predicate.Robot {
+	return predicate.Robot(sql.FieldNotNull(FieldToolsets))
+}
+
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.
 func MetadataIsNil() predicate.Robot {
 	return predicate.Robot(sql.FieldIsNull(FieldMetadata))

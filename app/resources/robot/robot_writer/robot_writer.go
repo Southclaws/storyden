@@ -64,6 +64,16 @@ func WithTools(v []robot_ref.ToolName) Option {
 	}
 }
 
+func WithToolsets(v []robot_ref.ToolsetRef) Option {
+	return func(m *ent.RobotMutation) {
+		toolsets := make([]string, len(v))
+		for i, toolset := range v {
+			toolsets[i] = string(toolset)
+		}
+		m.SetToolsets(toolsets)
+	}
+}
+
 func WithMeta(meta map[string]any) Option {
 	return func(m *ent.RobotMutation) {
 		m.SetMetadata(meta)

@@ -318,6 +318,31 @@ meeting a card content area.
 
 ## Components
 
+### Icons
+
+Icons are semantic product vocabulary, not decoration or a catalogue of useful
+shapes.
+
+- Product code imports named icons from `components/ui/icons`; raw Lucide,
+  Heroicons, or other library imports belong inside that semantic icon library.
+- Choose an icon by the meaning of its export, not by visual resemblance. For
+  example, `CollectionIcon` identifies Storyden Collections; it is not a
+  generic symbol for any grouped objects. `ToolsetIcon` identifies Robot
+  Toolsets and is backed by its own Toolbox metaphor.
+- Omit an icon when the surrounding label and context already identify the
+  object and the glyph adds no scanning or state value. When a repeated object
+  family deliberately uses an identity icon, give that concept its own semantic
+  export and apply it consistently.
+- Add a semantic export only when a recurring product concept has no existing
+  match. An absent icon is preferable to a nearby but incorrect metaphor.
+- The containing component owns contextual icon size, alignment, colour, and
+  decorative accessibility treatment. Compact inline and Card title icons use
+  the `4` size token (16px); call sites must not rely on an icon library's 24px
+  default or enlarge a glyph to manufacture hierarchy.
+- `Card.titleIcon` is reserved for deliberate object identity or state, such as
+  a Toolset, pinned item, or draft. Card renders it muted, decorative, and
+  aligned with the compact title. The title remains the accessible name.
+
 ### Buttons and icon buttons
 
 Buttons default to `size="sm"` and `variant="subtle"`.
@@ -451,6 +476,8 @@ menu, clicking controls inside it, clicking inert menu chrome, and click-away.
 - Consult Storybook principles and realistic compositions before building.
 - Keep community content and host branding stronger than application chrome.
 - Prefer compact defaults, stable dimensions, and aligned controls.
+- Use semantic icon exports only when the icon adds information; let the owning
+  component determine its contextual size.
 - Preserve keyboard focus, accessible names, contrast, reduced motion, and
   responsive access to every workflow.
 - Render one expensive navigation tree and reposition it responsively.
@@ -466,6 +493,8 @@ menu, clicking controls inside it, clicking inert menu chrome, and click-away.
   neutral selected treatment is sufficient.
 - Do not inflate controls or headings to create hierarchy that composition
   should provide.
+- Do not choose icons by shape, borrow another product concept's icon, add
+  redundant glyphs, or rely on third-party default icon dimensions.
 - Do not put settings navigation in horizontally overflowing Tabs.
 - Do not duplicate server-rendered navigation content for desktop and mobile.
 - Do not treat Storybook as a prop playground; stories must explain the approved

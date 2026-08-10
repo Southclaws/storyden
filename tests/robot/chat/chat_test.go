@@ -49,9 +49,28 @@ func TestRobotChat(t *testing.T) {
 					sessionID := xid.New().String()
 					stream := doChat(t, root, ts, adminSession, sessionID, "", "hello")
 					textDeltas := collectTextDeltas(stream)
+					sessionParts := collectPartsOfType(stream, "data-session_id")
 
 					a.NotEmpty(textDeltas)
 					a.Equal("hello from mock", strings.Join(textDeltas, ""))
+					require.Len(t, sessionParts, 1)
+					sessionPart, err := sessionParts[0].AsDataPart()
+					require.NoError(t, err)
+					a.Equal(sessionID, sessionPart.Data)
+
+					sessionPartIndex := -1
+					textPartIndex := -1
+					for index, part := range stream.parts {
+						if sessionPartIndex == -1 && part.Type == "data-session_id" {
+							sessionPartIndex = index
+						}
+						if textPartIndex == -1 && part.Type == "text-delta" {
+							textPartIndex = index
+						}
+					}
+					require.NotEqual(t, -1, sessionPartIndex)
+					require.NotEqual(t, -1, textPartIndex)
+					a.Less(sessionPartIndex, textPartIndex)
 				})
 
 				t.Run("session_messages_cursor_pagination", func(t *testing.T) {

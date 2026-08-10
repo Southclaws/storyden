@@ -21,6 +21,10 @@ const (
 	FieldSessionID = "session_id"
 	// FieldInvocationID holds the string denoting the invocation_id field in the database.
 	FieldInvocationID = "invocation_id"
+	// FieldBranch holds the string denoting the branch field in the database.
+	FieldBranch = "branch"
+	// FieldIsolationScope holds the string denoting the isolation_scope field in the database.
+	FieldIsolationScope = "isolation_scope"
 	// FieldRobotID holds the string denoting the robot_id field in the database.
 	FieldRobotID = "robot_id"
 	// FieldBuiltinRobot holds the string denoting the builtin_robot field in the database.
@@ -66,6 +70,8 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldSessionID,
 	FieldInvocationID,
+	FieldBranch,
+	FieldIsolationScope,
 	FieldRobotID,
 	FieldBuiltinRobot,
 	FieldAccountID,
@@ -112,6 +118,16 @@ func BySessionID(opts ...sql.OrderTermOption) OrderOption {
 // ByInvocationID orders the results by the invocation_id field.
 func ByInvocationID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInvocationID, opts...).ToFunc()
+}
+
+// ByBranch orders the results by the branch field.
+func ByBranch(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBranch, opts...).ToFunc()
+}
+
+// ByIsolationScope orders the results by the isolation_scope field.
+func ByIsolationScope(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsolationScope, opts...).ToFunc()
 }
 
 // ByRobotID orders the results by the robot_id field.

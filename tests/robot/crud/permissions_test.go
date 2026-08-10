@@ -41,6 +41,7 @@ func grantRobotPerms(t *testing.T, ctx context.Context, roles *role_repo.Reposit
 //	RobotCreate       | 401      | 403    | 403        | 200           |
 //	RobotGet          | 401      | 403    | 200        | 200           |
 //	RobotUpdate       | 401      | 403    | 403        | 200           |
+//	RobotToolsetCreate| 401      | 403    | 200        | 200           |
 //	RobotSessionsList | 401      | 403    | 200        | 200           |
 func TestRobotPermissions(t *testing.T) {
 	t.Parallel()
@@ -193,6 +194,68 @@ func TestRobotPermissions(t *testing.T) {
 					okMgr, err := cl.RobotUpdateWithResponse(root, robotID, body, managerSession)
 					r.NoError(err)
 					r.Equal(http.StatusOK, okMgr.StatusCode())
+				})
+
+				t.Run("RobotToolsetOwnership", func(t *testing.T) {
+					r := require.New(t)
+					newBody := func(name string) openapi.RobotToolsetCreateJSONRequestBody {
+						return openapi.RobotToolsetCreateJSONRequestBody{
+							Name:        name + "-" + uuid.NewString(),
+							Description: "Permission test Toolset",
+							Tools:       openapi.RobotToolNameList{"content_search"},
+						}
+					}
+
+					unauthed, err := cl.RobotToolsetCreateWithResponse(root, newBody("unauthored"))
+					r.NoError(err)
+					r.Equal(http.StatusUnauthorized, unauthed.StatusCode())
+
+					forbidden, err := cl.RobotToolsetCreateWithResponse(root, newBody("member"), memberSession)
+					r.NoError(err)
+					r.Equal(http.StatusForbidden, forbidden.StatusCode())
+
+					userCreated, err := cl.RobotToolsetCreateWithResponse(root, newBody("user"), userSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, userCreated.StatusCode())
+					r.NotNil(userCreated.JSON200)
+
+					managerCreated, err := cl.RobotToolsetCreateWithResponse(root, newBody("manager"), managerSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, managerCreated.StatusCode())
+					r.NotNil(managerCreated.JSON200)
+
+					ownGet, err := cl.RobotToolsetGetWithResponse(root, userCreated.JSON200.Id, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, ownGet.StatusCode())
+					r.True(ownGet.JSON200.Editable)
+					otherGet, err := cl.RobotToolsetGetWithResponse(root, managerCreated.JSON200.Id, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, otherGet.StatusCode())
+					r.False(otherGet.JSON200.Editable)
+
+					updatedDescription := "Updated by the author"
+					ownUpdate, err := cl.RobotToolsetUpdateWithResponse(root, userCreated.JSON200.Id,
+						openapi.RobotToolsetUpdateJSONRequestBody{Description: &updatedDescription}, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, ownUpdate.StatusCode())
+
+					otherUpdate, err := cl.RobotToolsetUpdateWithResponse(root, managerCreated.JSON200.Id,
+						openapi.RobotToolsetUpdateJSONRequestBody{Description: &updatedDescription}, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusForbidden, otherUpdate.StatusCode())
+
+					otherDelete, err := cl.RobotToolsetDeleteWithResponse(root, managerCreated.JSON200.Id, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusForbidden, otherDelete.StatusCode())
+
+					managerOverride, err := cl.RobotToolsetUpdateWithResponse(root, userCreated.JSON200.Id,
+						openapi.RobotToolsetUpdateJSONRequestBody{Description: &updatedDescription}, managerSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, managerOverride.StatusCode())
+
+					ownDelete, err := cl.RobotToolsetDeleteWithResponse(root, userCreated.JSON200.Id, userSession)
+					r.NoError(err)
+					r.Equal(http.StatusOK, ownDelete.StatusCode())
 				})
 
 				t.Run("RobotSessionsList", func(t *testing.T) {

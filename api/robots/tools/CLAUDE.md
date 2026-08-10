@@ -7,6 +7,39 @@ These rules apply to **all new tools** and **any modifications to existing tools
 
 ---
 
+## Built-in Toolset membership
+
+Use the `x-storyden.toolsets` string array to assign a tool to one or more
+built-in Toolsets:
+
+```yaml
+x-storyden:
+  toolsets:
+    - system.library
+    - system.content_search
+```
+
+- Membership is many-to-many. A tool MAY belong to multiple Toolsets.
+- Every tool schema MUST declare the array. Use `toolsets: []` when a tool is
+  intentionally not part of a built-in bundle.
+- Only built-in `system.*` Toolset IDs belong in this extension. Custom and
+  plugin Toolsets are assembled at runtime.
+- Toolset membership is generated from the dereferenced Robot schema. Do not
+  duplicate a built-in Toolset's public tool list by hand.
+- Each referenced Toolset MUST have a hand-written definition package under
+  `app/services/semdex/robot/toolsets/<toolset_id_with_dots_replaced_by_underscores>`.
+  Its `definition.go` owns the ID, name, description, and instruction; codegen
+  owns `tools_gen.go` and the parent registry bindings.
+- Session-only discovery and activation tools such as `tool_load` and
+  `toolset_load` are Denbot runtime primitives, not ordinary Toolset
+  members.
+
+Plugin Studio is the deliberate exception: its private tools are constructed
+in Go rather than declared in these schemas, so its membership remains beside
+its runtime builder while its public identity lives in the Toolsets package.
+
+---
+
 ## 1. Tool Naming
 
 ### 1.1 Naming format
@@ -56,6 +89,13 @@ Tool descriptions are the **primary semantic signal** used by modern language mo
 Poor descriptions cause mis-selection more often than poor naming or schema design.
 
 These rules MUST be followed for all tool descriptions.
+
+Every `description` in a tool schema is model-facing, including descriptions
+on inputs, outputs, shared catalogue items, and nested properties. Write each
+one to help the agent choose an action, supply the right value, or interpret
+the result. Structural filler such as “minimal identity returned during
+discovery” is not useful; explain what the identity lets the agent decide and
+which tool accepts it next.
 
 ---
 
@@ -592,6 +632,7 @@ x-storyden-tool:
   title: "Human-Readable Tool Name"
   role: MANAGE_ROBOTS # optional — omit when the service layer handles auth
   requires_confirmation: true # optional — require HITL approval before execution
+  requires_workspace: true # optional — hide unless the session has an active workspace
   annotations:
     readOnlyHint: true
     destructiveHint: false
@@ -604,11 +645,12 @@ Fields:
 - **`title`** (required): Human-readable display name passed to MCP clients.
 - **`role`** (optional): RBAC permission gate applied before tool execution. Omit for tools where the service layer already enforces ownership-based auth (e.g. `library_page_update`). Must be a valid value from `app/resources/rbac/permission.go`.
 - **`requires_confirmation`** (optional): If true, the robot runtime pauses before executing the tool and waits for an approve/deny result from the client.
+- **`requires_workspace`** (optional): If true, the runtime derives workspace availability from the session's `robot_workspace` mount state and excludes the tool when no workspace is active. `tool_get` still discloses this precondition, while `tool_load` rejects activation without changing session state.
 - **`annotations`**: MCP tool hints — `readOnlyHint`, `destructiveHint`, `idempotentHint`, `openWorldHint`.
 
 Permission rules:
 
-- `USE_ROBOTS` — read-only robot operations only: `robot_get`, `robot_list`, `system_robot_tool_catalog`, `robot_switch`
+- `USE_ROBOTS` — read-only robot operations only: Robot and Toolset lookup, catalogue, search, and loading tools
 - `MANAGE_ROBOTS` — create/update/delete robots
 - `READ_PUBLISHED_LIBRARY` / `MANAGE_LIBRARY` — library read/write
 - `READ_PUBLISHED_THREADS` / `CREATE_POST` / `MANAGE_POSTS` — thread/tag operations

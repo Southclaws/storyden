@@ -6,6 +6,7 @@ import { getNodeCreateMutationKey } from "../src/api/openapi-client/nodes";
 import { getReplyCreateMutationKey } from "../src/api/openapi-client/replies";
 import {
   getRobotCreateMutationKey,
+  getRobotDeleteMutationKey,
   getRobotGetKey,
   getRobotProviderUpdateMutationKey,
 } from "../src/api/openapi-client/robots";
@@ -51,6 +52,7 @@ export type AccessKeyClient = {
   robotCreate: (
     robotCreateBody: RobotCreateBody,
   ) => Promise<RobotCreateOKResponse>;
+  robotDelete: (robotId: string) => Promise<void>;
   robotGet: (robotId: string) => Promise<RobotGetOKResponse>;
   robotProviderUpdate: (
     provider: string,
@@ -115,6 +117,13 @@ export function createAccessKeyClient(accessKey: string): AccessKeyClient {
         body: robotCreateBody,
       });
     },
+    robotDelete: async (robotId) => {
+      await requestWithAccessKey<void>({
+        accessKey,
+        key: getRobotDeleteMutationKey(robotId),
+        method: "DELETE",
+      });
+    },
     robotGet: async (robotId) => {
       return await requestWithAccessKey<RobotGetOKResponse>({
         accessKey,
@@ -141,7 +150,7 @@ async function requestWithAccessKey<T>({
 }: {
   accessKey: string;
   key: readonly [string];
-  method: "GET" | "PATCH" | "POST" | "PUT";
+  method: "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
   body?: unknown;
 }): Promise<T> {
   const headers: Record<string, string> = {

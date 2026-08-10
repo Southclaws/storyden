@@ -1,0 +1,52 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolsetGet
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Get Toolset
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: toolset_get
+description: Get a Toolset's complete agent-relevant configuration after finding its ID with toolset_search. Returns its tool IDs, specialist instruction, workspace precondition, and whether this caller may edit it.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolsetGetInput" }
+  output: { $ref: "#/definitions/ToolToolsetGetOutput" }
+definitions:
+  ToolToolsetGetInput:
+    type: object
+    required: [id]
+    properties:
+      id:
+        type: string
+        description: Stable Toolset ID returned by toolset_search.
+    additionalProperties: false
+  ToolToolsetGetOutput:
+    type: object
+    required: [id, name, description, tools, instruction, editable, requires_workspace]
+    properties:
+      id:
+        type: string
+        description: Stable Toolset identifier accepted by toolset_load and Robot configuration tools.
+      name:
+        type: string
+        description: Human-readable name for explaining or confirming the selected capability bundle.
+      description:
+        type: string
+        description: The jobs this Toolset is designed to handle and when the bundle should be selected.
+      tools:
+        type: array
+        description: Tool IDs activated or assigned together by this Toolset; use tool_get when an individual schema is needed.
+        items: { type: string }
+      instruction:
+        type: string
+        description: Specialist guidance injected while this Toolset is active, including workflow and safety boundaries.
+      editable:
+        type: boolean
+        description: Whether the current caller can update or delete this Toolset through management tools.
+      requires_workspace:
+        type: boolean
+        description: Whether the conversation must have an active Robot workspace before this Toolset can be loaded or used.
+    additionalProperties: false

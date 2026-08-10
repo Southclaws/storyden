@@ -1,7 +1,6 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 import { useRobotSessionGet } from "@/api/openapi-client/robots";
@@ -10,7 +9,6 @@ import { toStorydenUIMessages } from "@/api/robots-types";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { FullPageChatInput } from "@/components/robots/RobotChat/FullPageChatInput";
 import { FullPageMessageList } from "@/components/robots/RobotChat/FullPageMessageList";
-import { RobotListMenu } from "@/components/robots/RobotListMenu";
 import { RobotWorkspaceSelect } from "@/components/robots/RobotWorkspaceSelect";
 import { BackAction } from "@/components/site/Action/Back";
 import {
@@ -26,15 +24,17 @@ type Props = {
   sessionId?: string;
   initialChatBefore?: string;
   initialChatLimit?: string;
-  initialSelectedRobotID?: string;
+  initialRobotID?: string;
 };
 
 const containerStyles = css({
   height: "viewportHeight",
   maxHeight: "viewportHeight",
+  minHeight: "0",
   display: "flex",
   flexDirection: "column",
   justifyContent: "space-between",
+  overflow: "hidden",
 });
 
 export function RobotSessionScreen(props: Props) {
@@ -55,16 +55,16 @@ export function RobotSessionScreen(props: Props) {
 
   const session = data ?? undefined;
   const messages = toStorydenUIMessages(session?.message_list.messages ?? []);
-  const initialSelectedRobotID =
-    props.initialSelectedRobotID ?? session?.active_robot_id;
-
+  const rootRobotID = isNewSession
+    ? props.initialRobotID
+    : session?.root_robot_id;
   return (
     <div className={containerStyles}>
       <RobotChatContext
         initialSessionID={session?.id}
         initialMessages={messages}
         initialNextBefore={session?.message_list.next_before}
-        initialSelectedRobotID={initialSelectedRobotID}
+        initialRootRobotID={rootRobotID}
         initialSelectedWorkspaceID={session?.active_workspace?.workspace_id}
       >
         <ChatPageContent session={session} isNewSession={isNewSession} />
@@ -80,45 +80,28 @@ function ChatPageContent({
   session?: RobotSession;
   isNewSession: boolean;
 }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { sessionId, isSessionConfirmed, selectedRobot } = useRobotChat();
-  const selectedRobotID = selectedRobot?.id;
-  const currentRobotID = searchParams.get("robot") ?? undefined;
+  const { sessionId, isSessionConfirmed } = useRobotChat();
 
   useEffect(() => {
     if (isNewSession && isSessionConfirmed && sessionId) {
-      const query = selectedRobotID ? `?robot=${selectedRobotID}` : "";
-
       console.debug(
         `[RobotSessionScreen] Session confirmed, updating URL to: /robots/chats/${sessionId}`,
       );
-      router.replace(`/robots/chats/${sessionId}${query}`);
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `/robots/chats/${encodeURIComponent(sessionId)}`,
+      );
     }
-  }, [isNewSession, isSessionConfirmed, selectedRobotID, sessionId, router]);
-
-  useEffect(() => {
-    if (isNewSession || !session?.id) {
-      return;
-    }
-
-    if (selectedRobotID === currentRobotID) {
-      return;
-    }
-
-    const query = selectedRobotID ? `?robot=${selectedRobotID}` : "";
-
-    router.replace(`/robots/chats/${session.id}${query}`);
-  }, [currentRobotID, isNewSession, router, selectedRobotID, session?.id]);
+  }, [isNewSession, isSessionConfirmed, sessionId]);
 
   return (
     <>
       <ChatPageHeader session={session} isNewSession={isNewSession} />
       <FullPageMessageList />
       <FullPageChatInput />
-      <WStack mt="1">
+      <WStack mt="1" flexShrink="0">
         <HStack>
-          <RobotListMenu />
           <RobotWorkspaceSelect variant="outline" />
         </HStack>
         {session && <StatusText session={session} />}

@@ -1,4 +1,3 @@
-import { RobotListMenu } from "@/components/robots/RobotListMenu";
 import { RobotWorkspaceSelect } from "@/components/robots/RobotWorkspaceSelect";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
@@ -20,7 +19,6 @@ export function RobotCommandPaletteStatusBar() {
       <RobotSessionMenu />
 
       <HStack gap="0">
-        <RobotListMenu variant="ghost" borderRightRadius="none" />
         <RobotWorkspaceSelect variant="ghost" minW="40" />
         <IconButton
           variant="ghost"

@@ -118,6 +118,8 @@ const (
 	EdgeAuthoredWarnings = "authored_warnings"
 	// EdgeRobots holds the string denoting the robots edge name in mutations.
 	EdgeRobots = "robots"
+	// EdgeRobotToolsets holds the string denoting the robot_toolsets edge name in mutations.
+	EdgeRobotToolsets = "robot_toolsets"
 	// EdgeRobotWorkspaces holds the string denoting the robot_workspaces edge name in mutations.
 	EdgeRobotWorkspaces = "robot_workspaces"
 	// EdgeRobotWorkspaceInstances holds the string denoting the robot_workspace_instances edge name in mutations.
@@ -387,6 +389,13 @@ const (
 	RobotsInverseTable = "robots"
 	// RobotsColumn is the table column denoting the robots relation/edge.
 	RobotsColumn = "author_id"
+	// RobotToolsetsTable is the table that holds the robot_toolsets relation/edge.
+	RobotToolsetsTable = "robot_toolsets"
+	// RobotToolsetsInverseTable is the table name for the RobotToolset entity.
+	// It exists in this package in order to avoid circular dependency with the "robottoolset" package.
+	RobotToolsetsInverseTable = "robot_toolsets"
+	// RobotToolsetsColumn is the table column denoting the robot_toolsets relation/edge.
+	RobotToolsetsColumn = "author_id"
 	// RobotWorkspacesTable is the table that holds the robot_workspaces relation/edge.
 	RobotWorkspacesTable = "robot_workspaces"
 	// RobotWorkspacesInverseTable is the table name for the RobotWorkspace entity.
@@ -1120,6 +1129,20 @@ func ByRobots(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByRobotToolsetsCount orders the results by robot_toolsets count.
+func ByRobotToolsetsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRobotToolsetsStep(), opts...)
+	}
+}
+
+// ByRobotToolsets orders the results by robot_toolsets terms.
+func ByRobotToolsets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRobotToolsetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByRobotWorkspacesCount orders the results by robot_workspaces count.
 func ByRobotWorkspacesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -1460,6 +1483,13 @@ func newRobotsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RobotsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RobotsTable, RobotsColumn),
+	)
+}
+func newRobotToolsetsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RobotToolsetsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RobotToolsetsTable, RobotToolsetsColumn),
 	)
 }
 func newRobotWorkspacesStep() *sqlgraph.Step {

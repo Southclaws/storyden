@@ -22,9 +22,8 @@ var (
 	toolRobotDelete                     *ToolDefinition
 	toolRobotGet                        *ToolDefinition
 	toolRobotList                       *ToolDefinition
-	toolRobotSwitch                     *ToolDefinition
+	toolRobotSearch                     *ToolDefinition
 	toolRobotUpdate                     *ToolDefinition
-	toolSystemRobotToolCatalog          *ToolDefinition
 	toolTagList                         *ToolDefinition
 	toolThreadCreate                    *ToolDefinition
 	toolThreadGet                       *ToolDefinition
@@ -32,6 +31,16 @@ var (
 	toolThreadReply                     *ToolDefinition
 	toolThreadSearch                    *ToolDefinition
 	toolThreadUpdate                    *ToolDefinition
+	toolToolGet                         *ToolDefinition
+	toolToolLoad                        *ToolDefinition
+	toolToolSearch                      *ToolDefinition
+	toolToolsetCreate                   *ToolDefinition
+	toolToolsetDelete                   *ToolDefinition
+	toolToolsetGet                      *ToolDefinition
+	toolToolsetList                     *ToolDefinition
+	toolToolsetLoad                     *ToolDefinition
+	toolToolsetSearch                   *ToolDefinition
+	toolToolsetUpdate                   *ToolDefinition
 	toolNamesEnum                       []any
 )
 
@@ -55,9 +64,8 @@ func initAllTools() {
 	toolRobotDelete = initTool("RobotDelete")
 	toolRobotGet = initTool("RobotGet")
 	toolRobotList = initTool("RobotList")
-	toolRobotSwitch = initTool("RobotSwitch")
+	toolRobotSearch = initTool("RobotSearch")
 	toolRobotUpdate = initTool("RobotUpdate")
-	toolSystemRobotToolCatalog = initTool("SystemRobotToolCatalog")
 	toolTagList = initTool("TagList")
 	toolThreadCreate = initTool("ThreadCreate")
 	toolThreadGet = initTool("ThreadGet")
@@ -65,6 +73,16 @@ func initAllTools() {
 	toolThreadReply = initTool("ThreadReply")
 	toolThreadSearch = initTool("ThreadSearch")
 	toolThreadUpdate = initTool("ThreadUpdate")
+	toolToolGet = initTool("ToolGet")
+	toolToolLoad = initTool("ToolLoad")
+	toolToolSearch = initTool("ToolSearch")
+	toolToolsetCreate = initTool("ToolsetCreate")
+	toolToolsetDelete = initTool("ToolsetDelete")
+	toolToolsetGet = initTool("ToolsetGet")
+	toolToolsetList = initTool("ToolsetList")
+	toolToolsetLoad = initTool("ToolsetLoad")
+	toolToolsetSearch = initTool("ToolsetSearch")
+	toolToolsetUpdate = initTool("ToolsetUpdate")
 
 	names := AllToolNames()
 	toolNamesEnum = make([]any, len(names))
@@ -95,9 +113,8 @@ func AllToolNames() []string {
 		toolRobotDelete.Name,
 		toolRobotGet.Name,
 		toolRobotList.Name,
-		toolRobotSwitch.Name,
+		toolRobotSearch.Name,
 		toolRobotUpdate.Name,
-		toolSystemRobotToolCatalog.Name,
 		toolTagList.Name,
 		toolThreadCreate.Name,
 		toolThreadGet.Name,
@@ -105,6 +122,16 @@ func AllToolNames() []string {
 		toolThreadReply.Name,
 		toolThreadSearch.Name,
 		toolThreadUpdate.Name,
+		toolToolGet.Name,
+		toolToolLoad.Name,
+		toolToolSearch.Name,
+		toolToolsetCreate.Name,
+		toolToolsetDelete.Name,
+		toolToolsetGet.Name,
+		toolToolsetList.Name,
+		toolToolsetLoad.Name,
+		toolToolsetSearch.Name,
+		toolToolsetUpdate.Name,
 	}
 }
 
@@ -184,16 +211,12 @@ func GetRobotListTool() *ToolDefinition {
 	return toolRobotList
 }
 
-func GetRobotSwitchTool() *ToolDefinition {
-	return toolRobotSwitch
+func GetRobotSearchTool() *ToolDefinition {
+	return toolRobotSearch
 }
 
 func GetRobotUpdateTool() *ToolDefinition {
 	return toolRobotUpdate
-}
-
-func GetSystemRobotToolCatalogTool() *ToolDefinition {
-	return toolSystemRobotToolCatalog
 }
 
 func GetTagListTool() *ToolDefinition {
@@ -222,4 +245,44 @@ func GetThreadSearchTool() *ToolDefinition {
 
 func GetThreadUpdateTool() *ToolDefinition {
 	return toolThreadUpdate
+}
+
+func GetToolGetTool() *ToolDefinition {
+	return toolToolGet
+}
+
+func GetToolLoadTool() *ToolDefinition {
+	return toolToolLoad
+}
+
+func GetToolSearchTool() *ToolDefinition {
+	return toolToolSearch
+}
+
+func GetToolsetCreateTool() *ToolDefinition {
+	return toolToolsetCreate
+}
+
+func GetToolsetDeleteTool() *ToolDefinition {
+	return toolToolsetDelete
+}
+
+func GetToolsetGetTool() *ToolDefinition {
+	return toolToolsetGet
+}
+
+func GetToolsetListTool() *ToolDefinition {
+	return toolToolsetList
+}
+
+func GetToolsetLoadTool() *ToolDefinition {
+	return toolToolsetLoad
+}
+
+func GetToolsetSearchTool() *ToolDefinition {
+	return toolToolsetSearch
+}
+
+func GetToolsetUpdateTool() *ToolDefinition {
+	return toolToolsetUpdate
 }

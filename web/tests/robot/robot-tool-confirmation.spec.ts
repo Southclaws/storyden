@@ -8,7 +8,6 @@ import {
   goToNewChat,
   sendMessage,
   setupRobotProviderWithScript,
-  switchToRobot,
   waitForPersistedChatRoute,
 } from "./helpers";
 
@@ -29,7 +28,6 @@ test.describe("Robot Chat — tool confirmation", () => {
   test("robot_delete pauses for approval before deleting", async ({ page }) => {
     const suffix = Date.now();
     const victimRobotName = `e2e-delete-victim-${suffix}`;
-    const deleterRobotName = `e2e-delete-actor-${suffix}`;
     const deleteScriptName = `e2e-delete-confirmation-${suffix}.yaml`;
     const deleteScriptPath = `${ROBOT_SCRIPT_DIR}/${deleteScriptName}`;
     let victimRobotID = "";
@@ -63,19 +61,13 @@ test.describe("Robot Chat — tool confirmation", () => {
       finish: "stop"
 `,
         );
-
-        await robotCreate({
-          name: deleterRobotName,
-          description: "E2E robot that requests robot_delete",
-          playbook: "you request robot deletion when asked",
-          model: `mock/../robot/scripts/${deleteScriptName}`,
-          tools: ["robot_delete"],
-        });
       });
 
-      await goToNewChat(page);
+      await setupRobotProviderWithScript(
+        `mock/../robot/scripts/${deleteScriptName}`,
+      );
 
-      await switchToRobot(page, deleterRobotName);
+      await goToNewChat(page);
 
       await sendMessage(page, "delete the victim");
 
@@ -126,6 +118,7 @@ test.describe("Robot Chat — tool confirmation", () => {
       });
     } finally {
       await unlink(deleteScriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
 
@@ -134,7 +127,6 @@ test.describe("Robot Chat — tool confirmation", () => {
   }) => {
     const suffix = Date.now();
     const victimRobotName = `e2e-mixed-victim-${suffix}`;
-    const actorRobotName = `e2e-mixed-actor-${suffix}`;
     const scriptName = `e2e-delete-after-create-${suffix}.yaml`;
     const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
     let victimRobotID = "";
@@ -183,19 +175,13 @@ test.describe("Robot Chat — tool confirmation", () => {
       finish: "stop"
 `,
         );
-
-        await robotCreate({
-          name: actorRobotName,
-          description: "E2E robot that creates before deleting",
-          playbook: "you create first, then delete later",
-          model: `mock/../robot/scripts/${scriptName}`,
-          tools: ["robot_create", "robot_delete"],
-        });
       });
 
-      await goToNewChat(page);
+      await setupRobotProviderWithScript(
+        `mock/../robot/scripts/${scriptName}`,
+      );
 
-      await switchToRobot(page, actorRobotName);
+      await goToNewChat(page);
 
       await sendMessage(page, "create a robot");
       await expect(
@@ -237,6 +223,7 @@ test.describe("Robot Chat — tool confirmation", () => {
       });
     } finally {
       await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
 
@@ -246,7 +233,6 @@ test.describe("Robot Chat — tool confirmation", () => {
     const suffix = Date.now();
     const firstVictimName = `e2e-multi-delete-first-${suffix}`;
     const secondVictimName = `e2e-multi-delete-second-${suffix}`;
-    const actorRobotName = `e2e-multi-delete-actor-${suffix}`;
     const scriptName = `e2e-multi-delete-confirmation-${suffix}.yaml`;
     const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
     let firstVictimID = "";
@@ -294,22 +280,13 @@ test.describe("Robot Chat — tool confirmation", () => {
       finish: "stop"
 `,
         );
-
-        await robotCreate({
-          name: actorRobotName,
-          description: "E2E robot that requests two robot_delete calls",
-          playbook: "you request multiple robot deletions when asked",
-          model: `mock/../robot/scripts/${scriptName}`,
-          tools: ["robot_delete"],
-        });
       });
 
-      await goToNewChat(page);
+      await setupRobotProviderWithScript(
+        `mock/../robot/scripts/${scriptName}`,
+      );
 
-      await switchToRobot(page, actorRobotName);
-      await expect(
-        page.getByRole("button", { name: actorRobotName }),
-      ).toBeVisible({ timeout: 15000 });
+      await goToNewChat(page);
 
       await sendMessage(page, "delete both victims");
 
@@ -360,6 +337,7 @@ test.describe("Robot Chat — tool confirmation", () => {
       });
     } finally {
       await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
 });

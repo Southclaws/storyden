@@ -3,11 +3,14 @@ definitions:
   ToolContentSearch:
     $ref: "./robots/tools/tool_content_search.yaml"
 
-  ToolRobotSwitch:
-    $ref: "./robots/tools/tool_robot_switch.yaml"
+  ToolToolSearch:
+    $ref: "./robots/tools/tool_tool_search.yaml"
 
-  ToolSystemRobotToolCatalog:
-    $ref: "./robots/tools/tool_system_robot_tool_catalog.yaml"
+  ToolToolGet:
+    $ref: "./robots/tools/tool_tool_get.yaml"
+
+  ToolToolLoad:
+    $ref: "./robots/tools/tool_tool_load.yaml"
 
   ToolRobotCreate:
     $ref: "./robots/tools/tool_robot_create.yaml"
@@ -23,6 +26,30 @@ definitions:
 
   ToolRobotDelete:
     $ref: "./robots/tools/tool_robot_delete.yaml"
+
+  ToolRobotSearch:
+    $ref: "./robots/tools/tool_robot_search.yaml"
+
+  ToolToolsetSearch:
+    $ref: "./robots/tools/tool_toolset_search.yaml"
+
+  ToolToolsetLoad:
+    $ref: "./robots/tools/tool_toolset_load.yaml"
+
+  ToolToolsetCreate:
+    $ref: "./robots/tools/tool_toolset_create.yaml"
+
+  ToolToolsetList:
+    $ref: "./robots/tools/tool_toolset_list.yaml"
+
+  ToolToolsetGet:
+    $ref: "./robots/tools/tool_toolset_get.yaml"
+
+  ToolToolsetUpdate:
+    $ref: "./robots/tools/tool_toolset_update.yaml"
+
+  ToolToolsetDelete:
+    $ref: "./robots/tools/tool_toolset_delete.yaml"
 
   ToolLibraryPageTree:
     $ref: "./robots/tools/tool_library_page_list.yaml"

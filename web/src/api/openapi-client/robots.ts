@@ -15,6 +15,7 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 import { fetcher } from "../client";
 import type {
   BadRequestResponse,
+  ConflictResponse,
   ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
@@ -42,6 +43,10 @@ import type {
   RobotSessionsListOKResponse,
   RobotSessionsListParams,
   RobotToolsListOKResponse,
+  RobotToolsetCreateBody,
+  RobotToolsetGetOKResponse,
+  RobotToolsetUpdateBody,
+  RobotToolsetsListOKResponse,
   RobotUpdateBody,
   RobotWorkspaceCreateBody,
   RobotWorkspaceCreateOKResponse,
@@ -138,12 +143,13 @@ export const getRobotCreateUrl = () => {
 /**
  * Create a new Robot with the specified configuration. A Robot in Storyden
  * consists of a name and description (for humans) as well as a playbook,
- * and a set of available tools to interact with Storyden or plugins. The
- * playbook is a detailed set of instructions that guides behaviour of the
- * Robot to help it assist members in achieving a specific automation goal.
- * Tools are available from either Storyden or plugins that allow it to
- * perform actions or query data. Robots never need all tools and it's best
- * to build goal-specific Robots with minimal sets of tools.
+ * and a set of direct tools and reusable Toolsets to interact with Storyden
+ * or plugins. The playbook is a detailed set of instructions that guides
+ * behaviour of the Robot to help it assist members in achieving a specific
+ * automation goal.
+ * Direct tools support narrowly scoped Robots, while Toolsets bundle tools
+ * with optional specialist instructions. Toolsets can be shared across
+ * Robots and can come from Storyden, members, or plugins.
  * @summary Create a robot
  */
 export const robotCreate = async (
@@ -176,7 +182,10 @@ export type RobotCreateMutationResult = NonNullable<
  */
 export const useRobotCreate = <
   TError =
-    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof robotCreate>>,
@@ -254,6 +263,335 @@ export const useRobotToolsList = <
     ...query,
   };
 };
+export const getRobotToolsetsListUrl = () => {
+  return `/robots/toolsets`;
+};
+
+/**
+ * List reusable Toolsets available to Robots. Toolsets group tools with
+ * optional instructions and may be provided by Storyden, members, or
+ * plugins.
+ * @summary List Robot Toolsets
+ */
+export const robotToolsetsList = async (
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotToolsetsListOKResponse> => {
+  return fetcher<RobotToolsetsListOKResponse>(getRobotToolsetsListUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getRobotToolsetsListKey = () => [`/robots/toolsets`] as const;
+
+export type RobotToolsetsListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof robotToolsetsList>>
+>;
+
+/**
+ * @summary List Robot Toolsets
+ */
+export const useRobotToolsetsList = <
+  TError =
+    UnauthorisedResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof robotToolsetsList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getRobotToolsetsListKey() : null));
+  const swrFn = () => robotToolsetsList(requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotToolsetCreateUrl = () => {
+  return `/robots/toolsets`;
+};
+
+/**
+ * Create a reusable member-authored Toolset.
+ * @summary Create a Robot Toolset
+ */
+export const robotToolsetCreate = async (
+  robotToolsetCreateBody: RobotToolsetCreateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotToolsetGetOKResponse> => {
+  return fetcher<RobotToolsetGetOKResponse>(getRobotToolsetCreateUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(robotToolsetCreateBody),
+  });
+};
+
+export const getRobotToolsetCreateMutationFetcher = (
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: RobotToolsetCreateBody }) => {
+    return robotToolsetCreate(arg, options);
+  };
+};
+export const getRobotToolsetCreateMutationKey = () =>
+  [`/robots/toolsets`] as const;
+
+export type RobotToolsetCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotToolsetCreate>>
+>;
+
+/**
+ * @summary Create a Robot Toolset
+ */
+export const useRobotToolsetCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof robotToolsetCreate>>,
+    TError,
+    Key,
+    RobotToolsetCreateBody,
+    Awaited<ReturnType<typeof robotToolsetCreate>>
+  > & { swrKey?: string };
+  request?: SecondParameter<typeof fetcher>;
+}) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getRobotToolsetCreateMutationKey();
+  const swrFn = getRobotToolsetCreateMutationFetcher(requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotToolsetGetUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Retrieve a built-in, custom, or plugin Toolset by ID.
+ * @summary Get a Robot Toolset
+ */
+export const robotToolsetGet = async (
+  toolsetId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotToolsetGetOKResponse> => {
+  return fetcher<RobotToolsetGetOKResponse>(getRobotToolsetGetUrl(toolsetId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getRobotToolsetGetKey = (toolsetId: string) =>
+  [`/robots/toolsets/${toolsetId}`] as const;
+
+export type RobotToolsetGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof robotToolsetGet>>
+>;
+
+/**
+ * @summary Get a Robot Toolset
+ */
+export const useRobotToolsetGet = <
+  TError =
+    UnauthorisedResponse | NotFoundResponse | InternalServerErrorResponse,
+>(
+  toolsetId: string,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof robotToolsetGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const isEnabled =
+    swrOptions?.enabled !== false &&
+    toolsetId !== null &&
+    toolsetId !== undefined;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getRobotToolsetGetKey(toolsetId) : null));
+  const swrFn = () => robotToolsetGet(toolsetId, requestOptions);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotToolsetUpdateUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Update a member-authored Toolset.
+ * @summary Update a Robot Toolset
+ */
+export const robotToolsetUpdate = async (
+  toolsetId: string,
+  robotToolsetUpdateBody: RobotToolsetUpdateBody,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<RobotToolsetGetOKResponse> => {
+  return fetcher<RobotToolsetGetOKResponse>(
+    getRobotToolsetUpdateUrl(toolsetId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(robotToolsetUpdateBody),
+    },
+  );
+};
+
+export const getRobotToolsetUpdateMutationFetcher = (
+  toolsetId: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, { arg }: { arg: RobotToolsetUpdateBody }) => {
+    return robotToolsetUpdate(toolsetId, arg, options);
+  };
+};
+export const getRobotToolsetUpdateMutationKey = (toolsetId: string) =>
+  [`/robots/toolsets/${toolsetId}`] as const;
+
+export type RobotToolsetUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotToolsetUpdate>>
+>;
+
+/**
+ * @summary Update a Robot Toolset
+ */
+export const useRobotToolsetUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  toolsetId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof robotToolsetUpdate>>,
+      TError,
+      Key,
+      RobotToolsetUpdateBody,
+      Awaited<ReturnType<typeof robotToolsetUpdate>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getRobotToolsetUpdateMutationKey(toolsetId);
+  const swrFn = getRobotToolsetUpdateMutationFetcher(toolsetId, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+export const getRobotToolsetDeleteUrl = (toolsetId: string) => {
+  return `/robots/toolsets/${toolsetId}`;
+};
+
+/**
+ * Delete an unused member-authored Toolset.
+ * @summary Delete a Robot Toolset
+ */
+export const robotToolsetDelete = async (
+  toolsetId: string,
+  options?: Parameters<typeof fetcher>[1],
+): Promise<void> => {
+  return fetcher<void>(getRobotToolsetDeleteUrl(toolsetId), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getRobotToolsetDeleteMutationFetcher = (
+  toolsetId: string,
+  options?: SecondParameter<typeof fetcher>,
+) => {
+  return (_: Key, __: { arg: Arguments }) => {
+    return robotToolsetDelete(toolsetId, options);
+  };
+};
+export const getRobotToolsetDeleteMutationKey = (toolsetId: string) =>
+  [`/robots/toolsets/${toolsetId}`] as const;
+
+export type RobotToolsetDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof robotToolsetDelete>>
+>;
+
+/**
+ * @summary Delete a Robot Toolset
+ */
+export const useRobotToolsetDelete = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | ConflictResponse
+    | InternalServerErrorResponse,
+>(
+  toolsetId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof robotToolsetDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof robotToolsetDelete>>
+    > & { swrKey?: string };
+    request?: SecondParameter<typeof fetcher>;
+  },
+) => {
+  const { swr: swrOptions, request: requestOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getRobotToolsetDeleteMutationKey(toolsetId);
+  const swrFn = getRobotToolsetDeleteMutationFetcher(toolsetId, requestOptions);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 export const getRobotChatSSEUrl = () => {
   return `/robots/chat/sse`;
 };
@@ -262,6 +600,11 @@ export const getRobotChatSSEUrl = () => {
  * Send a message to a Robot and receive its response. This endpoint
  * manages sessions automatically, creating new sessions as needed or
  * continuing existing sessions based on the provided session ID.
+ *
+ * New sessions use Denbot unless `robotId` selects a custom Robot. The
+ * selected Robot remains the root for that session. Denbot can search for
+ * Toolsets, load specialist capabilities, and
+ * delegate bounded work to custom Robots without leaving its session.
  *
  * Each message sent to the Robot is processed according to its playbook
  * and available tools, allowing it to perform actions or retrieve data
@@ -302,6 +645,7 @@ export const useRobotChatSSE = <
     | UnauthorisedResponse
     | ForbiddenResponse
     | NotFoundResponse
+    | ConflictResponse
     | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
@@ -1290,7 +1634,7 @@ export const getRobotUpdateUrl = (robotId: string) => {
 };
 
 /**
- * Update a Robot's name, description, playbook or available tools.
+ * Update a Robot's name, description, playbook, direct tools, or assigned Toolsets.
  * @summary Update a robot
  */
 export const robotUpdate = async (
@@ -1326,6 +1670,7 @@ export type RobotUpdateMutationResult = NonNullable<
  */
 export const useRobotUpdate = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | ForbiddenResponse
     | NotFoundResponse
@@ -1440,10 +1785,9 @@ export const getRobotSessionsListUrl = (params?: RobotSessionsListParams) => {
 
 /**
  * Get a paginated list of Robot sessions. These are chat sessions with the
- * Robot system. One session may span multiple Robots as members can switch
- * which Robot they are talking to mid conversation, or the Robot itself
- * may choose to switch to another Robot to achieve a goal. A session is a
- * representation of an entire conversation thread with the Robot system.
+ * Robot system. Denbot may delegate work to specialised Robots
+ * inside the same session. Delegated events retain their ADK branch and
+ * isolation scope so the execution tree remains inspectable.
  *
  * You may include an account ID to filter sessions by account. Only those
  * with "USE_ROBOTS" permission can use Robots, however sessions, messages

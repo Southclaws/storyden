@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/rs/xid"
 )
 
@@ -50,6 +51,34 @@ func (_c *RobotSessionMessageCreate) SetSessionID(v xid.ID) *RobotSessionMessage
 // SetInvocationID sets the "invocation_id" field.
 func (_c *RobotSessionMessageCreate) SetInvocationID(v string) *RobotSessionMessageCreate {
 	_c.mutation.SetInvocationID(v)
+	return _c
+}
+
+// SetBranch sets the "branch" field.
+func (_c *RobotSessionMessageCreate) SetBranch(v string) *RobotSessionMessageCreate {
+	_c.mutation.SetBranch(v)
+	return _c
+}
+
+// SetNillableBranch sets the "branch" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableBranch(v *string) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetBranch(*v)
+	}
+	return _c
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (_c *RobotSessionMessageCreate) SetIsolationScope(v string) *RobotSessionMessageCreate {
+	_c.mutation.SetIsolationScope(v)
+	return _c
+}
+
+// SetNillableIsolationScope sets the "isolation_scope" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableIsolationScope(v *string) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetIsolationScope(*v)
+	}
 	return _c
 }
 
@@ -96,7 +125,7 @@ func (_c *RobotSessionMessageCreate) SetNillableAccountID(v *xid.ID) *RobotSessi
 }
 
 // SetEventData sets the "event_data" field.
-func (_c *RobotSessionMessageCreate) SetEventData(v map[string]interface{}) *RobotSessionMessageCreate {
+func (_c *RobotSessionMessageCreate) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageCreate {
 	_c.mutation.SetEventData(v)
 	return _c
 }
@@ -255,6 +284,14 @@ func (_c *RobotSessionMessageCreate) createSpec() (*RobotSessionMessage, *sqlgra
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
 		_node.InvocationID = value
 	}
+	if value, ok := _c.mutation.Branch(); ok {
+		_spec.SetField(robotsessionmessage.FieldBranch, field.TypeString, value)
+		_node.Branch = value
+	}
+	if value, ok := _c.mutation.IsolationScope(); ok {
+		_spec.SetField(robotsessionmessage.FieldIsolationScope, field.TypeString, value)
+		_node.IsolationScope = value
+	}
 	if value, ok := _c.mutation.BuiltinRobot(); ok {
 		_spec.SetField(robotsessionmessage.FieldBuiltinRobot, field.TypeString, value)
 		_node.BuiltinRobot = &value
@@ -390,6 +427,42 @@ func (u *RobotSessionMessageUpsert) UpdateInvocationID() *RobotSessionMessageUps
 	return u
 }
 
+// SetBranch sets the "branch" field.
+func (u *RobotSessionMessageUpsert) SetBranch(v string) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldBranch, v)
+	return u
+}
+
+// UpdateBranch sets the "branch" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateBranch() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldBranch)
+	return u
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (u *RobotSessionMessageUpsert) ClearBranch() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldBranch)
+	return u
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (u *RobotSessionMessageUpsert) SetIsolationScope(v string) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldIsolationScope, v)
+	return u
+}
+
+// UpdateIsolationScope sets the "isolation_scope" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateIsolationScope() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldIsolationScope)
+	return u
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (u *RobotSessionMessageUpsert) ClearIsolationScope() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldIsolationScope)
+	return u
+}
+
 // SetRobotID sets the "robot_id" field.
 func (u *RobotSessionMessageUpsert) SetRobotID(v xid.ID) *RobotSessionMessageUpsert {
 	u.Set(robotsessionmessage.FieldRobotID, v)
@@ -445,7 +518,7 @@ func (u *RobotSessionMessageUpsert) ClearAccountID() *RobotSessionMessageUpsert 
 }
 
 // SetEventData sets the "event_data" field.
-func (u *RobotSessionMessageUpsert) SetEventData(v map[string]interface{}) *RobotSessionMessageUpsert {
+func (u *RobotSessionMessageUpsert) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageUpsert {
 	u.Set(robotsessionmessage.FieldEventData, v)
 	return u
 }
@@ -535,6 +608,48 @@ func (u *RobotSessionMessageUpsertOne) UpdateInvocationID() *RobotSessionMessage
 	})
 }
 
+// SetBranch sets the "branch" field.
+func (u *RobotSessionMessageUpsertOne) SetBranch(v string) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetBranch(v)
+	})
+}
+
+// UpdateBranch sets the "branch" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateBranch() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateBranch()
+	})
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (u *RobotSessionMessageUpsertOne) ClearBranch() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearBranch()
+	})
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (u *RobotSessionMessageUpsertOne) SetIsolationScope(v string) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetIsolationScope(v)
+	})
+}
+
+// UpdateIsolationScope sets the "isolation_scope" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateIsolationScope() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateIsolationScope()
+	})
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (u *RobotSessionMessageUpsertOne) ClearIsolationScope() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearIsolationScope()
+	})
+}
+
 // SetRobotID sets the "robot_id" field.
 func (u *RobotSessionMessageUpsertOne) SetRobotID(v xid.ID) *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
@@ -599,7 +714,7 @@ func (u *RobotSessionMessageUpsertOne) ClearAccountID() *RobotSessionMessageUpse
 }
 
 // SetEventData sets the "event_data" field.
-func (u *RobotSessionMessageUpsertOne) SetEventData(v map[string]interface{}) *RobotSessionMessageUpsertOne {
+func (u *RobotSessionMessageUpsertOne) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.SetEventData(v)
 	})
@@ -858,6 +973,48 @@ func (u *RobotSessionMessageUpsertBulk) UpdateInvocationID() *RobotSessionMessag
 	})
 }
 
+// SetBranch sets the "branch" field.
+func (u *RobotSessionMessageUpsertBulk) SetBranch(v string) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetBranch(v)
+	})
+}
+
+// UpdateBranch sets the "branch" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateBranch() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateBranch()
+	})
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (u *RobotSessionMessageUpsertBulk) ClearBranch() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearBranch()
+	})
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (u *RobotSessionMessageUpsertBulk) SetIsolationScope(v string) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetIsolationScope(v)
+	})
+}
+
+// UpdateIsolationScope sets the "isolation_scope" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateIsolationScope() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateIsolationScope()
+	})
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (u *RobotSessionMessageUpsertBulk) ClearIsolationScope() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearIsolationScope()
+	})
+}
+
 // SetRobotID sets the "robot_id" field.
 func (u *RobotSessionMessageUpsertBulk) SetRobotID(v xid.ID) *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
@@ -922,7 +1079,7 @@ func (u *RobotSessionMessageUpsertBulk) ClearAccountID() *RobotSessionMessageUps
 }
 
 // SetEventData sets the "event_data" field.
-func (u *RobotSessionMessageUpsertBulk) SetEventData(v map[string]interface{}) *RobotSessionMessageUpsertBulk {
+func (u *RobotSessionMessageUpsertBulk) SetEventData(v schema.RobotSessionEvent) *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.SetEventData(v)
 	})

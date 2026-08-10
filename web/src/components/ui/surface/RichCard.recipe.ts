@@ -17,6 +17,7 @@ export const richCard = defineSlotRecipe({
     "headerContainer",
     "menuContainer",
     "titleContainer",
+    "titleIcon",
     "title",
     "contentContainer",
     "mediaContainer",
@@ -65,7 +66,22 @@ export const richCard = defineSlotRecipe({
     titleContainer: {
       display: "flex",
       flexDirection: "row",
+      alignItems: "center",
       gap: "1",
+    },
+
+    titleIcon: {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: "0",
+      width: "4",
+      height: "4",
+      color: "text.muted",
+      "& svg": {
+        width: "full",
+        height: "full",
+      },
     },
 
     title: {

@@ -214,6 +214,11 @@ type OperationPermissions interface {
 	RobotsList() (bool, *rbac.Permission)
 	RobotCreate() (bool, *rbac.Permission)
 	RobotToolsList() (bool, *rbac.Permission)
+	RobotToolsetsList() (bool, *rbac.Permission)
+	RobotToolsetCreate() (bool, *rbac.Permission)
+	RobotToolsetGet() (bool, *rbac.Permission)
+	RobotToolsetUpdate() (bool, *rbac.Permission)
+	RobotToolsetDelete() (bool, *rbac.Permission)
 	RobotChatSSE() (bool, *rbac.Permission)
 	RobotProvidersList() (bool, *rbac.Permission)
 	RobotProviderUpdate() (bool, *rbac.Permission)
@@ -666,6 +671,16 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.RobotCreate()
 	case "RobotToolsList":
 		return optable.RobotToolsList()
+	case "RobotToolsetsList":
+		return optable.RobotToolsetsList()
+	case "RobotToolsetCreate":
+		return optable.RobotToolsetCreate()
+	case "RobotToolsetGet":
+		return optable.RobotToolsetGet()
+	case "RobotToolsetUpdate":
+		return optable.RobotToolsetUpdate()
+	case "RobotToolsetDelete":
+		return optable.RobotToolsetDelete()
 	case "RobotChatSSE":
 		return optable.RobotChatSSE()
 	case "RobotProvidersList":
