@@ -114,6 +114,18 @@ func application() fx.Option {
 }
 
 func isMaybeProdDB(url string) bool {
+	// Allow Turso testing databases (used in CI)
+	safePatterns := []string{
+		"storyden-test",  // manual testing
+		"storyden-ci-",   // CI automated testing
+	}
+
+	for _, safe := range safePatterns {
+		if strings.Contains(url, safe) {
+			return false
+		}
+	}
+
 	dangerous := []string{
 		"free-tier",
 		".aws-eu-central",
