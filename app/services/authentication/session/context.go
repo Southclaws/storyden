@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 )
@@ -36,6 +37,10 @@ type sessionContext struct {
 	// sessionToken stores the session token for later revocation during logout.
 	// This is only populated for browser sessions, not access keys.
 	sessionToken opt.Optional[string]
+
+	// accessKeyKind is only populated when securityScheme is "access_key", to
+	// distinguish a member's personal key from a plugin/robot's bot key.
+	accessKeyKind opt.Optional[access_key.AccessKeyKind]
 }
 
 func WithAccount(ctx context.Context, u account.Account, roles role.Roles) context.Context {
@@ -71,6 +76,16 @@ func WithAccessKeyPermissions(ctx context.Context, u account.Account, permission
 		securityScheme: "access_key",
 		sessionToken:   opt.NewEmpty[string](),
 	})
+}
+
+// WithAccessKeyOfKind is identical to WithAccessKey but also records which
+// kind of access key (personal or bot) authenticated the request, for
+// operations that must be restricted to a member's own personal key.
+func WithAccessKeyOfKind(ctx context.Context, u account.Account, roles role.Roles, kind access_key.AccessKeyKind) context.Context {
+	ctx = WithAccessKey(ctx, u, roles)
+	sc := ctx.Value(sessionContextKey).(sessionContext)
+	sc.accessKeyKind = opt.New(kind)
+	return context.WithValue(ctx, sessionContextKey, sc)
 }
 
 func WithOAuthToken(ctx context.Context, u account.Account, permissions rbac.Permissions, scopes []string) context.Context {
@@ -250,6 +265,22 @@ func GetOptAccount(ctx context.Context) opt.Optional[account.Account] {
 	}
 
 	return opt.New(acc)
+}
+
+// GetAccessKeyKind retrieves the access key kind from the context if present.
+// This is only populated when GetSecurityScheme returns "access_key".
+func GetAccessKeyKind(ctx context.Context) opt.Optional[access_key.AccessKeyKind] {
+	value := ctx.Value(sessionContextKey)
+	if value == nil {
+		return opt.NewEmpty[access_key.AccessKeyKind]()
+	}
+
+	sc, ok := value.(sessionContext)
+	if !ok {
+		return opt.NewEmpty[access_key.AccessKeyKind]()
+	}
+
+	return sc.accessKeyKind
 }
 
 // GetSessionToken retrieves the session token from the context if present.

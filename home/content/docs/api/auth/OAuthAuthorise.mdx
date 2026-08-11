@@ -1,17 +1,23 @@
 ---
 title: O Auth Authorise
 description: |
-  Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+  Start the OAuth 2.0 Authorization Code flow with PKCE.
 
-  This endpoint requires a browser session. If the account is not signed
-  in, Storyden redirects to the frontend login route instead of returning
-  a protocol redirect to the client application.
+  This endpoint accepts either a browser session (`storyden-session`
+  cookie) or a personal access key (`Authorization: Bearer <key>`),
+  letting a headless script drive the whole flow without ever loading
+  the web frontend. If neither credential is present, Storyden redirects
+  to a login URL instead of returning a protocol redirect to the client
+  application; this defaults to the frontend login route and can be
+  changed with `OAUTH_AUTHORISATION_LOGIN_URL`.
 
   Unlike many OAuth servers, Storyden does not render a consent page from
   this API endpoint. A valid request creates a short-lived pending
-  authorisation request and redirects the browser to the configured
-  frontend authorisation-code consent URL. Custom frontends can change
-  this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+  authorisation request and redirects to the configured
+  authorisation-code consent URL. A script can parse `request_id` out of
+  that redirect's query string and drive `/oauth/authorize/consent`
+  directly instead of following the redirect in a browser. Custom
+  frontends can change this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
 
   The `scope` parameter follows OAuth 2.0 and is optional. Empty or
   omitted scope means no requested scopes. Storyden permission scopes are
@@ -26,15 +32,22 @@ _openapi:
     headings: []
     contents:
       - content: >
-          Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+          Start the OAuth 2.0 Authorization Code flow with PKCE.
 
 
-          This endpoint requires a browser session. If the account is not signed
+          This endpoint accepts either a browser session (`storyden-session`
 
-          in, Storyden redirects to the frontend login route instead of
-          returning
+          cookie) or a personal access key (`Authorization: Bearer <key>`),
 
-          a protocol redirect to the client application.
+          letting a headless script drive the whole flow without ever loading
+
+          the web frontend. If neither credential is present, Storyden redirects
+
+          to a login URL instead of returning a protocol redirect to the client
+
+          application; this defaults to the frontend login route and can be
+
+          changed with `OAUTH_AUTHORISATION_LOGIN_URL`.
 
 
           Unlike many OAuth servers, Storyden does not render a consent page
@@ -42,11 +55,16 @@ _openapi:
 
           this API endpoint. A valid request creates a short-lived pending
 
-          authorisation request and redirects the browser to the configured
+          authorisation request and redirects to the configured
 
-          frontend authorisation-code consent URL. Custom frontends can change
+          authorisation-code consent URL. A script can parse `request_id` out of
 
-          this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+          that redirect's query string and drive `/oauth/authorize/consent`
+
+          directly instead of following the redirect in a browser. Custom
+
+          frontends can change this URL with
+          `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
 
 
           The `scope` parameter follows OAuth 2.0 and is optional. Empty or

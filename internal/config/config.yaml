@@ -482,6 +482,12 @@
       description: |-
         Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
 
+    - env: OAUTH_AUTHORISATION_LOGIN_URL
+      name: OAuthAuthorisationLoginURL
+      type: net/url.URL
+      description: |-
+        Frontend URL to redirect unauthenticated users to when starting the OAuth Authorization Code flow without a session. Defaults to `{PUBLIC_WEB_ADDRESS}/login` when unset.
+
     - env: OAUTH_SIGNING_KEY_BASE64
       name: OAuthSigningKeyBase64
       type: string

@@ -313,6 +313,8 @@ type Config struct {
 	OAuthDeviceAuthorisationConsentURL url.URL `envconfig:"OAUTH_DEVICE_AUTHORISATION_CONSENT_URL"`
 	// Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
 	OAuthAuthorisationCodeConsentURL url.URL `envconfig:"OAUTH_AUTHORISATION_CODE_CONSENT_URL"`
+	// Frontend URL to redirect unauthenticated users to when starting the OAuth Authorization Code flow without a session. Defaults to `{PUBLIC_WEB_ADDRESS}/login` when unset.
+	OAuthAuthorisationLoginURL url.URL `envconfig:"OAUTH_AUTHORISATION_LOGIN_URL"`
 	// Base64-encoded PEM private signing key used for OAuth2/OIDC JWT signing.
 	OAuthSigningKeyBase64 string `envconfig:"OAUTH_SIGNING_KEY_BASE64"`
 	// Optional JWT key ID (kid) for OAuth signing keys.

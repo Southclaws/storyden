@@ -1249,17 +1249,23 @@ export const getOAuthAuthoriseUrl = (params: OAuthAuthoriseParams) => {
 };
 
 /**
- * Start the browser-based OAuth 2.0 Authorization Code flow with PKCE.
+ * Start the OAuth 2.0 Authorization Code flow with PKCE.
  *
- * This endpoint requires a browser session. If the account is not signed
- * in, Storyden redirects to the frontend login route instead of returning
- * a protocol redirect to the client application.
+ * This endpoint accepts either a browser session (`storyden-session`
+ * cookie) or a personal access key (`Authorization: Bearer <key>`),
+ * letting a headless script drive the whole flow without ever loading
+ * the web frontend. If neither credential is present, Storyden redirects
+ * to a login URL instead of returning a protocol redirect to the client
+ * application; this defaults to the frontend login route and can be
+ * changed with `OAUTH_AUTHORISATION_LOGIN_URL`.
  *
  * Unlike many OAuth servers, Storyden does not render a consent page from
  * this API endpoint. A valid request creates a short-lived pending
- * authorisation request and redirects the browser to the configured
- * frontend authorisation-code consent URL. Custom frontends can change
- * this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
+ * authorisation request and redirects to the configured
+ * authorisation-code consent URL. A script can parse `request_id` out of
+ * that redirect's query string and drive `/oauth/authorize/consent`
+ * directly instead of following the redirect in a browser. Custom
+ * frontends can change this URL with `OAUTH_AUTHORISATION_CODE_CONSENT_URL`.
  *
  * The `scope` parameter follows OAuth 2.0 and is optional. Empty or
  * omitted scope means no requested scopes. Storyden permission scopes are
@@ -1287,6 +1293,7 @@ export const useOAuthAuthorise = <
   TError =
     | OAuthAuthoriseFoundResponse
     | OAuthErrorResponse
+    | ForbiddenResponse
     | InternalServerErrorResponse,
 >(
   params: OAuthAuthoriseParams,
@@ -1337,12 +1344,13 @@ export const getOAuthAuthoriseConsentUrl = (
 
 /**
  * Read a pending OAuth authorisation code request for a signed-in user
- * before they approve or deny consent in the frontend.
+ * before they approve or deny consent.
  *
  * This is a Storyden frontend/API integration endpoint, not an OAuth
  * protocol endpoint. It returns the client, redirect URI, requested
- * scopes, and currently grantable scopes so the frontend can render a
- * consent screen.
+ * scopes, and currently grantable scopes so a caller can render a
+ * consent screen or, for headless integrations, decide programmatically.
+ * Accepts either a browser session or a personal access key.
  */
 export const oAuthAuthoriseConsent = async (
   params?: OAuthAuthoriseConsentParams,
@@ -1367,7 +1375,10 @@ export type OAuthAuthoriseConsentQueryResult = NonNullable<
 
 export const useOAuthAuthoriseConsent = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(
   params?: OAuthAuthoriseConsentParams,
   options?: {
@@ -1410,7 +1421,8 @@ export const getOAuthAuthoriseConsentSubmitUrl = () => {
  * denial the returned redirect URI contains `error=access_denied`.
  *
  * Storyden recomputes the granted scope at approval time from current
- * account permissions and client policy.
+ * account permissions and client policy. Accepts either a browser
+ * session or a personal access key.
  */
 export const oAuthAuthoriseConsentSubmit = async (
   oAuthAuthoriseConsentSubmitBody: OAuthAuthoriseConsentSubmitBody,
@@ -1443,7 +1455,10 @@ export type OAuthAuthoriseConsentSubmitMutationResult = NonNullable<
 
 export const useOAuthAuthoriseConsentSubmit = <
   TError =
-    OAuthErrorResponse | UnauthorisedResponse | InternalServerErrorResponse,
+    | OAuthErrorResponse
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | InternalServerErrorResponse,
 >(options?: {
   swr?: SWRMutationConfiguration<
     Awaited<ReturnType<typeof oAuthAuthoriseConsentSubmit>>,

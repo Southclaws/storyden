@@ -247,6 +247,16 @@ func (s *Service) authorizationCodeConsentURL(requestID string) string {
 	return u.String()
 }
 
+func (s *Service) LoginURL() string {
+	base := s.cfg.OAuthAuthorisationLoginURL
+	if !base.IsAbs() || base.Host == "" {
+		base = s.cfg.PublicWebAddress
+		base.Path = strings.TrimRight(base.Path, "/") + "/login"
+	}
+
+	return base.String()
+}
+
 func b64url(b []byte) string {
 	return base64.RawURLEncoding.EncodeToString(b)
 }

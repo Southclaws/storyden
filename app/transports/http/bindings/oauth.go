@@ -31,7 +31,6 @@ type OAuth struct {
 	oauth      *oauthservice.Service
 	remote     *oauthremote.Service
 	apiAddress url.URL
-	webAddress url.URL
 }
 
 func NewOAuth(cfg config.Config, oauth *oauthservice.Service, remote *oauthremote.Service, router *echo.Echo) OAuth {
@@ -40,7 +39,6 @@ func NewOAuth(cfg config.Config, oauth *oauthservice.Service, remote *oauthremot
 		oauth:      oauth,
 		remote:     remote,
 		apiAddress: cfg.PublicAPIAddress,
-		webAddress: cfg.PublicWebAddress,
 	}
 }
 
@@ -548,9 +546,7 @@ func (o OAuth) OAuthAuthorise(ctx context.Context, req openapi.OAuthAuthoriseReq
 	if err != nil {
 		return openapi.OAuthAuthorise302Response{
 			Headers: openapi.OAuthAuthoriseFoundResponseHeaders{
-				// TODO: Make this configurable, the API should not depend on
-				// frontend implementation path design and route layout etc.
-				Location: ptr(o.webAddress.String() + "/login"),
+				Location: ptr(o.oauth.LoginURL()),
 			},
 		}, nil
 	}
@@ -597,7 +593,6 @@ func (o OAuth) OAuthAuthoriseConsent(ctx context.Context, req openapi.OAuthAutho
 	if err != nil {
 		return nil, err
 	}
-
 	requestID := ""
 	if req.Params.RequestId != nil {
 		requestID = string(*req.Params.RequestId)
@@ -649,7 +644,6 @@ func (o OAuth) OAuthAuthoriseConsentSubmit(ctx context.Context, req openapi.OAut
 	if err != nil {
 		return nil, err
 	}
-
 	result, oauthErr, err := o.oauth.SubmitAuthorisationConsent(ctx, account.AccountID(acc), permissions, req.Body.RequestId, req.Body.Decision == openapi.OAuthAuthoriseDecisionApprove)
 	if err != nil {
 		return nil, err
