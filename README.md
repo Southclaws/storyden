@@ -1,3 +1,5 @@
+[![MCP Toplist](https://mcptoplist.com/badge/glama%2FSouthclaws%2Fstoryden.svg)](https://mcptoplist.com/server/glama%2FSouthclaws%2Fstoryden)
+
 <p align="center">
   <a aria-label="storyden logo" href="https://storyden.org">
     <img src="home/public/opengraph-1584-396.png"  />
