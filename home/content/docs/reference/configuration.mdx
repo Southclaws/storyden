@@ -628,6 +628,15 @@ Frontend URL used by OAuth Device Authorization Grant users to approve or deny c
 
 Frontend URL used by OAuth Authorization Code Grant users to approve or deny consent.
 
+### `OAUTH_AUTHORISATION_LOGIN_URL`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Frontend URL to redirect unauthenticated users to when starting the OAuth Authorization Code flow without a session. Defaults to `{PUBLIC_WEB_ADDRESS}/login` when unset.
+
 ### `OAUTH_SIGNING_KEY_BASE64`
 
 <table>

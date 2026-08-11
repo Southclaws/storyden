@@ -150,7 +150,7 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, *acc, roles), nil
+	return WithAccessKeyOfKind(ctx, *acc, roles, ark.Kind), nil
 }
 
 // ValidateOAuthToken validates an OAuth access token and returns a context with account info.
