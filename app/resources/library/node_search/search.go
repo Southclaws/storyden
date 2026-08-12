@@ -127,7 +127,7 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 			cq.WithOwner()
 		}).
 		WithPrimaryImage().
-		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).
+		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()), node.ByID(sql.OrderDesc())).
 		Limit(params.Limit()).
 		Offset(params.Offset())
 
