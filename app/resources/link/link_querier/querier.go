@@ -33,7 +33,7 @@ type Filter func(*ent.LinkQuery)
 
 func WithURL(s string) Filter {
 	return func(lq *ent.LinkQuery) {
-		lq.Where(link_ent.URLContainsFold(s))
+		lq.Where(link_ent.URLEQ(s))
 	}
 }
 
