@@ -42,7 +42,7 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 		WithAuthor().
 		WithTags().
 		WithRoot().
-		Order(ent.Asc(ent_post.FieldCreatedAt)).
+		Order(ent.Asc(ent_post.FieldCreatedAt), ent.Asc(ent_post.FieldID)).
 		Limit(params.Limit()).
 		Offset(params.Offset())
 
