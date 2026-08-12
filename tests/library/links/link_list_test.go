@@ -112,6 +112,31 @@ func TestLinkListPaging(t *testing.T) {
 
 				a.Equal(1, first.JSON200.CurrentPage)
 				a.Nil(first.JSON200.NextPage, "every match fits on the default page")
+
+				bulk := uuid.NewString()[:8]
+				const overflow = 55
+				for i := range overflow {
+					_, err := lw.Store(ctx,
+						fmt.Sprintf("https://%s.example.com/%d", bulk, i),
+						fmt.Sprintf("%s title %d", bulk, i),
+						"enough links to need a second page",
+					)
+					r.NoError(err)
+				}
+
+				page1, err := cl.LinkListWithResponse(root, &openapi.LinkListParams{Q: &bulk}, session)
+				tests.Ok(t, err, page1)
+				r.NotNil(page1.JSON200.NextPage)
+				a.Equal(1, page1.JSON200.CurrentPage)
+				a.Equal(2, *page1.JSON200.NextPage, "the next page number is the one the client sends back")
+				a.Len(page1.JSON200.Links, 50)
+
+				second := "2"
+				page2, err := cl.LinkListWithResponse(root, &openapi.LinkListParams{Q: &bulk, Page: &second}, session)
+				tests.Ok(t, err, page2)
+				a.Equal(2, page2.JSON200.CurrentPage)
+				a.Nil(page2.JSON200.NextPage)
+				a.Len(page2.JSON200.Links, overflow-50)
 			})
 		}))
 	}))
