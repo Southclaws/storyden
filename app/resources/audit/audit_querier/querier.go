@@ -64,7 +64,7 @@ func (q *Querier) List(
 	}
 
 	results, err := query.
-		Order(ent_auditlog.ByCreatedAt(sql.OrderDesc())).
+		Order(ent_auditlog.ByCreatedAt(sql.OrderDesc()), ent_auditlog.ByID(sql.OrderDesc())).
 		Limit(page.Limit()).
 		Offset(page.Offset()).
 		All(ctx)
