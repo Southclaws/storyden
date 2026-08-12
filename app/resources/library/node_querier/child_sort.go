@@ -70,7 +70,8 @@ order by
     when 'boolean'   then cast(p.value as integer)
     else p.value
 
-  end %s
+  end %s,
+  n.id asc
 
 limit  %d
 offset %d
@@ -90,7 +91,8 @@ order by
   case f.type when 'number'    then cast(p.value as numeric)           end %s,
   case f.type when 'timestamp' then cast(p.value as timestamp)         end %s,
   case f.type when 'boolean'   then cast(p.value as boolean)           end %s,
-  p.value %s
+  p.value %s,
+  n.id asc
 limit  %d
 offset %d
 `
