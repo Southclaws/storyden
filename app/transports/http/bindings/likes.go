@@ -11,23 +11,27 @@ import (
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Likes struct {
-	likeQuerier *like_querier.LikeQuerier
-	postLiker   *post_liker.PostLiker
+	likeQuerier  *like_querier.LikeQuerier
+	postLiker    *post_liker.PostLiker
+	profileQuery *profile_querier.Querier
 }
 
 func NewLikes(
 	likeQuerier *like_querier.LikeQuerier,
 	postLiker *post_liker.PostLiker,
+	profileQuery *profile_querier.Querier,
 ) Likes {
 	return Likes{
-		likeQuerier: likeQuerier,
-		postLiker:   postLiker,
+		likeQuerier:  likeQuerier,
+		postLiker:    postLiker,
+		profileQuery: profileQuery,
 	}
 }
 
@@ -81,7 +85,7 @@ func (h *Likes) LikePostRemove(ctx context.Context, request openapi.LikePostRemo
 }
 
 func (h *Likes) LikeProfileGet(ctx context.Context, request openapi.LikeProfileGetRequestObject) (openapi.LikeProfileGetResponseObject, error) {
-	accountID, err := session.GetAccountID(ctx)
+	accountID, err := openapi.ResolveHandle(ctx, h.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
