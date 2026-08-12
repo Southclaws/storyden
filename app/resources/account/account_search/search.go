@@ -166,7 +166,9 @@ func (q *Querier) Search(ctx context.Context, params pagination.Parameters, filt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	aq.Limit(params.Limit()).Offset(params.Offset())
+	aq.Order(ent.Desc(account_ent.FieldCreatedAt), ent.Desc(account_ent.FieldID)).
+		Limit(params.Limit()).
+		Offset(params.Offset())
 
 	results, err := aq.All(ctx)
 	if err != nil {
