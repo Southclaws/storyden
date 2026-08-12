@@ -2,12 +2,10 @@ package bindings
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/like/item_like"
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
@@ -88,36 +86,21 @@ func (h *Likes) LikeProfileGet(ctx context.Context, request openapi.LikeProfileG
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pageSize := 50
+	params := deserialisePageParams(request.Params.Page, 50)
 
-	page := opt.NewPtrMap(request.Params.Page, func(s string) int {
-		v, err := strconv.ParseInt(s, 10, 32)
-		if err != nil {
-			return 0
-		}
-
-		return max(1, int(v))
-	}).Or(1)
-
-	// API is 1-indexed, internally it's 0-indexed.
-	page = max(0, page-1)
-
-	result, err := h.likeQuerier.GetProfileLikes(ctx, accountID, page, pageSize)
+	result, err := h.likeQuerier.GetProfileLikes(ctx, accountID, params)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// API is 1-indexed, internally it's 0-indexed.
-	page = result.CurrentPage + 1
-
 	return openapi.LikeProfileGet200JSONResponse{
 		LikeProfileGetOKJSONResponse: openapi.LikeProfileGetOKJSONResponse{
-			PageSize:    pageSize,
+			PageSize:    result.Size,
 			Results:     result.Results,
 			TotalPages:  result.TotalPages,
-			CurrentPage: page,
+			CurrentPage: result.CurrentPage,
 			NextPage:    result.NextPage.Ptr(),
-			Likes:       dt.Map(result.Likes, serialiseProfileLike),
+			Likes:       dt.Map(result.Items, serialiseProfileLike),
 		},
 	}, nil
 }
