@@ -2,18 +2,17 @@ package link_querier
 
 import (
 	"context"
-	"math"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/role/role_hydrate"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/link"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/internal/ent"
 	link_ent "github.com/Southclaws/storyden/internal/ent/link"
 )
@@ -28,15 +27,6 @@ func New(db *ent.Client, roleQuerier *role_hydrate.Hydrator) *LinkQuerier {
 		db:          db,
 		roleQuerier: roleQuerier,
 	}
-}
-
-type Result struct {
-	PageSize    int
-	Results     int
-	TotalPages  int
-	CurrentPage int
-	NextPage    opt.Optional[int]
-	Links       []*link_ref.LinkRef
 }
 
 type Filter func(*ent.LinkQuery)
@@ -119,45 +109,33 @@ func (d *LinkQuerier) GetByID(ctx context.Context, id link.LinkID) (*link_ref.Li
 	return link, nil
 }
 
-func (d *LinkQuerier) Search(ctx context.Context, page int, size int, filters ...Filter) (*Result, error) {
-	total, err := d.db.Link.Query().Count(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	query := d.db.Link.Query().
-		WithPrimaryImage().
-		WithFaviconImage().
-		Limit(size + 1).
-		Offset(page * size).
-		Order(ent.Desc(link_ent.FieldCreatedAt))
+func (d *LinkQuerier) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*link_ref.LinkRef], error) {
+	query := d.db.Link.Query()
 
 	for _, fn := range filters {
 		fn(query)
 	}
 
-	query.WithAssets()
-
-	r, err := query.All(ctx)
+	total, err := query.Clone().Count(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	isNextPage := len(r) >= size
-	nextPage := opt.NewSafe(page+1, isNextPage)
-
-	if isNextPage {
-		r = r[:len(r)-1]
+	r, err := query.
+		WithPrimaryImage().
+		WithFaviconImage().
+		WithAssets().
+		Limit(params.Limit()).
+		Offset(params.Offset()).
+		Order(ent.Desc(link_ent.FieldCreatedAt), ent.Desc(link_ent.FieldID)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	links := dt.Map(r, link_ref.Map)
 
-	return &Result{
-		PageSize:    size,
-		Results:     len(links),
-		TotalPages:  int(math.Ceil(float64(total) / float64(size))),
-		CurrentPage: page,
-		NextPage:    nextPage,
-		Links:       links,
-	}, nil
+	result := pagination.NewPageResult(params, total, links)
+
+	return &result, nil
 }
