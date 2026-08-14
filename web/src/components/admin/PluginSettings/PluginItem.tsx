@@ -1,4 +1,6 @@
 import { formatDate } from "date-fns";
+import Link from "next/link";
+import { MouseEvent } from "react";
 import { useSWRConfig } from "swr";
 
 import { mutateTransaction } from "@/api/mutate";
@@ -10,9 +12,10 @@ import { Plugin, PluginListOKResponse } from "@/api/openapi-schema";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CardBox } from "@/components/ui/card-box";
 import { Text } from "@/components/ui/text";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
-import { cardBox } from "@/styled-system/recipes";
+import { linkOverlay } from "@/styled-system/patterns";
 
 import { PluginStatusBadge } from "./PluginStatusBadge";
 import { useSelectedPlugin } from "./useSelectedPlugin";
@@ -51,16 +54,25 @@ export function PluginItem({ plugin }: Props) {
 
   const isError = plugin.status.active_state === "error";
 
-  const handleSelectPlugin = () => {
+  const handleSelectPlugin = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) {
+      return;
+    }
+
+    e.preventDefault();
     setSelectedPlugin(plugin.id);
   };
 
   return (
-    <li className={cardBox()}>
+    <CardBox as="li" position="relative">
       <LStack>
         <WStack alignItems="center" justifyContent="space-between">
           <HStack alignItems="center">
-            <a href="#" onClick={handleSelectPlugin}>
+            <Link
+              className={linkOverlay()}
+              href={`?plugin=${plugin.id}`}
+              onClick={handleSelectPlugin}
+            >
               <Text
                 variant="supporting"
                 color="text.default"
@@ -69,7 +81,7 @@ export function PluginItem({ plugin }: Props) {
               >
                 {plugin.name}
               </Text>
-            </a>
+            </Link>
             <PluginVersionBadge plugin={plugin} />
           </HStack>
 
@@ -81,7 +93,7 @@ export function PluginItem({ plugin }: Props) {
             Installed: <time>{formatDate(plugin.added_at, "PPpp")}</time>
           </Text>
 
-          <HStack>
+          <HStack position="relative" zIndex="docked">
             {isConfirming ? (
               <>
                 <Button
@@ -109,7 +121,7 @@ export function PluginItem({ plugin }: Props) {
           </Text>
         )}
       </LStack>
-    </li>
+    </CardBox>
   );
 }
 

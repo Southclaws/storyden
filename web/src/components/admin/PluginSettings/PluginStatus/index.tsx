@@ -55,7 +55,7 @@ export function PluginStatus({ plugin }: Props) {
     <CardBox className={lstack()} gap="2">
       <WStack justifyContent="space-between">
         <HStack>
-          <BackAction />
+          <BackAction fallbackHref="/admin/plugins" />
           <PageHeading lineClamp="1">{data.name}</PageHeading>
         </HStack>
 

@@ -1,5 +1,5 @@
 import { useQueryState } from "nuqs";
 
 export function useSelectedPlugin() {
-  return useQueryState("plugin");
+  return useQueryState("plugin", { history: "push" });
 }
