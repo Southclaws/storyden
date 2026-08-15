@@ -25,6 +25,10 @@ import (
 )
 
 func TestThreadListPagesWhenThreadsShareATimestamp(t *testing.T) {
+	if tests.IsSharedPostgresDatabase() {
+		t.Skip("skipping thread list paging test on shared postgres database")
+	}
+
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
