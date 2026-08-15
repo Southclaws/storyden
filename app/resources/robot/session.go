@@ -31,7 +31,7 @@ type Session struct {
 }
 
 func MapSession(s *ent.RobotSession, messages []*ent.RobotSessionMessage) (*Session, error) {
-	user, err := account.MapRef(s.Edges.User)
+	user, err := mapSessionCreator(s)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -55,7 +55,7 @@ func MapSession(s *ent.RobotSession, messages []*ent.RobotSessionMessage) (*Sess
 }
 
 func MapSessionRef(s *ent.RobotSession) (*session_ref.Ref, error) {
-	user, err := account.MapRef(s.Edges.User)
+	user, err := mapSessionCreator(s)
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +67,12 @@ func MapSessionRef(s *ent.RobotSession) (*session_ref.Ref, error) {
 		Name:      s.Name,
 		Human:     *user,
 	}, nil
+}
+
+func mapSessionCreator(s *ent.RobotSession) (*account.Account, error) {
+	creator, err := s.Edges.CreatorOrErr()
+	if err != nil {
+		return nil, err
+	}
+	return account.MapRef(creator)
 }

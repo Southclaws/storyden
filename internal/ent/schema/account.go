@@ -178,7 +178,10 @@ func (Account) Edges() []ent.Edge {
 		edge.To("robot_mcp_servers", RobotMCPServer.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("robot_sessions", RobotSession.Type).
+		edge.To("created_robot_sessions", RobotSession.Type).
+			Annotations(entsql.OnDelete(entsql.Restrict)),
+
+		edge.To("robot_session_views", RobotSessionView.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("robot_messages", RobotSessionMessage.Type).

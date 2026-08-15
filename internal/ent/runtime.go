@@ -49,6 +49,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
@@ -1779,6 +1780,10 @@ func init() {
 	robotsessionDescName := robotsessionFields[0].Descriptor()
 	// robotsession.DefaultName holds the default value on creation for the name field.
 	robotsession.DefaultName = robotsessionDescName.Default.(func() string)
+	// robotsessionDescLeaseGeneration is the schema descriptor for lease_generation field.
+	robotsessionDescLeaseGeneration := robotsessionFields[6].Descriptor()
+	// robotsession.DefaultLeaseGeneration holds the default value on creation for the lease_generation field.
+	robotsession.DefaultLeaseGeneration = robotsessionDescLeaseGeneration.Default.(uint64)
 	// robotsessionDescID is the schema descriptor for id field.
 	robotsessionDescID := robotsessionMixinFields0[0].Descriptor()
 	// robotsession.DefaultID holds the default value on creation for the id field.
@@ -1817,6 +1822,49 @@ func init() {
 	// robotsessionmessage.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	robotsessionmessage.IDValidator = func() func(string) error {
 		validators := robotsessionmessageDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	robotsessionviewMixin := schema.RobotSessionView{}.Mixin()
+	robotsessionviewMixinFields0 := robotsessionviewMixin[0].Fields()
+	_ = robotsessionviewMixinFields0
+	robotsessionviewMixinFields1 := robotsessionviewMixin[1].Fields()
+	_ = robotsessionviewMixinFields1
+	robotsessionviewMixinFields2 := robotsessionviewMixin[2].Fields()
+	_ = robotsessionviewMixinFields2
+	robotsessionviewFields := schema.RobotSessionView{}.Fields()
+	_ = robotsessionviewFields
+	// robotsessionviewDescCreatedAt is the schema descriptor for created_at field.
+	robotsessionviewDescCreatedAt := robotsessionviewMixinFields1[0].Descriptor()
+	// robotsessionview.DefaultCreatedAt holds the default value on creation for the created_at field.
+	robotsessionview.DefaultCreatedAt = robotsessionviewDescCreatedAt.Default.(func() time.Time)
+	// robotsessionviewDescUpdatedAt is the schema descriptor for updated_at field.
+	robotsessionviewDescUpdatedAt := robotsessionviewMixinFields2[0].Descriptor()
+	// robotsessionview.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	robotsessionview.DefaultUpdatedAt = robotsessionviewDescUpdatedAt.Default.(func() time.Time)
+	// robotsessionview.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	robotsessionview.UpdateDefaultUpdatedAt = robotsessionviewDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// robotsessionviewDescLastAccessedAt is the schema descriptor for last_accessed_at field.
+	robotsessionviewDescLastAccessedAt := robotsessionviewFields[2].Descriptor()
+	// robotsessionview.DefaultLastAccessedAt holds the default value on creation for the last_accessed_at field.
+	robotsessionview.DefaultLastAccessedAt = robotsessionviewDescLastAccessedAt.Default.(func() time.Time)
+	// robotsessionviewDescID is the schema descriptor for id field.
+	robotsessionviewDescID := robotsessionviewMixinFields0[0].Descriptor()
+	// robotsessionview.DefaultID holds the default value on creation for the id field.
+	robotsessionview.DefaultID = robotsessionviewDescID.Default.(func() xid.ID)
+	// robotsessionview.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	robotsessionview.IDValidator = func() func(string) error {
+		validators := robotsessionviewDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

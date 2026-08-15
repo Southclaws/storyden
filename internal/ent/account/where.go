@@ -1659,21 +1659,44 @@ func HasRobotMcpServersWith(preds ...predicate.RobotMCPServer) predicate.Account
 	})
 }
 
-// HasRobotSessions applies the HasEdge predicate on the "robot_sessions" edge.
-func HasRobotSessions() predicate.Account {
+// HasCreatedRobotSessions applies the HasEdge predicate on the "created_robot_sessions" edge.
+func HasCreatedRobotSessions() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RobotSessionsTable, RobotSessionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CreatedRobotSessionsTable, CreatedRobotSessionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRobotSessionsWith applies the HasEdge predicate on the "robot_sessions" edge with a given conditions (other predicates).
-func HasRobotSessionsWith(preds ...predicate.RobotSession) predicate.Account {
+// HasCreatedRobotSessionsWith applies the HasEdge predicate on the "created_robot_sessions" edge with a given conditions (other predicates).
+func HasCreatedRobotSessionsWith(preds ...predicate.RobotSession) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
-		step := newRobotSessionsStep()
+		step := newCreatedRobotSessionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRobotSessionViews applies the HasEdge predicate on the "robot_session_views" edge.
+func HasRobotSessionViews() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RobotSessionViewsTable, RobotSessionViewsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotSessionViewsWith applies the HasEdge predicate on the "robot_session_views" edge with a given conditions (other predicates).
+func HasRobotSessionViewsWith(preds ...predicate.RobotSessionView) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newRobotSessionViewsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

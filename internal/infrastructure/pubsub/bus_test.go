@@ -3,15 +3,17 @@ package pubsub_test
 import (
 	"context"
 	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
 	"time"
 
-	"go.uber.org/fx"
-
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/config"
@@ -19,6 +21,17 @@ import (
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
+
+type amqpCompetingCommand struct {
+	ID string `json:"id"`
+}
+
+func configuredQueue() *config.Config {
+	if amqpURL := os.Getenv("STORYDEN_TEST_AMQP_URL"); amqpURL != "" {
+		return &config.Config{QueueType: "amqp", AmqpURL: amqpURL}
+	}
+	return nil
+}
 
 func TestEventBus_SingleSubscriber(t *testing.T) {
 	integration.Test(t, &config.Config{
@@ -52,6 +65,101 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 
 			received := <-recv
 			a.Equal("Hello, World!", received.Value)
+		}))
+	}))
+}
+
+func TestCommandBus_SingleConsumer(t *testing.T) {
+	integration.Test(t, nil, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		bus *pubsub.Bus,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			type commandTest struct {
+				Value string
+			}
+			received := make(chan commandTest, 1)
+
+			sub, err := pubsub.SubscribeCommand(ctx, bus, "test_command_consumer", func(_ context.Context, command *commandTest) error {
+				received <- *command
+				return nil
+			})
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, sub.Close()) })
+
+			require.NoError(t, bus.SendCommand(ctx, commandTest{Value: "begin turn"}))
+
+			select {
+			case command := <-received:
+				assert.Equal(t, "begin turn", command.Value)
+			case <-time.After(2 * time.Second):
+				t.Fatal("timed out waiting for command")
+			}
+		}))
+	}))
+}
+
+func TestAMQPCommandQueueCompetesAcrossSubscribers(t *testing.T) {
+	amqpURL := os.Getenv("STORYDEN_TEST_AMQP_URL")
+	if amqpURL == "" {
+		t.Skip("set STORYDEN_TEST_AMQP_URL to run AMQP integration coverage")
+	}
+
+	integration.Test(t, &config.Config{QueueType: "amqp", AmqpURL: amqpURL}, fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		bus *pubsub.Bus,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			topic := reflect.TypeOf(amqpCompetingCommand{}).String()
+			queueName := topic + "." + xid.New().String()
+			cfg := amqp.NewDurablePubSubConfig(amqpURL, amqp.GenerateQueueNameConstant(queueName))
+
+			consumerOne, err := amqp.NewSubscriber(cfg, watermill.NopLogger{})
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, consumerOne.Close()) })
+			consumerTwo, err := amqp.NewSubscriber(cfg, watermill.NopLogger{})
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, consumerTwo.Close()) })
+
+			messagesOne, err := consumerOne.Subscribe(ctx, topic)
+			require.NoError(t, err)
+			messagesTwo, err := consumerTwo.Subscribe(ctx, topic)
+			require.NoError(t, err)
+
+			const commandCount = 12
+			for range commandCount {
+				require.NoError(t, bus.SendCommand(ctx, amqpCompetingCommand{ID: xid.New().String()}))
+			}
+
+			seen := make(map[string]struct{}, commandCount)
+			perConsumer := [2]int{}
+			deadline := time.After(10 * time.Second)
+			for len(seen) < commandCount {
+				var msgPayload []byte
+				var ack func() bool
+				select {
+				case msg := <-messagesOne:
+					msgPayload, ack = msg.Payload, msg.Ack
+					perConsumer[0]++
+				case msg := <-messagesTwo:
+					msgPayload, ack = msg.Payload, msg.Ack
+					perConsumer[1]++
+				case <-deadline:
+					t.Fatalf("timed out after %d of %d competing commands", len(seen), commandCount)
+				}
+
+				var command amqpCompetingCommand
+				require.NoError(t, json.Unmarshal(msgPayload, &command))
+				_, duplicate := seen[command.ID]
+				assert.False(t, duplicate, "a command must be delivered to only one competing consumer")
+				seen[command.ID] = struct{}{}
+				assert.True(t, ack())
+			}
+
+			assert.Positive(t, perConsumer[0])
+			assert.Positive(t, perConsumer[1])
 		}))
 	}))
 }
@@ -270,6 +378,52 @@ func TestSubscribeNamed_FanoutToIndependentHandlers(t *testing.T) {
 
 			a.Equal("fanout payload", one.Value)
 			a.Equal("fanout payload", two.Value)
+		}))
+	}))
+}
+
+func TestSubscribeEphemeralNamed_FanoutToIndependentHandlers(t *testing.T) {
+	integration.Test(t, configuredQueue(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		bus *pubsub.Bus,
+	) {
+		lc.Append(fx.StartHook(func(ctx context.Context) {
+			type ephemeralFanoutEvent struct {
+				Value string `json:"value"`
+			}
+
+			const topicName = "tests.named.ephemeral.fanout"
+			recvOne := make(chan ephemeralFanoutEvent, 1)
+			recvTwo := make(chan ephemeralFanoutEvent, 1)
+			handler := func(target chan<- ephemeralFanoutEvent) pubsub.DynamicHandlerFunc {
+				return func(_ context.Context, payload json.RawMessage) error {
+					var event ephemeralFanoutEvent
+					if err := json.Unmarshal(payload, &event); err != nil {
+						return err
+					}
+					target <- event
+					return nil
+				}
+			}
+
+			subOne, err := pubsub.SubscribeEphemeralNamed(ctx, bus, topicName, "ephemeral_fanout_one", handler(recvOne))
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, subOne.Close()) })
+			subTwo, err := pubsub.SubscribeEphemeralNamed(ctx, bus, topicName, "ephemeral_fanout_two", handler(recvTwo))
+			require.NoError(t, err)
+			t.Cleanup(func() { require.NoError(t, subTwo.Close()) })
+
+			require.NoError(t, bus.PublishNamed(ctx, topicName, ephemeralFanoutEvent{Value: "live tail"}))
+
+			for _, received := range []<-chan ephemeralFanoutEvent{recvOne, recvTwo} {
+				select {
+				case event := <-received:
+					assert.Equal(t, "live tail", event.Value)
+				case <-time.After(2 * time.Second):
+					t.Fatal("timed out waiting for ephemeral fanout event")
+				}
+			}
 		}))
 	}))
 }

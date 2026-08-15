@@ -9,7 +9,6 @@ import { DatagraphMatch } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { IconButton } from "@/components/ui/icon-button";
 import { AdminIcon } from "@/components/ui/icons/Admin";
-import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { HomeIcon } from "@/components/ui/icons/Home";
 import { RobotIcon } from "@/components/ui/icons/Robot";
@@ -28,8 +27,7 @@ import { RobotChatMessageList } from "./RobotChat/RobotChatMessageList";
 export function CommandPaletteContent() {
   const { search, setSearch, mode, setMode, focusInput, canUseRobots } =
     useCommandPalette();
-  const { activeRobotName, sendMessage, status, stopGenerating } =
-    useRobotChat();
+  const { activeRobotName, sendMessage, status } = useRobotChat();
   const filteredCount = useCommandState((s) => s.filtered.count);
   const selectedValue = useCommandState((s) => s.value);
 
@@ -95,19 +93,13 @@ export function CommandPaletteContent() {
         />
         {canUseRobots && mode === "chat" && (
           <IconButton
-            aria-label={
-              isBusy
-                ? "Cancel Robot response"
-                : mode === "chat"
-                  ? "Send message"
-                  : "Start robot chat"
-            }
+            aria-label="Send message"
             variant="subtle"
             type="button"
-            disabled={!isBusy && !search.trim()}
-            onClick={isBusy ? () => void stopGenerating() : handleChatSend}
+            disabled={isBusy || !search.trim()}
+            onClick={handleChatSend}
           >
-            {isBusy ? <CloseIcon /> : <DiscussionIcon />}
+            <DiscussionIcon />
           </IconButton>
         )}
       </HStack>

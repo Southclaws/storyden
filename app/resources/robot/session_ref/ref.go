@@ -23,7 +23,11 @@ type Ref struct {
 }
 
 func Map(in *ent.RobotSession) (*Ref, error) {
-	acc, err := account.MapRef(in.Edges.User)
+	creator, err := in.Edges.CreatorOrErr()
+	if err != nil {
+		return nil, err
+	}
+	acc, err := account.MapRef(creator)
 	if err != nil {
 		return nil, err
 	}

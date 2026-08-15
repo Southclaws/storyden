@@ -75,10 +75,12 @@ func newBus(
 		MaxInterval:     cfg.QueueRetryMaxInterval,
 		Multiplier:      2.0,
 		OnRetryHook: func(retryNum int, delay time.Duration) {
-			log := fmt.Sprintf("a message consumer returned an error: retrying %d/%d after %s/%s",
+			log := fmt.Sprintf(
+				"a message consumer returned an error: retrying %d/%d after %s/%s",
 				retryNum, cfg.QueueMaxRetries, delay, cfg.QueueRetryMaxInterval,
 			)
-			l.Error(log,
+			l.Error(
+				log,
 				slog.Int("retry_num", retryNum),
 				slog.String("delay", delay.String()),
 			)
@@ -161,7 +163,8 @@ func newBus(
 	}
 
 	router.AddNoPublisherHandler("poison_queue_logger", "poison_queue", sub, func(msg *message.Message) error {
-		l.Error("poisoned message received after all retries failed",
+		l.Error(
+			"poisoned message received after all retries failed",
 			slog.String("message_id", msg.UUID),
 			slog.String("message_type", msg.Metadata.Get("name")),
 			slog.String("reason", msg.Metadata.Get("reason_poisoned")),
@@ -176,7 +179,8 @@ func newBus(
 		go func() {
 			err := router.Run(ctx)
 			if err != nil {
-				l.Error("message router stopped unexpectedly",
+				l.Error(
+					"message router stopped unexpectedly",
 					slog.String("error", err.Error()),
 				)
 				os.Exit(0x12)
@@ -214,7 +218,8 @@ func newBus(
 // Most simple events can use this where a failure to publish isn't critical.
 func (b *Bus) Publish(ctx context.Context, event any) {
 	if err := b.eventBus.Publish(ctx, event); err != nil {
-		b.logger.Error("failed to publish event",
+		b.logger.Error(
+			"failed to publish event",
 			slog.String("event_type", fmt.Sprintf("%T", event)),
 			slog.String("error", err.Error()),
 		)
@@ -240,7 +245,8 @@ func (b *Bus) PublishNamed(ctx context.Context, topic string, event any) error {
 	msg.Metadata.Set("name", topic)
 
 	if err := b.contextPub.Publish(topic, msg); err != nil {
-		b.logger.Error("failed to publish named event",
+		b.logger.Error(
+			"failed to publish named event",
 			slog.String("topic", topic),
 			slog.String("error", err.Error()),
 		)
@@ -254,7 +260,8 @@ func (b *Bus) PublishNamed(ctx context.Context, topic string, event any) error {
 // prevent further procedures, for things like sending emails, etc.
 func (b *Bus) MustPublish(ctx context.Context, event any) error {
 	if err := b.eventBus.Publish(ctx, event); err != nil {
-		b.logger.Error("failed to publish event",
+		b.logger.Error(
+			"failed to publish event",
 			slog.String("event_type", fmt.Sprintf("%T", event)),
 			slog.String("error", err.Error()),
 		)
@@ -269,7 +276,8 @@ func (b *Bus) MustPublishMany(ctx context.Context, events ...any) error {
 	var errs []error
 	for _, event := range events {
 		if err := b.eventBus.Publish(ctx, event); err != nil {
-			b.logger.Error("failed to publish event",
+			b.logger.Error(
+				"failed to publish event",
 				slog.String("event_type", fmt.Sprintf("%T", event)),
 				slog.String("error", err.Error()),
 			)
@@ -283,7 +291,8 @@ func (b *Bus) MustPublishMany(ctx context.Context, events ...any) error {
 
 func (b *Bus) SendCommand(ctx context.Context, command any) error {
 	if err := b.commandBus.Send(ctx, command); err != nil {
-		b.logger.Error("failed to send command",
+		b.logger.Error(
+			"failed to send command",
 			slog.String("command_type", fmt.Sprintf("%T", command)),
 			slog.String("error", err.Error()),
 		)
@@ -386,7 +395,8 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 		return handler(ctx, command)
 	})
 
-	if err := bus.commandProcessor.AddHandlers(cqrsHandler); err != nil {
+	messageHandler, err := bus.commandProcessor.AddHandler(cqrsHandler)
+	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -395,9 +405,10 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 	}
 
 	sub := &Subscription{
-		bus:    bus,
-		subkey: subkey,
-		topic:  topic,
+		bus:            bus,
+		subkey:         subkey,
+		topic:          topic,
+		messageHandler: messageHandler,
 	}
 
 	bus.subscriptions[subkey] = sub
@@ -406,6 +417,16 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 }
 
 func SubscribeNamed(ctx context.Context, bus *Bus, topicName string, handlerName string, handler DynamicHandlerFunc) (*Subscription, error) {
+	return subscribeNamed(ctx, bus, topicName, handlerName, false, handler)
+}
+
+// SubscribeEphemeralNamed creates a fanout subscription whose AMQP queue is
+// exclusive to this subscriber and removed when it disconnects.
+func SubscribeEphemeralNamed(ctx context.Context, bus *Bus, topicName string, handlerName string, handler DynamicHandlerFunc) (*Subscription, error) {
+	return subscribeNamed(ctx, bus, topicName, handlerName, true, handler)
+}
+
+func subscribeNamed(ctx context.Context, bus *Bus, topicName string, handlerName string, ephemeral bool, handler DynamicHandlerFunc) (*Subscription, error) {
 	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
@@ -420,6 +441,12 @@ func SubscribeNamed(ctx context.Context, bus *Bus, topicName string, handlerName
 		apsc := amqp.NewDurablePubSubConfig(bus.cfg.AmqpURL, func(topic string) string {
 			return topic + "." + handlerName
 		})
+		if ephemeral {
+			apsc.Queue.Durable = false
+			apsc.Queue.AutoDelete = true
+			apsc.Queue.Exclusive = true
+			apsc.Consume.Exclusive = true
+		}
 		s, err := amqp.NewSubscriber(apsc, watermill.NewSlogLogger(bus.logger.With("component", "watermill")))
 		if err != nil {
 			return nil, err

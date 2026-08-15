@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	"github.com/rs/xid"
 )
 
@@ -80,6 +81,76 @@ func (_c *RobotSessionCreate) SetState(v map[string]interface{}) *RobotSessionCr
 	return _c
 }
 
+// SetExecutionStatus sets the "execution_status" field.
+func (_c *RobotSessionCreate) SetExecutionStatus(v robotsession.ExecutionStatus) *RobotSessionCreate {
+	_c.mutation.SetExecutionStatus(v)
+	return _c
+}
+
+// SetNillableExecutionStatus sets the "execution_status" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableExecutionStatus(v *robotsession.ExecutionStatus) *RobotSessionCreate {
+	if v != nil {
+		_c.SetExecutionStatus(*v)
+	}
+	return _c
+}
+
+// SetActiveTurnID sets the "active_turn_id" field.
+func (_c *RobotSessionCreate) SetActiveTurnID(v xid.ID) *RobotSessionCreate {
+	_c.mutation.SetActiveTurnID(v)
+	return _c
+}
+
+// SetNillableActiveTurnID sets the "active_turn_id" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableActiveTurnID(v *xid.ID) *RobotSessionCreate {
+	if v != nil {
+		_c.SetActiveTurnID(*v)
+	}
+	return _c
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (_c *RobotSessionCreate) SetLeaseToken(v string) *RobotSessionCreate {
+	_c.mutation.SetLeaseToken(v)
+	return _c
+}
+
+// SetNillableLeaseToken sets the "lease_token" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableLeaseToken(v *string) *RobotSessionCreate {
+	if v != nil {
+		_c.SetLeaseToken(*v)
+	}
+	return _c
+}
+
+// SetLeaseGeneration sets the "lease_generation" field.
+func (_c *RobotSessionCreate) SetLeaseGeneration(v uint64) *RobotSessionCreate {
+	_c.mutation.SetLeaseGeneration(v)
+	return _c
+}
+
+// SetNillableLeaseGeneration sets the "lease_generation" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableLeaseGeneration(v *uint64) *RobotSessionCreate {
+	if v != nil {
+		_c.SetLeaseGeneration(*v)
+	}
+	return _c
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (_c *RobotSessionCreate) SetLeaseExpiresAt(v time.Time) *RobotSessionCreate {
+	_c.mutation.SetLeaseExpiresAt(v)
+	return _c
+}
+
+// SetNillableLeaseExpiresAt sets the "lease_expires_at" field if the given value is not nil.
+func (_c *RobotSessionCreate) SetNillableLeaseExpiresAt(v *time.Time) *RobotSessionCreate {
+	if v != nil {
+		_c.SetLeaseExpiresAt(*v)
+	}
+	return _c
+}
+
 // SetID sets the "id" field.
 func (_c *RobotSessionCreate) SetID(v xid.ID) *RobotSessionCreate {
 	_c.mutation.SetID(v)
@@ -94,15 +165,30 @@ func (_c *RobotSessionCreate) SetNillableID(v *xid.ID) *RobotSessionCreate {
 	return _c
 }
 
-// SetUserID sets the "user" edge to the Account entity by ID.
-func (_c *RobotSessionCreate) SetUserID(id xid.ID) *RobotSessionCreate {
-	_c.mutation.SetUserID(id)
+// SetCreatorID sets the "creator" edge to the Account entity by ID.
+func (_c *RobotSessionCreate) SetCreatorID(id xid.ID) *RobotSessionCreate {
+	_c.mutation.SetCreatorID(id)
 	return _c
 }
 
-// SetUser sets the "user" edge to the Account entity.
-func (_c *RobotSessionCreate) SetUser(v *Account) *RobotSessionCreate {
-	return _c.SetUserID(v.ID)
+// SetCreator sets the "creator" edge to the Account entity.
+func (_c *RobotSessionCreate) SetCreator(v *Account) *RobotSessionCreate {
+	return _c.SetCreatorID(v.ID)
+}
+
+// AddViewIDs adds the "views" edge to the RobotSessionView entity by IDs.
+func (_c *RobotSessionCreate) AddViewIDs(ids ...xid.ID) *RobotSessionCreate {
+	_c.mutation.AddViewIDs(ids...)
+	return _c
+}
+
+// AddViews adds the "views" edges to the RobotSessionView entity.
+func (_c *RobotSessionCreate) AddViews(v ...*RobotSessionView) *RobotSessionCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddViewIDs(ids...)
 }
 
 // AddMessageIDs adds the "messages" edge to the RobotSessionMessage entity by IDs.
@@ -167,6 +253,14 @@ func (_c *RobotSessionCreate) defaults() {
 		v := robotsession.DefaultName()
 		_c.mutation.SetName(v)
 	}
+	if _, ok := _c.mutation.ExecutionStatus(); !ok {
+		v := robotsession.DefaultExecutionStatus
+		_c.mutation.SetExecutionStatus(v)
+	}
+	if _, ok := _c.mutation.LeaseGeneration(); !ok {
+		v := robotsession.DefaultLeaseGeneration
+		_c.mutation.SetLeaseGeneration(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotsession.DefaultID()
 		_c.mutation.SetID(v)
@@ -187,13 +281,24 @@ func (_c *RobotSessionCreate) check() error {
 	if _, ok := _c.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "RobotSession.account_id"`)}
 	}
+	if _, ok := _c.mutation.ExecutionStatus(); !ok {
+		return &ValidationError{Name: "execution_status", err: errors.New(`ent: missing required field "RobotSession.execution_status"`)}
+	}
+	if v, ok := _c.mutation.ExecutionStatus(); ok {
+		if err := robotsession.ExecutionStatusValidator(v); err != nil {
+			return &ValidationError{Name: "execution_status", err: fmt.Errorf(`ent: validator failed for field "RobotSession.execution_status": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.LeaseGeneration(); !ok {
+		return &ValidationError{Name: "lease_generation", err: errors.New(`ent: missing required field "RobotSession.lease_generation"`)}
+	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := robotsession.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "RobotSession.id": %w`, err)}
 		}
 	}
-	if len(_c.mutation.UserIDs()) == 0 {
-		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "RobotSession.user"`)}
+	if len(_c.mutation.CreatorIDs()) == 0 {
+		return &ValidationError{Name: "creator", err: errors.New(`ent: missing required edge "RobotSession.creator"`)}
 	}
 	return nil
 }
@@ -247,12 +352,32 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 		_spec.SetField(robotsession.FieldState, field.TypeJSON, value)
 		_node.State = value
 	}
-	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+	if value, ok := _c.mutation.ExecutionStatus(); ok {
+		_spec.SetField(robotsession.FieldExecutionStatus, field.TypeEnum, value)
+		_node.ExecutionStatus = value
+	}
+	if value, ok := _c.mutation.ActiveTurnID(); ok {
+		_spec.SetField(robotsession.FieldActiveTurnID, field.TypeString, value)
+		_node.ActiveTurnID = &value
+	}
+	if value, ok := _c.mutation.LeaseToken(); ok {
+		_spec.SetField(robotsession.FieldLeaseToken, field.TypeString, value)
+		_node.LeaseToken = &value
+	}
+	if value, ok := _c.mutation.LeaseGeneration(); ok {
+		_spec.SetField(robotsession.FieldLeaseGeneration, field.TypeUint64, value)
+		_node.LeaseGeneration = value
+	}
+	if value, ok := _c.mutation.LeaseExpiresAt(); ok {
+		_spec.SetField(robotsession.FieldLeaseExpiresAt, field.TypeTime, value)
+		_node.LeaseExpiresAt = &value
+	}
+	if nodes := _c.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   robotsession.UserTable,
-			Columns: []string{robotsession.UserColumn},
+			Table:   robotsession.CreatorTable,
+			Columns: []string{robotsession.CreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
@@ -262,6 +387,22 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AccountID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ViewsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.ViewsTable,
+			Columns: []string{robotsession.ViewsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessionview.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.MessagesIDs(); len(nodes) > 0 {
@@ -386,6 +527,90 @@ func (u *RobotSessionUpsert) ClearState() *RobotSessionUpsert {
 	return u
 }
 
+// SetExecutionStatus sets the "execution_status" field.
+func (u *RobotSessionUpsert) SetExecutionStatus(v robotsession.ExecutionStatus) *RobotSessionUpsert {
+	u.Set(robotsession.FieldExecutionStatus, v)
+	return u
+}
+
+// UpdateExecutionStatus sets the "execution_status" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateExecutionStatus() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldExecutionStatus)
+	return u
+}
+
+// SetActiveTurnID sets the "active_turn_id" field.
+func (u *RobotSessionUpsert) SetActiveTurnID(v xid.ID) *RobotSessionUpsert {
+	u.Set(robotsession.FieldActiveTurnID, v)
+	return u
+}
+
+// UpdateActiveTurnID sets the "active_turn_id" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateActiveTurnID() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldActiveTurnID)
+	return u
+}
+
+// ClearActiveTurnID clears the value of the "active_turn_id" field.
+func (u *RobotSessionUpsert) ClearActiveTurnID() *RobotSessionUpsert {
+	u.SetNull(robotsession.FieldActiveTurnID)
+	return u
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (u *RobotSessionUpsert) SetLeaseToken(v string) *RobotSessionUpsert {
+	u.Set(robotsession.FieldLeaseToken, v)
+	return u
+}
+
+// UpdateLeaseToken sets the "lease_token" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateLeaseToken() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldLeaseToken)
+	return u
+}
+
+// ClearLeaseToken clears the value of the "lease_token" field.
+func (u *RobotSessionUpsert) ClearLeaseToken() *RobotSessionUpsert {
+	u.SetNull(robotsession.FieldLeaseToken)
+	return u
+}
+
+// SetLeaseGeneration sets the "lease_generation" field.
+func (u *RobotSessionUpsert) SetLeaseGeneration(v uint64) *RobotSessionUpsert {
+	u.Set(robotsession.FieldLeaseGeneration, v)
+	return u
+}
+
+// UpdateLeaseGeneration sets the "lease_generation" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateLeaseGeneration() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldLeaseGeneration)
+	return u
+}
+
+// AddLeaseGeneration adds v to the "lease_generation" field.
+func (u *RobotSessionUpsert) AddLeaseGeneration(v uint64) *RobotSessionUpsert {
+	u.Add(robotsession.FieldLeaseGeneration, v)
+	return u
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (u *RobotSessionUpsert) SetLeaseExpiresAt(v time.Time) *RobotSessionUpsert {
+	u.Set(robotsession.FieldLeaseExpiresAt, v)
+	return u
+}
+
+// UpdateLeaseExpiresAt sets the "lease_expires_at" field to the value that was provided on create.
+func (u *RobotSessionUpsert) UpdateLeaseExpiresAt() *RobotSessionUpsert {
+	u.SetExcluded(robotsession.FieldLeaseExpiresAt)
+	return u
+}
+
+// ClearLeaseExpiresAt clears the value of the "lease_expires_at" field.
+func (u *RobotSessionUpsert) ClearLeaseExpiresAt() *RobotSessionUpsert {
+	u.SetNull(robotsession.FieldLeaseExpiresAt)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -497,6 +722,104 @@ func (u *RobotSessionUpsertOne) UpdateState() *RobotSessionUpsertOne {
 func (u *RobotSessionUpsertOne) ClearState() *RobotSessionUpsertOne {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.ClearState()
+	})
+}
+
+// SetExecutionStatus sets the "execution_status" field.
+func (u *RobotSessionUpsertOne) SetExecutionStatus(v robotsession.ExecutionStatus) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetExecutionStatus(v)
+	})
+}
+
+// UpdateExecutionStatus sets the "execution_status" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateExecutionStatus() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateExecutionStatus()
+	})
+}
+
+// SetActiveTurnID sets the "active_turn_id" field.
+func (u *RobotSessionUpsertOne) SetActiveTurnID(v xid.ID) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetActiveTurnID(v)
+	})
+}
+
+// UpdateActiveTurnID sets the "active_turn_id" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateActiveTurnID() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateActiveTurnID()
+	})
+}
+
+// ClearActiveTurnID clears the value of the "active_turn_id" field.
+func (u *RobotSessionUpsertOne) ClearActiveTurnID() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearActiveTurnID()
+	})
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (u *RobotSessionUpsertOne) SetLeaseToken(v string) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseToken(v)
+	})
+}
+
+// UpdateLeaseToken sets the "lease_token" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateLeaseToken() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseToken()
+	})
+}
+
+// ClearLeaseToken clears the value of the "lease_token" field.
+func (u *RobotSessionUpsertOne) ClearLeaseToken() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearLeaseToken()
+	})
+}
+
+// SetLeaseGeneration sets the "lease_generation" field.
+func (u *RobotSessionUpsertOne) SetLeaseGeneration(v uint64) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseGeneration(v)
+	})
+}
+
+// AddLeaseGeneration adds v to the "lease_generation" field.
+func (u *RobotSessionUpsertOne) AddLeaseGeneration(v uint64) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.AddLeaseGeneration(v)
+	})
+}
+
+// UpdateLeaseGeneration sets the "lease_generation" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateLeaseGeneration() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseGeneration()
+	})
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (u *RobotSessionUpsertOne) SetLeaseExpiresAt(v time.Time) *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseExpiresAt(v)
+	})
+}
+
+// UpdateLeaseExpiresAt sets the "lease_expires_at" field to the value that was provided on create.
+func (u *RobotSessionUpsertOne) UpdateLeaseExpiresAt() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseExpiresAt()
+	})
+}
+
+// ClearLeaseExpiresAt clears the value of the "lease_expires_at" field.
+func (u *RobotSessionUpsertOne) ClearLeaseExpiresAt() *RobotSessionUpsertOne {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearLeaseExpiresAt()
 	})
 }
 
@@ -778,6 +1101,104 @@ func (u *RobotSessionUpsertBulk) UpdateState() *RobotSessionUpsertBulk {
 func (u *RobotSessionUpsertBulk) ClearState() *RobotSessionUpsertBulk {
 	return u.Update(func(s *RobotSessionUpsert) {
 		s.ClearState()
+	})
+}
+
+// SetExecutionStatus sets the "execution_status" field.
+func (u *RobotSessionUpsertBulk) SetExecutionStatus(v robotsession.ExecutionStatus) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetExecutionStatus(v)
+	})
+}
+
+// UpdateExecutionStatus sets the "execution_status" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateExecutionStatus() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateExecutionStatus()
+	})
+}
+
+// SetActiveTurnID sets the "active_turn_id" field.
+func (u *RobotSessionUpsertBulk) SetActiveTurnID(v xid.ID) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetActiveTurnID(v)
+	})
+}
+
+// UpdateActiveTurnID sets the "active_turn_id" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateActiveTurnID() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateActiveTurnID()
+	})
+}
+
+// ClearActiveTurnID clears the value of the "active_turn_id" field.
+func (u *RobotSessionUpsertBulk) ClearActiveTurnID() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearActiveTurnID()
+	})
+}
+
+// SetLeaseToken sets the "lease_token" field.
+func (u *RobotSessionUpsertBulk) SetLeaseToken(v string) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseToken(v)
+	})
+}
+
+// UpdateLeaseToken sets the "lease_token" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateLeaseToken() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseToken()
+	})
+}
+
+// ClearLeaseToken clears the value of the "lease_token" field.
+func (u *RobotSessionUpsertBulk) ClearLeaseToken() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearLeaseToken()
+	})
+}
+
+// SetLeaseGeneration sets the "lease_generation" field.
+func (u *RobotSessionUpsertBulk) SetLeaseGeneration(v uint64) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseGeneration(v)
+	})
+}
+
+// AddLeaseGeneration adds v to the "lease_generation" field.
+func (u *RobotSessionUpsertBulk) AddLeaseGeneration(v uint64) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.AddLeaseGeneration(v)
+	})
+}
+
+// UpdateLeaseGeneration sets the "lease_generation" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateLeaseGeneration() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseGeneration()
+	})
+}
+
+// SetLeaseExpiresAt sets the "lease_expires_at" field.
+func (u *RobotSessionUpsertBulk) SetLeaseExpiresAt(v time.Time) *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.SetLeaseExpiresAt(v)
+	})
+}
+
+// UpdateLeaseExpiresAt sets the "lease_expires_at" field to the value that was provided on create.
+func (u *RobotSessionUpsertBulk) UpdateLeaseExpiresAt() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.UpdateLeaseExpiresAt()
+	})
+}
+
+// ClearLeaseExpiresAt clears the value of the "lease_expires_at" field.
+func (u *RobotSessionUpsertBulk) ClearLeaseExpiresAt() *RobotSessionUpsertBulk {
+	return u.Update(func(s *RobotSessionUpsert) {
+		s.ClearLeaseExpiresAt()
 	})
 }
 

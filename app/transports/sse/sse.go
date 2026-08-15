@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	storydenagent "github.com/Southclaws/storyden/app/services/semdex/robot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
@@ -59,7 +60,7 @@ func MountSSE(
 	ctx context.Context,
 	logger *slog.Logger,
 
-	chatAgent *storydenagent.Agent,
+	chatAgent *session_coordinator.Coordinator,
 	sessionRepo *robot_session.Repository,
 	robotQuerier *robot_querier.Querier,
 	toolRegistry *tools.Registry,
@@ -134,7 +135,7 @@ type chatApproval struct {
 
 func newChatHandler(
 	logger *slog.Logger,
-	chatAgent *storydenagent.Agent,
+	chatAgent *session_coordinator.Coordinator,
 	sessionRepo *robot_session.Repository,
 	robotQuerier *robot_querier.Querier,
 	toolRegistry *tools.Registry,
@@ -214,13 +215,6 @@ func newChatHandler(
 			return
 		}
 
-		if len(pendingToolIDs) > 0 && existingSess != nil {
-			state := clearPendingClientTools(existingSess.State)
-			if err := sessionRepo.UpdateState(ctx, robotSessionID, state); err != nil {
-				logger.Error("failed to clear pending tool IDs", slog.String("error", err.Error()))
-			}
-		}
-
 		logger.Debug("sse chat request",
 			slog.String("account_id", accountID.String()),
 			slog.String("robot_id", robotRef),
@@ -269,6 +263,7 @@ func newChatHandler(
 		finalSeen := false
 		eventCount := 0
 		sessionIDSent := false
+		projectionFinished := false
 		fallbackTextID := textID
 		delegations := newDelegationStream(
 			ctx,
@@ -306,6 +301,9 @@ func newChatHandler(
 
 			if ctx.Err() != nil {
 				return
+			}
+			if projectionFinished {
+				continue
 			}
 
 			if event != nil {
@@ -349,7 +347,7 @@ func newChatHandler(
 							continue
 						}
 						if part.FunctionCall.Name == toolconfirmation.FunctionCallName {
-							sendToolConfirmationCall(ctx, event, part, emitter, sessionRepo, robotSessionID, toolRegistry, logger)
+							sendToolConfirmationCall(ctx, event, part, emitter, toolRegistry, logger)
 						} else if toolRequiresConfirmation(ctx, toolRegistry, part.FunctionCall.Name) {
 							continue
 						} else {
@@ -377,9 +375,10 @@ func newChatHandler(
 				// interceptClientSideTools callback in agent.go returns a marker
 				// {"_client_side_pending": true} instead of executing the tool.
 				//
-				// We detect this marker here and immediately end the SSE stream WITHOUT
-				// sending a finish event. This prevents the LLM from seeing or responding
-				// to the marker.
+				// We detect this marker here and finish the client projection. The
+				// coordinator stream is still drained through its terminal blocked event
+				// so the pubsub delivery is acknowledged before its ephemeral subscriber
+				// is closed.
 				//
 				// The frontend will then:
 				// 1. Execute the tool on the client side
@@ -393,19 +392,17 @@ func newChatHandler(
 							logger.Info("client-side tool pending, ending stream to wait for client result",
 								slog.String("tool_call_id", part.FunctionResponse.ID))
 
-							if err := storePendingToolID(ctx, sessionRepo, robotSessionID, part.FunctionResponse.ID); err != nil {
-								logger.Error("failed to store pending tool ID",
-									slog.String("error", err.Error()),
-									slog.String("tool_call_id", part.FunctionResponse.ID))
-							}
-
 							finishPart := openapi.StreamPart{}
 							_ = finishPart.FromFinishMessagePart(openapi.FinishMessagePart{})
 							_ = emitter.Send(finishPart)
 
-							return
+							projectionFinished = true
+							break
 						}
 					}
+				}
+				if projectionFinished {
+					continue
 				}
 
 				if hasPendingConfirmation(event) {
@@ -413,7 +410,8 @@ func newChatHandler(
 					_ = finishPart.FromFinishMessagePart(openapi.FinishMessagePart{})
 					_ = emitter.Send(finishPart)
 
-					return
+					projectionFinished = true
+					continue
 				}
 			}
 
@@ -423,6 +421,9 @@ func newChatHandler(
 					finishReason = strings.ToLower(fr)
 				}
 			}
+		}
+		if projectionFinished {
+			return
 		}
 
 		logger.Info("sse stream complete",
@@ -752,8 +753,6 @@ func sendToolConfirmationCall(
 	event *adksession.Event,
 	part *genai.Part,
 	emitter *streamEmitter,
-	sessionRepo *robot_session.Repository,
-	robotSessionID robot.SessionID,
 	toolRegistry *tools.Registry,
 	logger *slog.Logger,
 ) {
@@ -777,12 +776,6 @@ func sendToolConfirmationCall(
 		slog.Any("args", original.Args),
 		slog.Any("long_running_ids", event.LongRunningToolIDs),
 	)
-
-	if err := storePendingToolID(ctx, sessionRepo, robotSessionID, fc.ID); err != nil {
-		logger.Error("failed to store pending confirmation ID",
-			slog.String("error", err.Error()),
-			slog.String("tool_call_id", fc.ID))
-	}
 
 	confirmationPart := &genai.Part{
 		FunctionCall: &genai.FunctionCall{

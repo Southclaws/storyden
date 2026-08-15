@@ -261,30 +261,4 @@ ${specialistTranscript}
       composerBox!.y + 1,
     );
   });
-
-  test("an interrupted delegation no longer appears to be working", async ({
-    page,
-  }) => {
-    await setupRobotProviderWithScript(
-      `mock/../robot/scripts/${coordinatorScriptName}`,
-    );
-    await goToNewChat(page);
-
-    await sendMessage(page, "delegate this research");
-
-    const delegation = page.getByRole("group", {
-      name: `${specialistName} delegation`,
-    });
-    await expect(delegation.getByText("Working…")).toBeVisible({
-      timeout: 15000,
-    });
-
-    await page.getByRole("button", { name: "Cancel Robot response" }).click();
-
-    await expect(page.getByText("Denbot is responding...")).toHaveCount(0, {
-      timeout: 15000,
-    });
-    await expect(delegation.getByText("Stopped")).toBeVisible();
-    await expect(delegation.getByText("Working…")).toHaveCount(0);
-  });
 });

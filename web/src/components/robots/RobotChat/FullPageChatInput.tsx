@@ -5,13 +5,11 @@ import { useRef, useState } from "react";
 import { useRobotChat } from "@/components/site/CommandPalette/RobotChat/RobotChatContext";
 import { RobotChatLoadingStatus } from "@/components/site/CommandPalette/RobotChat/RobotChatLoadingStatus";
 import { IconButton } from "@/components/ui/icon-button";
-import { CloseIcon } from "@/components/ui/icons/Close";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 export function FullPageChatInput() {
-  const { activeRobotName, sendMessage, status, stopGenerating } =
-    useRobotChat();
+  const { activeRobotName, sendMessage, status } = useRobotChat();
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -88,13 +86,12 @@ export function FullPageChatInput() {
             }
           />
           <IconButton
-            aria-label={isBusy ? "Cancel Robot response" : "Send message"}
+            aria-label="Send message"
             variant="subtle"
-            type={isBusy ? "button" : "submit"}
-            disabled={!isBusy && !input.trim()}
-            onClick={isBusy ? () => void stopGenerating() : undefined}
+            type="submit"
+            disabled={isBusy || !input.trim()}
           >
-            {isBusy ? <CloseIcon /> : <DiscussionIcon />}
+            <DiscussionIcon />
           </IconButton>
         </HStack>
       </LStack>

@@ -1,7 +1,6 @@
 package sse
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -9,10 +8,9 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/robot"
-	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 )
 
-const pendingClientToolsStateKey = "pending_client_tools"
+const pendingClientToolsStateKey = robot.PendingClientToolsStateKey
 
 type pendingClientTools struct {
 	IDs []string
@@ -66,11 +64,7 @@ func reconcilePendingClientTools(messages []chatMessage, pending pendingClientTo
 }
 
 func clearPendingClientTools(state map[string]any) map[string]any {
-	if state == nil {
-		state = make(map[string]any)
-	}
-	delete(state, pendingClientToolsStateKey)
-	return state
+	return robot.ClearPendingClientTools(state)
 }
 
 func existingSessState(sess *robot.Session) map[string]any {
@@ -81,27 +75,7 @@ func existingSessState(sess *robot.Session) map[string]any {
 }
 
 func readPendingToolIDs(state map[string]any) []string {
-	if state == nil {
-		return nil
-	}
-
-	existing, ok := state[pendingClientToolsStateKey]
-	if !ok {
-		return nil
-	}
-
-	var result []string
-	switch value := existing.(type) {
-	case []string:
-		result = append(result, value...)
-	case []any:
-		for _, id := range value {
-			if value, ok := id.(string); ok {
-				result = append(result, value)
-			}
-		}
-	}
-	return result
+	return robot.PendingClientToolIDs(state)
 }
 
 func getProvidedPendingToolIDs(messages []chatMessage, pendingToolIDs []string) map[string]struct{} {
@@ -132,23 +106,6 @@ func getProvidedPendingToolIDs(messages []chatMessage, pendingToolIDs []string) 
 		}
 	}
 	return provided
-}
-
-func storePendingToolID(ctx context.Context, sessionRepo *robot_session.Repository, sessionID robot.SessionID, toolCallID string) error {
-	sess, _, err := sessionRepo.Get(ctx, sessionID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
-	if err != nil {
-		return err
-	}
-
-	state := sess.State
-	if state == nil {
-		state = make(map[string]any)
-	}
-	pendingIDs := readPendingToolIDs(state)
-	pendingIDs = append(pendingIDs, toolCallID)
-	state[pendingClientToolsStateKey] = pendingIDs
-
-	return sessionRepo.UpdateState(ctx, sessionID, state)
 }
 
 func writeChatError(w http.ResponseWriter, err chatError) {

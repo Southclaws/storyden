@@ -192,6 +192,27 @@ func (s *Agent) Run(
 	return s.runResolvedAgent(ctx, spec, userID, sessionID, content, chatContext, runOptions)
 }
 
+// PrepareSession creates a shared Robot session when needed and records the
+// current account's view before the coordinator attempts to lease it.
+func (s *Agent) PrepareSession(ctx context.Context, robotRef, userID, sessionID string) error {
+	spec, err := s.resolveAgentSpec(ctx, strings.TrimSpace(robotRef))
+	if err != nil {
+		return err
+	}
+	if err := s.ensureSession(ctx, spec.AppName, spec.RobotRef, userID, sessionID); err != nil {
+		return err
+	}
+	sessionXID, err := xid.FromString(sessionID)
+	if err != nil {
+		return err
+	}
+	accountXID, err := xid.FromString(userID)
+	if err != nil {
+		return err
+	}
+	return s.sessionRepo.EnsureView(ctx, robot.SessionID(sessionXID), account.AccountID(accountXID))
+}
+
 func errorSeq(err error) iter.Seq2[*adksession.Event, error] {
 	return func(yield func(*adksession.Event, error) bool) {
 		yield(nil, err)
@@ -677,6 +698,10 @@ func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.
 }
 
 func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, userID, sessionID string) error {
+	return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, true)
+}
+
+func (s *Agent) ensureSessionAttempt(ctx context.Context, robotName, rootRobotRef, userID, sessionID string, retryCreateRace bool) error {
 	get, err := s.sessions.Get(ctx, &adksession.GetRequest{
 		AppName:   robotName,
 		UserID:    userID,
@@ -719,6 +744,11 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, user
 		State:     sessionInitialState(rootRobotRef),
 	})
 	if err != nil {
+		if retryCreateRace && ent.IsConstraintError(err) {
+			// Another command may have created the shared session between Get and
+			// Create. Re-read it and validate the root Robot through the normal path.
+			return s.ensureSessionAttempt(ctx, robotName, rootRobotRef, userID, sessionID, false)
+		}
 		return err
 	}
 	s.logger.Debug("session created",

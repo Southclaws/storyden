@@ -28,21 +28,49 @@ func (RobotSession) Fields() []ent.Field {
 
 		field.String("account_id").
 			GoType(xid.ID{}).
-			Comment("UserID (account ID) from ADK Session"),
+			Comment("The account that created this session."),
 
 		field.JSON("state", map[string]any{}).
 			Optional().
 			Comment("Session state from ADK"),
+
+		field.Enum("execution_status").
+			Values("idle", "running", "blocked").
+			Default("idle").
+			Comment("Serialises Robot turns for this shared session."),
+
+		field.String("active_turn_id").
+			GoType(xid.ID{}).
+			Optional().
+			Nillable().
+			Comment("Turn currently holding or blocking this session."),
+
+		field.String("lease_token").
+			Optional().
+			Nillable().
+			Comment("Anonymous capability held by the active execution."),
+
+		field.Uint64("lease_generation").
+			Default(0).
+			Comment("Monotonic fencing generation for session executions."),
+
+		field.Time("lease_expires_at").
+			Optional().
+			Nillable().
+			Comment("Expiry used to recover a session after an interrupted execution."),
 	}
 }
 
 func (RobotSession) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("user", Account.Type).
+		edge.From("creator", Account.Type).
+			Ref("created_robot_sessions").
 			Field("account_id").
-			Ref("robot_sessions").
 			Unique().
 			Required(),
+
+		edge.To("views", RobotSessionView.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("messages", RobotSessionMessage.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),

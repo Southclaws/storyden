@@ -139,15 +139,17 @@ type AccountEdges struct {
 	RobotWorkspaceInstances []*RobotWorkspaceInstance `json:"robot_workspace_instances,omitempty"`
 	// RobotMcpServers holds the value of the robot_mcp_servers edge.
 	RobotMcpServers []*RobotMCPServer `json:"robot_mcp_servers,omitempty"`
-	// RobotSessions holds the value of the robot_sessions edge.
-	RobotSessions []*RobotSession `json:"robot_sessions,omitempty"`
+	// CreatedRobotSessions holds the value of the created_robot_sessions edge.
+	CreatedRobotSessions []*RobotSession `json:"created_robot_sessions,omitempty"`
+	// RobotSessionViews holds the value of the robot_session_views edge.
+	RobotSessionViews []*RobotSessionView `json:"robot_session_views,omitempty"`
 	// RobotMessages holds the value of the robot_messages edge.
 	RobotMessages []*RobotSessionMessage `json:"robot_messages,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [44]bool
+	loadedTypes [45]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -521,19 +523,28 @@ func (e AccountEdges) RobotMcpServersOrErr() ([]*RobotMCPServer, error) {
 	return nil, &NotLoadedError{edge: "robot_mcp_servers"}
 }
 
-// RobotSessionsOrErr returns the RobotSessions value or an error if the edge
+// CreatedRobotSessionsOrErr returns the CreatedRobotSessions value or an error if the edge
 // was not loaded in eager-loading.
-func (e AccountEdges) RobotSessionsOrErr() ([]*RobotSession, error) {
+func (e AccountEdges) CreatedRobotSessionsOrErr() ([]*RobotSession, error) {
 	if e.loadedTypes[41] {
-		return e.RobotSessions, nil
+		return e.CreatedRobotSessions, nil
 	}
-	return nil, &NotLoadedError{edge: "robot_sessions"}
+	return nil, &NotLoadedError{edge: "created_robot_sessions"}
+}
+
+// RobotSessionViewsOrErr returns the RobotSessionViews value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) RobotSessionViewsOrErr() ([]*RobotSessionView, error) {
+	if e.loadedTypes[42] {
+		return e.RobotSessionViews, nil
+	}
+	return nil, &NotLoadedError{edge: "robot_session_views"}
 }
 
 // RobotMessagesOrErr returns the RobotMessages value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
-	if e.loadedTypes[42] {
+	if e.loadedTypes[43] {
 		return e.RobotMessages, nil
 	}
 	return nil, &NotLoadedError{edge: "robot_messages"}
@@ -542,7 +553,7 @@ func (e AccountEdges) RobotMessagesOrErr() ([]*RobotSessionMessage, error) {
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[43] {
+	if e.loadedTypes[44] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -896,9 +907,14 @@ func (_m *Account) QueryRobotMcpServers() *RobotMCPServerQuery {
 	return NewAccountClient(_m.config).QueryRobotMcpServers(_m)
 }
 
-// QueryRobotSessions queries the "robot_sessions" edge of the Account entity.
-func (_m *Account) QueryRobotSessions() *RobotSessionQuery {
-	return NewAccountClient(_m.config).QueryRobotSessions(_m)
+// QueryCreatedRobotSessions queries the "created_robot_sessions" edge of the Account entity.
+func (_m *Account) QueryCreatedRobotSessions() *RobotSessionQuery {
+	return NewAccountClient(_m.config).QueryCreatedRobotSessions(_m)
+}
+
+// QueryRobotSessionViews queries the "robot_session_views" edge of the Account entity.
+func (_m *Account) QueryRobotSessionViews() *RobotSessionViewQuery {
+	return NewAccountClient(_m.config).QueryRobotSessionViews(_m)
 }
 
 // QueryRobotMessages queries the "robot_messages" edge of the Account entity.

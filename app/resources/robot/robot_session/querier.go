@@ -19,18 +19,22 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
 	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	ent_robot_session_view "github.com/Southclaws/storyden/internal/ent/robotsessionview"
 )
+
+func withCreator(query *ent.RobotSessionQuery) *ent.RobotSessionQuery {
+	return query.WithCreator()
+}
 
 func (q *Repository) List(
 	ctx context.Context,
 	params pagination.Parameters,
 	accountID opt.Optional[account.AccountID],
 ) (*pagination.Result[*session_ref.Ref], error) {
-	query := q.db.RobotSession.Query().
-		WithUser()
+	query := withCreator(q.db.RobotSession.Query())
 
 	if aid, ok := accountID.Get(); ok {
-		query.Where(ent_robot_session.AccountIDEQ(xid.ID(aid)))
+		query.Where(ent_robot_session.HasViewsWith(ent_robot_session_view.AccountIDEQ(xid.ID(aid))))
 	}
 
 	total, err := query.Clone().Count(ctx)
@@ -60,10 +64,8 @@ func (q *Repository) Get(
 	sessionID robot.SessionID,
 	messageParams robot.MessageCursorParams,
 ) (*robot.Session, *robot.MessageCursorResult, error) {
-	session, err := q.db.RobotSession.Query().
-		Where(ent_robot_session.IDEQ(xid.ID(sessionID))).
-		WithUser().
-		Only(ctx)
+	session, err := withCreator(q.db.RobotSession.Query().
+		Where(ent_robot_session.IDEQ(xid.ID(sessionID)))).Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			err = fault.Wrap(err, ftag.With(ftag.NotFound))
@@ -154,12 +156,11 @@ func (q *Repository) GetWithMessageFilters(
 	numRecentEvents int,
 	after time.Time,
 ) (*robot.Session, error) {
-	sessionQuery := q.db.RobotSession.Query().
-		Where(ent_robot_session.IDEQ(xid.ID(sessionID))).
-		WithUser()
+	sessionQuery := withCreator(q.db.RobotSession.Query().
+		Where(ent_robot_session.IDEQ(xid.ID(sessionID))))
 
 	if aid, ok := accountID.Get(); ok {
-		sessionQuery.Where(ent_robot_session.AccountIDEQ(xid.ID(aid)))
+		sessionQuery.Where(ent_robot_session.HasViewsWith(ent_robot_session_view.AccountIDEQ(xid.ID(aid))))
 	}
 
 	session, err := sessionQuery.Only(ctx)
@@ -209,10 +210,10 @@ func (q *Repository) GetWithMessageFilters(
 }
 
 func (q *Repository) ListAll(ctx context.Context, accountID opt.Optional[account.AccountID]) ([]*robot.Session, error) {
-	query := q.db.RobotSession.Query().WithUser()
+	query := withCreator(q.db.RobotSession.Query())
 
 	if aid, ok := accountID.Get(); ok {
-		query.Where(ent_robot_session.AccountIDEQ(xid.ID(aid)))
+		query.Where(ent_robot_session.HasViewsWith(ent_robot_session_view.AccountIDEQ(xid.ID(aid))))
 	}
 
 	sessions, err := query.All(ctx)
@@ -221,19 +222,6 @@ func (q *Repository) ListAll(ctx context.Context, accountID opt.Optional[account
 	}
 
 	return dt.MapErr(sessions, func(s *ent.RobotSession) (*robot.Session, error) {
-		user, err := account.MapRef(s.Edges.User)
-		if err != nil {
-			return nil, err
-		}
-
-		return &robot.Session{
-			Ref: session_ref.Ref{
-				ID:        session_ref.ID(s.ID),
-				CreatedAt: s.CreatedAt,
-				UpdatedAt: s.UpdatedAt,
-				Human:     *user,
-			},
-			State: s.State,
-		}, nil
+		return robot.MapSession(s, nil)
 	})
 }

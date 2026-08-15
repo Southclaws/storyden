@@ -44,6 +44,8 @@ func newUnattendedFinishTool() (tool.Tool, error) {
 			InputSchema: unattendedFinishInputSchema(),
 		},
 		func(ctx adkagent.Context, args unattendedFinishInput) (unattendedFinishInput, error) {
+			ctx.Actions().Escalate = true
+			ctx.Actions().SkipSummarization = true
 			return args, nil
 		},
 	)

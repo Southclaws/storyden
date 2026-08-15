@@ -42,6 +42,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/redis_search"
 	"github.com/Southclaws/storyden/app/services/search/search_indexer"
 	"github.com/Southclaws/storyden/app/services/semdex/robot"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/session_coordinator"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -81,6 +82,7 @@ func Build() fx.Option {
 		beacon_listener.Build(),
 		generative.Build(),
 		robot.Build(),
+		session_coordinator.Build(),
 		semdexer.Build(),
 		event.Build(),
 		moderation.Build(),

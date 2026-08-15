@@ -103,7 +103,6 @@ type RobotChatContextValue = {
   workspacesReady: boolean;
   sessions: RobotSessionList;
   sendMessage: (input: { text: string }) => Promise<void>;
-  stopGenerating: () => Promise<void>;
   messages: StorydenUIMessage[];
   hasOlderMessages: boolean;
   isLoadingOlderMessages: boolean;
@@ -532,10 +531,6 @@ export function RobotChatContext({
     [chat],
   );
 
-  const stopGenerating = useCallback(async () => {
-    await chat.stop();
-  }, [chat]);
-
   function handleDismissError() {
     setErrorState(undefined);
   }
@@ -551,7 +546,6 @@ export function RobotChatContext({
     workspacesReady: !!workspacesData,
     sessions: sessionsData?.sessions ?? [],
     sendMessage,
-    stopGenerating,
     messages: chat.messages,
     hasOlderMessages: Boolean(nextBefore),
     isLoadingOlderMessages,

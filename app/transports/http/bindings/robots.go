@@ -651,6 +651,10 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	messageParams, err := deserialiseRobotMessageCursorParams(request.Params.Before, request.Params.Limit)
 	if err != nil {
@@ -659,6 +663,9 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 
 	sess, cursor, err := r.sessionRepo.Get(ctx, robot.SessionID(sessionID), messageParams)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := r.sessionRepo.EnsureView(ctx, robot.SessionID(sessionID), accountID); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

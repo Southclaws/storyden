@@ -82,8 +82,12 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 	)
 
 	var output strings.Builder
+	resultReady := false
 	for event, streamErr := range stream {
 		if streamErr != nil {
+			if resultReady {
+				return result, nil
+			}
 			message := fmsg.GetIssue(streamErr)
 			if message == "" {
 				message = streamErr.Error()
@@ -103,15 +107,16 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 			if part.Text != "" {
 				eventText.WriteString(part.Text)
 			}
-			if part.FunctionResponse != nil && part.FunctionResponse.Name == robotservice.UnattendedFinishToolName() {
+			if !resultReady && part.FunctionResponse != nil && part.FunctionResponse.Name == robotservice.UnattendedFinishToolName() {
 				runOutput, err := robotRunOutputFromMap(part.FunctionResponse.Response)
 				if err != nil {
 					message := "robot_run finish tool produced invalid structured output: " + err.Error()
 					setRobotRunFailure(&result, message, output.String())
-					return result, nil
+					resultReady = true
+					continue
 				}
 				result.Output = opt.New(runOutput)
-				return result, nil
+				resultReady = true
 			}
 		}
 
@@ -120,6 +125,9 @@ func (h *Handler) handleRobotRun(ctx context.Context, req *rpc.RPCRequestRobotRu
 			continue
 		}
 		output.WriteString(text)
+	}
+	if resultReady {
+		return result, nil
 	}
 
 	message := "robot_run did not call the unattended finish tool"

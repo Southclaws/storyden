@@ -76,6 +76,26 @@ func AccountID(v xid.ID) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldAccountID, v))
 }
 
+// ActiveTurnID applies equality check predicate on the "active_turn_id" field. It's identical to ActiveTurnIDEQ.
+func ActiveTurnID(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldActiveTurnID, v))
+}
+
+// LeaseToken applies equality check predicate on the "lease_token" field. It's identical to LeaseTokenEQ.
+func LeaseToken(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseToken, v))
+}
+
+// LeaseGeneration applies equality check predicate on the "lease_generation" field. It's identical to LeaseGenerationEQ.
+func LeaseGeneration(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseGeneration, v))
+}
+
+// LeaseExpiresAt applies equality check predicate on the "lease_expires_at" field. It's identical to LeaseExpiresAtEQ.
+func LeaseExpiresAt(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseExpiresAt, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldEQ(FieldCreatedAt, v))
@@ -301,21 +321,309 @@ func StateNotNil() predicate.RobotSession {
 	return predicate.RobotSession(sql.FieldNotNull(FieldState))
 }
 
-// HasUser applies the HasEdge predicate on the "user" edge.
-func HasUser() predicate.RobotSession {
+// ExecutionStatusEQ applies the EQ predicate on the "execution_status" field.
+func ExecutionStatusEQ(v ExecutionStatus) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldExecutionStatus, v))
+}
+
+// ExecutionStatusNEQ applies the NEQ predicate on the "execution_status" field.
+func ExecutionStatusNEQ(v ExecutionStatus) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldExecutionStatus, v))
+}
+
+// ExecutionStatusIn applies the In predicate on the "execution_status" field.
+func ExecutionStatusIn(vs ...ExecutionStatus) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldExecutionStatus, vs...))
+}
+
+// ExecutionStatusNotIn applies the NotIn predicate on the "execution_status" field.
+func ExecutionStatusNotIn(vs ...ExecutionStatus) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldExecutionStatus, vs...))
+}
+
+// ActiveTurnIDEQ applies the EQ predicate on the "active_turn_id" field.
+func ActiveTurnIDEQ(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDNEQ applies the NEQ predicate on the "active_turn_id" field.
+func ActiveTurnIDNEQ(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDIn applies the In predicate on the "active_turn_id" field.
+func ActiveTurnIDIn(vs ...xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldActiveTurnID, vs...))
+}
+
+// ActiveTurnIDNotIn applies the NotIn predicate on the "active_turn_id" field.
+func ActiveTurnIDNotIn(vs ...xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldActiveTurnID, vs...))
+}
+
+// ActiveTurnIDGT applies the GT predicate on the "active_turn_id" field.
+func ActiveTurnIDGT(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDGTE applies the GTE predicate on the "active_turn_id" field.
+func ActiveTurnIDGTE(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDLT applies the LT predicate on the "active_turn_id" field.
+func ActiveTurnIDLT(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDLTE applies the LTE predicate on the "active_turn_id" field.
+func ActiveTurnIDLTE(v xid.ID) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldActiveTurnID, v))
+}
+
+// ActiveTurnIDContains applies the Contains predicate on the "active_turn_id" field.
+func ActiveTurnIDContains(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldContains(FieldActiveTurnID, vc))
+}
+
+// ActiveTurnIDHasPrefix applies the HasPrefix predicate on the "active_turn_id" field.
+func ActiveTurnIDHasPrefix(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldHasPrefix(FieldActiveTurnID, vc))
+}
+
+// ActiveTurnIDHasSuffix applies the HasSuffix predicate on the "active_turn_id" field.
+func ActiveTurnIDHasSuffix(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldHasSuffix(FieldActiveTurnID, vc))
+}
+
+// ActiveTurnIDIsNil applies the IsNil predicate on the "active_turn_id" field.
+func ActiveTurnIDIsNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIsNull(FieldActiveTurnID))
+}
+
+// ActiveTurnIDNotNil applies the NotNil predicate on the "active_turn_id" field.
+func ActiveTurnIDNotNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotNull(FieldActiveTurnID))
+}
+
+// ActiveTurnIDEqualFold applies the EqualFold predicate on the "active_turn_id" field.
+func ActiveTurnIDEqualFold(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldEqualFold(FieldActiveTurnID, vc))
+}
+
+// ActiveTurnIDContainsFold applies the ContainsFold predicate on the "active_turn_id" field.
+func ActiveTurnIDContainsFold(v xid.ID) predicate.RobotSession {
+	vc := v.String()
+	return predicate.RobotSession(sql.FieldContainsFold(FieldActiveTurnID, vc))
+}
+
+// LeaseTokenEQ applies the EQ predicate on the "lease_token" field.
+func LeaseTokenEQ(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseToken, v))
+}
+
+// LeaseTokenNEQ applies the NEQ predicate on the "lease_token" field.
+func LeaseTokenNEQ(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldLeaseToken, v))
+}
+
+// LeaseTokenIn applies the In predicate on the "lease_token" field.
+func LeaseTokenIn(vs ...string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldLeaseToken, vs...))
+}
+
+// LeaseTokenNotIn applies the NotIn predicate on the "lease_token" field.
+func LeaseTokenNotIn(vs ...string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldLeaseToken, vs...))
+}
+
+// LeaseTokenGT applies the GT predicate on the "lease_token" field.
+func LeaseTokenGT(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldLeaseToken, v))
+}
+
+// LeaseTokenGTE applies the GTE predicate on the "lease_token" field.
+func LeaseTokenGTE(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldLeaseToken, v))
+}
+
+// LeaseTokenLT applies the LT predicate on the "lease_token" field.
+func LeaseTokenLT(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldLeaseToken, v))
+}
+
+// LeaseTokenLTE applies the LTE predicate on the "lease_token" field.
+func LeaseTokenLTE(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldLeaseToken, v))
+}
+
+// LeaseTokenContains applies the Contains predicate on the "lease_token" field.
+func LeaseTokenContains(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldContains(FieldLeaseToken, v))
+}
+
+// LeaseTokenHasPrefix applies the HasPrefix predicate on the "lease_token" field.
+func LeaseTokenHasPrefix(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldHasPrefix(FieldLeaseToken, v))
+}
+
+// LeaseTokenHasSuffix applies the HasSuffix predicate on the "lease_token" field.
+func LeaseTokenHasSuffix(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldHasSuffix(FieldLeaseToken, v))
+}
+
+// LeaseTokenIsNil applies the IsNil predicate on the "lease_token" field.
+func LeaseTokenIsNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIsNull(FieldLeaseToken))
+}
+
+// LeaseTokenNotNil applies the NotNil predicate on the "lease_token" field.
+func LeaseTokenNotNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotNull(FieldLeaseToken))
+}
+
+// LeaseTokenEqualFold applies the EqualFold predicate on the "lease_token" field.
+func LeaseTokenEqualFold(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEqualFold(FieldLeaseToken, v))
+}
+
+// LeaseTokenContainsFold applies the ContainsFold predicate on the "lease_token" field.
+func LeaseTokenContainsFold(v string) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldContainsFold(FieldLeaseToken, v))
+}
+
+// LeaseGenerationEQ applies the EQ predicate on the "lease_generation" field.
+func LeaseGenerationEQ(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseGeneration, v))
+}
+
+// LeaseGenerationNEQ applies the NEQ predicate on the "lease_generation" field.
+func LeaseGenerationNEQ(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldLeaseGeneration, v))
+}
+
+// LeaseGenerationIn applies the In predicate on the "lease_generation" field.
+func LeaseGenerationIn(vs ...uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldLeaseGeneration, vs...))
+}
+
+// LeaseGenerationNotIn applies the NotIn predicate on the "lease_generation" field.
+func LeaseGenerationNotIn(vs ...uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldLeaseGeneration, vs...))
+}
+
+// LeaseGenerationGT applies the GT predicate on the "lease_generation" field.
+func LeaseGenerationGT(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldLeaseGeneration, v))
+}
+
+// LeaseGenerationGTE applies the GTE predicate on the "lease_generation" field.
+func LeaseGenerationGTE(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldLeaseGeneration, v))
+}
+
+// LeaseGenerationLT applies the LT predicate on the "lease_generation" field.
+func LeaseGenerationLT(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldLeaseGeneration, v))
+}
+
+// LeaseGenerationLTE applies the LTE predicate on the "lease_generation" field.
+func LeaseGenerationLTE(v uint64) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldLeaseGeneration, v))
+}
+
+// LeaseExpiresAtEQ applies the EQ predicate on the "lease_expires_at" field.
+func LeaseExpiresAtEQ(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldEQ(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtNEQ applies the NEQ predicate on the "lease_expires_at" field.
+func LeaseExpiresAtNEQ(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNEQ(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtIn applies the In predicate on the "lease_expires_at" field.
+func LeaseExpiresAtIn(vs ...time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIn(FieldLeaseExpiresAt, vs...))
+}
+
+// LeaseExpiresAtNotIn applies the NotIn predicate on the "lease_expires_at" field.
+func LeaseExpiresAtNotIn(vs ...time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotIn(FieldLeaseExpiresAt, vs...))
+}
+
+// LeaseExpiresAtGT applies the GT predicate on the "lease_expires_at" field.
+func LeaseExpiresAtGT(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGT(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtGTE applies the GTE predicate on the "lease_expires_at" field.
+func LeaseExpiresAtGTE(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldGTE(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtLT applies the LT predicate on the "lease_expires_at" field.
+func LeaseExpiresAtLT(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLT(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtLTE applies the LTE predicate on the "lease_expires_at" field.
+func LeaseExpiresAtLTE(v time.Time) predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldLTE(FieldLeaseExpiresAt, v))
+}
+
+// LeaseExpiresAtIsNil applies the IsNil predicate on the "lease_expires_at" field.
+func LeaseExpiresAtIsNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldIsNull(FieldLeaseExpiresAt))
+}
+
+// LeaseExpiresAtNotNil applies the NotNil predicate on the "lease_expires_at" field.
+func LeaseExpiresAtNotNil() predicate.RobotSession {
+	return predicate.RobotSession(sql.FieldNotNull(FieldLeaseExpiresAt))
+}
+
+// HasCreator applies the HasEdge predicate on the "creator" edge.
+func HasCreator() predicate.RobotSession {
 	return predicate.RobotSession(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UserTable, UserColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUserWith applies the HasEdge predicate on the "user" edge with a given conditions (other predicates).
-func HasUserWith(preds ...predicate.Account) predicate.RobotSession {
+// HasCreatorWith applies the HasEdge predicate on the "creator" edge with a given conditions (other predicates).
+func HasCreatorWith(preds ...predicate.Account) predicate.RobotSession {
 	return predicate.RobotSession(func(s *sql.Selector) {
-		step := newUserStep()
+		step := newCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasViews applies the HasEdge predicate on the "views" edge.
+func HasViews() predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ViewsTable, ViewsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasViewsWith applies the HasEdge predicate on the "views" edge with a given conditions (other predicates).
+func HasViewsWith(preds ...predicate.RobotSessionView) predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := newViewsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

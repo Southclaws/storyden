@@ -11,7 +11,7 @@ import {
 
 const ROBOT_SCRIPT_DIR = "../tests/robot/scripts";
 
-async function getLatestRobotSessionID(page: Page) {
+async function getRobotSessionIDs(page: Page) {
   const response = await page.request.get(
     "http://localhost:8001/api/robots/sessions",
   );
@@ -22,18 +22,36 @@ async function getLatestRobotSessionID(page: Page) {
   const payload = (await response.json()) as {
     sessions?: { id: string }[];
   };
-  const session = payload.sessions?.[0];
-  if (!session) {
-    throw new Error("no robot sessions found");
-  }
-
-  return session.id;
+  return payload.sessions?.map((session) => session.id) ?? [];
 }
 
-async function openLatestRobotSession(page: Page) {
-  const sessionID = await getLatestRobotSessionID(page);
+async function waitForPersistedRobotText(
+  page: Page,
+  sessionID: string,
+  text: string,
+) {
+  await expect
+    .poll(
+      async () => {
+        const response = await page.request.get(
+          `http://localhost:8001/api/robots/sessions/${sessionID}`,
+        );
+        if (!response.ok()) return false;
 
-  await page.goto(`/robots/chats/${sessionID}`);
+        const payload = (await response.json()) as {
+          message_list?: {
+            messages?: { parts?: { text?: string }[] }[];
+          };
+        };
+        return Boolean(
+          payload.message_list?.messages?.some((message) =>
+            message.parts?.some((part) => part.text === text),
+          ),
+        );
+      },
+      { timeout: 15000 },
+    )
+    .toBe(true);
 }
 
 // The mock LLM uses ../tests/robot/scripts/e2e-default.yaml, selected through
@@ -174,7 +192,7 @@ test.describe("Robot Chat — mock LLM stream", () => {
     }
   });
 
-  test("cancelled response can be followed by another message and refreshed", async ({
+  test("a detached response completes before a later message is sent", async ({
     page,
   }) => {
     const suffix = Date.now();
@@ -189,12 +207,12 @@ test.describe("Robot Chat — mock LLM stream", () => {
       contains: "slow response"
     respond:
       delay_ms: 5000
-      text: "This cancelled response should not render."
+      text: "This detached response completed in the background."
       finish: "stop"
   - match:
-      contains: "after cancel"
+      contains: "after detachment"
     respond:
-      text: "Follow-up after cancellation rendered."
+      text: "Follow-up after detachment rendered."
       finish: "stop"
 `,
       );
@@ -202,41 +220,60 @@ test.describe("Robot Chat — mock LLM stream", () => {
       await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
 
       await page.goto("/robots/chats/new");
+      const existingSessionIDs = new Set(await getRobotSessionIDs(page));
 
       await sendMessage(page, "slow response");
       await expect(page.getByText("Denbot is responding...")).toBeVisible({
         timeout: 15000,
       });
 
-      await page.getByRole("button", { name: "Cancel Robot response" }).click();
-      await expect(page.getByText("Denbot is responding...")).toHaveCount(0, {
+      let sessionID: string | undefined;
+      await expect
+        .poll(
+          async () => {
+            const sessionIDs = await getRobotSessionIDs(page);
+            sessionID = sessionIDs.find((id) => !existingSessionIDs.has(id));
+            return sessionID;
+          },
+          { timeout: 15000 },
+        )
+        .toBeTruthy();
+      if (!sessionID) throw new Error("new robot session was not created");
+
+      await page.goto("/");
+      await waitForPersistedRobotText(
+        page,
+        sessionID,
+        "This detached response completed in the background.",
+      );
+
+      await page.goto(`/robots/chats/${sessionID}`);
+      await expect(page.getByText("slow response")).toBeVisible({
         timeout: 15000,
       });
       await expect(
-        page.getByText("This cancelled response should not render."),
-      ).toHaveCount(0);
-
-      await sendMessage(page, "after cancel");
-      await expect(
-        page.getByText("Follow-up after cancellation rendered."),
+        page.getByText("This detached response completed in the background."),
       ).toBeVisible({ timeout: 15000 });
 
-      await openLatestRobotSession(page);
+      await sendMessage(page, "after detachment");
+      await expect(
+        page.getByText("Follow-up after detachment rendered."),
+      ).toBeVisible({ timeout: 15000 });
+
+      await page.reload();
 
       await expect(page.getByText("slow response")).toBeVisible({
         timeout: 15000,
       });
-      await expect(page.getByText("after cancel", { exact: true })).toBeVisible(
-        {
-          timeout: 15000,
-        },
-      );
       await expect(
-        page.getByText("Follow-up after cancellation rendered."),
+        page.getByText("after detachment", { exact: true }),
       ).toBeVisible({ timeout: 15000 });
       await expect(
-        page.getByText("This cancelled response should not render."),
-      ).toHaveCount(0);
+        page.getByText("Follow-up after detachment rendered."),
+      ).toBeVisible({ timeout: 15000 });
+      await expect(
+        page.getByText("This detached response completed in the background."),
+      ).toBeVisible({ timeout: 15000 });
     } finally {
       await unlink(scriptPath).catch(() => undefined);
       await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
