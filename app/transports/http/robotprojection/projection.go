@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	adksession "google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/robot"
@@ -96,11 +96,19 @@ func ADKEventToUIMessageParts(event adksession.Event, hiddenToolCallIDs map[stri
 		}
 
 		if adkPart.Text != "" {
-			textParts, err := TextToPresentationUIParts(event, adkPart.Text)
-			if err != nil {
-				return nil, err
+			if adkPart.Thought {
+				reasoningPart, err := ReasoningUIPart(adkPart.Text)
+				if err != nil {
+					return nil, err
+				}
+				parts = append(parts, reasoningPart)
+			} else {
+				textParts, err := TextToPresentationUIParts(event, adkPart.Text)
+				if err != nil {
+					return nil, err
+				}
+				parts = append(parts, textParts...)
 			}
-			parts = append(parts, textParts...)
 		}
 
 		if adkPart.FunctionCall != nil {
@@ -204,6 +212,19 @@ func TextUIPart(text string) (openapi.UIMessagePart, error) {
 		return openapi.UIMessagePart{}, fmt.Errorf("create text part: %w", err)
 	}
 
+	return uiPart, nil
+}
+
+func ReasoningUIPart(text string) (openapi.UIMessagePart, error) {
+	reasoningPart := openapi.ReasoningUIPart{
+		Type:  openapi.ReasoningUIPartType("reasoning"),
+		Text:  text,
+		State: ptr(openapi.ReasoningUIPartState("done")),
+	}
+	var uiPart openapi.UIMessagePart
+	if err := uiPart.FromReasoningUIPart(reasoningPart); err != nil {
+		return openapi.UIMessagePart{}, fmt.Errorf("create reasoning part: %w", err)
+	}
 	return uiPart, nil
 }
 
@@ -312,31 +333,50 @@ func PresentationStreamParts(event *adksession.Event, fallbackTextID string) []o
 
 	var streamParts []openapi.StreamPart
 	for _, part := range event.LLMResponse.Content.Parts {
-		if part == nil || strings.TrimSpace(part.Text) == "" {
-			continue
-		}
-
-		for _, presentationPart := range presentation.Parse(part.Text) {
-			switch presentationPart.Kind {
-			case presentation.PartText:
-				if presentationPart.Text == "" {
-					continue
-				}
-				textID := uuid.NewString()
-				if fallbackTextID != "" {
-					textID = fallbackTextID
-					fallbackTextID = ""
-				}
-				streamParts = append(streamParts, TextStreamParts(textID, presentationPart.Text)...)
-
-			case presentation.PartRenderCard:
-				data := presentation.NewRenderCardData(presentationPart.Ref)
-				streamParts = append(streamParts, DataStreamPart(presentation.DataRenderCard, data))
-			}
+		partStream, consumedFallback := PresentationPartStreamParts(event, part, fallbackTextID)
+		streamParts = append(streamParts, partStream...)
+		if consumedFallback {
+			fallbackTextID = ""
 		}
 	}
 
 	return streamParts
+}
+
+// PresentationPartStreamParts projects one ADK content part without changing
+// its position relative to tool calls and results in the same event. The bool
+// reports whether fallbackTextID was used.
+func PresentationPartStreamParts(event *adksession.Event, part *genai.Part, fallbackTextID string) ([]openapi.StreamPart, bool) {
+	if event == nil || part == nil || strings.TrimSpace(part.Text) == "" {
+		return nil, false
+	}
+	if part.Thought {
+		return ReasoningStreamParts(uuid.NewString(), part.Text), false
+	}
+
+	var streamParts []openapi.StreamPart
+	consumedFallback := false
+	for _, presentationPart := range presentation.Parse(part.Text) {
+		switch presentationPart.Kind {
+		case presentation.PartText:
+			if presentationPart.Text == "" {
+				continue
+			}
+			textID := uuid.NewString()
+			if fallbackTextID != "" {
+				textID = fallbackTextID
+				fallbackTextID = ""
+				consumedFallback = true
+			}
+			streamParts = append(streamParts, TextStreamParts(textID, presentationPart.Text)...)
+
+		case presentation.PartRenderCard:
+			data := presentation.NewRenderCardData(presentationPart.Ref)
+			streamParts = append(streamParts, DataStreamPart(presentation.DataRenderCard, data))
+		}
+	}
+
+	return streamParts, consumedFallback
 }
 
 func TextStreamParts(textID string, text string) []openapi.StreamPart {
@@ -361,10 +401,36 @@ func TextStreamParts(textID string, text string) []openapi.StreamPart {
 	return []openapi.StreamPart{textStartPart, textDeltaPart, textEndPart}
 }
 
+func ReasoningStreamParts(reasoningID string, text string) []openapi.StreamPart {
+	startPart := openapi.StreamPart{}
+	_ = startPart.FromReasoningStartPart(openapi.ReasoningStartPart{Id: reasoningID})
+
+	deltaPart := openapi.StreamPart{}
+	if err := deltaPart.FromReasoningDeltaPart(openapi.ReasoningDeltaPart{Id: reasoningID, Delta: text}); err != nil {
+		return []openapi.StreamPart{startPart}
+	}
+
+	endPart := openapi.StreamPart{}
+	_ = endPart.FromReasoningEndPart(openapi.ReasoningEndPart{Id: reasoningID})
+
+	return []openapi.StreamPart{startPart, deltaPart, endPart}
+}
+
 func DataStreamPart(partType string, data any) openapi.StreamPart {
 	dataPart := openapi.StreamPart{}
 	_ = dataPart.FromDataPart(openapi.DataPart{
 		Type: partType,
+		Data: data,
+	})
+	dataPart.Type = partType
+	return dataPart
+}
+
+func DataStreamPartWithID(partType string, id string, data any) openapi.StreamPart {
+	dataPart := openapi.StreamPart{}
+	_ = dataPart.FromDataPart(openapi.DataPart{
+		Type: partType,
+		Id:   &id,
 		Data: data,
 	})
 	dataPart.Type = partType

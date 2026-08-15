@@ -3796,16 +3796,18 @@ paths:
       description: |
         Create a new Robot with the specified configuration. A Robot in Storyden
         consists of a name and description (for humans) as well as a playbook,
-        and a set of available tools to interact with Storyden or plugins. The
-        playbook is a detailed set of instructions that guides behaviour of the
-        Robot to help it assist members in achieving a specific automation goal.
-        Tools are available from either Storyden or plugins that allow it to
-        perform actions or query data. Robots never need all tools and it's best
-        to build goal-specific Robots with minimal sets of tools.
+        and a set of direct tools and reusable Toolsets to interact with Storyden
+        or plugins. The playbook is a detailed set of instructions that guides
+        behaviour of the Robot to help it assist members in achieving a specific
+        automation goal.
+        Direct tools support narrowly scoped Robots, while Toolsets bundle tools
+        with optional specialist instructions. Toolsets can be shared across
+        Robots and can come from Storyden, members, or plugins.
       tags: [robots]
       requestBody: { $ref: "#/components/requestBodies/RobotCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/RobotCreateOK" }
@@ -3824,6 +3826,76 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/RobotToolsListOK" }
 
+  /robots/toolsets:
+    get:
+      operationId: RobotToolsetsList
+      summary: List Robot Toolsets
+      description: |
+        List reusable Toolsets available to Robots. Toolsets group tools with
+        optional instructions and may be provided by Storyden, members, or
+        plugins.
+      tags: [robots]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotToolsetsListOK" }
+    post:
+      operationId: RobotToolsetCreate
+      summary: Create a Robot Toolset
+      description: Create a reusable member-authored Toolset.
+      tags: [robots]
+      requestBody: { $ref: "#/components/requestBodies/RobotToolsetCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotToolsetGetOK" }
+
+  /robots/toolsets/{toolset_id}:
+    get:
+      operationId: RobotToolsetGet
+      summary: Get a Robot Toolset
+      description: Retrieve a built-in, custom, or plugin Toolset by ID.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotToolsetIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RobotToolsetGetOK" }
+    patch:
+      operationId: RobotToolsetUpdate
+      summary: Update a Robot Toolset
+      description: Update a member-authored Toolset.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotToolsetIDParam"
+      requestBody: { $ref: "#/components/requestBodies/RobotToolsetUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/RobotToolsetGetOK" }
+    delete:
+      operationId: RobotToolsetDelete
+      summary: Delete a Robot Toolset
+      description: Delete an unused member-authored Toolset.
+      tags: [robots]
+      parameters:
+        - $ref: "#/components/parameters/RobotToolsetIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { description: OK }
+
   /robots/chat/sse:
     post:
       operationId: RobotChatSSE
@@ -3831,6 +3903,11 @@ paths:
         Send a message to a Robot and receive its response. This endpoint
         manages sessions automatically, creating new sessions as needed or
         continuing existing sessions based on the provided session ID.
+
+        New sessions use Denbot unless `robotId` selects a custom Robot. The
+        selected Robot remains the root for that session. Denbot can search for
+        Toolsets, load specialist capabilities, and
+        delegate bounded work to custom Robots without leaving its session.
 
         Each message sent to the Robot is processed according to its playbook
         and available tools, allowing it to perform actions or retrieve data
@@ -3845,6 +3922,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "200": { $ref: "#/components/responses/RobotChatStream" }
@@ -4050,13 +4128,14 @@ paths:
       operationId: RobotUpdate
       summary: Update a robot
       description: |
-        Update a Robot's name, description, playbook or available tools.
+        Update a Robot's name, description, playbook, direct tools, or assigned Toolsets.
       tags: [robots]
       parameters:
         - $ref: "#/components/parameters/RobotIDParam"
       requestBody: { $ref: "#/components/requestBodies/RobotUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -4081,10 +4160,9 @@ paths:
       summary: List robot sessions
       description: |
         Get a paginated list of Robot sessions. These are chat sessions with the
-        Robot system. One session may span multiple Robots as members can switch
-        which Robot they are talking to mid conversation, or the Robot itself
-        may choose to switch to another Robot to achieve a goal. A session is a
-        representation of an entire conversation thread with the Robot system.
+        Robot system. Denbot may delegate work to specialised Robots
+        inside the same session. Delegated events retain their ADK branch and
+        isolation scope so the execution tree remains inspectable.
 
         You may include an account ID to filter sessions by account. Only those
         with "USE_ROBOTS" permission can use Robots, however sessions, messages
@@ -4985,6 +5063,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    RobotToolsetIDParam:
+      description: Robot Toolset ID
+      in: path
+      name: toolset_id
+      required: true
+      schema:
+        type: string
+
     RobotModelProviderParam:
       description: Robot model provider namespace
       in: path
@@ -5469,6 +5555,18 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/RobotInitialProps" }
+
+    RobotToolsetCreate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotToolsetInitialProps" }
+
+    RobotToolsetUpdate:
+      required: true
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotToolsetMutableProps" }
 
     RobotChatStart:
       content:
@@ -6527,6 +6625,18 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/RobotToolListResult" }
+
+    RobotToolsetsListOK:
+      description: Robot Toolsets retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotToolsetListResult" }
+
+    RobotToolsetGetOK:
+      description: Robot Toolset retrieved.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RobotToolset" }
 
     RobotChatStream:
       description: Server-sent events stream of robot chat responses.
@@ -11722,7 +11832,7 @@ components:
 
     RobotProps:
       type: object
-      required: [name, description, playbook, model, author, tools]
+      required: [name, description, playbook, model, author, tools, toolsets]
       properties:
         name:
           type: string
@@ -11741,6 +11851,7 @@ components:
           description: Optional default workspace template for this robot.
         author: { $ref: "#/components/schemas/ProfileReference" }
         tools: { $ref: "#/components/schemas/RobotToolNameList" }
+        toolsets: { $ref: "#/components/schemas/RobotToolsetRefList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     RobotWorkspaceProvider:
@@ -11845,9 +11956,9 @@ components:
       required: [message_list]
       properties:
         message_list: { $ref: "#/components/schemas/PaginatedRobotMessageList" }
-        active_robot_id:
+        root_robot_id:
           type: string
-          description: Most recently active Robot ID for this session, including built-in Robot IDs.
+          description: Root Robot selected when this session was created, including built-in Robot IDs.
         active_workspace:
           $ref: "#/components/schemas/RobotWorkspaceMount"
 
@@ -12137,6 +12248,12 @@ components:
             author:
               $ref: "#/components/schemas/ProfileReference"
               description: Human author of the message
+            branch:
+              type: string
+              description: ADK execution branch. Delegated Robot events use a child branch.
+            isolation_scope:
+              type: string
+              description: ADK isolation scope for delegated task context.
 
     RobotSessionMessageList:
       type: array
@@ -12155,10 +12272,74 @@ components:
         messages: { $ref: "#/components/schemas/RobotSessionMessageList" }
 
     RobotToolNameList:
-      description: A list of tool names that the robot can use.
+      description: A list of raw tool names contained by a Toolset.
       type: array
       items:
         type: string
+
+    RobotToolsetRefList:
+      description: Reusable Toolset IDs assigned to a Robot.
+      type: array
+      items:
+        type: string
+
+    RobotToolsetSource:
+      type: string
+      enum: [system, custom, plugin]
+
+    RobotToolset:
+      type: object
+      required:
+        [
+          id,
+          name,
+          description,
+          instruction,
+          tools,
+          source,
+          editable,
+          usage_count,
+          requires_workspace,
+        ]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        instruction:
+          type: string
+          description: Specialist instructions injected whenever the Toolset is active.
+        tools:
+          $ref: "#/components/schemas/RobotToolNameList"
+        source:
+          $ref: "#/components/schemas/RobotToolsetSource"
+        source_ref:
+          type: string
+          description: Optional provider-specific source identifier.
+        editable:
+          type: boolean
+        usage_count:
+          type: integer
+          minimum: 0
+        requires_workspace:
+          type: boolean
+          description: Whether this Toolset is only available to Robot sessions with an active workspace.
+        author:
+          $ref: "#/components/schemas/ProfileReference"
+        meta:
+          $ref: "#/components/schemas/Metadata"
+
+    RobotToolsetList:
+      type: array
+      items: { $ref: "#/components/schemas/RobotToolset" }
+
+    RobotToolsetListResult:
+      type: object
+      required: [toolsets]
+      properties:
+        toolsets: { $ref: "#/components/schemas/RobotToolsetList" }
 
     RobotToolSource:
       type: string
@@ -12173,6 +12354,7 @@ components:
         - available
         - description
         - requires_confirmation
+        - requires_workspace
       properties:
         id:
           type: string
@@ -12193,6 +12375,9 @@ components:
         requires_confirmation:
           type: boolean
           description: Whether Robot runs must pause for human approval before executing this tool.
+        requires_workspace:
+          type: boolean
+          description: Whether this tool is only available to Robot sessions with an active workspace.
 
     RobotToolInfoList:
       type: array
@@ -12531,6 +12716,8 @@ components:
           $ref: "#/components/schemas/Identifier"
         tools:
           $ref: "#/components/schemas/RobotToolNameList"
+        toolsets:
+          $ref: "#/components/schemas/RobotToolsetRefList"
         meta: { $ref: "#/components/schemas/Metadata" }
 
     RobotMutableProps:
@@ -12552,7 +12739,39 @@ components:
             - $ref: "#/components/schemas/NullableIdentifier"
         tools:
           $ref: "#/components/schemas/RobotToolNameList"
+        toolsets:
+          $ref: "#/components/schemas/RobotToolsetRefList"
         meta: { $ref: "#/components/schemas/Metadata" }
+
+    RobotToolsetInitialProps:
+      type: object
+      required: [name, description, tools]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        instruction:
+          type: string
+          description: Specialist instructions injected whenever the Toolset is active.
+        tools:
+          $ref: "#/components/schemas/RobotToolNameList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
+
+    RobotToolsetMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        instruction:
+          type: string
+        tools:
+          $ref: "#/components/schemas/RobotToolNameList"
+        meta:
+          $ref: "#/components/schemas/Metadata"
 
     RobotWorkspaceInitialProps:
       type: object
@@ -12619,7 +12838,10 @@ components:
           description: Session ID to continue an existing conversation
         robotId:
           type: string
-          description: Specific robot ID to use for this message
+          description: |
+            Optional Robot ID to use as the root when creating a new session.
+            Omit this field to use Denbot. It cannot switch the root
+            Robot of an existing session.
         messages:
           type: array
           description: Array of chat messages in the conversation

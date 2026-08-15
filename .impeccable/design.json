@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-09T12:00:00Z",
+  "generatedAt": "2026-08-09T15:33:09Z",
   "title": "Design System: Storyden",
   "extensions": {
     "colorMeta": {
@@ -168,12 +168,18 @@
         "name": "Composition before invention",
         "body": "Consult Storybook and existing components before introducing a new visual language or local wrapper.",
         "section": "components"
+      },
+      {
+        "name": "Semantic icons before shapes",
+        "body": "Choose icons by their exported product meaning, create a dedicated semantic export for deliberate object identity, and let the containing component own contextual size.",
+        "section": "components"
       }
     ],
     "dos": [
       "Use semantic background, text, border, control, status, and accent tokens.",
       "Use compact defaults and stable dimensions for repeated workflows.",
       "Keep community content stronger than application chrome.",
+      "Use semantic icon exports only when the icon adds information; let the owning component determine its contextual size.",
       "Use PageLayout and PageHeader as screen-level decisions.",
       "Test interaction-heavy components from the outside."
     ],
@@ -181,6 +187,7 @@
       "Do not invent ad-hoc structural backgrounds or text roles.",
       "Do not nest visually identical Surfaces or use CardBox as a page wrapper.",
       "Do not use accent colour when neutral selection communicates the state.",
+      "Do not choose icons by shape, borrow another product concept's icon, add redundant glyphs, or rely on third-party default icon dimensions.",
       "Do not duplicate the expensive navigation tree for responsive layouts.",
       "Do not treat Storybook as a capability-only prop playground."
     ]

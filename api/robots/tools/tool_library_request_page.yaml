@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryRequestPage
+x-storyden:
+  toolsets:
+    - system.library
 x-storyden-tool:
   title: Request Library Page
   role: READ_PUBLISHED_LIBRARY

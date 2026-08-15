@@ -1,8 +1,8 @@
-# Plugin Builder Eval Playbook
+# Plugin Studio Eval Playbook
 
-This playbook describes the manual eval loop for the built-in `plugin_builder`
-Robot against the real Storyden backend, Robot SSE transport, and workspace
-provider. Use it when changing Plugin Builder instructions, tool descriptions,
+This playbook describes the manual eval loop for the `system.plugin_studio`
+Toolset through Denbot, the real Storyden backend, Robot SSE transport,
+and workspace provider. Use it when changing Plugin Studio instructions, tool descriptions,
 tool schemas, tool result shaping, validation, install/update behavior, or
 workspace provisioning.
 
@@ -12,12 +12,12 @@ validation, or result shaping.
 
 ## What This Eval Covers
 
-A good Plugin Builder eval exercises the full managed flow:
+A good Plugin Studio eval exercises the full managed flow:
 
 1. Start a backend from the current tree.
 2. Authenticate as a local admin (ask the user for a cookie.)
 3. Attach a Robot workspace, usually Sprites.
-4. Send a realistic `/sse/chat` request to `plugin_builder`.
+4. Send a realistic `/sse/chat` request to Denbot with a workspace mounted.
 5. Capture the full SSE stream and backend logs.
 6. Inspect the session transcript, tool calls, generated workspace, and
    installed plugin state.
@@ -112,7 +112,7 @@ WORKSPACE_ID=d92op7do2dtjpvta6jh0
 If `/sse/chat` returns:
 
 ```text
-Plugin Builder requires an active Robot workspace
+Plugin Studio requires an active Robot workspace
 ```
 
 then the request body did not include a valid workspace mount, or the backend
@@ -172,7 +172,6 @@ jq -n \
   '{
     id: $sid,
     sessionId: $sid,
-    robotId: "plugin_builder",
     workspace: { workspace_id: $workspace },
     messages: [
       {

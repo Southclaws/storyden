@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	adkagent "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	"github.com/Southclaws/storyden/lib/plugin/rpc"
@@ -45,7 +45,7 @@ func (a *Agent) addValidateTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_validate",
 		Description: "Check whether plugin source is ready to install. Runs manifest schema checks, manifest/code consistency checks, incomplete-implementation checks, gofmt, go mod tidy, go vet, plugin semantic lint, and go test. Use while iterating on source. Does not compile, package, upload, activate, or read runtime logs; plugin_install performs the single compile/package/install path.",
-	}, func(ctx adktool.Context, args ValidateInput) (ValidateResult, error) {
+	}, func(ctx adkagent.Context, args ValidateInput) (ValidateResult, error) {
 		return a.Validate(ctx, args)
 	}))
 }

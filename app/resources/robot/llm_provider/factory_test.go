@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx/fxtest"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_model_cache"

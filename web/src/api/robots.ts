@@ -6,13 +6,22 @@
 
 export interface MCPTools {
   ToolContentSearch?: ContentSearch;
-  ToolRobotSwitch?: RobotSwitch;
-  ToolSystemRobotToolCatalog?: SystemRobotToolCatalog;
+  ToolToolSearch?: ToolSearch;
+  ToolToolGet?: ToolGet;
+  ToolToolLoad?: ToolLoad;
   ToolRobotCreate?: RobotCreate;
   ToolRobotList?: RobotList;
   ToolRobotGet?: RobotGet;
   ToolRobotUpdate?: RobotUpdate;
   ToolRobotDelete?: RobotDelete;
+  ToolRobotSearch?: RobotSearch;
+  ToolToolsetSearch?: ToolsetSearch;
+  ToolToolsetLoad?: ToolsetLoad;
+  ToolToolsetCreate?: ToolsetCreate;
+  ToolToolsetList?: ToolsetList;
+  ToolToolsetGet?: ToolsetGet;
+  ToolToolsetUpdate?: ToolsetUpdate;
+  ToolToolsetDelete?: ToolsetDelete;
   ToolLibraryPageTree?: LibraryPageList;
   ToolLibraryRequestPage?: LibraryRequestPage;
   ToolLibraryPageGet?: GetLibraryPage;
@@ -54,15 +63,7 @@ export interface ToolContentSearchInput {
   /**
    * Filter by content types.
    */
-  kind?: (
-    | "post"
-    | "thread"
-    | "reply"
-    | "node"
-    | "collection"
-    | "profile"
-    | "event"
-  )[];
+  kind?: ("post" | "thread" | "reply" | "node" | "collection" | "profile" | "event")[];
   /**
    * Filter by author handles (usernames). Do not use '@' prefix.
    */
@@ -117,62 +118,126 @@ export interface SearchedItem {
   description?: string;
 }
 /**
- * Switch the current conversation to a different Robot (agent). Use this when the user wants to talk to a different specialized agent or when a different agent would be better suited to help with the user's request.
+ * Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.
  */
-export interface RobotSwitch {
-  input: ToolRobotSwitchInput;
-  output: ToolRobotSwitchOutput;
+export interface ToolSearch {
+  input: ToolToolSearchInput;
+  output: ToolToolSearchOutput;
   [k: string]: unknown;
 }
-export interface ToolRobotSwitchInput {
+export interface ToolToolSearchInput {
   /**
-   * The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs.
+   * Capability, task, or tool name to search for.
    */
-  robot_id: string;
+  query: string;
+  /**
+   * Maximum number of ranked candidates to return; omit to use the default.
+   */
+  max_results?: number;
 }
-export interface ToolRobotSwitchOutput {
+export interface ToolToolSearchOutput {
   /**
-   * Whether the agent switch was successful
+   * Ranked tool candidates with enough context to choose which one to inspect.
    */
-  success: boolean;
+  tools: RobotToolCatalogueItem[];
   /**
-   * The ID of the robot that was switched to
+   * Recommended next step for inspecting and activating a selected candidate.
    */
-  robot_id: string;
+  next_action: string;
 }
 /**
- * Returns a list of tools that may be assigned to a Robot during Robot creation or update. Use this when selecting capabilities assigned to a Robot. This catalog describes Robot capabilities, not this conversation's capabilities.
- *
+ * A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
  */
-export interface SystemRobotToolCatalog {
-  input: ToolSystemRobotToolCatalogInput;
-  output: ToolSystemRobotToolCatalogOutput;
-  [k: string]: unknown;
-}
-export interface ToolSystemRobotToolCatalogInput {}
-/**
- * List of the tools available in the catalog that you can assign to Robots, with their names and descriptions
- */
-export interface ToolSystemRobotToolCatalogOutput {
-  tools?: ToolInfo[];
-  [k: string]: unknown;
-}
-export interface ToolInfo {
+export interface RobotToolCatalogueItem {
   /**
-   * The tool name identifier
+   * Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools.
+   */
+  id: string;
+  /**
+   * Human-readable tool title that helps distinguish similar capabilities.
    */
   name: string;
   /**
-   * Brief description of what the tool does
+   * The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.
+   */
+  description: string;
+}
+/**
+ * Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+ */
+export interface ToolGet {
+  input: ToolToolGetInput;
+  output: ToolToolGetOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolGetInput {
+  /**
+   * Stable tool ID returned by tool_search.
+   */
+  id: string;
+}
+export interface ToolToolGetOutput {
+  /**
+   * Stable tool identifier accepted by tool_load and Robot configuration tools.
+   */
+  id: string;
+  /**
+   * Human-readable title for explaining or confirming the selected capability.
+   */
+  name: string;
+  /**
+   * The outcome the tool is designed to achieve and when it should be selected.
    */
   description: string;
   /**
-   * Whether Robot runs must pause for human approval before executing this tool.
+   * Complete JSON Schema for arguments that must be supplied when calling the tool.
+   */
+  input_schema: {
+    [k: string]: unknown;
+  };
+  /**
+   * Complete JSON Schema for the tool result when the tool declares one.
+   */
+  output_schema?: {
+    [k: string]: unknown;
+  };
+  /**
+   * Whether a run must pause for human approval before executing this tool.
    */
   requires_confirmation: boolean;
+  /**
+   * Whether the conversation must have an active Robot workspace before this tool can be loaded or used.
+   */
+  requires_workspace: boolean;
 }
 /**
- * Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions.
+ * Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.
+ */
+export interface ToolLoad {
+  input: ToolToolLoadInput;
+  output: ToolToolLoadOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolLoadInput {
+  /**
+   * Stable tool IDs inspected with tool_get.
+   *
+   * @minItems 1
+   */
+  tools: [string, ...string[]];
+}
+export interface ToolToolLoadOutput {
+  /**
+   * Tools activated for subsequent model steps in this conversation.
+   */
+  loaded: RobotToolCatalogueItem[];
+  /**
+   * Recommended continuation now that the selected tools are available.
+   */
+  next_action: string;
+}
+/**
+ * Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using direct tools, reusable Toolsets, and instructions.
  */
 export interface RobotCreate {
   input: ToolRobotCreateInput;
@@ -197,9 +262,13 @@ export interface ToolRobotCreateInput {
    */
   model?: string;
   /**
-   * List of tool names that the Robot can use.
+   * Individual tool names that the Robot can use. Tools already provided by an assigned Toolset are removed.
    */
   tools?: string[];
+  /**
+   * List of reusable Toolset IDs that the Robot can use.
+   */
+  toolsets?: string[];
 }
 export interface ToolRobotCreateOutput {
   /**
@@ -285,12 +354,16 @@ export interface ToolRobotGetOutput {
    */
   model: string;
   /**
-   * List of tool names that the Robot can use
+   * List of individual tool names that the Robot can use
    */
   tools: string[];
+  /**
+   * List of reusable Toolset IDs that the Robot can use
+   */
+  toolsets: string[];
 }
 /**
- * Update a Robot's configuration. You can modify its name, description, playbook (directive), or tools. Only provide the fields you want to change.
+ * Update a Robot's configuration. You can modify its name, description, playbook (directive), direct tools, or Toolsets. Only provide the fields you want to change.
  */
 export interface RobotUpdate {
   input: ToolRobotUpdateInput;
@@ -319,9 +392,13 @@ export interface ToolRobotUpdateInput {
    */
   model?: string;
   /**
-   * The new list of tool names that the Robot can use.
+   * The new list of individual tool names that the Robot can use.
    */
   tools?: string[];
+  /**
+   * The new list of reusable Toolset IDs that the Robot can use.
+   */
+  toolsets?: string[];
 }
 export interface ToolRobotUpdateOutput {
   /**
@@ -358,7 +435,214 @@ export interface ToolRobotDeleteOutput {
   id: string;
 }
 /**
- * Get the full tree structure of pages in the library. Returns a hierarchical view of all wiki pages showing their parent-child relationships.
+ * Search specialised Robots by capability before delegating a task.
+ */
+export interface RobotSearch {
+  input: ToolRobotSearchInput;
+  output: ToolRobotSearchOutput;
+  [k: string]: unknown;
+}
+export interface ToolRobotSearchInput {
+  /**
+   * The task or capability a specialised Robot should handle.
+   */
+  query: string;
+  max_results?: number;
+}
+export interface ToolRobotSearchOutput {
+  robots: RobotSearchResult[];
+  next_action: string;
+}
+export interface RobotSearchResult {
+  id: string;
+  /**
+   * Delegation target name.
+   */
+  delegate_to: string;
+  name: string;
+  description: string;
+}
+/**
+ * Search reusable Toolsets for a coherent bundle of capabilities and specialist guidance. Use toolset_get to inspect a candidate before loading it or assigning it to a Robot.
+ */
+export interface ToolsetSearch {
+  input: ToolToolsetSearchInput;
+  output: ToolToolsetSearchOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetSearchInput {
+  /**
+   * Capability, task, or Toolset name to search for.
+   */
+  query: string;
+  /**
+   * Maximum number of ranked candidates to return; omit to use the default.
+   */
+  max_results?: number;
+}
+export interface ToolToolsetSearchOutput {
+  /**
+   * Ranked Toolset candidates with enough context to choose which bundle to inspect.
+   */
+  toolsets: RobotToolsetCatalogueItem[];
+  /**
+   * Recommended next step for inspecting and activating a selected candidate.
+   */
+  next_action: string;
+}
+/**
+ * A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.
+ */
+export interface RobotToolsetCatalogueItem {
+  /**
+   * Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools.
+   */
+  id: string;
+  /**
+   * Human-readable Toolset name that identifies the capability bundle.
+   */
+  name: string;
+  /**
+   * The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting.
+   */
+  description: string;
+}
+/**
+ * Activate reusable Toolsets for the current Robot conversation after inspecting their contents and runtime preconditions with toolset_get. Workspace-dependent Toolsets cannot be loaded until the conversation has an active workspace.
+ */
+export interface ToolsetLoad {
+  input: ToolToolsetLoadInput;
+  output: ToolToolsetLoadOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetLoadInput {
+  /**
+   * Toolset IDs inspected with toolset_get.
+   *
+   * @minItems 1
+   */
+  toolsets: [string, ...string[]];
+}
+export interface ToolToolsetLoadOutput {
+  /**
+   * Toolsets activated for subsequent model steps in this conversation.
+   */
+  loaded: RobotToolsetCatalogueItem[];
+  /**
+   * Recommended continuation now that the selected Toolsets and their guidance are active.
+   */
+  next_action: string;
+}
+/**
+ * Create a reusable custom Toolset from available tool identifiers and optional specialised prompt guidance.
+ */
+export interface ToolsetCreate {
+  input: ToolToolsetCreateInput;
+  output: ToolToolsetCreateOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetCreateInput {
+  name: string;
+  description: string;
+  instruction?: string;
+  tools: string[];
+}
+export interface ToolToolsetCreateOutput {
+  id: string;
+  name: string;
+}
+/**
+ * List reusable system, custom, and plugin Toolsets.
+ */
+export interface ToolsetList {
+  input: ToolToolsetListInput;
+  output: ToolToolsetListOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetListInput {}
+export interface ToolToolsetListOutput {
+  toolsets: RobotToolsetCatalogueItem[];
+}
+/**
+ * Get a Toolset's complete agent-relevant configuration after finding its ID with toolset_search. Returns its tool IDs, specialist instruction, workspace precondition, and whether this caller may edit it.
+ */
+export interface ToolsetGet {
+  input: ToolToolsetGetInput;
+  output: ToolToolsetGetOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetGetInput {
+  /**
+   * Stable Toolset ID returned by toolset_search.
+   */
+  id: string;
+}
+export interface ToolToolsetGetOutput {
+  /**
+   * Stable Toolset identifier accepted by toolset_load and Robot configuration tools.
+   */
+  id: string;
+  /**
+   * Human-readable name for explaining or confirming the selected capability bundle.
+   */
+  name: string;
+  /**
+   * The jobs this Toolset is designed to handle and when the bundle should be selected.
+   */
+  description: string;
+  /**
+   * Tool IDs activated or assigned together by this Toolset; use tool_get when an individual schema is needed.
+   */
+  tools: string[];
+  /**
+   * Specialist guidance injected while this Toolset is active, including workflow and safety boundaries.
+   */
+  instruction: string;
+  /**
+   * Whether the current caller can update or delete this Toolset through management tools.
+   */
+  editable: boolean;
+  /**
+   * Whether the conversation must have an active Robot workspace before this Toolset can be loaded or used.
+   */
+  requires_workspace: boolean;
+}
+/**
+ * Update an authored custom Toolset. System and plugin Toolsets are read-only.
+ */
+export interface ToolsetUpdate {
+  input: ToolToolsetUpdateInput;
+  output: ToolToolsetUpdateOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetUpdateInput {
+  id: string;
+  name?: string;
+  description?: string;
+  instruction?: string;
+  tools?: string[];
+}
+export interface ToolToolsetUpdateOutput {
+  id: string;
+  name: string;
+}
+/**
+ * Delete an unused authored custom Toolset. Remove it from Robots first.
+ */
+export interface ToolsetDelete {
+  input: ToolToolsetDeleteInput;
+  output: ToolToolsetDeleteOutput;
+  [k: string]: unknown;
+}
+export interface ToolToolsetDeleteInput {
+  id: string;
+}
+export interface ToolToolsetDeleteOutput {
+  id: string;
+  deleted: boolean;
+}
+/**
+ * List library pages by hierarchy and workflow visibility.
  */
 export interface LibraryPageList {
   input: ToolLibraryPageTreeInput;
@@ -370,12 +654,20 @@ export interface ToolLibraryPageTreeInput {
    * Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)
    */
   depth?: number;
+  /**
+   * Limit pages to one workflow visibility.
+   */
+  visibility?: "draft" | "review" | "published";
 }
 export interface ToolLibraryPageTreeOutput {
   /**
-   * List of pages in tree structure
+   * Pages in hierarchical order for selecting a page to inspect.
    */
   pages: LibraryPageTreeNode[];
+  /**
+   * Number of pages returned.
+   */
+  results: number;
 }
 export interface LibraryPageTreeNode {
   /**
@@ -406,6 +698,10 @@ export interface LibraryPageTreeNode {
    * Tags associated with this page
    */
   tags?: string[];
+  /**
+   * Current publishing workflow state.
+   */
+  visibility: "draft" | "review" | "published";
 }
 /**
  * Request a Library page selection from the user. When this tool returns, the user has selected the returned Library page and the task should continue using that page.
@@ -439,7 +735,7 @@ export interface ToolLibraryRequestPageOutput {
   browser_url?: string;
 }
 /**
- * Get detailed information about a specific library page by its slug.
+ * Retrieve a library page with its content and workflow visibility by ID.
  */
 export interface GetLibraryPage {
   input: ToolLibraryPageGetInput;
@@ -474,6 +770,10 @@ export interface ToolLibraryPageGetOutput {
    */
   description?: string;
   /**
+   * Plain-text page body for evaluating or summarising the page.
+   */
+  content: string;
+  /**
    * Tags associated with this page
    */
   tags: string[];
@@ -481,6 +781,10 @@ export interface ToolLibraryPageGetOutput {
    * Slugs of child pages
    */
   child_pages: string[];
+  /**
+   * Current publishing workflow state.
+   */
+  visibility: "draft" | "review" | "published";
 }
 /**
  * Create a new page in the library. A slug will be generated automatically if not provided.
@@ -1436,14 +1740,7 @@ export interface DatagraphItemRef {
   /**
    * Type of datagraph item (thread, node, profile, collection, etc.)
    */
-  kind:
-    | "post"
-    | "thread"
-    | "reply"
-    | "node"
-    | "collection"
-    | "profile"
-    | "event";
+  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
 }
 export interface RobotChatContext {
   datagraph_item?: DatagraphItemRef1;
@@ -1467,256 +1764,244 @@ export interface DatagraphItemRef1 {
   /**
    * Type of datagraph item (thread, node, profile, collection, etc.)
    */
-  kind:
-    | "post"
-    | "thread"
-    | "reply"
-    | "node"
-    | "collection"
-    | "profile"
-    | "event";
+  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
 }
 
-export type ToolName =
-  | "content_search"
-  | "robot_switch"
-  | "system_robot_tool_catalog"
-  | "robot_create"
-  | "robot_list"
-  | "robot_get"
-  | "robot_update"
-  | "robot_delete"
-  | "library_page_list"
-  | "library_request_page"
-  | "get_library_page"
-  | "create_library_page"
-  | "update_library_page"
-  | "library_search_pages"
-  | "library_page_property_schema_get"
-  | "library_page_property_schema_update"
-  | "library_page_properties_update"
-  | "tag_list"
-  | "link_create"
-  | "thread_create"
-  | "thread_list"
-  | "thread_get"
-  | "thread_update"
-  | "thread_reply"
-  | "category_list"
-  | "thread_search"
-  | "reply_search"
-  | "post_search"
-  | "member_search";
+export type ToolName = "content_search" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "get_library_page" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "thread_create" | "thread_list" | "thread_get" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";
 
-export const TOOL_NAMES = [
-  "content_search",
-  "robot_switch",
-  "system_robot_tool_catalog",
-  "robot_create",
-  "robot_list",
-  "robot_get",
-  "robot_update",
-  "robot_delete",
-  "library_page_list",
-  "library_request_page",
-  "get_library_page",
-  "create_library_page",
-  "update_library_page",
-  "library_search_pages",
-  "library_page_property_schema_get",
-  "library_page_property_schema_update",
-  "library_page_properties_update",
-  "tag_list",
-  "link_create",
-  "thread_create",
-  "thread_list",
-  "thread_get",
-  "thread_update",
-  "thread_reply",
-  "category_list",
-  "thread_search",
-  "reply_search",
-  "post_search",
-  "member_search",
-] as const;
+export const TOOL_NAMES = ["content_search", "tool_search", "tool_get", "tool_load", "robot_create", "robot_list", "robot_get", "robot_update", "robot_delete", "robot_search", "toolset_search", "toolset_load", "toolset_create", "toolset_list", "toolset_get", "toolset_update", "toolset_delete", "library_page_list", "library_request_page", "get_library_page", "create_library_page", "update_library_page", "library_search_pages", "library_page_property_schema_get", "library_page_property_schema_update", "library_page_properties_update", "tag_list", "link_create", "thread_create", "thread_list", "thread_get", "thread_update", "thread_reply", "category_list", "thread_search", "reply_search", "post_search", "member_search"] as const;
 
 export type ToolInputMap = {
-  content_search: ToolContentSearchInput;
-  robot_switch: ToolRobotSwitchInput;
-  system_robot_tool_catalog: ToolSystemRobotToolCatalogInput;
-  robot_create: ToolRobotCreateInput;
-  robot_list: ToolRobotListInput;
-  robot_get: ToolRobotGetInput;
-  robot_update: ToolRobotUpdateInput;
-  robot_delete: ToolRobotDeleteInput;
-  library_page_list: ToolLibraryPageTreeInput;
-  library_request_page: ToolLibraryRequestPageInput;
-  get_library_page: ToolLibraryPageGetInput;
-  create_library_page: ToolLibraryPageCreateInput;
-  update_library_page: ToolLibraryPageUpdateInput;
-  library_search_pages: ToolLibrarySearchPagesInput;
-  library_page_property_schema_get: ToolLibraryPagePropertySchemaGetInput;
-  library_page_property_schema_update: ToolLibraryPagePropertySchemaUpdateInput;
-  library_page_properties_update: ToolLibraryPagePropertiesUpdateInput;
-  tag_list: ToolTagListInput;
-  link_create: ToolLinkCreateInput;
-  thread_create: ToolThreadCreateInput;
-  thread_list: ToolThreadListInput;
-  thread_get: ToolThreadGetInput;
-  thread_update: ToolThreadUpdateInput;
-  thread_reply: ToolThreadReplyInput;
-  category_list: ToolCategoryListInput;
-  thread_search: ToolThreadSearchInput;
-  reply_search: ToolReplySearchInput;
-  post_search: ToolPostSearchInput;
-  member_search: ToolMemberSearchInput;
+  "content_search": ToolContentSearchInput;
+  "tool_search": ToolToolSearchInput;
+  "tool_get": ToolToolGetInput;
+  "tool_load": ToolToolLoadInput;
+  "robot_create": ToolRobotCreateInput;
+  "robot_list": ToolRobotListInput;
+  "robot_get": ToolRobotGetInput;
+  "robot_update": ToolRobotUpdateInput;
+  "robot_delete": ToolRobotDeleteInput;
+  "robot_search": ToolRobotSearchInput;
+  "toolset_search": ToolToolsetSearchInput;
+  "toolset_load": ToolToolsetLoadInput;
+  "toolset_create": ToolToolsetCreateInput;
+  "toolset_list": ToolToolsetListInput;
+  "toolset_get": ToolToolsetGetInput;
+  "toolset_update": ToolToolsetUpdateInput;
+  "toolset_delete": ToolToolsetDeleteInput;
+  "library_page_list": ToolLibraryPageTreeInput;
+  "library_request_page": ToolLibraryRequestPageInput;
+  "get_library_page": ToolLibraryPageGetInput;
+  "create_library_page": ToolLibraryPageCreateInput;
+  "update_library_page": ToolLibraryPageUpdateInput;
+  "library_search_pages": ToolLibrarySearchPagesInput;
+  "library_page_property_schema_get": ToolLibraryPagePropertySchemaGetInput;
+  "library_page_property_schema_update": ToolLibraryPagePropertySchemaUpdateInput;
+  "library_page_properties_update": ToolLibraryPagePropertiesUpdateInput;
+  "tag_list": ToolTagListInput;
+  "link_create": ToolLinkCreateInput;
+  "thread_create": ToolThreadCreateInput;
+  "thread_list": ToolThreadListInput;
+  "thread_get": ToolThreadGetInput;
+  "thread_update": ToolThreadUpdateInput;
+  "thread_reply": ToolThreadReplyInput;
+  "category_list": ToolCategoryListInput;
+  "thread_search": ToolThreadSearchInput;
+  "reply_search": ToolReplySearchInput;
+  "post_search": ToolPostSearchInput;
+  "member_search": ToolMemberSearchInput;
 };
 
 export type ToolOutputMap = {
-  content_search: ToolContentSearchOutput;
-  robot_switch: ToolRobotSwitchOutput;
-  system_robot_tool_catalog: ToolSystemRobotToolCatalogOutput;
-  robot_create: ToolRobotCreateOutput;
-  robot_list: ToolRobotListOutput;
-  robot_get: ToolRobotGetOutput;
-  robot_update: ToolRobotUpdateOutput;
-  robot_delete: ToolRobotDeleteOutput;
-  library_page_list: ToolLibraryPageTreeOutput;
-  library_request_page: ToolLibraryRequestPageOutput;
-  get_library_page: ToolLibraryPageGetOutput;
-  create_library_page: ToolLibraryPageCreateOutput;
-  update_library_page: ToolLibraryPageUpdateOutput;
-  library_search_pages: ToolLibrarySearchPagesOutput;
-  library_page_property_schema_get: ToolLibraryPagePropertySchemaGetOutput;
-  library_page_property_schema_update: ToolLibraryPagePropertySchemaUpdateOutput;
-  library_page_properties_update: ToolLibraryPagePropertiesUpdateOutput;
-  tag_list: ToolTagListOutput;
-  link_create: ToolLinkCreateOutput;
-  thread_create: ToolThreadCreateOutput;
-  thread_list: ToolThreadListOutput;
-  thread_get: ToolThreadGetOutput;
-  thread_update: ToolThreadUpdateOutput;
-  thread_reply: ToolThreadReplyOutput;
-  category_list: ToolCategoryListOutput;
-  thread_search: ToolThreadSearchOutput;
-  reply_search: ToolReplySearchOutput;
-  post_search: ToolPostSearchOutput;
-  member_search: ToolMemberSearchOutput;
+  "content_search": ToolContentSearchOutput;
+  "tool_search": ToolToolSearchOutput;
+  "tool_get": ToolToolGetOutput;
+  "tool_load": ToolToolLoadOutput;
+  "robot_create": ToolRobotCreateOutput;
+  "robot_list": ToolRobotListOutput;
+  "robot_get": ToolRobotGetOutput;
+  "robot_update": ToolRobotUpdateOutput;
+  "robot_delete": ToolRobotDeleteOutput;
+  "robot_search": ToolRobotSearchOutput;
+  "toolset_search": ToolToolsetSearchOutput;
+  "toolset_load": ToolToolsetLoadOutput;
+  "toolset_create": ToolToolsetCreateOutput;
+  "toolset_list": ToolToolsetListOutput;
+  "toolset_get": ToolToolsetGetOutput;
+  "toolset_update": ToolToolsetUpdateOutput;
+  "toolset_delete": ToolToolsetDeleteOutput;
+  "library_page_list": ToolLibraryPageTreeOutput;
+  "library_request_page": ToolLibraryRequestPageOutput;
+  "get_library_page": ToolLibraryPageGetOutput;
+  "create_library_page": ToolLibraryPageCreateOutput;
+  "update_library_page": ToolLibraryPageUpdateOutput;
+  "library_search_pages": ToolLibrarySearchPagesOutput;
+  "library_page_property_schema_get": ToolLibraryPagePropertySchemaGetOutput;
+  "library_page_property_schema_update": ToolLibraryPagePropertySchemaUpdateOutput;
+  "library_page_properties_update": ToolLibraryPagePropertiesUpdateOutput;
+  "tag_list": ToolTagListOutput;
+  "link_create": ToolLinkCreateOutput;
+  "thread_create": ToolThreadCreateOutput;
+  "thread_list": ToolThreadListOutput;
+  "thread_get": ToolThreadGetOutput;
+  "thread_update": ToolThreadUpdateOutput;
+  "thread_reply": ToolThreadReplyOutput;
+  "category_list": ToolCategoryListOutput;
+  "thread_search": ToolThreadSearchOutput;
+  "reply_search": ToolReplySearchOutput;
+  "post_search": ToolPostSearchOutput;
+  "member_search": ToolMemberSearchOutput;
 };
 export type StorydenTools = {
-  content_search: {
+  "content_search": {
     input: ToolContentSearchInput;
     output: ToolContentSearchOutput;
   };
-  robot_switch: {
-    input: ToolRobotSwitchInput;
-    output: ToolRobotSwitchOutput;
+  "tool_search": {
+    input: ToolToolSearchInput;
+    output: ToolToolSearchOutput;
   };
-  system_robot_tool_catalog: {
-    input: ToolSystemRobotToolCatalogInput;
-    output: ToolSystemRobotToolCatalogOutput;
+  "tool_get": {
+    input: ToolToolGetInput;
+    output: ToolToolGetOutput;
   };
-  robot_create: {
+  "tool_load": {
+    input: ToolToolLoadInput;
+    output: ToolToolLoadOutput;
+  };
+  "robot_create": {
     input: ToolRobotCreateInput;
     output: ToolRobotCreateOutput;
   };
-  robot_list: {
+  "robot_list": {
     input: ToolRobotListInput;
     output: ToolRobotListOutput;
   };
-  robot_get: {
+  "robot_get": {
     input: ToolRobotGetInput;
     output: ToolRobotGetOutput;
   };
-  robot_update: {
+  "robot_update": {
     input: ToolRobotUpdateInput;
     output: ToolRobotUpdateOutput;
   };
-  robot_delete: {
+  "robot_delete": {
     input: ToolRobotDeleteInput;
     output: ToolRobotDeleteOutput;
   };
-  library_page_list: {
+  "robot_search": {
+    input: ToolRobotSearchInput;
+    output: ToolRobotSearchOutput;
+  };
+  "toolset_search": {
+    input: ToolToolsetSearchInput;
+    output: ToolToolsetSearchOutput;
+  };
+  "toolset_load": {
+    input: ToolToolsetLoadInput;
+    output: ToolToolsetLoadOutput;
+  };
+  "toolset_create": {
+    input: ToolToolsetCreateInput;
+    output: ToolToolsetCreateOutput;
+  };
+  "toolset_list": {
+    input: ToolToolsetListInput;
+    output: ToolToolsetListOutput;
+  };
+  "toolset_get": {
+    input: ToolToolsetGetInput;
+    output: ToolToolsetGetOutput;
+  };
+  "toolset_update": {
+    input: ToolToolsetUpdateInput;
+    output: ToolToolsetUpdateOutput;
+  };
+  "toolset_delete": {
+    input: ToolToolsetDeleteInput;
+    output: ToolToolsetDeleteOutput;
+  };
+  "library_page_list": {
     input: ToolLibraryPageTreeInput;
     output: ToolLibraryPageTreeOutput;
   };
-  library_request_page: {
+  "library_request_page": {
     input: ToolLibraryRequestPageInput;
     output: ToolLibraryRequestPageOutput;
   };
-  get_library_page: {
+  "get_library_page": {
     input: ToolLibraryPageGetInput;
     output: ToolLibraryPageGetOutput;
   };
-  create_library_page: {
+  "create_library_page": {
     input: ToolLibraryPageCreateInput;
     output: ToolLibraryPageCreateOutput;
   };
-  update_library_page: {
+  "update_library_page": {
     input: ToolLibraryPageUpdateInput;
     output: ToolLibraryPageUpdateOutput;
   };
-  library_search_pages: {
+  "library_search_pages": {
     input: ToolLibrarySearchPagesInput;
     output: ToolLibrarySearchPagesOutput;
   };
-  library_page_property_schema_get: {
+  "library_page_property_schema_get": {
     input: ToolLibraryPagePropertySchemaGetInput;
     output: ToolLibraryPagePropertySchemaGetOutput;
   };
-  library_page_property_schema_update: {
+  "library_page_property_schema_update": {
     input: ToolLibraryPagePropertySchemaUpdateInput;
     output: ToolLibraryPagePropertySchemaUpdateOutput;
   };
-  library_page_properties_update: {
+  "library_page_properties_update": {
     input: ToolLibraryPagePropertiesUpdateInput;
     output: ToolLibraryPagePropertiesUpdateOutput;
   };
-  tag_list: {
+  "tag_list": {
     input: ToolTagListInput;
     output: ToolTagListOutput;
   };
-  link_create: {
+  "link_create": {
     input: ToolLinkCreateInput;
     output: ToolLinkCreateOutput;
   };
-  thread_create: {
+  "thread_create": {
     input: ToolThreadCreateInput;
     output: ToolThreadCreateOutput;
   };
-  thread_list: {
+  "thread_list": {
     input: ToolThreadListInput;
     output: ToolThreadListOutput;
   };
-  thread_get: {
+  "thread_get": {
     input: ToolThreadGetInput;
     output: ToolThreadGetOutput;
   };
-  thread_update: {
+  "thread_update": {
     input: ToolThreadUpdateInput;
     output: ToolThreadUpdateOutput;
   };
-  thread_reply: {
+  "thread_reply": {
     input: ToolThreadReplyInput;
     output: ToolThreadReplyOutput;
   };
-  category_list: {
+  "category_list": {
     input: ToolCategoryListInput;
     output: ToolCategoryListOutput;
   };
-  thread_search: {
+  "thread_search": {
     input: ToolThreadSearchInput;
     output: ToolThreadSearchOutput;
   };
-  reply_search: {
+  "reply_search": {
     input: ToolReplySearchInput;
     output: ToolReplySearchOutput;
   };
-  post_search: {
+  "post_search": {
     input: ToolPostSearchInput;
     output: ToolPostSearchOutput;
   };
-  member_search: {
+  "member_search": {
     input: ToolMemberSearchInput;
     output: ToolMemberSearchOutput;
   };

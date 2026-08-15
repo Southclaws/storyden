@@ -29,8 +29,23 @@ export interface RobotToolProviderToolConfig {
   name: string;
   output_schema?: RobotToolJSONSchema;
   requires_confirmation?: boolean;
+  // Whether this tool requires an active Robot workspace.
+  requires_workspace?: boolean;
   // Optional display title for MCP clients and Robot builders.
   title?: string;
+}
+
+export interface RobotToolProviderToolsetConfig {
+  description: string;
+  // Stable provider-local Toolset identifier.
+  id: string;
+  // Specialist instructions injected whenever the Toolset is active.
+  instruction?: string;
+  name: string;
+  // Whether this entire Toolset requires an active Robot workspace.
+  requires_workspace?: boolean;
+  // Provider-local tool IDs included in this Toolset.
+  tools: string[];
 }
 
 
@@ -54,6 +69,8 @@ export interface RobotToolProviderCapabilityConfig {
   name?: string;
   // Robot tools statically provided by this plugin.
   tools: RobotToolProviderToolConfig[];
+  // Reusable prompt-decorated Toolsets assembled from this provider's tools.
+  toolsets?: RobotToolProviderToolsetConfig[];
   // Version of the host capability protocol implemented by this plugin.
   version: string;
 }

@@ -12,6 +12,7 @@ import type { NullableIdentifier } from "./nullableIdentifier";
 import type { ProfileReference } from "./profileReference";
 import type { RobotModelRef } from "./robotModelRef";
 import type { RobotToolNameList } from "./robotToolNameList";
+import type { RobotToolsetRefList } from "./robotToolsetRefList";
 
 export interface RobotProps {
   /** The name of the robot */
@@ -25,5 +26,6 @@ export interface RobotProps {
   workspace_id?: NullableIdentifier | null;
   author: ProfileReference;
   tools: RobotToolNameList;
+  toolsets: RobotToolsetRefList;
   meta?: Metadata;
 }

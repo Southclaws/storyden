@@ -47,6 +47,7 @@ export function FullPageChatInput() {
     <styled.form
       onSubmit={handleSubmit}
       w="full"
+      flexShrink="0"
       aria-label="Send message to Robot"
     >
       <LStack w="full" gap="1.5">

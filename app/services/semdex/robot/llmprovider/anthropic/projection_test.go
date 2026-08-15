@@ -7,17 +7,17 @@ import (
 	anthropicapi "github.com/anthropics/anthropic-sdk-go"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
 func TestBuildToolInputSchemaSerializesEmptyParametersAsObject(t *testing.T) {
 	inputSchema := buildToolInputSchema(&genai.FunctionDeclaration{
-		Name: "system_robot_tool_catalog",
+		Name: "robot_create",
 	})
 
 	raw, err := json.Marshal(anthropicapi.ToolParam{
-		Name:        "system_robot_tool_catalog",
+		Name:        "robot_create",
 		InputSchema: inputSchema,
 	})
 	require.NoError(t, err)

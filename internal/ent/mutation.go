@@ -56,6 +56,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -119,6 +120,7 @@ const (
 	TypeRobotProviderModel           = "RobotProviderModel"
 	TypeRobotSession                 = "RobotSession"
 	TypeRobotSessionMessage          = "RobotSessionMessage"
+	TypeRobotToolset                 = "RobotToolset"
 	TypeRobotWorkspace               = "RobotWorkspace"
 	TypeRobotWorkspaceInstance       = "RobotWorkspaceInstance"
 	TypeRole                         = "Role"
@@ -259,6 +261,9 @@ type AccountMutation struct {
 	robots                                      map[xid.ID]struct{}
 	removedrobots                               map[xid.ID]struct{}
 	clearedrobots                               bool
+	robot_toolsets                              map[xid.ID]struct{}
+	removedrobot_toolsets                       map[xid.ID]struct{}
+	clearedrobot_toolsets                       bool
 	robot_workspaces                            map[xid.ID]struct{}
 	removedrobot_workspaces                     map[xid.ID]struct{}
 	clearedrobot_workspaces                     bool
@@ -2968,6 +2973,60 @@ func (m *AccountMutation) ResetRobots() {
 	m.removedrobots = nil
 }
 
+// AddRobotToolsetIDs adds the "robot_toolsets" edge to the RobotToolset entity by ids.
+func (m *AccountMutation) AddRobotToolsetIDs(ids ...xid.ID) {
+	if m.robot_toolsets == nil {
+		m.robot_toolsets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.robot_toolsets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRobotToolsets clears the "robot_toolsets" edge to the RobotToolset entity.
+func (m *AccountMutation) ClearRobotToolsets() {
+	m.clearedrobot_toolsets = true
+}
+
+// RobotToolsetsCleared reports if the "robot_toolsets" edge to the RobotToolset entity was cleared.
+func (m *AccountMutation) RobotToolsetsCleared() bool {
+	return m.clearedrobot_toolsets
+}
+
+// RemoveRobotToolsetIDs removes the "robot_toolsets" edge to the RobotToolset entity by IDs.
+func (m *AccountMutation) RemoveRobotToolsetIDs(ids ...xid.ID) {
+	if m.removedrobot_toolsets == nil {
+		m.removedrobot_toolsets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.robot_toolsets, ids[i])
+		m.removedrobot_toolsets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRobotToolsets returns the removed IDs of the "robot_toolsets" edge to the RobotToolset entity.
+func (m *AccountMutation) RemovedRobotToolsetsIDs() (ids []xid.ID) {
+	for id := range m.removedrobot_toolsets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RobotToolsetsIDs returns the "robot_toolsets" edge IDs in the mutation.
+func (m *AccountMutation) RobotToolsetsIDs() (ids []xid.ID) {
+	for id := range m.robot_toolsets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRobotToolsets resets all changes to the "robot_toolsets" edge.
+func (m *AccountMutation) ResetRobotToolsets() {
+	m.robot_toolsets = nil
+	m.clearedrobot_toolsets = false
+	m.removedrobot_toolsets = nil
+}
+
 // AddRobotWorkspaceIDs adds the "robot_workspaces" edge to the RobotWorkspace entity by ids.
 func (m *AccountMutation) AddRobotWorkspaceIDs(ids ...xid.ID) {
 	if m.robot_workspaces == nil {
@@ -3691,7 +3750,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 43)
+	edges := make([]string, 0, 44)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -3802,6 +3861,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.robots != nil {
 		edges = append(edges, account.EdgeRobots)
+	}
+	if m.robot_toolsets != nil {
+		edges = append(edges, account.EdgeRobotToolsets)
 	}
 	if m.robot_workspaces != nil {
 		edges = append(edges, account.EdgeRobotWorkspaces)
@@ -4048,6 +4110,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeRobotToolsets:
+		ids := make([]ent.Value, 0, len(m.robot_toolsets))
+		for id := range m.robot_toolsets {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeRobotWorkspaces:
 		ids := make([]ent.Value, 0, len(m.robot_workspaces))
 		for id := range m.robot_workspaces {
@@ -4090,7 +4158,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 43)
+	edges := make([]string, 0, 44)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4198,6 +4266,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedrobots != nil {
 		edges = append(edges, account.EdgeRobots)
+	}
+	if m.removedrobot_toolsets != nil {
+		edges = append(edges, account.EdgeRobotToolsets)
 	}
 	if m.removedrobot_workspaces != nil {
 		edges = append(edges, account.EdgeRobotWorkspaces)
@@ -4440,6 +4511,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeRobotToolsets:
+		ids := make([]ent.Value, 0, len(m.removedrobot_toolsets))
+		for id := range m.removedrobot_toolsets {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeRobotWorkspaces:
 		ids := make([]ent.Value, 0, len(m.removedrobot_workspaces))
 		for id := range m.removedrobot_workspaces {
@@ -4482,7 +4559,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 43)
+	edges := make([]string, 0, 44)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -4594,6 +4671,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedrobots {
 		edges = append(edges, account.EdgeRobots)
 	}
+	if m.clearedrobot_toolsets {
+		edges = append(edges, account.EdgeRobotToolsets)
+	}
 	if m.clearedrobot_workspaces {
 		edges = append(edges, account.EdgeRobotWorkspaces)
 	}
@@ -4693,6 +4773,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedauthored_warnings
 	case account.EdgeRobots:
 		return m.clearedrobots
+	case account.EdgeRobotToolsets:
+		return m.clearedrobot_toolsets
 	case account.EdgeRobotWorkspaces:
 		return m.clearedrobot_workspaces
 	case account.EdgeRobotWorkspaceInstances:
@@ -4834,6 +4916,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeRobots:
 		m.ResetRobots()
+		return nil
+	case account.EdgeRobotToolsets:
+		m.ResetRobotToolsets()
 		return nil
 	case account.EdgeRobotWorkspaces:
 		m.ResetRobotWorkspaces()
@@ -41107,6 +41192,8 @@ type RobotMutation struct {
 	model            *string
 	tools            *[]string
 	appendtools      []string
+	toolsets         *[]string
+	appendtoolsets   []string
 	metadata         *map[string]interface{}
 	clearedFields    map[string]struct{}
 	author           *xid.ID
@@ -41519,6 +41606,71 @@ func (m *RobotMutation) ResetTools() {
 	delete(m.clearedFields, robot.FieldTools)
 }
 
+// SetToolsets sets the "toolsets" field.
+func (m *RobotMutation) SetToolsets(s []string) {
+	m.toolsets = &s
+	m.appendtoolsets = nil
+}
+
+// Toolsets returns the value of the "toolsets" field in the mutation.
+func (m *RobotMutation) Toolsets() (r []string, exists bool) {
+	v := m.toolsets
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldToolsets returns the old "toolsets" field's value of the Robot entity.
+// If the Robot object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotMutation) OldToolsets(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldToolsets is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldToolsets requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldToolsets: %w", err)
+	}
+	return oldValue.Toolsets, nil
+}
+
+// AppendToolsets adds s to the "toolsets" field.
+func (m *RobotMutation) AppendToolsets(s []string) {
+	m.appendtoolsets = append(m.appendtoolsets, s...)
+}
+
+// AppendedToolsets returns the list of values that were appended to the "toolsets" field in this mutation.
+func (m *RobotMutation) AppendedToolsets() ([]string, bool) {
+	if len(m.appendtoolsets) == 0 {
+		return nil, false
+	}
+	return m.appendtoolsets, true
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (m *RobotMutation) ClearToolsets() {
+	m.toolsets = nil
+	m.appendtoolsets = nil
+	m.clearedFields[robot.FieldToolsets] = struct{}{}
+}
+
+// ToolsetsCleared returns if the "toolsets" field was cleared in this mutation.
+func (m *RobotMutation) ToolsetsCleared() bool {
+	_, ok := m.clearedFields[robot.FieldToolsets]
+	return ok
+}
+
+// ResetToolsets resets all changes to the "toolsets" field.
+func (m *RobotMutation) ResetToolsets() {
+	m.toolsets = nil
+	m.appendtoolsets = nil
+	delete(m.clearedFields, robot.FieldToolsets)
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *RobotMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -41795,7 +41947,7 @@ func (m *RobotMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, robot.FieldCreatedAt)
 	}
@@ -41816,6 +41968,9 @@ func (m *RobotMutation) Fields() []string {
 	}
 	if m.tools != nil {
 		fields = append(fields, robot.FieldTools)
+	}
+	if m.toolsets != nil {
+		fields = append(fields, robot.FieldToolsets)
 	}
 	if m.metadata != nil {
 		fields = append(fields, robot.FieldMetadata)
@@ -41848,6 +42003,8 @@ func (m *RobotMutation) Field(name string) (ent.Value, bool) {
 		return m.Model()
 	case robot.FieldTools:
 		return m.Tools()
+	case robot.FieldToolsets:
+		return m.Toolsets()
 	case robot.FieldMetadata:
 		return m.Metadata()
 	case robot.FieldWorkspaceID:
@@ -41877,6 +42034,8 @@ func (m *RobotMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldModel(ctx)
 	case robot.FieldTools:
 		return m.OldTools(ctx)
+	case robot.FieldToolsets:
+		return m.OldToolsets(ctx)
 	case robot.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case robot.FieldWorkspaceID:
@@ -41941,6 +42100,13 @@ func (m *RobotMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTools(v)
 		return nil
+	case robot.FieldToolsets:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetToolsets(v)
+		return nil
 	case robot.FieldMetadata:
 		v, ok := value.(map[string]interface{})
 		if !ok {
@@ -41998,6 +42164,9 @@ func (m *RobotMutation) ClearedFields() []string {
 	if m.FieldCleared(robot.FieldTools) {
 		fields = append(fields, robot.FieldTools)
 	}
+	if m.FieldCleared(robot.FieldToolsets) {
+		fields = append(fields, robot.FieldToolsets)
+	}
 	if m.FieldCleared(robot.FieldMetadata) {
 		fields = append(fields, robot.FieldMetadata)
 	}
@@ -42023,6 +42192,9 @@ func (m *RobotMutation) ClearField(name string) error {
 		return nil
 	case robot.FieldTools:
 		m.ClearTools()
+		return nil
+	case robot.FieldToolsets:
+		m.ClearToolsets()
 		return nil
 	case robot.FieldMetadata:
 		m.ClearMetadata()
@@ -42058,6 +42230,9 @@ func (m *RobotMutation) ResetField(name string) error {
 		return nil
 	case robot.FieldTools:
 		m.ResetTools()
+		return nil
+	case robot.FieldToolsets:
+		m.ResetToolsets()
 		return nil
 	case robot.FieldMetadata:
 		m.ResetMetadata()
@@ -45895,23 +46070,25 @@ func (m *RobotSessionMutation) ResetEdge(name string) error {
 // RobotSessionMessageMutation represents an operation that mutates the RobotSessionMessage nodes in the graph.
 type RobotSessionMessageMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *xid.ID
-	created_at     *time.Time
-	invocation_id  *string
-	builtin_robot  *string
-	event_data     *map[string]interface{}
-	clearedFields  map[string]struct{}
-	session        *xid.ID
-	clearedsession bool
-	robot          *xid.ID
-	clearedrobot   bool
-	author         *xid.ID
-	clearedauthor  bool
-	done           bool
-	oldValue       func(context.Context) (*RobotSessionMessage, error)
-	predicates     []predicate.RobotSessionMessage
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	invocation_id   *string
+	branch          *string
+	isolation_scope *string
+	builtin_robot   *string
+	event_data      *schema.RobotSessionEvent
+	clearedFields   map[string]struct{}
+	session         *xid.ID
+	clearedsession  bool
+	robot           *xid.ID
+	clearedrobot    bool
+	author          *xid.ID
+	clearedauthor   bool
+	done            bool
+	oldValue        func(context.Context) (*RobotSessionMessage, error)
+	predicates      []predicate.RobotSessionMessage
 }
 
 var _ ent.Mutation = (*RobotSessionMessageMutation)(nil)
@@ -46126,6 +46303,104 @@ func (m *RobotSessionMessageMutation) ResetInvocationID() {
 	m.invocation_id = nil
 }
 
+// SetBranch sets the "branch" field.
+func (m *RobotSessionMessageMutation) SetBranch(s string) {
+	m.branch = &s
+}
+
+// Branch returns the value of the "branch" field in the mutation.
+func (m *RobotSessionMessageMutation) Branch() (r string, exists bool) {
+	v := m.branch
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBranch returns the old "branch" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldBranch(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBranch is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBranch requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBranch: %w", err)
+	}
+	return oldValue.Branch, nil
+}
+
+// ClearBranch clears the value of the "branch" field.
+func (m *RobotSessionMessageMutation) ClearBranch() {
+	m.branch = nil
+	m.clearedFields[robotsessionmessage.FieldBranch] = struct{}{}
+}
+
+// BranchCleared returns if the "branch" field was cleared in this mutation.
+func (m *RobotSessionMessageMutation) BranchCleared() bool {
+	_, ok := m.clearedFields[robotsessionmessage.FieldBranch]
+	return ok
+}
+
+// ResetBranch resets all changes to the "branch" field.
+func (m *RobotSessionMessageMutation) ResetBranch() {
+	m.branch = nil
+	delete(m.clearedFields, robotsessionmessage.FieldBranch)
+}
+
+// SetIsolationScope sets the "isolation_scope" field.
+func (m *RobotSessionMessageMutation) SetIsolationScope(s string) {
+	m.isolation_scope = &s
+}
+
+// IsolationScope returns the value of the "isolation_scope" field in the mutation.
+func (m *RobotSessionMessageMutation) IsolationScope() (r string, exists bool) {
+	v := m.isolation_scope
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsolationScope returns the old "isolation_scope" field's value of the RobotSessionMessage entity.
+// If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotSessionMessageMutation) OldIsolationScope(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsolationScope is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsolationScope requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsolationScope: %w", err)
+	}
+	return oldValue.IsolationScope, nil
+}
+
+// ClearIsolationScope clears the value of the "isolation_scope" field.
+func (m *RobotSessionMessageMutation) ClearIsolationScope() {
+	m.isolation_scope = nil
+	m.clearedFields[robotsessionmessage.FieldIsolationScope] = struct{}{}
+}
+
+// IsolationScopeCleared returns if the "isolation_scope" field was cleared in this mutation.
+func (m *RobotSessionMessageMutation) IsolationScopeCleared() bool {
+	_, ok := m.clearedFields[robotsessionmessage.FieldIsolationScope]
+	return ok
+}
+
+// ResetIsolationScope resets all changes to the "isolation_scope" field.
+func (m *RobotSessionMessageMutation) ResetIsolationScope() {
+	m.isolation_scope = nil
+	delete(m.clearedFields, robotsessionmessage.FieldIsolationScope)
+}
+
 // SetRobotID sets the "robot_id" field.
 func (m *RobotSessionMessageMutation) SetRobotID(x xid.ID) {
 	m.robot = &x
@@ -46274,12 +46549,12 @@ func (m *RobotSessionMessageMutation) ResetAccountID() {
 }
 
 // SetEventData sets the "event_data" field.
-func (m *RobotSessionMessageMutation) SetEventData(value map[string]interface{}) {
-	m.event_data = &value
+func (m *RobotSessionMessageMutation) SetEventData(sse schema.RobotSessionEvent) {
+	m.event_data = &sse
 }
 
 // EventData returns the value of the "event_data" field in the mutation.
-func (m *RobotSessionMessageMutation) EventData() (r map[string]interface{}, exists bool) {
+func (m *RobotSessionMessageMutation) EventData() (r schema.RobotSessionEvent, exists bool) {
 	v := m.event_data
 	if v == nil {
 		return
@@ -46290,7 +46565,7 @@ func (m *RobotSessionMessageMutation) EventData() (r map[string]interface{}, exi
 // OldEventData returns the old "event_data" field's value of the RobotSessionMessage entity.
 // If the RobotSessionMessage object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RobotSessionMessageMutation) OldEventData(ctx context.Context) (v map[string]interface{}, err error) {
+func (m *RobotSessionMessageMutation) OldEventData(ctx context.Context) (v schema.RobotSessionEvent, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEventData is only allowed on UpdateOne operations")
 	}
@@ -46437,7 +46712,7 @@ func (m *RobotSessionMessageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RobotSessionMessageMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, robotsessionmessage.FieldCreatedAt)
 	}
@@ -46446,6 +46721,12 @@ func (m *RobotSessionMessageMutation) Fields() []string {
 	}
 	if m.invocation_id != nil {
 		fields = append(fields, robotsessionmessage.FieldInvocationID)
+	}
+	if m.branch != nil {
+		fields = append(fields, robotsessionmessage.FieldBranch)
+	}
+	if m.isolation_scope != nil {
+		fields = append(fields, robotsessionmessage.FieldIsolationScope)
 	}
 	if m.robot != nil {
 		fields = append(fields, robotsessionmessage.FieldRobotID)
@@ -46473,6 +46754,10 @@ func (m *RobotSessionMessageMutation) Field(name string) (ent.Value, bool) {
 		return m.SessionID()
 	case robotsessionmessage.FieldInvocationID:
 		return m.InvocationID()
+	case robotsessionmessage.FieldBranch:
+		return m.Branch()
+	case robotsessionmessage.FieldIsolationScope:
+		return m.IsolationScope()
 	case robotsessionmessage.FieldRobotID:
 		return m.RobotID()
 	case robotsessionmessage.FieldBuiltinRobot:
@@ -46496,6 +46781,10 @@ func (m *RobotSessionMessageMutation) OldField(ctx context.Context, name string)
 		return m.OldSessionID(ctx)
 	case robotsessionmessage.FieldInvocationID:
 		return m.OldInvocationID(ctx)
+	case robotsessionmessage.FieldBranch:
+		return m.OldBranch(ctx)
+	case robotsessionmessage.FieldIsolationScope:
+		return m.OldIsolationScope(ctx)
 	case robotsessionmessage.FieldRobotID:
 		return m.OldRobotID(ctx)
 	case robotsessionmessage.FieldBuiltinRobot:
@@ -46534,6 +46823,20 @@ func (m *RobotSessionMessageMutation) SetField(name string, value ent.Value) err
 		}
 		m.SetInvocationID(v)
 		return nil
+	case robotsessionmessage.FieldBranch:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBranch(v)
+		return nil
+	case robotsessionmessage.FieldIsolationScope:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsolationScope(v)
+		return nil
 	case robotsessionmessage.FieldRobotID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -46556,7 +46859,7 @@ func (m *RobotSessionMessageMutation) SetField(name string, value ent.Value) err
 		m.SetAccountID(v)
 		return nil
 	case robotsessionmessage.FieldEventData:
-		v, ok := value.(map[string]interface{})
+		v, ok := value.(schema.RobotSessionEvent)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -46592,6 +46895,12 @@ func (m *RobotSessionMessageMutation) AddField(name string, value ent.Value) err
 // mutation.
 func (m *RobotSessionMessageMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(robotsessionmessage.FieldBranch) {
+		fields = append(fields, robotsessionmessage.FieldBranch)
+	}
+	if m.FieldCleared(robotsessionmessage.FieldIsolationScope) {
+		fields = append(fields, robotsessionmessage.FieldIsolationScope)
+	}
 	if m.FieldCleared(robotsessionmessage.FieldRobotID) {
 		fields = append(fields, robotsessionmessage.FieldRobotID)
 	}
@@ -46615,6 +46924,12 @@ func (m *RobotSessionMessageMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *RobotSessionMessageMutation) ClearField(name string) error {
 	switch name {
+	case robotsessionmessage.FieldBranch:
+		m.ClearBranch()
+		return nil
+	case robotsessionmessage.FieldIsolationScope:
+		m.ClearIsolationScope()
+		return nil
 	case robotsessionmessage.FieldRobotID:
 		m.ClearRobotID()
 		return nil
@@ -46640,6 +46955,12 @@ func (m *RobotSessionMessageMutation) ResetField(name string) error {
 		return nil
 	case robotsessionmessage.FieldInvocationID:
 		m.ResetInvocationID()
+		return nil
+	case robotsessionmessage.FieldBranch:
+		m.ResetBranch()
+		return nil
+	case robotsessionmessage.FieldIsolationScope:
+		m.ResetIsolationScope()
 		return nil
 	case robotsessionmessage.FieldRobotID:
 		m.ResetRobotID()
@@ -46765,6 +47086,866 @@ func (m *RobotSessionMessageMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown RobotSessionMessage edge %s", name)
+}
+
+// RobotToolsetMutation represents an operation that mutates the RobotToolset nodes in the graph.
+type RobotToolsetMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	updated_at    *time.Time
+	name          *string
+	description   *string
+	instruction   *string
+	tools         *[]string
+	appendtools   []string
+	metadata      *map[string]interface{}
+	clearedFields map[string]struct{}
+	author        *xid.ID
+	clearedauthor bool
+	done          bool
+	oldValue      func(context.Context) (*RobotToolset, error)
+	predicates    []predicate.RobotToolset
+}
+
+var _ ent.Mutation = (*RobotToolsetMutation)(nil)
+
+// robottoolsetOption allows management of the mutation configuration using functional options.
+type robottoolsetOption func(*RobotToolsetMutation)
+
+// newRobotToolsetMutation creates new mutation for the RobotToolset entity.
+func newRobotToolsetMutation(c config, op Op, opts ...robottoolsetOption) *RobotToolsetMutation {
+	m := &RobotToolsetMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRobotToolset,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRobotToolsetID sets the ID field of the mutation.
+func withRobotToolsetID(id xid.ID) robottoolsetOption {
+	return func(m *RobotToolsetMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *RobotToolset
+		)
+		m.oldValue = func(ctx context.Context) (*RobotToolset, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().RobotToolset.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRobotToolset sets the old RobotToolset of the mutation.
+func withRobotToolset(node *RobotToolset) robottoolsetOption {
+	return func(m *RobotToolsetMutation) {
+		m.oldValue = func(context.Context) (*RobotToolset, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RobotToolsetMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RobotToolsetMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of RobotToolset entities.
+func (m *RobotToolsetMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RobotToolsetMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RobotToolsetMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().RobotToolset.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *RobotToolsetMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *RobotToolsetMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *RobotToolsetMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *RobotToolsetMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *RobotToolsetMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *RobotToolsetMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *RobotToolsetMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RobotToolsetMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RobotToolsetMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *RobotToolsetMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *RobotToolsetMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *RobotToolsetMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[robottoolset.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *RobotToolsetMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[robottoolset.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *RobotToolsetMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, robottoolset.FieldDescription)
+}
+
+// SetInstruction sets the "instruction" field.
+func (m *RobotToolsetMutation) SetInstruction(s string) {
+	m.instruction = &s
+}
+
+// Instruction returns the value of the "instruction" field in the mutation.
+func (m *RobotToolsetMutation) Instruction() (r string, exists bool) {
+	v := m.instruction
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInstruction returns the old "instruction" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldInstruction(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInstruction is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInstruction requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInstruction: %w", err)
+	}
+	return oldValue.Instruction, nil
+}
+
+// ClearInstruction clears the value of the "instruction" field.
+func (m *RobotToolsetMutation) ClearInstruction() {
+	m.instruction = nil
+	m.clearedFields[robottoolset.FieldInstruction] = struct{}{}
+}
+
+// InstructionCleared returns if the "instruction" field was cleared in this mutation.
+func (m *RobotToolsetMutation) InstructionCleared() bool {
+	_, ok := m.clearedFields[robottoolset.FieldInstruction]
+	return ok
+}
+
+// ResetInstruction resets all changes to the "instruction" field.
+func (m *RobotToolsetMutation) ResetInstruction() {
+	m.instruction = nil
+	delete(m.clearedFields, robottoolset.FieldInstruction)
+}
+
+// SetTools sets the "tools" field.
+func (m *RobotToolsetMutation) SetTools(s []string) {
+	m.tools = &s
+	m.appendtools = nil
+}
+
+// Tools returns the value of the "tools" field in the mutation.
+func (m *RobotToolsetMutation) Tools() (r []string, exists bool) {
+	v := m.tools
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTools returns the old "tools" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldTools(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTools is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTools requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTools: %w", err)
+	}
+	return oldValue.Tools, nil
+}
+
+// AppendTools adds s to the "tools" field.
+func (m *RobotToolsetMutation) AppendTools(s []string) {
+	m.appendtools = append(m.appendtools, s...)
+}
+
+// AppendedTools returns the list of values that were appended to the "tools" field in this mutation.
+func (m *RobotToolsetMutation) AppendedTools() ([]string, bool) {
+	if len(m.appendtools) == 0 {
+		return nil, false
+	}
+	return m.appendtools, true
+}
+
+// ClearTools clears the value of the "tools" field.
+func (m *RobotToolsetMutation) ClearTools() {
+	m.tools = nil
+	m.appendtools = nil
+	m.clearedFields[robottoolset.FieldTools] = struct{}{}
+}
+
+// ToolsCleared returns if the "tools" field was cleared in this mutation.
+func (m *RobotToolsetMutation) ToolsCleared() bool {
+	_, ok := m.clearedFields[robottoolset.FieldTools]
+	return ok
+}
+
+// ResetTools resets all changes to the "tools" field.
+func (m *RobotToolsetMutation) ResetTools() {
+	m.tools = nil
+	m.appendtools = nil
+	delete(m.clearedFields, robottoolset.FieldTools)
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *RobotToolsetMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *RobotToolsetMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *RobotToolsetMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[robottoolset.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *RobotToolsetMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[robottoolset.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *RobotToolsetMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, robottoolset.FieldMetadata)
+}
+
+// SetAuthorID sets the "author_id" field.
+func (m *RobotToolsetMutation) SetAuthorID(x xid.ID) {
+	m.author = &x
+}
+
+// AuthorID returns the value of the "author_id" field in the mutation.
+func (m *RobotToolsetMutation) AuthorID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuthorID returns the old "author_id" field's value of the RobotToolset entity.
+// If the RobotToolset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RobotToolsetMutation) OldAuthorID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuthorID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuthorID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuthorID: %w", err)
+	}
+	return oldValue.AuthorID, nil
+}
+
+// ResetAuthorID resets all changes to the "author_id" field.
+func (m *RobotToolsetMutation) ResetAuthorID() {
+	m.author = nil
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *RobotToolsetMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[robottoolset.FieldAuthorID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *RobotToolsetMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *RobotToolsetMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *RobotToolsetMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// Where appends a list predicates to the RobotToolsetMutation builder.
+func (m *RobotToolsetMutation) Where(ps ...predicate.RobotToolset) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RobotToolsetMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RobotToolsetMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.RobotToolset, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RobotToolsetMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RobotToolsetMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (RobotToolset).
+func (m *RobotToolsetMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RobotToolsetMutation) Fields() []string {
+	fields := make([]string, 0, 8)
+	if m.created_at != nil {
+		fields = append(fields, robottoolset.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, robottoolset.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, robottoolset.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, robottoolset.FieldDescription)
+	}
+	if m.instruction != nil {
+		fields = append(fields, robottoolset.FieldInstruction)
+	}
+	if m.tools != nil {
+		fields = append(fields, robottoolset.FieldTools)
+	}
+	if m.metadata != nil {
+		fields = append(fields, robottoolset.FieldMetadata)
+	}
+	if m.author != nil {
+		fields = append(fields, robottoolset.FieldAuthorID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RobotToolsetMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case robottoolset.FieldCreatedAt:
+		return m.CreatedAt()
+	case robottoolset.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case robottoolset.FieldName:
+		return m.Name()
+	case robottoolset.FieldDescription:
+		return m.Description()
+	case robottoolset.FieldInstruction:
+		return m.Instruction()
+	case robottoolset.FieldTools:
+		return m.Tools()
+	case robottoolset.FieldMetadata:
+		return m.Metadata()
+	case robottoolset.FieldAuthorID:
+		return m.AuthorID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RobotToolsetMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case robottoolset.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case robottoolset.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case robottoolset.FieldName:
+		return m.OldName(ctx)
+	case robottoolset.FieldDescription:
+		return m.OldDescription(ctx)
+	case robottoolset.FieldInstruction:
+		return m.OldInstruction(ctx)
+	case robottoolset.FieldTools:
+		return m.OldTools(ctx)
+	case robottoolset.FieldMetadata:
+		return m.OldMetadata(ctx)
+	case robottoolset.FieldAuthorID:
+		return m.OldAuthorID(ctx)
+	}
+	return nil, fmt.Errorf("unknown RobotToolset field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotToolsetMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case robottoolset.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case robottoolset.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case robottoolset.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case robottoolset.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case robottoolset.FieldInstruction:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInstruction(v)
+		return nil
+	case robottoolset.FieldTools:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTools(v)
+		return nil
+	case robottoolset.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	case robottoolset.FieldAuthorID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuthorID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown RobotToolset field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RobotToolsetMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RobotToolsetMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RobotToolsetMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown RobotToolset numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RobotToolsetMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(robottoolset.FieldDescription) {
+		fields = append(fields, robottoolset.FieldDescription)
+	}
+	if m.FieldCleared(robottoolset.FieldInstruction) {
+		fields = append(fields, robottoolset.FieldInstruction)
+	}
+	if m.FieldCleared(robottoolset.FieldTools) {
+		fields = append(fields, robottoolset.FieldTools)
+	}
+	if m.FieldCleared(robottoolset.FieldMetadata) {
+		fields = append(fields, robottoolset.FieldMetadata)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RobotToolsetMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RobotToolsetMutation) ClearField(name string) error {
+	switch name {
+	case robottoolset.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case robottoolset.FieldInstruction:
+		m.ClearInstruction()
+		return nil
+	case robottoolset.FieldTools:
+		m.ClearTools()
+		return nil
+	case robottoolset.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotToolset nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RobotToolsetMutation) ResetField(name string) error {
+	switch name {
+	case robottoolset.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case robottoolset.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case robottoolset.FieldName:
+		m.ResetName()
+		return nil
+	case robottoolset.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case robottoolset.FieldInstruction:
+		m.ResetInstruction()
+		return nil
+	case robottoolset.FieldTools:
+		m.ResetTools()
+		return nil
+	case robottoolset.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	case robottoolset.FieldAuthorID:
+		m.ResetAuthorID()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotToolset field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RobotToolsetMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.author != nil {
+		edges = append(edges, robottoolset.EdgeAuthor)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RobotToolsetMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case robottoolset.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RobotToolsetMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RobotToolsetMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RobotToolsetMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedauthor {
+		edges = append(edges, robottoolset.EdgeAuthor)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RobotToolsetMutation) EdgeCleared(name string) bool {
+	switch name {
+	case robottoolset.EdgeAuthor:
+		return m.clearedauthor
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RobotToolsetMutation) ClearEdge(name string) error {
+	switch name {
+	case robottoolset.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotToolset unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RobotToolsetMutation) ResetEdge(name string) error {
+	switch name {
+	case robottoolset.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown RobotToolset edge %s", name)
 }
 
 // RobotWorkspaceMutation represents an operation that mutates the RobotWorkspace nodes in the graph.

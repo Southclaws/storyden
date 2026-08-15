@@ -19,7 +19,11 @@ export interface RobotChatRequest {
   threadId?: string;
   /** Session ID to continue an existing conversation */
   sessionId?: string;
-  /** Specific robot ID to use for this message */
+  /**
+   * Optional Robot ID to use as the root when creating a new session.
+   * Omit this field to use Denbot. It cannot switch the root
+   * Robot of an existing session.
+   */
   robotId?: string;
   /** Array of chat messages in the conversation */
   messages: UIMessage[];

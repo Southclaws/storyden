@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"google.golang.org/adk/agent"
+	"google.golang.org/adk/v2/agent"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/lib/mcp"
 )
 
-func (s *Agent) globalInstructionProvider(chatContext *mcp.RobotChatContext, identity robotIdentityContext, options RunOptions) func(ctx agent.ReadonlyContext) (string, error) {
+func (s *Agent) globalInstructionProvider(chatContext *mcp.RobotChatContext, options RunOptions) func(ctx agent.ReadonlyContext) (string, error) {
 	return func(ctx agent.ReadonlyContext) (string, error) {
 		acc, err := session.GetAccount(ctx)
 		if err != nil {
@@ -29,9 +29,6 @@ func (s *Agent) globalInstructionProvider(chatContext *mcp.RobotChatContext, ide
 			b.WriteString("\n\n")
 			b.WriteString(unattendedInstruction)
 		}
-
-		b.WriteString("\n\n")
-		b.WriteString(robotIdentityInstruction(identity))
 
 		b.WriteString("\n\n## Current Context\n\n")
 		b.WriteString(fmt.Sprintf("Current date and time: %s\n\n", time.Now().UTC().Format(time.RFC3339)))

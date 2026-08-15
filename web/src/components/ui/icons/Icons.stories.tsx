@@ -80,6 +80,7 @@ import * as SuggestIcons from "./Suggest";
 import * as SystemIcons from "./System";
 import * as TagIcons from "./Tag";
 import * as ToolIcons from "./Tool";
+import * as ToolsetIcons from "./Toolset";
 import * as TypographyIcons from "./Typography";
 import * as VersionsIcons from "./Versions";
 import * as VisibilityIcons from "./Visibility";
@@ -162,6 +163,7 @@ const modules = {
   SystemIcons,
   TagIcons,
   ToolIcons,
+  ToolsetIcons,
   TypographyIcons,
   VersionsIcons,
   VisibilityIcons,
@@ -191,6 +193,14 @@ const iconPreviewClassName = css({
 
 const meta = {
   title: "Foundations/Icons/Library",
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Storyden icons are semantic product exports, not a shape catalogue. Product code imports from `components/ui/icons`; raw Lucide or Heroicons imports belong inside this library. Choose an icon by its exported meaning—`CollectionIcon` represents Storyden Collections and `ToolsetIcon` represents Robot Toolsets. If no semantic icon matches, prefer no icon before adding decoration. Add a new export only for a recurring product concept. The containing component owns contextual size whenever possible: compact inline and Card title icons render at 16px, while icon buttons derive icon size from the control.",
+      },
+    },
+  },
 } satisfies Meta;
 
 export default meta;

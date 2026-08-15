@@ -1,0 +1,6 @@
+steps:
+  - match:
+      any: true
+    respond:
+      text: "Specialist found the delegated result."
+      finish: "stop"

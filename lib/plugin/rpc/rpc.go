@@ -47,8 +47,24 @@ type RobotToolProviderToolConfig struct {
 	Name                 string                            `json:"name"`
 	OutputSchema         opt.Optional[RobotToolJSONSchema] `json:"output_schema,omitempty"`
 	RequiresConfirmation opt.Optional[bool]                `json:"requires_confirmation,omitempty"`
+	// Whether this tool requires an active Robot workspace.
+	RequiresWorkspace opt.Optional[bool] `json:"requires_workspace,omitempty"`
 	// Optional display title for MCP clients and Robot builders.
 	Title opt.Optional[string] `json:"title,omitempty"`
+}
+
+type RobotToolProviderToolsetConfig struct {
+	Description string `json:"description"`
+	// Stable provider-local Toolset identifier.
+	ID string `json:"id"`
+	// Specialist instructions injected whenever the Toolset is active.
+	//
+	Instruction opt.Optional[string] `json:"instruction,omitempty"`
+	Name        string               `json:"name"`
+	// Whether this entire Toolset requires an active Robot workspace.
+	RequiresWorkspace opt.Optional[bool] `json:"requires_workspace,omitempty"`
+	// Provider-local tool IDs included in this Toolset.
+	Tools []string `json:"tools"`
 }
 
 type CapabilityConfigUnion interface {
@@ -127,7 +143,9 @@ type RobotToolProviderCapabilityConfig struct {
 	Name opt.Optional[string] `json:"name,omitempty"`
 	// Robot tools statically provided by this plugin.
 	Tools []RobotToolProviderToolConfig `json:"tools"`
-	Type  string                        `json:"type"`
+	// Reusable prompt-decorated Toolsets assembled from this provider's tools.
+	Toolsets []RobotToolProviderToolsetConfig `json:"toolsets,omitempty"`
+	Type     string                           `json:"type"`
 	// Version of the host capability protocol implemented by this plugin.
 	Version string `json:"version"`
 }

@@ -1,365 +1,200 @@
-# Robot Tool Registry
-
-This directory contains the tool registry system for Storyden's AI agents (Robots). The architecture is schema-driven, with all tool definitions centralized in `/api/robots.yaml` and code generated from that single source of truth.
-
-## Architecture Overview
-
-### Schema-Driven Design
-
-All tool definitions live in `/api/robots.yaml` as JSON Schema definitions. This provides:
-
-- Single source of truth for tool schemas
-- Type-safe Go bindings generated via `go-jsonschema`
-- LLM-friendly OpenAPI-compatible schemas
-- Easy validation and documentation
-
-### ToolResult Pattern
-
-Tool execution functions return `ToolResult[T]` instead of `T` directly because the Google ADK `functiontool` type doesn't allow error returns. This wrapper provides:
-
-```go
-type ToolResult[T any] struct {
-    Result T      // The actual result data
-    Error  string // LLM-friendly error message
-}
-```
-
-Helper constructors:
-
-- `NewSuccess[T](v T) ToolResult[T]` - For successful results
-- `NewError[T](err error) ToolResult[T]` - For errors (uses err.Error())
-- `NewErrorMsg[T](msg string) ToolResult[T]` - For custom error messages
-
-### Why This Pattern Exists
-
-The Google ADK has two error handling paths:
-
-1. **Schema validation errors** (wrong argument names, types, missing required fields): The ADK validates arguments before calling our function. When validation fails, it wraps the error as a Go `error` type which doesn't serialize properly to JSON, resulting in `{"error":{}}` sent to the LLM.
-
-2. **Tool execution errors** (our ToolResult): By returning `ToolResult[T]` with a string `Error` field, we ensure errors serialize correctly as `{"Result":...,"Error":"message here"}`.
-
-**Impact**: Schema validation failures appear as empty error objects to the LLM, while tool execution errors have clear messages. We work around this by providing detailed schema descriptions and validation constraints that help the LLM avoid schema errors.
-
-### Error Accumulation for Validation
-
-When validating array inputs (like kinds, authors, tools), we **accumulate errors** instead of failing early. This gives the LLM feedback about which specific arguments were valid vs invalid.
-
-Example from search tool:
-
-```go
-var validationErrors []string
-
-// Validate kinds filter
-var invalidKinds []string
-for _, k := range args.Kinds {
-    kind, err := datagraph.NewKind(string(k))
-    if err != nil {
-        invalidKinds = append(invalidKinds, string(k))
-        continue
-    }
-    kinds = append(kinds, kind)
-}
-if len(invalidKinds) > 0 {
-    validationErrors = append(validationErrors, fmt.Sprintf("invalid kinds: %v", invalidKinds))
-}
-
-// Continue with valid kinds, accumulate all errors, return at end
-```
-
-This allows partial success - the search can proceed with valid filters while informing the LLM about invalid ones.
-
-## Tool Registry Components
-
-### 1. Schema Definition (`/api/robots.yaml`)
-
-Each tool has three schema definitions:
-
-- `Tool{Name}`: Top-level definition with title and description
-- `Tool{Name}Input`: Input parameters schema
-- `Tool{Name}Output`: Output result schema
-
-Example:
-
-```yaml
-ToolSearch:
-  title: search
-  description: "Search the Storyden knowledge base..."
-  type: object
-  required: [input, output]
-  properties:
-    input:
-      $ref: "#/definitions/ToolSearchInput"
-    output:
-      $ref: "#/definitions/ToolSearchOutput"
-
-ToolSearchInput:
-  type: object
-  required: [query]
-  properties:
-    query:
-      type: string
-      description: The search query text
-    # ... more properties
-```
-
-### 2. Code Generation (`/api/embed.go`, `/mcp/bindings.go`)
-
-`embed.go` just exists to load the schema YAML into Go's address space at build time.
-
-Then, the `mcp/bindings` code will make this more useful for us:
-
-The `init()` function:
-
-1. Parses `schema.yaml` into Go structs
-2. Calls `initAllTools()` to create tool definitions
-3. Builds the tool names enum for validation
-
-Key functions:
-
-- `GetSearchTool()` - Returns search tool definition
-- `GetRobotCreateTool()` - Returns robot create tool definition
-- `AllToolNames()` - Returns slice of all tool names
-- `InjectToolNamesEnum(schema, propertyName)` - Injects dynamic enum into schema
-
-### 3. Tool Provider (`tools/provider.go`)
-
-The `DefaultToolProvider` implements the `ToolProvider` interface:
-
-```go
-type ToolProvider interface {
-    GetTool(ctx context.Context, name string) (tool.Tool, error)
-    GetDefaultTools(ctx context.Context) ([]tool.Tool, error)
-    GetRobotTools(ctx context.Context, robotID xid.ID) ([]tool.Tool, error)
-}
-```
-
-Constructor signature:
-
-```go
-func NewToolProvider(
-    logger *slog.Logger,
-    db *ent.Client,
-    searcher searcher.Searcher,
-    accountQuerier *account_querier.Querier,
-    categoryRepo *category.Repository,
-) ToolProvider
-```
-
-## Available Tools
-
-### Search (`tool_search.go`)
-
-Searches the Storyden knowledge base with filters:
-
-- `query` (required): Search text
-- `kinds`: Filter by content type (post, thread, reply, node, collection, profile, event)
-- `authors`: Filter by author handles (username strings, looked up to IDs)
-- `categories`: Filter by category names (case-insensitive match to IDs)
-- `tags`: Filter by tag names
-- `max_results`: Limit results (default 10)
-
-**Validation**: Accumulates errors for invalid kinds, unfound authors, and unfound categories while proceeding with valid values.
-
-### Robot Switch (`tool_switch.go`)
-
-Switches the conversation to a different Robot agent.
-
-- Dynamically injects available robot IDs into enum
-- Validates robot exists before switching
-
-### Robot CRUD (`tool_robots.go`)
-
-#### Create
-
-Creates a new Robot with:
-
-- `name` (required): Robot name
-- `playbook` (required): System prompt/directive
-- `description` (optional): Human-readable description
-- `tools` (optional): Array of tool names
-
-**Validation**: Validates tool names against `AllToolNames()` enum, accumulates invalid tool errors.
-
-#### List
-
-Lists all robots with optional limit.
-
-#### Get
-
-Retrieves a specific robot by ID.
-
-**Validation**: Validates ID format.
-
-#### Update
-
-Updates robot fields (name, description, playbook, tools).
-
-**Validation**: Same tool name validation as Create.
-
-#### Delete
-
-Permanently deletes a robot.
-
-**Validation**: Validates ID format and robot existence.
-
-## Dynamic Schema Injection
-
-Some tool schemas need runtime data:
-
-### Robot ID Enum (Switch Tool)
-
-```go
-robots, err := p.db.Robot.Query().Order(robot.ByCreatedAt()).All(ctx)
-robotIDs := make([]any, len(robots))
-for i, r := range robots {
-    robotIDs[i] = r.ID.String()
-}
-inputSchema.Properties["robot_id"].Enum = robotIDs
-```
-
-### Tool Names Enum (Create/Update Robot)
-
-```go
-inputSchema := toolDef.InputSchema
-mcp.InjectToolNamesEnum(inputSchema, "tools")
-```
-
-The `InjectToolNamesEnum` helper finds the array property and injects the enum of all available tool names.
-
-## Adding a New Tool
-
-1. **Define schema in `/api/robots.yaml`**:
-
-```yaml
-ToolMyNewTool:
-  title: my_new_tool
-  description: "What this tool does..."
-  type: object
-  required: [input, output]
-  properties:
-    input:
-      $ref: "#/definitions/ToolMyNewToolInput"
-    output:
-      $ref: "#/definitions/ToolMyNewToolOutput"
-
-ToolMyNewToolInput:
-  type: object
-  required: [some_field]
-  properties:
-    some_field:
-      type: string
-      description: Description here
-
-ToolMyNewToolOutput:
-  type: object
-  required: [result]
-  properties:
-    result:
-      type: string
-```
-
-2. **Update `/api/embed.go`**:
-
-```go
-var toolMyNewTool *ToolDefinition
-
-func initAllTools() {
-    // ... existing tools
-    toolMyNewTool = initTool("MyNewTool")
-    // Update AllToolNames() return value
-}
-
-func GetMyNewToolTool() *ToolDefinition {
-    return toolMyNewTool
-}
-
-func AllToolNames() []string {
-    return []string{
-        // ... existing tools
-        toolMyNewTool.Name,
-    }
-}
-```
-
-3. **Create tool file `tool_mynew.go`**:
-
-```go
-package tools
-
-func (p *DefaultToolProvider) newMyNewToolTool(ctx context.Context) (tool.Tool, error) {
-    toolDef := mcp.GetMyNewToolTool()
-
-    tool, err := functiontool.New(
-        functiontool.Config{
-            Name:        toolDef.Name,
-            Description: toolDef.Description,
-            InputSchema: toolDef.InputSchema,
-        },
-        p.executeMyNewTool,
-    )
-    return tool, err
-}
-
-func (p *DefaultToolProvider) executeMyNewTool(ctx tool.Context, args mcp.ToolMyNewToolInput) ToolResult[mcp.ToolMyNewToolOutput] {
-    // Validate inputs, accumulate errors
-    var validationErrors []string
-
-    // Do the work
-    result, err := doSomething(args.SomeField)
-    if err != nil {
-        return NewError[mcp.ToolMyNewToolOutput](err)
-    }
-
-    // Return success or partial success with validation errors
-    output := mcp.ToolMyNewToolOutput{Result: result}
-    if len(validationErrors) > 0 {
-        return ToolResult[mcp.ToolMyNewToolOutput]{
-            Result: output,
-            Error:  strings.Join(validationErrors, "; "),
-        }
-    }
-    return NewSuccess(output)
-}
-```
-
-4. **Register in `provider.go` `GetTool` switch**:
-
-```go
-case mcp.GetMyNewToolTool().Name:
-    return p.newMyNewToolTool(ctx)
-```
-
-5. **Generate code**:
-
-```bash
-task generate
-```
-
-## Testing Tools
-
-Tools are tested via integration tests that verify:
-
-- Schema validation
-- Error handling and accumulation
-- Successful execution paths
-- LLM-friendly error messages
-
-See `tests/robot/` for examples.
-
-## Best Practices
-
-1. **Always use ToolResult pattern** - Even for infallible operations
-2. **Accumulate validation errors** - Don't fail fast, collect all issues
-3. **Provide helpful error messages** - Remember the LLM reads these
-4. **Validate IDs early** - Parse xid.IDs before database operations
-5. **Use schema-driven types** - Never hand-write request/response structs
-6. **Update AllToolNames()** - Keep the enum synchronized
-7. **Document filter behavior** - Explain how name→ID lookups work
-
-## Dependency Injection
-
-The tool provider is wired via Uber FX in the main application. Add new dependencies to:
-
-1. `DefaultToolProvider` struct in `provider.go`
-2. `NewToolProvider` constructor signature
-3. FX provider in `app/services/semdex/robot/fx.go`
+# Robots Runtime
+
+Storyden Robots is an agent runtime built on Google ADK v2. New
+conversations use the built-in **Denbot** unless a custom Robot is selected
+explicitly for testing or a focused interaction. Denbot can discover
+reusable Toolsets, load capabilities for the current session, search the
+specialist Robot catalogue, and delegate bounded tasks without changing the
+user's active conversation.
+
+Database-backed Robots are focused specialists and reusable delegation targets,
+but remain valid chat entrypoints so their behaviour can be exercised directly.
+
+## Runtime Contract
+
+- `/sse/chat` accepts an optional Robot selector when creating a session and
+  defaults to `denbot`. The chosen root Robot is immutable for that session.
+- `robot_switch` and active-Robot session state do not exist.
+- Custom Robots can also be invoked directly by internal/plugin `robot_run`
+  workflows when an explicit specialist run is the intended API operation.
+- Denbot and delegated Robots share one ADK session and one mounted workspace.
+- Delegated events retain their database Robot attribution and ADK `Branch`.
+  `IsolationScope` is also persisted when ADK supplies one.
+- Branched specialist output is projected as collapsed reasoning in the UI.
+  Denbot's synthesis remains the visible assistant answer.
+
+## Agent Topology
+
+`runner.go` resolves the built-in Denbot definition and attaches every
+available database-backed Robot as an ADK sub-agent:
+
+- Denbot uses `llmagent.ModeChat` and owns the user conversation.
+- Specialists use `llmagent.ModeSingleTurn`.
+- ADK exposes each specialist as a generated agent tool named
+  `robot_<database-xid>`.
+- `robot_search` returns that callable delegation name with the Robot's purpose
+  and configured Toolsets.
+- A specialist receives only the delegated request, its playbook, its model,
+  and its assigned direct tools and Toolsets. Its result returns to Denbot as
+  a tool result.
+- Every Robot receives shared execution guidance that prevents unchanged tool
+  calls from being repeated when neither their inputs nor underlying state have
+  changed. This belongs to the runtime identity instruction rather than any
+  individual Toolset, so custom Toolsets and direct tools inherit it too.
+
+Single-turn delegation intentionally avoids chat hand-off semantics. It gives
+Denbot evidence to synthesize and automatically returns control in the same
+invocation.
+
+## Toolsets
+
+A Toolset is a reusable capability package:
+
+- stable ID and human-readable name
+- description used for discovery
+- optional specialist instruction injected while active
+- a set of raw registered tools
+- source metadata: `system`, `custom`, or `plugin`
+
+System Toolsets are registered at startup. Custom Toolsets are Ent resources
+owned by an account and managed through `/robots/toolsets`. Plugins may publish
+Toolset definitions alongside their tools; plugin host registration and
+unregistration is atomic for both surfaces.
+
+Robots store both direct tool names and Toolset references. Direct tools support
+narrow configurations where assigning an entire Toolset would grant unrelated
+capabilities or inject unnecessary guidance. A custom Toolset cannot be deleted
+while any Robot references it.
+
+Tool assignment is intentionally disjoint. Adding a Toolset removes direct
+tools already provided by that Toolset. Adding a direct tool already provided
+by an assigned Toolset is rejected with the owning Toolset's name.
+
+Denbot starts with the Library management, Discussion management, Content
+search, and Robot studio Toolsets. Plugin Studio is a prompt-bearing system
+Toolset, not a built-in Robot.
+
+### Toolset discovery and loading
+
+Denbot always receives `toolset_search`, `toolset_load`, and `tool_load`.
+`toolset_search` returns only Toolset ID, name, and description. The Robot uses
+`toolset_get` to inspect the selected bundle's tool IDs and instruction before
+loading it. Loading records active Toolset references in ADK session state and
+makes both their prompt and tools available on the next model step.
+
+Individual capability discovery is deliberately separate. `tool_search`
+returns only tool ID, name, and description; `tool_get` returns the selected
+tool's full input/output schema, confirmation requirement, and workspace
+precondition. `tool_get` is
+inspection-only. `tool_load` is the explicit state-changing operation that
+activates one or more inspected tools for the conversation.
+
+Workspace availability is derived from the session's authoritative
+`robot_workspace` mount state. Toolsets can declare that the whole bundle
+requires a workspace, and individual schema-backed tools can declare
+`x-storyden-tool.requires_workspace`. ADK's dynamic `Toolset.Tools` boundary
+hides these capabilities when no workspace is mounted. Inspection remains
+available so Denbot can explain the precondition, while `toolset_load` and
+`tool_load` reject activation without mutating session state.
+
+ADK v2.1 caches `Toolset.Tools` once per flow: `toolProcessor` returns as soon as
+`Flow.Tools` is non-nil, while the same Flow performs each model step in an
+invocation. To support same-invocation loading without exposing every schema to
+the model, Storyden's discovery Toolset:
+
+1. resolves the complete executable tool pool once for ADK dispatch;
+2. records which Toolsets own each callable tool name;
+3. prunes inactive Toolset schemas from every model request;
+4. re-evaluates session state after `toolset_load` or `tool_load`, allowing the
+   newly active schemas through on the following model step.
+
+This keeps normal ADK tool execution, RBAC callbacks, confirmation gates, and
+client-side tool handling intact while preserving progressive disclosure.
+
+## Tool Registry
+
+Raw tool contracts are schema-driven. Tool schemas live under `api/robots.yaml`
+and `api/robots/tools/`; generated bindings live in `lib/mcp`. The runtime
+registry in `tools/` owns native, MCP, and plugin tool implementations and maps
+stable IDs to callable ADK names.
+
+Capability discovery follows progressive disclosure. Search responses never
+dump schemas, Toolset membership, or provenance:
+
+- `tool_search` -> ID, name, description
+- `tool_get` -> full individual schema and runtime preconditions
+- `tool_load` -> conversation activation
+- `toolset_search` -> ID, name, description
+- `toolset_get` -> full bundle configuration, tool IDs, instruction, runtime preconditions, editability
+- `toolset_load` -> conversation activation
+
+`source` remains management/UI provenance and is excluded from agent-facing
+discovery. `editable` remains on `toolset_get` because it determines which
+management actions are possible.
+
+When adding a tool:
+
+1. add or update the schema source;
+2. run `task generate:mcp`;
+3. register the implementation in `tools/` or a plugin provider;
+4. place it in an appropriate Toolset, or leave it catalogue-only for custom
+   composition;
+5. test the model-visible schema and real execution path.
+
+## Sessions and presentation
+
+`session_storage.go` adapts Storyden persistence to ADK's session service. Each
+non-partial event stores the complete ADK event plus indexed attribution fields:
+
+- invocation ID
+- branch
+- isolation scope
+- human author, built-in Robot, or database Robot
+
+Model parts marked `Thought` and text emitted on delegated branches are
+projected as AI SDK reasoning parts. They are hidden by default behind an
+expandable disclosure. Tool calls and Denbot's final prose keep their normal
+presentation.
+
+## Workspaces
+
+Workspaces belong to the root session, not to Plugin Studio. A request may
+mount a workspace template or an existing workspace instance. The mount is
+stored in session state and is therefore available to Denbot, loaded Toolsets,
+and delegated specialists.
+
+Workspace providers own confinement and execution policy. Toolsets must use the
+workspace abstraction rather than infer host paths. Arbitrary command tools
+must continue to respect the workspace's `allow_untrusted_commands` policy.
+
+## Safety boundaries
+
+- Tool permission checks run immediately before execution using the current
+  account session.
+- Confirmation-required tools still pause the SSE flow and resume from the
+  client-supplied approval.
+- Unattended runs disable confirmation-only side effects and block tools that
+  need live client input.
+- Specialist construction failures are logged and skipped so one unavailable
+  model or Toolset does not take down Denbot.
+- Plugin Toolsets are validated against the tools registered by that plugin
+  before they become discoverable.
+
+The current Robot catalogue is instance-visible, matching the existing Robots
+API. Custom Toolset mutations are author-controlled. Per-user Robot visibility
+is a separate product boundary and should be designed explicitly rather than
+inferred from Toolset ownership.
+
+## Validation
+
+Focused runtime coverage lives in:
+
+- `app/services/semdex/robot/toolsets`
+- `app/resources/robot/robot_toolset`
+- `app/resources/robot/robot_session`
+- `tests/robot/chat`
+- `tests/plugin/plugin_robot_run_test.go`
+
+The chat integration tests exercise direct-tool execution, same-session
+delegation, branch attribution, collapsed specialist output, and
+search-load-execute behavior for custom Toolsets.

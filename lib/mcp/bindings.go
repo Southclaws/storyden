@@ -31,6 +31,7 @@ type ToolDefinition struct {
 	OutputSchema         *jsonschema.Schema
 	RequiredPermission   opt.Optional[rbac.Permission]
 	RequiresConfirmation bool
+	RequiresWorkspace    bool
 	Annotations          ToolAnnotations
 }
 
@@ -188,6 +189,7 @@ func initTool(name string) *ToolDefinition {
 	var requiredPermission opt.Optional[rbac.Permission]
 	var displayTitle string
 	var requiresConfirmation bool
+	var requiresWorkspace bool
 	var annotations ToolAnnotations
 
 	if toolDef.Extra != nil {
@@ -203,6 +205,7 @@ func initTool(name string) *ToolDefinition {
 				displayTitle = t
 			}
 			requiresConfirmation, _ = ext["requires_confirmation"].(bool)
+			requiresWorkspace, _ = ext["requires_workspace"].(bool)
 			if ann, ok := ext["annotations"].(map[string]any); ok {
 				annotations.ReadOnlyHint, _ = ann["readOnlyHint"].(bool)
 				annotations.DestructiveHint, _ = ann["destructiveHint"].(bool)
@@ -220,6 +223,7 @@ func initTool(name string) *ToolDefinition {
 		OutputSchema:         outputSchema,
 		RequiredPermission:   requiredPermission,
 		RequiresConfirmation: requiresConfirmation,
+		RequiresWorkspace:    requiresWorkspace,
 		Annotations:          annotations,
 	}
 }

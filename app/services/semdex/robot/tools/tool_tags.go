@@ -2,10 +2,11 @@ package tools
 
 import (
 	"context"
+	adkagent "google.golang.org/adk/v2/agent"
 	"log/slog"
 
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
@@ -45,7 +46,7 @@ func (tt *tagTools) newTagListTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolTagListInput) (*mcp.ToolTagListOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolTagListInput) (*mcp.ToolTagListOutput, error) {
 					return tt.ExecuteTagList(ctx, args)
 				},
 			)

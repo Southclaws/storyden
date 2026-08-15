@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/storyden/lib/mcp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
@@ -127,7 +127,7 @@ func TestNormalizeClientToolResultsLeavesOtherToolsUnchanged(t *testing.T) {
 					{
 						FunctionResponse: &genai.FunctionResponse{
 							ID:       "call_123",
-							Name:     "robot_switch",
+							Name:     "unrelated_tool",
 							Response: response,
 						},
 					},

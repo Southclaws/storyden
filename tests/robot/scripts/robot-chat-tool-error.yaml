@@ -1,6 +1,6 @@
 steps:
   - match:
-      tool_result: throw_an_error
+      tool_result: robot_get
     respond:
       text: "The tool returned an error."
       finish: "stop"
@@ -9,5 +9,6 @@ steps:
     respond:
       tool_calls:
         - id: call_err_1
-          name: throw_an_error
-          args: {}
+          name: robot_get
+          args:
+            id: "not-a-robot-id"

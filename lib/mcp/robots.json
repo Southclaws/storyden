@@ -124,6 +124,15 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "visibility": {
+          "description": "Current publishing workflow state.",
+          "enum": [
+            "draft",
+            "review",
+            "published"
+          ],
+          "type": "string"
         }
       },
       "required": [
@@ -131,7 +140,8 @@
         "slug",
         "name",
         "description",
-        "browser_url"
+        "browser_url",
+        "visibility"
       ],
       "type": "object"
     },
@@ -414,6 +424,31 @@
       ],
       "type": "object"
     },
+    "RobotSearchResult": {
+      "additionalProperties": false,
+      "properties": {
+        "delegate_to": {
+          "description": "Delegation target name.",
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "delegate_to",
+        "name",
+        "description"
+      ],
+      "type": "object"
+    },
     "SearchedItem": {
       "additionalProperties": false,
       "properties": {
@@ -559,6 +594,11 @@
       ],
       "title": "category_list",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -606,6 +646,11 @@
       ],
       "title": "content_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -695,29 +740,6 @@
       ],
       "type": "object"
     },
-    "ToolInfo": {
-      "additionalProperties": false,
-      "properties": {
-        "description": {
-          "description": "Brief description of what the tool does",
-          "type": "string"
-        },
-        "name": {
-          "description": "The tool name identifier",
-          "type": "string"
-        },
-        "requires_confirmation": {
-          "description": "Whether Robot runs must pause for human approval before executing this tool.",
-          "type": "boolean"
-        }
-      },
-      "required": [
-        "name",
-        "description",
-        "requires_confirmation"
-      ],
-      "type": "object"
-    },
     "ToolLibraryPageCreate": {
       "$id": "ToolLibraryPageCreate",
       "description": "Create a new page in the library. A slug will be generated automatically if not provided.",
@@ -735,6 +757,11 @@
       ],
       "title": "create_library_page",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -822,7 +849,7 @@
     },
     "ToolLibraryPageGet": {
       "$id": "ToolLibraryPageGet",
-      "description": "Get detailed information about a specific library page by its slug.",
+      "description": "Retrieve a library page with its content and workflow visibility by ID.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolLibraryPageGetInput"
@@ -837,6 +864,11 @@
       ],
       "title": "get_library_page",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -876,6 +908,10 @@
           },
           "type": "array"
         },
+        "content": {
+          "description": "Plain-text page body for evaluating or summarising the page.",
+          "type": "string"
+        },
         "description": {
           "description": "Brief description of the page",
           "type": "string"
@@ -898,6 +934,15 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "visibility": {
+          "description": "Current publishing workflow state.",
+          "enum": [
+            "draft",
+            "review",
+            "published"
+          ],
+          "type": "string"
         }
       },
       "required": [
@@ -906,7 +951,9 @@
         "name",
         "tags",
         "child_pages",
-        "browser_url"
+        "browser_url",
+        "content",
+        "visibility"
       ],
       "type": "object"
     },
@@ -927,6 +974,11 @@
       ],
       "title": "library_page_properties_update",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -992,6 +1044,11 @@
       ],
       "title": "library_page_property_schema_get",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1054,6 +1111,11 @@
       ],
       "title": "library_page_property_schema_update",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -1105,7 +1167,7 @@
     },
     "ToolLibraryPageTree": {
       "$id": "ToolLibraryPageTree",
-      "description": "Get the full tree structure of pages in the library. Returns a hierarchical view of all wiki pages showing their parent-child relationships.",
+      "description": "List library pages by hierarchy and workflow visibility.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolLibraryPageTreeInput"
@@ -1120,10 +1182,15 @@
       ],
       "title": "library_page_list",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
-          "idempotentHint": false,
+          "idempotentHint": true,
           "openWorldHint": false,
           "readOnlyHint": true
         },
@@ -1138,6 +1205,15 @@
           "description": "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)",
           "minimum": -1,
           "type": "integer"
+        },
+        "visibility": {
+          "description": "Limit pages to one workflow visibility.",
+          "enum": [
+            "draft",
+            "review",
+            "published"
+          ],
+          "type": "string"
         }
       },
       "type": "object"
@@ -1146,15 +1222,20 @@
       "additionalProperties": false,
       "properties": {
         "pages": {
-          "description": "List of pages in tree structure",
+          "description": "Pages in hierarchical order for selecting a page to inspect.",
           "items": {
             "$ref": "#/definitions/LibraryPageTreeNode"
           },
           "type": "array"
+        },
+        "results": {
+          "description": "Number of pages returned.",
+          "type": "integer"
         }
       },
       "required": [
-        "pages"
+        "pages",
+        "results"
       ],
       "type": "object"
     },
@@ -1175,6 +1256,11 @@
       ],
       "title": "update_library_page",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1282,6 +1368,11 @@
       ],
       "title": "library_request_page",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1346,6 +1437,12 @@
       ],
       "title": "library_search_pages",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.library",
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1409,6 +1506,9 @@
       ],
       "title": "link_create",
       "type": "object",
+      "x-storyden": {
+        "toolsets": []
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1481,6 +1581,11 @@
       ],
       "title": "member_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1549,6 +1654,12 @@
       ],
       "title": "post_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1639,6 +1750,12 @@
       ],
       "title": "reply_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1707,7 +1824,7 @@
     },
     "ToolRobotCreate": {
       "$id": "ToolRobotCreate",
-      "description": "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions.",
+      "description": "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using direct tools, reusable Toolsets, and instructions.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolRobotCreateInput"
@@ -1722,6 +1839,11 @@
       ],
       "title": "robot_create",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1756,7 +1878,14 @@
           "type": "string"
         },
         "tools": {
-          "description": "List of tool names that the Robot can use.",
+          "description": "Individual tool names that the Robot can use. Tools already provided by an assigned Toolset are removed.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "toolsets": {
+          "description": "List of reusable Toolset IDs that the Robot can use.",
           "items": {
             "type": "string"
           },
@@ -1805,6 +1934,11 @@
       ],
       "title": "robot_delete",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": true,
@@ -1866,6 +2000,11 @@
       ],
       "title": "robot_get",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1915,7 +2054,14 @@
           "type": "string"
         },
         "tools": {
-          "description": "List of tool names that the Robot can use",
+          "description": "List of individual tool names that the Robot can use",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "toolsets": {
+          "description": "List of reusable Toolset IDs that the Robot can use",
           "items": {
             "type": "string"
           },
@@ -1927,7 +2073,8 @@
         "name",
         "playbook",
         "model",
-        "tools"
+        "tools",
+        "toolsets"
       ],
       "type": "object"
     },
@@ -1948,6 +2095,11 @@
       ],
       "title": "robot_list",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -1990,69 +2142,80 @@
       ],
       "type": "object"
     },
-    "ToolRobotSwitch": {
-      "$id": "ToolRobotSwitch",
-      "description": "Switch the current conversation to a different Robot (agent). Use this when the user wants to talk to a different specialized agent or when a different agent would be better suited to help with the user's request.",
+    "ToolRobotSearch": {
+      "$id": "ToolRobotSearch",
+      "description": "Search specialised Robots by capability before delegating a task.",
       "properties": {
         "input": {
-          "$ref": "#/definitions/ToolRobotSwitchInput"
+          "$ref": "#/definitions/ToolRobotSearchInput"
         },
         "output": {
-          "$ref": "#/definitions/ToolRobotSwitchOutput"
+          "$ref": "#/definitions/ToolRobotSearchOutput"
         }
       },
       "required": [
         "input",
         "output"
       ],
-      "title": "robot_switch",
+      "title": "robot_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
           "idempotentHint": true,
           "openWorldHint": false,
-          "readOnlyHint": false
+          "readOnlyHint": true
         },
         "role": "USE_ROBOTS",
-        "title": "Switch Robot"
+        "title": "Search Robots"
       }
     },
-    "ToolRobotSwitchInput": {
+    "ToolRobotSearchInput": {
       "additionalProperties": false,
       "properties": {
-        "robot_id": {
-          "description": "The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs.",
-          "pattern": "^[0-9a-v]{20}$",
+        "max_results": {
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "description": "The task or capability a specialised Robot should handle.",
+          "minLength": 1,
           "type": "string"
         }
       },
       "required": [
-        "robot_id"
+        "query"
       ],
       "type": "object"
     },
-    "ToolRobotSwitchOutput": {
+    "ToolRobotSearchOutput": {
       "additionalProperties": false,
       "properties": {
-        "robot_id": {
-          "description": "The ID of the robot that was switched to",
+        "next_action": {
           "type": "string"
         },
-        "success": {
-          "description": "Whether the agent switch was successful",
-          "type": "boolean"
+        "robots": {
+          "items": {
+            "$ref": "#/definitions/RobotSearchResult"
+          },
+          "type": "array"
         }
       },
       "required": [
-        "success",
-        "robot_id"
+        "robots",
+        "next_action"
       ],
       "type": "object"
     },
     "ToolRobotUpdate": {
       "$id": "ToolRobotUpdate",
-      "description": "Update a Robot's configuration. You can modify its name, description, playbook (directive), or tools. Only provide the fields you want to change.",
+      "description": "Update a Robot's configuration. You can modify its name, description, playbook (directive), direct tools, or Toolsets. Only provide the fields you want to change.",
       "properties": {
         "input": {
           "$ref": "#/definitions/ToolRobotUpdateInput"
@@ -2067,6 +2230,11 @@
       ],
       "title": "robot_update",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2106,7 +2274,14 @@
           "type": "string"
         },
         "tools": {
-          "description": "The new list of tool names that the Robot can use.",
+          "description": "The new list of individual tool names that the Robot can use.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "toolsets": {
+          "description": "The new list of reusable Toolset IDs that the Robot can use.",
           "items": {
             "type": "string"
           },
@@ -2136,51 +2311,6 @@
       ],
       "type": "object"
     },
-    "ToolSystemRobotToolCatalog": {
-      "$id": "ToolSystemRobotToolCatalog",
-      "description": "Returns a list of tools that may be assigned to a Robot during Robot creation or update. Use this when selecting capabilities assigned to a Robot. This catalog describes Robot capabilities, not this conversation's capabilities.\n",
-      "properties": {
-        "input": {
-          "$ref": "#/definitions/ToolSystemRobotToolCatalogInput"
-        },
-        "output": {
-          "$ref": "#/definitions/ToolSystemRobotToolCatalogOutput"
-        }
-      },
-      "required": [
-        "input",
-        "output"
-      ],
-      "title": "system_robot_tool_catalog",
-      "type": "object",
-      "x-storyden-tool": {
-        "annotations": {
-          "destructiveHint": false,
-          "idempotentHint": false,
-          "openWorldHint": false,
-          "readOnlyHint": true
-        },
-        "role": "USE_ROBOTS",
-        "title": "List All Tool Names"
-      }
-    },
-    "ToolSystemRobotToolCatalogInput": {
-      "additionalProperties": false,
-      "properties": {},
-      "type": "object"
-    },
-    "ToolSystemRobotToolCatalogOutput": {
-      "description": "List of the tools available in the catalog that you can assign to Robots, with their names and descriptions",
-      "properties": {
-        "tools": {
-          "items": {
-            "$ref": "#/definitions/ToolInfo"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object"
-    },
     "ToolTagList": {
       "$id": "ToolTagList",
       "description": "Get a list of all tags on the site or search for tags by name. Tags are labels used to categorize and organize content. Each tag includes its name and the number of items tagged with it.",
@@ -2198,6 +2328,11 @@
       ],
       "title": "tag_list",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2252,6 +2387,11 @@
       ],
       "title": "thread_create",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2383,6 +2523,11 @@
       ],
       "title": "thread_get",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2491,6 +2636,11 @@
       ],
       "title": "thread_list",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2573,6 +2723,11 @@
       ],
       "title": "thread_reply",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2659,6 +2814,12 @@
       ],
       "title": "thread_search",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2749,6 +2910,11 @@
       ],
       "title": "thread_update",
       "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "annotations": {
           "destructiveHint": false,
@@ -2852,6 +3018,845 @@
         "slug",
         "title",
         "browser_url"
+      ],
+      "type": "object"
+    },
+    "ToolToolGet": {
+      "$id": "ToolToolGet",
+      "description": "Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "tool_get",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "USE_ROBOTS",
+        "title": "Get Tool"
+      }
+    },
+    "ToolToolGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Stable tool ID returned by tool_search.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolToolGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "The outcome the tool is designed to achieve and when it should be selected.",
+          "type": "string"
+        },
+        "id": {
+          "description": "Stable tool identifier accepted by tool_load and Robot configuration tools.",
+          "type": "string"
+        },
+        "input_schema": {
+          "additionalProperties": true,
+          "description": "Complete JSON Schema for arguments that must be supplied when calling the tool.",
+          "type": "object"
+        },
+        "name": {
+          "description": "Human-readable title for explaining or confirming the selected capability.",
+          "type": "string"
+        },
+        "output_schema": {
+          "additionalProperties": true,
+          "description": "Complete JSON Schema for the tool result when the tool declares one.",
+          "type": "object"
+        },
+        "requires_confirmation": {
+          "description": "Whether a run must pause for human approval before executing this tool.",
+          "type": "boolean"
+        },
+        "requires_workspace": {
+          "description": "Whether the conversation must have an active Robot workspace before this tool can be loaded or used.",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "input_schema",
+        "requires_confirmation",
+        "requires_workspace"
+      ],
+      "type": "object"
+    },
+    "ToolToolLoad": {
+      "$id": "ToolToolLoad",
+      "description": "Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolLoadInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolLoadOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "tool_load",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "title": "Load Tools"
+      }
+    },
+    "ToolToolLoadInput": {
+      "additionalProperties": false,
+      "properties": {
+        "tools": {
+          "description": "Stable tool IDs inspected with tool_get.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "tools"
+      ],
+      "type": "object"
+    },
+    "ToolToolLoadOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "loaded": {
+          "description": "Tools activated for subsequent model steps in this conversation.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "properties": {
+              "description": {
+                "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable tool title that helps distinguish similar capabilities.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "next_action": {
+          "description": "Recommended continuation now that the selected tools are available.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "loaded",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolToolSearch": {
+      "$id": "ToolToolSearch",
+      "description": "Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolSearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolSearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "tool_search",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "USE_ROBOTS",
+        "title": "Search Tools"
+      }
+    },
+    "ToolToolSearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "max_results": {
+          "description": "Maximum number of ranked candidates to return; omit to use the default.",
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "description": "Capability, task, or tool name to search for.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ToolToolSearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "next_action": {
+          "description": "Recommended next step for inspecting and activating a selected candidate.",
+          "type": "string"
+        },
+        "tools": {
+          "description": "Ranked tool candidates with enough context to choose which one to inspect.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+            "properties": {
+              "description": {
+                "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable tool title that helps distinguish similar capabilities.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "tools",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetCreate": {
+      "$id": "ToolToolsetCreate",
+      "description": "Create a reusable custom Toolset from available tool identifiers and optional specialised prompt guidance.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetCreateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetCreateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_create",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "USE_ROBOTS",
+        "title": "Create Toolset"
+      }
+    },
+    "ToolToolsetCreateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tools": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "tools"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetCreateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetDelete": {
+      "$id": "ToolToolsetDelete",
+      "description": "Delete an unused authored custom Toolset. Remove it from Robots first.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetDeleteInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetDeleteOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_delete",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "USE_ROBOTS",
+        "title": "Delete Toolset"
+      }
+    },
+    "ToolToolsetDeleteInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetDeleteOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "deleted": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "deleted"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetGet": {
+      "$id": "ToolToolsetGet",
+      "description": "Get a Toolset's complete agent-relevant configuration after finding its ID with toolset_search. Returns its tool IDs, specialist instruction, workspace precondition, and whether this caller may edit it.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetGetInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetGetOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_get",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "USE_ROBOTS",
+        "title": "Get Toolset"
+      }
+    },
+    "ToolToolsetGetInput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "description": "Stable Toolset ID returned by toolset_search.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetGetOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "The jobs this Toolset is designed to handle and when the bundle should be selected.",
+          "type": "string"
+        },
+        "editable": {
+          "description": "Whether the current caller can update or delete this Toolset through management tools.",
+          "type": "boolean"
+        },
+        "id": {
+          "description": "Stable Toolset identifier accepted by toolset_load and Robot configuration tools.",
+          "type": "string"
+        },
+        "instruction": {
+          "description": "Specialist guidance injected while this Toolset is active, including workflow and safety boundaries.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Human-readable name for explaining or confirming the selected capability bundle.",
+          "type": "string"
+        },
+        "requires_workspace": {
+          "description": "Whether the conversation must have an active Robot workspace before this Toolset can be loaded or used.",
+          "type": "boolean"
+        },
+        "tools": {
+          "description": "Tool IDs activated or assigned together by this Toolset; use tool_get when an individual schema is needed.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "tools",
+        "instruction",
+        "editable",
+        "requires_workspace"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetList": {
+      "$id": "ToolToolsetList",
+      "description": "List reusable system, custom, and plugin Toolsets.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetListInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetListOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_list",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "USE_ROBOTS",
+        "title": "List Toolsets"
+      }
+    },
+    "ToolToolsetListInput": {
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ToolToolsetListOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "toolsets": {
+          "items": {
+            "additionalProperties": false,
+            "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+            "properties": {
+              "description": {
+                "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable Toolset name that identifies the capability bundle.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "toolsets"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetLoad": {
+      "$id": "ToolToolsetLoad",
+      "description": "Activate reusable Toolsets for the current Robot conversation after inspecting their contents and runtime preconditions with toolset_get. Workspace-dependent Toolsets cannot be loaded until the conversation has an active workspace.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetLoadInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetLoadOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_load",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "title": "Load Toolsets"
+      }
+    },
+    "ToolToolsetLoadInput": {
+      "additionalProperties": false,
+      "properties": {
+        "toolsets": {
+          "description": "Toolset IDs inspected with toolset_get.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "toolsets"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetLoadOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "loaded": {
+          "description": "Toolsets activated for subsequent model steps in this conversation.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+            "properties": {
+              "description": {
+                "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable Toolset name that identifies the capability bundle.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "next_action": {
+          "description": "Recommended continuation now that the selected Toolsets and their guidance are active.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "loaded",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetSearch": {
+      "$id": "ToolToolsetSearch",
+      "description": "Search reusable Toolsets for a coherent bundle of capabilities and specialist guidance. Use toolset_get to inspect a candidate before loading it or assigning it to a Robot.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetSearchInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetSearchOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_search",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": true
+        },
+        "role": "USE_ROBOTS",
+        "title": "Search Toolsets"
+      }
+    },
+    "ToolToolsetSearchInput": {
+      "additionalProperties": false,
+      "properties": {
+        "max_results": {
+          "description": "Maximum number of ranked candidates to return; omit to use the default.",
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "query": {
+          "description": "Capability, task, or Toolset name to search for.",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "query"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetSearchOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "next_action": {
+          "description": "Recommended next step for inspecting and activating a selected candidate.",
+          "type": "string"
+        },
+        "toolsets": {
+          "description": "Ranked Toolset candidates with enough context to choose which bundle to inspect.",
+          "items": {
+            "additionalProperties": false,
+            "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+            "properties": {
+              "description": {
+                "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting.",
+                "type": "string"
+              },
+              "id": {
+                "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools.",
+                "type": "string"
+              },
+              "name": {
+                "description": "Human-readable Toolset name that identifies the capability bundle.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "description"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "toolsets",
+        "next_action"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetUpdate": {
+      "$id": "ToolToolsetUpdate",
+      "description": "Update an authored custom Toolset. System and plugin Toolsets are read-only.",
+      "properties": {
+        "input": {
+          "$ref": "#/definitions/ToolToolsetUpdateInput"
+        },
+        "output": {
+          "$ref": "#/definitions/ToolToolsetUpdateOutput"
+        }
+      },
+      "required": [
+        "input",
+        "output"
+      ],
+      "title": "toolset_update",
+      "type": "object",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "annotations": {
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false,
+          "readOnlyHint": false
+        },
+        "role": "USE_ROBOTS",
+        "title": "Update Toolset"
+      }
+    },
+    "ToolToolsetUpdateInput": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[0-9a-v]{20}$",
+          "type": "string"
+        },
+        "instruction": {
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "tools": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "type": "object"
+    },
+    "ToolToolsetUpdateOutput": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
       ],
       "type": "object"
     }

@@ -22,4 +22,6 @@ export interface RobotToolInfo {
   available: boolean;
   /** Whether Robot runs must pause for human approval before executing this tool. */
   requires_confirmation: boolean;
+  /** Whether this tool is only available to Robot sessions with an active workspace. */
+  requires_workspace: boolean;
 }

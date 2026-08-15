@@ -6,7 +6,18 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
+	adksession "google.golang.org/adk/v2/session"
 )
+
+type RobotSessionEvent adksession.Event
+
+func NewRobotSessionEvent(event adksession.Event) RobotSessionEvent {
+	return RobotSessionEvent(event)
+}
+
+func (event RobotSessionEvent) ADK() adksession.Event {
+	return adksession.Event(event)
+}
 
 type RobotSessionMessage struct {
 	ent.Schema
@@ -22,6 +33,14 @@ func (RobotSessionMessage) Fields() []ent.Field {
 
 		field.String("invocation_id").
 			Comment("Invocation ID from ADK Event"),
+
+		field.String("branch").
+			Optional().
+			Comment("ADK agent branch path used to attribute delegated work"),
+
+		field.String("isolation_scope").
+			Optional().
+			Comment("ADK exact-match history scope for private sub-agent events"),
 
 		field.String("robot_id").
 			GoType(xid.ID{}).
@@ -40,7 +59,7 @@ func (RobotSessionMessage) Fields() []ent.Field {
 			Nillable().
 			Comment("Author account ID from ADK Event, optional for system messages"),
 
-		field.JSON("event_data", map[string]any{}).
+		field.JSON("event_data", RobotSessionEvent{}).
 			Comment("Full ADK Event object stored as JSON"),
 	}
 }

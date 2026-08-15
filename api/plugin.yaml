@@ -197,6 +197,43 @@ $defs:
             description: Robot tools statically provided by this plugin.
             items:
               $ref: "#/$defs/RobotToolProviderToolConfig"
+          toolsets:
+            type: array
+            description: Reusable prompt-decorated Toolsets assembled from this provider's tools.
+            items:
+              $ref: "#/$defs/RobotToolProviderToolsetConfig"
+
+  RobotToolProviderToolsetConfig:
+    type: object
+    required:
+      - id
+      - name
+      - description
+      - tools
+    properties:
+      id:
+        type: string
+        description: Stable provider-local Toolset identifier.
+        pattern: "^[a-zA-Z0-9][a-zA-Z0-9_]*$"
+      name:
+        type: string
+      description:
+        type: string
+      instruction:
+        type: string
+        description: >
+          Specialist instructions injected whenever the Toolset is active.
+      requires_workspace:
+        type: boolean
+        description: Whether this entire Toolset requires an active Robot workspace.
+      tools:
+        type: array
+        minItems: 1
+        uniqueItems: true
+        description: Provider-local tool IDs included in this Toolset.
+        items:
+          type: string
+          pattern: "^[a-zA-Z0-9][a-zA-Z0-9_]*$"
 
   RobotToolProviderToolConfig:
     type: object
@@ -224,6 +261,9 @@ $defs:
         $ref: "#/$defs/RobotToolJSONSchema"
       requires_confirmation:
         type: boolean
+      requires_workspace:
+        type: boolean
+        description: Whether this tool requires an active Robot workspace.
       annotations:
         $ref: "#/$defs/RobotToolAnnotations"
 

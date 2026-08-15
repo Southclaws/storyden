@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryPageGet
+x-storyden:
+  toolsets:
+    - system.library
 x-storyden-tool:
   title: Get Library Page
   role: READ_PUBLISHED_LIBRARY
@@ -9,7 +12,7 @@ x-storyden-tool:
     idempotentHint: true
     openWorldHint: false
 title: get_library_page
-description: Get detailed information about a specific library page by its slug.
+description: Retrieve a library page with its content and workflow visibility by ID.
 type: object
 required:
   - input
@@ -39,6 +42,8 @@ definitions:
       - tags
       - child_pages
       - browser_url
+      - content
+      - visibility
     properties:
       browser_url:
         type: string
@@ -55,6 +60,9 @@ definitions:
       description:
         type: string
         description: Brief description of the page
+      content:
+        type: string
+        description: Plain-text page body for evaluating or summarising the page.
       tags:
         type: array
         description: Tags associated with this page
@@ -65,4 +73,11 @@ definitions:
         description: Slugs of child pages
         items:
           type: string
+      visibility:
+        type: string
+        enum:
+          - draft
+          - review
+          - published
+        description: Current publishing workflow state.
     additionalProperties: false

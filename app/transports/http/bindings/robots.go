@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,10 +13,11 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	oauth_remote "github.com/Southclaws/storyden/app/resources/oauth/remote"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	robot_mcp "github.com/Southclaws/storyden/app/resources/robot/mcp"
@@ -23,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_toolset"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_workspace"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_writer"
 	"github.com/Southclaws/storyden/app/resources/robot/session_ref"
@@ -30,9 +33,10 @@ import (
 	"github.com/Southclaws/storyden/app/services/admin/settings_manager"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	robotservice "github.com/Southclaws/storyden/app/services/semdex/robot"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
 	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	robot_toolsets "github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
@@ -49,6 +53,8 @@ type Robots struct {
 	settings           *settings_manager.Manager
 	mcp                *mcpclient.Manager
 	tools              *robot_tools.Registry
+	toolsets           *robot_toolsets.Registry
+	toolsetRepo        *robot_toolset.Repository
 }
 
 func NewRobots(
@@ -60,6 +66,8 @@ func NewRobots(
 	sessionRepo *robot_session.Repository,
 	modelFactory *llm_provider.Factory,
 	toolRegistry *robot_tools.Registry,
+	toolsetRegistry *robot_toolsets.Registry,
+	toolsetRepo *robot_toolset.Repository,
 	settingsManager *settings_manager.Manager,
 	mcpManager *mcpclient.Manager,
 ) Robots {
@@ -74,6 +82,8 @@ func NewRobots(
 		settings:           settingsManager,
 		mcp:                mcpManager,
 		tools:              toolRegistry,
+		toolsets:           toolsetRegistry,
+		toolsetRepo:        toolsetRepo,
 	}
 }
 
@@ -107,11 +117,23 @@ func (r *Robots) RobotCreate(ctx context.Context, request openapi.RobotCreateReq
 	if meta := request.Body.Meta; meta != nil {
 		opts = append(opts, robot_writer.WithMeta(*meta))
 	}
-	if tools := request.Body.Tools; tools != nil {
-		if err := r.validateRobotToolsForCreate(*tools); err != nil {
+	selectedToolsets := []string(nil)
+	if toolsetRefs := request.Body.Toolsets; toolsetRefs != nil {
+		if err := r.toolsets.Validate(ctx, *toolsetRefs); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
-		opts = append(opts, robot_writer.WithTools(dt.Map(*tools, func(t string) robot_ref.ToolName { return robot_ref.ToolName(t) })))
+		selectedToolsets = append([]string(nil), (*toolsetRefs)...)
+		opts = append(opts, robot_writer.WithToolsets(mapRobotToolsetRefs(*toolsetRefs)))
+	}
+	if tools := request.Body.Tools; tools != nil {
+		directTools, err := r.toolsets.RemoveContainedTools(ctx, *tools, selectedToolsets)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		if err := r.validateRobotToolsForCreate(directTools); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		opts = append(opts, robot_writer.WithTools(mapRobotToolNames(directTools)))
 	}
 	if workspaceID := request.Body.WorkspaceId; workspaceID != nil {
 		id, err := xid.FromString(string(*workspaceID))
@@ -556,12 +578,11 @@ func (r *Robots) RobotUpdate(ctx context.Context, request openapi.RobotUpdateReq
 			opts = append(opts, robot_writer.WithWorkspaceID(id))
 		}
 	}
-	if tools := request.Body.Tools; tools != nil {
-		if err := r.validateRobotToolsForUpdate(ctx, robotID, *tools); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-		}
-		opts = append(opts, robot_writer.WithTools(dt.Map(*tools, func(t string) robot_ref.ToolName { return robot_ref.ToolName(t) })))
+	toolOptions, err := r.robotToolAssignmentUpdateOptions(ctx, robotID, request.Body.Tools, request.Body.Toolsets)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
+	opts = append(opts, toolOptions...)
 
 	updated, err := r.robotWriter.Update(ctx, robotID, opts...)
 	if err != nil {
@@ -650,7 +671,6 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
 	return openapi.RobotSessionGet200JSONResponse{
 		RobotSessionGetOKJSONResponse: openapi.RobotSessionGetOKJSONResponse(openapi.RobotSession{
 			Id:              openapi.Identifier(sess.ID.String()),
@@ -658,7 +678,7 @@ func (r *Robots) RobotSessionGet(ctx context.Context, request openapi.RobotSessi
 			CreatedAt:       sess.CreatedAt,
 			UpdatedAt:       sess.UpdatedAt,
 			CreatedBy:       serialiseProfileReferenceFromAccount(sess.Human),
-			ActiveRobotId:   robotservice.CurrentRobotIDFromState(sess.State).Ptr(),
+			RootRobotId:     robotservice.SessionRootRobotRef(sess.State).Ptr(),
 			ActiveWorkspace: serialiseRobotWorkspaceMountPtr(robotservice.WorkspaceMountFromState(sess.State).Ptr()),
 			MessageList: openapi.PaginatedRobotMessageList{
 				NextBefore: opt.PtrMap(cursor.NextBefore, func(id robot.MessageID) openapi.Identifier {
@@ -681,6 +701,153 @@ func (r *Robots) RobotToolsList(ctx context.Context, request openapi.RobotToolsL
 	return openapi.RobotToolsList200JSONResponse{RobotToolsListOKJSONResponse: openapi.RobotToolsListOKJSONResponse{
 		Tools: dt.Map(catalogue, serialiseRobotToolInfo),
 	}}, nil
+}
+
+func (r *Robots) RobotToolsetsList(ctx context.Context, request openapi.RobotToolsetsListRequestObject) (openapi.RobotToolsetsListResponseObject, error) {
+	definitions, err := r.toolsets.List(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	items := make(openapi.RobotToolsetList, 0, len(definitions))
+	for _, definition := range definitions {
+		item := serialiseRobotToolset(definition)
+		item.Editable = r.canEditToolset(ctx, definition)
+		items = append(items, item)
+	}
+	return openapi.RobotToolsetsList200JSONResponse{
+		RobotToolsetsListOKJSONResponse: openapi.RobotToolsetsListOKJSONResponse{
+			Toolsets: items,
+		},
+	}, nil
+}
+
+func (r *Robots) RobotToolsetCreate(ctx context.Context, request openapi.RobotToolsetCreateRequestObject) (openapi.RobotToolsetCreateResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := r.validateToolNames(request.Body.Tools); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	created, err := r.toolsetRepo.Create(
+		ctx,
+		accountID,
+		request.Body.Name,
+		request.Body.Description,
+		opt.NewPtr(request.Body.Instruction).Or(""),
+		request.Body.Tools,
+		map[string]any(opt.NewPtr(request.Body.Meta).Or(openapi.Metadata{})),
+	)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	definition, err := r.toolsets.Get(ctx, created.ID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.RobotToolsetCreate200JSONResponse{
+		RobotToolsetGetOKJSONResponse: openapi.RobotToolsetGetOKJSONResponse(serialiseRobotToolset(definition)),
+	}, nil
+}
+
+func (r *Robots) RobotToolsetGet(ctx context.Context, request openapi.RobotToolsetGetRequestObject) (openapi.RobotToolsetGetResponseObject, error) {
+	definition, err := r.toolsets.Get(ctx, request.ToolsetId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	item := serialiseRobotToolset(definition)
+	item.Editable = r.canEditToolset(ctx, definition)
+	return openapi.RobotToolsetGet200JSONResponse{
+		RobotToolsetGetOKJSONResponse: openapi.RobotToolsetGetOKJSONResponse(item),
+	}, nil
+}
+
+func (r *Robots) RobotToolsetUpdate(ctx context.Context, request openapi.RobotToolsetUpdateRequestObject) (openapi.RobotToolsetUpdateResponseObject, error) {
+	id, err := robot_toolset.ParseID(request.ToolsetId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+	if request.Body.Tools != nil {
+		if err := r.validateToolNames(*request.Body.Tools); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+	}
+	if err := r.authoriseToolsetMutation(ctx, id); err != nil {
+		return nil, err
+	}
+
+	patch := robot_toolset.Update{
+		Name:        request.Body.Name,
+		Description: request.Body.Description,
+		Instruction: request.Body.Instruction,
+		Tools:       request.Body.Tools,
+	}
+	if request.Body.Meta != nil {
+		metadata := map[string]any(*request.Body.Meta)
+		patch.Metadata = &metadata
+	}
+	updated, err := r.toolsetRepo.Update(ctx, id, patch)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	definition, err := r.toolsets.Get(ctx, updated.ID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.RobotToolsetUpdate200JSONResponse{
+		RobotToolsetGetOKJSONResponse: openapi.RobotToolsetGetOKJSONResponse(serialiseRobotToolset(definition)),
+	}, nil
+}
+
+func (r *Robots) RobotToolsetDelete(ctx context.Context, request openapi.RobotToolsetDeleteRequestObject) (openapi.RobotToolsetDeleteResponseObject, error) {
+	id, err := robot_toolset.ParseID(request.ToolsetId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+	if err := r.authoriseToolsetMutation(ctx, id); err != nil {
+		return nil, err
+	}
+	if err := r.toolsetRepo.Delete(ctx, id); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	return openapi.RobotToolsetDelete200Response{}, nil
+}
+
+func (r *Robots) authoriseToolsetMutation(ctx context.Context, id robot_toolset.ID) error {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	return session.Authorise(ctx, func() error {
+		isAuthor, err := r.toolsetRepo.IsAuthor(ctx, id, accountID)
+		if err != nil {
+			return err
+		}
+		if !isAuthor {
+			return fault.New("only the Toolset author can change it")
+		}
+		return nil
+	}, rbac.PermissionManageRobots)
+}
+
+func (r *Robots) canEditToolset(ctx context.Context, definition robot_toolsets.Definition) bool {
+	if definition.Source != robot_toolsets.SourceCustom || definition.Author == nil {
+		return false
+	}
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return false
+	}
+	return session.Authorise(ctx, func() error {
+		if definition.Author.ID != accountID {
+			return rbac.ErrPermissions
+		}
+		return nil
+	}, rbac.PermissionManageRobots) == nil
 }
 
 func (r *Robots) RobotMCPServersList(ctx context.Context, request openapi.RobotMCPServersListRequestObject) (openapi.RobotMCPServersListResponseObject, error) {
@@ -896,18 +1063,13 @@ func (r *Robots) validateRobotToolsForCreate(toolNames []string) error {
 		}
 	}
 	if len(invalid) > 0 {
-		return fault.New("invalid robot tool names: " + strings.Join(invalid, ", "))
+		return fault.New("invalid Robot tool names: " + strings.Join(invalid, ", "))
 	}
 	return nil
 }
 
-func (r *Robots) validateRobotToolsForUpdate(ctx context.Context, robotID robot_ref.ID, toolNames []string) error {
-	existing, err := r.robotQuerier.Get(ctx, robotID)
-	if err != nil {
-		return err
-	}
-
-	preserved := map[string]struct{}{}
+func (r *Robots) validateRobotToolsForUpdate(existing *robot.Robot, toolNames []string) error {
+	preserved := make(map[string]struct{}, len(existing.Tools))
 	for _, name := range existing.Tools {
 		preserved[string(name)] = struct{}{}
 	}
@@ -923,7 +1085,100 @@ func (r *Robots) validateRobotToolsForUpdate(ctx context.Context, robotID robot_
 		invalid = append(invalid, name)
 	}
 	if len(invalid) > 0 {
-		return fault.New("invalid robot tool names: " + strings.Join(invalid, ", "))
+		return fault.New("invalid Robot tool names: " + strings.Join(invalid, ", "))
+	}
+	return nil
+}
+
+func (r *Robots) robotToolAssignmentUpdateOptions(
+	ctx context.Context,
+	robotID robot_ref.ID,
+	requestedTools *openapi.RobotToolNameList,
+	requestedToolsets *openapi.RobotToolsetRefList,
+) ([]robot_writer.Option, error) {
+	if requestedTools == nil && requestedToolsets == nil {
+		return nil, nil
+	}
+
+	existing, err := r.robotQuerier.Get(ctx, robotID)
+	if err != nil {
+		return nil, err
+	}
+	existingTools := dt.Map(existing.Tools, func(name robot_ref.ToolName) string { return string(name) })
+	existingToolsets := dt.Map(existing.Toolsets, func(ref robot_ref.ToolsetRef) string { return string(ref) })
+
+	finalTools := slices.Clone(existingTools)
+	if requestedTools != nil {
+		finalTools = slices.Clone(*requestedTools)
+	}
+
+	finalToolsets := slices.Clone(existingToolsets)
+	if requestedToolsets != nil {
+		if err := r.toolsets.Validate(ctx, *requestedToolsets); err != nil {
+			return nil, err
+		}
+		finalToolsets = slices.Clone(*requestedToolsets)
+	}
+
+	addedToolsets := addedStrings(existingToolsets, finalToolsets)
+	if len(addedToolsets) > 0 {
+		finalTools, err = r.toolsets.RemoveContainedTools(ctx, finalTools, addedToolsets)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if requestedTools != nil {
+		if err := r.validateRobotToolsForUpdate(existing, finalTools); err != nil {
+			return nil, err
+		}
+	}
+
+	addedTools := addedStrings(existingTools, finalTools)
+	if err := r.toolsets.ValidateDirectTools(ctx, addedTools, finalToolsets); err != nil {
+		return nil, err
+	}
+
+	opts := make([]robot_writer.Option, 0, 2)
+	if requestedTools != nil || !slices.Equal(existingTools, finalTools) {
+		opts = append(opts, robot_writer.WithTools(mapRobotToolNames(finalTools)))
+	}
+	if requestedToolsets != nil {
+		opts = append(opts, robot_writer.WithToolsets(mapRobotToolsetRefs(finalToolsets)))
+	}
+	return opts, nil
+}
+
+func addedStrings(existing, requested []string) []string {
+	seen := make(map[string]struct{}, len(existing))
+	for _, value := range existing {
+		seen[value] = struct{}{}
+	}
+	added := make([]string, 0, len(requested))
+	for _, value := range requested {
+		if _, ok := seen[value]; !ok {
+			added = append(added, value)
+		}
+	}
+	return added
+}
+
+func mapRobotToolNames(names []string) []robot_ref.ToolName {
+	return dt.Map(names, func(name string) robot_ref.ToolName { return robot_ref.ToolName(name) })
+}
+
+func mapRobotToolsetRefs(refs []string) []robot_ref.ToolsetRef {
+	return dt.Map(refs, func(ref string) robot_ref.ToolsetRef { return robot_ref.ToolsetRef(ref) })
+}
+
+func (r *Robots) validateToolNames(toolNames []string) error {
+	var invalid []string
+	for _, name := range toolNames {
+		if !r.tools.HasTool(name) {
+			invalid = append(invalid, name)
+		}
+	}
+	if len(invalid) > 0 {
+		return fault.New("invalid Robot Toolset tool names: " + strings.Join(invalid, ", "))
 	}
 	return nil
 }
@@ -987,6 +1242,7 @@ func serialiseRobotToolInfo(tool robot_tools.CatalogueTool) openapi.RobotToolInf
 		Source:               openapi.RobotToolSource(tool.Source),
 		Available:            tool.Available,
 		RequiresConfirmation: tool.RequiresConfirmation,
+		RequiresWorkspace:    tool.RequiresWorkspace,
 	}
 }
 
@@ -1122,9 +1378,10 @@ func serialiseRobot(r *robot.Robot) openapi.Robot {
 		WorkspaceId: serialiseNullableOpt(opt.Map(r.WorkspaceID, func(id xid.ID) openapi.NullableIdentifier {
 			return openapi.NullableIdentifier(id.String())
 		})),
-		Author: serialiseProfileReferenceFromAccount(r.Author),
-		Tools:  serialiseRobotToolNameList(r.Tools),
-		Meta:   (*openapi.Metadata)(&r.Metadata),
+		Author:   serialiseProfileReferenceFromAccount(r.Author),
+		Tools:    serialiseRobotToolNameList(r.Tools),
+		Toolsets: serialiseRobotToolsetRefList(r.Toolsets),
+		Meta:     (*openapi.Metadata)(&r.Metadata),
 	}
 }
 
@@ -1139,6 +1396,45 @@ func serialiseRobotToolNameList(in []robot_ref.ToolName) openapi.RobotToolNameLi
 	return dt.Map(in, func(tool robot_ref.ToolName) string {
 		return string(tool)
 	})
+}
+
+func serialiseRobotToolsetRefList(in []robot_ref.ToolsetRef) openapi.RobotToolsetRefList {
+	return dt.Map(in, func(toolset robot_ref.ToolsetRef) string {
+		return string(toolset)
+	})
+}
+
+func serialiseRobotToolset(def robot_toolsets.Definition) openapi.RobotToolset {
+	var author *openapi.ProfileReference
+	if def.Author != nil {
+		value := serialiseProfileReferenceFromAccount(*def.Author)
+		author = &value
+	}
+
+	var sourceRef *string
+	if def.SourceRef != "" {
+		sourceRef = &def.SourceRef
+	}
+	var metadata *openapi.Metadata
+	if def.Metadata != nil {
+		value := openapi.Metadata(def.Metadata)
+		metadata = &value
+	}
+
+	return openapi.RobotToolset{
+		Id:                def.ID,
+		Name:              def.Name,
+		Description:       def.Description,
+		Instruction:       def.Instruction,
+		Tools:             append([]string(nil), def.ToolNames...),
+		Source:            openapi.RobotToolsetSource(def.Source),
+		SourceRef:         sourceRef,
+		Editable:          def.Editable,
+		UsageCount:        def.UsageCount,
+		RequiresWorkspace: def.RequiresWorkspace,
+		Author:            author,
+		Meta:              metadata,
+	}
 }
 
 func serialiseRobots(robots []*robot.Robot) []openapi.Robot {
@@ -1208,12 +1504,14 @@ func serialiseRobotSessionMessage(m *robot.Message, hiddenToolCallIDs map[string
 	role := serialiseMessageRole(m.Event)
 
 	msg := openapi.RobotSessionMessage{
-		Id:        m.ID.String(),
-		Role:      openapi.RobotSessionMessageRole(role),
-		Parts:     parts,
-		CreatedAt: m.CreatedAt,
-		Robot:     serialiseRobotActorReference(m),
-		Author:    opt.Map(m.Author, func(a *account.Account) openapi.ProfileReference { return serialiseProfileReferenceFromAccount(*a) }).Ptr(),
+		Id:             m.ID.String(),
+		Role:           openapi.RobotSessionMessageRole(role),
+		Parts:          parts,
+		CreatedAt:      m.CreatedAt,
+		Robot:          serialiseRobotActorReference(m),
+		Author:         opt.Map(m.Author, func(a *account.Account) openapi.ProfileReference { return serialiseProfileReferenceFromAccount(*a) }).Ptr(),
+		Branch:         m.Branch.Ptr(),
+		IsolationScope: m.IsolationScope.Ptr(),
 	}
 
 	return msg, nil
@@ -1249,10 +1547,8 @@ func serialiseRobotActorReference(m *robot.Message) *openapi.RobotReference {
 
 func builtinRobotName(id string) string {
 	switch id {
-	case agent_registry.RobotBuilderID, "storyden":
-		return "Storyden Robot Builder"
-	case agent_registry.PluginBuilderID:
-		return "Plugin Builder"
+	case denbot.ID:
+		return denbot.DisplayName
 	default:
 		return id
 	}

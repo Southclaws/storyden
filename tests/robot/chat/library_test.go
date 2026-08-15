@@ -2,6 +2,7 @@ package chat_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -9,15 +10,21 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	authsession "github.com/Southclaws/storyden/app/services/authentication/session"
+	robot_tools "github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/sse"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/lib/mcp"
 	"github.com/Southclaws/storyden/tests"
 	"github.com/Southclaws/storyden/tests/robot"
 )
@@ -38,16 +45,22 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 			cl *openapi.ClientWithResponses,
 			sh *e2e.SessionHelper,
 			aw *account_writer.Writer,
+			toolRegistry *robot_tools.Registry,
 		) {
 			lc.Append(fx.StartHook(func() {
-				adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+				adminCtx = authsession.WithAccountPermissions(
+					adminCtx,
+					*admin,
+					rbac.NewList(rbac.PermissionReadPublishedLibrary, rbac.PermissionManageLibrary),
+				)
 				adminSession := sh.WithSession(adminCtx)
 
 				rob := tests.AssertRequest(cl.RobotCreateWithResponse(root, openapi.RobotCreateJSONRequestBody{
 					Name:        "test-robot-" + xid.New().String(),
 					Description: "robot for library tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("library_page_list"),
+					Toolsets:    robotToolsetsPtr("system.library"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -57,10 +70,59 @@ func TestRobotChatLibraryPageList(t *testing.T) {
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)
 
-				tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+				publishedPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
 					Name:       "Robot Test Page Beta",
 					Visibility: &vis,
 				}, adminSession))(t, http.StatusOK)
+
+				reviewVisibility := openapi.VisibilityReview
+				reviewContent := "This page is ready for a substantive review."
+				reviewPage := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeCreateJSONRequestBody{
+					Name:       "Robot Review Page",
+					Content:    &reviewContent,
+					Visibility: &reviewVisibility,
+				}, adminSession))(t, http.StatusOK)
+
+				t.Run("filters_pages_by_review_visibility", func(t *testing.T) {
+					tool, err := toolRegistry.GetTool(adminCtx, "library_page_list")
+					require.NoError(t, err)
+
+					input, err := json.Marshal(mcp.ToolLibraryPageTreeInput{
+						Visibility: opt.New(mcp.ToolLibraryPageTreeInputVisibilityReview).Ptr(),
+					})
+					require.NoError(t, err)
+					rawOutput, err := tool.Handler(adminCtx, input)
+					require.NoError(t, err)
+
+					var output mcp.ToolLibraryPageTreeOutput
+					require.NoError(t, json.Unmarshal(rawOutput, &output))
+
+					pageIDs := make([]string, 0, len(output.Pages))
+					for _, page := range output.Pages {
+						pageIDs = append(pageIDs, page.Id)
+						assert.Equal(t, "review", string(page.Visibility))
+					}
+					assert.Contains(t, pageIDs, string(reviewPage.JSON200.Id))
+					assert.NotContains(t, pageIDs, string(publishedPage.JSON200.Id))
+					assert.Equal(t, len(output.Pages), output.Results)
+				})
+
+				t.Run("gets_page_content_and_visibility", func(t *testing.T) {
+					tool, err := toolRegistry.GetTool(adminCtx, "get_library_page")
+					require.NoError(t, err)
+
+					input, err := json.Marshal(mcp.ToolLibraryPageGetInput{
+						Id: string(reviewPage.JSON200.Id),
+					})
+					require.NoError(t, err)
+					rawOutput, err := tool.Handler(adminCtx, input)
+					require.NoError(t, err)
+
+					var output mcp.ToolLibraryPageGetOutput
+					require.NoError(t, json.Unmarshal(rawOutput, &output))
+					assert.Equal(t, "This page is ready for a substantive review.", output.Content)
+					assert.Equal(t, "review", string(output.Visibility))
+				})
 
 				t.Run("triggers_library_page_list", func(t *testing.T) {
 					a := assert.New(t)
@@ -104,7 +166,7 @@ func TestRobotChatLibrarySearchPages(t *testing.T) {
 					Name:        "search-robot-" + xid.New().String(),
 					Description: "robot for search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("library_search_pages"),
+					Toolsets:    robotToolsetsPtr("system.library"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 

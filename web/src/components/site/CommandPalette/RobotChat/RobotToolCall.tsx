@@ -135,17 +135,23 @@ function RobotToolCallContent({ part }: Props) {
     case "tool-library_search_pages":
       return <p>{part.output.results} pages found</p>;
 
-    case "tool-robot_switch":
+    case "tool-tool_search":
+      return <p>{part.output.tools.length} tools found</p>;
+
+    case "tool-tool_get":
       return null;
 
-    case "tool-system_robot_tool_catalog":
-      return <p>{part.output.tools?.length ?? 0} tools available</p>;
+    case "tool-tool_load":
+      return <p>Loaded {part.output.loaded.length} tools</p>;
 
     case "tool-robot_create":
       return <p>Created "{part.output.name}"</p>;
 
     case "tool-robot_list":
       return <p>{part.output.total} robots</p>;
+
+    case "tool-robot_search":
+      return <p>{part.output.robots.length} specialist Robots found</p>;
 
     case "tool-robot_get":
       return null;
@@ -158,6 +164,25 @@ function RobotToolCallContent({ part }: Props) {
         return <p>Delete cancelled</p>;
       }
       return <p>Deleted robot</p>;
+
+    case "tool-toolset_search":
+    case "tool-toolset_list":
+      return <p>{part.output.toolsets.length} Toolsets found</p>;
+
+    case "tool-toolset_load":
+      return <p>Loaded {part.output.loaded.length} Toolsets</p>;
+
+    case "tool-toolset_create":
+      return <p>Created Toolset &quot;{part.output.name}&quot;</p>;
+
+    case "tool-toolset_get":
+      return null;
+
+    case "tool-toolset_update":
+      return <p>Updated Toolset &quot;{part.output.name}&quot;</p>;
+
+    case "tool-toolset_delete":
+      return <p>Deleted Toolset</p>;
 
     case "tool-library_page_list":
       return null;
@@ -293,7 +318,7 @@ export function RobotToolConfirmationBatch({
 }: {
   parts: ConfirmationPart[];
 }) {
-  const { messages, resolveToolConfirmation, robots } = useRobotChat();
+  const { messages, resolveToolConfirmation } = useRobotChat();
   const pendingParts = parts.filter(
     (part) =>
       part.state === "approval-requested" &&
@@ -356,7 +381,7 @@ export function RobotToolConfirmationBatch({
             key={part.toolCallId}
             part={part}
             resolution={getToolConfirmationResolution(part, messages)}
-            label={formatConfirmationAction(part, index, robots)}
+            label={formatConfirmationAction(part, index)}
             onApprove={() => resolvePart(part, true)}
             onDeny={() => resolvePart(part, false)}
           />
@@ -451,18 +476,17 @@ function ConfirmationBatchRow({
   );
 }
 
-function formatConfirmationAction(
-  part: ConfirmationPart,
-  index: number,
-  robots: readonly { id: string; name: string }[],
-) {
+function formatConfirmationAction(part: ConfirmationPart, index: number) {
   if (part.type === "tool-robot_delete") {
     const input = part.input as ToolRobotDeleteInput | undefined;
-    const robot = robots.find((robot) => robot.id === input?.id);
-    if (robot) {
-      return `Delete ${robot.name}`;
-    }
     return input?.id ? `Delete Robot ${input.id}` : `Delete Robot ${index + 1}`;
+  }
+
+  if (part.type === "tool-toolset_delete") {
+    const input = part.input as { id?: string } | undefined;
+    return input?.id
+      ? `Delete Toolset ${input.id}`
+      : `Delete Toolset ${index + 1}`;
   }
 
   return `Action ${index + 1}`;

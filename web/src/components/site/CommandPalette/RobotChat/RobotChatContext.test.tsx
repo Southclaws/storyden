@@ -139,17 +139,17 @@ describe("assistantCompletedToolOutputIDs", () => {
       role: "assistant",
       parts: [
         {
-          type: "tool-robot_switch",
-          toolCallId: "call_switch",
-          toolName: "robot_switch",
+          type: "tool-toolset_load",
+          toolCallId: "call_load",
+          toolName: "toolset_load",
           state: "output-available",
-          input: { robot_id: "plugin_builder" },
-          output: { success: true, robot_id: "plugin_builder" },
+          input: { toolset_ids: ["system.plugin_studio"] },
+          output: { loaded: ["system.plugin_studio"] },
         },
       ],
     } as unknown as StorydenUIMessage;
 
-    expect(assistantCompletedToolOutputIDs(message)).toEqual(["call_switch"]);
+    expect(assistantCompletedToolOutputIDs(message)).toEqual(["call_load"]);
   });
 
   it("ignores provider-executed tools", () => {

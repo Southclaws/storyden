@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"slices"
 	"strings"
@@ -10,6 +11,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/app/services/semdex/robot/searchscore"
 )
 
 var (
@@ -17,16 +20,23 @@ var (
 	ErrToolAlreadyRegistered = fault.New("tool already registered")
 )
 
-var DefaultTools = []string{
-	"content_search",
-	"system_robot_tool_catalog",
-	"robot_switch",
-	"robot_create",
-	"robot_list",
-	"robot_get",
-	"robot_update",
-	"robot_delete",
-	"throw_an_error",
+type ToolsetResolver interface {
+	Validate(context.Context, []string) error
+	RemoveContainedTools(context.Context, []string, []string) ([]string, error)
+	ValidateDirectTools(context.Context, []string, []string) error
+	SearchToolsets(context.Context, string, int) ([]ToolsetInfo, error)
+	ListToolsets(context.Context) ([]ToolsetInfo, error)
+	GetToolset(context.Context, string) (ToolsetInfo, error)
+}
+
+type ToolsetInfo struct {
+	ID                string
+	Name              string
+	Description       string
+	Instruction       string
+	Tools             []string
+	Editable          bool
+	RequiresWorkspace bool
 }
 
 type Registry struct {
@@ -43,6 +53,7 @@ type CatalogueTool struct {
 	Source               string
 	Available            bool
 	RequiresConfirmation bool
+	RequiresWorkspace    bool
 }
 
 func Build() fx.Option {
@@ -50,7 +61,9 @@ func Build() fx.Option {
 		fx.Provide(NewRegistry),
 		fx.Invoke(
 			NewRegistry,
+			newToolDiscoveryTools,
 			newRobotTools,
+			newToolsetTools,
 			newSearchTools,
 			newLibraryTools,
 			newTagTools,
@@ -71,6 +84,15 @@ func NewRegistry(
 }
 
 func (p *Registry) Register(tool *Tool) error {
+	if tool == nil || tool.Definition == nil {
+		return fmt.Errorf("register Robot tool: definition is required")
+	}
+	if strings.TrimSpace(tool.Definition.Name) == "" {
+		return fmt.Errorf("register Robot tool: ID is required")
+	}
+	if strings.TrimSpace(tool.Definition.Title) == "" {
+		return fmt.Errorf("register Robot tool %q: title is required", tool.Definition.Name)
+	}
 	if _, ok := p.tools.LoadOrStore(tool.Definition.Name, tool); ok {
 		return fault.Wrap(ErrToolAlreadyRegistered, fctx.With(context.Background()))
 	}
@@ -105,6 +127,18 @@ func (p *Registry) GetTool(ctx context.Context, name string) (*Tool, error) {
 		return nil, fault.Wrap(ErrToolNotFound, fctx.With(ctx))
 	}
 	return tool, nil
+}
+
+func (p *Registry) FindByADKName(name string) (*Tool, bool) {
+	var found *Tool
+	p.tools.Range(func(_ string, tool *Tool) bool {
+		if tool.ADKName() == name || tool.Name() == name {
+			found = tool
+			return false
+		}
+		return true
+	})
+	return found, found != nil
 }
 
 func (p *Registry) GetTools(ctx context.Context, toolNames ...string) (Tools, error) {
@@ -174,6 +208,7 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 			Source:               source,
 			Available:            true,
 			RequiresConfirmation: tool.Definition.RequiresConfirmation,
+			RequiresWorkspace:    tool.Definition.RequiresWorkspace,
 		})
 		return true
 	})
@@ -194,6 +229,7 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 			Source:               source,
 			Available:            true,
 			RequiresConfirmation: tool.Definition.RequiresConfirmation,
+			RequiresWorkspace:    tool.Definition.RequiresWorkspace,
 		})
 		return true
 	})
@@ -207,6 +243,71 @@ func (p *Registry) ListCatalogue(ctx context.Context) []CatalogueTool {
 		return 0
 	})
 	return tools
+}
+
+// SearchCatalogue returns canonical tool identities for agent capability
+// discovery. Aliases and management provenance remain available through the UI
+// catalogue, but are intentionally excluded from this progressive-disclosure
+// surface.
+func (p *Registry) SearchCatalogue(query string, maxResults int) []CatalogueTool {
+	if maxResults <= 0 || maxResults > 20 {
+		maxResults = 8
+	}
+
+	parsedQuery := searchscore.New(query)
+	type scoredTool struct {
+		tool  CatalogueTool
+		score int
+	}
+
+	results := make([]scoredTool, 0)
+	p.tools.Range(func(_ string, tool *Tool) bool {
+		name := tool.Definition.Title
+		if strings.TrimSpace(name) == "" {
+			name = tool.Definition.Name
+		}
+		item := CatalogueTool{
+			ID:                   tool.Definition.Name,
+			CallableName:         tool.ADKName(),
+			Name:                 name,
+			Description:          tool.Definition.Description,
+			Available:            true,
+			RequiresConfirmation: tool.Definition.RequiresConfirmation,
+			RequiresWorkspace:    tool.Definition.RequiresWorkspace,
+		}
+		score := toolLexicalScore(parsedQuery, item)
+		if parsedQuery.Empty() || score > 0 {
+			results = append(results, scoredTool{tool: item, score: score})
+		}
+		return true
+	})
+
+	slices.SortFunc(results, func(a, b scoredTool) int {
+		if a.score != b.score {
+			return b.score - a.score
+		}
+		if a.tool.Name != b.tool.Name {
+			return strings.Compare(a.tool.Name, b.tool.Name)
+		}
+		return strings.Compare(a.tool.ID, b.tool.ID)
+	})
+	if len(results) > maxResults {
+		results = results[:maxResults]
+	}
+
+	tools := make([]CatalogueTool, 0, len(results))
+	for _, result := range results {
+		tools = append(tools, result.tool)
+	}
+	return tools
+}
+
+func toolLexicalScore(query searchscore.Query, tool CatalogueTool) int {
+	return query.Score(
+		searchscore.Field{Text: tool.ID, ExactMatch: 120, SubstringMatch: 50, TermMatch: 10},
+		searchscore.Field{Text: tool.Name, ExactMatch: 100, SubstringMatch: 40, TermMatch: 8},
+		searchscore.Field{Text: tool.Description, SubstringMatch: 20, TermMatch: 4},
+	)
 }
 
 func (p *Registry) AllToolIDs(ctx context.Context) []string {
@@ -223,6 +324,10 @@ func (p *Registry) AllToolIDs(ctx context.Context) []string {
 	})
 	slices.Sort(names)
 	return names
+}
+
+func (p *Registry) CanonicalName(name string) string {
+	return p.resolveName(name)
 }
 
 func (p *Registry) resolveName(name string) string {

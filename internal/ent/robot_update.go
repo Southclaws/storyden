@@ -120,6 +120,24 @@ func (_u *RobotUpdate) ClearTools() *RobotUpdate {
 	return _u
 }
 
+// SetToolsets sets the "toolsets" field.
+func (_u *RobotUpdate) SetToolsets(v []string) *RobotUpdate {
+	_u.mutation.SetToolsets(v)
+	return _u
+}
+
+// AppendToolsets appends value to the "toolsets" field.
+func (_u *RobotUpdate) AppendToolsets(v []string) *RobotUpdate {
+	_u.mutation.AppendToolsets(v)
+	return _u
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (_u *RobotUpdate) ClearToolsets() *RobotUpdate {
+	_u.mutation.ClearToolsets()
+	return _u
+}
+
 // SetMetadata sets the "metadata" field.
 func (_u *RobotUpdate) SetMetadata(v map[string]interface{}) *RobotUpdate {
 	_u.mutation.SetMetadata(v)
@@ -329,6 +347,17 @@ func (_u *RobotUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ToolsCleared() {
 		_spec.ClearField(robot.FieldTools, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.Toolsets(); ok {
+		_spec.SetField(robot.FieldToolsets, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedToolsets(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, robot.FieldToolsets, value)
+		})
+	}
+	if _u.mutation.ToolsetsCleared() {
+		_spec.ClearField(robot.FieldToolsets, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(robot.FieldMetadata, field.TypeJSON, value)
@@ -544,6 +573,24 @@ func (_u *RobotUpdateOne) AppendTools(v []string) *RobotUpdateOne {
 // ClearTools clears the value of the "tools" field.
 func (_u *RobotUpdateOne) ClearTools() *RobotUpdateOne {
 	_u.mutation.ClearTools()
+	return _u
+}
+
+// SetToolsets sets the "toolsets" field.
+func (_u *RobotUpdateOne) SetToolsets(v []string) *RobotUpdateOne {
+	_u.mutation.SetToolsets(v)
+	return _u
+}
+
+// AppendToolsets appends value to the "toolsets" field.
+func (_u *RobotUpdateOne) AppendToolsets(v []string) *RobotUpdateOne {
+	_u.mutation.AppendToolsets(v)
+	return _u
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (_u *RobotUpdateOne) ClearToolsets() *RobotUpdateOne {
+	_u.mutation.ClearToolsets()
 	return _u
 }
 
@@ -786,6 +833,17 @@ func (_u *RobotUpdateOne) sqlSave(ctx context.Context) (_node *Robot, err error)
 	}
 	if _u.mutation.ToolsCleared() {
 		_spec.ClearField(robot.FieldTools, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.Toolsets(); ok {
+		_spec.SetField(robot.FieldToolsets, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedToolsets(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, robot.FieldToolsets, value)
+		})
+	}
+	if _u.mutation.ToolsetsCleared() {
+		_spec.ClearField(robot.FieldToolsets, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(robot.FieldMetadata, field.TypeJSON, value)

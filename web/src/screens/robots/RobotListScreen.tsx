@@ -2,8 +2,10 @@
 
 import { useRobotsList } from "@/api/openapi-client/robots";
 import { RobotCard } from "@/components/robots/RobotCard";
+import { EmptyState } from "@/components/site/EmptyState";
 import { Unready } from "@/components/site/Unready";
-import { LStack } from "@/styled-system/jsx";
+import { RobotIcon } from "@/components/ui/icons/Robot";
+import { CardRows } from "@/components/ui/surface";
 
 export default function RobotListScreen() {
   const { data, error } = useRobotsList();
@@ -12,11 +14,20 @@ export default function RobotListScreen() {
     return <Unready error={error} />;
   }
 
+  if (data.robots.length === 0) {
+    return (
+      <EmptyState icon={<RobotIcon />}>
+        No specialist Robots yet. Denbot can handle any conversation and
+        delegate once you create one.
+      </EmptyState>
+    );
+  }
+
   return (
-    <LStack>
+    <CardRows>
       {data.robots.map((robot) => (
         <RobotCard key={robot.id} robot={robot} />
       ))}
-    </LStack>
+    </CardRows>
   );
 }

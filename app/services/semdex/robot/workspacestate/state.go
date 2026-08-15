@@ -10,6 +10,10 @@ import (
 
 const WorkspaceStateKey = "robot_workspace"
 
+type ReadonlyState interface {
+	Get(string) (any, error)
+}
+
 func MountToState(mount *robotresource.WorkspaceMount) map[string]any {
 	return map[string]any{
 		"workspace_id":             mount.WorkspaceID.String(),
@@ -64,4 +68,21 @@ func MountFromState(state map[string]any) opt.Optional[robotresource.WorkspaceMo
 		AllowUntrustedCommands: payload.AllowUntrustedCommands,
 		Metadata:               payload.Metadata,
 	})
+}
+
+func MountFromReadonlyState(state ReadonlyState) opt.Optional[robotresource.WorkspaceMount] {
+	if state == nil {
+		return opt.NewEmpty[robotresource.WorkspaceMount]()
+	}
+
+	value, err := state.Get(WorkspaceStateKey)
+	if err != nil {
+		return opt.NewEmpty[robotresource.WorkspaceMount]()
+	}
+	return MountFromState(map[string]any{WorkspaceStateKey: value})
+}
+
+func Available(state ReadonlyState) bool {
+	_, ok := MountFromReadonlyState(state).Get()
+	return ok
 }

@@ -166,6 +166,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("robots", Robot.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("robot_toolsets", RobotToolset.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("robot_workspaces", RobotWorkspace.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	adkagent "google.golang.org/adk/v2/agent"
 	"io/fs"
 	"runtime"
 	"sort"
@@ -15,8 +16,7 @@ import (
 
 	"github.com/goccy/go-yaml"
 	"github.com/rs/xid"
-	adktool "google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	pluginresource "github.com/Southclaws/storyden/app/resources/plugin"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
@@ -65,7 +65,7 @@ func (a *Agent) addInstallTools(add toolAdder) error {
 	return add(functiontool.New(functiontool.Config{
 		Name:        "plugin_install",
 		Description: "Final delivery step for the managed plugin. Validates source unless skip_validation is true, compiles the plugin exactly once for the Storyden host OS/architecture, packages the archive internally, installs a new supervised plugin or updates the bound installation, remembers the installation ID for this chat, and optionally activates it. Use this when the implementation is ready; do not call any separate package/archive tool.",
-	}, func(ctx adktool.Context, args InstallInput) (InstallResult, error) {
+	}, func(ctx adkagent.Context, args InstallInput) (InstallResult, error) {
 		result, err := a.Install(ctx, args)
 		if err != nil {
 			return InstallResult{}, err

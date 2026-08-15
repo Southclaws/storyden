@@ -118,7 +118,11 @@ export function Card({
 
         {title && (
           <styled.div className={styles.titleContainer}>
-            {titleIcon && <Box>{titleIcon}</Box>}
+            {titleIcon && (
+              <Box className={styles.titleIcon} aria-hidden="true">
+                {titleIcon}
+              </Box>
+            )}
 
             <styled.h1 className={styles.title}>
               <Link

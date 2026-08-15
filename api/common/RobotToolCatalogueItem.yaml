@@ -1,0 +1,15 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.
+required: [id, name, description]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    description: Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools.
+  name:
+    type: string
+    description: Human-readable tool title that helps distinguish similar capabilities.
+  description:
+    type: string
+    description: The outcome this tool can achieve, used to decide whether its full schema is worth inspecting.

@@ -170,52 +170,59 @@ export function RobotMessageListViewport({ surface }: Props) {
   if (isFullPage) {
     return (
       <Box
-        ref={scrollerRef}
-        onScroll={handleScroll}
-        role="log"
-        aria-label="Robot chat messages"
-        aria-live="polite"
-        aria-relevant="additions text"
         w="full"
         flex="1"
         minH="0"
         minW="0"
-        gap="3"
-        overflowY="auto"
         position="relative"
+        overflow="hidden"
       >
         <Box
-          position="sticky"
-          top="0"
-          left="0"
-          right="0"
-          h="8"
-          pointerEvents="none"
-          zIndex="dropdown"
-          bgColor="scroll-fade-top"
-        />
-        {hasOlderMessages && (
-          <Box display="flex" justifyContent="center" my="1">
-            <Button
-              type="button"
-              variant="ghost"
-              loading={isLoadingOlderMessages}
-              onClick={() => void handleLoadOlder()}
-            >
-              Load older
-            </Button>
-          </Box>
-        )}
-        <MessageContent
-          contentRef={contentRef}
-          bottomRef={bottomRef}
-          errorState={errorState}
-          handleDismissError={handleDismissError}
-          my="4"
-        />
+          ref={scrollerRef}
+          onScroll={handleScroll}
+          role="log"
+          aria-label="Robot chat messages"
+          aria-live="polite"
+          aria-relevant="additions text"
+          w="full"
+          h="full"
+          minH="0"
+          minW="0"
+          overflowY="auto"
+          overflowX="hidden"
+        >
+          <Box
+            position="sticky"
+            top="0"
+            left="0"
+            right="0"
+            h="8"
+            pointerEvents="none"
+            zIndex="dropdown"
+            bgColor="scroll-fade-top"
+          />
+          {hasOlderMessages && (
+            <Box display="flex" justifyContent="center" my="1">
+              <Button
+                type="button"
+                variant="ghost"
+                loading={isLoadingOlderMessages}
+                onClick={() => void handleLoadOlder()}
+              >
+                Load older
+              </Button>
+            </Box>
+          )}
+          <MessageContent
+            contentRef={contentRef}
+            bottomRef={bottomRef}
+            errorState={errorState}
+            handleDismissError={handleDismissError}
+            my="4"
+          />
+        </Box>
         <NewMessagesButton
           visible={showNewMessages}
-          position="sticky"
           onClick={() => {
             setShowNewMessages(false);
             scrollToBottom();
@@ -252,7 +259,6 @@ export function RobotMessageListViewport({ surface }: Props) {
       </VStack>
       <NewMessagesButton
         visible={showNewMessages}
-        position="absolute"
         onClick={() => {
           setShowNewMessages(false);
           scrollToBottom();
@@ -290,22 +296,17 @@ function MessageContent({
 
 type NewMessagesButtonProps = {
   visible: boolean;
-  position: "absolute" | "sticky";
   onClick: () => void;
 };
 
-function NewMessagesButton({
-  visible,
-  position,
-  onClick,
-}: NewMessagesButtonProps) {
+function NewMessagesButton({ visible, onClick }: NewMessagesButtonProps) {
   if (!visible) {
     return null;
   }
 
   return (
     <Box
-      position={position}
+      position="absolute"
       bottom="3"
       left="0"
       right="0"

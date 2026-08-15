@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/require"
-	adksession "google.golang.org/adk/session"
+	adksession "google.golang.org/adk/v2/session"
 )
 
 func TestResolveInstallationUsesBoundTarget(t *testing.T) {

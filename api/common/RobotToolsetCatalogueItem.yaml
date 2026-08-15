@@ -1,0 +1,15 @@
+$schema: http://json-schema.org/draft-07/schema#
+type: object
+description: A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.
+required: [id, name, description]
+additionalProperties: false
+properties:
+  id:
+    type: string
+    description: Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools.
+  name:
+    type: string
+    description: Human-readable Toolset name that identifies the capability bundle.
+  description:
+    type: string
+    description: The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting.

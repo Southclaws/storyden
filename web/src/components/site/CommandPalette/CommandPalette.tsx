@@ -40,7 +40,6 @@ function CommandPaletteDialog() {
       <RobotChatContext
         key={sessionState.id}
         initialSessionID={sessionState.id}
-        initialSelectedRobotID={sessionState.activeRobotID}
         initialSelectedWorkspaceID={sessionState.activeWorkspaceID}
         initialMessages={sessionState.messages}
         initialNextBefore={sessionState.nextBefore}

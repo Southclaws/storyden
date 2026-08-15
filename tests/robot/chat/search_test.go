@@ -49,7 +49,7 @@ func TestRobotChatContentSearch(t *testing.T) {
 					Name:        "content-search-robot-" + xid.New().String(),
 					Description: "robot for content search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("content_search"),
+					Toolsets:    robotToolsetsPtr("system.content_search"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -117,7 +117,7 @@ func TestRobotChatThreadSearch(t *testing.T) {
 					Name:        "thread-search-robot-" + xid.New().String(),
 					Description: "robot for thread search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("thread_search"),
+					Toolsets:    robotToolsetsPtr("system.content_search"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -176,7 +176,7 @@ func TestRobotChatReplySearch(t *testing.T) {
 					Name:        "reply-search-robot-" + xid.New().String(),
 					Description: "robot for reply search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("reply_search"),
+					Toolsets:    robotToolsetsPtr("system.content_search"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -239,7 +239,7 @@ func TestRobotChatPostSearch(t *testing.T) {
 					Name:        "post-search-robot-" + xid.New().String(),
 					Description: "robot for post search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("post_search"),
+					Toolsets:    robotToolsetsPtr("system.content_search"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -298,7 +298,7 @@ func TestRobotChatMemberSearch(t *testing.T) {
 					Name:        "member-search-robot-" + xid.New().String(),
 					Description: "robot for member search tool tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("member_search"),
+					Toolsets:    robotToolsetsPtr("system.content_search"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 

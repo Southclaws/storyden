@@ -3,14 +3,15 @@ package tools
 import (
 	"context"
 	"fmt"
+	adkagent "google.golang.org/adk/v2/agent"
 	"log/slog"
 	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"google.golang.org/adk/tool"
-	"google.golang.org/adk/tool/functiontool"
+	"google.golang.org/adk/v2/tool"
+	"google.golang.org/adk/v2/tool/functiontool"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -116,7 +117,7 @@ func (lt *libraryTools) newLibraryRequestPageTool() *Tool {
 					InputSchema:   toolDef.InputSchema,
 					IsLongRunning: true,
 				},
-				func(ctx tool.Context, _ struct{}) (*mcp.ToolLibraryRequestPageOutput, error) {
+				func(ctx adkagent.Context, _ struct{}) (*mcp.ToolLibraryRequestPageOutput, error) {
 					return &mcp.ToolLibraryRequestPageOutput{}, nil
 				},
 			)
@@ -136,7 +137,7 @@ func (lt *libraryTools) newLibraryPageTreeTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageTreeInput) (*mcp.ToolLibraryPageTreeOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPageTreeInput) (*mcp.ToolLibraryPageTreeOutput, error) {
 					return lt.ExecuteLibraryPageTree(ctx, args)
 				},
 			)
@@ -156,8 +157,21 @@ func (lt *libraryTools) ExecuteLibraryPageTree(ctx context.Context, args mcp.Too
 		return nil, err
 	}
 
+	visibilities := []visibility.Visibility{
+		visibility.VisibilityDraft,
+		visibility.VisibilityReview,
+		visibility.VisibilityPublished,
+	}
+	if args.Visibility != nil {
+		selected, err := visibility.NewVisibility(string(*args.Visibility))
+		if err != nil {
+			return nil, err
+		}
+		visibilities = []visibility.Visibility{selected}
+	}
+
 	opts := []node_traversal.Filter{
-		node_traversal.WithVisibility(opt.New(*acc), visibility.VisibilityDraft, visibility.VisibilityPublished),
+		node_traversal.WithVisibility(opt.New(*acc), visibilities...),
 	}
 
 	if args.Depth != nil {
@@ -175,7 +189,8 @@ func (lt *libraryTools) ExecuteLibraryPageTree(ctx context.Context, args mcp.Too
 	pages := dt.Map(tree, lt.mapNodeToTreeNode)
 
 	output := mcp.ToolLibraryPageTreeOutput{
-		Pages: pages,
+		Pages:   pages,
+		Results: len(pages),
 	}
 
 	return &output, nil
@@ -189,6 +204,7 @@ func (lt *libraryTools) mapNodeToTreeNode(n *library.Node) mcp.LibraryPageTreeNo
 		Name:        n.Name,
 		Description: n.Description.OrZero(),
 		Tags:        dt.Map(n.Tags, func(t *tag_ref.Tag) string { return t.Name.String() }),
+		Visibility:  mcp.LibraryPageTreeNodeVisibility(n.Visibility.String()),
 	}
 
 	if parent, ok := n.Parent.Get(); ok {
@@ -211,7 +227,7 @@ func (lt *libraryTools) newLibraryPageGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageGetInput) (*mcp.ToolLibraryPageGetOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPageGetInput) (*mcp.ToolLibraryPageGetOutput, error) {
 					return lt.ExecuteLibraryPageGet(ctx, args)
 				},
 			)
@@ -232,8 +248,10 @@ func (lt *libraryTools) ExecuteLibraryPageGet(ctx context.Context, args mcp.Tool
 		Slug:        node.Mark.Slug(),
 		Name:        node.Name,
 		Description: node.Description.Ptr(),
+		Content:     node.Content.OrZero().Plaintext(),
 		Tags:        dt.Map(node.Tags, func(t *tag_ref.Tag) string { return t.Name.String() }),
 		ChildPages:  dt.Map(node.Nodes, func(n *library.Node) string { return n.Mark.Slug() }),
+		Visibility:  mcp.ToolLibraryPageGetOutputVisibility(node.Visibility.String()),
 	}
 
 	return &output, nil
@@ -251,7 +269,7 @@ func (lt *libraryTools) newLibraryPageCreateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageCreateInput) (*mcp.ToolLibraryPageCreateOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPageCreateInput) (*mcp.ToolLibraryPageCreateOutput, error) {
 					return lt.ExecuteLibraryPageCreate(ctx, args)
 				},
 			)
@@ -355,7 +373,7 @@ func (lt *libraryTools) newLibraryPageUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPageUpdateInput) (*mcp.ToolLibraryPageUpdateOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPageUpdateInput) (*mcp.ToolLibraryPageUpdateOutput, error) {
 					return lt.ExecuteLibraryPageUpdate(ctx, args)
 				},
 			)
@@ -441,7 +459,7 @@ func (lt *libraryTools) newLibrarySearchPagesTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibrarySearchPagesInput) (*mcp.ToolLibrarySearchPagesOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibrarySearchPagesInput) (*mcp.ToolLibrarySearchPagesOutput, error) {
 					return lt.ExecuteLibrarySearchPages(ctx, args)
 				},
 			)
@@ -495,7 +513,7 @@ func (lt *libraryTools) newLibraryPagePropertySchemaGetTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertySchemaGetInput) (*mcp.ToolLibraryPagePropertySchemaGetOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPagePropertySchemaGetInput) (*mcp.ToolLibraryPagePropertySchemaGetOutput, error) {
 					return lt.ExecuteLibraryPagePropertySchemaGet(ctx, args)
 				},
 			)
@@ -548,7 +566,7 @@ func (lt *libraryTools) newLibraryPagePropertySchemaUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertySchemaUpdateInput) (*mcp.ToolLibraryPagePropertySchemaUpdateOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPagePropertySchemaUpdateInput) (*mcp.ToolLibraryPagePropertySchemaUpdateOutput, error) {
 					return lt.ExecuteLibraryPagePropertySchemaUpdate(ctx, args)
 				},
 			)
@@ -613,7 +631,7 @@ func (lt *libraryTools) newLibraryPagePropertiesUpdateTool() *Tool {
 					Description: toolDef.Description,
 					InputSchema: toolDef.InputSchema,
 				},
-				func(ctx tool.Context, args mcp.ToolLibraryPagePropertiesUpdateInput) (*mcp.ToolLibraryPagePropertiesUpdateOutput, error) {
+				func(ctx adkagent.Context, args mcp.ToolLibraryPagePropertiesUpdateInput) (*mcp.ToolLibraryPagePropertiesUpdateOutput, error) {
 					return lt.ExecuteLibraryPagePropertiesUpdate(ctx, args)
 				},
 			)

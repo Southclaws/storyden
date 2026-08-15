@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolRobotCreate
+x-storyden:
+  toolsets:
+    - system.robot_studio
 x-storyden-tool:
   title: Create Robot
   role: MANAGE_ROBOTS
@@ -11,7 +14,7 @@ x-storyden-tool:
 title: robot_create
 description: Create a new Robot (agent) with a specific purpose and behavior.
   Robots are customizable automations that can help users with specific
-  workflows using tailored tools and instructions.
+  workflows using direct tools, reusable Toolsets, and instructions.
 type: object
 required:
   - input
@@ -50,7 +53,12 @@ definitions:
         description: The language model ID in provider/model_name format. If omitted, the system will use a default model configured for Robots.
       tools:
         type: array
-        description: List of tool names that the Robot can use.
+        description: Individual tool names that the Robot can use. Tools already provided by an assigned Toolset are removed.
+        items:
+          type: string
+      toolsets:
+        type: array
+        description: List of reusable Toolset IDs that the Robot can use.
         items:
           type: string
     additionalProperties: false

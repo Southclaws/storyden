@@ -1,0 +1,53 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolGet
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Get Tool
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: tool_get
+description: Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolGetInput" }
+  output: { $ref: "#/definitions/ToolToolGetOutput" }
+definitions:
+  ToolToolGetInput:
+    type: object
+    required: [id]
+    properties:
+      id:
+        type: string
+        description: Stable tool ID returned by tool_search.
+    additionalProperties: false
+  ToolToolGetOutput:
+    type: object
+    required: [id, name, description, input_schema, requires_confirmation, requires_workspace]
+    properties:
+      id:
+        type: string
+        description: Stable tool identifier accepted by tool_load and Robot configuration tools.
+      name:
+        type: string
+        description: Human-readable title for explaining or confirming the selected capability.
+      description:
+        type: string
+        description: The outcome the tool is designed to achieve and when it should be selected.
+      input_schema:
+        type: object
+        description: Complete JSON Schema for arguments that must be supplied when calling the tool.
+        additionalProperties: true
+      output_schema:
+        type: object
+        description: Complete JSON Schema for the tool result when the tool declares one.
+        additionalProperties: true
+      requires_confirmation:
+        type: boolean
+        description: Whether a run must pause for human approval before executing this tool.
+      requires_workspace:
+        type: boolean
+        description: Whether the conversation must have an active Robot workspace before this tool can be loaded or used.
+    additionalProperties: false

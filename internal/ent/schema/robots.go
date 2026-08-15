@@ -37,6 +37,10 @@ func (Robot) Fields() []ent.Field {
 			Optional().
 			Comment("A list of tool names that the robot can use"),
 
+		field.Strings("toolsets").
+			Optional().
+			Comment("A list of reusable Toolset references that the robot can use"),
+
 		field.JSON("metadata", map[string]any{}).
 			Optional().
 			Comment("Arbitrary metadata used by clients to store domain specific information"),

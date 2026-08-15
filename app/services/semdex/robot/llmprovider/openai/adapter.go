@@ -8,7 +8,7 @@ import (
 
 	"github.com/openai/openai-go/v3"
 	openaioption "github.com/openai/openai-go/v3/option"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"

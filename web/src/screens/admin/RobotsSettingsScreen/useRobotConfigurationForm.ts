@@ -23,6 +23,7 @@ export const FormSchema = z.object({
   playbook: z.string(),
   model: z.string().optional(),
   tools: z.array(z.string()),
+  toolsets: z.array(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -36,6 +37,7 @@ export function useRobotConfigurationForm({ robot, onSave }: Props) {
       playbook: robot?.playbook ?? "",
       model: robot?.model,
       tools: robot?.tools ?? [],
+      toolsets: robot?.toolsets ?? [],
     },
     resolver: zodResolver(FormSchema),
   });

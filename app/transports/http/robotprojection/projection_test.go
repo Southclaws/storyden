@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"google.golang.org/adk/model"
-	adksession "google.golang.org/adk/session"
-	"google.golang.org/adk/tool/toolconfirmation"
+	"google.golang.org/adk/v2/model"
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
 )
 
@@ -41,6 +41,68 @@ func TestFunctionResponseToUIPartDoesNotCopyOutputIntoInput(t *testing.T) {
 	}
 	if got.Output["results"] != float64(0) {
 		t.Fatalf("output.results = %#v, want 0", got.Output["results"])
+	}
+}
+
+func TestADKEventToUIMessagePartsPreservesThoughtAsReasoning(t *testing.T) {
+	event := adksession.Event{LLMResponse: model.LLMResponse{Content: &genai.Content{Parts: []*genai.Part{{
+		Text:    "I should inspect the session branch first.",
+		Thought: true,
+	}}}}}
+
+	parts, err := ADKEventToUIMessageParts(event, nil, nil)
+	if err != nil {
+		t.Fatalf("ADKEventToUIMessageParts() error = %v", err)
+	}
+	if len(parts) != 1 {
+		t.Fatalf("len(parts) = %d, want 1", len(parts))
+	}
+
+	data, err := json.Marshal(parts[0])
+	if err != nil {
+		t.Fatalf("json.Marshal() error = %v", err)
+	}
+	var got struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	}
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("json.Unmarshal() error = %v", err)
+	}
+	if got.Type != "reasoning" || got.Text != "I should inspect the session branch first." {
+		t.Fatalf("reasoning part = %#v", got)
+	}
+}
+
+func TestADKEventToUIMessagePartsProjectsDelegatedBranchAsText(t *testing.T) {
+	event := adksession.Event{
+		Branch: "robot_researcher@1",
+		LLMResponse: model.LLMResponse{Content: &genai.Content{Parts: []*genai.Part{{
+			Text: "Specialist result for the coordinator.",
+		}}}},
+	}
+
+	parts, err := ADKEventToUIMessageParts(event, nil, nil)
+	if err != nil {
+		t.Fatalf("ADKEventToUIMessageParts() error = %v", err)
+	}
+	if len(parts) != 1 {
+		t.Fatalf("len(parts) = %d, want 1", len(parts))
+	}
+
+	data, err := json.Marshal(parts[0])
+	if err != nil {
+		t.Fatalf("json.Marshal() error = %v", err)
+	}
+	var got struct {
+		Type string `json:"type"`
+		Text string `json:"text"`
+	}
+	if err := json.Unmarshal(data, &got); err != nil {
+		t.Fatalf("json.Unmarshal() error = %v", err)
+	}
+	if got.Type != "text" || got.Text != "Specialist result for the coordinator." {
+		t.Fatalf("delegated text part = %#v", got)
 	}
 }
 

@@ -17,7 +17,7 @@ type RichCardVariantMap = {
   [key in keyof RichCardVariant]: Array<RichCardVariant[key]>
 }
 
-type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "title" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
+type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "titleIcon" | "title" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
 
 export type RichCardVariantProps = {
   [key in keyof RichCardVariant]?: ConditionalValue<RichCardVariant[key]> | undefined

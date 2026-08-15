@@ -11,6 +11,12 @@ steps:
     respond:
       error: "simulated LLM provider failure"
   - match:
+      contains: "show thought"
+    respond:
+      thought: "I should verify the evidence before answering."
+      text: "The answer is ready."
+      finish: "stop"
+  - match:
       tool_result: library_page_list
     respond:
       text: "I found some pages in the library."

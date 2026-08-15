@@ -1,0 +1,14 @@
+steps:
+  - match:
+      tool_result: toolset_search
+    respond:
+      text: "Toolsets searched."
+      finish: "stop"
+  - match:
+      any: true
+    respond:
+      tool_calls:
+        - id: call_toolset_search_1
+          name: toolset_search
+          args:
+            query: "plugin building"

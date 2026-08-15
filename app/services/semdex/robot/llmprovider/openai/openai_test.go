@@ -7,7 +7,7 @@ import (
 	"github.com/openai/openai-go/v3/responses"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
@@ -115,6 +115,32 @@ func TestConvertToOpenAIToolsUsesObjectSchemaWhenDeclarationHasNone(t *testing.T
 	require.Len(t, tools, 1)
 	require.NotNil(t, tools[0].OfFunction)
 	assert.Equal(t, map[string]any{"type": "object", "properties": map[string]any{}}, tools[0].OfFunction.Parameters)
+}
+
+func TestConvertToOpenAIToolsNormalizesADKAgentSchema(t *testing.T) {
+	req := &model.LLMRequest{Config: &genai.GenerateContentConfig{Tools: []*genai.Tool{{
+		FunctionDeclarations: []*genai.FunctionDeclaration{{
+			Name: "robot_d9n7eodo2dtgv230rpng",
+			Parameters: &genai.Schema{
+				Type: genai.TypeObject,
+				Properties: map[string]*genai.Schema{
+					"request": {Type: genai.TypeString},
+				},
+				Required: []string{"request"},
+			},
+		}},
+	}}}}
+
+	tools := convertToOpenAITools(req)
+	require.Len(t, tools, 1)
+	require.NotNil(t, tools[0].OfFunction)
+	assert.Equal(t, map[string]any{
+		"type": "object",
+		"properties": map[string]any{
+			"request": map[string]any{"type": "string"},
+		},
+		"required": []any{"request"},
+	}, tools[0].OfFunction.Parameters)
 }
 
 func TestConvertOpenAIResponseToGenaiFinishReason(t *testing.T) {

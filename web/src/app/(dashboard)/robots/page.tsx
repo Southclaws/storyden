@@ -15,7 +15,7 @@ export default function Page() {
           <PageHeading>Robots</PageHeading>
         </HStack>
 
-        <LinkButton href="/robots/new">New</LinkButton>
+        <LinkButton href="/robots/new">New Robot</LinkButton>
       </WStack>
 
       <RobotListScreen />

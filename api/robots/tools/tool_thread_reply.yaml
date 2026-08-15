@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolThreadReply
+x-storyden:
+  toolsets:
+    - system.discussions
 x-storyden-tool:
   title: Reply to Thread
   role: CREATE_POST

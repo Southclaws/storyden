@@ -44,6 +44,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -97,6 +98,7 @@ type AccountQuery struct {
 	withWarnings                          *WarningQuery
 	withAuthoredWarnings                  *WarningQuery
 	withRobots                            *RobotQuery
+	withRobotToolsets                     *RobotToolsetQuery
 	withRobotWorkspaces                   *RobotWorkspaceQuery
 	withRobotWorkspaceInstances           *RobotWorkspaceInstanceQuery
 	withRobotMcpServers                   *RobotMCPServerQuery
@@ -954,6 +956,28 @@ func (_q *AccountQuery) QueryRobots() *RobotQuery {
 	return query
 }
 
+// QueryRobotToolsets chains the current query on the "robot_toolsets" edge.
+func (_q *AccountQuery) QueryRobotToolsets() *RobotToolsetQuery {
+	query := (&RobotToolsetClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(robottoolset.Table, robottoolset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotToolsetsTable, account.RobotToolsetsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryRobotWorkspaces chains the current query on the "robot_workspaces" edge.
 func (_q *AccountQuery) QueryRobotWorkspaces() *RobotWorkspaceQuery {
 	query := (&RobotWorkspaceClient{config: _q.config}).Query()
@@ -1315,6 +1339,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withWarnings:                          _q.withWarnings.Clone(),
 		withAuthoredWarnings:                  _q.withAuthoredWarnings.Clone(),
 		withRobots:                            _q.withRobots.Clone(),
+		withRobotToolsets:                     _q.withRobotToolsets.Clone(),
 		withRobotWorkspaces:                   _q.withRobotWorkspaces.Clone(),
 		withRobotWorkspaceInstances:           _q.withRobotWorkspaceInstances.Clone(),
 		withRobotMcpServers:                   _q.withRobotMcpServers.Clone(),
@@ -1735,6 +1760,17 @@ func (_q *AccountQuery) WithRobots(opts ...func(*RobotQuery)) *AccountQuery {
 	return _q
 }
 
+// WithRobotToolsets tells the query-builder to eager-load the nodes that are connected to
+// the "robot_toolsets" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithRobotToolsets(opts ...func(*RobotToolsetQuery)) *AccountQuery {
+	query := (&RobotToolsetClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRobotToolsets = query
+	return _q
+}
+
 // WithRobotWorkspaces tells the query-builder to eager-load the nodes that are connected to
 // the "robot_workspaces" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithRobotWorkspaces(opts ...func(*RobotWorkspaceQuery)) *AccountQuery {
@@ -1879,7 +1915,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [43]bool{
+		loadedTypes = [44]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -1917,6 +1953,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withWarnings != nil,
 			_q.withAuthoredWarnings != nil,
 			_q.withRobots != nil,
+			_q.withRobotToolsets != nil,
 			_q.withRobotWorkspaces != nil,
 			_q.withRobotWorkspaceInstances != nil,
 			_q.withRobotMcpServers != nil,
@@ -2217,6 +2254,13 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadRobots(ctx, query, nodes,
 			func(n *Account) { n.Edges.Robots = []*Robot{} },
 			func(n *Account, e *Robot) { n.Edges.Robots = append(n.Edges.Robots, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRobotToolsets; query != nil {
+		if err := _q.loadRobotToolsets(ctx, query, nodes,
+			func(n *Account) { n.Edges.RobotToolsets = []*RobotToolset{} },
+			func(n *Account, e *RobotToolset) { n.Edges.RobotToolsets = append(n.Edges.RobotToolsets, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -3457,6 +3501,36 @@ func (_q *AccountQuery) loadRobots(ctx context.Context, query *RobotQuery, nodes
 	}
 	query.Where(predicate.Robot(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.RobotsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AuthorID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "author_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadRobotToolsets(ctx context.Context, query *RobotToolsetQuery, nodes []*Account, init func(*Account), assign func(*Account, *RobotToolset)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robottoolset.FieldAuthorID)
+	}
+	query.Where(predicate.RobotToolset(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.RobotToolsetsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

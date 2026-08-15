@@ -1,0 +1,173 @@
+package sse
+
+import (
+	"context"
+	"log/slog"
+	"strings"
+
+	adksession "google.golang.org/adk/v2/session"
+	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
+	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
+)
+
+const delegationDataPartType = "data-delegation"
+
+type delegationStatus string
+
+const (
+	delegationStatusRunning   delegationStatus = "running"
+	delegationStatusCompleted delegationStatus = "completed"
+	delegationStatusFailed    delegationStatus = "failed"
+)
+
+type delegationData struct {
+	CallID   string                 `json:"callId"`
+	Robot    openapi.RobotReference `json:"robot"`
+	Request  string                 `json:"request"`
+	Status   delegationStatus       `json:"status"`
+	Messages []openapi.UIMessage    `json:"messages"`
+	Error    string                 `json:"error,omitempty"`
+}
+
+type delegationStream struct {
+	ctx          context.Context
+	robotQuerier *robot_querier.Querier
+	toolMetadata robotprojection.ToolMetadataResolver
+	emitter      *streamEmitter
+	logger       *slog.Logger
+	active       map[string]*delegationData
+}
+
+func newDelegationStream(
+	ctx context.Context,
+	robotQuerier *robot_querier.Querier,
+	toolMetadata robotprojection.ToolMetadataResolver,
+	emitter *streamEmitter,
+	logger *slog.Logger,
+) *delegationStream {
+	return &delegationStream{
+		ctx:          ctx,
+		robotQuerier: robotQuerier,
+		toolMetadata: toolMetadata,
+		emitter:      emitter,
+		logger:       logger,
+		active:       make(map[string]*delegationData),
+	}
+}
+
+func (d *delegationStream) Start(call *genai.FunctionCall) bool {
+	if call == nil || call.ID == "" {
+		return false
+	}
+
+	robotID, ok := robot_ref.IDFromAgentName(call.Name)
+	if !ok {
+		return false
+	}
+
+	request, _ := call.Args["request"].(string)
+	data := &delegationData{
+		CallID:   call.ID,
+		Robot:    d.robotReference(robotID),
+		Request:  strings.TrimSpace(request),
+		Status:   delegationStatusRunning,
+		Messages: []openapi.UIMessage{},
+	}
+	d.active[call.ID] = data
+	d.emit(data)
+	return true
+}
+
+func (d *delegationStream) AppendEvent(event *adksession.Event) bool {
+	if event == nil || event.IsolationScope == "" {
+		return false
+	}
+
+	data, ok := d.active[event.IsolationScope]
+	if !ok {
+		robotID, isRobot := robot_ref.IDFromAgentName(event.Author)
+		if !isRobot {
+			return true
+		}
+		data = &delegationData{
+			CallID:   event.IsolationScope,
+			Robot:    d.robotReference(robotID),
+			Status:   delegationStatusRunning,
+			Messages: []openapi.UIMessage{},
+		}
+		d.active[event.IsolationScope] = data
+	}
+
+	parts, err := robotprojection.ADKEventToUIMessageParts(*event, nil, d.toolMetadata)
+	if err != nil {
+		d.logger.Warn("failed to project delegated Robot event",
+			slog.String("call_id", event.IsolationScope),
+			slog.String("error", err.Error()))
+		return true
+	}
+	if len(parts) == 0 {
+		return true
+	}
+
+	role := openapi.UIMessageRoleAssistant
+	if event.Author == "user" {
+		role = openapi.UIMessageRoleUser
+	}
+	data.Messages = append(data.Messages, openapi.UIMessage{
+		Id:    event.ID,
+		Role:  role,
+		Parts: parts,
+	})
+	d.emit(data)
+	return true
+}
+
+func (d *delegationStream) Complete(response *genai.FunctionResponse) bool {
+	if response == nil || response.ID == "" {
+		return false
+	}
+	data, ok := d.active[response.ID]
+	if !ok {
+		return false
+	}
+
+	data.Status = delegationStatusCompleted
+	d.emit(data)
+	return true
+}
+
+func (d *delegationStream) Fail(message string) {
+	for _, data := range d.active {
+		if data.Status != delegationStatusRunning {
+			continue
+		}
+		data.Status = delegationStatusFailed
+		data.Error = message
+		d.emit(data)
+	}
+}
+
+func (d *delegationStream) robotReference(id robot_ref.ID) openapi.RobotReference {
+	reference := openapi.RobotReference{
+		Id:   openapi.Identifier(id.String()),
+		Name: "Delegated Robot",
+	}
+
+	resolved, err := d.robotQuerier.Get(d.ctx, id)
+	if err != nil {
+		d.logger.Warn("failed to resolve delegated Robot",
+			slog.String("robot_id", id.String()),
+			slog.String("error", err.Error()))
+		return reference
+	}
+	reference.Name = resolved.Name
+	return reference
+}
+
+func (d *delegationStream) emit(data *delegationData) {
+	_ = d.emitter.Send(robotprojection.DataStreamPartWithID(delegationDataPartType, data.CallID, data))
+}

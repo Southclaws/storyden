@@ -4,10 +4,10 @@ import { unlink, writeFile } from "node:fs/promises";
 import { withAdminAccessKey } from "../access_key_admin_assignment";
 
 import {
+  DEFAULT_ROBOT_MODEL,
   goToNewChat,
   sendMessage,
   setupRobotProviderWithScript,
-  switchToRobot,
 } from "./helpers";
 
 const ROBOT_SCRIPT_DIR = "../tests/robot/scripts";
@@ -95,12 +95,11 @@ test.describe("Robot Chat — Library page request tool", () => {
     const suffix = Date.now();
     const libraryPageName = `E2E Requested Library Page ${suffix}`;
     const libraryPageSlug = `e2e-requested-library-page-${suffix}`;
-    const robotName = `e2e-page-request-robot-${suffix}`;
     const scriptName = `e2e-library-request-page-${suffix}.yaml`;
     const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
 
     try {
-      await withAdminAccessKey(async ({ robotCreate, nodeCreate }) => {
+      await withAdminAccessKey(async ({ nodeCreate }) => {
         await nodeCreate({
           name: libraryPageName,
           slug: libraryPageSlug,
@@ -133,19 +132,13 @@ test.describe("Robot Chat — Library page request tool", () => {
       finish: "stop"
 `,
         );
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot that asks the user to select a Library page",
-          playbook: "you request a Library page when the task needs one",
-          model: `mock/../robot/scripts/${scriptName}`,
-          tools: ["library_request_page"],
-        });
       });
 
-      await goToNewChat(page);
+      await setupRobotProviderWithScript(
+        `mock/../robot/scripts/${scriptName}`,
+      );
 
-      await switchToRobot(page, robotName);
+      await goToNewChat(page);
 
       const firstPrompt = "choose a library page";
       await sendMessage(page, firstPrompt);
@@ -187,6 +180,7 @@ test.describe("Robot Chat — Library page request tool", () => {
       await expect(page.getByText("No tool invocation found")).toHaveCount(0);
     } finally {
       await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
 });

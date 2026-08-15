@@ -11,6 +11,7 @@ import type { Metadata } from "./metadata";
 import type { NullableIdentifier } from "./nullableIdentifier";
 import type { RobotModelRef } from "./robotModelRef";
 import type { RobotToolNameList } from "./robotToolNameList";
+import type { RobotToolsetRefList } from "./robotToolsetRefList";
 
 export interface RobotMutableProps {
   /** The name of the robot */
@@ -22,5 +23,6 @@ export interface RobotMutableProps {
   model?: RobotModelRef;
   workspace_id?: NullableIdentifier | null;
   tools?: RobotToolNameList;
+  toolsets?: RobotToolsetRefList;
   meta?: Metadata;
 }

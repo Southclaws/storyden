@@ -1,0 +1,29 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolsetDelete
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Delete Toolset
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false }
+title: toolset_delete
+description: Delete an unused authored custom Toolset. Remove it from Robots first.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolsetDeleteInput" }
+  output: { $ref: "#/definitions/ToolToolsetDeleteOutput" }
+definitions:
+  ToolToolsetDeleteInput:
+    type: object
+    required: [id]
+    properties: { id: { type: string, pattern: "^[0-9a-v]{20}$" } }
+    additionalProperties: false
+  ToolToolsetDeleteOutput:
+    type: object
+    required: [id, deleted]
+    properties:
+      id: { type: string }
+      deleted: { type: boolean }
+    additionalProperties: false

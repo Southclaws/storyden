@@ -43,6 +43,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -782,6 +783,21 @@ func (_c *AccountCreate) AddRobots(v ...*Robot) *AccountCreate {
 		ids[i] = v[i].ID
 	}
 	return _c.AddRobotIDs(ids...)
+}
+
+// AddRobotToolsetIDs adds the "robot_toolsets" edge to the RobotToolset entity by IDs.
+func (_c *AccountCreate) AddRobotToolsetIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRobotToolsetIDs(ids...)
+	return _c
+}
+
+// AddRobotToolsets adds the "robot_toolsets" edges to the RobotToolset entity.
+func (_c *AccountCreate) AddRobotToolsets(v ...*RobotToolset) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotToolsetIDs(ids...)
 }
 
 // AddRobotWorkspaceIDs adds the "robot_workspaces" edge to the RobotWorkspace entity by IDs.
@@ -1664,6 +1680,22 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robot.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotToolsetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

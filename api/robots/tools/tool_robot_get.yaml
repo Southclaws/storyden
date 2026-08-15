@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolRobotGet
+x-storyden:
+  toolsets:
+    - system.robot_studio
 x-storyden-tool:
   title: Get Robot
   role: USE_ROBOTS
@@ -41,6 +44,7 @@ definitions:
       - playbook
       - model
       - tools
+      - toolsets
     properties:
       id:
         type: string
@@ -59,7 +63,12 @@ definitions:
         description: The Robot's language model ID in provider/model_name format
       tools:
         type: array
-        description: List of tool names that the Robot can use
+        description: List of individual tool names that the Robot can use
+        items:
+          type: string
+      toolsets:
+        type: array
+        description: List of reusable Toolset IDs that the Robot can use
         items:
           type: string
     additionalProperties: false

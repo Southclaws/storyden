@@ -79,6 +79,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot/robot_model_cache"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_querier"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_toolset"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_workspace"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_writer"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -130,6 +131,7 @@ func Build() fx.Option {
 			robot_querier.New,
 			robot_writer.New,
 			robot_session.New,
+			robot_toolset.New,
 			robot_workspace.New,
 			like_querier.New,
 			like_writer.New,

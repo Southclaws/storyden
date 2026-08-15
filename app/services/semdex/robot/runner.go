@@ -2,6 +2,7 @@ package robot
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"iter"
 	"log/slog"
@@ -9,31 +10,32 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"github.com/samber/lo"
 	"go.uber.org/fx"
-	"google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/artifact"
-	"google.golang.org/adk/memory"
-	"google.golang.org/adk/model"
-	"google.golang.org/adk/runner"
-	adksession "google.golang.org/adk/session"
-	adktool "google.golang.org/adk/tool"
+	"google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/artifact"
+	"google.golang.org/adk/v2/memory"
+	"google.golang.org/adk/v2/model"
+	"google.golang.org/adk/v2/runner"
+	adksession "google.golang.org/adk/v2/session"
+	adktool "google.golang.org/adk/v2/tool"
 	"google.golang.org/genai"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/app/resources/robot/llm_provider"
 	"github.com/Southclaws/storyden/app/resources/robot/model_ref"
+	"github.com/Southclaws/storyden/app/resources/robot/robot_ref"
 	"github.com/Southclaws/storyden/app/resources/robot/robot_session"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_history"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/denbot"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/pluginbuilder"
-	"github.com/Southclaws/storyden/app/services/semdex/robot/agent_registry/robotbuilder"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/mcpclient"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
+	"github.com/Southclaws/storyden/app/services/semdex/robot/toolsets"
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -43,9 +45,10 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		tools.Build(),
+		toolsets.Build(),
 		llmprovider.Build(),
 		workspaceprovider.Build(),
-		robotbuilder.Build(),
+		denbot.Build(),
 		pluginbuilder.Build(),
 		fx.Provide(agent_registry.New, NewSessionStorage, New, NewSessionNamer, NewWorkspaceManager, mcpclient.NewHTTPClient, mcpclient.New),
 	)
@@ -62,6 +65,7 @@ type Agent struct {
 	artifact     artifact.Service
 	memory       memory.Service
 	toolProvider *tools.Registry
+	toolsets     *toolsets.Registry
 	agents       *agent_registry.Registry
 	runConfig    agent.RunConfig
 
@@ -82,10 +86,9 @@ type resolvedAgentSpec struct {
 	Instruction         string
 	InstructionProvider func(agent.ReadonlyContext) (string, error)
 	ToolNames           []string
-	Toolsets            []adktool.Toolset
+	ToolsetRefs         []string
 	Capabilities        []string
 	DefaultWorkspaceID  opt.Optional[xid.ID]
-	WorkspaceDefinition *agent_registry.Definition
 }
 
 type RunMode = agent_registry.RunMode
@@ -135,6 +138,7 @@ func New(
 	sessionNamer *SessionNamer,
 	workspaceManager *WorkspaceManager,
 	toolProvider *tools.Registry,
+	toolsetRegistry *toolsets.Registry,
 	agentRegistry *agent_registry.Registry,
 ) (*Agent, error) {
 	artifactService := artifact.InMemoryService()
@@ -151,6 +155,7 @@ func New(
 		artifact:     artifactService,
 		memory:       memoryService,
 		toolProvider: toolProvider,
+		toolsets:     toolsetRegistry,
 		agents:       agentRegistry,
 		runConfig: agent.RunConfig{
 			// We don't use streaming, it's cliche as fuck.
@@ -210,12 +215,13 @@ func (s *Agent) resolveAgentSpec(ctx context.Context, robotRef string) (*resolve
 			DatabaseRobotID:    opt.New(id),
 			ModelRef:           opt.New(modelRef),
 			AppName:            entRobot.Name,
-			AgentName:          entRobot.Name,
+			AgentName:          robot_ref.AgentName(robot_ref.ID(id)),
 			DisplayName:        entRobot.Name,
 			Description:        entRobot.Description,
 			Instruction:        entRobot.Playbook,
 			ToolNames:          entRobot.Tools,
-			Capabilities:       robotCapabilityNames(entRobot.Tools),
+			ToolsetRefs:        entRobot.Toolsets,
+			Capabilities:       append(append([]string(nil), entRobot.Toolsets...), entRobot.Tools...),
 			DefaultWorkspaceID: opt.NewEmpty[xid.ID](),
 		}
 		if entRobot.WorkspaceID != nil {
@@ -235,18 +241,9 @@ func (s *Agent) resolveAgentSpec(ctx context.Context, robotRef string) (*resolve
 		return nil, fmt.Errorf("unknown robot %q", robotRef)
 	}
 
-	toolsets := make([]adktool.Toolset, 0, len(def.ToolsetBuilders))
-	for _, build := range def.ToolsetBuilders {
-		toolset, err := build(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("build robot %q toolset: %w", def.ID, err)
-		}
-		toolsets = append(toolsets, toolset)
-	}
-
 	capabilities := append([]string(nil), def.Capabilities...)
 	if len(capabilities) == 0 {
-		capabilities = robotCapabilityNames(def.ToolNames)
+		capabilities = append([]string(nil), def.ToolsetRefs...)
 	}
 
 	spec := &resolvedAgentSpec{
@@ -259,14 +256,9 @@ func (s *Agent) resolveAgentSpec(ctx context.Context, robotRef string) (*resolve
 		Description:         def.Description,
 		Instruction:         def.Instruction,
 		InstructionProvider: def.InstructionProvider,
-		ToolNames:           def.ToolNames,
-		Toolsets:            toolsets,
+		ToolsetRefs:         def.ToolsetRefs,
 		Capabilities:        capabilities,
 		DefaultWorkspaceID:  opt.NewEmpty[xid.ID](),
-		WorkspaceDefinition: nil,
-	}
-	if def.RequiresWorkspace {
-		spec.WorkspaceDefinition = &def
 	}
 
 	return spec, nil
@@ -296,19 +288,9 @@ func (s *Agent) runResolvedAgent(
 		}
 	}
 
-	var missingTools []string
-	toolList := tools.Tools{}
-	if len(spec.ToolNames) > 0 {
-		toolList, missingTools = s.toolProvider.GetToolsWithMissing(ctx, spec.ToolNames...)
-	}
-
-	// NOTE: Inside the actual callback, we lose our tool definition info, so we
-	// build a quick table of our own tool definitions here, keyed by name, then
-	// in the hook, look up our tool using the name to get permissions to check.
-	tooltable := lo.KeyBy(toolList, func(t *tools.Tool) string { return t.Name() })
-	checkToolRBAC := func(ctx adktool.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
-		t := tooltable[tool.Name()]
-		if t == nil {
+	checkToolRBAC := func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
+		t, ok := s.toolProvider.FindByADKName(tool.Name())
+		if !ok {
 			return nil, nil
 		}
 
@@ -330,22 +312,39 @@ func (s *Agent) runResolvedAgent(
 		toolCtx = tools.ContextWithConfirmationDisabled(toolCtx)
 	}
 
-	adktools, err := toolList.ToADKTools(toolCtx)
-	if err != nil {
-		return errorSeq(fmt.Errorf("convert to adk tools: %w", err))
+	var missingTools []string
+	resolvedToolsets := make([]adktool.Toolset, 0, len(spec.ToolsetRefs)+1)
+	if spec.RobotRef == denbot.ID {
+		discovery, err := s.toolsets.Discovery(toolCtx, spec.ToolsetRefs...)
+		if err != nil {
+			return errorSeq(fmt.Errorf("build Toolset discovery: %w", err))
+		}
+		resolvedToolsets = append(resolvedToolsets, discovery)
+	} else {
+		var err error
+		resolvedToolsets, missingTools, err = s.toolsets.Build(toolCtx, spec.ToolsetRefs)
+		if err != nil {
+			return errorSeq(fmt.Errorf("build Robot Toolsets: %w", err))
+		}
+	}
+	if len(spec.ToolNames) > 0 {
+		effectiveToolNames, err := s.toolsets.RemoveContainedTools(toolCtx, spec.ToolNames, spec.ToolsetRefs)
+		if err != nil {
+			return errorSeq(fmt.Errorf("compose direct Robot tools: %w", err))
+		}
+		directTools, missingDirectTools := s.toolProvider.GetToolsWithMissing(toolCtx, effectiveToolNames...)
+		missingTools = append(missingTools, missingDirectTools...)
+		if len(directTools) > 0 {
+			resolvedToolsets = append(resolvedToolsets, &tools.Toolset{Registered: directTools, BuildContext: toolCtx})
+		}
 	}
 	if runOptions.Mode == ModeUnattended {
 		finishTool, err := newUnattendedFinishTool()
 		if err != nil {
 			return errorSeq(fmt.Errorf("construct unattended finish tool: %w", err))
 		}
-		adktools = append(adktools, finishTool)
+		resolvedToolsets = append(resolvedToolsets, &tools.Toolset{ToolList: []adktool.Tool{finishTool}})
 	}
-	toolsets := make([]adktool.Toolset, 0, len(spec.Toolsets)+1)
-	if len(adktools) > 0 {
-		toolsets = append(toolsets, &tools.Toolset{ToolList: adktools})
-	}
-	toolsets = append(toolsets, spec.Toolsets...)
 
 	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, runOptions)}, s.beforeToolCallbacks...)
 	currentIdentity := robotIdentity{
@@ -355,21 +354,27 @@ func (s *Agent) runResolvedAgent(
 		Capabilities:     spec.Capabilities,
 		UnavailableTools: missingTools,
 	}
-	identityContext := s.buildRobotIdentityContext(ctx, sessionID, currentIdentity)
-	beforeModelCallbacks := append(
-		[]llmagent.BeforeModelCallback{projectRobotSwitchesBeforeModel(s.logger, s.robotNameResolver())},
-		s.beforeModelCallbacks...,
-	)
+	identityContext := s.buildRobotIdentityContext(sessionID, currentIdentity, false)
+
+	var subAgents []agent.Agent
+	if spec.RobotRef == denbot.ID {
+		var err error
+		subAgents, err = s.buildDelegatedAgents(ctx, userID, sessionID, runOptions)
+		if err != nil {
+			return errorSeq(fmt.Errorf("build delegated Robots: %w", err))
+		}
+	}
 
 	llmAgent, err := llmagent.New(llmagent.Config{
 		Name:                      spec.AgentName,
 		Description:               spec.Description,
-		GlobalInstructionProvider: s.globalInstructionProvider(chatContext, identityContext, runOptions),
-		Instruction:               spec.Instruction,
-		InstructionProvider:       spec.InstructionProvider,
+		SubAgents:                 subAgents,
+		GlobalInstructionProvider: s.globalInstructionProvider(chatContext, runOptions),
+		InstructionProvider:       robotInstructionProvider(spec, identityContext),
 		Model:                     llm,
-		Toolsets:                  toolsets,
-		BeforeModelCallbacks:      beforeModelCallbacks,
+		Mode:                      llmagent.ModeChat,
+		Toolsets:                  resolvedToolsets,
+		BeforeModelCallbacks:      s.beforeModelCallbacks,
 		AfterModelCallbacks:       s.afterModelCallbacks,
 		BeforeToolCallbacks:       beforeToolCallbacks,
 		AfterToolCallbacks:        s.afterToolCallbacks,
@@ -379,15 +384,125 @@ func (s *Agent) runResolvedAgent(
 	}
 
 	return s.RunADKAgent(ctx, agent_registry.ADKRunRequest{
-		AppName:              spec.AppName,
-		Agent:                llmAgent,
-		RobotRef:             spec.RobotRef,
-		UserID:               userID,
-		SessionID:            sessionID,
-		Content:              content,
-		DefaultWorkspaceID:   spec.DefaultWorkspaceID,
-		WorkspaceRequirement: spec.WorkspaceDefinition,
-		Options:              runOptions,
+		AppName:            spec.AppName,
+		Agent:              llmAgent,
+		RobotRef:           spec.RobotRef,
+		UserID:             userID,
+		SessionID:          sessionID,
+		Content:            content,
+		DefaultWorkspaceID: spec.DefaultWorkspaceID,
+		Options:            runOptions,
+	})
+}
+
+func (s *Agent) buildDelegatedAgents(
+	ctx context.Context,
+	userID string,
+	sessionID string,
+	runOptions RunOptions,
+) ([]agent.Agent, error) {
+	robots, err := s.db.Robot.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	subAgents := make([]agent.Agent, 0, len(robots))
+	for _, stored := range robots {
+		spec, err := s.resolveAgentSpec(ctx, stored.ID.String())
+		if err != nil {
+			s.logger.Warn("skipping unavailable delegated Robot",
+				slog.String("robot_id", stored.ID.String()),
+				slog.String("error", err.Error()))
+			continue
+		}
+
+		subAgent, err := s.buildDelegatedAgent(ctx, spec, userID, sessionID, runOptions)
+		if err != nil {
+			s.logger.Warn("skipping unavailable delegated Robot",
+				slog.String("robot_id", stored.ID.String()),
+				slog.String("robot_name", stored.Name),
+				slog.String("error", err.Error()))
+			continue
+		}
+		subAgents = append(subAgents, subAgent)
+	}
+
+	return subAgents, nil
+}
+
+func (s *Agent) buildDelegatedAgent(
+	ctx context.Context,
+	spec *resolvedAgentSpec,
+	userID string,
+	sessionID string,
+	runOptions RunOptions,
+) (agent.Agent, error) {
+	modelRef, ok := spec.ModelRef.Get()
+	if !ok {
+		return nil, fmt.Errorf("delegated Robot has no model")
+	}
+	llm, err := s.modelFactory.GetADKModelLLM(ctx, modelRef)
+	if err != nil {
+		return nil, err
+	}
+
+	toolCtx := tools.ContextWithRunContext(ctx, tools.RunContext{
+		RobotID:   spec.DatabaseRobotID,
+		AccountID: userID,
+		SessionID: sessionID,
+	})
+	if runOptions.Mode == ModeUnattended {
+		toolCtx = tools.ContextWithConfirmationDisabled(toolCtx)
+	}
+	resolvedToolsets, missingTools, err := s.toolsets.Build(toolCtx, spec.ToolsetRefs)
+	if err != nil {
+		return nil, err
+	}
+	if len(spec.ToolNames) > 0 {
+		effectiveToolNames, err := s.toolsets.RemoveContainedTools(toolCtx, spec.ToolNames, spec.ToolsetRefs)
+		if err != nil {
+			return nil, fmt.Errorf("compose direct Robot tools: %w", err)
+		}
+		directTools, missingDirectTools := s.toolProvider.GetToolsWithMissing(toolCtx, effectiveToolNames...)
+		missingTools = append(missingTools, missingDirectTools...)
+		if len(directTools) > 0 {
+			resolvedToolsets = append(resolvedToolsets, &tools.Toolset{Registered: directTools, BuildContext: toolCtx})
+		}
+	}
+
+	checkToolRBAC := func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
+		registered, ok := s.toolProvider.FindByADKName(tool.Name())
+		if !ok {
+			return nil, nil
+		}
+		if permission, ok := registered.Definition.RequiredPermission.Get(); ok {
+			if err := session.Authorise(ctx, nil, permission); err != nil {
+				return nil, err
+			}
+		}
+		return nil, nil
+	}
+
+	identity := robotIdentity{
+		ID:               spec.DatabaseRobotID,
+		Name:             spec.DisplayName,
+		Description:      spec.Description,
+		Capabilities:     spec.Capabilities,
+		UnavailableTools: missingTools,
+	}
+	beforeToolCallbacks := append([]llmagent.BeforeToolCallback{checkToolRBAC, interceptClientSideTools(s.logger, runOptions)}, s.beforeToolCallbacks...)
+
+	return llmagent.New(llmagent.Config{
+		Name:                 spec.AgentName,
+		Description:          spec.Description,
+		InstructionProvider:  robotInstructionProvider(spec, s.buildRobotIdentityContext(sessionID, identity, true)),
+		Model:                llm,
+		Mode:                 llmagent.ModeSingleTurn,
+		Toolsets:             resolvedToolsets,
+		BeforeModelCallbacks: s.beforeModelCallbacks,
+		AfterModelCallbacks:  s.afterModelCallbacks,
+		BeforeToolCallbacks:  beforeToolCallbacks,
+		AfterToolCallbacks:   s.afterToolCallbacks,
 	})
 }
 
@@ -425,11 +540,6 @@ func (s *Agent) RunADKAgent(
 	}
 	if err := s.mountWorkspaceForRun(ctx, req.UserID, req.SessionID, req.DefaultWorkspaceID, req.Options); err != nil {
 		return errorSeq(err)
-	}
-	if req.WorkspaceRequirement != nil {
-		if err := s.RequireWorkspace(ctx, req.SessionID, *req.WorkspaceRequirement); err != nil {
-			return errorSeq(err)
-		}
 	}
 	if req.Options.Mode == ModeUnattended {
 		if err := s.markSessionUnattended(ctx, req.SessionID, req.Options); err != nil {
@@ -533,7 +643,7 @@ func (s *Agent) canReuseWorkspaceMount(ctx context.Context, sessionID robot.Sess
 //
 // RELATED: Vercel AI SDK client-side tools, Google ADK tool confirmation (Python-only)
 func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.BeforeToolCallback {
-	return func(ctx adktool.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
+	return func(ctx agent.Context, tool adktool.Tool, args map[string]any) (map[string]any, error) {
 		if tool.IsLongRunning() {
 			if options.Mode == ModeUnattended {
 				logger.Info("blocking long-running tool in unattended run",
@@ -566,22 +676,35 @@ func interceptClientSideTools(logger *slog.Logger, options RunOptions) llmagent.
 	}
 }
 
-func (s *Agent) ensureSession(ctx context.Context, robotName, robotRef, userID, sessionID string) error {
+func (s *Agent) ensureSession(ctx context.Context, robotName, rootRobotRef, userID, sessionID string) error {
 	get, err := s.sessions.Get(ctx, &adksession.GetRequest{
 		AppName:   robotName,
 		UserID:    userID,
 		SessionID: sessionID,
 	})
 	if err == nil {
+		storedRootRobotRef, stateErr := get.Session.State().Get(sessionRootRobotRefStateKey)
+		if errors.Is(stateErr, adksession.ErrStateKeyNotExist) {
+			storedRootRobotRef = denbot.ID
+			stateErr = nil
+		}
+		if stateErr != nil {
+			return stateErr
+		}
+		storedRootRobotRefString, ok := storedRootRobotRef.(string)
+		if !ok {
+			return fmt.Errorf("session %s has invalid root Robot state", sessionID)
+		}
+		if strings.TrimSpace(storedRootRobotRefString) != strings.TrimSpace(rootRobotRef) {
+			return fmt.Errorf("session %s already has root Robot %q", sessionID, storedRootRobotRefString)
+		}
+
 		s.logger.Debug("session exists",
 			slog.String("userID", userID),
 			slog.String("sessionID", sessionID),
 			slog.Any("session", get.Session),
 		)
 
-		if err := s.setCurrentRobotForRun(ctx, get.Session, robotRef); err != nil {
-			return err
-		}
 		s.updateSessionName(ctx, get.Session)
 		return nil
 	}
@@ -589,15 +712,11 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, robotRef, userID, 
 		return err
 	}
 
-	state := map[string]any{
-		"current_robot_id": robotRef,
-	}
-
 	create, err := s.sessions.Create(ctx, &adksession.CreateRequest{
 		AppName:   robotName,
 		UserID:    userID,
 		SessionID: sessionID,
-		State:     state,
+		State:     sessionInitialState(rootRobotRef),
 	})
 	if err != nil {
 		return err
@@ -609,25 +728,6 @@ func (s *Agent) ensureSession(ctx context.Context, robotName, robotRef, userID, 
 	)
 
 	return nil
-}
-
-func (s *Agent) setCurrentRobotForRun(ctx context.Context, sess adksession.Session, robotRef string) error {
-	state := map[string]any{}
-	if sess.State() != nil {
-		for key, value := range sess.State().All() {
-			state[key] = value
-		}
-		if err := sess.State().Set("current_robot_id", robotRef); err != nil {
-			return err
-		}
-	}
-	state["current_robot_id"] = robotRef
-
-	sessionID, err := robot.NewSessionID(sess.ID())
-	if err != nil {
-		return err
-	}
-	return s.sessionRepo.UpdateState(ctx, sessionID, state)
 }
 
 func (s *Agent) updateSessionName(ctx context.Context, sess adksession.Session) {
@@ -643,21 +743,4 @@ func (s *Agent) updateSessionName(ctx context.Context, sess adksession.Session) 
 	id, _ := xid.FromString(sess.ID())
 
 	s.sessionNamer.MaybeNameSession(ctx, robot.SessionID(id), text)
-}
-
-func (s *Agent) RequireWorkspace(ctx context.Context, sessionID string, def agent_registry.Definition) error {
-	sessionXID, err := robot.NewSessionID(sessionID)
-	if err != nil {
-		return err
-	}
-
-	sess, _, err := s.sessionRepo.Get(ctx, sessionXID, robot.NewMessageCursorParams(opt.NewEmpty[robot.MessageID](), 1))
-	if err != nil {
-		return err
-	}
-	if _, ok := WorkspaceMountFromState(sess.State).Get(); ok {
-		return nil
-	}
-
-	return fmt.Errorf("%s requires an active Robot workspace", def.Name)
 }

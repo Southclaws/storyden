@@ -7,16 +7,16 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/lib/mcp"
-	agentpkg "google.golang.org/adk/agent"
-	"google.golang.org/adk/agent/llmagent"
-	"google.golang.org/adk/model"
+	agentpkg "google.golang.org/adk/v2/agent"
+	"google.golang.org/adk/v2/agent/llmagent"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
 )
 
 const elicitationHydratedMetadataKey = "storyden_elicitation_hydrated"
 
 func normalizeClientToolResultsBeforeModel(logger *slog.Logger, webAddress url.URL) llmagent.BeforeModelCallback {
-	return func(ctx agentpkg.CallbackContext, req *model.LLMRequest) (*model.LLMResponse, error) {
+	return func(ctx agentpkg.Context, req *model.LLMRequest) (*model.LLMResponse, error) {
 		normalised := normalizeClientToolResults(req, webAddress)
 		if normalised > 0 {
 			logger.Info("normalised client tool results",

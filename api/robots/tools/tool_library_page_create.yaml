@@ -1,5 +1,8 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: ToolLibraryPageCreate
+x-storyden:
+  toolsets:
+    - system.library
 x-storyden-tool:
   title: Create Library Page
   role: MANAGE_LIBRARY

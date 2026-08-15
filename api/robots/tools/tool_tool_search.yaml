@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolSearch
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Search Tools
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: tool_search
+description: Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolSearchInput" }
+  output: { $ref: "#/definitions/ToolToolSearchOutput" }
+definitions:
+  ToolToolSearchInput:
+    type: object
+    required: [query]
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: Capability, task, or tool name to search for.
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 20
+        description: Maximum number of ranked candidates to return; omit to use the default.
+    additionalProperties: false
+  ToolToolSearchOutput:
+    type: object
+    required: [tools, next_action]
+    properties:
+      tools:
+        type: array
+        description: Ranked tool candidates with enough context to choose which one to inspect.
+        items: { $ref: "../../common/RobotToolCatalogueItem.yaml" }
+      next_action:
+        type: string
+        description: Recommended next step for inspecting and activating a selected candidate.
+    additionalProperties: false

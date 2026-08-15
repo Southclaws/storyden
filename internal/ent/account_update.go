@@ -44,6 +44,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/robottoolset"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspace"
 	"github.com/Southclaws/storyden/internal/ent/robotworkspaceinstance"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -817,6 +818,21 @@ func (_u *AccountUpdate) AddRobots(v ...*Robot) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddRobotIDs(ids...)
+}
+
+// AddRobotToolsetIDs adds the "robot_toolsets" edge to the RobotToolset entity by IDs.
+func (_u *AccountUpdate) AddRobotToolsetIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddRobotToolsetIDs(ids...)
+	return _u
+}
+
+// AddRobotToolsets adds the "robot_toolsets" edges to the RobotToolset entity.
+func (_u *AccountUpdate) AddRobotToolsets(v ...*RobotToolset) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRobotToolsetIDs(ids...)
 }
 
 // AddRobotWorkspaceIDs adds the "robot_workspaces" edge to the RobotWorkspace entity by IDs.
@@ -1674,6 +1690,27 @@ func (_u *AccountUpdate) RemoveRobots(v ...*Robot) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveRobotIDs(ids...)
+}
+
+// ClearRobotToolsets clears all "robot_toolsets" edges to the RobotToolset entity.
+func (_u *AccountUpdate) ClearRobotToolsets() *AccountUpdate {
+	_u.mutation.ClearRobotToolsets()
+	return _u
+}
+
+// RemoveRobotToolsetIDs removes the "robot_toolsets" edge to RobotToolset entities by IDs.
+func (_u *AccountUpdate) RemoveRobotToolsetIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveRobotToolsetIDs(ids...)
+	return _u
+}
+
+// RemoveRobotToolsets removes "robot_toolsets" edges to RobotToolset entities.
+func (_u *AccountUpdate) RemoveRobotToolsets(v ...*RobotToolset) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRobotToolsetIDs(ids...)
 }
 
 // ClearRobotWorkspaces clears all "robot_workspaces" edges to the RobotWorkspace entity.
@@ -3610,6 +3647,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.RobotToolsetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRobotToolsetsIDs(); len(nodes) > 0 && !_u.mutation.RobotToolsetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RobotToolsetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.RobotWorkspacesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -4653,6 +4735,21 @@ func (_u *AccountUpdateOne) AddRobots(v ...*Robot) *AccountUpdateOne {
 	return _u.AddRobotIDs(ids...)
 }
 
+// AddRobotToolsetIDs adds the "robot_toolsets" edge to the RobotToolset entity by IDs.
+func (_u *AccountUpdateOne) AddRobotToolsetIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddRobotToolsetIDs(ids...)
+	return _u
+}
+
+// AddRobotToolsets adds the "robot_toolsets" edges to the RobotToolset entity.
+func (_u *AccountUpdateOne) AddRobotToolsets(v ...*RobotToolset) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRobotToolsetIDs(ids...)
+}
+
 // AddRobotWorkspaceIDs adds the "robot_workspaces" edge to the RobotWorkspace entity by IDs.
 func (_u *AccountUpdateOne) AddRobotWorkspaceIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddRobotWorkspaceIDs(ids...)
@@ -5508,6 +5605,27 @@ func (_u *AccountUpdateOne) RemoveRobots(v ...*Robot) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveRobotIDs(ids...)
+}
+
+// ClearRobotToolsets clears all "robot_toolsets" edges to the RobotToolset entity.
+func (_u *AccountUpdateOne) ClearRobotToolsets() *AccountUpdateOne {
+	_u.mutation.ClearRobotToolsets()
+	return _u
+}
+
+// RemoveRobotToolsetIDs removes the "robot_toolsets" edge to RobotToolset entities by IDs.
+func (_u *AccountUpdateOne) RemoveRobotToolsetIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveRobotToolsetIDs(ids...)
+	return _u
+}
+
+// RemoveRobotToolsets removes "robot_toolsets" edges to RobotToolset entities.
+func (_u *AccountUpdateOne) RemoveRobotToolsets(v ...*RobotToolset) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRobotToolsetIDs(ids...)
 }
 
 // ClearRobotWorkspaces clears all "robot_workspaces" edges to the RobotWorkspace entity.
@@ -7467,6 +7585,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robot.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.RobotToolsetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRobotToolsetsIDs(); len(nodes) > 0 && !_u.mutation.RobotToolsetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RobotToolsetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotToolsetsTable,
+			Columns: []string{account.RobotToolsetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robottoolset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

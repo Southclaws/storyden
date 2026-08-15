@@ -5,8 +5,10 @@ import (
 	"strings"
 
 	"github.com/anthropics/anthropic-sdk-go"
-	"google.golang.org/adk/model"
+	"google.golang.org/adk/v2/model"
 	"google.golang.org/genai"
+
+	"github.com/Southclaws/storyden/app/services/semdex/robot/llmprovider/toolschema"
 )
 
 func convertToAnthropicMessages(req *model.LLMRequest) []anthropic.MessageParam {
@@ -115,22 +117,7 @@ func convertToAnthropicTools(req *model.LLMRequest) []anthropic.ToolUnionParam {
 }
 
 func buildToolInputSchema(fn *genai.FunctionDeclaration) anthropic.ToolInputSchemaParam {
-	var schema map[string]any
-
-	if fn.Parameters != nil {
-		if b, err := json.Marshal(fn.Parameters); err == nil {
-			json.Unmarshal(b, &schema)
-		}
-	}
-
-	if len(schema) == 0 && fn.ParametersJsonSchema != nil {
-		if b, err := json.Marshal(fn.ParametersJsonSchema); err == nil {
-			json.Unmarshal(b, &schema)
-		}
-	}
-
-	// genai schema types are uppercase ("STRING", "OBJECT") but Anthropic requires lowercase.
-	normalizeSchemaTypeStrings(schema)
+	schema := toolschema.FromFunctionDeclaration(fn)
 
 	result := anthropic.ToolInputSchemaParam{
 		Properties: map[string]any{},
@@ -149,26 +136,6 @@ func buildToolInputSchema(fn *genai.FunctionDeclaration) anthropic.ToolInputSche
 	}
 
 	return result
-}
-
-// normalizeSchemaTypeStrings recursively lowercases "type" values in a JSON schema map.
-func normalizeSchemaTypeStrings(schema map[string]any) {
-	if schema == nil {
-		return
-	}
-	if t, ok := schema["type"].(string); ok {
-		schema["type"] = strings.ToLower(t)
-	}
-	if props, ok := schema["properties"].(map[string]any); ok {
-		for _, v := range props {
-			if sub, ok := v.(map[string]any); ok {
-				normalizeSchemaTypeStrings(sub)
-			}
-		}
-	}
-	if items, ok := schema["items"].(map[string]any); ok {
-		normalizeSchemaTypeStrings(items)
-	}
 }
 
 func convertAnthropicMessageToGenai(blocks []anthropic.ContentBlockUnion) *genai.Content {

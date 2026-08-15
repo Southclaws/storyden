@@ -11,6 +11,7 @@ import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 import type { RobotModelRef } from "./robotModelRef";
 import type { RobotToolNameList } from "./robotToolNameList";
+import type { RobotToolsetRefList } from "./robotToolsetRefList";
 
 export interface RobotInitialProps {
   /** The name of the robot */
@@ -22,5 +23,6 @@ export interface RobotInitialProps {
   model?: RobotModelRef;
   workspace_id?: Identifier;
   tools?: RobotToolNameList;
+  toolsets?: RobotToolsetRefList;
   meta?: Metadata;
 }

@@ -4,6 +4,11 @@
     "ToolContentSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolContentSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Content Search",
         "annotations": {
@@ -290,12 +295,314 @@
         }
       }
     },
-    "ToolRobotSwitch": {
+    "ToolToolSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "$id": "ToolRobotSwitch",
+      "$id": "ToolToolSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
-        "title": "Switch Robot",
+        "title": "Search Tools",
         "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "tool_search",
+      "description": "Search for individual tools that can perform one narrow task. Use tool_get to inspect a candidate's schema before loading it or assigning it to a Robot.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Capability, task, or tool name to search for."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Maximum number of ranked candidates to return; omit to use the default."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "tools",
+            "next_action"
+          ],
+          "properties": {
+            "tools": {
+              "type": "array",
+              "description": "Ranked tool candidates with enough context to choose which one to inspect.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable tool title that helps distinguish similar capabilities."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended next step for inspecting and activating a selected candidate."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolSearchInput": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Capability, task, or tool name to search for."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Maximum number of ranked candidates to return; omit to use the default."
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolSearchOutput": {
+          "type": "object",
+          "required": [
+            "tools",
+            "next_action"
+          ],
+          "properties": {
+            "tools": {
+              "type": "array",
+              "description": "Ranked tool candidates with enough context to choose which one to inspect.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable tool title that helps distinguish similar capabilities."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended next step for inspecting and activating a selected candidate."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolGet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Get Tool",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "tool_get",
+      "description": "Get the full schema and runtime preconditions of one tool after finding its ID with tool_search. This is inspection only; it does not load or activate the tool.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable tool ID returned by tool_search."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "description",
+            "input_schema",
+            "requires_confirmation",
+            "requires_workspace"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable tool identifier accepted by tool_load and Robot configuration tools."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable title for explaining or confirming the selected capability."
+            },
+            "description": {
+              "type": "string",
+              "description": "The outcome the tool is designed to achieve and when it should be selected."
+            },
+            "input_schema": {
+              "type": "object",
+              "description": "Complete JSON Schema for arguments that must be supplied when calling the tool.",
+              "additionalProperties": true
+            },
+            "output_schema": {
+              "type": "object",
+              "description": "Complete JSON Schema for the tool result when the tool declares one.",
+              "additionalProperties": true
+            },
+            "requires_confirmation": {
+              "type": "boolean",
+              "description": "Whether a run must pause for human approval before executing this tool."
+            },
+            "requires_workspace": {
+              "type": "boolean",
+              "description": "Whether the conversation must have an active Robot workspace before this tool can be loaded or used."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolGetInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable tool ID returned by tool_search."
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolGetOutput": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "description",
+            "input_schema",
+            "requires_confirmation",
+            "requires_workspace"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable tool identifier accepted by tool_load and Robot configuration tools."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable title for explaining or confirming the selected capability."
+            },
+            "description": {
+              "type": "string",
+              "description": "The outcome the tool is designed to achieve and when it should be selected."
+            },
+            "input_schema": {
+              "type": "object",
+              "description": "Complete JSON Schema for arguments that must be supplied when calling the tool.",
+              "additionalProperties": true
+            },
+            "output_schema": {
+              "type": "object",
+              "description": "Complete JSON Schema for the tool result when the tool declares one.",
+              "additionalProperties": true
+            },
+            "requires_confirmation": {
+              "type": "boolean",
+              "description": "Whether a run must pause for human approval before executing this tool."
+            },
+            "requires_workspace": {
+              "type": "boolean",
+              "description": "Whether the conversation must have an active Robot workspace before this tool can be loaded or used."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolLoad": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolLoad",
+      "x-storyden": {
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "title": "Load Tools",
         "annotations": {
           "readOnlyHint": false,
           "destructiveHint": false,
@@ -303,8 +610,8 @@
           "openWorldHint": false
         }
       },
-      "title": "robot_switch",
-      "description": "Switch the current conversation to a different Robot (agent). Use this when the user wants to talk to a different specialized agent or when a different agent would be better suited to help with the user's request.",
+      "title": "tool_load",
+      "description": "Activate one or more individual tools for the current Denbot conversation after inspecting their schemas and runtime preconditions with tool_get. Workspace-dependent tools cannot be loaded until the conversation has an active workspace.",
       "type": "object",
       "required": [
         "input",
@@ -314,13 +621,16 @@
         "input": {
           "type": "object",
           "required": [
-            "robot_id"
+            "tools"
           ],
           "properties": {
-            "robot_id": {
-              "type": "string",
-              "pattern": "^[0-9a-v]{20}$",
-              "description": "The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs."
+            "tools": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              },
+              "description": "Stable tool IDs inspected with tool_get."
             }
           },
           "additionalProperties": false
@@ -328,173 +638,104 @@
         "output": {
           "type": "object",
           "required": [
-            "success",
-            "robot_id"
+            "loaded",
+            "next_action"
           ],
           "properties": {
-            "success": {
-              "type": "boolean",
-              "description": "Whether the agent switch was successful"
+            "loaded": {
+              "type": "array",
+              "description": "Tools activated for subsequent model steps in this conversation.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable tool title that helps distinguish similar capabilities."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
+                  }
+                }
+              }
             },
-            "robot_id": {
+            "next_action": {
               "type": "string",
-              "description": "The ID of the robot that was switched to"
+              "description": "Recommended continuation now that the selected tools are available."
             }
           },
           "additionalProperties": false
         }
       },
       "definitions": {
-        "ToolRobotSwitchInput": {
+        "ToolToolLoadInput": {
           "type": "object",
           "required": [
-            "robot_id"
+            "tools"
           ],
           "properties": {
-            "robot_id": {
-              "type": "string",
-              "pattern": "^[0-9a-v]{20}$",
-              "description": "The ID of the Robot (agent) to switch to. Must be a valid XID format (20 character alphanumeric string). Use robot_list to see available Robot IDs."
+            "tools": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              },
+              "description": "Stable tool IDs inspected with tool_get."
             }
           },
           "additionalProperties": false
         },
-        "ToolRobotSwitchOutput": {
+        "ToolToolLoadOutput": {
           "type": "object",
           "required": [
-            "success",
-            "robot_id"
+            "loaded",
+            "next_action"
           ],
           "properties": {
-            "success": {
-              "type": "boolean",
-              "description": "Whether the agent switch was successful"
-            },
-            "robot_id": {
-              "type": "string",
-              "description": "The ID of the robot that was switched to"
-            }
-          },
-          "additionalProperties": false
-        }
-      }
-    },
-    "ToolSystemRobotToolCatalog": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "$id": "ToolSystemRobotToolCatalog",
-      "x-storyden-tool": {
-        "title": "List All Tool Names",
-        "role": "USE_ROBOTS",
-        "annotations": {
-          "readOnlyHint": true,
-          "destructiveHint": false,
-          "idempotentHint": false,
-          "openWorldHint": false
-        }
-      },
-      "title": "system_robot_tool_catalog",
-      "description": "Returns a list of tools that may be assigned to a Robot during Robot creation or update. Use this when selecting capabilities assigned to a Robot. This catalog describes Robot capabilities, not this conversation's capabilities.\n",
-      "type": "object",
-      "required": [
-        "input",
-        "output"
-      ],
-      "properties": {
-        "input": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "output": {
-          "type": "object",
-          "description": "List of the tools available in the catalog that you can assign to Robots, with their names and descriptions",
-          "properties": {
-            "tools": {
+            "loaded": {
               "type": "array",
+              "description": "Tools activated for subsequent model steps in this conversation.",
               "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
                 "type": "object",
+                "description": "A tool candidate returned by capability discovery; use its ID with tool_get before choosing or loading it.",
                 "required": [
+                  "id",
                   "name",
-                  "description",
-                  "requires_confirmation"
+                  "description"
                 ],
+                "additionalProperties": false,
                 "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable tool identifier accepted by tool_get, tool_load, and Robot configuration tools."
+                  },
                   "name": {
                     "type": "string",
-                    "description": "The tool name identifier"
+                    "description": "Human-readable tool title that helps distinguish similar capabilities."
                   },
                   "description": {
                     "type": "string",
-                    "description": "Brief description of what the tool does"
-                  },
-                  "requires_confirmation": {
-                    "type": "boolean",
-                    "description": "Whether Robot runs must pause for human approval before executing this tool."
+                    "description": "The outcome this tool can achieve, used to decide whether its full schema is worth inspecting."
                   }
-                },
-                "additionalProperties": false
+                }
               }
-            }
-          }
-        }
-      },
-      "definitions": {
-        "ToolSystemRobotToolCatalogInput": {
-          "type": "object",
-          "properties": {},
-          "additionalProperties": false
-        },
-        "ToolSystemRobotToolCatalogOutput": {
-          "type": "object",
-          "description": "List of the tools available in the catalog that you can assign to Robots, with their names and descriptions",
-          "properties": {
-            "tools": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": [
-                  "name",
-                  "description",
-                  "requires_confirmation"
-                ],
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "description": "The tool name identifier"
-                  },
-                  "description": {
-                    "type": "string",
-                    "description": "Brief description of what the tool does"
-                  },
-                  "requires_confirmation": {
-                    "type": "boolean",
-                    "description": "Whether Robot runs must pause for human approval before executing this tool."
-                  }
-                },
-                "additionalProperties": false
-              }
-            }
-          }
-        },
-        "ToolInfo": {
-          "type": "object",
-          "required": [
-            "name",
-            "description",
-            "requires_confirmation"
-          ],
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "The tool name identifier"
             },
-            "description": {
+            "next_action": {
               "type": "string",
-              "description": "Brief description of what the tool does"
-            },
-            "requires_confirmation": {
-              "type": "boolean",
-              "description": "Whether Robot runs must pause for human approval before executing this tool."
+              "description": "Recommended continuation now that the selected tools are available."
             }
           },
           "additionalProperties": false
@@ -504,6 +745,11 @@
     "ToolRobotCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotCreate",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Create Robot",
         "role": "MANAGE_ROBOTS",
@@ -515,7 +761,7 @@
         }
       },
       "title": "robot_create",
-      "description": "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using tailored tools and instructions.",
+      "description": "Create a new Robot (agent) with a specific purpose and behavior. Robots are customizable automations that can help users with specific workflows using direct tools, reusable Toolsets, and instructions.",
       "type": "object",
       "required": [
         "input",
@@ -551,7 +797,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "List of tool names that the Robot can use.",
+              "description": "Individual tool names that the Robot can use. Tools already provided by an assigned Toolset are removed.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "List of reusable Toolset IDs that the Robot can use.",
               "items": {
                 "type": "string"
               }
@@ -608,7 +861,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "List of tool names that the Robot can use.",
+              "description": "Individual tool names that the Robot can use. Tools already provided by an assigned Toolset are removed.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "List of reusable Toolset IDs that the Robot can use.",
               "items": {
                 "type": "string"
               }
@@ -639,6 +899,11 @@
     "ToolRobotList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotList",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "title": "List Robots",
         "role": "USE_ROBOTS",
@@ -786,6 +1051,11 @@
     "ToolRobotGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Get Robot",
         "role": "USE_ROBOTS",
@@ -825,7 +1095,8 @@
             "name",
             "playbook",
             "model",
-            "tools"
+            "tools",
+            "toolsets"
           ],
           "properties": {
             "id": {
@@ -850,7 +1121,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "List of tool names that the Robot can use",
+              "description": "List of individual tool names that the Robot can use",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "List of reusable Toolset IDs that the Robot can use",
               "items": {
                 "type": "string"
               }
@@ -881,7 +1159,8 @@
             "name",
             "playbook",
             "model",
-            "tools"
+            "tools",
+            "toolsets"
           ],
           "properties": {
             "id": {
@@ -906,7 +1185,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "List of tool names that the Robot can use",
+              "description": "List of individual tool names that the Robot can use",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "List of reusable Toolset IDs that the Robot can use",
               "items": {
                 "type": "string"
               }
@@ -919,6 +1205,11 @@
     "ToolRobotUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Update Robot",
         "role": "MANAGE_ROBOTS",
@@ -930,7 +1221,7 @@
         }
       },
       "title": "robot_update",
-      "description": "Update a Robot's configuration. You can modify its name, description, playbook (directive), or tools. Only provide the fields you want to change.",
+      "description": "Update a Robot's configuration. You can modify its name, description, playbook (directive), direct tools, or Toolsets. Only provide the fields you want to change.",
       "type": "object",
       "required": [
         "input",
@@ -969,7 +1260,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "The new list of tool names that the Robot can use.",
+              "description": "The new list of individual tool names that the Robot can use.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "The new list of reusable Toolset IDs that the Robot can use.",
               "items": {
                 "type": "string"
               }
@@ -1029,7 +1327,14 @@
             },
             "tools": {
               "type": "array",
-              "description": "The new list of tool names that the Robot can use.",
+              "description": "The new list of individual tool names that the Robot can use.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "toolsets": {
+              "type": "array",
+              "description": "The new list of reusable Toolset IDs that the Robot can use.",
               "items": {
                 "type": "string"
               }
@@ -1060,6 +1365,11 @@
     "ToolRobotDelete": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolRobotDelete",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Delete Robot",
         "role": "MANAGE_ROBOTS",
@@ -1147,21 +1457,1088 @@
         }
       }
     },
+    "ToolRobotSearch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolRobotSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Search Robots",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "robot_search",
+      "description": "Search specialised Robots by capability before delegating a task.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The task or capability a specialised Robot should handle."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "robots",
+            "next_action"
+          ],
+          "properties": {
+            "robots": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "delegate_to",
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "delegate_to": {
+                    "type": "string",
+                    "description": "Delegation target name."
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolRobotSearchInput": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The task or capability a specialised Robot should handle."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolRobotSearchOutput": {
+          "type": "object",
+          "required": [
+            "robots",
+            "next_action"
+          ],
+          "properties": {
+            "robots": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "delegate_to",
+                  "name",
+                  "description"
+                ],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "delegate_to": {
+                    "type": "string",
+                    "description": "Delegation target name."
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "next_action": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "RobotSearchResult": {
+          "type": "object",
+          "required": [
+            "id",
+            "delegate_to",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "delegate_to": {
+              "type": "string",
+              "description": "Delegation target name."
+            },
+            "name": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetSearch": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Search Toolsets",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_search",
+      "description": "Search reusable Toolsets for a coherent bundle of capabilities and specialist guidance. Use toolset_get to inspect a candidate before loading it or assigning it to a Robot.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Capability, task, or Toolset name to search for."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Maximum number of ranked candidates to return; omit to use the default."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "toolsets",
+            "next_action"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "description": "Ranked Toolset candidates with enough context to choose which bundle to inspect.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended next step for inspecting and activating a selected candidate."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetSearchInput": {
+          "type": "object",
+          "required": [
+            "query"
+          ],
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Capability, task, or Toolset name to search for."
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Maximum number of ranked candidates to return; omit to use the default."
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetSearchOutput": {
+          "type": "object",
+          "required": [
+            "toolsets",
+            "next_action"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "description": "Ranked Toolset candidates with enough context to choose which bundle to inspect.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended next step for inspecting and activating a selected candidate."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetLoad": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetLoad",
+      "x-storyden": {
+        "toolsets": []
+      },
+      "x-storyden-tool": {
+        "title": "Load Toolsets",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_load",
+      "description": "Activate reusable Toolsets for the current Robot conversation after inspecting their contents and runtime preconditions with toolset_get. Workspace-dependent Toolsets cannot be loaded until the conversation has an active workspace.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "toolsets"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              },
+              "description": "Toolset IDs inspected with toolset_get."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "loaded",
+            "next_action"
+          ],
+          "properties": {
+            "loaded": {
+              "type": "array",
+              "description": "Toolsets activated for subsequent model steps in this conversation.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended continuation now that the selected Toolsets and their guidance are active."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetLoadInput": {
+          "type": "object",
+          "required": [
+            "toolsets"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              },
+              "description": "Toolset IDs inspected with toolset_get."
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetLoadOutput": {
+          "type": "object",
+          "required": [
+            "loaded",
+            "next_action"
+          ],
+          "properties": {
+            "loaded": {
+              "type": "array",
+              "description": "Toolsets activated for subsequent model steps in this conversation.",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            },
+            "next_action": {
+              "type": "string",
+              "description": "Recommended continuation now that the selected Toolsets and their guidance are active."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetCreate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetCreate",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Create Toolset",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_create",
+      "description": "Create a reusable custom Toolset from available tool identifiers and optional specialised prompt guidance.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "name",
+            "description",
+            "tools"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "instruction": {
+              "type": "string"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetCreateInput": {
+          "type": "object",
+          "required": [
+            "name",
+            "description",
+            "tools"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "instruction": {
+              "type": "string"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetCreateOutput": {
+          "type": "object",
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetList": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetList",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "List Toolsets",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_list",
+      "description": "List reusable system, custom, and plugin Toolsets.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "toolsets"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetListInput": {
+          "type": "object",
+          "additionalProperties": false
+        },
+        "ToolToolsetListOutput": {
+          "type": "object",
+          "required": [
+            "toolsets"
+          ],
+          "properties": {
+            "toolsets": {
+              "type": "array",
+              "items": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "description": "A reusable capability bundle returned by discovery; use its ID with toolset_get before loading or assigning it.",
+                "required": [
+                  "id",
+                  "name",
+                  "description"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Stable Toolset identifier accepted by toolset_get, toolset_load, and Robot configuration tools."
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Human-readable Toolset name that identifies the capability bundle."
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The jobs this Toolset is designed to handle, used to decide whether its tools and instruction are worth inspecting."
+                  }
+                }
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetGet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Get Toolset",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_get",
+      "description": "Get a Toolset's complete agent-relevant configuration after finding its ID with toolset_search. Returns its tool IDs, specialist instruction, workspace precondition, and whether this caller may edit it.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable Toolset ID returned by toolset_search."
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "description",
+            "tools",
+            "instruction",
+            "editable",
+            "requires_workspace"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable Toolset identifier accepted by toolset_load and Robot configuration tools."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable name for explaining or confirming the selected capability bundle."
+            },
+            "description": {
+              "type": "string",
+              "description": "The jobs this Toolset is designed to handle and when the bundle should be selected."
+            },
+            "tools": {
+              "type": "array",
+              "description": "Tool IDs activated or assigned together by this Toolset; use tool_get when an individual schema is needed.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "instruction": {
+              "type": "string",
+              "description": "Specialist guidance injected while this Toolset is active, including workflow and safety boundaries."
+            },
+            "editable": {
+              "type": "boolean",
+              "description": "Whether the current caller can update or delete this Toolset through management tools."
+            },
+            "requires_workspace": {
+              "type": "boolean",
+              "description": "Whether the conversation must have an active Robot workspace before this Toolset can be loaded or used."
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetGetInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable Toolset ID returned by toolset_search."
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetGetOutput": {
+          "type": "object",
+          "required": [
+            "id",
+            "name",
+            "description",
+            "tools",
+            "instruction",
+            "editable",
+            "requires_workspace"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "Stable Toolset identifier accepted by toolset_load and Robot configuration tools."
+            },
+            "name": {
+              "type": "string",
+              "description": "Human-readable name for explaining or confirming the selected capability bundle."
+            },
+            "description": {
+              "type": "string",
+              "description": "The jobs this Toolset is designed to handle and when the bundle should be selected."
+            },
+            "tools": {
+              "type": "array",
+              "description": "Tool IDs activated or assigned together by this Toolset; use tool_get when an individual schema is needed.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "instruction": {
+              "type": "string",
+              "description": "Specialist guidance injected while this Toolset is active, including workflow and safety boundaries."
+            },
+            "editable": {
+              "type": "boolean",
+              "description": "Whether the current caller can update or delete this Toolset through management tools."
+            },
+            "requires_workspace": {
+              "type": "boolean",
+              "description": "Whether the conversation must have an active Robot workspace before this Toolset can be loaded or used."
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetUpdate": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Update Toolset",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_update",
+      "description": "Update an authored custom Toolset. System and plugin Toolsets are read-only.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "instruction": {
+              "type": "string"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetUpdateInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            },
+            "instruction": {
+              "type": "string"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetUpdateOutput": {
+          "type": "object",
+          "required": [
+            "id",
+            "name"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "ToolToolsetDelete": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$id": "ToolToolsetDelete",
+      "x-storyden": {
+        "toolsets": [
+          "system.robot_studio"
+        ]
+      },
+      "x-storyden-tool": {
+        "title": "Delete Toolset",
+        "role": "USE_ROBOTS",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        }
+      },
+      "title": "toolset_delete",
+      "description": "Delete an unused authored custom Toolset. Remove it from Robots first.",
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "output": {
+          "type": "object",
+          "required": [
+            "id",
+            "deleted"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "deleted": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "definitions": {
+        "ToolToolsetDeleteInput": {
+          "type": "object",
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[0-9a-v]{20}$"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ToolToolsetDeleteOutput": {
+          "type": "object",
+          "required": [
+            "id",
+            "deleted"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "deleted": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
     "ToolLibraryPageTree": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageTree",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "List Library Pages",
         "role": "READ_PUBLISHED_LIBRARY",
         "annotations": {
           "readOnlyHint": true,
           "destructiveHint": false,
-          "idempotentHint": false,
+          "idempotentHint": true,
           "openWorldHint": false
         }
       },
       "title": "library_page_list",
-      "description": "Get the full tree structure of pages in the library. Returns a hierarchical view of all wiki pages showing their parent-child relationships.",
+      "description": "List library pages by hierarchy and workflow visibility.",
       "type": "object",
       "required": [
         "input",
@@ -1175,6 +2552,15 @@
               "type": "integer",
               "minimum": -1,
               "description": "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "review",
+                "published"
+              ],
+              "description": "Limit pages to one workflow visibility."
             }
           },
           "additionalProperties": false
@@ -1182,12 +2568,13 @@
         "output": {
           "type": "object",
           "required": [
-            "pages"
+            "pages",
+            "results"
           ],
           "properties": {
             "pages": {
               "type": "array",
-              "description": "List of pages in tree structure",
+              "description": "Pages in hierarchical order for selecting a page to inspect.",
               "items": {
                 "type": "object",
                 "required": [
@@ -1195,7 +2582,8 @@
                   "slug",
                   "name",
                   "description",
-                  "browser_url"
+                  "browser_url",
+                  "visibility"
                 ],
                 "properties": {
                   "browser_url": {
@@ -1228,10 +2616,23 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "review",
+                      "published"
+                    ],
+                    "description": "Current publishing workflow state."
                   }
                 },
                 "additionalProperties": false
               }
+            },
+            "results": {
+              "type": "integer",
+              "description": "Number of pages returned."
             }
           },
           "additionalProperties": false
@@ -1245,6 +2646,15 @@
               "type": "integer",
               "minimum": -1,
               "description": "Maximum depth to traverse (-1 for unlimited, 0 for root only, 1 for root + children, etc.)"
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "review",
+                "published"
+              ],
+              "description": "Limit pages to one workflow visibility."
             }
           },
           "additionalProperties": false
@@ -1252,12 +2662,13 @@
         "ToolLibraryPageTreeOutput": {
           "type": "object",
           "required": [
-            "pages"
+            "pages",
+            "results"
           ],
           "properties": {
             "pages": {
               "type": "array",
-              "description": "List of pages in tree structure",
+              "description": "Pages in hierarchical order for selecting a page to inspect.",
               "items": {
                 "type": "object",
                 "required": [
@@ -1265,7 +2676,8 @@
                   "slug",
                   "name",
                   "description",
-                  "browser_url"
+                  "browser_url",
+                  "visibility"
                 ],
                 "properties": {
                   "browser_url": {
@@ -1298,10 +2710,23 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "visibility": {
+                    "type": "string",
+                    "enum": [
+                      "draft",
+                      "review",
+                      "published"
+                    ],
+                    "description": "Current publishing workflow state."
                   }
                 },
                 "additionalProperties": false
               }
+            },
+            "results": {
+              "type": "integer",
+              "description": "Number of pages returned."
             }
           },
           "additionalProperties": false
@@ -1313,7 +2738,8 @@
             "slug",
             "name",
             "description",
-            "browser_url"
+            "browser_url",
+            "visibility"
           ],
           "properties": {
             "browser_url": {
@@ -1346,6 +2772,15 @@
               "items": {
                 "type": "string"
               }
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "review",
+                "published"
+              ],
+              "description": "Current publishing workflow state."
             }
           },
           "additionalProperties": false
@@ -1355,6 +2790,11 @@
     "ToolLibraryRequestPage": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryRequestPage",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Request Library Page",
         "role": "READ_PUBLISHED_LIBRARY",
@@ -1452,6 +2892,11 @@
     "ToolLibraryPageGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Get Library Page",
         "role": "READ_PUBLISHED_LIBRARY",
@@ -1463,7 +2908,7 @@
         }
       },
       "title": "get_library_page",
-      "description": "Get detailed information about a specific library page by its slug.",
+      "description": "Retrieve a library page with its content and workflow visibility by ID.",
       "type": "object",
       "required": [
         "input",
@@ -1492,7 +2937,9 @@
             "name",
             "tags",
             "child_pages",
-            "browser_url"
+            "browser_url",
+            "content",
+            "visibility"
           ],
           "properties": {
             "browser_url": {
@@ -1515,6 +2962,10 @@
               "type": "string",
               "description": "Brief description of the page"
             },
+            "content": {
+              "type": "string",
+              "description": "Plain-text page body for evaluating or summarising the page."
+            },
             "tags": {
               "type": "array",
               "description": "Tags associated with this page",
@@ -1528,6 +2979,15 @@
               "items": {
                 "type": "string"
               }
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "review",
+                "published"
+              ],
+              "description": "Current publishing workflow state."
             }
           },
           "additionalProperties": false
@@ -1556,7 +3016,9 @@
             "name",
             "tags",
             "child_pages",
-            "browser_url"
+            "browser_url",
+            "content",
+            "visibility"
           ],
           "properties": {
             "browser_url": {
@@ -1579,6 +3041,10 @@
               "type": "string",
               "description": "Brief description of the page"
             },
+            "content": {
+              "type": "string",
+              "description": "Plain-text page body for evaluating or summarising the page."
+            },
             "tags": {
               "type": "array",
               "description": "Tags associated with this page",
@@ -1592,6 +3058,15 @@
               "items": {
                 "type": "string"
               }
+            },
+            "visibility": {
+              "type": "string",
+              "enum": [
+                "draft",
+                "review",
+                "published"
+              ],
+              "description": "Current publishing workflow state."
             }
           },
           "additionalProperties": false
@@ -1601,6 +3076,11 @@
     "ToolLibraryPageCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageCreate",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Create Library Page",
         "role": "MANAGE_LIBRARY",
@@ -1774,6 +3254,11 @@
     "ToolLibraryPageUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPageUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Update Library Page",
         "annotations": {
@@ -1958,6 +3443,12 @@
     "ToolLibrarySearchPages": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibrarySearchPages",
+      "x-storyden": {
+        "toolsets": [
+          "system.library",
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Search Library Pages",
         "role": "READ_PUBLISHED_LIBRARY",
@@ -2155,6 +3646,11 @@
     "ToolLibraryPagePropertySchemaGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertySchemaGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Get Property Schema",
         "role": "READ_PUBLISHED_LIBRARY",
@@ -2341,6 +3837,11 @@
     "ToolLibraryPagePropertySchemaUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertySchemaUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Update Property Schema",
         "role": "MANAGE_LIBRARY",
@@ -2604,6 +4105,11 @@
     "ToolLibraryPagePropertiesUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLibraryPagePropertiesUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.library"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Update Page Properties",
         "annotations": {
@@ -2845,6 +4351,11 @@
     "ToolTagList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolTagList",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "List Tags",
         "role": "READ_PUBLISHED_THREADS",
@@ -2970,6 +4481,9 @@
     "ToolLinkCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolLinkCreate",
+      "x-storyden": {
+        "toolsets": []
+      },
       "x-storyden-tool": {
         "title": "Create Link",
         "role": "CREATE_POST",
@@ -3083,6 +4597,11 @@
     "ToolThreadCreate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadCreate",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Create Thread",
         "role": "CREATE_POST",
@@ -3314,6 +4833,11 @@
     "ToolThreadList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadList",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "List Threads",
         "role": "READ_PUBLISHED_THREADS",
@@ -3564,6 +5088,11 @@
     "ToolThreadGet": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadGet",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Get Thread",
         "role": "READ_PUBLISHED_THREADS",
@@ -3749,6 +5278,11 @@
     "ToolThreadUpdate": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadUpdate",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Update Thread",
         "annotations": {
@@ -3965,6 +5499,11 @@
     "ToolThreadReply": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadReply",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Reply to Thread",
         "role": "CREATE_POST",
@@ -4106,6 +5645,11 @@
     "ToolCategoryList": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolCategoryList",
+      "x-storyden": {
+        "toolsets": [
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "List Categories",
         "annotations": {
@@ -4230,6 +5774,12 @@
     "ToolThreadSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolThreadSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Thread Search",
         "annotations": {
@@ -4470,6 +6020,12 @@
     "ToolReplySearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolReplySearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Reply Search",
         "annotations": {
@@ -4696,6 +6252,12 @@
     "ToolPostSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolPostSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search",
+          "system.discussions"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Post Search",
         "annotations": {
@@ -4951,6 +6513,11 @@
     "ToolMemberSearch": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "$id": "ToolMemberSearch",
+      "x-storyden": {
+        "toolsets": [
+          "system.content_search"
+        ]
+      },
       "x-storyden-tool": {
         "title": "Member Search",
         "annotations": {
@@ -5161,6 +6728,7 @@
           "description": "URL-friendly slug of the datagraph item"
         },
         "kind": {
+          "description": "Type of datagraph item (thread, node, profile, collection, etc.)",
           "$schema": "http://json-schema.org/draft-07/schema#",
           "type": "string",
           "enum": [
@@ -5171,8 +6739,7 @@
             "collection",
             "profile",
             "event"
-          ],
-          "description": "Type of datagraph item (thread, node, profile, collection, etc.)"
+          ]
         }
       },
       "additionalProperties": false
@@ -5198,6 +6765,7 @@
               "description": "URL-friendly slug of the datagraph item"
             },
             "kind": {
+              "description": "Type of datagraph item (thread, node, profile, collection, etc.)",
               "$schema": "http://json-schema.org/draft-07/schema#",
               "type": "string",
               "enum": [
@@ -5208,8 +6776,7 @@
                 "collection",
                 "profile",
                 "event"
-              ],
-              "description": "Type of datagraph item (thread, node, profile, collection, etc.)"
+              ]
             }
           },
           "additionalProperties": false

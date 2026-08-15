@@ -4,10 +4,10 @@ import { unlink, writeFile } from "node:fs/promises";
 import { withAdminAccessKey } from "../access_key_admin_assignment";
 
 import {
+  DEFAULT_ROBOT_MODEL,
   goToNewChat,
   sendMessage,
   setupRobotProviderWithScript,
-  switchToRobot,
   waitForPersistedChatRoute,
 } from "./helpers";
 
@@ -24,13 +24,12 @@ test.describe("Robot Chat — presentation markup", () => {
     const suffix = Date.now();
     const libraryPageName = `E2E Presented Library Page ${suffix}`;
     const libraryPageSlug = `e2e-presented-library-page-${suffix}`;
-    const robotName = `e2e-presentation-robot-${suffix}`;
     const scriptName = `e2e-presentation-markup-${suffix}.yaml`;
     const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
     let libraryPageID = "";
 
     try {
-      await withAdminAccessKey(async ({ robotCreate, nodeCreate }) => {
+      await withAdminAccessKey(async ({ nodeCreate }) => {
         const libraryPage = await nodeCreate({
           name: libraryPageName,
           slug: libraryPageSlug,
@@ -61,18 +60,13 @@ test.describe("Robot Chat — presentation markup", () => {
       finish: "stop"
 `,
         );
-
-        await robotCreate({
-          name: robotName,
-          description: "E2E robot that emits presentation markup",
-          playbook: "you present Library pages with presentation markup",
-          model: `mock/../robot/scripts/${scriptName}`,
-        });
       });
 
-      await goToNewChat(page);
+      await setupRobotProviderWithScript(
+        `mock/../robot/scripts/${scriptName}`,
+      );
 
-      await switchToRobot(page, robotName);
+      await goToNewChat(page);
 
       await sendMessage(page, "show the rich page card");
 
@@ -124,6 +118,7 @@ test.describe("Robot Chat — presentation markup", () => {
       ).toBeVisible();
     } finally {
       await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
     }
   });
 });

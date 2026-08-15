@@ -51,7 +51,7 @@ func TestRobotToolCallError(t *testing.T) {
 					Name:        "error-robot-" + xid.New().String(),
 					Description: "robot for error tests",
 					Playbook:    "you are a test robot",
-					Tools:       robotToolsPtr("throw_an_error"),
+					Toolsets:    robotToolsetsPtr("system.robot_studio"),
 				}, adminSession))(t, http.StatusOK)
 				robotID := string(rob.JSON200.Id)
 
@@ -64,14 +64,14 @@ func TestRobotToolCallError(t *testing.T) {
 					toolOutputs := collectToolOutputs(stream)
 					textDeltas := collectTextDeltas(stream)
 
-					a.Contains(toolNames, "throw_an_error")
+					a.Contains(toolNames, "robot_get")
 
 					// The ADK wraps tool errors as {"error": "..."} in the
 					// FunctionResponse.Response, which becomes the output field.
 					errorSeen := false
 					for _, out := range toolOutputs {
 						if output, ok := out.Output.(map[string]any); ok {
-							if errVal, ok := output["error"].(string); ok && strings.Contains(errVal, "intentional tool error") {
+							if errVal, ok := output["error"].(string); ok && strings.Contains(errVal, "does not match regular expression") {
 								errorSeen = true
 								break
 							}

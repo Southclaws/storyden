@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
+	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/rs/xid"
 )
 
@@ -28,6 +29,10 @@ type RobotSessionMessage struct {
 	SessionID xid.ID `json:"session_id,omitempty"`
 	// Invocation ID from ADK Event
 	InvocationID string `json:"invocation_id,omitempty"`
+	// ADK agent branch path used to attribute delegated work
+	Branch string `json:"branch,omitempty"`
+	// ADK exact-match history scope for private sub-agent events
+	IsolationScope string `json:"isolation_scope,omitempty"`
 	// Database Robot ID that generated this message. Null for built-in Robot or human-authored messages.
 	RobotID *xid.ID `json:"robot_id,omitempty"`
 	// Built-in Robot ID that generated this message. Set only when robot_id and account_id are null.
@@ -35,7 +40,7 @@ type RobotSessionMessage struct {
 	// Author account ID from ADK Event, optional for system messages
 	AccountID *xid.ID `json:"account_id,omitempty"`
 	// Full ADK Event object stored as JSON
-	EventData map[string]interface{} `json:"event_data,omitempty"`
+	EventData schema.RobotSessionEvent `json:"event_data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RobotSessionMessageQuery when eager-loading is set.
 	Edges        RobotSessionMessageEdges `json:"edges"`
@@ -97,7 +102,7 @@ func (*RobotSessionMessage) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case robotsessionmessage.FieldEventData:
 			values[i] = new([]byte)
-		case robotsessionmessage.FieldInvocationID, robotsessionmessage.FieldBuiltinRobot:
+		case robotsessionmessage.FieldInvocationID, robotsessionmessage.FieldBranch, robotsessionmessage.FieldIsolationScope, robotsessionmessage.FieldBuiltinRobot:
 			values[i] = new(sql.NullString)
 		case robotsessionmessage.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -141,6 +146,18 @@ func (_m *RobotSessionMessage) assignValues(columns []string, values []any) erro
 				return fmt.Errorf("unexpected type %T for field invocation_id", values[i])
 			} else if value.Valid {
 				_m.InvocationID = value.String
+			}
+		case robotsessionmessage.FieldBranch:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field branch", values[i])
+			} else if value.Valid {
+				_m.Branch = value.String
+			}
+		case robotsessionmessage.FieldIsolationScope:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field isolation_scope", values[i])
+			} else if value.Valid {
+				_m.IsolationScope = value.String
 			}
 		case robotsessionmessage.FieldRobotID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -230,6 +247,12 @@ func (_m *RobotSessionMessage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("invocation_id=")
 	builder.WriteString(_m.InvocationID)
+	builder.WriteString(", ")
+	builder.WriteString("branch=")
+	builder.WriteString(_m.Branch)
+	builder.WriteString(", ")
+	builder.WriteString("isolation_scope=")
+	builder.WriteString(_m.IsolationScope)
 	builder.WriteString(", ")
 	if v := _m.RobotID; v != nil {
 		builder.WriteString("robot_id=")

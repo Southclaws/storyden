@@ -1,0 +1,20 @@
+steps:
+  - match:
+      tool_result: robot_create
+    respond:
+      text: "Created Robot: React Library Directory Curator"
+      finish: "stop"
+      delay_ms: 1500
+  - match:
+      contains: "create the curator robot"
+    respond:
+      text: "I’ll make it a focused Library curator Robot."
+      tool_calls:
+        - id: call_create_curator_robot
+          name: robot_create
+          args:
+            name: "React Library Directory Curator"
+            description: "Reviews React library catalog submissions for substantive content."
+            playbook: "Read the submitted Library page, reject empty or placeholder content, and report a source-grounded advisory verdict."
+            toolsets:
+              - system.library

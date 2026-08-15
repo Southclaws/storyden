@@ -93,6 +93,12 @@ func (_c *RobotCreate) SetTools(v []string) *RobotCreate {
 	return _c
 }
 
+// SetToolsets sets the "toolsets" field.
+func (_c *RobotCreate) SetToolsets(v []string) *RobotCreate {
+	_c.mutation.SetToolsets(v)
+	return _c
+}
+
 // SetMetadata sets the "metadata" field.
 func (_c *RobotCreate) SetMetadata(v map[string]interface{}) *RobotCreate {
 	_c.mutation.SetMetadata(v)
@@ -309,6 +315,10 @@ func (_c *RobotCreate) createSpec() (*Robot, *sqlgraph.CreateSpec) {
 		_spec.SetField(robot.FieldTools, field.TypeJSON, value)
 		_node.Tools = value
 	}
+	if value, ok := _c.mutation.Toolsets(); ok {
+		_spec.SetField(robot.FieldToolsets, field.TypeJSON, value)
+		_node.Toolsets = value
+	}
 	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(robot.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
@@ -496,6 +506,24 @@ func (u *RobotUpsert) UpdateTools() *RobotUpsert {
 // ClearTools clears the value of the "tools" field.
 func (u *RobotUpsert) ClearTools() *RobotUpsert {
 	u.SetNull(robot.FieldTools)
+	return u
+}
+
+// SetToolsets sets the "toolsets" field.
+func (u *RobotUpsert) SetToolsets(v []string) *RobotUpsert {
+	u.Set(robot.FieldToolsets, v)
+	return u
+}
+
+// UpdateToolsets sets the "toolsets" field to the value that was provided on create.
+func (u *RobotUpsert) UpdateToolsets() *RobotUpsert {
+	u.SetExcluded(robot.FieldToolsets)
+	return u
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (u *RobotUpsert) ClearToolsets() *RobotUpsert {
+	u.SetNull(robot.FieldToolsets)
 	return u
 }
 
@@ -693,6 +721,27 @@ func (u *RobotUpsertOne) UpdateTools() *RobotUpsertOne {
 func (u *RobotUpsertOne) ClearTools() *RobotUpsertOne {
 	return u.Update(func(s *RobotUpsert) {
 		s.ClearTools()
+	})
+}
+
+// SetToolsets sets the "toolsets" field.
+func (u *RobotUpsertOne) SetToolsets(v []string) *RobotUpsertOne {
+	return u.Update(func(s *RobotUpsert) {
+		s.SetToolsets(v)
+	})
+}
+
+// UpdateToolsets sets the "toolsets" field to the value that was provided on create.
+func (u *RobotUpsertOne) UpdateToolsets() *RobotUpsertOne {
+	return u.Update(func(s *RobotUpsert) {
+		s.UpdateToolsets()
+	})
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (u *RobotUpsertOne) ClearToolsets() *RobotUpsertOne {
+	return u.Update(func(s *RobotUpsert) {
+		s.ClearToolsets()
 	})
 }
 
@@ -1065,6 +1114,27 @@ func (u *RobotUpsertBulk) UpdateTools() *RobotUpsertBulk {
 func (u *RobotUpsertBulk) ClearTools() *RobotUpsertBulk {
 	return u.Update(func(s *RobotUpsert) {
 		s.ClearTools()
+	})
+}
+
+// SetToolsets sets the "toolsets" field.
+func (u *RobotUpsertBulk) SetToolsets(v []string) *RobotUpsertBulk {
+	return u.Update(func(s *RobotUpsert) {
+		s.SetToolsets(v)
+	})
+}
+
+// UpdateToolsets sets the "toolsets" field to the value that was provided on create.
+func (u *RobotUpsertBulk) UpdateToolsets() *RobotUpsertBulk {
+	return u.Update(func(s *RobotUpsert) {
+		s.UpdateToolsets()
+	})
+}
+
+// ClearToolsets clears the value of the "toolsets" field.
+func (u *RobotUpsertBulk) ClearToolsets() *RobotUpsertBulk {
+	return u.Update(func(s *RobotUpsert) {
+		s.ClearToolsets()
 	})
 }
 

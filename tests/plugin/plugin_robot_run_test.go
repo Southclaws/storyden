@@ -370,10 +370,19 @@ func createRobotForRun(
 	scriptName string,
 	tools ...string,
 ) xid.ID {
-	var toolList *openapi.RobotToolNameList
+	var toolsets *openapi.RobotToolsetRefList
 	if len(tools) > 0 {
-		v := openapi.RobotToolNameList(tools)
-		toolList = &v
+		createdToolset := tests.AssertRequest(cl.RobotToolsetCreateWithResponse(ctx,
+			openapi.RobotToolsetCreateJSONRequestBody{
+				Name:        "robot-run-tools-" + xid.New().String(),
+				Description: "Tools used by a robot_run integration fixture",
+				Tools:       openapi.RobotToolNameList(tools),
+			},
+			adminSession,
+		))(t, http.StatusOK)
+		r.NotNil(createdToolset.JSON200)
+		refs := openapi.RobotToolsetRefList{createdToolset.JSON200.Id}
+		toolsets = &refs
 	}
 
 	created := tests.AssertRequest(cl.RobotCreateWithResponse(ctx,
@@ -382,7 +391,7 @@ func createRobotForRun(
 			Description: "robot_run test actor",
 			Playbook:    "you are a robot_run test actor",
 			Model:       ptr("mock/../robot/scripts/" + scriptName),
-			Tools:       toolList,
+			Toolsets:    toolsets,
 		},
 		adminSession,
 	))(t, http.StatusOK)

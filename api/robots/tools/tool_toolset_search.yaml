@@ -1,0 +1,43 @@
+$schema: http://json-schema.org/draft-07/schema#
+$id: ToolToolsetSearch
+x-storyden:
+  toolsets:
+    - system.robot_studio
+x-storyden-tool:
+  title: Search Toolsets
+  role: USE_ROBOTS
+  annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
+title: toolset_search
+description: Search reusable Toolsets for a coherent bundle of capabilities and specialist guidance. Use toolset_get to inspect a candidate before loading it or assigning it to a Robot.
+type: object
+required: [input, output]
+properties:
+  input: { $ref: "#/definitions/ToolToolsetSearchInput" }
+  output: { $ref: "#/definitions/ToolToolsetSearchOutput" }
+definitions:
+  ToolToolsetSearchInput:
+    type: object
+    required: [query]
+    properties:
+      query:
+        type: string
+        minLength: 1
+        description: Capability, task, or Toolset name to search for.
+      max_results:
+        type: integer
+        minimum: 1
+        maximum: 20
+        description: Maximum number of ranked candidates to return; omit to use the default.
+    additionalProperties: false
+  ToolToolsetSearchOutput:
+    type: object
+    required: [toolsets, next_action]
+    properties:
+      toolsets:
+        type: array
+        description: Ranked Toolset candidates with enough context to choose which bundle to inspect.
+        items: { $ref: "../../common/RobotToolsetCatalogueItem.yaml" }
+      next_action:
+        type: string
+        description: Recommended next step for inspecting and activating a selected candidate.
+    additionalProperties: false

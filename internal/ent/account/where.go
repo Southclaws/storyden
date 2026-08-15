@@ -1567,6 +1567,29 @@ func HasRobotsWith(preds ...predicate.Robot) predicate.Account {
 	})
 }
 
+// HasRobotToolsets applies the HasEdge predicate on the "robot_toolsets" edge.
+func HasRobotToolsets() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RobotToolsetsTable, RobotToolsetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRobotToolsetsWith applies the HasEdge predicate on the "robot_toolsets" edge with a given conditions (other predicates).
+func HasRobotToolsetsWith(preds ...predicate.RobotToolset) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newRobotToolsetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasRobotWorkspaces applies the HasEdge predicate on the "robot_workspaces" edge.
 func HasRobotWorkspaces() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

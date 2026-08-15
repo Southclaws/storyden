@@ -18,4 +18,8 @@ export type RobotSessionMessage = UIMessage & {
   robot?: RobotReference;
   /** Human author of the message */
   author?: ProfileReference;
+  /** ADK execution branch. Delegated Robot events use a child branch. */
+  branch?: string;
+  /** ADK isolation scope for delegated task context. */
+  isolation_scope?: string;
 };
