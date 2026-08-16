@@ -57,9 +57,11 @@ type RobotSessionTurnEdges struct {
 	Session *RobotSession `json:"session,omitempty"`
 	// Initiator holds the value of the initiator edge.
 	Initiator *Account `json:"initiator,omitempty"`
+	// Inputs holds the value of the inputs edge.
+	Inputs []*RobotSessionInput `json:"inputs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // SessionOrErr returns the Session value or an error if the edge
@@ -82,6 +84,15 @@ func (e RobotSessionTurnEdges) InitiatorOrErr() (*Account, error) {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "initiator"}
+}
+
+// InputsOrErr returns the Inputs value or an error if the edge
+// was not loaded in eager-loading.
+func (e RobotSessionTurnEdges) InputsOrErr() ([]*RobotSessionInput, error) {
+	if e.loadedTypes[2] {
+		return e.Inputs, nil
+	}
+	return nil, &NotLoadedError{edge: "inputs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -220,6 +231,11 @@ func (_m *RobotSessionTurn) QuerySession() *RobotSessionQuery {
 // QueryInitiator queries the "initiator" edge of the RobotSessionTurn entity.
 func (_m *RobotSessionTurn) QueryInitiator() *AccountQuery {
 	return NewRobotSessionTurnClient(_m.config).QueryInitiator(_m)
+}
+
+// QueryInputs queries the "inputs" edge of the RobotSessionTurn entity.
+func (_m *RobotSessionTurn) QueryInputs() *RobotSessionInputQuery {
+	return NewRobotSessionTurnClient(_m.config).QueryInputs(_m)
 }
 
 // Update returns a builder for updating this RobotSessionTurn.

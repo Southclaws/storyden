@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	adksession "google.golang.org/adk/v2/session"
 	"google.golang.org/adk/v2/tool/toolconfirmation"
 	"google.golang.org/genai"
@@ -22,7 +23,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/tools"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/app/transports/http/robotprojection"
-	"github.com/Southclaws/storyden/lib/mcp"
 )
 
 const (
@@ -54,14 +54,14 @@ func (f robotSessionStreamHeadResponseFunc) VisitRobotSessionStreamHeadResponse(
 }
 
 type chatRequest struct {
-	ID        string                 `json:"id"`
-	ThreadID  string                 `json:"threadId"`
-	SessionID string                 `json:"sessionId"`
-	RobotID   string                 `json:"robotId,omitempty"`
-	Messages  []chatMessage          `json:"messages"`
-	Data      any                    `json:"data"`
-	Context   *mcp.RobotChatContext  `json:"context,omitempty"`
-	Workspace *workspaceMountRequest `json:"workspace,omitempty"`
+	ID        string                    `json:"id"`
+	ThreadID  string                    `json:"threadId"`
+	SessionID string                    `json:"sessionId"`
+	RobotID   string                    `json:"robotId,omitempty"`
+	Messages  []chatMessage             `json:"messages"`
+	Data      any                       `json:"data"`
+	Context   *openapi.RobotChatContext `json:"context,omitempty"`
+	Workspace *workspaceMountRequest    `json:"workspace,omitempty"`
 }
 
 type workspaceMountRequest struct {
@@ -181,18 +181,25 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
+	invocationContext := invocationContextFromRequest(req.Context)
+	lastMessageID, err := xid.FromString(req.Messages[len(req.Messages)-1].ID)
+	if err != nil {
+		http.Error(w, "message ID must be a valid xid", http.StatusBadRequest)
+		return
+	}
 
-	r.logger.Debug("Robot session turn request",
+	r.logger.Debug(
+		"Robot session turn request",
 		slog.String("account_id", accountID.String()),
 		slog.String("robot_id", robotRef),
 		slog.String("session_id", sessionID),
 		slog.String("user_message", lastUserMessage(req.Messages)),
 		slog.Int("messages", len(req.Messages)),
 		slog.Any("init_message", initMessage),
-		slog.Any("context", req.Context),
+		slog.Any("invocation_context", invocationContext),
 	)
 
-	turnID, err := r.coordinator.Start(ctx, robotRef, accountID.String(), sessionID, initMessage, req.Context, storydenagent.RunOptions{
+	inputID, err := r.coordinator.Enqueue(ctx, robot.InputID(lastMessageID), robotRef, accountID.String(), sessionID, initMessage, invocationContext, storydenagent.RunOptions{
 		Mode:      storydenagent.ModeInteractive,
 		Source:    storydenagent.SourceInteractiveChat,
 		Workspace: workspaceSpec,
@@ -203,17 +210,32 @@ func (r *Robots) createSessionTurn(ctx context.Context, w http.ResponseWriter, b
 		return
 	}
 
-	streamPath := "/api/robots/sessions/" + robotSessionID.String() + "/turns/" + turnID.String()
+	streamPath := "/api/robots/sessions/" + robotSessionID.String() + "/stream"
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Location", streamPath)
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(openapi.RobotSessionStreamReference{
+	w.WriteHeader(http.StatusAccepted)
+	_ = json.NewEncoder(w).Encode(openapi.RobotSessionInputReference{
 		StreamUrl: streamPath,
 		SessionId: openapi.Identifier(robotSessionID.String()),
-		TurnId:    openapi.Identifier(turnID.String()),
+		MessageId: openapi.Identifier(inputID.String()),
 	})
+}
+
+func invocationContextFromRequest(context *openapi.RobotChatContext) storydenagent.InvocationContext {
+	if context == nil {
+		return nil
+	}
+
+	result := storydenagent.InvocationContext{}
+	if context.DatagraphItem != nil {
+		result["datagraph_item"] = context.DatagraphItem
+	}
+	if context.PageType != nil {
+		result["page_type"] = *context.PageType
+	}
+	return result
 }
 
 func (r *Robots) RobotSessionStream(ctx context.Context, request openapi.RobotSessionStreamRequestObject) (openapi.RobotSessionStreamResponseObject, error) {
@@ -349,7 +371,7 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 				}
 
 				if len(pendingSet) > 0 && !pendingSet[approvalID] && !pendingSet[part.ToolCallId] {
-					logger.Info("skipping tool approval not in pending list",
+					logger.Debug("skipping tool approval not in pending list",
 						slog.String("tool_call_id", part.ToolCallId),
 						slog.String("approval_id", approvalID),
 						slog.String("tool_name", part.ToolName))
@@ -366,7 +388,7 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 					},
 				})
 
-				logger.Info("tool approval received from frontend",
+				logger.Debug("tool approval received from frontend",
 					slog.String("tool_call_id", part.ToolCallId),
 					slog.String("approval_id", approvalID),
 					slog.String("tool_name", part.ToolName),
@@ -381,7 +403,7 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 				}
 
 				if len(pendingSet) > 0 && !pendingSet[part.ToolCallId] {
-					logger.Info("skipping tool result not in pending list",
+					logger.Debug("skipping tool result not in pending list",
 						slog.String("tool_call_id", part.ToolCallId),
 						slog.String("tool_name", part.ToolName))
 					continue
@@ -412,7 +434,7 @@ func getLastMessage(messages []chatMessage, pendingToolIDs []string, logger *slo
 					},
 				})
 
-				logger.Info("tool result received from frontend",
+				logger.Debug("tool result received from frontend",
 					slog.String("tool_call_id", part.ToolCallId),
 					slog.String("tool_name", toolName),
 					slog.Any("output", output))
@@ -587,7 +609,8 @@ func sendToolCall(ctx context.Context, event *adksession.Event, part *genai.Part
 	toolCallId := fc.ID
 	toolName := fc.Name
 
-	logger.Info("tool call detected",
+	logger.Debug(
+		"tool call detected",
 		slog.String("tool_call_id", toolCallId),
 		slog.String("tool_name", toolName),
 		slog.Any("args", fc.Args),
@@ -621,7 +644,8 @@ func sendToolConfirmationCall(
 		return
 	}
 
-	logger.Info("tool confirmation requested",
+	logger.Debug(
+		"tool confirmation requested",
 		slog.String("confirmation_call_id", fc.ID),
 		slog.String("tool_call_id", original.ID),
 		slog.String("tool_name", original.Name),
@@ -649,7 +673,8 @@ func sendToolResult(part *genai.Part, emitter partEmitter, logger *slog.Logger) 
 	toolCallId := fr.ID
 	toolName := fr.Name
 
-	logger.Info("tool result detected",
+	logger.Debug(
+		"tool result detected",
 		slog.String("tool_call_id", toolCallId),
 		slog.String("tool_name", toolName),
 		slog.Any("response", fr.Response),

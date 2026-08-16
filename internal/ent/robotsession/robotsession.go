@@ -44,6 +44,8 @@ const (
 	EdgeViews = "views"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
 	EdgeMessages = "messages"
+	// EdgeInputs holds the string denoting the inputs edge name in mutations.
+	EdgeInputs = "inputs"
 	// EdgeTurns holds the string denoting the turns edge name in mutations.
 	EdgeTurns = "turns"
 	// Table holds the table name of the robotsession in the database.
@@ -69,6 +71,13 @@ const (
 	MessagesInverseTable = "robot_session_messages"
 	// MessagesColumn is the table column denoting the messages relation/edge.
 	MessagesColumn = "session_id"
+	// InputsTable is the table that holds the inputs relation/edge.
+	InputsTable = "robot_session_inputs"
+	// InputsInverseTable is the table name for the RobotSessionInput entity.
+	// It exists in this package in order to avoid circular dependency with the "robotsessioninput" package.
+	InputsInverseTable = "robot_session_inputs"
+	// InputsColumn is the table column denoting the inputs relation/edge.
+	InputsColumn = "session_id"
 	// TurnsTable is the table that holds the turns relation/edge.
 	TurnsTable = "robot_session_turns"
 	// TurnsInverseTable is the table name for the RobotSessionTurn entity.
@@ -243,6 +252,20 @@ func ByMessages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByInputsCount orders the results by inputs count.
+func ByInputsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInputsStep(), opts...)
+	}
+}
+
+// ByInputs orders the results by inputs terms.
+func ByInputs(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInputsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByTurnsCount orders the results by turns count.
 func ByTurnsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -275,6 +298,13 @@ func newMessagesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(MessagesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, MessagesTable, MessagesColumn),
+	)
+}
+func newInputsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InputsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InputsTable, InputsColumn),
 	)
 }
 func newTurnsStep() *sqlgraph.Step {

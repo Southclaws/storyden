@@ -76,7 +76,13 @@ func (q *Repository) Get(
 	messageQuery := q.db.RobotSessionMessage.Query().
 		Where(
 			ent_robot_session_message.SessionIDEQ(xid.ID(sessionID)),
-			ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindMessage),
+			ent_robot_session_message.Or(
+				ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindInputQueued),
+				ent_robot_session_message.And(
+					ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindMessage),
+					ent_robot_session_message.HiddenFromProjectionEQ(false),
+				),
+			),
 		).
 		WithRobot(func(rq *ent.RobotQuery) {
 			rq.WithAuthor()
@@ -92,7 +98,13 @@ func (q *Repository) Get(
 			Where(
 				ent_robot_session_message.IDEQ(xid.ID(before)),
 				ent_robot_session_message.SessionIDEQ(xid.ID(sessionID)),
-				ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindMessage),
+				ent_robot_session_message.Or(
+					ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindInputQueued),
+					ent_robot_session_message.And(
+						ent_robot_session_message.EventKindEQ(ent_robot_session_message.EventKindMessage),
+						ent_robot_session_message.HiddenFromProjectionEQ(false),
+					),
+				),
 			).
 			Only(ctx)
 		if err != nil {

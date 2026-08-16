@@ -23,38 +23,6 @@
       ],
       "type": "object"
     },
-    "DatagraphItemRef": {
-      "additionalProperties": false,
-      "properties": {
-        "id": {
-          "description": "Unique identifier of the datagraph item",
-          "type": "string"
-        },
-        "kind": {
-          "description": "Type of datagraph item (thread, node, profile, collection, etc.)",
-          "enum": [
-            "post",
-            "thread",
-            "reply",
-            "node",
-            "collection",
-            "profile",
-            "event"
-          ],
-          "type": "string"
-        },
-        "slug": {
-          "description": "URL-friendly slug of the datagraph item",
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "slug",
-        "kind"
-      ],
-      "type": "object"
-    },
     "LibraryPageSearchItem": {
       "additionalProperties": false,
       "properties": {
@@ -386,20 +354,6 @@
         "name",
         "browser_url"
       ],
-      "type": "object"
-    },
-    "RobotChatContext": {
-      "additionalProperties": false,
-      "properties": {
-        "datagraph_item": {
-          "$ref": "#/definitions/DatagraphItemRef",
-          "description": "Optional reference to a datagraph item if the user is viewing one (e.g., a thread, library page, profile)"
-        },
-        "page_type": {
-          "description": "Human-readable page type if not viewing a specific datagraph item. Examples: 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form text since the backend doesn't know about frontend routes.",
-          "type": "string"
-        }
-      },
       "type": "object"
     },
     "RobotItem": {

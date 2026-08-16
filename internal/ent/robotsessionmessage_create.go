@@ -82,6 +82,26 @@ func (_c *RobotSessionMessageCreate) SetNillableEventKind(v *robotsessionmessage
 	return _c
 }
 
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (_c *RobotSessionMessageCreate) SetHiddenFromProjection(v bool) *RobotSessionMessageCreate {
+	_c.mutation.SetHiddenFromProjection(v)
+	return _c
+}
+
+// SetNillableHiddenFromProjection sets the "hidden_from_projection" field if the given value is not nil.
+func (_c *RobotSessionMessageCreate) SetNillableHiddenFromProjection(v *bool) *RobotSessionMessageCreate {
+	if v != nil {
+		_c.SetHiddenFromProjection(*v)
+	}
+	return _c
+}
+
+// SetInputIds sets the "input_ids" field.
+func (_c *RobotSessionMessageCreate) SetInputIds(v []xid.ID) *RobotSessionMessageCreate {
+	_c.mutation.SetInputIds(v)
+	return _c
+}
+
 // SetInvocationID sets the "invocation_id" field.
 func (_c *RobotSessionMessageCreate) SetInvocationID(v string) *RobotSessionMessageCreate {
 	_c.mutation.SetInvocationID(v)
@@ -280,6 +300,10 @@ func (_c *RobotSessionMessageCreate) defaults() {
 		v := robotsessionmessage.DefaultEventKind
 		_c.mutation.SetEventKind(v)
 	}
+	if _, ok := _c.mutation.HiddenFromProjection(); !ok {
+		v := robotsessionmessage.DefaultHiddenFromProjection
+		_c.mutation.SetHiddenFromProjection(v)
+	}
 	if _, ok := _c.mutation.ID(); !ok {
 		v := robotsessionmessage.DefaultID()
 		_c.mutation.SetID(v)
@@ -304,6 +328,9 @@ func (_c *RobotSessionMessageCreate) check() error {
 		if err := robotsessionmessage.EventKindValidator(v); err != nil {
 			return &ValidationError{Name: "event_kind", err: fmt.Errorf(`ent: validator failed for field "RobotSessionMessage.event_kind": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.HiddenFromProjection(); !ok {
+		return &ValidationError{Name: "hidden_from_projection", err: errors.New(`ent: missing required field "RobotSessionMessage.hidden_from_projection"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := robotsessionmessage.IDValidator(v.String()); err != nil {
@@ -364,6 +391,14 @@ func (_c *RobotSessionMessageCreate) createSpec() (*RobotSessionMessage, *sqlgra
 	if value, ok := _c.mutation.EventKind(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
 		_node.EventKind = value
+	}
+	if value, ok := _c.mutation.HiddenFromProjection(); ok {
+		_spec.SetField(robotsessionmessage.FieldHiddenFromProjection, field.TypeBool, value)
+		_node.HiddenFromProjection = value
+	}
+	if value, ok := _c.mutation.InputIds(); ok {
+		_spec.SetField(robotsessionmessage.FieldInputIds, field.TypeJSON, value)
+		_node.InputIds = value
 	}
 	if value, ok := _c.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
@@ -549,6 +584,36 @@ func (u *RobotSessionMessageUpsert) SetEventKind(v robotsessionmessage.EventKind
 // UpdateEventKind sets the "event_kind" field to the value that was provided on create.
 func (u *RobotSessionMessageUpsert) UpdateEventKind() *RobotSessionMessageUpsert {
 	u.SetExcluded(robotsessionmessage.FieldEventKind)
+	return u
+}
+
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (u *RobotSessionMessageUpsert) SetHiddenFromProjection(v bool) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldHiddenFromProjection, v)
+	return u
+}
+
+// UpdateHiddenFromProjection sets the "hidden_from_projection" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateHiddenFromProjection() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldHiddenFromProjection)
+	return u
+}
+
+// SetInputIds sets the "input_ids" field.
+func (u *RobotSessionMessageUpsert) SetInputIds(v []xid.ID) *RobotSessionMessageUpsert {
+	u.Set(robotsessionmessage.FieldInputIds, v)
+	return u
+}
+
+// UpdateInputIds sets the "input_ids" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsert) UpdateInputIds() *RobotSessionMessageUpsert {
+	u.SetExcluded(robotsessionmessage.FieldInputIds)
+	return u
+}
+
+// ClearInputIds clears the value of the "input_ids" field.
+func (u *RobotSessionMessageUpsert) ClearInputIds() *RobotSessionMessageUpsert {
+	u.SetNull(robotsessionmessage.FieldInputIds)
 	return u
 }
 
@@ -814,6 +879,41 @@ func (u *RobotSessionMessageUpsertOne) SetEventKind(v robotsessionmessage.EventK
 func (u *RobotSessionMessageUpsertOne) UpdateEventKind() *RobotSessionMessageUpsertOne {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateEventKind()
+	})
+}
+
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (u *RobotSessionMessageUpsertOne) SetHiddenFromProjection(v bool) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetHiddenFromProjection(v)
+	})
+}
+
+// UpdateHiddenFromProjection sets the "hidden_from_projection" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateHiddenFromProjection() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateHiddenFromProjection()
+	})
+}
+
+// SetInputIds sets the "input_ids" field.
+func (u *RobotSessionMessageUpsertOne) SetInputIds(v []xid.ID) *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetInputIds(v)
+	})
+}
+
+// UpdateInputIds sets the "input_ids" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertOne) UpdateInputIds() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateInputIds()
+	})
+}
+
+// ClearInputIds clears the value of the "input_ids" field.
+func (u *RobotSessionMessageUpsertOne) ClearInputIds() *RobotSessionMessageUpsertOne {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearInputIds()
 	})
 }
 
@@ -1270,6 +1370,41 @@ func (u *RobotSessionMessageUpsertBulk) SetEventKind(v robotsessionmessage.Event
 func (u *RobotSessionMessageUpsertBulk) UpdateEventKind() *RobotSessionMessageUpsertBulk {
 	return u.Update(func(s *RobotSessionMessageUpsert) {
 		s.UpdateEventKind()
+	})
+}
+
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (u *RobotSessionMessageUpsertBulk) SetHiddenFromProjection(v bool) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetHiddenFromProjection(v)
+	})
+}
+
+// UpdateHiddenFromProjection sets the "hidden_from_projection" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateHiddenFromProjection() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateHiddenFromProjection()
+	})
+}
+
+// SetInputIds sets the "input_ids" field.
+func (u *RobotSessionMessageUpsertBulk) SetInputIds(v []xid.ID) *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.SetInputIds(v)
+	})
+}
+
+// UpdateInputIds sets the "input_ids" field to the value that was provided on create.
+func (u *RobotSessionMessageUpsertBulk) UpdateInputIds() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.UpdateInputIds()
+	})
+}
+
+// ClearInputIds clears the value of the "input_ids" field.
+func (u *RobotSessionMessageUpsertBulk) ClearInputIds() *RobotSessionMessageUpsertBulk {
+	return u.Update(func(s *RobotSessionMessageUpsert) {
+		s.ClearInputIds()
 	})
 }
 

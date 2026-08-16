@@ -26,6 +26,10 @@ const (
 	FieldSequence = "sequence"
 	// FieldEventKind holds the string denoting the event_kind field in the database.
 	FieldEventKind = "event_kind"
+	// FieldHiddenFromProjection holds the string denoting the hidden_from_projection field in the database.
+	FieldHiddenFromProjection = "hidden_from_projection"
+	// FieldInputIds holds the string denoting the input_ids field in the database.
+	FieldInputIds = "input_ids"
 	// FieldInvocationID holds the string denoting the invocation_id field in the database.
 	FieldInvocationID = "invocation_id"
 	// FieldBranch holds the string denoting the branch field in the database.
@@ -81,6 +85,8 @@ var Columns = []string{
 	FieldTurnID,
 	FieldSequence,
 	FieldEventKind,
+	FieldHiddenFromProjection,
+	FieldInputIds,
 	FieldInvocationID,
 	FieldBranch,
 	FieldIsolationScope,
@@ -104,6 +110,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultHiddenFromProjection holds the default value on creation for the "hidden_from_projection" field.
+	DefaultHiddenFromProjection bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -119,6 +127,7 @@ const DefaultEventKind = EventKindMessage
 // EventKind values.
 const (
 	EventKindMessage       EventKind = "message"
+	EventKindInputQueued   EventKind = "input_queued"
 	EventKindTurnQueued    EventKind = "turn_queued"
 	EventKindTurnCompleted EventKind = "turn_completed"
 	EventKindTurnBlocked   EventKind = "turn_blocked"
@@ -133,7 +142,7 @@ func (ek EventKind) String() string {
 // EventKindValidator is a validator for the "event_kind" field enum values. It is called by the builders before save.
 func EventKindValidator(ek EventKind) error {
 	switch ek {
-	case EventKindMessage, EventKindTurnQueued, EventKindTurnCompleted, EventKindTurnBlocked, EventKindTurnFailed, EventKindTurnCancelled:
+	case EventKindMessage, EventKindInputQueued, EventKindTurnQueued, EventKindTurnCompleted, EventKindTurnBlocked, EventKindTurnFailed, EventKindTurnCancelled:
 		return nil
 	default:
 		return fmt.Errorf("robotsessionmessage: invalid enum value for event_kind field: %q", ek)
@@ -171,6 +180,11 @@ func BySequence(opts ...sql.OrderTermOption) OrderOption {
 // ByEventKind orders the results by the event_kind field.
 func ByEventKind(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventKind, opts...).ToFunc()
+}
+
+// ByHiddenFromProjection orders the results by the hidden_from_projection field.
+func ByHiddenFromProjection(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHiddenFromProjection, opts...).ToFunc()
 }
 
 // ByInvocationID orders the results by the invocation_id field.

@@ -79,6 +79,9 @@ func (RobotSession) Edges() []ent.Edge {
 		edge.To("messages", RobotSessionMessage.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("inputs", RobotSessionInput.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("turns", RobotSessionTurn.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}

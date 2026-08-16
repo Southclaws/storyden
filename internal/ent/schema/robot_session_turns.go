@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -69,5 +70,7 @@ func (RobotSessionTurn) Edges() []ent.Edge {
 			Field("initiated_by_account_id").
 			Ref("initiated_robot_turns").
 			Unique(),
+		edge.To("inputs", RobotSessionInput.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

@@ -68,7 +68,7 @@ func startSession(t *testing.T, ctx context.Context, ts *httptest.Server, sessio
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
-	require.Equal(t, http.StatusCreated, resp.StatusCode)
+	require.Equal(t, http.StatusAccepted, resp.StatusCode)
 
 	location := resp.Header.Get("Location")
 	require.NotEmpty(t, location)

@@ -14,7 +14,7 @@ import { HomeIcon } from "@/components/ui/icons/Home";
 import { RobotIcon } from "@/components/ui/icons/Robot";
 import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { Spinner } from "@/components/ui/spinner";
-import { HStack, LStack } from "@/styled-system/jsx";
+import { HStack, LStack, styled } from "@/styled-system/jsx";
 
 import "./styles.css";
 
@@ -27,14 +27,15 @@ import { RobotChatMessageList } from "./RobotChat/RobotChatMessageList";
 export function CommandPaletteContent() {
   const { search, setSearch, mode, setMode, focusInput, canUseRobots } =
     useCommandPalette();
-  const { activeRobotName, sendMessage, status } = useRobotChat();
+  const { activeRobotName, sendMessage, status, queuedMessageCount } =
+    useRobotChat();
   const filteredCount = useCommandState((s) => s.filtered.count);
   const selectedValue = useCommandState((s) => s.value);
 
   const isBusy = status === "submitted" || status === "streaming";
 
   async function handleChatSend() {
-    if (!search.trim() || isBusy) return;
+    if (!search.trim()) return;
 
     if (mode !== "chat") {
       setMode("chat");
@@ -81,6 +82,11 @@ export function CommandPaletteContent() {
       <CommandPaletteContentMode mode={mode} />
 
       <RobotChatLoadingStatus active={isBusy} robotName={activeRobotName} />
+      {queuedMessageCount > 0 && mode === "chat" && (
+        <styled.span px="2" color="text.muted" fontSize="xs">
+          {queuedMessageCount} queued
+        </styled.span>
+      )}
 
       <HStack w="full" minW="0">
         <Command.Input
@@ -88,7 +94,6 @@ export function CommandPaletteContent() {
           value={search}
           onValueChange={setSearch}
           placeholder="Ask, search or command..."
-          disabled={isBusy}
           onKeyDown={handleSubmissionIntent}
         />
         {canUseRobots && mode === "chat" && (
@@ -96,7 +101,7 @@ export function CommandPaletteContent() {
             aria-label="Send message"
             variant="subtle"
             type="button"
-            disabled={isBusy || !search.trim()}
+            disabled={!search.trim()}
             onClick={handleChatSend}
           >
             <DiscussionIcon />

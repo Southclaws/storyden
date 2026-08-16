@@ -6,7 +6,7 @@ import { useCallback, useRef } from "react";
 import { nodeGet } from "@/api/openapi-client/nodes";
 import { profileGet } from "@/api/openapi-client/profiles";
 import { threadGet } from "@/api/openapi-client/threads";
-import { RobotChatContext } from "@/api/robots";
+import { RobotChatContext } from "@/api/openapi-schema";
 
 export function useRobotPageContext(): () => Promise<RobotChatContext> {
   const pathname = usePathname();

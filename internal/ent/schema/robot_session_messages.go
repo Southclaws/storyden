@@ -38,8 +38,15 @@ func (RobotSessionMessage) Fields() []ent.Field {
 		field.Uint64("sequence").
 			Comment("Monotonic event offset within the session."),
 		field.Enum("event_kind").
-			Values("message", "turn_queued", "turn_completed", "turn_blocked", "turn_failed", "turn_cancelled").
+			Values("message", "input_queued", "turn_queued", "turn_completed", "turn_blocked", "turn_failed", "turn_cancelled").
 			Default("message"),
+		field.Bool("hidden_from_projection").
+			Default(false).
+			Comment("Whether this runtime event is omitted from the user-facing message history."),
+
+		field.JSON("input_ids", []xid.ID{}).
+			Optional().
+			Comment("Inputs claimed by a queued turn."),
 
 		field.String("invocation_id").
 			Optional().

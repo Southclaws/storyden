@@ -1532,6 +1532,7 @@ func serialiseRobotSessionMessage(m *robot.Message, hiddenToolCallIDs map[string
 		Role:           openapi.RobotSessionMessageRole(role),
 		Parts:          parts,
 		CreatedAt:      m.CreatedAt,
+		Queued:         m.Queued,
 		Robot:          serialiseRobotActorReference(m),
 		Author:         opt.Map(m.Author, func(a *account.Account) openapi.ProfileReference { return serialiseProfileReferenceFromAccount(*a) }).Ptr(),
 		Branch:         m.Branch.Ptr(),

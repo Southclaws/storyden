@@ -13,6 +13,7 @@ export type RobotSessionStreamEventKind =
 
 export const RobotSessionStreamEventKind = {
   message: "message",
+  input_queued: "input_queued",
   turn_queued: "turn_queued",
   turn_completed: "turn_completed",
   turn_blocked: "turn_blocked",

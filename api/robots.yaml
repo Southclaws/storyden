@@ -113,32 +113,3 @@ definitions:
 
   ToolMemberSearch:
     $ref: "./robots/tools/tool_member_search.yaml"
-
-  DatagraphItemRef:
-    type: object
-    required:
-      - id
-      - slug
-      - kind
-    properties:
-      id:
-        type: string
-        description: "Unique identifier of the datagraph item"
-      slug:
-        type: string
-        description: "URL-friendly slug of the datagraph item"
-      kind:
-        $ref: "./common/DatagraphItemKind.yaml"
-        description: "Type of datagraph item (thread, node, profile, collection, etc.)"
-    additionalProperties: false
-
-  RobotChatContext:
-    type: object
-    properties:
-      datagraph_item:
-        $ref: "#/definitions/DatagraphItemRef"
-        description: "Optional reference to a datagraph item if the user is viewing one (e.g., a thread, library page, profile)"
-      page_type:
-        type: string
-        description: "Human-readable page type if not viewing a specific datagraph item. Examples: 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form text since the backend doesn't know about frontend routes."
-    additionalProperties: false

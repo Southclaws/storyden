@@ -117,6 +117,7 @@ type RobotChatContextValue = {
   isLoadingOlderMessages: boolean;
   loadOlderMessages: () => Promise<boolean>;
   status: ReturnType<typeof useChat>["status"];
+  queuedMessageCount: number;
   errorState?: string;
   handleDismissError: () => void;
   isSessionConfirmed: boolean;
@@ -176,7 +177,6 @@ export function RobotChatContext({
     initialSelectedWorkspaceID,
   );
   const autoSubmittedToolOutputIDsRef = useRef<Set<string>>(new Set());
-  const pendingTurnMessages = useMemo(() => new Map<string, string>(), []);
   const [sessionId] = useState(() => initialSessionID ?? generateXid());
   const [streamStartOffset] = useState(initialStreamOffset ?? "-1");
   const [isSessionConfirmed, setIsSessionConfirmed] =
@@ -247,12 +247,9 @@ export function RobotChatContext({
       if (command.sessionId !== sessionId) {
         return;
       }
-      if (command.clientMessageRole === "user" && command.clientMessageId) {
-        pendingTurnMessages.set(command.turnId, command.clientMessageId);
-      }
       setIsSessionConfirmed(true);
     },
-    [pendingTurnMessages, sessionId],
+    [sessionId],
   );
 
   const transport = useMemo(() => {
@@ -490,21 +487,28 @@ export function RobotChatContext({
       }
 
       if (event.event_kind === "turn_queued") {
+        if (!turnID) return;
         activeTurnIDs.add(turnID);
         queuedParts.set(turnID, parts);
+        const claimedInputIDs = new Set(event.input_ids ?? []);
+        if (claimedInputIDs.size > 0) {
+          setMessagesRef.current((messages) =>
+            messages.map((message) =>
+              claimedInputIDs.has(message.id)
+                ? { ...message, queued: false }
+                : message,
+            ),
+          );
+        }
         setObserverStatus("submitted");
         return;
       }
 
       if (event.message) {
         setMessagesRef.current((messages) =>
-          mergeSessionMessage(
-            messages,
-            event.message as StorydenUIMessage,
-            pendingTurnMessages.get(turnID),
-          ),
+          mergeSessionMessage(messages, event.message as StorydenUIMessage),
         );
-      } else if (parts.length > 0) {
+      } else if (parts.length > 0 && turnID) {
         setObserverStatus("streaming");
         const consumer = consumerFor(turnID);
         for (const part of parts) {
@@ -513,7 +517,7 @@ export function RobotChatContext({
       }
 
       if (isTerminalSessionEvent(event)) {
-        pendingTurnMessages.delete(turnID);
+        if (!turnID) return;
         activeTurnIDs.delete(turnID);
         consumers.get(turnID)?.close();
         consumers.delete(turnID);
@@ -543,13 +547,7 @@ export function RobotChatContext({
         consumer.close();
       }
     };
-  }, [
-    isSessionConfirmed,
-    observerFetchClient,
-    pendingTurnMessages,
-    sessionId,
-    streamStartOffset,
-  ]);
+  }, [isSessionConfirmed, observerFetchClient, sessionId, streamStartOffset]);
 
   const initialMessagesSignature = useMemo(
     () => messageListSignature(initialMessages),
@@ -596,14 +594,22 @@ export function RobotChatContext({
     async (input: { text: string }) => {
       const pageContext = await getPageContext();
       const currentWorkspaceID = selectedWorkspaceIDRef.current;
-      await chat.sendMessage(input, {
-        body: {
-          context: pageContext,
-          workspace: currentWorkspaceID
-            ? { workspace_id: currentWorkspaceID }
-            : undefined,
+      await chat.sendMessage(
+        {
+          id: generateXid(),
+          role: "user",
+          parts: [{ type: "text", text: input.text }],
+          queued: true,
         },
-      });
+        {
+          body: {
+            context: pageContext,
+            workspace: currentWorkspaceID
+              ? { workspace_id: currentWorkspaceID }
+              : undefined,
+          },
+        },
+      );
     },
     [chat.sendMessage, getPageContext],
   );
@@ -724,6 +730,9 @@ export function RobotChatContext({
     isLoadingOlderMessages,
     loadOlderMessages,
     status: observerStatus === "ready" ? chat.status : observerStatus,
+    queuedMessageCount: chat.messages.filter(
+      (message) => message.role === "user" && message.queued,
+    ).length,
     errorState,
     handleDismissError,
     isSessionConfirmed,

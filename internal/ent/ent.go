@@ -54,6 +54,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robotmcptool"
 	"github.com/Southclaws/storyden/internal/ent/robotprovidermodel"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -167,6 +168,7 @@ func checkColumn(t, c string) error {
 			robotmcptool.Table:                 robotmcptool.ValidColumn,
 			robotprovidermodel.Table:           robotprovidermodel.ValidColumn,
 			robotsession.Table:                 robotsession.ValidColumn,
+			robotsessioninput.Table:            robotsessioninput.ValidColumn,
 			robotsessionmessage.Table:          robotsessionmessage.ValidColumn,
 			robotsessionturn.Table:             robotsessionturn.ValidColumn,
 			robotsessionview.Table:             robotsessionview.ValidColumn,

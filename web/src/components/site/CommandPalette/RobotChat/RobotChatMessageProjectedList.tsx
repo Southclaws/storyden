@@ -31,6 +31,7 @@ export function RobotChatMessageProjectedList() {
       author={message.author}
       isCurrentMemberMessage={message.author?.id === session?.id}
       isNewestUserMessage={message.id === latestUserMessageId}
+      queued={message.queued}
     />
   ));
 }

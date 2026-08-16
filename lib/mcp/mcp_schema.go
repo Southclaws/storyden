@@ -79,41 +79,6 @@ func (j *DatagraphItemKindYaml) UnmarshalJSON(value []byte) error {
 	return nil
 }
 
-type DatagraphItemRef struct {
-	// Unique identifier of the datagraph item
-	Id string `json:"id" yaml:"id" mapstructure:"id"`
-
-	// Type of datagraph item (thread, node, profile, collection, etc.)
-	Kind DatagraphItemKindYaml `json:"kind" yaml:"kind" mapstructure:"kind"`
-
-	// URL-friendly slug of the datagraph item
-	Slug string `json:"slug" yaml:"slug" mapstructure:"slug"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *DatagraphItemRef) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["id"]; raw != nil && !ok {
-		return fmt.Errorf("field id in DatagraphItemRef: required")
-	}
-	if _, ok := raw["kind"]; raw != nil && !ok {
-		return fmt.Errorf("field kind in DatagraphItemRef: required")
-	}
-	if _, ok := raw["slug"]; raw != nil && !ok {
-		return fmt.Errorf("field slug in DatagraphItemRef: required")
-	}
-	type Plain DatagraphItemRef
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	*j = DatagraphItemRef(plain)
-	return nil
-}
-
 type LibraryPageSearchItem struct {
 	// Browser URL for this resource. Always present this as a Markdown link when
 	// showing results to the user.
@@ -705,17 +670,6 @@ func (j *ReplySearchItem) UnmarshalJSON(value []byte) error {
 	}
 	*j = ReplySearchItem(plain)
 	return nil
-}
-
-type RobotChatContext struct {
-	// Optional reference to a datagraph item if the user is viewing one (e.g., a
-	// thread, library page, profile)
-	DatagraphItem *DatagraphItemRef `json:"datagraph_item,omitempty" yaml:"datagraph_item,omitempty" mapstructure:"datagraph_item,omitempty"`
-
-	// Human-readable page type if not viewing a specific datagraph item. Examples:
-	// 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form
-	// text since the backend doesn't know about frontend routes.
-	PageType *string `json:"page_type,omitempty" yaml:"page_type,omitempty" mapstructure:"page_type,omitempty"`
 }
 
 type RobotItem struct {

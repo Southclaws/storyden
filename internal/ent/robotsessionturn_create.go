@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/rs/xid"
 )
@@ -199,6 +200,21 @@ func (_c *RobotSessionTurnCreate) SetNillableInitiatorID(id *xid.ID) *RobotSessi
 // SetInitiator sets the "initiator" edge to the Account entity.
 func (_c *RobotSessionTurnCreate) SetInitiator(v *Account) *RobotSessionTurnCreate {
 	return _c.SetInitiatorID(v.ID)
+}
+
+// AddInputIDs adds the "inputs" edge to the RobotSessionInput entity by IDs.
+func (_c *RobotSessionTurnCreate) AddInputIDs(ids ...xid.ID) *RobotSessionTurnCreate {
+	_c.mutation.AddInputIDs(ids...)
+	return _c
+}
+
+// AddInputs adds the "inputs" edges to the RobotSessionInput entity.
+func (_c *RobotSessionTurnCreate) AddInputs(v ...*RobotSessionInput) *RobotSessionTurnCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddInputIDs(ids...)
 }
 
 // Mutation returns the RobotSessionTurnMutation object of the builder.
@@ -395,6 +411,22 @@ func (_c *RobotSessionTurnCreate) createSpec() (*RobotSessionTurn, *sqlgraph.Cre
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.InitiatedByAccountID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.InputsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsessionturn.InputsTable,
+			Columns: []string{robotsessionturn.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

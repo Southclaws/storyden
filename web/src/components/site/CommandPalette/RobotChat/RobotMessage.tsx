@@ -44,6 +44,7 @@ type Props = {
   author?: ProfileReference;
   isCurrentMemberMessage?: boolean;
   isNewestUserMessage?: boolean;
+  queued?: boolean;
 };
 
 export function RobotMessage({
@@ -53,6 +54,7 @@ export function RobotMessage({
   author,
   isCurrentMemberMessage = false,
   isNewestUserMessage = false,
+  queued = false,
 }: Props) {
   const isUser = role === "user";
   const isOwnMessage = isUser && (!author || isCurrentMemberMessage);
@@ -78,6 +80,11 @@ export function RobotMessage({
         <MemberBadge profile={author} avatar="hidden" size="xs" name="handle" />
       )}
       {renderMessageParts(parts, isUser)}
+      {isUser && queued && (
+        <Text as="span" variant="metadata" color="text.muted">
+          Queued
+        </Text>
+      )}
     </VStack>
   );
 }

@@ -43,8 +43,6 @@ export interface MCPTools {
   ToolReplySearch?: ReplySearch;
   ToolPostSearch?: PostSearch;
   ToolMemberSearch?: MemberSearch;
-  DatagraphItemRef?: DatagraphItemRef;
-  RobotChatContext?: RobotChatContext;
   [k: string]: unknown;
 }
 /**
@@ -1727,44 +1725,6 @@ export interface MemberSearchItem {
    * Brief member bio or description
    */
   bio?: string;
-}
-export interface DatagraphItemRef {
-  /**
-   * Unique identifier of the datagraph item
-   */
-  id: string;
-  /**
-   * URL-friendly slug of the datagraph item
-   */
-  slug: string;
-  /**
-   * Type of datagraph item (thread, node, profile, collection, etc.)
-   */
-  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
-}
-export interface RobotChatContext {
-  datagraph_item?: DatagraphItemRef1;
-  /**
-   * Human-readable page type if not viewing a specific datagraph item. Examples: 'Index page', 'Settings page', 'Admin page', 'Search page'. This is free-form text since the backend doesn't know about frontend routes.
-   */
-  page_type?: string;
-}
-/**
- * Optional reference to a datagraph item if the user is viewing one (e.g., a thread, library page, profile)
- */
-export interface DatagraphItemRef1 {
-  /**
-   * Unique identifier of the datagraph item
-   */
-  id: string;
-  /**
-   * URL-friendly slug of the datagraph item
-   */
-  slug: string;
-  /**
-   * Type of datagraph item (thread, node, profile, collection, etc.)
-   */
-  kind: "post" | "thread" | "reply" | "node" | "collection" | "profile" | "event";
 }
 
 export type ToolName = "content_search" | "tool_search" | "tool_get" | "tool_load" | "robot_create" | "robot_list" | "robot_get" | "robot_update" | "robot_delete" | "robot_search" | "toolset_search" | "toolset_load" | "toolset_create" | "toolset_list" | "toolset_get" | "toolset_update" | "toolset_delete" | "library_page_list" | "library_request_page" | "get_library_page" | "create_library_page" | "update_library_page" | "library_search_pages" | "library_page_property_schema_get" | "library_page_property_schema_update" | "library_page_properties_update" | "tag_list" | "link_create" | "thread_create" | "thread_list" | "thread_get" | "thread_update" | "thread_reply" | "category_list" | "thread_search" | "reply_search" | "post_search" | "member_search";

@@ -39,7 +39,7 @@ import type {
   RobotProvidersListOKResponse,
   RobotSessionGetOKResponse,
   RobotSessionGetParams,
-  RobotSessionStreamCreatedResponse,
+  RobotSessionInputAcceptedResponse,
   RobotSessionStreamHeadParams,
   RobotSessionStreamMetadataResponse,
   RobotSessionStreamParams,
@@ -1703,19 +1703,20 @@ export const getRobotSessionCreateUrl = () => {
 };
 
 /**
- * Start a turn in a Robot session. The session is created when it does
+ * Queue a message in a Robot session. The session is created when it does
  * not already exist. New sessions use Denbot unless `robotId` selects a
  * custom Robot, which then remains the root Robot for the session.
  *
- * The turn runs asynchronously. The response identifies the turn stream
- * that clients can read immediately and resume later.
- * @summary Start a Robot session turn
+ * Submission is asynchronous. The response identifies the accepted
+ * message and the session stream. Compatible queued messages may later be
+ * consumed together by one Robot turn.
+ * @summary Submit a Robot session message
  */
 export const robotSessionCreate = async (
   robotChatStartBody: RobotChatStartBody,
   options?: Parameters<typeof fetcher>[1],
-): Promise<RobotSessionStreamCreatedResponse> => {
-  return fetcher<RobotSessionStreamCreatedResponse>(
+): Promise<RobotSessionInputAcceptedResponse> => {
+  return fetcher<RobotSessionInputAcceptedResponse>(
     getRobotSessionCreateUrl(),
     {
       ...options,
@@ -1741,7 +1742,7 @@ export type RobotSessionCreateMutationResult = NonNullable<
 >;
 
 /**
- * @summary Start a Robot session turn
+ * @summary Submit a Robot session message
  */
 export const useRobotSessionCreate = <
   TError =

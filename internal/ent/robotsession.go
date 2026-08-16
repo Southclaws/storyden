@@ -56,11 +56,13 @@ type RobotSessionEdges struct {
 	Views []*RobotSessionView `json:"views,omitempty"`
 	// Messages holds the value of the messages edge.
 	Messages []*RobotSessionMessage `json:"messages,omitempty"`
+	// Inputs holds the value of the inputs edge.
+	Inputs []*RobotSessionInput `json:"inputs,omitempty"`
 	// Turns holds the value of the turns edge.
 	Turns []*RobotSessionTurn `json:"turns,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -92,10 +94,19 @@ func (e RobotSessionEdges) MessagesOrErr() ([]*RobotSessionMessage, error) {
 	return nil, &NotLoadedError{edge: "messages"}
 }
 
+// InputsOrErr returns the Inputs value or an error if the edge
+// was not loaded in eager-loading.
+func (e RobotSessionEdges) InputsOrErr() ([]*RobotSessionInput, error) {
+	if e.loadedTypes[3] {
+		return e.Inputs, nil
+	}
+	return nil, &NotLoadedError{edge: "inputs"}
+}
+
 // TurnsOrErr returns the Turns value or an error if the edge
 // was not loaded in eager-loading.
 func (e RobotSessionEdges) TurnsOrErr() ([]*RobotSessionTurn, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Turns, nil
 	}
 	return nil, &NotLoadedError{edge: "turns"}
@@ -236,6 +247,11 @@ func (_m *RobotSession) QueryViews() *RobotSessionViewQuery {
 // QueryMessages queries the "messages" edge of the RobotSession entity.
 func (_m *RobotSession) QueryMessages() *RobotSessionMessageQuery {
 	return NewRobotSessionClient(_m.config).QueryMessages(_m)
+}
+
+// QueryInputs queries the "inputs" edge of the RobotSession entity.
+func (_m *RobotSession) QueryInputs() *RobotSessionInputQuery {
+	return NewRobotSessionClient(_m.config).QueryInputs(_m)
 }
 
 // QueryTurns queries the "turns" edge of the RobotSession entity.

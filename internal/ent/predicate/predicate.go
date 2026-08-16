@@ -132,6 +132,9 @@ type RobotProviderModel func(*sql.Selector)
 // RobotSession is the predicate function for robotsession builders.
 type RobotSession func(*sql.Selector)
 
+// RobotSessionInput is the predicate function for robotsessioninput builders.
+type RobotSessionInput func(*sql.Selector)
+
 // RobotSessionMessage is the predicate function for robotsessionmessage builders.
 type RobotSessionMessage func(*sql.Selector)
 

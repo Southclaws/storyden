@@ -96,10 +96,14 @@ func newTurnProjector(
 }
 
 func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Registry) []openapi.StreamPart {
+	turnID, hasTurn := event.TurnID.Get()
+	if !hasTurn {
+		return []openapi.StreamPart{}
+	}
 	switch event.Kind {
 	case robot.SessionEventTurnQueued:
 		start := openapi.StreamPart{}
-		_ = start.FromStartPart(openapi.StartPart{MessageId: event.TurnID.String()})
+		_ = start.FromStartPart(openapi.StartPart{MessageId: turnID.String()})
 		_ = p.collector.Send(start)
 		_ = p.collector.Send(robotprojection.DataStreamPart("data-session_id", p.sessionID.String()))
 
@@ -124,7 +128,7 @@ func (p *turnProjector) project(event robot.SessionEvent, toolRegistry *tools.Re
 				continue
 			}
 			if !delegatedEvent {
-				presentationParts := robotprojection.PresentationPartStreamPartsDeterministic(adkEvent, part, fmt.Sprintf("%s-%d-%d", event.TurnID.String(), event.Sequence, partIndex))
+				presentationParts := robotprojection.PresentationPartStreamPartsDeterministic(adkEvent, part, fmt.Sprintf("%s-%d-%d", turnID.String(), event.Sequence, partIndex))
 				for _, presentationPart := range presentationParts {
 					_ = p.collector.Send(presentationPart)
 				}
@@ -231,23 +235,36 @@ func newSessionProjector(
 }
 
 func (p *sessionProjector) project(event robot.SessionEvent) (openapi.RobotSessionStreamEvent, error) {
-	projector := p.turns[event.TurnID]
-	if projector == nil {
-		projector = newTurnProjector(p.ctx, p.logger, p.sessions, p.robotQuerier, p.toolRegistry, p.sessionID)
-		p.turns[event.TurnID] = projector
+	turnID, hasTurn := event.TurnID.Get()
+	var parts []openapi.StreamPart
+	if hasTurn {
+		projector := p.turns[turnID]
+		if projector == nil {
+			projector = newTurnProjector(p.ctx, p.logger, p.sessions, p.robotQuerier, p.toolRegistry, p.sessionID)
+			p.turns[turnID] = projector
+		}
+		parts = projector.project(event, p.toolRegistry)
 	}
-
-	parts := projector.project(event, p.toolRegistry)
 	if parts == nil {
 		parts = []openapi.StreamPart{}
 	}
 	streamEvent := openapi.RobotSessionStreamEvent{
 		Sequence:  event.Sequence,
-		TurnId:    openapi.Identifier(event.TurnID.String()),
 		EventKind: openapi.RobotSessionStreamEventKind(event.Kind),
 		Parts:     parts,
 	}
-	if message, ok := event.Message.Get(); ok && message.Event.Author == "user" {
+	if hasTurn {
+		id := openapi.Identifier(turnID.String())
+		streamEvent.TurnId = &id
+	}
+	if len(event.InputIDs) > 0 {
+		ids := make([]openapi.Identifier, len(event.InputIDs))
+		for i, inputID := range event.InputIDs {
+			ids[i] = openapi.Identifier(inputID.String())
+		}
+		streamEvent.InputIds = &ids
+	}
+	if message, ok := event.Message.Get(); ok && event.Kind == robot.SessionEventInputQueued {
 		serialised, err := serialiseRobotSessionMessage(message, map[string]bool{}, robotprojection.ToolMetadataFromRegistry(p.ctx, p.toolRegistry))
 		if err != nil {
 			return openapi.RobotSessionStreamEvent{}, err
@@ -257,7 +274,9 @@ func (p *sessionProjector) project(event robot.SessionEvent) (openapi.RobotSessi
 
 	switch event.Kind {
 	case robot.SessionEventTurnCompleted, robot.SessionEventTurnBlocked, robot.SessionEventTurnFailed, robot.SessionEventTurnCancelled:
-		delete(p.turns, event.TurnID)
+		if hasTurn {
+			delete(p.turns, turnID)
+		}
 	}
 	return streamEvent, nil
 }

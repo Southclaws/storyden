@@ -1574,13 +1574,67 @@ var (
 			},
 		},
 	}
+	// RobotSessionInputsColumns holds the columns for the "robot_session_inputs" table.
+	RobotSessionInputsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "sequence", Type: field.TypeUint64},
+		{Name: "source_kind", Type: field.TypeString},
+		{Name: "batch_key", Type: field.TypeString},
+		{Name: "input_data", Type: field.TypeJSON},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"queued", "claimed", "cancelled"}, Default: "queued"},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "session_id", Type: field.TypeString, Size: 20},
+		{Name: "turn_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// RobotSessionInputsTable holds the schema information for the "robot_session_inputs" table.
+	RobotSessionInputsTable = &schema.Table{
+		Name:       "robot_session_inputs",
+		Columns:    RobotSessionInputsColumns,
+		PrimaryKey: []*schema.Column{RobotSessionInputsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "robot_session_inputs_accounts_robot_session_inputs",
+				Columns:    []*schema.Column{RobotSessionInputsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "robot_session_inputs_robot_sessions_inputs",
+				Columns:    []*schema.Column{RobotSessionInputsColumns[9]},
+				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "robot_session_inputs_robot_session_turns_inputs",
+				Columns:    []*schema.Column{RobotSessionInputsColumns[10]},
+				RefColumns: []*schema.Column{RobotSessionTurnsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "robotsessioninput_session_id_status_sequence",
+				Unique:  false,
+				Columns: []*schema.Column{RobotSessionInputsColumns[9], RobotSessionInputsColumns[7], RobotSessionInputsColumns[3]},
+			},
+			{
+				Name:    "robotsessioninput_session_id_turn_id_sequence",
+				Unique:  false,
+				Columns: []*schema.Column{RobotSessionInputsColumns[9], RobotSessionInputsColumns[10], RobotSessionInputsColumns[3]},
+			},
+		},
+	}
 	// RobotSessionMessagesColumns holds the columns for the "robot_session_messages" table.
 	RobotSessionMessagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "turn_id", Type: field.TypeString, Nullable: true},
 		{Name: "sequence", Type: field.TypeUint64},
-		{Name: "event_kind", Type: field.TypeEnum, Enums: []string{"message", "turn_queued", "turn_completed", "turn_blocked", "turn_failed", "turn_cancelled"}, Default: "message"},
+		{Name: "event_kind", Type: field.TypeEnum, Enums: []string{"message", "input_queued", "turn_queued", "turn_completed", "turn_blocked", "turn_failed", "turn_cancelled"}, Default: "message"},
+		{Name: "hidden_from_projection", Type: field.TypeBool, Default: false},
+		{Name: "input_ids", Type: field.TypeJSON, Nullable: true},
 		{Name: "invocation_id", Type: field.TypeString, Nullable: true},
 		{Name: "branch", Type: field.TypeString, Nullable: true},
 		{Name: "isolation_scope", Type: field.TypeString, Nullable: true},
@@ -1599,19 +1653,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "robot_session_messages_accounts_robot_messages",
-				Columns:    []*schema.Column{RobotSessionMessagesColumns[11]},
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "robot_session_messages_robots_messages",
-				Columns:    []*schema.Column{RobotSessionMessagesColumns[12]},
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[14]},
 				RefColumns: []*schema.Column{RobotsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "robot_session_messages_robot_sessions_messages",
-				Columns:    []*schema.Column{RobotSessionMessagesColumns[13]},
+				Columns:    []*schema.Column{RobotSessionMessagesColumns[15]},
 				RefColumns: []*schema.Column{RobotSessionsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -1620,17 +1674,17 @@ var (
 			{
 				Name:    "robotsessionmessage_session_id_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionMessagesColumns[13], RobotSessionMessagesColumns[1]},
+				Columns: []*schema.Column{RobotSessionMessagesColumns[15], RobotSessionMessagesColumns[1]},
 			},
 			{
 				Name:    "robotsessionmessage_session_id_sequence",
 				Unique:  true,
-				Columns: []*schema.Column{RobotSessionMessagesColumns[13], RobotSessionMessagesColumns[3]},
+				Columns: []*schema.Column{RobotSessionMessagesColumns[15], RobotSessionMessagesColumns[3]},
 			},
 			{
 				Name:    "robotsessionmessage_session_id_turn_id_sequence",
 				Unique:  false,
-				Columns: []*schema.Column{RobotSessionMessagesColumns[13], RobotSessionMessagesColumns[2], RobotSessionMessagesColumns[3]},
+				Columns: []*schema.Column{RobotSessionMessagesColumns[15], RobotSessionMessagesColumns[2], RobotSessionMessagesColumns[3]},
 			},
 		},
 	}
@@ -2151,6 +2205,7 @@ var (
 		RobotMcpToolsTable,
 		RobotProviderModelsTable,
 		RobotSessionsTable,
+		RobotSessionInputsTable,
 		RobotSessionMessagesTable,
 		RobotSessionTurnsTable,
 		RobotSessionViewsTable,
@@ -2249,6 +2304,9 @@ func init() {
 	RobotMcpServersTable.ForeignKeys[1].RefTable = OauthRemoteConnectionsTable
 	RobotMcpToolsTable.ForeignKeys[0].RefTable = RobotMcpServersTable
 	RobotSessionsTable.ForeignKeys[0].RefTable = AccountsTable
+	RobotSessionInputsTable.ForeignKeys[0].RefTable = AccountsTable
+	RobotSessionInputsTable.ForeignKeys[1].RefTable = RobotSessionsTable
+	RobotSessionInputsTable.ForeignKeys[2].RefTable = RobotSessionTurnsTable
 	RobotSessionMessagesTable.ForeignKeys[0].RefTable = AccountsTable
 	RobotSessionMessagesTable.ForeignKeys[1].RefTable = RobotsTable
 	RobotSessionMessagesTable.ForeignKeys[2].RefTable = RobotSessionsTable

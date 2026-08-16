@@ -76,6 +76,11 @@ func Sequence(v uint64) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldSequence, v))
 }
 
+// HiddenFromProjection applies equality check predicate on the "hidden_from_projection" field. It's identical to HiddenFromProjectionEQ.
+func HiddenFromProjection(v bool) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldHiddenFromProjection, v))
+}
+
 // InvocationID applies equality check predicate on the "invocation_id" field. It's identical to InvocationIDEQ.
 func InvocationID(v string) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldEQ(FieldInvocationID, v))
@@ -359,6 +364,26 @@ func EventKindIn(vs ...EventKind) predicate.RobotSessionMessage {
 // EventKindNotIn applies the NotIn predicate on the "event_kind" field.
 func EventKindNotIn(vs ...EventKind) predicate.RobotSessionMessage {
 	return predicate.RobotSessionMessage(sql.FieldNotIn(FieldEventKind, vs...))
+}
+
+// HiddenFromProjectionEQ applies the EQ predicate on the "hidden_from_projection" field.
+func HiddenFromProjectionEQ(v bool) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldEQ(FieldHiddenFromProjection, v))
+}
+
+// HiddenFromProjectionNEQ applies the NEQ predicate on the "hidden_from_projection" field.
+func HiddenFromProjectionNEQ(v bool) predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNEQ(FieldHiddenFromProjection, v))
+}
+
+// InputIdsIsNil applies the IsNil predicate on the "input_ids" field.
+func InputIdsIsNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldIsNull(FieldInputIds))
+}
+
+// InputIdsNotNil applies the NotNil predicate on the "input_ids" field.
+func InputIdsNotNil() predicate.RobotSessionMessage {
+	return predicate.RobotSessionMessage(sql.FieldNotNull(FieldInputIds))
 }
 
 // InvocationIDEQ applies the EQ predicate on the "invocation_id" field.

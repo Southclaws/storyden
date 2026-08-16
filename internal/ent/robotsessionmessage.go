@@ -33,6 +33,10 @@ type RobotSessionMessage struct {
 	Sequence uint64 `json:"sequence,omitempty"`
 	// EventKind holds the value of the "event_kind" field.
 	EventKind robotsessionmessage.EventKind `json:"event_kind,omitempty"`
+	// Whether this runtime event is omitted from the user-facing message history.
+	HiddenFromProjection bool `json:"hidden_from_projection,omitempty"`
+	// Inputs claimed by a queued turn.
+	InputIds []xid.ID `json:"input_ids,omitempty"`
 	// Invocation ID from ADK Event
 	InvocationID string `json:"invocation_id,omitempty"`
 	// ADK agent branch path used to attribute delegated work
@@ -108,8 +112,10 @@ func (*RobotSessionMessage) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case robotsessionmessage.FieldTurnID, robotsessionmessage.FieldRobotID, robotsessionmessage.FieldAccountID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
-		case robotsessionmessage.FieldEventData:
+		case robotsessionmessage.FieldInputIds, robotsessionmessage.FieldEventData:
 			values[i] = new([]byte)
+		case robotsessionmessage.FieldHiddenFromProjection:
+			values[i] = new(sql.NullBool)
 		case robotsessionmessage.FieldSequence:
 			values[i] = new(sql.NullInt64)
 		case robotsessionmessage.FieldEventKind, robotsessionmessage.FieldInvocationID, robotsessionmessage.FieldBranch, robotsessionmessage.FieldIsolationScope, robotsessionmessage.FieldBuiltinRobot, robotsessionmessage.FieldErrorText:
@@ -169,6 +175,20 @@ func (_m *RobotSessionMessage) assignValues(columns []string, values []any) erro
 				return fmt.Errorf("unexpected type %T for field event_kind", values[i])
 			} else if value.Valid {
 				_m.EventKind = robotsessionmessage.EventKind(value.String)
+			}
+		case robotsessionmessage.FieldHiddenFromProjection:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field hidden_from_projection", values[i])
+			} else if value.Valid {
+				_m.HiddenFromProjection = value.Bool
+			}
+		case robotsessionmessage.FieldInputIds:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field input_ids", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.InputIds); err != nil {
+					return fmt.Errorf("unmarshal field input_ids: %w", err)
+				}
 			}
 		case robotsessionmessage.FieldInvocationID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -291,6 +311,12 @@ func (_m *RobotSessionMessage) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("event_kind=")
 	builder.WriteString(fmt.Sprintf("%v", _m.EventKind))
+	builder.WriteString(", ")
+	builder.WriteString("hidden_from_projection=")
+	builder.WriteString(fmt.Sprintf("%v", _m.HiddenFromProjection))
+	builder.WriteString(", ")
+	builder.WriteString("input_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.InputIds))
 	builder.WriteString(", ")
 	builder.WriteString("invocation_id=")
 	builder.WriteString(_m.InvocationID)

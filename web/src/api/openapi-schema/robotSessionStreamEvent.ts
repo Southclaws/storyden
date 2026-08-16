@@ -14,7 +14,8 @@ import type { StreamPart } from "./streamPart";
 
 export interface RobotSessionStreamEvent {
   sequence: number;
-  turn_id: Identifier;
+  turn_id?: Identifier;
+  input_ids?: Identifier[];
   event_kind: RobotSessionStreamEventKind;
   message?: RobotSessionMessage;
   parts: StreamPart[];

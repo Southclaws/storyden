@@ -5,7 +5,7 @@ import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStrea
 
 export type CommandAccepted = {
   sessionId: string;
-  turnId: string;
+  messageId: string;
   clientMessageId?: string;
   clientMessageRole?: string;
 };
@@ -42,13 +42,13 @@ function parseCommandAccepted(body: unknown): CommandAccepted | undefined {
     !body ||
     typeof body !== "object" ||
     !("sessionId" in body) ||
-    !("turnId" in body) ||
+    !("messageId" in body) ||
     typeof body.sessionId !== "string" ||
-    typeof body.turnId !== "string"
+    typeof body.messageId !== "string"
   ) {
     return;
   }
-  return { sessionId: body.sessionId, turnId: body.turnId };
+  return { sessionId: body.sessionId, messageId: body.messageId };
 }
 
 export async function observeRobotSession({
@@ -107,7 +107,9 @@ export function createDurableChatTransport<UI_MESSAGE extends UIMessage>({
 
       const accepted = parseCommandAccepted(await response.json());
       if (!accepted) {
-        throw new Error("Robot turn identity missing from command response.");
+        throw new Error(
+          "Robot message identity missing from command response.",
+        );
       }
       const clientMessage = messages[messages.length - 1];
       onCommandAccepted?.({

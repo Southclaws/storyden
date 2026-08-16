@@ -1,12 +1,11 @@
-import { describe, expect, it, vi } from "vitest";
 import type { UIMessageChunk } from "ai";
-
-import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStreamEvent";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   createDurableChatTransport,
   observeRobotSession,
 } from "./durable-chat-transport";
+import type { RobotSessionStreamEvent } from "./openapi-schema/robotSessionStreamEvent";
 
 describe("createDurableChatTransport", () => {
   it("submits a command without coupling it to the response stream", async () => {
@@ -14,12 +13,11 @@ describe("createDurableChatTransport", () => {
     const fetchClient = vi.fn<typeof fetch>(async () => {
       return new Response(
         JSON.stringify({
-          streamUrl:
-            "http://api.test/api/robots/sessions/session-1/turns/turn-1",
+          streamUrl: "http://api.test/api/robots/sessions/session-1/stream",
           sessionId: "session-1",
-          turnId: "turn-1",
+          messageId: "message-1",
         }),
-        { status: 201, headers: { "Content-Type": "application/json" } },
+        { status: 202, headers: { "Content-Type": "application/json" } },
       );
     });
     const transport = createDurableChatTransport({
@@ -42,7 +40,7 @@ describe("createDurableChatTransport", () => {
     expect(fetchClient).toHaveBeenCalledTimes(1);
     expect(onCommandAccepted).toHaveBeenCalledWith({
       sessionId: "session-1",
-      turnId: "turn-1",
+      messageId: "message-1",
       clientMessageId: "message-1",
       clientMessageRole: "user",
     });

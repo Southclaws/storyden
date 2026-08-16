@@ -39,7 +39,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/robot/workspaceprovider"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/lib/mcp"
 )
 
 func Build() fx.Option {
@@ -174,7 +173,7 @@ func (s *Agent) Run(
 	userID,
 	sessionID string,
 	content *genai.Content,
-	chatContext *mcp.RobotChatContext,
+	invocationContext InvocationContext,
 	options ...RunOptions,
 ) iter.Seq2[*adksession.Event, error] {
 	runOptions := resolveRunOptions(options)
@@ -189,7 +188,7 @@ func (s *Agent) Run(
 		return errorSeq(err)
 	}
 
-	return s.runResolvedAgent(ctx, spec, userID, sessionID, content, chatContext, runOptions)
+	return s.runResolvedAgent(ctx, spec, userID, sessionID, content, invocationContext, runOptions)
 }
 
 // PrepareSession creates a shared Robot session when needed and records the
@@ -291,7 +290,7 @@ func (s *Agent) runResolvedAgent(
 	userID string,
 	sessionID string,
 	content *genai.Content,
-	chatContext *mcp.RobotChatContext,
+	invocationContext InvocationContext,
 	runOptions RunOptions,
 ) iter.Seq2[*adksession.Event, error] {
 	var llm model.LLM
@@ -390,7 +389,7 @@ func (s *Agent) runResolvedAgent(
 		Name:                      spec.AgentName,
 		Description:               spec.Description,
 		SubAgents:                 subAgents,
-		GlobalInstructionProvider: s.globalInstructionProvider(chatContext, runOptions),
+		GlobalInstructionProvider: s.globalInstructionProvider(invocationContext, runOptions),
 		InstructionProvider:       robotInstructionProvider(spec, identityContext),
 		Model:                     llm,
 		Mode:                      llmagent.ModeChat,

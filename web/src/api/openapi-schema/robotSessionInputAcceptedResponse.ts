@@ -7,11 +7,9 @@
  *
  * OpenAPI spec version: v1.26.15-post
  */
-import type { Identifier } from "./identifier";
+import type { RobotSessionInputReference } from "./robotSessionInputReference";
 
-export interface RobotSessionStreamReference {
-  /** Relative URL of the Robot turn stream. */
-  streamUrl: string;
-  sessionId: Identifier;
-  turnId: Identifier;
-}
+/**
+ * Robot session message accepted for asynchronous processing.
+ */
+export type RobotSessionInputAcceptedResponse = RobotSessionInputReference;

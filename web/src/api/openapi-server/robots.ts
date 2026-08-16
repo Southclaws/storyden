@@ -33,7 +33,7 @@ import type {
   RobotProvidersListOKResponse,
   RobotSessionGetOKResponse,
   RobotSessionGetParams,
-  RobotSessionStreamCreatedResponse,
+  RobotSessionInputAcceptedResponse,
   RobotSessionStreamHeadParams,
   RobotSessionStreamMetadataResponse,
   RobotSessionStreamParams,
@@ -1499,9 +1499,9 @@ export const robotDelete = async (
   });
 };
 
-export type robotSessionCreateResponse201 = {
-  data: RobotSessionStreamCreatedResponse;
-  status: 201;
+export type robotSessionCreateResponse202 = {
+  data: RobotSessionInputAcceptedResponse;
+  status: 202;
 };
 
 export type robotSessionCreateResponse400 = {
@@ -1531,11 +1531,11 @@ export type robotSessionCreateResponse409 = {
 
 export type robotSessionCreateResponseDefault = {
   data: InternalServerErrorResponse;
-  status: Exclude<HTTPStatusCodes, 201 | 400 | 401 | 403 | 404 | 409>;
+  status: Exclude<HTTPStatusCodes, 202 | 400 | 401 | 403 | 404 | 409>;
 };
 
 export type robotSessionCreateResponseSuccess =
-  robotSessionCreateResponse201 & {
+  robotSessionCreateResponse202 & {
     headers: Headers;
   };
 export type robotSessionCreateResponseError = (
@@ -1554,13 +1554,14 @@ export const getRobotSessionCreateUrl = () => {
 };
 
 /**
- * Start a turn in a Robot session. The session is created when it does
+ * Queue a message in a Robot session. The session is created when it does
  * not already exist. New sessions use Denbot unless `robotId` selects a
  * custom Robot, which then remains the root Robot for the session.
  *
- * The turn runs asynchronously. The response identifies the turn stream
- * that clients can read immediately and resume later.
- * @summary Start a Robot session turn
+ * Submission is asynchronous. The response identifies the accepted
+ * message and the session stream. Compatible queued messages may later be
+ * consumed together by one Robot turn.
+ * @summary Submit a Robot session message
  */
 export const robotSessionCreate = async (
   robotChatStartBody: RobotChatStartBody,

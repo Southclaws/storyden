@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -99,6 +100,38 @@ func (_u *RobotSessionMessageUpdate) SetNillableEventKind(v *robotsessionmessage
 	if v != nil {
 		_u.SetEventKind(*v)
 	}
+	return _u
+}
+
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (_u *RobotSessionMessageUpdate) SetHiddenFromProjection(v bool) *RobotSessionMessageUpdate {
+	_u.mutation.SetHiddenFromProjection(v)
+	return _u
+}
+
+// SetNillableHiddenFromProjection sets the "hidden_from_projection" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdate) SetNillableHiddenFromProjection(v *bool) *RobotSessionMessageUpdate {
+	if v != nil {
+		_u.SetHiddenFromProjection(*v)
+	}
+	return _u
+}
+
+// SetInputIds sets the "input_ids" field.
+func (_u *RobotSessionMessageUpdate) SetInputIds(v []xid.ID) *RobotSessionMessageUpdate {
+	_u.mutation.SetInputIds(v)
+	return _u
+}
+
+// AppendInputIds appends value to the "input_ids" field.
+func (_u *RobotSessionMessageUpdate) AppendInputIds(v []xid.ID) *RobotSessionMessageUpdate {
+	_u.mutation.AppendInputIds(v)
+	return _u
+}
+
+// ClearInputIds clears the value of the "input_ids" field.
+func (_u *RobotSessionMessageUpdate) ClearInputIds() *RobotSessionMessageUpdate {
+	_u.mutation.ClearInputIds()
 	return _u
 }
 
@@ -387,6 +420,20 @@ func (_u *RobotSessionMessageUpdate) sqlSave(ctx context.Context) (_node int, er
 	if value, ok := _u.mutation.EventKind(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
 	}
+	if value, ok := _u.mutation.HiddenFromProjection(); ok {
+		_spec.SetField(robotsessionmessage.FieldHiddenFromProjection, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.InputIds(); ok {
+		_spec.SetField(robotsessionmessage.FieldInputIds, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedInputIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, robotsessionmessage.FieldInputIds, value)
+		})
+	}
+	if _u.mutation.InputIdsCleared() {
+		_spec.ClearField(robotsessionmessage.FieldInputIds, field.TypeJSON)
+	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)
 	}
@@ -598,6 +645,38 @@ func (_u *RobotSessionMessageUpdateOne) SetNillableEventKind(v *robotsessionmess
 	if v != nil {
 		_u.SetEventKind(*v)
 	}
+	return _u
+}
+
+// SetHiddenFromProjection sets the "hidden_from_projection" field.
+func (_u *RobotSessionMessageUpdateOne) SetHiddenFromProjection(v bool) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetHiddenFromProjection(v)
+	return _u
+}
+
+// SetNillableHiddenFromProjection sets the "hidden_from_projection" field if the given value is not nil.
+func (_u *RobotSessionMessageUpdateOne) SetNillableHiddenFromProjection(v *bool) *RobotSessionMessageUpdateOne {
+	if v != nil {
+		_u.SetHiddenFromProjection(*v)
+	}
+	return _u
+}
+
+// SetInputIds sets the "input_ids" field.
+func (_u *RobotSessionMessageUpdateOne) SetInputIds(v []xid.ID) *RobotSessionMessageUpdateOne {
+	_u.mutation.SetInputIds(v)
+	return _u
+}
+
+// AppendInputIds appends value to the "input_ids" field.
+func (_u *RobotSessionMessageUpdateOne) AppendInputIds(v []xid.ID) *RobotSessionMessageUpdateOne {
+	_u.mutation.AppendInputIds(v)
+	return _u
+}
+
+// ClearInputIds clears the value of the "input_ids" field.
+func (_u *RobotSessionMessageUpdateOne) ClearInputIds() *RobotSessionMessageUpdateOne {
+	_u.mutation.ClearInputIds()
 	return _u
 }
 
@@ -915,6 +994,20 @@ func (_u *RobotSessionMessageUpdateOne) sqlSave(ctx context.Context) (_node *Rob
 	}
 	if value, ok := _u.mutation.EventKind(); ok {
 		_spec.SetField(robotsessionmessage.FieldEventKind, field.TypeEnum, value)
+	}
+	if value, ok := _u.mutation.HiddenFromProjection(); ok {
+		_spec.SetField(robotsessionmessage.FieldHiddenFromProjection, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.InputIds(); ok {
+		_spec.SetField(robotsessionmessage.FieldInputIds, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedInputIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, robotsessionmessage.FieldInputIds, value)
+		})
+	}
+	if _u.mutation.InputIdsCleared() {
+		_spec.ClearField(robotsessionmessage.FieldInputIds, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.InvocationID(); ok {
 		_spec.SetField(robotsessionmessage.FieldInvocationID, field.TypeString, value)

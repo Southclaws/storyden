@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -219,6 +220,21 @@ func (_c *RobotSessionCreate) AddMessages(v ...*RobotSessionMessage) *RobotSessi
 		ids[i] = v[i].ID
 	}
 	return _c.AddMessageIDs(ids...)
+}
+
+// AddInputIDs adds the "inputs" edge to the RobotSessionInput entity by IDs.
+func (_c *RobotSessionCreate) AddInputIDs(ids ...xid.ID) *RobotSessionCreate {
+	_c.mutation.AddInputIDs(ids...)
+	return _c
+}
+
+// AddInputs adds the "inputs" edges to the RobotSessionInput entity.
+func (_c *RobotSessionCreate) AddInputs(v ...*RobotSessionInput) *RobotSessionCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddInputIDs(ids...)
 }
 
 // AddTurnIDs adds the "turns" edge to the RobotSessionTurn entity by IDs.
@@ -455,6 +471,22 @@ func (_c *RobotSessionCreate) createSpec() (*RobotSession, *sqlgraph.CreateSpec)
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.InputsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

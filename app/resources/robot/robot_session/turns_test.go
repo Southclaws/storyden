@@ -119,6 +119,12 @@ func TestQueuedTurnClaimIsIdempotentAndRecoverable(t *testing.T) {
 
 			first, err := repo.AcquireQueuedTurnExecution(ctx, sessionID, xid.ID(turnID), false, -time.Second)
 			require.NoError(t, err)
+			recoverable, err := repo.RecoverableTurn(ctx, sessionID)
+			require.NoError(t, err)
+			assert.Equal(t, turnID, recoverable.ID)
+			runnable, err := repo.RunnableSessionIDs(ctx, robot.SessionEventPageSize)
+			require.NoError(t, err)
+			assert.Contains(t, runnable, sessionID)
 			recovered, err := repo.AcquireQueuedTurnExecution(ctx, sessionID, xid.ID(turnID), false, time.Minute)
 			require.NoError(t, err)
 			assert.Greater(t, recovered.Generation, first.Generation)

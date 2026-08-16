@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/robot"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_robot_session "github.com/Southclaws/storyden/internal/ent/robotsession"
+	ent_robot_session_input "github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	ent_robot_session_view "github.com/Southclaws/storyden/internal/ent/robotsessionview"
 	entschema "github.com/Southclaws/storyden/internal/ent/schema"
@@ -148,7 +149,11 @@ func (q *Repository) AppendMessage(
 			if err != nil {
 				return err
 			}
-			return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr)
+			hidden, err := shouldHideRuntimeInput(ctx, tx, leasePtr, storedEvent)
+			if err != nil {
+				return err
+			}
+			return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr, ent_robot_session_message.EventKindMessage, hidden)
 		})
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -181,7 +186,11 @@ func (q *Repository) AppendMessage(
 			return err
 		}
 
-		return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr)
+		hidden, err := shouldHideRuntimeInput(ctx, tx, leasePtr, storedEvent)
+		if err != nil {
+			return err
+		}
+		return saveMessage(ctx, tx.RobotSessionMessage.Create(), sessionID, accountID, actor, storedEvent, sequence, leasePtr, ent_robot_session_message.EventKindMessage, hidden)
 	})
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -198,11 +207,14 @@ func saveMessage(
 	event *adksession.Event,
 	sequence uint64,
 	lease *ExecutionLease,
+	eventKind ent_robot_session_message.EventKind,
+	hiddenFromProjection bool,
 ) error {
 	create = create.
 		SetSessionID(xid.ID(sessionID)).
 		SetSequence(sequence).
-		SetEventKind(ent_robot_session_message.EventKindMessage).
+		SetEventKind(eventKind).
+		SetHiddenFromProjection(hiddenFromProjection).
 		SetInvocationID(event.InvocationID).
 		SetEventData(entschema.NewRobotSessionEvent(*event))
 	if lease != nil {
@@ -229,6 +241,22 @@ func saveMessage(
 	}
 
 	return nil
+}
+
+// ADK persists the effective input at the start of every run. The visible
+// inputs were already appended individually when they were queued, so exposing
+// this event would duplicate them as one merged message. Tool responses also
+// use the user role, but remain part of the visible conversation history.
+func shouldHideRuntimeInput(ctx context.Context, tx *ent.Tx, lease *ExecutionLease, event *adksession.Event) (bool, error) {
+	if lease == nil || event.Author != "user" || event.Content == nil {
+		return false, nil
+	}
+	for _, part := range event.Content.Parts {
+		if part != nil && part.FunctionResponse != nil {
+			return false, nil
+		}
+	}
+	return tx.RobotSessionInput.Query().Where(ent_robot_session_input.TurnIDEQ(lease.TurnID)).Exist(ctx)
 }
 
 // eventForPersistence applies ADK's session-state contract without mutating

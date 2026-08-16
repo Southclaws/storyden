@@ -203,16 +203,18 @@ func (q *Repository) ReadSessionEvents(ctx context.Context, sessionID robot.Sess
 func mapSessionEvents(rows []*ent.RobotSessionMessage) ([]robot.SessionEvent, error) {
 	events := make([]robot.SessionEvent, 0, len(rows))
 	for _, row := range rows {
-		if row.TurnID == nil {
-			continue
-		}
 		event := robot.SessionEvent{
 			Sequence:  row.Sequence,
 			Kind:      robot.SessionEventKind(row.EventKind),
-			TurnID:    robot.TurnID(*row.TurnID),
 			ErrorText: opt.NewPtr(row.ErrorText),
 		}
-		if row.EventKind == ent_robot_session_message.EventKindMessage {
+		if row.TurnID != nil {
+			event.TurnID = opt.New(robot.TurnID(*row.TurnID))
+		}
+		for _, id := range row.InputIds {
+			event.InputIDs = append(event.InputIDs, robot.InputID(id))
+		}
+		if row.EventKind == ent_robot_session_message.EventKindMessage || row.EventKind == ent_robot_session_message.EventKindInputQueued {
 			message, err := robot.MapMessage(row)
 			if err != nil {
 				return nil, err

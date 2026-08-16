@@ -42,6 +42,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -890,6 +891,21 @@ func (_c *AccountCreate) AddRobotMessages(v ...*RobotSessionMessage) *AccountCre
 		ids[i] = v[i].ID
 	}
 	return _c.AddRobotMessageIDs(ids...)
+}
+
+// AddRobotSessionInputIDs adds the "robot_session_inputs" edge to the RobotSessionInput entity by IDs.
+func (_c *AccountCreate) AddRobotSessionInputIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRobotSessionInputIDs(ids...)
+	return _c
+}
+
+// AddRobotSessionInputs adds the "robot_session_inputs" edges to the RobotSessionInput entity.
+func (_c *AccountCreate) AddRobotSessionInputs(v ...*RobotSessionInput) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRobotSessionInputIDs(ids...)
 }
 
 // AddInitiatedRobotTurnIDs adds the "initiated_robot_turns" edge to the RobotSessionTurn entity by IDs.
@@ -1824,6 +1840,22 @@ func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.RobotSessionInputsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.RobotSessionInputsTable,
+			Columns: []string{account.RobotSessionInputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

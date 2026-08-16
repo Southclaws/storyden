@@ -210,4 +210,84 @@ test.describe("Robot Chat — session stream", () => {
       await viewer.context.close();
     }
   });
+
+  test("messages submitted during a turn queue visibly and share the next turn", async ({
+    browser,
+    page: sender,
+  }) => {
+    const suffix = Date.now();
+    const scriptName = `e2e-session-message-queue-${suffix}.yaml`;
+    const scriptPath = `${ROBOT_SCRIPT_DIR}/${scriptName}`;
+    const viewer = await createIndependentCurrentMemberPage(browser);
+
+    try {
+      await writeFile(
+        scriptPath,
+        `steps:
+  - match:
+      contains: "start the long active turn"
+    respond:
+      delay_ms: 5000
+      text: "The active turn completed."
+      finish: "stop"
+  - match:
+      contains: "first queued follow-up"
+    respond:
+      text: "The queued batch completed."
+      finish: "stop"
+`,
+      );
+      await setupRobotProviderWithScript(`mock/../robot/scripts/${scriptName}`);
+
+      await sender.goto("/robots/chats/new");
+      await sendMessage(sender, "start the long active turn");
+      await waitForPersistedChatRoute(sender);
+      const sessionURL = new URL(sender.url()).pathname;
+      await expect(sender.getByText("Denbot is responding...")).toBeVisible();
+
+      await viewer.page.goto(sessionURL);
+      await expect(
+        viewer.page.getByText("Denbot is responding..."),
+      ).toBeVisible({ timeout: 15000 });
+
+      const input = sender.getByPlaceholder("Type a message...");
+      await expect(input).toBeEnabled();
+      await sendMessage(sender, "first queued follow-up", {
+        waitForIdle: false,
+      });
+      await sendMessage(sender, "second queued follow-up", {
+        waitForIdle: false,
+      });
+
+      await expect(sender.getByText("2 messages queued")).toBeVisible({
+        timeout: 15000,
+      });
+      for (const text of [
+        "first queued follow-up",
+        "second queued follow-up",
+      ]) {
+        await expect(
+          messageLog(viewer.page)
+            .getByRole("article", { name: "You message" })
+            .filter({ hasText: text }),
+        ).toBeVisible({ timeout: 15000 });
+      }
+
+      await expect(sender.getByText("The active turn completed.")).toBeVisible({
+        timeout: 15000,
+      });
+      await expect(sender.getByText("The queued batch completed.")).toHaveCount(
+        1,
+        { timeout: 15000 },
+      );
+      await expect(
+        viewer.page.getByText("The queued batch completed."),
+      ).toHaveCount(1, { timeout: 15000 });
+      await expect(sender.getByText(/messages? queued/)).toHaveCount(0);
+    } finally {
+      await viewer.context.close();
+      await unlink(scriptPath).catch(() => undefined);
+      await setupRobotProviderWithScript(DEFAULT_ROBOT_MODEL);
+    }
+  });
 });

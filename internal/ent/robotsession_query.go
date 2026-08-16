@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -31,6 +32,7 @@ type RobotSessionQuery struct {
 	withCreator  *AccountQuery
 	withViews    *RobotSessionViewQuery
 	withMessages *RobotSessionMessageQuery
+	withInputs   *RobotSessionInputQuery
 	withTurns    *RobotSessionTurnQuery
 	modifiers    []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -128,6 +130,28 @@ func (_q *RobotSessionQuery) QueryMessages() *RobotSessionMessageQuery {
 			sqlgraph.From(robotsession.Table, robotsession.FieldID, selector),
 			sqlgraph.To(robotsessionmessage.Table, robotsessionmessage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, robotsession.MessagesTable, robotsession.MessagesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInputs chains the current query on the "inputs" edge.
+func (_q *RobotSessionQuery) QueryInputs() *RobotSessionInputQuery {
+	query := (&RobotSessionInputClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(robotsession.Table, robotsession.FieldID, selector),
+			sqlgraph.To(robotsessioninput.Table, robotsessioninput.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, robotsession.InputsTable, robotsession.InputsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -352,6 +376,7 @@ func (_q *RobotSessionQuery) Clone() *RobotSessionQuery {
 		withCreator:  _q.withCreator.Clone(),
 		withViews:    _q.withViews.Clone(),
 		withMessages: _q.withMessages.Clone(),
+		withInputs:   _q.withInputs.Clone(),
 		withTurns:    _q.withTurns.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -390,6 +415,17 @@ func (_q *RobotSessionQuery) WithMessages(opts ...func(*RobotSessionMessageQuery
 		opt(query)
 	}
 	_q.withMessages = query
+	return _q
+}
+
+// WithInputs tells the query-builder to eager-load the nodes that are connected to
+// the "inputs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *RobotSessionQuery) WithInputs(opts ...func(*RobotSessionInputQuery)) *RobotSessionQuery {
+	query := (&RobotSessionInputClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withInputs = query
 	return _q
 }
 
@@ -482,10 +518,11 @@ func (_q *RobotSessionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	var (
 		nodes       = []*RobotSession{}
 		_spec       = _q.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			_q.withCreator != nil,
 			_q.withViews != nil,
 			_q.withMessages != nil,
+			_q.withInputs != nil,
 			_q.withTurns != nil,
 		}
 	)
@@ -527,6 +564,13 @@ func (_q *RobotSessionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		if err := _q.loadMessages(ctx, query, nodes,
 			func(n *RobotSession) { n.Edges.Messages = []*RobotSessionMessage{} },
 			func(n *RobotSession, e *RobotSessionMessage) { n.Edges.Messages = append(n.Edges.Messages, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withInputs; query != nil {
+		if err := _q.loadInputs(ctx, query, nodes,
+			func(n *RobotSession) { n.Edges.Inputs = []*RobotSessionInput{} },
+			func(n *RobotSession, e *RobotSessionInput) { n.Edges.Inputs = append(n.Edges.Inputs, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -614,6 +658,36 @@ func (_q *RobotSessionQuery) loadMessages(ctx context.Context, query *RobotSessi
 	}
 	query.Where(predicate.RobotSessionMessage(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(robotsession.MessagesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.SessionID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "session_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *RobotSessionQuery) loadInputs(ctx context.Context, query *RobotSessionInputQuery, nodes []*RobotSession, init func(*RobotSession), assign func(*RobotSession, *RobotSessionInput)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*RobotSession)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robotsessioninput.FieldSessionID)
+	}
+	query.Where(predicate.RobotSessionInput(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(robotsession.InputsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

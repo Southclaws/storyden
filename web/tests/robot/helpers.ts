@@ -32,7 +32,11 @@ export async function goToNewChat(page: Page) {
   await page.goto("/robots/chats/new");
 }
 
-export async function sendMessage(page: Page, text: string) {
+export async function sendMessage(
+  page: Page,
+  text: string,
+  options: { waitForIdle?: boolean } = {},
+) {
   const respondingStatus = page
     .getByRole("status")
     .filter({ hasText: /is responding/ });
@@ -42,7 +46,9 @@ export async function sendMessage(page: Page, text: string) {
       hasText: text,
     });
 
-  await expect(respondingStatus).toHaveCount(0, { timeout: 15000 });
+  if (options.waitForIdle ?? true) {
+    await expect(respondingStatus).toHaveCount(0, { timeout: 15000 });
+  }
 
   await expect(async () => {
     const textarea = page.getByPlaceholder("Type a message...");

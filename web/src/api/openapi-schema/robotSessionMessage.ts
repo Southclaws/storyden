@@ -14,6 +14,8 @@ import type { UIMessage } from "./uIMessage";
 export type RobotSessionMessage = UIMessage & {
   /** When the message was sent */
   created_at: string;
+  /** Whether this message is waiting to be claimed by a Robot turn. */
+  queued: boolean;
   /** Robot that generated this message */
   robot?: RobotReference;
   /** Human author of the message */

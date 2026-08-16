@@ -797,6 +797,29 @@ func HasInitiatorWith(preds ...predicate.Account) predicate.RobotSessionTurn {
 	})
 }
 
+// HasInputs applies the HasEdge predicate on the "inputs" edge.
+func HasInputs() predicate.RobotSessionTurn {
+	return predicate.RobotSessionTurn(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InputsTable, InputsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInputsWith applies the HasEdge predicate on the "inputs" edge with a given conditions (other predicates).
+func HasInputsWith(preds ...predicate.RobotSessionInput) predicate.RobotSessionTurn {
+	return predicate.RobotSessionTurn(func(s *sql.Selector) {
+		step := newInputsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.RobotSessionTurn) predicate.RobotSessionTurn {
 	return predicate.RobotSessionTurn(sql.AndPredicates(predicates...))

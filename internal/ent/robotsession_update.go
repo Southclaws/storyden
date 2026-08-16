@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -237,6 +238,21 @@ func (_u *RobotSessionUpdate) AddMessages(v ...*RobotSessionMessage) *RobotSessi
 	return _u.AddMessageIDs(ids...)
 }
 
+// AddInputIDs adds the "inputs" edge to the RobotSessionInput entity by IDs.
+func (_u *RobotSessionUpdate) AddInputIDs(ids ...xid.ID) *RobotSessionUpdate {
+	_u.mutation.AddInputIDs(ids...)
+	return _u
+}
+
+// AddInputs adds the "inputs" edges to the RobotSessionInput entity.
+func (_u *RobotSessionUpdate) AddInputs(v ...*RobotSessionInput) *RobotSessionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddInputIDs(ids...)
+}
+
 // AddTurnIDs adds the "turns" edge to the RobotSessionTurn entity by IDs.
 func (_u *RobotSessionUpdate) AddTurnIDs(ids ...xid.ID) *RobotSessionUpdate {
 	_u.mutation.AddTurnIDs(ids...)
@@ -303,6 +319,27 @@ func (_u *RobotSessionUpdate) RemoveMessages(v ...*RobotSessionMessage) *RobotSe
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMessageIDs(ids...)
+}
+
+// ClearInputs clears all "inputs" edges to the RobotSessionInput entity.
+func (_u *RobotSessionUpdate) ClearInputs() *RobotSessionUpdate {
+	_u.mutation.ClearInputs()
+	return _u
+}
+
+// RemoveInputIDs removes the "inputs" edge to RobotSessionInput entities by IDs.
+func (_u *RobotSessionUpdate) RemoveInputIDs(ids ...xid.ID) *RobotSessionUpdate {
+	_u.mutation.RemoveInputIDs(ids...)
+	return _u
+}
+
+// RemoveInputs removes "inputs" edges to RobotSessionInput entities.
+func (_u *RobotSessionUpdate) RemoveInputs(v ...*RobotSessionInput) *RobotSessionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveInputIDs(ids...)
 }
 
 // ClearTurns clears all "turns" edges to the RobotSessionTurn entity.
@@ -550,6 +587,51 @@ func (_u *RobotSessionUpdate) sqlSave(ctx context.Context) (_node int, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.InputsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedInputsIDs(); len(nodes) > 0 && !_u.mutation.InputsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InputsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -827,6 +909,21 @@ func (_u *RobotSessionUpdateOne) AddMessages(v ...*RobotSessionMessage) *RobotSe
 	return _u.AddMessageIDs(ids...)
 }
 
+// AddInputIDs adds the "inputs" edge to the RobotSessionInput entity by IDs.
+func (_u *RobotSessionUpdateOne) AddInputIDs(ids ...xid.ID) *RobotSessionUpdateOne {
+	_u.mutation.AddInputIDs(ids...)
+	return _u
+}
+
+// AddInputs adds the "inputs" edges to the RobotSessionInput entity.
+func (_u *RobotSessionUpdateOne) AddInputs(v ...*RobotSessionInput) *RobotSessionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddInputIDs(ids...)
+}
+
 // AddTurnIDs adds the "turns" edge to the RobotSessionTurn entity by IDs.
 func (_u *RobotSessionUpdateOne) AddTurnIDs(ids ...xid.ID) *RobotSessionUpdateOne {
 	_u.mutation.AddTurnIDs(ids...)
@@ -893,6 +990,27 @@ func (_u *RobotSessionUpdateOne) RemoveMessages(v ...*RobotSessionMessage) *Robo
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveMessageIDs(ids...)
+}
+
+// ClearInputs clears all "inputs" edges to the RobotSessionInput entity.
+func (_u *RobotSessionUpdateOne) ClearInputs() *RobotSessionUpdateOne {
+	_u.mutation.ClearInputs()
+	return _u
+}
+
+// RemoveInputIDs removes the "inputs" edge to RobotSessionInput entities by IDs.
+func (_u *RobotSessionUpdateOne) RemoveInputIDs(ids ...xid.ID) *RobotSessionUpdateOne {
+	_u.mutation.RemoveInputIDs(ids...)
+	return _u
+}
+
+// RemoveInputs removes "inputs" edges to RobotSessionInput entities.
+func (_u *RobotSessionUpdateOne) RemoveInputs(v ...*RobotSessionInput) *RobotSessionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveInputIDs(ids...)
 }
 
 // ClearTurns clears all "turns" edges to the RobotSessionTurn entity.
@@ -1170,6 +1288,51 @@ func (_u *RobotSessionUpdateOne) sqlSave(ctx context.Context) (_node *RobotSessi
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(robotsessionmessage.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.InputsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedInputsIDs(); len(nodes) > 0 && !_u.mutation.InputsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.InputsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   robotsession.InputsTable,
+			Columns: []string{robotsession.InputsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(robotsessioninput.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

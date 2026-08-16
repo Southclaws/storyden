@@ -25,6 +25,7 @@ const (
 	mockModelLLMError        = "mock/../scripts/robot-chat-llm-error.yaml"
 	mockModelAck             = "mock/../scripts/robot-chat-ack.yaml"
 	mockModelDelayed         = "mock/../scripts/robot-chat-delayed.yaml"
+	mockModelQueue           = "mock/../scripts/robot-chat-queue.yaml"
 
 	mockModelLibrarySearchPages = "mock/../scripts/robot-chat-library-search-pages.yaml"
 	mockModelContentSearch      = "mock/../scripts/robot-chat-content-search.yaml"
@@ -57,6 +58,11 @@ type fullResponse struct {
 	usedLiveSSE bool
 }
 
+type acceptedInput struct {
+	location  string
+	reference openapi.RobotSessionInputReference
+}
+
 type delegationStreamData struct {
 	StreamID string                 `json:"-"`
 	CallID   string                 `json:"callId"`
@@ -74,6 +80,18 @@ func doChat(
 	session openapi.RequestEditorFn,
 	sessionID, robotID, message string,
 ) *fullResponse {
+	t.Helper()
+	accepted := enqueueChatMessage(t, ctx, ts, session, sessionID, robotID, message)
+	return readDurableChatParts(t, ctx, ts, session, accepted)
+}
+
+func enqueueChatMessage(
+	t *testing.T,
+	ctx context.Context,
+	ts *httptest.Server,
+	session openapi.RequestEditorFn,
+	sessionID, robotID, message string,
+) acceptedInput {
 	t.Helper()
 
 	var textPart openapi.UIMessagePart
@@ -100,8 +118,8 @@ func doChat(
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusCreated, resp.StatusCode)
-	return readDurableChatParts(t, ctx, ts, session, resp)
+	require.Equal(t, http.StatusAccepted, resp.StatusCode)
+	return decodeAcceptedInput(t, resp)
 }
 
 func doChatToolOutput(
@@ -158,8 +176,17 @@ func doChatToolOutputs(
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	require.Equal(t, http.StatusCreated, resp.StatusCode)
-	return readDurableChatParts(t, ctx, ts, session, resp)
+	require.Equal(t, http.StatusAccepted, resp.StatusCode)
+	return readDurableChatParts(t, ctx, ts, session, decodeAcceptedInput(t, resp))
+}
+
+func decodeAcceptedInput(t *testing.T, response *http.Response) acceptedInput {
+	t.Helper()
+	location := response.Header.Get("Location")
+	require.NotEmpty(t, location)
+	var reference openapi.RobotSessionInputReference
+	require.NoError(t, json.NewDecoder(response.Body).Decode(&reference))
+	return acceptedInput{location: location, reference: reference}
 }
 
 func readDurableChatParts(
@@ -167,15 +194,30 @@ func readDurableChatParts(
 	ctx context.Context,
 	ts *httptest.Server,
 	session openapi.RequestEditorFn,
-	created *http.Response,
+	accepted acceptedInput,
 ) *fullResponse {
 	t.Helper()
 
-	location := created.Header.Get("Location")
-	require.NotEmpty(t, location)
-	read, err := robottest.ReadDurableJSON[openapi.StreamPart](ctx, ts.URL+location, session)
+	var turnID string
+	read, err := robottest.ReadDurableJSONUntil[openapi.RobotSessionStreamEvent](ctx, ts.URL+accepted.location, session, "-1", func(event openapi.RobotSessionStreamEvent) bool {
+		if turnID == "" && event.InputIds != nil {
+			for _, inputID := range *event.InputIds {
+				if inputID == accepted.reference.MessageId && event.TurnId != nil {
+					turnID = string(*event.TurnId)
+				}
+			}
+		}
+		return turnID != "" && event.TurnId != nil && string(*event.TurnId) == turnID && (event.EventKind == openapi.TurnCompleted || event.EventKind == openapi.TurnBlocked || event.EventKind == openapi.TurnFailed || event.EventKind == openapi.TurnCancelled)
+	})
 	require.NoError(t, err)
-	return &fullResponse{parts: read.Items, usedLiveSSE: read.UsedLiveSSE}
+	parts := []openapi.StreamPart{}
+	for _, event := range read.Items {
+		if event.TurnId == nil || string(*event.TurnId) != turnID {
+			continue
+		}
+		parts = append(parts, event.Parts...)
+	}
+	return &fullResponse{parts: parts, usedLiveSSE: read.UsedLiveSSE}
 }
 
 func collectToolInputs(ev *fullResponse) []openapi.ToolInputAvailablePart {

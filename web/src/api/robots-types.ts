@@ -37,7 +37,12 @@ export type StorydenUIMessage = UIMessage<
   Partial<
     Pick<
       RobotSessionMessage,
-      "created_at" | "robot" | "author" | "branch" | "isolation_scope"
+      | "created_at"
+      | "queued"
+      | "robot"
+      | "author"
+      | "branch"
+      | "isolation_scope"
     >
   >;
 

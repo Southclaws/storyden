@@ -700,6 +700,29 @@ func HasMessagesWith(preds ...predicate.RobotSessionMessage) predicate.RobotSess
 	})
 }
 
+// HasInputs applies the HasEdge predicate on the "inputs" edge.
+func HasInputs() predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InputsTable, InputsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInputsWith applies the HasEdge predicate on the "inputs" edge with a given conditions (other predicates).
+func HasInputsWith(preds ...predicate.RobotSessionInput) predicate.RobotSession {
+	return predicate.RobotSession(func(s *sql.Selector) {
+		step := newInputsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasTurns applies the HasEdge predicate on the "turns" edge.
 func HasTurns() predicate.RobotSession {
 	return predicate.RobotSession(func(s *sql.Selector) {

@@ -43,6 +43,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/robot"
 	"github.com/Southclaws/storyden/internal/ent/robotmcpserver"
 	"github.com/Southclaws/storyden/internal/ent/robotsession"
+	"github.com/Southclaws/storyden/internal/ent/robotsessioninput"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionturn"
 	"github.com/Southclaws/storyden/internal/ent/robotsessionview"
@@ -107,6 +108,7 @@ type AccountQuery struct {
 	withCreatedRobotSessions              *RobotSessionQuery
 	withRobotSessionViews                 *RobotSessionViewQuery
 	withRobotMessages                     *RobotSessionMessageQuery
+	withRobotSessionInputs                *RobotSessionInputQuery
 	withInitiatedRobotTurns               *RobotSessionTurnQuery
 	withAccountRoles                      *AccountRolesQuery
 	modifiers                             []func(*sql.Selector)
@@ -1114,6 +1116,28 @@ func (_q *AccountQuery) QueryRobotMessages() *RobotSessionMessageQuery {
 	return query
 }
 
+// QueryRobotSessionInputs chains the current query on the "robot_session_inputs" edge.
+func (_q *AccountQuery) QueryRobotSessionInputs() *RobotSessionInputQuery {
+	query := (&RobotSessionInputClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(robotsessioninput.Table, robotsessioninput.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.RobotSessionInputsTable, account.RobotSessionInputsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryInitiatedRobotTurns chains the current query on the "initiated_robot_turns" edge.
 func (_q *AccountQuery) QueryInitiatedRobotTurns() *RobotSessionTurnQuery {
 	query := (&RobotSessionTurnClient{config: _q.config}).Query()
@@ -1394,6 +1418,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withCreatedRobotSessions:              _q.withCreatedRobotSessions.Clone(),
 		withRobotSessionViews:                 _q.withRobotSessionViews.Clone(),
 		withRobotMessages:                     _q.withRobotMessages.Clone(),
+		withRobotSessionInputs:                _q.withRobotSessionInputs.Clone(),
 		withInitiatedRobotTurns:               _q.withInitiatedRobotTurns.Clone(),
 		withAccountRoles:                      _q.withAccountRoles.Clone(),
 		// clone intermediate query.
@@ -1887,6 +1912,17 @@ func (_q *AccountQuery) WithRobotMessages(opts ...func(*RobotSessionMessageQuery
 	return _q
 }
 
+// WithRobotSessionInputs tells the query-builder to eager-load the nodes that are connected to
+// the "robot_session_inputs" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithRobotSessionInputs(opts ...func(*RobotSessionInputQuery)) *AccountQuery {
+	query := (&RobotSessionInputClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRobotSessionInputs = query
+	return _q
+}
+
 // WithInitiatedRobotTurns tells the query-builder to eager-load the nodes that are connected to
 // the "initiated_robot_turns" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithInitiatedRobotTurns(opts ...func(*RobotSessionTurnQuery)) *AccountQuery {
@@ -1987,7 +2023,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [46]bool{
+		loadedTypes = [47]bool{
 			_q.withSessions != nil,
 			_q.withPlugins != nil,
 			_q.withEmails != nil,
@@ -2032,6 +2068,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withCreatedRobotSessions != nil,
 			_q.withRobotSessionViews != nil,
 			_q.withRobotMessages != nil,
+			_q.withRobotSessionInputs != nil,
 			_q.withInitiatedRobotTurns != nil,
 			_q.withAccountRoles != nil,
 		}
@@ -2383,6 +2420,15 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadRobotMessages(ctx, query, nodes,
 			func(n *Account) { n.Edges.RobotMessages = []*RobotSessionMessage{} },
 			func(n *Account, e *RobotSessionMessage) { n.Edges.RobotMessages = append(n.Edges.RobotMessages, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withRobotSessionInputs; query != nil {
+		if err := _q.loadRobotSessionInputs(ctx, query, nodes,
+			func(n *Account) { n.Edges.RobotSessionInputs = []*RobotSessionInput{} },
+			func(n *Account, e *RobotSessionInput) {
+				n.Edges.RobotSessionInputs = append(n.Edges.RobotSessionInputs, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -3818,6 +3864,36 @@ func (_q *AccountQuery) loadRobotMessages(ctx context.Context, query *RobotSessi
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadRobotSessionInputs(ctx context.Context, query *RobotSessionInputQuery, nodes []*Account, init func(*Account), assign func(*Account, *RobotSessionInput)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(robotsessioninput.FieldAccountID)
+	}
+	query.Where(predicate.RobotSessionInput(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.RobotSessionInputsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

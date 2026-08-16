@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_robot_session_message "github.com/Southclaws/storyden/internal/ent/robotsessionmessage"
 )
 
 type MessageID xid.ID
@@ -23,6 +24,7 @@ type Message struct {
 	ID        MessageID
 	CreatedAt time.Time
 	Sequence  uint64
+	Queued    bool
 
 	SessionID      SessionID
 	TurnID         opt.Optional[TurnID]
@@ -93,6 +95,7 @@ func MapMessage(m *ent.RobotSessionMessage) (*Message, error) {
 		ID:             MessageID(m.ID),
 		CreatedAt:      m.CreatedAt,
 		Sequence:       m.Sequence,
+		Queued:         m.EventKind == ent_robot_session_message.EventKindInputQueued && m.TurnID == nil,
 		SessionID:      SessionID(m.SessionID),
 		TurnID:         opt.Map(opt.NewPtr(m.TurnID), func(id xid.ID) TurnID { return TurnID(id) }),
 		InvocationID:   m.InvocationID,
